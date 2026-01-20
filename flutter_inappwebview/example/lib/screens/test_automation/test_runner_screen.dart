@@ -72,7 +72,23 @@ class _TestRunnerScreenState extends State<TestRunnerScreen> {
 
     if (lastConfigJson != null && lastConfigJson.isNotEmpty) {
       try {
-        final config = TestConfiguration.fromJsonString(lastConfigJson);
+        var config = TestConfiguration.fromJsonString(lastConfigJson);
+
+        // Check if we have a fresher version in the manager
+        if (mounted) {
+          final configManager = context.read<TestConfigurationManager>();
+          // Find config by ID in saved configs
+          try {
+            final freshConfig = configManager.savedConfigs.firstWhere(
+              (c) => c.id == config.id,
+            );
+            // Use the fresh configuration from the manager
+            config = freshConfig;
+          } catch (_) {
+            // Not found in saved configs, likely a temporary config or deleted
+          }
+        }
+
         if (mounted) {
           setState(() {
             _customConfiguration = config;

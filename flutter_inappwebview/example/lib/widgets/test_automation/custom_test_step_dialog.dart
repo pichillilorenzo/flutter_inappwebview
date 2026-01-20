@@ -33,7 +33,6 @@ class _CustomTestStepDialogState extends State<CustomTestStepDialog> {
   late final TextEditingController _expectedResultController;
   late final TextEditingController _targetProgressController;
   late final TextEditingController _urlPatternController;
-  late final TextEditingController _timeoutController;
 
   CustomTestActionType _selectedActionType =
       CustomTestActionType.evaluateJavascript;
@@ -91,9 +90,6 @@ class _CustomTestStepDialogState extends State<CustomTestStepDialog> {
     _urlPatternController = TextEditingController(
       text: step?.action.urlPattern ?? '',
     );
-    _timeoutController = TextEditingController(
-      text: step?.action.timeoutMs?.toString() ?? '0',
-    );
 
     if (step != null) {
       _selectedActionType = step.action.type;
@@ -137,7 +133,6 @@ class _CustomTestStepDialogState extends State<CustomTestStepDialog> {
     _expectedResultController.dispose();
     _targetProgressController.dispose();
     _urlPatternController.dispose();
-    _timeoutController.dispose();
     super.dispose();
   }
 
@@ -586,19 +581,6 @@ class _CustomTestStepDialogState extends State<CustomTestStepDialog> {
           helperText: 'Only trigger when URL contains this text',
         ),
       ),
-      const SizedBox(height: 12),
-
-      // Timeout
-      TextField(
-        controller: _timeoutController,
-        decoration: const InputDecoration(
-          labelText: 'Timeout (ms)',
-          border: OutlineInputBorder(),
-          hintText: '1000',
-        ),
-        keyboardType: TextInputType.number,
-        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-      ),
       const SizedBox(height: 8),
       Text(
         _getNavigationEventDescription(_selectedNavigationEvent),
@@ -841,10 +823,9 @@ class _CustomTestStepDialogState extends State<CustomTestStepDialog> {
             params[key] = EnumParameterValueHint<dynamic>(
               typedValue,
               defValue.enumValues,
-              displayName:
-                  displayNameFunc != null
-                      ? (e) => displayNameFunc(e) as String
-                      : null,
+              displayName: displayNameFunc != null
+                  ? (e) => displayNameFunc(e) as String
+                  : null,
             );
           } else {
             params[key] = ParameterValueHint(currentValue, defValue.type);
@@ -1178,7 +1159,6 @@ class _CustomTestStepDialogState extends State<CustomTestStepDialog> {
         return CustomTestAction.delay(delay);
 
       case CustomTestActionType.waitForNavigationEvent:
-        final timeout = int.tryParse(_timeoutController.text) ?? 0;
         final targetProgress = int.tryParse(_targetProgressController.text);
         final urlPattern = _urlPatternController.text.trim();
         return CustomTestAction.waitForNavigationEvent(
@@ -1186,7 +1166,6 @@ class _CustomTestStepDialogState extends State<CustomTestStepDialog> {
           targetProgress: targetProgress,
           progressComparison: _progressComparison,
           urlPattern: urlPattern.isNotEmpty ? urlPattern : null,
-          timeoutMs: timeout,
         );
 
       case CustomTestActionType.custom:

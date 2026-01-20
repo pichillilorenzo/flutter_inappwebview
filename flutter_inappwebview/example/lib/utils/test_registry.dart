@@ -2,6 +2,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import '../models/test_case.dart';
 import '../models/test_result.dart';
 import '../utils/constants.dart';
+import '../utils/support_checker.dart';
 
 /// Central registry for all test cases in the testing interface.
 class TestRegistry {
@@ -428,17 +429,18 @@ class TestRegistry {
     );
   }
 
-  /// Helper to get supported platforms for a method (placeholder implementation).
+  /// Helper to get supported platforms for a method.
   static List<String> _getPlatformsForMethod(String methodName) {
-    // For now, return common platforms. In real implementation,
-    // this would check InAppWebViewController.isMethodSupported()
-    return ['android', 'ios', 'macos', 'windows', 'linux'];
+    return SupportChecker.getSupportedPlatformsForMethod(
+      'InAppWebViewController',
+      methodName,
+    ).map((p) => p.name).toList();
   }
 
-  /// Helper to get supported platforms for a class (placeholder implementation).
+  /// Helper to get supported platforms for a class.
   static List<String> _getPlatformsForClass(String className) {
-    // For now, return common platforms. In real implementation,
-    // this would check the class's isClassSupported() method
-    return ['android', 'ios', 'macos', 'windows', 'linux'];
+    return SupportChecker.getSupportedPlatformsForClass(
+      className,
+    ).map((p) => p.name).toList();
   }
 }

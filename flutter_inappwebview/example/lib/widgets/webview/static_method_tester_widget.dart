@@ -117,7 +117,9 @@ class StaticMethodEntry {
   /// The method type enum - name is derived from this
   final StaticMethodType methodType;
   final String description;
-  final Set<SupportedPlatform> supportedPlatforms;
+
+  /// The class name for looking up support info via SupportChecker
+  final String className;
   final Map<String, dynamic> parameters;
   final List<String> requiredParameters;
   final Future<dynamic> Function(Map<String, dynamic> params) execute;
@@ -125,7 +127,7 @@ class StaticMethodEntry {
   const StaticMethodEntry({
     required this.methodType,
     required this.description,
-    required this.supportedPlatforms,
+    required this.className,
     this.parameters = const {},
     this.requiredParameters = const [],
     required this.execute,
@@ -133,6 +135,10 @@ class StaticMethodEntry {
 
   /// The display name derived from methodType.name
   String get name => methodType.name;
+
+  /// Returns supported platforms using runtime checks via SupportChecker
+  Set<SupportedPlatform> get supportedPlatforms =>
+      SupportChecker.getSupportedPlatformsForMethod(className, name);
 }
 
 /// A class containing static methods
@@ -186,16 +192,6 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
   }
 
   List<StaticMethodClass> _buildStaticMethodClasses() {
-    const mobilePlatforms = {SupportedPlatform.android, SupportedPlatform.ios};
-    const applePlatforms = {SupportedPlatform.ios, SupportedPlatform.macos};
-    const nativePlatforms = {
-      SupportedPlatform.android,
-      SupportedPlatform.ios,
-      SupportedPlatform.macos,
-      SupportedPlatform.windows,
-      SupportedPlatform.linux,
-    };
-
     return [
       // InAppWebViewController static methods
       StaticMethodClass(
@@ -204,11 +200,7 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
           StaticMethodEntry(
             methodType: StaticMethodType.getDefaultUserAgent,
             description: 'Gets the default User-Agent string',
-            supportedPlatforms: {
-              ...mobilePlatforms,
-              SupportedPlatform.macos,
-              SupportedPlatform.windows,
-            },
+            className: 'InAppWebViewController',
             execute: (params) async {
               return await InAppWebViewController.getDefaultUserAgent();
             },
@@ -216,7 +208,7 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
           StaticMethodEntry(
             methodType: StaticMethodType.clearClientCertPreferences,
             description: 'Clears the client certificate preferences',
-            supportedPlatforms: {SupportedPlatform.android},
+            className: 'InAppWebViewController',
             execute: (params) async {
               await InAppWebViewController.clearClientCertPreferences();
               return 'Client cert preferences cleared';
@@ -225,7 +217,7 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
           StaticMethodEntry(
             methodType: StaticMethodType.getSafeBrowsingPrivacyPolicyUrl,
             description: 'Gets the Safe Browsing privacy policy URL',
-            supportedPlatforms: {SupportedPlatform.android},
+            className: 'InAppWebViewController',
             execute: (params) async {
               final url =
                   await InAppWebViewController.getSafeBrowsingPrivacyPolicyUrl();
@@ -235,7 +227,7 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
           StaticMethodEntry(
             methodType: StaticMethodType.setSafeBrowsingAllowlist,
             description: 'Sets the Safe Browsing allowlist',
-            supportedPlatforms: {SupportedPlatform.android},
+            className: 'InAppWebViewController',
             parameters: {'hosts': 'example.com,test.com'},
             requiredParameters: ['hosts'],
             execute: (params) async {
@@ -253,7 +245,7 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
           StaticMethodEntry(
             methodType: StaticMethodType.getCurrentWebViewPackage,
             description: 'Gets the current WebView package info',
-            supportedPlatforms: {SupportedPlatform.android},
+            className: 'InAppWebViewController',
             execute: (params) async {
               final pkg =
                   await InAppWebViewController.getCurrentWebViewPackage();
@@ -264,7 +256,7 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
           StaticMethodEntry(
             methodType: StaticMethodType.setWebContentsDebuggingEnabled,
             description: 'Enables or disables WebView debugging',
-            supportedPlatforms: {SupportedPlatform.android},
+            className: 'InAppWebViewController',
             parameters: {'debuggingEnabled': true},
             requiredParameters: ['debuggingEnabled'],
             execute: (params) async {
@@ -278,7 +270,7 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
           StaticMethodEntry(
             methodType: StaticMethodType.getVariationsHeader,
             description: 'Gets the variations header',
-            supportedPlatforms: {SupportedPlatform.android},
+            className: 'InAppWebViewController',
             execute: (params) async {
               final header = await InAppWebViewController.getVariationsHeader();
               return header ?? 'No variations header';
@@ -287,7 +279,7 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
           StaticMethodEntry(
             methodType: StaticMethodType.isMultiProcessEnabled,
             description: 'Checks if multi-process is enabled',
-            supportedPlatforms: {SupportedPlatform.android},
+            className: 'InAppWebViewController',
             execute: (params) async {
               return await InAppWebViewController.isMultiProcessEnabled();
             },
@@ -295,7 +287,7 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
           StaticMethodEntry(
             methodType: StaticMethodType.disableWebView,
             description: 'Disables the WebView',
-            supportedPlatforms: {SupportedPlatform.android},
+            className: 'InAppWebViewController',
             execute: (params) async {
               await InAppWebViewController.disableWebView();
               return 'WebView disabled';
@@ -304,7 +296,7 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
           StaticMethodEntry(
             methodType: StaticMethodType.handlesURLScheme,
             description: 'Checks if WebView handles a URL scheme',
-            supportedPlatforms: applePlatforms,
+            className: 'InAppWebViewController',
             parameters: {'urlScheme': 'https'},
             requiredParameters: ['urlScheme'],
             execute: (params) async {
@@ -315,7 +307,7 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
           StaticMethodEntry(
             methodType: StaticMethodType.clearAllCache,
             description: 'Clears all WebView caches',
-            supportedPlatforms: nativePlatforms,
+            className: 'InAppWebViewController',
             parameters: {'includeDiskFiles': true},
             execute: (params) async {
               final includeDiskFiles =
@@ -329,7 +321,7 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
           StaticMethodEntry(
             methodType: StaticMethodType.tRexRunnerHtml,
             description: 'Gets the T-Rex Runner game HTML',
-            supportedPlatforms: SupportedPlatform.values.toSet(),
+            className: 'InAppWebViewController',
             execute: (params) async {
               final html = await InAppWebViewController.tRexRunnerHtml;
               if (html.length > 200) {
@@ -341,7 +333,7 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
           StaticMethodEntry(
             methodType: StaticMethodType.tRexRunnerCss,
             description: 'Gets the T-Rex Runner game CSS',
-            supportedPlatforms: SupportedPlatform.values.toSet(),
+            className: 'InAppWebViewController',
             execute: (params) async {
               final css = await InAppWebViewController.tRexRunnerCss;
               if (css.length > 200) {
@@ -360,7 +352,7 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
           StaticMethodEntry(
             methodType: StaticMethodType.openWithSystemBrowser,
             description: 'Opens a URL in the system browser',
-            supportedPlatforms: nativePlatforms,
+            className: 'InAppBrowser',
             parameters: {'url': 'https://flutter.dev'},
             requiredParameters: ['url'],
             execute: (params) async {
@@ -380,7 +372,7 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
             methodType: StaticMethodType.isAvailable,
             description:
                 'Checks if Chrome Custom Tabs / SFSafariViewController is available',
-            supportedPlatforms: {...mobilePlatforms, SupportedPlatform.macos},
+            className: 'ChromeSafariBrowser',
             execute: (params) async {
               return await ChromeSafariBrowser.isAvailable();
             },
@@ -388,7 +380,7 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
           StaticMethodEntry(
             methodType: StaticMethodType.getMaxToolbarItems,
             description: 'Gets the maximum toolbar items (Android only)',
-            supportedPlatforms: {SupportedPlatform.android},
+            className: 'ChromeSafariBrowser',
             execute: (params) async {
               return await ChromeSafariBrowser.getMaxToolbarItems();
             },
@@ -396,7 +388,7 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
           StaticMethodEntry(
             methodType: StaticMethodType.getPackageName,
             description: 'Gets the package name for Custom Tabs (Android only)',
-            supportedPlatforms: {SupportedPlatform.android},
+            className: 'ChromeSafariBrowser',
             execute: (params) async {
               final packageName = await ChromeSafariBrowser.getPackageName();
               return packageName ?? 'No package available';
@@ -405,7 +397,7 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
           StaticMethodEntry(
             methodType: StaticMethodType.clearWebsiteData,
             description: 'Clears website data (Android only)',
-            supportedPlatforms: {SupportedPlatform.android},
+            className: 'ChromeSafariBrowser',
             execute: (params) async {
               await ChromeSafariBrowser.clearWebsiteData();
               return 'Website data cleared';
@@ -414,7 +406,7 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
           StaticMethodEntry(
             methodType: StaticMethodType.prewarmConnections,
             description: 'Prewarms connections (iOS only)',
-            supportedPlatforms: {SupportedPlatform.ios},
+            className: 'ChromeSafariBrowser',
             parameters: {'urls': 'https://flutter.dev,https://dart.dev'},
             requiredParameters: ['urls'],
             execute: (params) async {
@@ -439,7 +431,7 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
           StaticMethodEntry(
             methodType: StaticMethodType.isAvailable,
             description: 'Checks if web authentication is available',
-            supportedPlatforms: applePlatforms,
+            className: 'WebAuthenticationSession',
             execute: (params) async {
               return await WebAuthenticationSession.isAvailable();
             },
@@ -454,7 +446,7 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
           StaticMethodEntry(
             methodType: StaticMethodType.instance,
             description: 'Gets the singleton instance',
-            supportedPlatforms: {SupportedPlatform.android},
+            className: 'ServiceWorkerController',
             execute: (params) async {
               final controller = ServiceWorkerController.instance();
               return 'ServiceWorkerController instance: ${controller.hashCode}';
@@ -470,7 +462,7 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
           StaticMethodEntry(
             methodType: StaticMethodType.isFeatureSupported,
             description: 'Checks if a WebView feature is supported',
-            supportedPlatforms: {SupportedPlatform.android},
+            className: 'WebViewFeature',
             parameters: {'feature': 'WEB_MESSAGE_LISTENER'},
             requiredParameters: ['feature'],
             execute: (params) async {
@@ -486,7 +478,7 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
           StaticMethodEntry(
             methodType: StaticMethodType.isStartupFeatureSupported,
             description: 'Checks if a startup feature is supported',
-            supportedPlatforms: {SupportedPlatform.android},
+            className: 'WebViewFeature',
             parameters: {
               'feature': 'STARTUP_FEATURE_SET_DATA_DIRECTORY_SUFFIX',
             },
@@ -513,7 +505,7 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
           StaticMethodEntry(
             methodType: StaticMethodType.apply,
             description: 'Applies process global config',
-            supportedPlatforms: {SupportedPlatform.android},
+            className: 'ProcessGlobalConfig',
             parameters: {'dataDirectorySuffix': ''},
             execute: (params) async {
               final suffix = params['dataDirectorySuffix']?.toString();
@@ -537,7 +529,7 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
           StaticMethodEntry(
             methodType: StaticMethodType.instance,
             description: 'Gets the singleton instance',
-            supportedPlatforms: SupportedPlatform.values.toSet(),
+            className: 'CookieManager',
             execute: (params) async {
               final manager = CookieManager.instance();
               return 'CookieManager instance: ${manager.hashCode}';
@@ -553,7 +545,7 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
           StaticMethodEntry(
             methodType: StaticMethodType.instance,
             description: 'Gets the singleton instance',
-            supportedPlatforms: {...mobilePlatforms, SupportedPlatform.macos},
+            className: 'HttpAuthCredentialDatabase',
             execute: (params) async {
               final db = HttpAuthCredentialDatabase.instance();
               return 'HttpAuthCredentialDatabase instance: ${db.hashCode}';
@@ -569,7 +561,7 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
           StaticMethodEntry(
             methodType: StaticMethodType.instance,
             description: 'Gets the singleton instance',
-            supportedPlatforms: nativePlatforms,
+            className: 'WebStorageManager',
             execute: (params) async {
               final manager = WebStorageManager.instance();
               return 'WebStorageManager instance: ${manager.hashCode}';

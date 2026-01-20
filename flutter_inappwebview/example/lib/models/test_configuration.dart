@@ -338,9 +338,6 @@ class CustomTestAction {
   /// For waitForNavigationEvent - optional URL pattern to match (regex or contains)
   final String? urlPattern;
 
-  /// For waitForNavigationEvent - timeout in milliseconds (default 0)
-  final int? timeoutMs;
-
   const CustomTestAction({
     required this.type,
     this.script,
@@ -358,7 +355,6 @@ class CustomTestAction {
     this.targetProgress,
     this.progressComparison,
     this.urlPattern,
-    this.timeoutMs,
   });
 
   Map<String, dynamic> toJson() {
@@ -379,7 +375,6 @@ class CustomTestAction {
       'targetProgress': targetProgress,
       'progressComparison': progressComparison,
       'urlPattern': urlPattern,
-      'timeoutMs': timeoutMs,
     };
   }
 
@@ -485,7 +480,6 @@ class CustomTestAction {
       targetProgress: json['targetProgress'] as int?,
       progressComparison: json['progressComparison'] as String?,
       urlPattern: json['urlPattern'] as String?,
-      timeoutMs: json['timeoutMs'] as int?,
     );
   }
 
@@ -579,7 +573,6 @@ class CustomTestAction {
     int? targetProgress,
     String? progressComparison,
     String? urlPattern,
-    int timeoutMs = 0,
   }) {
     return CustomTestAction(
       type: CustomTestActionType.waitForNavigationEvent,
@@ -587,7 +580,6 @@ class CustomTestAction {
       targetProgress: targetProgress,
       progressComparison: progressComparison,
       urlPattern: urlPattern,
-      timeoutMs: timeoutMs,
     );
   }
 

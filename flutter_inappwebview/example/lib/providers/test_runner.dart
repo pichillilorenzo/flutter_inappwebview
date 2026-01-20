@@ -157,6 +157,19 @@ class TestRunner extends ChangeNotifier {
   /// Controller for headless WebView
   InAppWebViewController? _headlessController;
 
+  // Event StreamControllers for listening to WebView events
+  final _onLoadStopController = StreamController<WebUri?>.broadcast();
+  final _onLoadStartController = StreamController<WebUri?>.broadcast();
+  final _onProgressChangedController = StreamController<int>.broadcast();
+  final _onPageCommitVisibleController = StreamController<WebUri?>.broadcast();
+  final _onTitleChangedController = StreamController<String?>.broadcast();
+  final _onUpdateVisitedHistoryController =
+      StreamController<WebUri?>.broadcast();
+
+  // Store target progress for onProgressChanged event filtering
+  int _targetProgress = 100;
+  String _progressComparison = 'greaterThanOrEquals';
+
   // Getters
   TestStatus get status => _status;
   List<ExtendedTestResult> get results => List.unmodifiable(_results);
@@ -216,10 +229,26 @@ class TestRunner extends ChangeNotifier {
       onWebViewCreated: (controller) {
         _headlessController = controller;
       },
+      onLoadStart: (controller, url) {
+        _onLoadStartController.add(url);
+      },
       onLoadStop: (controller, url) {
+        _onLoadStopController.add(url);
         if (!completer.isCompleted) {
           completer.complete();
         }
+      },
+      onProgressChanged: (controller, progress) {
+        _onProgressChangedController.add(progress);
+      },
+      onPageCommitVisible: (controller, url) {
+        _onPageCommitVisibleController.add(url);
+      },
+      onTitleChanged: (controller, title) {
+        _onTitleChangedController.add(title);
+      },
+      onUpdateVisitedHistory: (controller, url, isReload) {
+        _onUpdateVisitedHistoryController.add(url);
       },
     );
 
@@ -553,117 +582,48 @@ class TestRunner extends ChangeNotifier {
       throw Exception('Navigation event type not specified');
     }
 
-    final timeout = action.timeoutMs ?? 0;
-    final startTime = DateTime.now();
-
-    // This is a simplified implementation. In a real implementation,
-    // you would need to attach event listeners to the WebView.
-    // For now, we'll use polling with evaluateJavascript for some events.
+    // Use broadcast streams to listen for the next event
+    // .first will return the next value published to the stream
     switch (event) {
       case NavigationEventType.onLoadStop:
-        // Wait for document.readyState to be 'complete'
-        while (DateTime.now().difference(startTime).inMilliseconds < timeout) {
-          final readyState = await controller.evaluateJavascript(
-            source: 'document.readyState',
-          );
-          if (readyState == 'complete') {
-            return 'onLoadStop triggered - document ready';
-          }
-          await Future.delayed(const Duration(milliseconds: 100));
-        }
-        throw Exception('Timeout waiting for onLoadStop');
+        final url = await _onLoadStopController.stream.first;
+        return 'onLoadStop triggered - loaded: $url';
 
       case NavigationEventType.onLoadStart:
-        // For onLoadStart, we check if navigation has begun
-        final initialUrl = await controller.getUrl();
-        while (DateTime.now().difference(startTime).inMilliseconds < timeout) {
-          final currentUrl = await controller.getUrl();
-          if (currentUrl != initialUrl) {
-            return 'onLoadStart triggered - navigation started to $currentUrl';
-          }
-          await Future.delayed(const Duration(milliseconds: 50));
-        }
-        return 'onLoadStart - no navigation detected within timeout';
+        final url = await _onLoadStartController.stream.first;
+        return 'onLoadStart triggered - navigation started to $url';
 
       case NavigationEventType.onProgressChanged:
-        final targetProgress = action.targetProgress ?? 100;
-        final comparison = action.progressComparison ?? 'greaterThanOrEquals';
-
-        while (DateTime.now().difference(startTime).inMilliseconds < timeout) {
-          // Get progress via JavaScript
-          final progress = await controller.evaluateJavascript(
-            source: '''
-              (function() {
-                if (document.readyState === 'complete') return 100;
-                if (document.readyState === 'interactive') return 90;
-                if (document.readyState === 'loading') return 50;
-                return 0;
-              })()
-            ''',
-          );
-
-          final currentProgress = (progress is num) ? progress.toInt() : 0;
-
-          bool matches;
-          switch (comparison) {
+        _targetProgress = action.targetProgress ?? 100;
+        _progressComparison =
+            action.progressComparison ?? 'greaterThanOrEquals';
+        // Filter the stream to only get progress values that match the condition
+        final progress = await _onProgressChangedController.stream.firstWhere((
+          progress,
+        ) {
+          switch (_progressComparison) {
             case 'equals':
-              matches = currentProgress == targetProgress;
-              break;
+              return progress == _targetProgress;
             case 'greaterThan':
-              matches = currentProgress > targetProgress;
-              break;
+              return progress > _targetProgress;
             case 'greaterThanOrEquals':
             default:
-              matches = currentProgress >= targetProgress;
-              break;
+              return progress >= _targetProgress;
           }
-
-          if (matches) {
-            return 'onProgressChanged reached $currentProgress (target: $comparison $targetProgress)';
-          }
-          await Future.delayed(const Duration(milliseconds: 100));
-        }
-        throw Exception(
-          'Timeout waiting for onProgressChanged to reach $comparison $targetProgress',
-        );
+        });
+        return 'onProgressChanged reached $progress (target: $_progressComparison $_targetProgress)';
 
       case NavigationEventType.onPageCommitVisible:
-        // Wait for first paint / visible content
-        while (DateTime.now().difference(startTime).inMilliseconds < timeout) {
-          final hasContent = await controller.evaluateJavascript(
-            source: '''
-              document.body && document.body.innerHTML.length > 0
-            ''',
-          );
-          if (hasContent == true || hasContent == 'true') {
-            return 'onPageCommitVisible triggered - page content visible';
-          }
-          await Future.delayed(const Duration(milliseconds: 50));
-        }
-        throw Exception('Timeout waiting for onPageCommitVisible');
+        final url = await _onPageCommitVisibleController.stream.first;
+        return 'onPageCommitVisible triggered - page visible: $url';
 
       case NavigationEventType.onTitleChanged:
-        final initialTitle = await controller.getTitle();
-        while (DateTime.now().difference(startTime).inMilliseconds < timeout) {
-          final currentTitle = await controller.getTitle();
-          if (currentTitle != initialTitle &&
-              currentTitle?.isNotEmpty == true) {
-            return 'onTitleChanged triggered - title changed to: $currentTitle';
-          }
-          await Future.delayed(const Duration(milliseconds: 100));
-        }
-        return 'onTitleChanged - no title change detected within timeout';
+        final title = await _onTitleChangedController.stream.first;
+        return 'onTitleChanged triggered - title changed to: $title';
 
       case NavigationEventType.onUpdateVisitedHistory:
-        final initialUrl = await controller.getUrl();
-        while (DateTime.now().difference(startTime).inMilliseconds < timeout) {
-          final currentUrl = await controller.getUrl();
-          if (currentUrl != initialUrl) {
-            return 'onUpdateVisitedHistory triggered - URL changed to: $currentUrl';
-          }
-          await Future.delayed(const Duration(milliseconds: 100));
-        }
-        return 'onUpdateVisitedHistory - no URL change detected within timeout';
+        final url = await _onUpdateVisitedHistoryController.stream.first;
+        return 'onUpdateVisitedHistory triggered - URL changed to: $url';
     }
   }
 

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:ui';
 
+import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import '../models/test_configuration.dart';
@@ -154,8 +155,17 @@ class TestRunner extends ChangeNotifier {
   /// Headless WebView instance (when using headless mode)
   HeadlessInAppWebView? _headlessWebView;
 
-  /// Controller for headless WebView
-  InAppWebViewController? _headlessController;
+  /// Controller for WebView (both headless and visible)
+  InAppWebViewController? _webViewController;
+
+  /// Whether the WebView is ready
+  bool _webViewReady = false;
+
+  /// Key to force WebView recreation
+  Key _webViewKey = UniqueKey();
+
+  /// Initial URL for the WebView
+  String _initialUrl = 'about:blank';
 
   // Event StreamControllers for listening to WebView events
   final _onLoadStopController = StreamController<WebUri?>.broadcast();
@@ -185,7 +195,9 @@ class TestRunner extends ChangeNotifier {
   TestWebViewType get webViewType => _webViewType;
   bool get isUsingHeadless => _webViewType == TestWebViewType.headless;
   HeadlessInAppWebView? get headlessWebView => _headlessWebView;
-  InAppWebViewController? get headlessController => _headlessController;
+  InAppWebViewController? get webViewController => _webViewController;
+  bool get webViewReady => _webViewReady;
+  Key get webViewKey => _webViewKey;
 
   Duration get elapsedTime {
     if (_startTime == null) return Duration.zero;
@@ -201,14 +213,78 @@ class TestRunner extends ChangeNotifier {
 
   /// Set the WebView type to use for testing
   void setWebViewType(TestWebViewType type) {
-    _webViewType = type;
-    notifyListeners();
+    if (_webViewType != type) {
+      _webViewType = type;
+      _webViewReady = false;
+      _webViewController = null;
+      _webViewKey = UniqueKey();
+      notifyListeners();
+    }
   }
 
   /// Set the test configuration to use
   void setConfiguration(TestConfiguration? config) {
     _currentConfiguration = config;
+    if (config != null) {
+      _webViewType = config.webViewType;
+      _initialUrl = config.initialUrl ?? 'about:blank';
+    }
+    _webViewReady = false;
+    _webViewController = null;
+    _webViewKey = UniqueKey();
     notifyListeners();
+  }
+
+  /// Set the initial URL for the WebView
+  void setInitialUrl(String url) {
+    _initialUrl = url;
+    notifyListeners();
+  }
+
+  /// Recreate the WebView (forces a new key)
+  void recreateWebView() {
+    _webViewReady = false;
+    _webViewController = null;
+    _webViewKey = UniqueKey();
+    notifyListeners();
+  }
+
+  /// Build the InAppWebView widget for visible mode
+  /// This should be used by the UI to display the WebView
+  Widget buildInAppWebView({double? width, double? height}) {
+    return InAppWebView(
+      key: _webViewKey,
+      initialUrlRequest: URLRequest(
+        url: WebUri(_currentConfiguration?.initialUrl ?? _initialUrl),
+      ),
+      initialSettings: InAppWebViewSettings(javaScriptEnabled: true),
+      onWebViewCreated: (controller) {
+        _webViewController = controller;
+        notifyListeners();
+      },
+      onLoadStart: (controller, url) {
+        _onLoadStartController.add(url);
+      },
+      onLoadStop: (controller, url) {
+        _onLoadStopController.add(url);
+        if (!_webViewReady) {
+          _webViewReady = true;
+          notifyListeners();
+        }
+      },
+      onProgressChanged: (controller, progress) {
+        _onProgressChangedController.add(progress);
+      },
+      onPageCommitVisible: (controller, url) {
+        _onPageCommitVisibleController.add(url);
+      },
+      onTitleChanged: (controller, title) {
+        _onTitleChangedController.add(title);
+      },
+      onUpdateVisitedHistory: (controller, url, isReload) {
+        _onUpdateVisitedHistoryController.add(url);
+      },
+    );
   }
 
   /// Initialize headless WebView for testing
@@ -224,10 +300,11 @@ class TestRunner extends ChangeNotifier {
     final completer = Completer<void>();
 
     _headlessWebView = HeadlessInAppWebView(
-      initialUrlRequest: URLRequest(url: WebUri(initialUrl ?? 'about:blank')),
+      initialUrlRequest: URLRequest(url: WebUri(initialUrl ?? _initialUrl)),
       initialSize: Size(width ?? 1920, height ?? 1080),
       onWebViewCreated: (controller) {
-        _headlessController = controller;
+        _webViewController = controller;
+        notifyListeners();
       },
       onLoadStart: (controller, url) {
         _onLoadStartController.add(url);
@@ -236,6 +313,10 @@ class TestRunner extends ChangeNotifier {
         _onLoadStopController.add(url);
         if (!completer.isCompleted) {
           completer.complete();
+        }
+        if (!_webViewReady) {
+          _webViewReady = true;
+          notifyListeners();
         }
       },
       onProgressChanged: (controller, progress) {
@@ -260,6 +341,7 @@ class TestRunner extends ChangeNotifier {
       onTimeout: () {},
     );
 
+    _webViewReady = true;
     notifyListeners();
   }
 
@@ -268,20 +350,18 @@ class TestRunner extends ChangeNotifier {
     if (_headlessWebView != null) {
       await _headlessWebView!.dispose();
       _headlessWebView = null;
-      _headlessController = null;
+      _webViewController = null;
+      _webViewReady = false;
       notifyListeners();
     }
   }
 
   /// Run tests from a custom configuration
-  Future<void> runConfiguration(
-    TestConfiguration config,
-    InAppWebViewController? controller,
-  ) async {
+  Future<void> runConfiguration(TestConfiguration config) async {
     _currentConfiguration = config;
+    _webViewType = config.webViewType;
 
     // Get appropriate controller based on WebView type
-    InAppWebViewController? testController = controller;
     if (config.webViewType == TestWebViewType.headless) {
       // Always recreate headless WebView to ensure fresh state and correct size
       await initializeHeadlessWebView(
@@ -289,12 +369,24 @@ class TestRunner extends ChangeNotifier {
         width: config.headlessWidth,
         height: config.headlessHeight,
       );
-      testController = _headlessController;
     }
 
     // Run custom steps if any
     if (config.customSteps.isNotEmpty) {
-      await _runCustomSteps(config.customSteps, testController);
+      await _runCustomSteps(config.customSteps, _webViewController);
+    }
+  }
+
+  /// Run tests using the current WebView state
+  /// Call this after ensuring the WebView is ready
+  Future<void> runConfigurationWithCurrentWebView(
+    TestConfiguration config,
+  ) async {
+    _currentConfiguration = config;
+
+    // Run custom steps if any
+    if (config.customSteps.isNotEmpty) {
+      await _runCustomSteps(config.customSteps, _webViewController);
     }
   }
 
@@ -635,54 +727,42 @@ class TestRunner extends ChangeNotifier {
   }
 
   /// Run all tests for a specific category
-  Future<void> runCategoryTests(
-    TestCategory category,
-    InAppWebViewController? controller,
-  ) async {
+  Future<void> runCategoryTests(TestCategory category) async {
     final categoryGroup = getTestCategories().firstWhere(
       (g) => g.category == category,
       orElse: () => throw Exception('Category not found'),
     );
 
-    await _runTests(categoryGroup.tests, controller);
+    await _runTests(categoryGroup.tests, _webViewController);
   }
 
   /// Run all tests across all categories
-  Future<void> runAllTests(InAppWebViewController? controller) async {
+  Future<void> runAllTests() async {
     final allTests = <ExecutableTestCase>[];
     for (final category in getTestCategories()) {
       allTests.addAll(category.tests);
     }
-    await _runTests(allTests, controller);
+    await _runTests(allTests, _webViewController);
   }
 
   /// Run selected tests
-  Future<void> runSelectedTests(
-    List<ExecutableTestCase> tests,
-    InAppWebViewController? controller,
-  ) async {
-    await _runTests(tests, controller);
+  Future<void> runSelectedTests(List<ExecutableTestCase> tests) async {
+    await _runTests(tests, _webViewController);
   }
 
   /// Run tests from selected categories
-  Future<void> runSelectedCategories(
-    List<TestCategory> categories,
-    InAppWebViewController? controller,
-  ) async {
+  Future<void> runSelectedCategories(List<TestCategory> categories) async {
     final tests = <ExecutableTestCase>[];
     for (final category in getTestCategories()) {
       if (categories.contains(category.category)) {
         tests.addAll(category.tests);
       }
     }
-    await _runTests(tests, controller);
+    await _runTests(tests, _webViewController);
   }
 
   /// Run a single test
-  Future<ExtendedTestResult> runSingleTest(
-    ExecutableTestCase testCase,
-    InAppWebViewController? controller,
-  ) async {
+  Future<ExtendedTestResult> runSingleTest(ExecutableTestCase testCase) async {
     _status = TestStatus.running;
     _currentTest = testCase.title;
     _progress = 0;
@@ -690,7 +770,7 @@ class TestRunner extends ChangeNotifier {
     _startTime = DateTime.now();
     notifyListeners();
 
-    final result = await _executeTest(testCase, controller);
+    final result = await _executeTest(testCase, _webViewController);
     _results = [result];
 
     _status = TestStatus.completed;
@@ -703,7 +783,7 @@ class TestRunner extends ChangeNotifier {
   }
 
   /// Re-run failed tests
-  Future<void> rerunFailedTests(InAppWebViewController? controller) async {
+  Future<void> rerunFailedTests() async {
     final failedTestIds = _results
         .where((r) => !r.success && !r.skipped)
         .map((r) => r.testId)
@@ -721,7 +801,7 @@ class TestRunner extends ChangeNotifier {
     // Remove old failed results
     _results = _results.where((r) => r.success || r.skipped).toList();
 
-    await _runTests(failedTests, controller, append: true);
+    await _runTests(failedTests, _webViewController, append: true);
   }
 
   Future<void> _runTests(

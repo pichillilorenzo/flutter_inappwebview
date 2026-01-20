@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -22,19 +21,11 @@ class _TestRunnerScreenState extends State<TestRunnerScreen> {
   static const String _lastConfigKey = 'test_runner_last_config';
   static const String _lastWebViewTypeKey = 'test_runner_last_webview_type';
 
-  InAppWebViewController? _webViewController;
   final Set<TestCategory> _selectedCategories = {};
   ResultFilter _resultFilter = ResultFilter.all;
-  bool _webViewReady = false;
 
   // Custom configuration support
   TestConfiguration? _customConfiguration;
-
-  // WebView type
-  TestWebViewType _webViewType = TestWebViewType.inAppWebView;
-
-  // Key to force WebView recreation when configuration changes
-  Key _webViewKey = UniqueKey();
 
   // Flag to prevent loading config multiple times
   bool _configLoaded = false;
@@ -58,16 +49,14 @@ class _TestRunnerScreenState extends State<TestRunnerScreen> {
     final lastConfigJson = prefs.getString(_lastConfigKey);
     final lastWebViewType = prefs.getString(_lastWebViewTypeKey);
 
+    final runner = context.read<TestRunner>();
+
     if (lastWebViewType != null) {
       final webViewType = TestWebViewType.values.firstWhere(
         (e) => e.name == lastWebViewType,
         orElse: () => TestWebViewType.inAppWebView,
       );
-      if (mounted) {
-        setState(() {
-          _webViewType = webViewType;
-        });
-      }
+      runner.setWebViewType(webViewType);
     }
 
     if (lastConfigJson != null && lastConfigJson.isNotEmpty) {
@@ -92,9 +81,8 @@ class _TestRunnerScreenState extends State<TestRunnerScreen> {
         if (mounted) {
           setState(() {
             _customConfiguration = config;
-            _webViewType = config.webViewType;
-            _webViewKey = UniqueKey();
           });
+          runner.setConfiguration(config);
         }
       } catch (e) {
         debugPrint('Failed to load last configuration: $e');
@@ -104,6 +92,7 @@ class _TestRunnerScreenState extends State<TestRunnerScreen> {
 
   Future<void> _saveLastConfiguration() async {
     final prefs = await SharedPreferences.getInstance();
+    final runner = context.read<TestRunner>();
     if (_customConfiguration != null) {
       await prefs.setString(
         _lastConfigKey,
@@ -112,7 +101,7 @@ class _TestRunnerScreenState extends State<TestRunnerScreen> {
     } else {
       await prefs.remove(_lastConfigKey);
     }
-    await prefs.setString(_lastWebViewTypeKey, _webViewType.name);
+    await prefs.setString(_lastWebViewTypeKey, runner.webViewType.name);
   }
 
   @override
@@ -154,46 +143,50 @@ class _TestRunnerScreenState extends State<TestRunnerScreen> {
         ],
       ),
       drawer: buildDrawer(context: context),
-      body: Column(
-        children: [
-          if (_customConfiguration != null) _buildConfigurationBanner(),
-          // Only show category selector when no custom configuration is loaded
-          if (_customConfiguration == null) _buildCategorySelector(),
-          _buildWebViewTypeSelector(),
-          _buildControlBar(),
-          _buildProgressSection(),
-          _buildFilterBar(),
-          Expanded(
-            child: Row(
-              children: [
-                // WebView for testing (visible or hidden based on type)
-                if (_webViewType == TestWebViewType.inAppWebView)
-                  Expanded(
-                    flex: 1,
-                    child: Container(
-                      margin: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey.shade300),
-                        borderRadius: BorderRadius.circular(8),
+      body: Consumer<TestRunner>(
+        builder: (context, runner, child) {
+          return Column(
+            children: [
+              if (_customConfiguration != null) _buildConfigurationBanner(),
+              // Only show category selector when no custom configuration is loaded
+              if (_customConfiguration == null) _buildCategorySelector(),
+              _buildWebViewTypeSelector(),
+              _buildControlBar(),
+              _buildProgressSection(),
+              _buildFilterBar(),
+              Expanded(
+                child: Row(
+                  children: [
+                    // WebView for testing (visible or hidden based on type)
+                    if (runner.webViewType == TestWebViewType.inAppWebView)
+                      Expanded(
+                        flex: 1,
+                        child: Container(
+                          margin: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey.shade300),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: _buildVisibleWebView(runner),
+                          ),
+                        ),
                       ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: _buildVisibleWebView(),
-                      ),
+                    // Results list
+                    Expanded(
+                      flex: runner.webViewType == TestWebViewType.inAppWebView
+                          ? 1
+                          : 2,
+                      child: _buildResultsList(),
                     ),
-                  )
-                else
-                  SizedBox(width: 1, height: 1, child: _buildHiddenWebView()),
-                // Results list
-                Expanded(
-                  flex: _webViewType == TestWebViewType.inAppWebView ? 1 : 2,
-                  child: _buildResultsList(),
+                  ],
                 ),
-              ],
-            ),
-          ),
-          _buildSummaryBar(),
-        ],
+              ),
+              _buildSummaryBar(),
+            ],
+          );
+        },
       ),
     );
   }
@@ -283,6 +276,7 @@ class _TestRunnerScreenState extends State<TestRunnerScreen> {
   }
 
   Widget _buildConfigurationBanner() {
+    final runner = context.read<TestRunner>();
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -315,10 +309,9 @@ class _TestRunnerScreenState extends State<TestRunnerScreen> {
             onPressed: () {
               setState(() {
                 _customConfiguration = null;
-                _webViewReady = false;
-                _webViewController = null;
-                _webViewKey = UniqueKey();
               });
+              runner.setConfiguration(null);
+              runner.setInitialUrl('https://flutter.dev');
               // Clear saved configuration
               _saveLastConfiguration();
             },
@@ -329,53 +322,55 @@ class _TestRunnerScreenState extends State<TestRunnerScreen> {
   }
 
   Widget _buildWebViewTypeSelector() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border(bottom: BorderSide(color: Colors.grey.shade200)),
-      ),
-      child: Row(
-        children: [
-          const Text('WebView Mode: '),
-          const SizedBox(width: 8),
-          SegmentedButton<TestWebViewType>(
-            segments: const [
-              ButtonSegment(
-                value: TestWebViewType.inAppWebView,
-                label: Text('Visible'),
-                icon: Icon(Icons.visibility, size: 18),
-              ),
-              ButtonSegment(
-                value: TestWebViewType.headless,
-                label: Text('Headless'),
-                icon: Icon(Icons.visibility_off, size: 18),
-              ),
-            ],
-            selected: {_webViewType},
-            onSelectionChanged: (selection) {
-              setState(() {
-                _webViewType = selection.first;
-                _webViewReady = false;
-              });
-            },
+    return Consumer<TestRunner>(
+      builder: (context, runner, child) {
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border(bottom: BorderSide(color: Colors.grey.shade200)),
           ),
-          const Spacer(),
-          if (_webViewType == TestWebViewType.inAppWebView)
-            Text(
-              'Real-time rendering enabled',
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.green.shade700,
-                fontStyle: FontStyle.italic,
+          child: Row(
+            children: [
+              const Text('WebView Mode: '),
+              const SizedBox(width: 8),
+              SegmentedButton<TestWebViewType>(
+                segments: const [
+                  ButtonSegment(
+                    value: TestWebViewType.inAppWebView,
+                    label: Text('Visible'),
+                    icon: Icon(Icons.visibility, size: 18),
+                  ),
+                  ButtonSegment(
+                    value: TestWebViewType.headless,
+                    label: Text('Headless'),
+                    icon: Icon(Icons.visibility_off, size: 18),
+                  ),
+                ],
+                selected: {runner.webViewType},
+                onSelectionChanged: (selection) {
+                  runner.setWebViewType(selection.first);
+                  _saveLastConfiguration();
+                },
               ),
-            ),
-        ],
-      ),
+              const Spacer(),
+              if (runner.webViewType == TestWebViewType.inAppWebView)
+                Text(
+                  'Real-time rendering enabled',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.green.shade700,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+            ],
+          ),
+        );
+      },
     );
   }
 
-  Widget _buildVisibleWebView() {
+  Widget _buildVisibleWebView(TestRunner runner) {
     return Column(
       children: [
         Container(
@@ -387,7 +382,7 @@ class _TestRunnerScreenState extends State<TestRunnerScreen> {
               const SizedBox(width: 4),
               const Text('WebView Preview', style: TextStyle(fontSize: 12)),
               const Spacer(),
-              if (_webViewReady)
+              if (runner.webViewReady)
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 6,
@@ -411,27 +406,7 @@ class _TestRunnerScreenState extends State<TestRunnerScreen> {
             ],
           ),
         ),
-        Expanded(
-          child: InAppWebView(
-            key: _webViewKey,
-            initialUrlRequest: URLRequest(
-              url: WebUri(
-                _customConfiguration?.initialUrl ?? 'https://flutter.dev',
-              ),
-            ),
-            initialSettings: InAppWebViewSettings(javaScriptEnabled: true),
-            onWebViewCreated: (controller) {
-              _webViewController = controller;
-            },
-            onLoadStop: (controller, url) {
-              if (!_webViewReady) {
-                setState(() {
-                  _webViewReady = true;
-                });
-              }
-            },
-          ),
-        ),
+        Expanded(child: runner.buildInAppWebView()),
       ],
     );
   }
@@ -439,6 +414,7 @@ class _TestRunnerScreenState extends State<TestRunnerScreen> {
   void _showConfigurationDialog() {
     final configManager = context.read<TestConfigurationManager>();
     final savedConfigs = configManager.savedConfigs;
+    final runner = context.read<TestRunner>();
 
     showDialog(
       context: context,
@@ -524,10 +500,9 @@ class _TestRunnerScreenState extends State<TestRunnerScreen> {
                     Navigator.pop(dialogContext);
                     setState(() {
                       _customConfiguration = null;
-                      _webViewReady = false;
-                      _webViewController = null;
-                      _webViewKey = UniqueKey();
                     });
+                    runner.setConfiguration(null);
+                    runner.setInitialUrl('https://flutter.dev');
                     // Clear saved configuration
                     _saveLastConfiguration();
                   },
@@ -547,14 +522,11 @@ class _TestRunnerScreenState extends State<TestRunnerScreen> {
   }
 
   void _loadConfiguration(TestConfiguration config) {
+    final runner = context.read<TestRunner>();
     setState(() {
       _customConfiguration = config;
-      _webViewType = config.webViewType;
-      _webViewReady = false;
-      _webViewController = null;
-      // Force WebView recreation with new key
-      _webViewKey = UniqueKey();
     });
+    runner.setConfiguration(config);
     // Save as last configuration
     _saveLastConfiguration();
     ScaffoldMessenger.of(context).showSnackBar(
@@ -653,7 +625,8 @@ class _TestRunnerScreenState extends State<TestRunnerScreen> {
                   onPressed: _rerunFailedTests,
                 ),
               const Spacer(),
-              if (!_webViewReady)
+              if (!runner.webViewReady &&
+                  runner.webViewType == TestWebViewType.inAppWebView)
                 const Chip(
                   avatar: SizedBox(
                     width: 16,
@@ -662,14 +635,21 @@ class _TestRunnerScreenState extends State<TestRunnerScreen> {
                   ),
                   label: Text('WebView loading...'),
                 ),
-              if (_webViewReady)
-                const Chip(
+              if (runner.webViewReady ||
+                  runner.webViewType == TestWebViewType.headless)
+                Chip(
                   avatar: Icon(
-                    Icons.check_circle,
+                    runner.webViewType == TestWebViewType.headless
+                        ? Icons.visibility_off
+                        : Icons.check_circle,
                     color: Colors.green,
                     size: 18,
                   ),
-                  label: Text('WebView ready'),
+                  label: Text(
+                    runner.webViewType == TestWebViewType.headless
+                        ? 'Headless mode'
+                        : 'WebView ready',
+                  ),
                 ),
             ],
           ),
@@ -1002,26 +982,6 @@ class _TestRunnerScreenState extends State<TestRunnerScreen> {
     );
   }
 
-  Widget _buildHiddenWebView() {
-    return InAppWebView(
-      key: _webViewKey,
-      initialUrlRequest: URLRequest(
-        url: WebUri(_customConfiguration?.initialUrl ?? 'https://flutter.dev'),
-      ),
-      initialSettings: InAppWebViewSettings(javaScriptEnabled: true),
-      onWebViewCreated: (controller) {
-        _webViewController = controller;
-      },
-      onLoadStop: (controller, url) {
-        if (!_webViewReady) {
-          setState(() {
-            _webViewReady = true;
-          });
-        }
-      },
-    );
-  }
-
   List<ExtendedTestResult> _filterResults(List<ExtendedTestResult> results) {
     switch (_resultFilter) {
       case ResultFilter.passed:
@@ -1035,78 +995,102 @@ class _TestRunnerScreenState extends State<TestRunnerScreen> {
     }
   }
 
-  /// Recreates the WebView widget and waits for it to be ready before executing the callback.
-  /// This ensures a fresh WebView state for each test run.
-  void _recreateWebViewAndRun(void Function() onReady) {
-    // Reset WebView state
-    setState(() {
-      _webViewReady = false;
-      _webViewController = null;
-      _webViewKey = UniqueKey();
-    });
+  /// Waits for the WebView to be ready (for visible mode) or initializes headless WebView
+  Future<void> _ensureWebViewReady() async {
+    final runner = context.read<TestRunner>();
 
-    // Wait for the WebView to be ready, then execute callback
-    void waitForReady() {
-      if (_webViewReady && _webViewController != null) {
-        onReady();
-      } else {
-        // Check again after a short delay
-        Future.delayed(const Duration(milliseconds: 100), () {
-          if (mounted) {
-            waitForReady();
-          }
-        });
+    if (runner.webViewType == TestWebViewType.headless) {
+      // For headless mode, initialize the headless WebView
+      await runner.initializeHeadlessWebView(
+        initialUrl: _customConfiguration?.initialUrl ?? 'https://flutter.dev',
+        width: _customConfiguration?.headlessWidth,
+        height: _customConfiguration?.headlessHeight,
+      );
+    } else {
+      // For visible mode, recreate the WebView and wait for it to be ready
+      runner.recreateWebView();
+
+      // Wait for the WebView to be ready
+      int attempts = 0;
+      while (!runner.webViewReady && attempts < 100) {
+        await Future.delayed(const Duration(milliseconds: 100));
+        attempts++;
+      }
+
+      if (!runner.webViewReady) {
+        throw Exception('WebView failed to initialize within timeout');
       }
     }
-
-    // Start waiting after the next frame (to allow widget rebuild)
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      waitForReady();
-    });
   }
 
-  void _runSelectedTests() {
+  void _runSelectedTests() async {
     final runner = context.read<TestRunner>();
 
-    // Recreate WebView and run tests once ready
-    _recreateWebViewAndRun(() {
+    try {
+      await _ensureWebViewReady();
+
       // If a custom configuration is loaded, run its custom steps
       if (_customConfiguration != null &&
           _customConfiguration!.customSteps.isNotEmpty) {
-        runner.runConfiguration(_customConfiguration!, _webViewController);
+        await runner.runConfigurationWithCurrentWebView(_customConfiguration!);
       } else {
         // Otherwise run built-in category tests
-        runner.runSelectedCategories(
-          _selectedCategories.toList(),
-          _webViewController,
+        await runner.runSelectedCategories(_selectedCategories.toList());
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to run tests: $e'),
+            backgroundColor: Colors.red,
+          ),
         );
       }
-    });
+    }
   }
 
-  void _runAllTests() {
+  void _runAllTests() async {
     final runner = context.read<TestRunner>();
 
-    // Recreate WebView and run tests once ready
-    _recreateWebViewAndRun(() {
+    try {
+      await _ensureWebViewReady();
+
       // If a custom configuration is loaded, run its custom steps
       if (_customConfiguration != null &&
           _customConfiguration!.customSteps.isNotEmpty) {
-        runner.runConfiguration(_customConfiguration!, _webViewController);
+        await runner.runConfigurationWithCurrentWebView(_customConfiguration!);
       } else {
         // Otherwise run all built-in category tests
-        runner.runAllTests(_webViewController);
+        await runner.runAllTests();
       }
-    });
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to run tests: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
-  void _rerunFailedTests() {
+  void _rerunFailedTests() async {
     final runner = context.read<TestRunner>();
 
-    // Recreate WebView and run failed tests once ready
-    _recreateWebViewAndRun(() {
-      runner.rerunFailedTests(_webViewController);
-    });
+    try {
+      await _ensureWebViewReady();
+      await runner.rerunFailedTests();
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to re-run tests: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
   void _handleMenuAction(String action) {

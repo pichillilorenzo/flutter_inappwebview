@@ -303,9 +303,7 @@ class _SettingsEditorScreenState extends State<SettingsEditorScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: isModified
-            ? Colors.orange.shade50
-            : (!isCurrentPlatformSupported ? Colors.grey.shade50 : null),
+        color: isModified ? Colors.orange.shade50 : null,
         border: Border(bottom: BorderSide(color: Colors.grey.shade200)),
       ),
       child: Column(

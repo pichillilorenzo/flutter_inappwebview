@@ -7,6 +7,8 @@ import 'package:flutter_inappwebview_example/models/webview_environment_profile.
 import 'package:flutter_inappwebview_example/utils/platform_utils.dart';
 import 'package:flutter_inappwebview_example/widgets/common/app_drawer.dart';
 
+import '../utils/support_checker.dart';
+
 /// Comprehensive settings editor for WebViewEnvironmentSettings
 /// Used to configure WebView2 (Windows) and WPE WebKit (Linux) environments
 class WebViewEnvironmentSettingsEditorScreen extends StatefulWidget {

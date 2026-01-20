@@ -73,6 +73,9 @@ class ExecutableTestCase {
   final TestCategory category;
   final Future<TestResult> Function(InAppWebViewController? controller) execute;
   final List<String> supportedPlatforms;
+  final dynamic supportedMethod;
+  final bool Function(dynamic method, {TargetPlatform? platform})?
+  isMethodSupported;
 
   const ExecutableTestCase({
     required this.id,
@@ -88,9 +91,18 @@ class ExecutableTestCase {
       'linux',
       'web',
     ],
+    this.supportedMethod,
+    this.isMethodSupported,
   });
 
   bool isSupportedOnCurrentPlatform() {
+    if (isMethodSupported != null && supportedMethod != null) {
+      return isMethodSupported!(
+        supportedMethod,
+        platform: _getCurrentTargetPlatform(),
+      );
+    }
+
     final currentPlatform = _getCurrentPlatform();
     return supportedPlatforms.contains(currentPlatform);
   }
@@ -111,6 +123,11 @@ class ExecutableTestCase {
       default:
         return 'unknown';
     }
+  }
+
+  static TargetPlatform? _getCurrentTargetPlatform() {
+    if (kIsWeb) return null;
+    return defaultTargetPlatform;
   }
 }
 

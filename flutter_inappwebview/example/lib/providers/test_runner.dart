@@ -10,7 +10,6 @@ import '../models/test_result.dart';
 import '../models/test_runner_models.dart';
 import '../utils/constants.dart';
 import '../utils/controller_methods_registry.dart';
-import '../utils/test_runner_catalog.dart';
 
 /// Test runner for executing automated tests
 class TestRunner extends ChangeNotifier {
@@ -270,13 +269,16 @@ class TestRunner extends ChangeNotifier {
   /// Run custom test steps
   Future<void> _runCustomSteps(
     List<CustomTestStep> steps,
-    InAppWebViewController? controller,
-  ) async {
+    InAppWebViewController? controller, {
+    bool append = false,
+  }) async {
     if (_status == TestStatus.running) return;
 
     _status = TestStatus.running;
     _shouldStop = false;
-    _results = [];
+    if (!append) {
+      _results = [];
+    }
     _progress = 0;
     _total = steps.length;
     _startTime = DateTime.now();
@@ -297,7 +299,7 @@ class TestRunner extends ChangeNotifier {
           ExtendedTestResult(
             testId: step.id,
             testTitle: step.name,
-            category: _categoryFromString(step.category),
+            category: step.category,
             success: true,
             message: 'Skipped - disabled',
             duration: Duration.zero,
@@ -464,27 +466,25 @@ class TestRunner extends ChangeNotifier {
 
       stopwatch.stop();
 
-      // Check expected result if specified
-      if (step.expectedResult != null) {
-        final resultStr = result?.toString() ?? '';
-        if (!resultStr.contains(step.expectedResult!)) {
-          return ExtendedTestResult(
-            testId: step.id,
-            testTitle: step.name,
-            category: _categoryFromString(step.category),
-            success: false,
-            message: 'Expected "${step.expectedResult}" but got "$resultStr"',
-            duration: stopwatch.elapsed,
-            timestamp: DateTime.now(),
-            data: {'result': result},
-          );
-        }
+      // Validate result using the step's validation configuration
+      if (!step.validateResult(result)) {
+        return ExtendedTestResult(
+          testId: step.id,
+          testTitle: step.name,
+          category: step.category,
+          success: false,
+          message:
+              'Validation failed (${step.expectedResultType.name}): expected "${step.expectedResult ?? 'N/A'}" but got "${result?.toString() ?? 'null'}"',
+          duration: stopwatch.elapsed,
+          timestamp: DateTime.now(),
+          data: {'result': result},
+        );
       }
 
       return ExtendedTestResult(
         testId: step.id,
         testTitle: step.name,
-        category: _categoryFromString(step.category),
+        category: step.category,
         success: true,
         message: result?.toString() ?? 'Success',
         duration: stopwatch.elapsed,
@@ -499,7 +499,7 @@ class TestRunner extends ChangeNotifier {
       return ExtendedTestResult(
         testId: step.id,
         testTitle: step.name,
-        category: _categoryFromString(step.category),
+        category: step.category,
         success: false,
         message: 'Error: $e',
         duration: stopwatch.elapsed,
@@ -596,67 +596,28 @@ class TestRunner extends ChangeNotifier {
     }
   }
 
-  TestCategory _categoryFromString(String category) {
-    return TestCategory.values.firstWhere(
-      (c) => c.name.toLowerCase() == category.toLowerCase(),
-      orElse: () => TestCategory.advanced,
-    );
-  }
-
-  /// Run all tests for a specific category
-  Future<void> runCategoryTests(TestCategory category) async {
-    final categoryGroup = getTestCategories().firstWhere(
-      (g) => g.category == category,
-      orElse: () => throw Exception('Category not found'),
-    );
-
-    await _runTests(categoryGroup.tests, _webViewController);
-  }
-
-  /// Run all tests across all categories
+  /// Run all tests from the default configuration
   Future<void> runAllTests() async {
-    final allTests = <ExecutableTestCase>[];
-    for (final category in getTestCategories()) {
-      allTests.addAll(category.tests);
-    }
-    await _runTests(allTests, _webViewController);
+    final config = _currentConfiguration ?? TestConfiguration.defaultConfig();
+    await _runCustomSteps(config.customSteps, _webViewController);
   }
 
-  /// Run selected tests
-  Future<void> runSelectedTests(List<ExecutableTestCase> tests) async {
-    await _runTests(tests, _webViewController);
+  /// Run tests for a specific category from the default configuration
+  Future<void> runCategoryTests(TestCategory category) async {
+    final config = _currentConfiguration ?? TestConfiguration.defaultConfig();
+    final categorySteps = config.customSteps
+        .where((step) => step.category == category)
+        .toList();
+    await _runCustomSteps(categorySteps, _webViewController);
   }
 
   /// Run tests from selected categories
   Future<void> runSelectedCategories(List<TestCategory> categories) async {
-    final tests = <ExecutableTestCase>[];
-    for (final category in getTestCategories()) {
-      if (categories.contains(category.category)) {
-        tests.addAll(category.tests);
-      }
-    }
-    await _runTests(tests, _webViewController);
-  }
-
-  /// Run a single test
-  Future<ExtendedTestResult> runSingleTest(ExecutableTestCase testCase) async {
-    _status = TestStatus.running;
-    _currentTest = testCase.title;
-    _progress = 0;
-    _total = 1;
-    _startTime = DateTime.now();
-    notifyListeners();
-
-    final result = await _executeTest(testCase, _webViewController);
-    _results = [result];
-
-    _status = TestStatus.completed;
-    _currentTest = null;
-    _progress = 1;
-    _endTime = DateTime.now();
-    notifyListeners();
-
-    return result;
+    final config = _currentConfiguration ?? TestConfiguration.defaultConfig();
+    final selectedSteps = config.customSteps
+        .where((step) => categories.contains(step.category))
+        .toList();
+    await _runCustomSteps(selectedSteps, _webViewController);
   }
 
   /// Re-run failed tests
@@ -666,137 +627,50 @@ class TestRunner extends ChangeNotifier {
         .map((r) => r.testId)
         .toSet();
 
-    final allTests = <ExecutableTestCase>[];
-    for (final category in getTestCategories()) {
-      allTests.addAll(category.tests);
-    }
-
-    final failedTests = allTests
-        .where((t) => failedTestIds.contains(t.id))
+    final config = _currentConfiguration ?? TestConfiguration.defaultConfig();
+    final failedSteps = config.customSteps
+        .where((step) => failedTestIds.contains(step.id))
         .toList();
 
     // Remove old failed results
     _results = _results.where((r) => r.success || r.skipped).toList();
 
-    await _runTests(failedTests, _webViewController, append: true);
+    await _runCustomSteps(failedSteps, _webViewController, append: true);
   }
 
-  Future<void> _runTests(
-    List<ExecutableTestCase> tests,
-    InAppWebViewController? controller, {
-    bool append = false,
-  }) async {
-    if (_status == TestStatus.running) return;
+  /// Get test categories from the current or default configuration
+  static List<TestCategoryGroup> getTestCategories() {
+    final config = TestConfiguration.defaultConfig();
+    final Map<TestCategory, List<CustomTestStep>> categorizedSteps = {};
 
-    _status = TestStatus.running;
-    _shouldStop = false;
-    if (!append) {
-      _results = [];
-    }
-    _progress = 0;
-    _total = tests.length;
-    _startTime = DateTime.now();
-    _endTime = null;
-    notifyListeners();
-
-    for (var i = 0; i < tests.length; i++) {
-      if (_shouldStop) {
-        _status = TestStatus.paused;
-        notifyListeners();
-        break;
-      }
-
-      final test = tests[i];
-      _currentTest = test.title;
-      _progress = i;
-      notifyListeners();
-
-      final result = await _executeTest(test, controller);
-      _results = [..._results, result];
-      notifyListeners();
-
-      // Small delay between tests to avoid overwhelming the system
-      await Future.delayed(const Duration(milliseconds: 100));
+    for (final step in config.customSteps) {
+      categorizedSteps.putIfAbsent(step.category, () => []).add(step);
     }
 
-    _status = _shouldStop ? TestStatus.paused : TestStatus.completed;
-    _currentTest = null;
-    _progress = tests.length;
-    _endTime = DateTime.now();
-    _shouldStop = false;
-    notifyListeners();
+    return categorizedSteps.entries.map((entry) {
+      return TestCategoryGroup(
+        category: entry.key,
+        tests: entry.value.map((step) => _convertStepToTestCase(step)).toList(),
+      );
+    }).toList();
   }
 
-  Future<ExtendedTestResult> _executeTest(
-    ExecutableTestCase testCase,
-    InAppWebViewController? controller,
-  ) async {
-    // Check platform support
-    if (!testCase.isSupportedOnCurrentPlatform()) {
-      return ExtendedTestResult(
-        testId: testCase.id,
-        testTitle: testCase.title,
-        category: testCase.category,
-        success: true,
-        message: 'Skipped - not supported on current platform',
-        duration: Duration.zero,
-        timestamp: DateTime.now(),
-        skipped: true,
-        skipReason: 'Platform not supported',
-      );
-    }
-
-    // Check if controller is required but not provided
-    if (controller == null && _requiresController(testCase.id)) {
-      return ExtendedTestResult(
-        testId: testCase.id,
-        testTitle: testCase.title,
-        category: testCase.category,
-        success: false,
-        message: 'WebView controller not available',
-        duration: Duration.zero,
-        timestamp: DateTime.now(),
-      );
-    }
-
-    final stopwatch = Stopwatch()..start();
-    try {
-      final result = await testCase.execute(controller);
-      stopwatch.stop();
-
-      return ExtendedTestResult(
-        testId: testCase.id,
-        testTitle: testCase.title,
-        category: testCase.category,
-        success: result.passed,
-        message: result.message,
-        duration: stopwatch.elapsed,
-        timestamp: DateTime.now(),
-        data: result.data,
-      );
-    } catch (e, stackTrace) {
-      stopwatch.stop();
-      debugPrint('Test ${testCase.id} failed with error: $e');
-      debugPrint('Stack trace: $stackTrace');
-
-      return ExtendedTestResult(
-        testId: testCase.id,
-        testTitle: testCase.title,
-        category: testCase.category,
-        success: false,
-        message: 'Error: ${e.toString()}',
-        duration: stopwatch.elapsed,
-        timestamp: DateTime.now(),
-        data: {'error': e.toString(), 'stackTrace': stackTrace.toString()},
-      );
-    }
-  }
-
-  bool _requiresController(String testId) {
-    // Most tests require a controller except for cookie/storage tests
-    // that use static managers
-    return !testId.startsWith('cookie_') &&
-        !testId.startsWith('storage_class_');
+  /// Convert a CustomTestStep to an ExecutableTestCase for compatibility
+  static ExecutableTestCase _convertStepToTestCase(CustomTestStep step) {
+    return ExecutableTestCase(
+      id: step.id,
+      title: step.name,
+      description: step.description,
+      category: step.category,
+      execute: (controller) async {
+        // This is a placeholder - actual execution happens through _executeCustomStep
+        return TestResult(
+          passed: true,
+          message: 'Executed via configuration',
+          duration: Duration.zero,
+        );
+      },
+    );
   }
 
   /// Stop running tests
@@ -832,10 +706,5 @@ class TestRunner extends ChangeNotifier {
       'results': _results.map((r) => r.toJson()).toList(),
     };
     return const JsonEncoder.withIndent('  ').convert(export);
-  }
-
-  /// Get all available test categories with their tests
-  static List<TestCategoryGroup> getTestCategories() {
-    return TestRunnerCatalog.getTestCategories();
   }
 }

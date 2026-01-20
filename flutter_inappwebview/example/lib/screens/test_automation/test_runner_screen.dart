@@ -7,7 +7,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../models/test_configuration.dart';
 import '../../models/test_runner_models.dart';
 import '../../providers/test_runner.dart';
-import '../../utils/constants.dart';
 import '../../widgets/common/app_drawer.dart';
 
 /// Automated test runner screen
@@ -22,11 +21,10 @@ class _TestRunnerScreenState extends State<TestRunnerScreen> {
   static const String _lastConfigKey = 'test_runner_last_config';
   static const String _lastWebViewTypeKey = 'test_runner_last_webview_type';
 
-  final Set<TestCategory> _selectedCategories = {};
   ResultFilter _resultFilter = ResultFilter.all;
 
   // Custom configuration support
-  TestConfiguration? _customConfiguration;
+  TestConfiguration? _currentConfiguration;
 
   // Flag to prevent loading config multiple times
   bool _configLoaded = false;
@@ -34,8 +32,6 @@ class _TestRunnerScreenState extends State<TestRunnerScreen> {
   @override
   void initState() {
     super.initState();
-    // Select all categories by default
-    _selectedCategories.addAll(TestCategory.values);
     // Defer loading last configuration until after the first frame
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadLastConfiguration();
@@ -81,12 +77,29 @@ class _TestRunnerScreenState extends State<TestRunnerScreen> {
 
         if (mounted) {
           setState(() {
-            _customConfiguration = config;
+            _currentConfiguration = config;
           });
           runner.setConfiguration(config);
         }
       } catch (e) {
         debugPrint('Failed to load last configuration: $e');
+        // Load default configuration on error
+        if (mounted) {
+          final defaultConfig = TestConfiguration.defaultConfig();
+          setState(() {
+            _currentConfiguration = defaultConfig;
+          });
+          runner.setConfiguration(defaultConfig);
+        }
+      }
+    } else {
+      // No last configuration found, load default
+      if (mounted) {
+        final defaultConfig = TestConfiguration.defaultConfig();
+        setState(() {
+          _currentConfiguration = defaultConfig;
+        });
+        runner.setConfiguration(defaultConfig);
       }
     }
   }
@@ -94,10 +107,10 @@ class _TestRunnerScreenState extends State<TestRunnerScreen> {
   Future<void> _saveLastConfiguration() async {
     final prefs = await SharedPreferences.getInstance();
     final runner = context.read<TestRunner>();
-    if (_customConfiguration != null) {
+    if (_currentConfiguration != null) {
       await prefs.setString(
         _lastConfigKey,
-        _customConfiguration!.toJsonString(),
+        _currentConfiguration!.toJsonString(),
       );
     } else {
       await prefs.remove(_lastConfigKey);
@@ -148,9 +161,7 @@ class _TestRunnerScreenState extends State<TestRunnerScreen> {
         builder: (context, runner, child) {
           return Column(
             children: [
-              if (_customConfiguration != null) _buildConfigurationBanner(),
-              // Only show category selector when no custom configuration is loaded
-              if (_customConfiguration == null) _buildCategorySelector(),
+              _buildConfigurationBanner(),
               _buildWebViewTypeSelector(),
               _buildControlBar(),
               _buildProgressSection(),
@@ -192,92 +203,9 @@ class _TestRunnerScreenState extends State<TestRunnerScreen> {
     );
   }
 
-  Widget _buildCategorySelector() {
-    final categories = TestRunner.getTestCategories();
-
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.grey.shade50,
-        border: Border(bottom: BorderSide(color: Colors.grey.shade300)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Test Categories',
-                style: Theme.of(
-                  context,
-                ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
-              ),
-              Row(
-                children: [
-                  TextButton.icon(
-                    icon: const Icon(Icons.select_all, size: 18),
-                    label: const Text('All'),
-                    onPressed: () {
-                      setState(() {
-                        _selectedCategories.clear();
-                        _selectedCategories.addAll(TestCategory.values);
-                      });
-                    },
-                  ),
-                  TextButton.icon(
-                    icon: const Icon(Icons.deselect, size: 18),
-                    label: const Text('None'),
-                    onPressed: () {
-                      setState(() {
-                        _selectedCategories.clear();
-                      });
-                    },
-                  ),
-                ],
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: categories.map((category) {
-              final isSelected = _selectedCategories.contains(
-                category.category,
-              );
-              return FilterChip(
-                label: Text('${category.name} (${category.tests.length})'),
-                selected: isSelected,
-                onSelected: (selected) {
-                  setState(() {
-                    if (selected) {
-                      _selectedCategories.add(category.category);
-                    } else {
-                      _selectedCategories.remove(category.category);
-                    }
-                  });
-                },
-                avatar: Icon(
-                  _getCategoryIcon(category.category),
-                  size: 18,
-                  color: isSelected ? Colors.white : Colors.grey,
-                ),
-                selectedColor: _getCategoryColor(category.category),
-                checkmarkColor: Colors.white,
-                labelStyle: TextStyle(
-                  color: isSelected ? Colors.white : Colors.black87,
-                ),
-              );
-            }).toList(),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildConfigurationBanner() {
     final runner = context.read<TestRunner>();
+    final config = _currentConfiguration ?? TestConfiguration.defaultConfig();
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -293,26 +221,28 @@ class _TestRunnerScreenState extends State<TestRunnerScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Custom Configuration: ${_customConfiguration!.name}',
+                  'Configuration: ${config.name}',
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 Text(
-                  '${_customConfiguration!.customSteps.length} custom steps • '
-                  '${_customConfiguration!.webViewType == TestWebViewType.headless ? "Headless" : "Visible"} WebView',
+                  '${config.customSteps.length} test steps • '
+                  '${config.webViewType == TestWebViewType.headless ? "Headless" : "Visible"} WebView',
                   style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
                 ),
               ],
             ),
           ),
           TextButton.icon(
-            icon: const Icon(Icons.close, size: 18),
-            label: const Text('Clear'),
+            icon: const Icon(Icons.refresh, size: 18),
+            label: const Text('Reset'),
             onPressed: () {
               setState(() {
-                _customConfiguration = null;
+                _currentConfiguration = TestConfiguration.defaultConfig();
               });
-              runner.setConfiguration(null);
-              runner.setInitialUrl('https://flutter.dev');
+              runner.setConfiguration(_currentConfiguration);
+              runner.setInitialUrl(
+                _currentConfiguration?.initialUrl ?? 'https://flutter.dev',
+              );
               // Clear saved configuration
               _saveLastConfiguration();
             },
@@ -494,17 +424,20 @@ class _TestRunnerScreenState extends State<TestRunnerScreen> {
                 ),
                 const Divider(),
                 ListTile(
-                  leading: const Icon(Icons.close, color: Colors.grey),
-                  title: const Text('Clear Configuration'),
-                  subtitle: const Text('Run built-in category tests'),
+                  leading: const Icon(Icons.restore, color: Colors.grey),
+                  title: const Text('Reset to Default'),
+                  subtitle: const Text('Load default test configuration'),
                   onTap: () {
                     Navigator.pop(dialogContext);
                     setState(() {
-                      _customConfiguration = null;
+                      _currentConfiguration = TestConfiguration.defaultConfig();
                     });
-                    runner.setConfiguration(null);
-                    runner.setInitialUrl('https://flutter.dev');
-                    // Clear saved configuration
+                    runner.setConfiguration(_currentConfiguration);
+                    runner.setInitialUrl(
+                      _currentConfiguration?.initialUrl ??
+                          'https://flutter.dev',
+                    );
+                    // Save configuration
                     _saveLastConfiguration();
                   },
                 ),
@@ -525,7 +458,7 @@ class _TestRunnerScreenState extends State<TestRunnerScreen> {
   void _loadConfiguration(TestConfiguration config) {
     final runner = context.read<TestRunner>();
     setState(() {
-      _customConfiguration = config;
+      _currentConfiguration = config;
     });
     runner.setConfiguration(config);
     // Save as last configuration
@@ -533,7 +466,7 @@ class _TestRunnerScreenState extends State<TestRunnerScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          'Configuration loaded: ${config.name} (${config.customSteps.length} custom steps)',
+          'Configuration loaded: ${config.name} (${config.customSteps.length} test steps)',
         ),
       ),
     );
@@ -570,6 +503,8 @@ class _TestRunnerScreenState extends State<TestRunnerScreen> {
       builder: (context, runner, child) {
         final isRunning = runner.status == TestStatus.running;
         final hasFailed = runner.failed > 0;
+        final config =
+            _currentConfiguration ?? TestConfiguration.defaultConfig();
 
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -584,42 +519,18 @@ class _TestRunnerScreenState extends State<TestRunnerScreen> {
                 label: Text(
                   isRunning
                       ? 'Stop'
-                      : (_customConfiguration != null
-                            ? 'Run Custom Steps'
-                            : 'Run Selected'),
+                      : 'Run Tests (${config.customSteps.length})',
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: isRunning ? Colors.red : Colors.green,
                   foregroundColor: Colors.white,
                 ),
-                // Enable button if we have a custom config OR selected categories
-                onPressed:
-                    (_selectedCategories.isEmpty &&
-                            _customConfiguration == null) &&
-                        !isRunning
-                    ? null
-                    : () {
-                        if (isRunning) {
-                          runner.stopTests();
-                        } else {
-                          _runSelectedTests();
-                        }
-                      },
+                onPressed: isRunning
+                    ? () => runner.stopTests()
+                    : () => _runSelectedTests(),
               ),
               const SizedBox(width: 8),
-              // Hide "Run All" when custom config is loaded (custom steps are already all steps)
-              if (_customConfiguration == null)
-                ElevatedButton.icon(
-                  icon: const Icon(Icons.play_circle_outline),
-                  label: const Text('Run All'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
-                  ),
-                  onPressed: isRunning ? null : _runAllTests,
-                ),
-              const SizedBox(width: 8),
-              if (hasFailed && !isRunning && _customConfiguration == null)
+              if (hasFailed && !isRunning)
                 OutlinedButton.icon(
                   icon: const Icon(Icons.refresh),
                   label: const Text('Re-run Failed'),
@@ -999,13 +910,14 @@ class _TestRunnerScreenState extends State<TestRunnerScreen> {
   /// Waits for the WebView to be ready (for visible mode) or initializes headless WebView
   Future<void> _ensureWebViewReady() async {
     final runner = context.read<TestRunner>();
+    final config = _currentConfiguration ?? TestConfiguration.defaultConfig();
 
     if (runner.webViewType == TestWebViewType.headless) {
       // For headless mode, initialize the headless WebView
       await runner.initializeHeadlessWebView(
-        initialUrl: _customConfiguration?.initialUrl ?? 'https://flutter.dev',
-        width: _customConfiguration?.headlessWidth,
-        height: _customConfiguration?.headlessHeight,
+        initialUrl: config.initialUrl ?? 'https://flutter.dev',
+        width: config.headlessWidth,
+        height: config.headlessHeight,
       );
     } else {
       // For visible mode, recreate the WebView and wait for it to be ready
@@ -1026,44 +938,11 @@ class _TestRunnerScreenState extends State<TestRunnerScreen> {
 
   void _runSelectedTests() async {
     final runner = context.read<TestRunner>();
+    final config = _currentConfiguration ?? TestConfiguration.defaultConfig();
 
     try {
       await _ensureWebViewReady();
-
-      // If a custom configuration is loaded, run its custom steps
-      if (_customConfiguration != null &&
-          _customConfiguration!.customSteps.isNotEmpty) {
-        await runner.runConfigurationWithCurrentWebView(_customConfiguration!);
-      } else {
-        // Otherwise run built-in category tests
-        await runner.runSelectedCategories(_selectedCategories.toList());
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to run tests: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    }
-  }
-
-  void _runAllTests() async {
-    final runner = context.read<TestRunner>();
-
-    try {
-      await _ensureWebViewReady();
-
-      // If a custom configuration is loaded, run its custom steps
-      if (_customConfiguration != null &&
-          _customConfiguration!.customSteps.isNotEmpty) {
-        await runner.runConfigurationWithCurrentWebView(_customConfiguration!);
-      } else {
-        // Otherwise run all built-in category tests
-        await runner.runAllTests();
-      }
+      await runner.runConfigurationWithCurrentWebView(config);
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -1116,40 +995,6 @@ class _TestRunnerScreenState extends State<TestRunnerScreen> {
         action: SnackBarAction(label: 'OK', onPressed: () {}),
       ),
     );
-  }
-
-  IconData _getCategoryIcon(TestCategory category) {
-    switch (category) {
-      case TestCategory.navigation:
-        return Icons.navigation;
-      case TestCategory.javascript:
-        return Icons.code;
-      case TestCategory.content:
-        return Icons.article;
-      case TestCategory.storage:
-        return Icons.storage;
-      case TestCategory.advanced:
-        return Icons.settings;
-      case TestCategory.browsers:
-        return Icons.web;
-    }
-  }
-
-  Color _getCategoryColor(TestCategory category) {
-    switch (category) {
-      case TestCategory.navigation:
-        return Colors.blue;
-      case TestCategory.javascript:
-        return Colors.amber.shade700;
-      case TestCategory.content:
-        return Colors.green;
-      case TestCategory.storage:
-        return Colors.purple;
-      case TestCategory.advanced:
-        return Colors.orange;
-      case TestCategory.browsers:
-        return Colors.teal;
-    }
   }
 
   String _getStatusText(TestRunner runner) {

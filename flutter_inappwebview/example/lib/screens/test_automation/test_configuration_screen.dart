@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import '../../models/test_configuration.dart';
+import '../../utils/constants.dart';
 import '../../widgets/common/app_drawer.dart';
 import '../../widgets/test_automation/custom_test_step_dialog.dart';
 
@@ -680,7 +681,7 @@ class _TestConfigurationScreenState extends State<TestConfigurationScreen>
                     spacing: 6,
                     runSpacing: 4,
                     children: [
-                      _buildChip(step.category, Colors.blue),
+                      _buildChip(step.category.name, Colors.blue),
                       _buildChip(
                         _getActionTypeName(step.action.type),
                         Colors.green,
@@ -1196,7 +1197,7 @@ class _TestConfigurationScreenState extends State<TestConfigurationScreen>
           id: 'sample_step_1',
           name: 'Check Page Title',
           description: 'Verify the page title contains expected text',
-          category: 'content',
+          category: TestCategory.content,
           action: CustomTestAction.evaluateJs('document.title'),
           expectedResult: 'Flutter',
           order: 0,
@@ -1205,7 +1206,7 @@ class _TestConfigurationScreenState extends State<TestConfigurationScreen>
           id: 'sample_step_2',
           name: 'Wait for Element',
           description: 'Wait for the main content to load',
-          category: 'content',
+          category: TestCategory.content,
           action: CustomTestAction.waitForElement('body', timeoutMs: 5000),
           order: 1,
         ),
@@ -1213,7 +1214,7 @@ class _TestConfigurationScreenState extends State<TestConfigurationScreen>
           id: 'sample_step_3',
           name: 'Check Element Exists',
           description: 'Verify a specific element is present',
-          category: 'content',
+          category: TestCategory.content,
           action: CustomTestAction.checkElement('a[href]'),
           order: 2,
         ),
@@ -1221,7 +1222,7 @@ class _TestConfigurationScreenState extends State<TestConfigurationScreen>
           id: 'sample_step_4',
           name: 'Execute Custom JS',
           description: 'Run custom JavaScript and return result',
-          category: 'javascript',
+          category: TestCategory.javascript,
           action: CustomTestAction.evaluateJs(
             'document.querySelectorAll("a").length',
           ),

@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_inappwebview_example/widgets/common/parameter_dialog.dart';
+import 'package:flutter_inappwebview_example/utils/constants.dart';
 
 /// Specifies which type of WebView to use for test execution
 enum TestWebViewType {
@@ -69,7 +70,7 @@ class CustomTestStep {
   final String id;
   final String name;
   final String description;
-  final String category;
+  final TestCategory category;
   final CustomTestAction action;
   final Map<String, dynamic> parameters;
 
@@ -99,7 +100,7 @@ class CustomTestStep {
     String? id,
     String? name,
     String? description,
-    String? category,
+    TestCategory? category,
     CustomTestAction? action,
     Map<String, dynamic>? parameters,
     String? expectedResult,
@@ -126,7 +127,7 @@ class CustomTestStep {
       'id': id,
       'name': name,
       'description': description,
-      'category': category,
+      'category': category.name,
       'action': action.toJson(),
       'parameters': parameters,
       'expectedResult': expectedResult,
@@ -141,7 +142,10 @@ class CustomTestStep {
       id: json['id'] as String,
       name: json['name'] as String,
       description: json['description'] as String? ?? '',
-      category: json['category'] as String? ?? 'custom',
+      category: TestCategory.values.firstWhere(
+        (c) => c.name == json['category'],
+        orElse: () => TestCategory.advanced,
+      ),
       action: CustomTestAction.fromJson(json['action'] as Map<String, dynamic>),
       parameters: (json['parameters'] as Map<String, dynamic>?) ?? {},
       expectedResult: json['expectedResult'] as String?,
@@ -747,95 +751,464 @@ class TestConfiguration {
 
   /// Build default test steps covering common scenarios
   static List<CustomTestStep> _buildDefaultTestSteps() {
+    int order = 0;
     return [
-      // Navigation tests
+      // ============================================================
+      // NAVIGATION TESTS
+      // ============================================================
       CustomTestStep(
-        id: 'default_load_url',
+        id: 'nav_load_url',
         name: 'Load URL',
         description: 'Load a test URL and verify navigation',
-        category: 'navigation',
+        category: TestCategory.navigation,
         action: CustomTestAction.controllerMethod(
           'loadUrl',
           parameters: {'url': 'https://example.com'},
         ),
-        order: 0,
+        order: order++,
       ),
       CustomTestStep(
-        id: 'default_get_url',
+        id: 'nav_get_url',
         name: 'Get Current URL',
         description: 'Retrieve and verify the current URL',
-        category: 'navigation',
+        category: TestCategory.navigation,
         action: CustomTestAction.controllerMethod('getUrl'),
-        order: 1,
+        expectedResultType: ExpectedResultType.notNull,
+        order: order++,
       ),
       CustomTestStep(
-        id: 'default_reload',
+        id: 'nav_load_data',
+        name: 'Load HTML Data',
+        description: 'Load HTML content directly into WebView',
+        category: TestCategory.navigation,
+        action: CustomTestAction.controllerMethod(
+          'loadData',
+          parameters: {
+            'data': '<html><body><h1 id="test">Test Page</h1></body></html>',
+            'mimeType': 'text/html',
+            'encoding': 'utf-8',
+          },
+        ),
+        order: order++,
+      ),
+      CustomTestStep(
+        id: 'nav_reload',
         name: 'Reload Page',
         description: 'Reload the current page',
-        category: 'navigation',
+        category: TestCategory.navigation,
         action: CustomTestAction.controllerMethod('reload'),
-        order: 2,
+        order: order++,
+      ),
+      CustomTestStep(
+        id: 'nav_can_go_back',
+        name: 'Can Go Back',
+        description: 'Check if navigation history allows going back',
+        category: TestCategory.navigation,
+        action: CustomTestAction.controllerMethod('canGoBack'),
+        expectedResultType: ExpectedResultType.notNull,
+        order: order++,
+      ),
+      CustomTestStep(
+        id: 'nav_can_go_forward',
+        name: 'Can Go Forward',
+        description: 'Check if navigation history allows going forward',
+        category: TestCategory.navigation,
+        action: CustomTestAction.controllerMethod('canGoForward'),
+        expectedResultType: ExpectedResultType.notNull,
+        order: order++,
+      ),
+      CustomTestStep(
+        id: 'nav_go_back',
+        name: 'Go Back',
+        description: 'Navigate back in history',
+        category: TestCategory.navigation,
+        action: CustomTestAction.controllerMethod('goBack'),
+        order: order++,
+      ),
+      CustomTestStep(
+        id: 'nav_go_forward',
+        name: 'Go Forward',
+        description: 'Navigate forward in history',
+        category: TestCategory.navigation,
+        action: CustomTestAction.controllerMethod('goForward'),
+        order: order++,
+      ),
+      CustomTestStep(
+        id: 'nav_stop_loading',
+        name: 'Stop Loading',
+        description: 'Stop the current page loading',
+        category: TestCategory.navigation,
+        action: CustomTestAction.controllerMethod('stopLoading'),
+        order: order++,
       ),
 
-      // Page info tests
+      // ============================================================
+      // CONTENT/PAGE INFO TESTS
+      // ============================================================
       CustomTestStep(
-        id: 'default_get_title',
+        id: 'content_get_title',
         name: 'Get Page Title',
-        description: 'Retrieve the page title',
-        category: 'pageInfo',
+        description: 'Retrieve the current page title',
+        category: TestCategory.content,
         action: CustomTestAction.controllerMethod('getTitle'),
-        order: 3,
+        order: order++,
       ),
       CustomTestStep(
-        id: 'default_get_html',
+        id: 'content_get_html',
         name: 'Get HTML Source',
         description: 'Retrieve the page HTML source',
-        category: 'pageInfo',
+        category: TestCategory.content,
         action: CustomTestAction.controllerMethod('getHtml'),
-        order: 4,
+        expectedResultType: ExpectedResultType.notEmpty,
+        order: order++,
+      ),
+      CustomTestStep(
+        id: 'content_get_progress',
+        name: 'Get Loading Progress',
+        description: 'Get the current page loading progress',
+        category: TestCategory.content,
+        action: CustomTestAction.controllerMethod('getProgress'),
+        expectedResultType: ExpectedResultType.notNull,
+        order: order++,
+      ),
+      CustomTestStep(
+        id: 'content_get_favicons',
+        name: 'Get Favicons',
+        description: 'Get page favicon URLs',
+        category: TestCategory.content,
+        action: CustomTestAction.controllerMethod('getFavicons'),
+        order: order++,
+      ),
+      CustomTestStep(
+        id: 'content_get_original_url',
+        name: 'Get Original URL',
+        description: 'Get the original URL before any redirects',
+        category: TestCategory.content,
+        action: CustomTestAction.controllerMethod('getOriginalUrl'),
+        order: order++,
       ),
 
-      // JavaScript tests
+      // ============================================================
+      // JAVASCRIPT TESTS
+      // ============================================================
       CustomTestStep(
-        id: 'default_evaluate_js',
-        name: 'Evaluate JavaScript',
-        description: 'Execute JavaScript and get result',
-        category: 'javascript',
+        id: 'js_evaluate_simple',
+        name: 'Evaluate Simple JS',
+        description: 'Execute simple JavaScript expression',
+        category: TestCategory.javascript,
+        action: CustomTestAction.controllerMethod(
+          'evaluateJavascript',
+          parameters: {'source': '1 + 1'},
+        ),
+        expectedResult: '2',
+        expectedResultType: ExpectedResultType.exact,
+        order: order++,
+      ),
+      CustomTestStep(
+        id: 'js_evaluate_string',
+        name: 'Evaluate JS String',
+        description: 'Execute JavaScript returning a string',
+        category: TestCategory.javascript,
+        action: CustomTestAction.controllerMethod(
+          'evaluateJavascript',
+          parameters: {'source': '"Hello" + " " + "World"'},
+        ),
+        expectedResult: 'Hello World',
+        expectedResultType: ExpectedResultType.exact,
+        order: order++,
+      ),
+      CustomTestStep(
+        id: 'js_evaluate_document_title',
+        name: 'Get Document Title via JS',
+        description: 'Execute JavaScript to get document title',
+        category: TestCategory.javascript,
         action: CustomTestAction.controllerMethod(
           'evaluateJavascript',
           parameters: {'source': 'document.title'},
         ),
-        order: 5,
+        order: order++,
+      ),
+      CustomTestStep(
+        id: 'js_evaluate_object',
+        name: 'Evaluate JS Object',
+        description: 'Execute JavaScript returning an object',
+        category: TestCategory.javascript,
+        action: CustomTestAction.controllerMethod(
+          'evaluateJavascript',
+          parameters: {'source': 'JSON.stringify({name: "test", value: 42})'},
+        ),
+        expectedResultType: ExpectedResultType.notEmpty,
+        order: order++,
+      ),
+      CustomTestStep(
+        id: 'js_call_async',
+        name: 'Call Async JavaScript',
+        description: 'Execute async JavaScript with await',
+        category: TestCategory.javascript,
+        action: CustomTestAction.controllerMethod(
+          'callAsyncJavaScript',
+          parameters: {
+            'functionBody': '''
+              await new Promise(resolve => setTimeout(resolve, 100));
+              return "async result";
+            ''',
+          },
+        ),
+        order: order++,
+      ),
+      CustomTestStep(
+        id: 'js_inject_css',
+        name: 'Inject CSS Code',
+        description: 'Inject CSS styles into the page',
+        category: TestCategory.javascript,
+        action: CustomTestAction.controllerMethod(
+          'injectCSSCode',
+          parameters: {
+            'source': 'body { background-color: #f0f0f0 !important; }',
+          },
+        ),
+        order: order++,
       ),
 
-      // Screenshot test
+      // ============================================================
+      // SCROLL TESTS
+      // ============================================================
       CustomTestStep(
-        id: 'default_screenshot',
+        id: 'scroll_to',
+        name: 'Scroll To Position',
+        description: 'Scroll to a specific position',
+        category: TestCategory.advanced,
+        action: CustomTestAction.controllerMethod(
+          'scrollTo',
+          parameters: {'x': 0, 'y': 100},
+        ),
+        order: order++,
+      ),
+      CustomTestStep(
+        id: 'scroll_by',
+        name: 'Scroll By Offset',
+        description: 'Scroll by a relative offset',
+        category: TestCategory.advanced,
+        action: CustomTestAction.controllerMethod(
+          'scrollBy',
+          parameters: {'x': 0, 'y': 50},
+        ),
+        order: order++,
+      ),
+      CustomTestStep(
+        id: 'scroll_get_x',
+        name: 'Get Scroll X',
+        description: 'Get horizontal scroll position',
+        category: TestCategory.advanced,
+        action: CustomTestAction.controllerMethod('getScrollX'),
+        expectedResultType: ExpectedResultType.notNull,
+        order: order++,
+      ),
+      CustomTestStep(
+        id: 'scroll_get_y',
+        name: 'Get Scroll Y',
+        description: 'Get vertical scroll position',
+        category: TestCategory.advanced,
+        action: CustomTestAction.controllerMethod('getScrollY'),
+        expectedResultType: ExpectedResultType.notNull,
+        order: order++,
+      ),
+
+      // ============================================================
+      // SCREENSHOT & PRINT TESTS
+      // ============================================================
+      CustomTestStep(
+        id: 'screenshot_take',
         name: 'Take Screenshot',
         description: 'Capture a screenshot of the WebView',
-        category: 'screenshotPrint',
+        category: TestCategory.advanced,
         action: CustomTestAction.controllerMethod('takeScreenshot'),
-        order: 6,
+        expectedResultType: ExpectedResultType.notNull,
+        order: order++,
       ),
 
-      // Security test
+      // ============================================================
+      // SECURITY TESTS
+      // ============================================================
       CustomTestStep(
-        id: 'default_secure_context',
+        id: 'security_is_secure_context',
         name: 'Check Secure Context',
-        description: 'Verify if the page is in a secure context',
-        category: 'security',
+        description: 'Verify if the page is in a secure context (HTTPS)',
+        category: TestCategory.advanced,
         action: CustomTestAction.controllerMethod('isSecureContext'),
-        order: 7,
+        expectedResultType: ExpectedResultType.notNull,
+        order: order++,
       ),
-
-      // Certificate test
       CustomTestStep(
-        id: 'default_get_certificate',
+        id: 'security_get_certificate',
         name: 'Get SSL Certificate',
         description: 'Retrieve SSL certificate information',
-        category: 'security',
+        category: TestCategory.advanced,
         action: CustomTestAction.controllerMethod('getCertificate'),
-        order: 8,
+        order: order++,
+      ),
+
+      // ============================================================
+      // STORAGE TESTS - COOKIES
+      // ============================================================
+      CustomTestStep(
+        id: 'storage_set_cookie',
+        name: 'Set Cookie',
+        description: 'Set a test cookie',
+        category: TestCategory.storage,
+        action: CustomTestAction.evaluateJs('''
+          document.cookie = "test_cookie=test_value; path=/";
+          document.cookie;
+        '''),
+        expectedResultType: ExpectedResultType.contains,
+        expectedResult: 'test_cookie',
+        order: order++,
+      ),
+      CustomTestStep(
+        id: 'storage_get_cookies',
+        name: 'Get Cookies via JS',
+        description: 'Retrieve cookies using JavaScript',
+        category: TestCategory.storage,
+        action: CustomTestAction.evaluateJs('document.cookie'),
+        order: order++,
+      ),
+
+      // ============================================================
+      // STORAGE TESTS - LOCAL STORAGE
+      // ============================================================
+      CustomTestStep(
+        id: 'storage_local_set',
+        name: 'LocalStorage Set Item',
+        description: 'Set an item in localStorage',
+        category: TestCategory.storage,
+        action: CustomTestAction.evaluateJs('''
+          localStorage.setItem("test_key", "test_value");
+          localStorage.getItem("test_key");
+        '''),
+        expectedResult: 'test_value',
+        expectedResultType: ExpectedResultType.exact,
+        order: order++,
+      ),
+      CustomTestStep(
+        id: 'storage_local_get',
+        name: 'LocalStorage Get Item',
+        description: 'Get an item from localStorage',
+        category: TestCategory.storage,
+        action: CustomTestAction.evaluateJs('localStorage.getItem("test_key")'),
+        order: order++,
+      ),
+      CustomTestStep(
+        id: 'storage_local_remove',
+        name: 'LocalStorage Remove Item',
+        description: 'Remove an item from localStorage',
+        category: TestCategory.storage,
+        action: CustomTestAction.evaluateJs('''
+          localStorage.removeItem("test_key");
+          localStorage.getItem("test_key");
+        '''),
+        expectedResultType: ExpectedResultType.isNull,
+        order: order++,
+      ),
+
+      // ============================================================
+      // STORAGE TESTS - SESSION STORAGE
+      // ============================================================
+      CustomTestStep(
+        id: 'storage_session_set',
+        name: 'SessionStorage Set Item',
+        description: 'Set an item in sessionStorage',
+        category: TestCategory.storage,
+        action: CustomTestAction.evaluateJs('''
+          sessionStorage.setItem("session_key", "session_value");
+          sessionStorage.getItem("session_key");
+        '''),
+        expectedResult: 'session_value',
+        expectedResultType: ExpectedResultType.exact,
+        order: order++,
+      ),
+      CustomTestStep(
+        id: 'storage_session_get',
+        name: 'SessionStorage Get Item',
+        description: 'Get an item from sessionStorage',
+        category: TestCategory.storage,
+        action: CustomTestAction.evaluateJs(
+          'sessionStorage.getItem("session_key")',
+        ),
+        order: order++,
+      ),
+
+      // ============================================================
+      // CONTENT SIZE & ZOOM TESTS
+      // ============================================================
+      CustomTestStep(
+        id: 'content_height',
+        name: 'Get Content Height',
+        description: 'Get the content height of the page',
+        category: TestCategory.content,
+        action: CustomTestAction.controllerMethod('getContentHeight'),
+        order: order++,
+      ),
+      CustomTestStep(
+        id: 'content_width',
+        name: 'Get Content Width',
+        description: 'Get the content width of the page',
+        category: TestCategory.content,
+        action: CustomTestAction.controllerMethod('getContentWidth'),
+        order: order++,
+      ),
+      CustomTestStep(
+        id: 'zoom_get_scale',
+        name: 'Get Zoom Scale',
+        description: 'Get the current zoom scale',
+        category: TestCategory.advanced,
+        action: CustomTestAction.controllerMethod('getZoomScale'),
+        order: order++,
+      ),
+      CustomTestStep(
+        id: 'zoom_set_scale',
+        name: 'Set Zoom Scale',
+        description: 'Set the zoom scale to 1.0',
+        category: TestCategory.advanced,
+        action: CustomTestAction.controllerMethod(
+          'zoomBy',
+          parameters: {'zoomFactor': 1.0},
+        ),
+        order: order++,
+      ),
+
+      // ============================================================
+      // DOM ELEMENT TESTS
+      // ============================================================
+      CustomTestStep(
+        id: 'dom_check_element',
+        name: 'Check Element Exists',
+        description: 'Check if body element exists',
+        category: TestCategory.content,
+        action: CustomTestAction.checkElement('body'),
+        order: order++,
+      ),
+
+      // ============================================================
+      // FIND INTERACTION TESTS
+      // ============================================================
+      CustomTestStep(
+        id: 'find_on_page',
+        name: 'Find Text on Page',
+        description: 'Find text content on the page',
+        category: TestCategory.content,
+        action: CustomTestAction.controllerMethod(
+          'findAllAsync',
+          parameters: {'find': 'Example'},
+        ),
+        order: order++,
+      ),
+      CustomTestStep(
+        id: 'find_clear',
+        name: 'Clear Find Results',
+        description: 'Clear the find results',
+        category: TestCategory.content,
+        action: CustomTestAction.controllerMethod('clearMatches'),
+        order: order++,
       ),
     ];
   }

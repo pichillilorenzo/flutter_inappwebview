@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../models/test_configuration.dart';
+import '../../utils/constants.dart';
 import '../../utils/controller_methods_registry.dart';
 import '../../widgets/common/parameter_dialog.dart';
 
@@ -36,7 +37,7 @@ class _CustomTestStepDialogState extends State<CustomTestStepDialog> {
 
   CustomTestActionType _selectedActionType =
       CustomTestActionType.evaluateJavascript;
-  String _selectedCategory = 'custom';
+  TestCategory _selectedCategory = TestCategory.advanced;
   bool _enabled = true;
   ExpectedResultType _expectedResultType = ExpectedResultType.any;
 
@@ -47,15 +48,6 @@ class _CustomTestStepDialogState extends State<CustomTestStepDialog> {
   // Navigation event selection
   NavigationEventType _selectedNavigationEvent = NavigationEventType.onLoadStop;
   String _progressComparison = 'greaterThanOrEquals';
-
-  final List<String> _categories = [
-    'custom',
-    'navigation',
-    'javascript',
-    'content',
-    'storage',
-    'advanced',
-  ];
 
   @override
   void initState() {
@@ -171,17 +163,18 @@ class _CustomTestStepDialogState extends State<CustomTestStepDialog> {
               const SizedBox(height: 12),
 
               // Category dropdown
-              DropdownButtonFormField<String>(
+              DropdownButtonFormField<TestCategory>(
                 value: _selectedCategory,
                 decoration: const InputDecoration(
                   labelText: 'Category',
                   border: OutlineInputBorder(),
                 ),
-                items: _categories.map((c) {
+                items: TestCategory.values.map((c) {
                   return DropdownMenuItem(
                     value: c,
                     child: Text(
-                      c.substring(0, 1).toUpperCase() + c.substring(1),
+                      c.name.substring(0, 1).toUpperCase() +
+                          c.name.substring(1),
                     ),
                   );
                 }).toList(),

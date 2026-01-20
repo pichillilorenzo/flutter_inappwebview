@@ -1,3 +1,4 @@
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_inappwebview_example/models/environment_setting_definition.dart';
 
 /// Get all environment setting definitions organized by category.
@@ -11,28 +12,29 @@ getEnvironmentSettingDefinitions() {
             'Path to the folder containing the WebView2 browser executable',
         type: EnvironmentSettingType.string,
         hint: 'C:\\Program Files (x86)\\Microsoft\\Edge WebView2\\...',
-        property: EnvironmentSettingProperty.browserExecutableFolder,
+        property: WebViewEnvironmentSettingsProperty.browserExecutableFolder,
       ),
       EnvironmentSettingDefinition(
         name: 'User Data Folder',
         description: 'Path to the user data folder for WebView2 profile',
         type: EnvironmentSettingType.string,
         hint: 'C:\\Users\\...\\AppData\\Local\\...',
-        property: EnvironmentSettingProperty.userDataFolder,
+        property: WebViewEnvironmentSettingsProperty.userDataFolder,
       ),
       EnvironmentSettingDefinition(
         name: 'Additional Browser Arguments',
         description: 'Additional command line arguments for the browser',
         type: EnvironmentSettingType.string,
         hint: '--disable-gpu --enable-logging',
-        property: EnvironmentSettingProperty.additionalBrowserArguments,
+        property: WebViewEnvironmentSettingsProperty.additionalBrowserArguments,
       ),
       EnvironmentSettingDefinition(
         name: 'Target Compatible Browser Version',
         description: 'Minimum WebView2 version required',
         type: EnvironmentSettingType.string,
         hint: '100.0.0.0',
-        property: EnvironmentSettingProperty.targetCompatibleBrowserVersion,
+        property:
+            WebViewEnvironmentSettingsProperty.targetCompatibleBrowserVersion,
       ),
     ],
     'Release Channel': [
@@ -40,17 +42,15 @@ getEnvironmentSettingDefinitions() {
         name: 'Channel Search Kind',
         description: 'How to search for WebView2 runtime',
         type: EnvironmentSettingType.enumeration,
-        // EnvironmentChannelSearchKind: MOST_STABLE = 0, LEAST_STABLE = 1
-        enumValues: const {'Most Stable': 0, 'Least Stable': 1},
-        property: EnvironmentSettingProperty.channelSearchKind,
+        enumValues: EnvironmentChannelSearchKind.values.toList(),
+        property: WebViewEnvironmentSettingsProperty.channelSearchKind,
       ),
       EnvironmentSettingDefinition(
         name: 'Release Channels',
         description: 'Which release channels to consider',
         type: EnvironmentSettingType.enumeration,
-        // EnvironmentReleaseChannels: STABLE = 1, BETA = 2, DEV = 4, CANARY = 8
-        enumValues: const {'Stable': 1, 'Beta': 2, 'Dev': 4, 'Canary': 8},
-        property: EnvironmentSettingProperty.releaseChannels,
+        enumValues: EnvironmentReleaseChannels.values.toList(),
+        property: WebViewEnvironmentSettingsProperty.releaseChannels,
       ),
     ],
     'Localization': [
@@ -59,21 +59,21 @@ getEnvironmentSettingDefinitions() {
         description: 'Default language for the WebView',
         type: EnvironmentSettingType.string,
         hint: 'en-US',
-        property: EnvironmentSettingProperty.language,
+        property: WebViewEnvironmentSettingsProperty.language,
       ),
       EnvironmentSettingDefinition(
         name: 'Preferred Languages',
         description: 'List of preferred languages',
         type: EnvironmentSettingType.stringList,
         hint: 'en-US, fr-FR, de-DE',
-        property: EnvironmentSettingProperty.preferredLanguages,
+        property: WebViewEnvironmentSettingsProperty.preferredLanguages,
       ),
       EnvironmentSettingDefinition(
         name: 'Time Zone Override',
         description: 'Override the default time zone',
         type: EnvironmentSettingType.string,
         hint: 'America/New_York',
-        property: EnvironmentSettingProperty.timeZoneOverride,
+        property: WebViewEnvironmentSettingsProperty.timeZoneOverride,
       ),
     ],
     'Spellcheck': [
@@ -82,14 +82,14 @@ getEnvironmentSettingDefinitions() {
         description: 'Enable spell checking',
         type: EnvironmentSettingType.boolean,
         defaultValue: false,
-        property: EnvironmentSettingProperty.spellCheckingEnabled,
+        property: WebViewEnvironmentSettingsProperty.spellCheckingEnabled,
       ),
       EnvironmentSettingDefinition(
         name: 'Spell Checking Languages',
         description: 'Languages for spell checking',
         type: EnvironmentSettingType.stringList,
         hint: 'en_US, fr_FR',
-        property: EnvironmentSettingProperty.spellCheckingLanguages,
+        property: WebViewEnvironmentSettingsProperty.spellCheckingLanguages,
       ),
     ],
     'Extensions': [
@@ -98,14 +98,15 @@ getEnvironmentSettingDefinitions() {
         description: 'Enable browser extensions support',
         type: EnvironmentSettingType.boolean,
         defaultValue: false,
-        property: EnvironmentSettingProperty.areBrowserExtensionsEnabled,
+        property: WebViewEnvironmentSettingsProperty.areBrowserExtensionsEnabled,
       ),
       EnvironmentSettingDefinition(
         name: 'Web Process Extensions Directory',
         description: 'Path to web process extensions',
         type: EnvironmentSettingType.string,
         hint: '/path/to/extensions',
-        property: EnvironmentSettingProperty.webProcessExtensionsDirectory,
+        property:
+            WebViewEnvironmentSettingsProperty.webProcessExtensionsDirectory,
       ),
     ],
     'Security & Privacy': [
@@ -114,29 +115,30 @@ getEnvironmentSettingDefinitions() {
         description: 'Allow single sign-on using the OS primary account (AAD)',
         type: EnvironmentSettingType.boolean,
         defaultValue: false,
-        property:
-            EnvironmentSettingProperty.allowSingleSignOnUsingOSPrimaryAccount,
+        property: WebViewEnvironmentSettingsProperty
+            .allowSingleSignOnUsingOSPrimaryAccount,
       ),
       EnvironmentSettingDefinition(
         name: 'Enable Tracking Prevention',
         description: 'Enable tracking prevention features',
         type: EnvironmentSettingType.boolean,
         defaultValue: true,
-        property: EnvironmentSettingProperty.enableTrackingPrevention,
+        property: WebViewEnvironmentSettingsProperty.enableTrackingPrevention,
       ),
       EnvironmentSettingDefinition(
         name: 'Exclusive User Data Folder Access',
         description: 'Ensure exclusive access to the user data folder',
         type: EnvironmentSettingType.boolean,
         defaultValue: false,
-        property: EnvironmentSettingProperty.exclusiveUserDataFolderAccess,
+        property:
+            WebViewEnvironmentSettingsProperty.exclusiveUserDataFolderAccess,
       ),
       EnvironmentSettingDefinition(
         name: 'Sandbox Paths',
         description: 'Paths for sandbox isolation',
         type: EnvironmentSettingType.stringList,
         hint: '/path/to/sandbox',
-        property: EnvironmentSettingProperty.sandboxPaths,
+        property: WebViewEnvironmentSettingsProperty.sandboxPaths,
       ),
     ],
     'Automation & Debugging': [
@@ -145,14 +147,14 @@ getEnvironmentSettingDefinitions() {
         description: 'Allow WebDriver automation',
         type: EnvironmentSettingType.boolean,
         defaultValue: false,
-        property: EnvironmentSettingProperty.automationAllowed,
+        property: WebViewEnvironmentSettingsProperty.automationAllowed,
       ),
       EnvironmentSettingDefinition(
         name: 'Custom Crash Reporting',
         description: 'Enable custom crash reporting',
         type: EnvironmentSettingType.boolean,
         defaultValue: false,
-        property: EnvironmentSettingProperty.isCustomCrashReportingEnabled,
+        property: WebViewEnvironmentSettingsProperty.isCustomCrashReportingEnabled,
       ),
     ],
     'Appearance': [
@@ -160,9 +162,8 @@ getEnvironmentSettingDefinitions() {
         name: 'Scrollbar Style',
         description: 'Style of scrollbars in the WebView',
         type: EnvironmentSettingType.enumeration,
-        // EnvironmentScrollbarStyle: DEFAULT = 0, FLUENT_OVERLAY = 1
-        enumValues: const {'Default': 0, 'Fluent Overlay': 1},
-        property: EnvironmentSettingProperty.scrollbarStyle,
+        enumValues: EnvironmentScrollbarStyle.values.toList(),
+        property: WebViewEnvironmentSettingsProperty.scrollbarStyle,
       ),
     ],
     'Cache': [
@@ -170,13 +171,8 @@ getEnvironmentSettingDefinitions() {
         name: 'Cache Model',
         description: 'Caching strategy for the WebView',
         type: EnvironmentSettingType.enumeration,
-        // CacheModel: DOCUMENT_VIEWER = 0, DOCUMENT_BROWSER = 1, WEB_BROWSER = 2
-        enumValues: const {
-          'Document Viewer': 0,
-          'Document Browser': 1,
-          'Web Browser': 2,
-        },
-        property: EnvironmentSettingProperty.cacheModel,
+        enumValues: CacheModel.values.toList(),
+        property: WebViewEnvironmentSettingsProperty.cacheModel,
       ),
     ],
     'Custom Schemes': [
@@ -184,7 +180,7 @@ getEnvironmentSettingDefinitions() {
         name: 'Custom Scheme Registrations',
         description: 'Register custom URL schemes',
         type: EnvironmentSettingType.customSchemeRegistrations,
-        property: EnvironmentSettingProperty.customSchemeRegistrations,
+        property: WebViewEnvironmentSettingsProperty.customSchemeRegistrations,
       ),
     ],
   };

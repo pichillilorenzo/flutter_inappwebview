@@ -480,7 +480,7 @@ class _SettingsEditorScreenState extends State<SettingsEditorScreen> {
         );
 
       case SettingType.enumeration:
-        if (setting.enumValues == null) {
+        if (setting.enumValues == null || setting.enumValues!.isEmpty) {
           return const SizedBox.shrink();
         }
         return DropdownButton<dynamic>(
@@ -490,10 +490,16 @@ class _SettingsEditorScreenState extends State<SettingsEditorScreen> {
               value: null,
               child: Text('Not Set', style: TextStyle(fontSize: 14)),
             ),
-            ...setting.enumValues!.entries.map((entry) {
+            ...setting.enumValues!.map((enumValue) {
+              final nativeValue = SettingDefinition.enumValueToNative(
+                enumValue,
+              );
               return DropdownMenuItem(
-                value: entry.value,
-                child: Text(entry.key, style: const TextStyle(fontSize: 14)),
+                value: nativeValue,
+                child: Text(
+                  SettingDefinition.enumDisplayName(enumValue),
+                  style: const TextStyle(fontSize: 14),
+                ),
               );
             }),
           ],

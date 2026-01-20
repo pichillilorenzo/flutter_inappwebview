@@ -455,7 +455,7 @@ class _WebViewEnvironmentSettingsEditorScreenState
         return _buildStringListControl(setting, currentValue);
 
       case EnvironmentSettingType.enumeration:
-        if (setting.enumValues == null) {
+        if (setting.enumValues == null || setting.enumValues!.isEmpty) {
           return const SizedBox.shrink();
         }
         return DropdownButton<dynamic>(
@@ -466,10 +466,15 @@ class _WebViewEnvironmentSettingsEditorScreenState
               value: null,
               child: Text('Not Set', style: TextStyle(fontSize: 14)),
             ),
-            ...setting.enumValues!.entries.map((entry) {
+            ...setting.enumValues!.map((enumValue) {
+              final nativeValue = EnvironmentSettingDefinition
+                  .enumValueToNative(enumValue);
               return DropdownMenuItem(
-                value: entry.value,
-                child: Text(entry.key, style: const TextStyle(fontSize: 14)),
+                value: nativeValue,
+                child: Text(
+                  EnvironmentSettingDefinition.enumDisplayName(enumValue),
+                  style: const TextStyle(fontSize: 14),
+                ),
               );
             }),
           ],

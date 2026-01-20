@@ -11,7 +11,7 @@ class SettingDefinition {
   final String description;
   final SettingType type;
   final dynamic defaultValue;
-  final Map<String, dynamic>? enumValues;
+  final List<dynamic>? enumValues;
 
   /// The InAppWebViewSettings property for runtime support checking.
   /// If provided, use InAppWebViewSettings.isPropertySupported to check platform support.
@@ -25,6 +25,28 @@ class SettingDefinition {
     this.enumValues,
     required this.property,
   });
+
+  static String enumDisplayName(dynamic value) {
+    if (value == null) return '(none)';
+    try {
+      final dynamic result = (value as dynamic).name();
+      if (result is String) return result;
+    } catch (_) {}
+    try {
+      final dynamic result = (value as dynamic).name;
+      if (result is String) return result;
+    } catch (_) {}
+    return value.toString();
+  }
+
+  static dynamic enumValueToNative(dynamic value) {
+    if (value == null) return null;
+    try {
+      return (value as dynamic).toNativeValue();
+    } catch (_) {
+      return value;
+    }
+  }
 
   String get key => property.name;
 

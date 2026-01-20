@@ -10,41 +10,15 @@ enum EnvironmentSettingType {
   customSchemeRegistrations,
 }
 
-/// Enum representing known WebViewEnvironmentSettings properties.
-enum EnvironmentSettingProperty {
-  browserExecutableFolder,
-  userDataFolder,
-  additionalBrowserArguments,
-  targetCompatibleBrowserVersion,
-  channelSearchKind,
-  releaseChannels,
-  language,
-  preferredLanguages,
-  timeZoneOverride,
-  spellCheckingEnabled,
-  spellCheckingLanguages,
-  areBrowserExtensionsEnabled,
-  webProcessExtensionsDirectory,
-  allowSingleSignOnUsingOSPrimaryAccount,
-  enableTrackingPrevention,
-  exclusiveUserDataFolderAccess,
-  sandboxPaths,
-  automationAllowed,
-  isCustomCrashReportingEnabled,
-  scrollbarStyle,
-  cacheModel,
-  customSchemeRegistrations,
-}
-
 /// Definition of a single environment setting.
 class EnvironmentSettingDefinition {
   final String name;
   final String description;
   final EnvironmentSettingType type;
   final dynamic defaultValue;
-  final Map<String, dynamic>? enumValues;
+  final List<dynamic>? enumValues;
   final String? hint;
-  final EnvironmentSettingProperty property;
+  final WebViewEnvironmentSettingsProperty property;
 
   const EnvironmentSettingDefinition({
     required this.name,
@@ -56,20 +30,40 @@ class EnvironmentSettingDefinition {
     required this.property,
   });
 
+  static String enumDisplayName(dynamic value) {
+    if (value == null) return '(none)';
+    try {
+      final dynamic result = (value as dynamic).name();
+      if (result is String) return result;
+    } catch (_) {}
+    try {
+      final dynamic result = (value as dynamic).name;
+      if (result is String) return result;
+    } catch (_) {}
+    return value.toString();
+  }
+
+  static dynamic enumValueToNative(dynamic value) {
+    if (value == null) return null;
+    try {
+      return (value as dynamic).toNativeValue();
+    } catch (_) {
+      return value;
+    }
+  }
+
   String get key => property.name;
 
   bool isSupportedOnPlatform(TargetPlatform platform) {
-    return const PlatformWebViewEnvironmentCreationParams().isPropertySupported(
-      PlatformWebViewEnvironmentCreationParamsProperty.settings,
+    return WebViewEnvironmentSettings.isPropertySupported(
+      property,
       platform: platform,
     );
   }
 
   bool get isSupportedOnCurrentPlatform {
     if (kIsWeb) return true;
-    return const PlatformWebViewEnvironmentCreationParams().isPropertySupported(
-      PlatformWebViewEnvironmentCreationParamsProperty.settings,
-    );
+    return WebViewEnvironmentSettings.isPropertySupported(property);
   }
 
   bool get hasPlatformLimitations {

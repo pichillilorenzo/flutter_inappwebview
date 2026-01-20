@@ -198,15 +198,7 @@ Map<String, List<SettingDefinition>> getSettingDefinitions() {
         description: 'How to handle mixed HTTP/HTTPS content',
         type: SettingType.enumeration,
         defaultValue: null,
-        enumValues: {
-          'Always Allow': MixedContentMode.MIXED_CONTENT_ALWAYS_ALLOW
-              .toNativeValue(),
-          'Never Allow': MixedContentMode.MIXED_CONTENT_NEVER_ALLOW
-              .toNativeValue(),
-          'Compatibility Mode': MixedContentMode
-              .MIXED_CONTENT_COMPATIBILITY_MODE
-              .toNativeValue(),
-        },
+        enumValues: MixedContentMode.values.toList(),
         property: InAppWebViewSettingsProperty.mixedContentMode,
       ),
       SettingDefinition(
@@ -252,13 +244,7 @@ Map<String, List<SettingDefinition>> getSettingDefinitions() {
         description: 'Override the way the cache is used',
         type: SettingType.enumeration,
         defaultValue: CacheMode.LOAD_DEFAULT.toNativeValue(),
-        enumValues: {
-          'Default': CacheMode.LOAD_DEFAULT.toNativeValue(),
-          'Cache Else Network': CacheMode.LOAD_CACHE_ELSE_NETWORK
-              .toNativeValue(),
-          'No Cache': CacheMode.LOAD_NO_CACHE.toNativeValue(),
-          'Cache Only': CacheMode.LOAD_CACHE_ONLY.toNativeValue(),
-        },
+        enumValues: CacheMode.values.toList(),
         property: InAppWebViewSettingsProperty.cacheMode,
       ),
     ],

@@ -682,10 +682,10 @@ class ControllerMethodsRegistry {
           methodEnum: PlatformInAppWebViewControllerMethod.addUserScript,
           parameters: {
             'source': 'console.log("User script executed");',
-            'injectionTime': EnumParameterValueHint<UserScriptInjectionTime>(
+            'injectionTime': EnumParameterValueHint<UserScriptInjectionTime>
+                .fromIterable(
               UserScriptInjectionTime.AT_DOCUMENT_END,
-              UserScriptInjectionTime.values.toList(),
-              displayName: (e) => e.name(),
+              UserScriptInjectionTime.values,
             ),
             'groupName': 'testGroup',
           },
@@ -870,10 +870,10 @@ class ControllerMethodsRegistry {
           description: 'Takes a screenshot',
           methodEnum: PlatformInAppWebViewControllerMethod.takeScreenshot,
           parameters: {
-            'compressFormat': EnumParameterValueHint<CompressFormat>(
+            'compressFormat': EnumParameterValueHint<CompressFormat>
+                .fromIterable(
               CompressFormat.PNG,
-              CompressFormat.values.toList(),
-              displayName: (e) => e.name(),
+              CompressFormat.values,
             ),
             'quality': 100,
             'snapshotWidth': const ParameterValueHint<double?>(

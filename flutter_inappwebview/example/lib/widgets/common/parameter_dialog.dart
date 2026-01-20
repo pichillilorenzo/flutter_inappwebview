@@ -28,32 +28,42 @@ class ParameterValueHint<T> {
 /// Works with both standard Dart enums and custom enum-like classes
 /// (like UserScriptInjectionTime, CompressFormat) that have a `values` property
 /// and a `name()` method.
-class EnumParameterValueHint<T> extends ParameterValueHint<T> {
+class EnumParameterValueHint<T> extends ParameterValueHint<Object?> {
   /// The list of all available enum values.
   /// Accepts both List<T> and Set<T> (will be converted to List internally).
   final List<T> enumValues;
 
+  /// Whether the enum should allow multiple selections.
+  /// Useful for bitmask/flag-style enums.
+  final bool isMultiSelect;
+
   /// Optional display names for enum values.
   /// For standard Dart enums, defaults to `e.name`.
-  /// For custom enum-like classes, you should provide this function
-  /// (e.g., `(e) => e.name()` for classes with a `name()` method).
+  /// For custom enum-like classes, this is optional; the default
+  /// resolver tries `name()` then `.name` before falling back to `toString()`.
   final String Function(T)? displayName;
 
   /// Creates an enum parameter value hint.
   /// [values] can be a List<T> or Set<T> (common for custom enum-like classes).
-  const EnumParameterValueHint(T? value, this.enumValues, {this.displayName})
-    : super(value, ParameterValueType.enumeration);
+  const EnumParameterValueHint(
+    Object? value,
+    this.enumValues, {
+    this.displayName,
+    this.isMultiSelect = false,
+  }) : super(value, ParameterValueType.enumeration);
 
   /// Factory constructor that accepts an Iterable (List or Set).
   factory EnumParameterValueHint.fromIterable(
-    T? value,
+    Object? value,
     Iterable<T> values, {
     String Function(T)? displayName,
+    bool isMultiSelect = false,
   }) {
     return EnumParameterValueHint(
       value,
       values.toList(),
       displayName: displayName,
+      isMultiSelect: isMultiSelect,
     );
   }
 }
@@ -165,11 +175,17 @@ class _ParameterDialogState extends State<ParameterDialog> {
         } else {
           displayNameFn = _defaultEnumDisplayName;
         }
+        final enumValues = (value as dynamic).enumValues.toList();
+        final isMultiSelect = (value as dynamic).isMultiSelect == true;
         _enumInfoMap[key] = _EnumInfo(
-          values: (value as dynamic).enumValues.toList(),
+          values: enumValues,
           displayName: displayNameFn,
+          isMultiSelect: isMultiSelect,
         );
-        ParameterDialogUtils.setValueAtPath(cloned, path, value.value);
+        final normalizedValue = isMultiSelect
+            ? _normalizeEnumMultiSelectValue(value.value, enumValues)
+            : value.value;
+        ParameterDialogUtils.setValueAtPath(cloned, path, normalizedValue);
         return;
       }
       if (value is ParameterValueHint) {
@@ -251,6 +267,24 @@ class _ParameterDialogState extends State<ParameterDialog> {
     if (value is List) return value.isEmpty;
     if (value is Map) return value.isEmpty;
     return false;
+  }
+
+  List<dynamic> _normalizeEnumMultiSelectValue(
+    dynamic value,
+    List<dynamic> allowedValues,
+  ) {
+    if (value == null) return <dynamic>[];
+
+    Iterable<dynamic> rawValues;
+    if (value is Set) {
+      rawValues = value;
+    } else if (value is List) {
+      rawValues = value;
+    } else {
+      rawValues = [value];
+    }
+
+    return rawValues.where(allowedValues.contains).toList();
   }
 
   ParameterValueType _inferType(dynamic value, List<Object> path) {
@@ -723,6 +757,46 @@ class _ParameterDialogState extends State<ParameterDialog> {
               errorText: errorText,
             ),
           );
+        } else if (enumInfo.isMultiSelect) {
+          final selectedValues = _normalizeEnumMultiSelectValue(
+            value,
+            enumInfo.values,
+          );
+          field = InputDecorator(
+            decoration: InputDecoration(
+              labelText: label,
+              border: const OutlineInputBorder(),
+              errorText: errorText,
+            ),
+            child: Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: enumInfo.values.map((enumValue) {
+                final isSelected = selectedValues.contains(enumValue);
+                return FilterChip(
+                  label: Text(enumInfo.displayName(enumValue)),
+                  selected: isSelected,
+                  onSelected: (selected) {
+                    setState(() {
+                      final updated = List<dynamic>.from(selectedValues);
+                      if (selected) {
+                        if (!updated.contains(enumValue)) {
+                          updated.add(enumValue);
+                        }
+                      } else {
+                        updated.remove(enumValue);
+                      }
+                      ParameterDialogUtils.setValueAtPath(
+                        _editedParameters,
+                        path,
+                        updated,
+                      );
+                    });
+                  },
+                );
+              }).toList(),
+            ),
+          );
         } else {
           field = DropdownButtonFormField<dynamic>(
             value: value,
@@ -799,8 +873,13 @@ class _ParameterDialogState extends State<ParameterDialog> {
 class _EnumInfo {
   final List<dynamic> values;
   final String Function(dynamic) displayName;
+  final bool isMultiSelect;
 
-  const _EnumInfo({required this.values, required this.displayName});
+  const _EnumInfo({
+    required this.values,
+    required this.displayName,
+    required this.isMultiSelect,
+  });
 }
 
 class _ColorPickerDialog extends StatefulWidget {

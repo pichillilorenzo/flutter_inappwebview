@@ -509,7 +509,10 @@ class _SettingsEditorScreenState extends State<SettingsEditorScreen> {
     }
   }
 
-  dynamic _resolveEnumSelection(SettingDefinition setting, dynamic currentValue) {
+  dynamic _resolveEnumSelection(
+    SettingDefinition setting,
+    dynamic currentValue,
+  ) {
     if (currentValue == null) return null;
     final enumValues = setting.enumValues;
     if (enumValues == null || enumValues.isEmpty) return null;

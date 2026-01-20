@@ -70,9 +70,8 @@ class _WebStorageScreenState extends State<WebStorageScreen>
 
   bool get _isLocalStorageTab => _tabController.index == 0;
 
-  String get _activeStorageTypeName => _isLocalStorageTab
-      ? '$LocalStorage'
-      : '$SessionStorage';
+  String get _activeStorageTypeName =>
+      _isLocalStorageTab ? '$LocalStorage' : '$SessionStorage';
 
   String _storageMethodKey(String methodName) {
     return '$_activeStorageTypeName.$methodName';

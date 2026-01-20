@@ -842,9 +842,7 @@ class _WebViewEnvironmentSettingsEditorScreenState
                 await settingsManager.recreateEnvironment();
                 if (mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('$WebViewEnvironment recreated'),
-                    ),
+                    SnackBar(content: Text('$WebViewEnvironment recreated')),
                   );
                 }
               },

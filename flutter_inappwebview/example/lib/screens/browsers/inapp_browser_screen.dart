@@ -291,7 +291,7 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
       title: PlatformInAppBrowserMethod.openData.name,
       parameters: {
         'data':
-          '<html><body><h1>Hello ${InAppBrowser}!</h1><p>This is HTML data.</p></body></html>',
+            '<html><body><h1>Hello ${InAppBrowser}!</h1><p>This is HTML data.</p></body></html>',
         'mimeType': 'text/html',
         'encoding': 'utf8',
         'toolbarTopBackgroundColor': Colors.purple,

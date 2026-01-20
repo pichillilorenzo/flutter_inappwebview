@@ -194,10 +194,8 @@ class PlatformInfoScreen extends StatelessWidget {
     try {
       return {
         '${InAppWebView} (Widget)': InAppWebView.isClassSupported(),
-        '${InAppWebViewController}':
-            InAppWebViewController.isClassSupported(),
-        '${HeadlessInAppWebView}':
-            HeadlessInAppWebView.isClassSupported(),
+        '${InAppWebViewController}': InAppWebViewController.isClassSupported(),
+        '${HeadlessInAppWebView}': HeadlessInAppWebView.isClassSupported(),
       };
     } catch (e) {
       return {};

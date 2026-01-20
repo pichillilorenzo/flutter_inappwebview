@@ -102,8 +102,7 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
   final Map<String, int> _selectedHistoryIndex = {};
   static const int _maxHistoryEntries = 3;
 
-  String get _initStatusKey =>
-      PlatformInAppBrowserMethod.openUrlRequest.name;
+  String get _initStatusKey => PlatformInAppBrowserMethod.openUrlRequest.name;
 
   void _initBrowser(WebViewEnvironment? webViewEnvironment) {
     try {
@@ -436,18 +435,6 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
         isError: true,
       );
     }
-  }
-
-  void _removeAllMenuItems() {
-    _browser?.removeAllMenuItem();
-    setState(() {
-      _menuItems.clear();
-    });
-    _recordMethodResult(
-      PlatformInAppBrowserMethod.removeAllMenuItems.name,
-      'All menu items removed',
-      isError: false,
-    );
   }
 
   Future<void> _show() async {
@@ -876,9 +863,6 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
             const SizedBox(height: 8),
             _buildMethodHistory(PlatformInAppBrowserMethod.addMenuItem.name),
             _buildMethodHistory(PlatformInAppBrowserMethod.removeMenuItem.name),
-            _buildMethodHistory(
-              PlatformInAppBrowserMethod.removeAllMenuItems.name,
-            ),
             const SizedBox(height: 12),
             if (_menuItems.isNotEmpty) ...[
               const Divider(),
@@ -898,16 +882,6 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
                     ),
                   );
                 },
-              ),
-              const SizedBox(height: 8),
-              ElevatedButton.icon(
-                onPressed: _removeAllMenuItems,
-                icon: const Icon(Icons.clear_all),
-                label: const Text('Remove All'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
-                  foregroundColor: Colors.white,
-                ),
               ),
             ],
           ],

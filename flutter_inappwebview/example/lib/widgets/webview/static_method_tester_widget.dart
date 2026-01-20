@@ -23,10 +23,10 @@ enum StaticMethodType {
   tRexRunnerHtml,
   tRexRunnerCss,
 
-    // In-app browser methods
+  // In-app browser methods
   openWithSystemBrowser,
 
-    // Custom tab / Safari view controller methods
+  // Custom tab / Safari view controller methods
   isAvailable,
   getMaxToolbarItems,
   getPackageName,
@@ -36,23 +36,23 @@ enum StaticMethodType {
   // Web authentication methods
   // isAvailable - already defined above, reused
 
-    // Service worker methods
+  // Service worker methods
   instance,
 
-    // WebView feature checks
+  // WebView feature checks
   isFeatureSupported,
   isStartupFeatureSupported,
 
-    // Process global config methods
+  // Process global config methods
   apply,
 
-    // Cookie methods
+  // Cookie methods
   // instance - already defined above, reused
 
-    // HTTP auth credential database methods
+  // HTTP auth credential database methods
   // instance - already defined above, reused
 
-    // Web storage methods
+  // Web storage methods
   // instance - already defined above, reused
 }
 
@@ -93,21 +93,13 @@ enum StaticClassType {
     'Process-level configuration (Android)',
     Icons.settings_applications,
   ),
-  cookieManager(
-    CookieManager,
-    'Cookie management methods',
-    Icons.cookie,
-  ),
+  cookieManager(CookieManager, 'Cookie management methods', Icons.cookie),
   httpAuthCredentialDatabase(
     HttpAuthCredentialDatabase,
     'HTTP authentication credential storage',
     Icons.lock,
   ),
-  webStorageManager(
-    WebStorageManager,
-    'Web storage management',
-    Icons.storage,
-  );
+  webStorageManager(WebStorageManager, 'Web storage management', Icons.storage);
 
   final Type apiType;
   final String description;
@@ -469,9 +461,7 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
             methodType: StaticMethodType.isFeatureSupported,
             description: 'Checks if a WebView feature is supported',
             classType: WebViewFeature,
-            parameters: {
-              'feature': WebViewFeature.WEB_MESSAGE_LISTENER.name(),
-            },
+            parameters: {'feature': WebViewFeature.WEB_MESSAGE_LISTENER.name()},
             requiredParameters: ['feature'],
             execute: (params) async {
               final featureName =
@@ -489,9 +479,9 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
             description: 'Checks if a startup feature is supported',
             classType: WebViewFeature,
             parameters: {
-              'feature':
-                  WebViewFeature.STARTUP_FEATURE_SET_DATA_DIRECTORY_SUFFIX
-                      .name(),
+              'feature': WebViewFeature
+                  .STARTUP_FEATURE_SET_DATA_DIRECTORY_SUFFIX
+                  .name(),
             },
             requiredParameters: ['feature'],
             execute: (params) async {

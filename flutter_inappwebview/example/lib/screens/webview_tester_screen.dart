@@ -336,7 +336,7 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
         _webViewController = controller;
         _logEvent(
           EventType.ui,
-          'onWebViewCreated',
+          PlatformWebViewCreationParamsProperty.onWebViewCreated.name,
           data: {'viewId': controller.getViewId()},
         );
       },
@@ -345,7 +345,7 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
       onLoadStart: (controller, url) {
         _logEvent(
           EventType.navigation,
-          'onLoadStart',
+          PlatformWebViewCreationParamsProperty.onLoadStart.name,
           data: {'url': url?.toString()},
         );
         if (url != null) {
@@ -358,7 +358,7 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
       onLoadStop: (controller, url) async {
         _logEvent(
           EventType.navigation,
-          'onLoadStop',
+          PlatformWebViewCreationParamsProperty.onLoadStop.name,
           data: {'url': url?.toString()},
         );
         if (url != null) {
@@ -376,7 +376,7 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
       onReceivedError: (controller, request, error) {
         _logEvent(
           EventType.error,
-          'onReceivedError',
+          PlatformWebViewCreationParamsProperty.onReceivedError.name,
           data: {
             'url': request.url.toString(),
             'errorType': error.type.name(),
@@ -389,7 +389,7 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
       onReceivedHttpError: (controller, request, response) {
         _logEvent(
           EventType.error,
-          'onReceivedHttpError',
+          PlatformWebViewCreationParamsProperty.onReceivedHttpError.name,
           data: {
             'url': request.url.toString(),
             'statusCode': response.statusCode,
@@ -405,7 +405,7 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
         });
         _logEvent(
           EventType.performance,
-          'onProgressChanged',
+          PlatformWebViewCreationParamsProperty.onProgressChanged.name,
           data: {'progress': progress},
         );
       },
@@ -414,7 +414,7 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
       onConsoleMessage: (controller, consoleMessage) {
         _logEvent(
           EventType.console,
-          'onConsoleMessage',
+          PlatformWebViewCreationParamsProperty.onConsoleMessage.name,
           data: {
             'message': consoleMessage.message,
             'level': consoleMessage.messageLevel.name(),
@@ -424,7 +424,11 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
 
       // 8. onTitleChanged
       onTitleChanged: (controller, title) {
-        _logEvent(EventType.ui, 'onTitleChanged', data: {'title': title});
+        _logEvent(
+          EventType.ui,
+          PlatformWebViewCreationParamsProperty.onTitleChanged.name,
+          data: {'title': title},
+        );
         setState(() {
           _currentTitle = title;
         });
@@ -439,7 +443,7 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
         final url = navigationAction.request.url;
         _logEvent(
           EventType.navigation,
-          'shouldOverrideUrlLoading',
+          PlatformWebViewCreationParamsProperty.shouldOverrideUrlLoading.name,
           data: {
             'url': url?.toString(),
             'isForMainFrame': navigationAction.isForMainFrame,
@@ -468,7 +472,7 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
       onLoadResource: (controller, resource) {
         // _logEvent(
         //   EventType.network,
-        //   'onLoadResource',
+        //   PlatformWebViewCreationParamsProperty.onLoadResource.name,
         //   data: {
         //     'url': resource.url?.toString(),
         //     'initiatorType': resource.initiatorType,
@@ -482,7 +486,7 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
       onUpdateVisitedHistory: (controller, url, isReload) {
         _logEvent(
           EventType.navigation,
-          'onUpdateVisitedHistory',
+          PlatformWebViewCreationParamsProperty.onUpdateVisitedHistory.name,
           data: {'url': url?.toString(), 'isReload': isReload},
         );
         if (url != null) {
@@ -495,7 +499,7 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
       onPageCommitVisible: (controller, url) {
         _logEvent(
           EventType.navigation,
-          'onPageCommitVisible',
+          PlatformWebViewCreationParamsProperty.onPageCommitVisible.name,
           data: {'url': url?.toString()},
         );
         if (url != null) {
@@ -507,7 +511,7 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
       onNavigationResponse: (controller, navigationResponse) async {
         _logEvent(
           EventType.navigation,
-          'onNavigationResponse',
+          PlatformWebViewCreationParamsProperty.onNavigationResponse.name,
           data: {
             'url': navigationResponse.response?.url?.toString(),
             'statusCode': navigationResponse.response?.statusCode,
@@ -522,7 +526,9 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
       onDidReceiveServerRedirectForProvisionalNavigation: (controller) {
         _logEvent(
           EventType.navigation,
-          'onDidReceiveServerRedirectForProvisionalNavigation',
+          PlatformWebViewCreationParamsProperty
+              .onDidReceiveServerRedirectForProvisionalNavigation
+              .name,
         );
       },
 
@@ -534,7 +540,7 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
       onCreateWindow: (controller, createWindowAction) async {
         _logEvent(
           EventType.ui,
-          'onCreateWindow',
+          PlatformWebViewCreationParamsProperty.onCreateWindow.name,
           data: {
             'url': createWindowAction.request.url?.toString(),
             'windowId': createWindowAction.windowId,
@@ -546,17 +552,26 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
 
       // 16. onCloseWindow
       onCloseWindow: (controller) {
-        _logEvent(EventType.ui, 'onCloseWindow');
+        _logEvent(
+          EventType.ui,
+          PlatformWebViewCreationParamsProperty.onCloseWindow.name,
+        );
       },
 
       // 17. onWindowFocus
       onWindowFocus: (controller) {
-        _logEvent(EventType.ui, 'onWindowFocus');
+        _logEvent(
+          EventType.ui,
+          PlatformWebViewCreationParamsProperty.onWindowFocus.name,
+        );
       },
 
       // 18. onWindowBlur
       onWindowBlur: (controller) {
-        _logEvent(EventType.ui, 'onWindowBlur');
+        _logEvent(
+          EventType.ui,
+          PlatformWebViewCreationParamsProperty.onWindowBlur.name,
+        );
       },
 
       // ============================================================
@@ -567,7 +582,7 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
       onJsAlert: (controller, jsAlertRequest) async {
         _logEvent(
           EventType.javascript,
-          'onJsAlert',
+          PlatformWebViewCreationParamsProperty.onJsAlert.name,
           data: {
             'message': jsAlertRequest.message,
             'url': jsAlertRequest.url?.toString(),
@@ -580,7 +595,7 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
       onJsConfirm: (controller, jsConfirmRequest) async {
         _logEvent(
           EventType.javascript,
-          'onJsConfirm',
+          PlatformWebViewCreationParamsProperty.onJsConfirm.name,
           data: {
             'message': jsConfirmRequest.message,
             'url': jsConfirmRequest.url?.toString(),
@@ -593,7 +608,7 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
       onJsPrompt: (controller, jsPromptRequest) async {
         _logEvent(
           EventType.javascript,
-          'onJsPrompt',
+          PlatformWebViewCreationParamsProperty.onJsPrompt.name,
           data: {
             'message': jsPromptRequest.message,
             'defaultValue': jsPromptRequest.defaultValue,
@@ -607,7 +622,7 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
       onJsBeforeUnload: (controller, jsBeforeUnloadRequest) async {
         _logEvent(
           EventType.javascript,
-          'onJsBeforeUnload',
+          PlatformWebViewCreationParamsProperty.onJsBeforeUnload.name,
           data: {
             'message': jsBeforeUnloadRequest.message,
             'url': jsBeforeUnloadRequest.url?.toString(),
@@ -624,7 +639,7 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
       onReceivedHttpAuthRequest: (controller, challenge) async {
         _logEvent(
           EventType.network,
-          'onReceivedHttpAuthRequest',
+          PlatformWebViewCreationParamsProperty.onReceivedHttpAuthRequest.name,
           data: {
             'host': challenge.protectionSpace.host,
             'port': challenge.protectionSpace.port,
@@ -639,7 +654,9 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
       onReceivedServerTrustAuthRequest: (controller, challenge) async {
         _logEvent(
           EventType.network,
-          'onReceivedServerTrustAuthRequest',
+          PlatformWebViewCreationParamsProperty
+              .onReceivedServerTrustAuthRequest
+              .name,
           data: {
             'host': challenge.protectionSpace.host,
             'port': challenge.protectionSpace.port,
@@ -655,7 +672,9 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
       onReceivedClientCertRequest: (controller, challenge) async {
         _logEvent(
           EventType.network,
-          'onReceivedClientCertRequest',
+          PlatformWebViewCreationParamsProperty
+              .onReceivedClientCertRequest
+              .name,
           data: {
             'host': challenge.protectionSpace.host,
             'port': challenge.protectionSpace.port,
@@ -673,7 +692,7 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
       shouldInterceptAjaxRequest: (controller, ajaxRequest) async {
         _logEvent(
           EventType.network,
-          'shouldInterceptAjaxRequest',
+          PlatformWebViewCreationParamsProperty.shouldInterceptAjaxRequest.name,
           data: {
             'url': ajaxRequest.url?.toString(),
             'method': ajaxRequest.method,
@@ -687,7 +706,7 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
       onAjaxReadyStateChange: (controller, ajaxRequest) async {
         _logEvent(
           EventType.network,
-          'onAjaxReadyStateChange',
+          PlatformWebViewCreationParamsProperty.onAjaxReadyStateChange.name,
           data: {
             'url': ajaxRequest.url?.toString(),
             'method': ajaxRequest.method,
@@ -702,7 +721,7 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
       onAjaxProgress: (controller, ajaxRequest) async {
         _logEvent(
           EventType.network,
-          'onAjaxProgress',
+          PlatformWebViewCreationParamsProperty.onAjaxProgress.name,
           data: {
             'url': ajaxRequest.url?.toString(),
             'method': ajaxRequest.method,
@@ -716,7 +735,9 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
       shouldInterceptFetchRequest: (controller, fetchRequest) async {
         _logEvent(
           EventType.network,
-          'shouldInterceptFetchRequest',
+          PlatformWebViewCreationParamsProperty
+              .shouldInterceptFetchRequest
+              .name,
           data: {
             'url': fetchRequest.url?.toString(),
             'method': fetchRequest.method,
@@ -731,7 +752,7 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
       shouldInterceptRequest: (controller, request) async {
         _logEvent(
           EventType.network,
-          'shouldInterceptRequest',
+          PlatformWebViewCreationParamsProperty.shouldInterceptRequest.name,
           data: {
             'url': request.url.toString(),
             'method': request.method,
@@ -745,7 +766,9 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
       onLoadResourceWithCustomScheme: (controller, request) async {
         _logEvent(
           EventType.network,
-          'onLoadResourceWithCustomScheme',
+          PlatformWebViewCreationParamsProperty
+              .onLoadResourceWithCustomScheme
+              .name,
           data: {'url': request.url.toString(), 'scheme': request.url.scheme},
         );
         return null; // Don't handle custom scheme
@@ -759,7 +782,7 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
       onDownloadStarting: (controller, downloadStartRequest) async {
         _logEvent(
           EventType.network,
-          'onDownloadStarting',
+          PlatformWebViewCreationParamsProperty.onDownloadStarting.name,
           data: {
             'url': downloadStartRequest.url.toString(),
             'mimeType': downloadStartRequest.mimeType,
@@ -779,14 +802,18 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
 
       // 33. onScrollChanged
       onScrollChanged: (controller, x, y) {
-        // _logEvent(EventType.ui, 'onScrollChanged', data: {'x': x, 'y': y});
+        // _logEvent(
+        //   EventType.ui,
+        //   PlatformWebViewCreationParamsProperty.onScrollChanged.name,
+        //   data: {'x': x, 'y': y},
+        // );
       },
 
       // 34. onOverScrolled
       onOverScrolled: (controller, x, y, clampedX, clampedY) {
         _logEvent(
           EventType.ui,
-          'onOverScrolled',
+          PlatformWebViewCreationParamsProperty.onOverScrolled.name,
           data: {'x': x, 'y': y, 'clampedX': clampedX, 'clampedY': clampedY},
         );
       },
@@ -799,7 +826,7 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
       onZoomScaleChanged: (controller, oldScale, newScale) {
         _logEvent(
           EventType.ui,
-          'onZoomScaleChanged',
+          PlatformWebViewCreationParamsProperty.onZoomScaleChanged.name,
           data: {'oldScale': oldScale, 'newScale': newScale},
         );
       },
@@ -812,7 +839,7 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
       onPrintRequest: (controller, url, printJobController) async {
         _logEvent(
           EventType.ui,
-          'onPrintRequest',
+          PlatformWebViewCreationParamsProperty.onPrintRequest.name,
           data: {'url': url?.toString()},
         );
         return false; // Don't handle print
@@ -824,12 +851,18 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
 
       // 37. onEnterFullscreen
       onEnterFullscreen: (controller) {
-        _logEvent(EventType.ui, 'onEnterFullscreen');
+        _logEvent(
+          EventType.ui,
+          PlatformWebViewCreationParamsProperty.onEnterFullscreen.name,
+        );
       },
 
       // 38. onExitFullscreen
       onExitFullscreen: (controller) {
-        _logEvent(EventType.ui, 'onExitFullscreen');
+        _logEvent(
+          EventType.ui,
+          PlatformWebViewCreationParamsProperty.onExitFullscreen.name,
+        );
       },
 
       // ============================================================
@@ -840,7 +873,7 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
       onPermissionRequest: (controller, permissionRequest) async {
         _logEvent(
           EventType.ui,
-          'onPermissionRequest',
+          PlatformWebViewCreationParamsProperty.onPermissionRequest.name,
           data: {
             'resources': permissionRequest.resources
                 .map((r) => r.name)
@@ -857,7 +890,9 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
       onPermissionRequestCanceled: (controller, permissionRequest) {
         _logEvent(
           EventType.ui,
-          'onPermissionRequestCanceled',
+          PlatformWebViewCreationParamsProperty
+              .onPermissionRequestCanceled
+              .name,
           data: {
             'resources': permissionRequest.resources
                 .map((r) => r.name)
@@ -870,7 +905,9 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
       onGeolocationPermissionsShowPrompt: (controller, origin) async {
         _logEvent(
           EventType.ui,
-          'onGeolocationPermissionsShowPrompt',
+          PlatformWebViewCreationParamsProperty
+              .onGeolocationPermissionsShowPrompt
+              .name,
           data: {'origin': origin},
         );
         return GeolocationPermissionShowPromptResponse(
@@ -882,7 +919,12 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
 
       // 42. onGeolocationPermissionsHidePrompt
       onGeolocationPermissionsHidePrompt: (controller) {
-        _logEvent(EventType.ui, 'onGeolocationPermissionsHidePrompt');
+        _logEvent(
+          EventType.ui,
+          PlatformWebViewCreationParamsProperty
+              .onGeolocationPermissionsHidePrompt
+              .name,
+        );
       },
 
       // ============================================================
@@ -893,7 +935,7 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
       onLongPressHitTestResult: (controller, hitTestResult) async {
         _logEvent(
           EventType.ui,
-          'onLongPressHitTestResult',
+          PlatformWebViewCreationParamsProperty.onLongPressHitTestResult.name,
           data: {
             'type': hitTestResult.type?.name(),
             'extra': hitTestResult.extra,
@@ -909,7 +951,9 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
       onRenderProcessUnresponsive: (controller, url) async {
         _logEvent(
           EventType.error,
-          'onRenderProcessUnresponsive',
+          PlatformWebViewCreationParamsProperty
+              .onRenderProcessUnresponsive
+              .name,
           data: {'url': url?.toString()},
         );
         return WebViewRenderProcessAction.TERMINATE;
@@ -919,7 +963,7 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
       onRenderProcessResponsive: (controller, url) async {
         _logEvent(
           EventType.ui,
-          'onRenderProcessResponsive',
+          PlatformWebViewCreationParamsProperty.onRenderProcessResponsive.name,
           data: {'url': url?.toString()},
         );
         return WebViewRenderProcessAction.TERMINATE;
@@ -929,7 +973,7 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
       onRenderProcessGone: (controller, detail) {
         _logEvent(
           EventType.error,
-          'onRenderProcessGone',
+          PlatformWebViewCreationParamsProperty.onRenderProcessGone.name,
           data: {
             'didCrash': detail.didCrash,
             'rendererPriorityAtExit': detail.rendererPriorityAtExit?.name(),
@@ -945,7 +989,7 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
       onFormResubmission: (controller, url) async {
         _logEvent(
           EventType.navigation,
-          'onFormResubmission',
+          PlatformWebViewCreationParamsProperty.onFormResubmission.name,
           data: {'url': url?.toString()},
         );
         return FormResubmissionAction.DONT_RESEND;
@@ -955,7 +999,7 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
       onReceivedLoginRequest: (controller, loginRequest) {
         _logEvent(
           EventType.network,
-          'onReceivedLoginRequest',
+          PlatformWebViewCreationParamsProperty.onReceivedLoginRequest.name,
           data: {
             'realm': loginRequest.realm,
             'account': loginRequest.account,
@@ -972,7 +1016,7 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
       onReceivedIcon: (controller, icon) {
         _logEvent(
           EventType.ui,
-          'onReceivedIcon',
+          PlatformWebViewCreationParamsProperty.onReceivedIcon.name,
           data: {'iconSize': icon.length},
         );
       },
@@ -981,7 +1025,7 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
       onReceivedTouchIconUrl: (controller, url, precomposed) {
         _logEvent(
           EventType.ui,
-          'onReceivedTouchIconUrl',
+          PlatformWebViewCreationParamsProperty.onReceivedTouchIconUrl.name,
           data: {'url': url.toString(), 'precomposed': precomposed},
         );
       },
@@ -994,7 +1038,7 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
       onSafeBrowsingHit: (controller, url, threatType) async {
         _logEvent(
           EventType.error,
-          'onSafeBrowsingHit',
+          PlatformWebViewCreationParamsProperty.onSafeBrowsingHit.name,
           data: {'url': url.toString(), 'threatType': threatType?.name},
         );
         return SafeBrowsingResponse(
@@ -1009,14 +1053,19 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
 
       // 52. onWebContentProcessDidTerminate
       onWebContentProcessDidTerminate: (controller) {
-        _logEvent(EventType.error, 'onWebContentProcessDidTerminate');
+        _logEvent(
+          EventType.error,
+          PlatformWebViewCreationParamsProperty
+              .onWebContentProcessDidTerminate
+              .name,
+        );
       },
 
       // 53. shouldAllowDeprecatedTLS
       shouldAllowDeprecatedTLS: (controller, challenge) async {
         _logEvent(
           EventType.network,
-          'shouldAllowDeprecatedTLS',
+          PlatformWebViewCreationParamsProperty.shouldAllowDeprecatedTLS.name,
           data: {
             'host': challenge.protectionSpace.host,
             'port': challenge.protectionSpace.port,
@@ -1030,7 +1079,9 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
       onCameraCaptureStateChanged: (controller, oldState, newState) {
         _logEvent(
           EventType.ui,
-          'onCameraCaptureStateChanged',
+          PlatformWebViewCreationParamsProperty
+              .onCameraCaptureStateChanged
+              .name,
           data: {'oldState': oldState?.name(), 'newState': newState?.name()},
         );
       },
@@ -1039,7 +1090,9 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
       onMicrophoneCaptureStateChanged: (controller, oldState, newState) {
         _logEvent(
           EventType.ui,
-          'onMicrophoneCaptureStateChanged',
+          PlatformWebViewCreationParamsProperty
+              .onMicrophoneCaptureStateChanged
+              .name,
           data: {'oldState': oldState?.name(), 'newState': newState?.name()},
         );
       },
@@ -1048,7 +1101,7 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
       onContentSizeChanged: (controller, oldContentSize, newContentSize) {
         _logEvent(
           EventType.ui,
-          'onContentSizeChanged',
+          PlatformWebViewCreationParamsProperty.onContentSizeChanged.name,
           data: {
             'oldWidth': oldContentSize.width,
             'oldHeight': oldContentSize.height,
@@ -1066,7 +1119,7 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
       onProcessFailed: (controller, detail) {
         _logEvent(
           EventType.error,
-          'onProcessFailed',
+          PlatformWebViewCreationParamsProperty.onProcessFailed.name,
           data: {
             'kind': detail.kind.name(),
             'reason': detail.reason?.name(),
@@ -1079,7 +1132,7 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
       onAcceleratorKeyPressed: (controller, keyEventInfo) {
         _logEvent(
           EventType.ui,
-          'onAcceleratorKeyPressed',
+          PlatformWebViewCreationParamsProperty.onAcceleratorKeyPressed.name,
           data: {
             'keyEventKind': keyEventInfo.keyEventKind,
             'virtualKey': keyEventInfo.virtualKey,
@@ -1094,14 +1147,17 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
 
       // 59. onRequestFocus
       onRequestFocus: (controller) {
-        _logEvent(EventType.ui, 'onRequestFocus');
+        _logEvent(
+          EventType.ui,
+          PlatformWebViewCreationParamsProperty.onRequestFocus.name,
+        );
       },
 
       // 60. onShowFileChooser
       onShowFileChooser: (controller, fileChooserParams) async {
         _logEvent(
           EventType.ui,
-          'onShowFileChooser',
+          PlatformWebViewCreationParamsProperty.onShowFileChooser.name,
           data: {
             'mode': fileChooserParams.mode.name(),
             'acceptTypes': fileChooserParams.acceptTypes,

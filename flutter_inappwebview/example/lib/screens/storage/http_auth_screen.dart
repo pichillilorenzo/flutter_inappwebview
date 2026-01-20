@@ -35,13 +35,13 @@ class _HttpAuthScreenState extends State<HttpAuthScreen> {
       final credentials = await _db.getAllAuthCredentials();
       setState(() => _allCredentials = credentials);
       _recordMethodResult(
-        'getAllAuthCredentials',
+        PlatformHttpAuthCredentialDatabaseMethod.getAllAuthCredentials.name,
         'Found ${credentials.length} protection spaces',
         isError: false,
       );
     } catch (e) {
       _recordMethodResult(
-        'getAllAuthCredentials',
+        PlatformHttpAuthCredentialDatabaseMethod.getAllAuthCredentials.name,
         'Error getting credentials: $e',
         isError: true,
       );
@@ -60,13 +60,13 @@ class _HttpAuthScreenState extends State<HttpAuthScreen> {
       );
       _showCredentialsDialog(protectionSpace, credentials);
       _recordMethodResult(
-        'getHttpAuthCredentials',
+        PlatformHttpAuthCredentialDatabaseMethod.getHttpAuthCredentials.name,
         'Found ${credentials.length} credential(s)',
         isError: false,
       );
     } catch (e) {
       _recordMethodResult(
-        'getHttpAuthCredentials',
+        PlatformHttpAuthCredentialDatabaseMethod.getHttpAuthCredentials.name,
         'Error getting credentials: $e',
         isError: true,
       );
@@ -116,14 +116,14 @@ class _HttpAuthScreenState extends State<HttpAuthScreen> {
         credential: credential,
       );
       _recordMethodResult(
-        'removeHttpAuthCredential',
+        PlatformHttpAuthCredentialDatabaseMethod.removeHttpAuthCredential.name,
         'Credential removed',
         isError: false,
       );
       await _getAllAuthCredentials();
     } catch (e) {
       _recordMethodResult(
-        'removeHttpAuthCredential',
+        PlatformHttpAuthCredentialDatabaseMethod.removeHttpAuthCredential.name,
         'Error removing credential: $e',
         isError: true,
       );
@@ -151,7 +151,7 @@ class _HttpAuthScreenState extends State<HttpAuthScreen> {
     final space = _protectionSpaceFromParams(params['protectionSpace']);
     if (space == null) {
       _recordMethodResult(
-        'getHttpAuthCredentials',
+        PlatformHttpAuthCredentialDatabaseMethod.getHttpAuthCredentials.name,
         'Protection space host is required',
         isError: true,
       );
@@ -184,7 +184,7 @@ class _HttpAuthScreenState extends State<HttpAuthScreen> {
     final space = _protectionSpaceFromParams(params['protectionSpace']);
     if (space == null) {
       _recordMethodResult(
-        'removeHttpAuthCredential',
+        PlatformHttpAuthCredentialDatabaseMethod.removeHttpAuthCredential.name,
         'Protection space host is required',
         isError: true,
       );
@@ -193,7 +193,7 @@ class _HttpAuthScreenState extends State<HttpAuthScreen> {
     final credential = _credentialFromParams(params['credential']);
     if (credential == null) {
       _recordMethodResult(
-        'removeHttpAuthCredential',
+        PlatformHttpAuthCredentialDatabaseMethod.removeHttpAuthCredential.name,
         'Credential username and password are required',
         isError: true,
       );
@@ -221,7 +221,7 @@ class _HttpAuthScreenState extends State<HttpAuthScreen> {
     final space = _protectionSpaceFromParams(params['protectionSpace']);
     if (space == null) {
       _recordMethodResult(
-        'removeHttpAuthCredentials',
+        PlatformHttpAuthCredentialDatabaseMethod.removeHttpAuthCredentials.name,
         'Protection space host is required',
         isError: true,
       );
@@ -243,14 +243,14 @@ class _HttpAuthScreenState extends State<HttpAuthScreen> {
     try {
       await _db.removeHttpAuthCredentials(protectionSpace: protectionSpace);
       _recordMethodResult(
-        'removeHttpAuthCredentials',
+        PlatformHttpAuthCredentialDatabaseMethod.removeHttpAuthCredentials.name,
         'Credentials removed for protection space',
         isError: false,
       );
       await _getAllAuthCredentials();
     } catch (e) {
       _recordMethodResult(
-        'removeHttpAuthCredentials',
+        PlatformHttpAuthCredentialDatabaseMethod.removeHttpAuthCredentials.name,
         'Error removing credentials: $e',
         isError: true,
       );
@@ -271,13 +271,13 @@ class _HttpAuthScreenState extends State<HttpAuthScreen> {
       await _db.clearAllAuthCredentials();
       setState(() => _allCredentials = []);
       _recordMethodResult(
-        'clearAllAuthCredentials',
+        PlatformHttpAuthCredentialDatabaseMethod.clearAllAuthCredentials.name,
         'All credentials cleared',
         isError: false,
       );
     } catch (e) {
       _recordMethodResult(
-        'clearAllAuthCredentials',
+        PlatformHttpAuthCredentialDatabaseMethod.clearAllAuthCredentials.name,
         'Error clearing credentials: $e',
         isError: true,
       );
@@ -341,7 +341,7 @@ class _HttpAuthScreenState extends State<HttpAuthScreen> {
     final credential = _credentialFromParams(params['credential']);
     if (space == null || credential == null) {
       _recordMethodResult(
-        'setHttpAuthCredential',
+        PlatformHttpAuthCredentialDatabaseMethod.setHttpAuthCredential.name,
         'Protection space, username, and password are required',
         isError: true,
       );
@@ -355,14 +355,14 @@ class _HttpAuthScreenState extends State<HttpAuthScreen> {
         credential: credential,
       );
       _recordMethodResult(
-        'setHttpAuthCredential',
+        PlatformHttpAuthCredentialDatabaseMethod.setHttpAuthCredential.name,
         'Credential saved',
         isError: false,
       );
       await _getAllAuthCredentials();
     } catch (e) {
       _recordMethodResult(
-        'setHttpAuthCredential',
+        PlatformHttpAuthCredentialDatabaseMethod.setHttpAuthCredential.name,
         'Error saving credential: $e',
         isError: true,
       );
@@ -480,39 +480,33 @@ class _HttpAuthScreenState extends State<HttpAuthScreen> {
         padding: const EdgeInsets.all(16),
         children: [
           _buildMethodSection(
-            'getAllAuthCredentials',
-            'Get all saved credentials',
             PlatformHttpAuthCredentialDatabaseMethod.getAllAuthCredentials,
+            'Get all saved credentials',
             _getAllAuthCredentials,
           ),
           _buildMethodSection(
-            'getHttpAuthCredentials',
-            'Get credentials for a protection space (select from list)',
             PlatformHttpAuthCredentialDatabaseMethod.getHttpAuthCredentials,
+            'Get credentials for a protection space (select from list)',
             _promptGetHttpAuthCredentials,
           ),
           _buildMethodSection(
-            'setHttpAuthCredential',
-            'Save a new credential',
             PlatformHttpAuthCredentialDatabaseMethod.setHttpAuthCredential,
+            'Save a new credential',
             _setHttpAuthCredential,
           ),
           _buildMethodSection(
-            'removeHttpAuthCredential',
-            'Remove a specific credential (select from list)',
             PlatformHttpAuthCredentialDatabaseMethod.removeHttpAuthCredential,
+            'Remove a specific credential (select from list)',
             _promptRemoveHttpAuthCredential,
           ),
           _buildMethodSection(
-            'removeHttpAuthCredentials',
-            'Remove all credentials for a protection space',
             PlatformHttpAuthCredentialDatabaseMethod.removeHttpAuthCredentials,
+            'Remove all credentials for a protection space',
             _promptRemoveHttpAuthCredentials,
           ),
           _buildMethodSection(
-            'clearAllAuthCredentials',
-            'Clear all credentials',
             PlatformHttpAuthCredentialDatabaseMethod.clearAllAuthCredentials,
+            'Clear all credentials',
             _clearAllAuthCredentials,
           ),
           const SizedBox(height: 16),
@@ -523,11 +517,11 @@ class _HttpAuthScreenState extends State<HttpAuthScreen> {
   }
 
   Widget _buildMethodSection(
-    String methodName,
-    String description,
     PlatformHttpAuthCredentialDatabaseMethod method,
+    String description,
     VoidCallback? onPressed,
   ) {
+    final methodName = method.name;
     final supportedPlatforms = SupportCheckHelper.supportedPlatformsForMethod(
       method: method,
       checker: HttpAuthCredentialDatabase.isMethodSupported,
@@ -582,7 +576,7 @@ class _HttpAuthScreenState extends State<HttpAuthScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Click "Save a new credential" to add HTTP auth credentials',
+                  'Click "${PlatformHttpAuthCredentialDatabaseMethod.setHttpAuthCredential.name}" to add HTTP auth credentials',
                   style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
                 ),
               ],

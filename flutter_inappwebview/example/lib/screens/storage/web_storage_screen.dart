@@ -70,8 +70,16 @@ class _WebStorageScreenState extends State<WebStorageScreen>
 
   bool get _isLocalStorageTab => _tabController.index == 0;
 
+  String get _activeStorageTypeName => _isLocalStorageTab
+      ? (LocalStorage).toString()
+      : (SessionStorage).toString();
+
   String _storageMethodKey(String methodName) {
-    return '${_isLocalStorageTab ? 'localStorage' : 'sessionStorage'}.$methodName';
+    return '$_activeStorageTypeName.$methodName';
+  }
+
+  String _managerMethodKey(PlatformWebStorageManagerMethod method) {
+    return '${(WebStorageManager).toString()}.${method.name}';
   }
 
   Set<SupportedPlatform> _getStorageMethodPlatforms(
@@ -100,7 +108,11 @@ class _WebStorageScreenState extends State<WebStorageScreen>
   Future<void> _loadUrl() async {
     final url = _urlController.text.trim();
     if (url.isEmpty) {
-      _recordMethodResult('loadUrl', 'Please enter a URL', isError: true);
+      _recordMethodResult(
+        PlatformInAppWebViewControllerMethod.loadUrl.name,
+        'Please enter a URL',
+        isError: true,
+      );
       return;
     }
 
@@ -109,14 +121,18 @@ class _WebStorageScreenState extends State<WebStorageScreen>
         urlRequest: URLRequest(url: WebUri(url)),
       );
     } catch (e) {
-      _recordMethodResult('loadUrl', 'Error loading URL: $e', isError: true);
+      _recordMethodResult(
+        PlatformInAppWebViewControllerMethod.loadUrl.name,
+        'Error loading URL: $e',
+        isError: true,
+      );
     }
   }
 
   Future<void> _getLength() async {
     if (!_webViewReady) {
       _recordMethodResult(
-        _storageMethodKey('length'),
+        _storageMethodKey(PlatformLocalStorageMethod.length.name),
         'WebView not ready. Load a page first.',
         isError: true,
       );
@@ -136,13 +152,13 @@ class _WebStorageScreenState extends State<WebStorageScreen>
         }
       });
       _recordMethodResult(
-        _storageMethodKey('length'),
+        _storageMethodKey(PlatformLocalStorageMethod.length.name),
         'Storage length: $length',
         isError: false,
       );
     } catch (e) {
       _recordMethodResult(
-        _storageMethodKey('length'),
+        _storageMethodKey(PlatformLocalStorageMethod.length.name),
         'Error getting length: $e',
         isError: true,
       );
@@ -154,7 +170,7 @@ class _WebStorageScreenState extends State<WebStorageScreen>
   Future<void> _getItems() async {
     if (!_webViewReady) {
       _recordMethodResult(
-        _storageMethodKey('getItems'),
+        _storageMethodKey(PlatformLocalStorageMethod.getItems.name),
         'WebView not ready. Load a page first.',
         isError: true,
       );
@@ -176,13 +192,13 @@ class _WebStorageScreenState extends State<WebStorageScreen>
         }
       });
       _recordMethodResult(
-        _storageMethodKey('getItems'),
+        _storageMethodKey(PlatformLocalStorageMethod.getItems.name),
         'Found ${items.length} items',
         isError: false,
       );
     } catch (e) {
       _recordMethodResult(
-        _storageMethodKey('getItems'),
+        _storageMethodKey(PlatformLocalStorageMethod.getItems.name),
         'Error getting items: $e',
         isError: true,
       );
@@ -194,7 +210,7 @@ class _WebStorageScreenState extends State<WebStorageScreen>
   Future<void> _getItem(String key) async {
     if (!_webViewReady) {
       _recordMethodResult(
-        _storageMethodKey('getItem'),
+        _storageMethodKey(PlatformLocalStorageMethod.getItem.name),
         'WebView not ready. Load a page first.',
         isError: true,
       );
@@ -206,13 +222,13 @@ class _WebStorageScreenState extends State<WebStorageScreen>
       final storage = _isLocalStorageTab ? _localStorage : _sessionStorage;
       final value = await storage?.getItem(key: key);
       _recordMethodResult(
-        _storageMethodKey('getItem'),
+        _storageMethodKey(PlatformLocalStorageMethod.getItem.name),
         'Value for "$key": ${value ?? "null"}',
         isError: false,
       );
     } catch (e) {
       _recordMethodResult(
-        _storageMethodKey('getItem'),
+        _storageMethodKey(PlatformLocalStorageMethod.getItem.name),
         'Error getting item: $e',
         isError: true,
       );
@@ -224,7 +240,7 @@ class _WebStorageScreenState extends State<WebStorageScreen>
   Future<void> _setItem() async {
     if (!_webViewReady) {
       _recordMethodResult(
-        _storageMethodKey('setItem'),
+        _storageMethodKey(PlatformLocalStorageMethod.setItem.name),
         'WebView not ready. Load a page first.',
         isError: true,
       );
@@ -237,7 +253,7 @@ class _WebStorageScreenState extends State<WebStorageScreen>
   Future<void> _removeItem(String key) async {
     if (!_webViewReady) {
       _recordMethodResult(
-        _storageMethodKey('removeItem'),
+        _storageMethodKey(PlatformLocalStorageMethod.removeItem.name),
         'WebView not ready. Load a page first.',
         isError: true,
       );
@@ -249,14 +265,14 @@ class _WebStorageScreenState extends State<WebStorageScreen>
       final storage = _isLocalStorageTab ? _localStorage : _sessionStorage;
       await storage?.removeItem(key: key);
       _recordMethodResult(
-        _storageMethodKey('removeItem'),
+        _storageMethodKey(PlatformLocalStorageMethod.removeItem.name),
         'Item "$key" removed',
         isError: false,
       );
       await _getItems();
     } catch (e) {
       _recordMethodResult(
-        _storageMethodKey('removeItem'),
+        _storageMethodKey(PlatformLocalStorageMethod.removeItem.name),
         'Error removing item: $e',
         isError: true,
       );
@@ -277,7 +293,7 @@ class _WebStorageScreenState extends State<WebStorageScreen>
     final key = params['key']?.toString() ?? '';
     if (key.isEmpty) {
       _recordMethodResult(
-        _storageMethodKey('removeItem'),
+        _storageMethodKey(PlatformLocalStorageMethod.removeItem.name),
         'Please enter a key',
         isError: true,
       );
@@ -289,7 +305,7 @@ class _WebStorageScreenState extends State<WebStorageScreen>
   Future<void> _clear() async {
     if (!_webViewReady) {
       _recordMethodResult(
-        _storageMethodKey('clear'),
+        _storageMethodKey(PlatformLocalStorageMethod.clear.name),
         'WebView not ready. Load a page first.',
         isError: true,
       );
@@ -298,7 +314,7 @@ class _WebStorageScreenState extends State<WebStorageScreen>
 
     final confirmed = await _showConfirmDialog(
       'Clear Storage',
-      'Are you sure you want to clear all ${_isLocalStorageTab ? "localStorage" : "sessionStorage"} items?',
+      'Are you sure you want to clear all $_activeStorageTypeName items?',
     );
     if (!confirmed) return;
 
@@ -316,13 +332,13 @@ class _WebStorageScreenState extends State<WebStorageScreen>
         }
       });
       _recordMethodResult(
-        _storageMethodKey('clear'),
+        _storageMethodKey(PlatformLocalStorageMethod.clear.name),
         'Storage cleared',
         isError: false,
       );
     } catch (e) {
       _recordMethodResult(
-        _storageMethodKey('clear'),
+        _storageMethodKey(PlatformLocalStorageMethod.clear.name),
         'Error clearing storage: $e',
         isError: true,
       );
@@ -334,7 +350,7 @@ class _WebStorageScreenState extends State<WebStorageScreen>
   Future<void> _key(int index) async {
     if (!_webViewReady) {
       _recordMethodResult(
-        _storageMethodKey('key'),
+        _storageMethodKey(PlatformLocalStorageMethod.key.name),
         'WebView not ready. Load a page first.',
         isError: true,
       );
@@ -346,13 +362,13 @@ class _WebStorageScreenState extends State<WebStorageScreen>
       final storage = _isLocalStorageTab ? _localStorage : _sessionStorage;
       final keyName = await storage?.key(index: index);
       _recordMethodResult(
-        _storageMethodKey('key'),
+        _storageMethodKey(PlatformLocalStorageMethod.key.name),
         'Key at index $index: ${keyName ?? "null"}',
         isError: false,
       );
     } catch (e) {
       _recordMethodResult(
-        _storageMethodKey('key'),
+        _storageMethodKey(PlatformLocalStorageMethod.key.name),
         'Error getting key: $e',
         isError: true,
       );
@@ -413,8 +429,7 @@ class _WebStorageScreenState extends State<WebStorageScreen>
   Future<void> _promptSetItem() async {
     final params = await showParameterDialog(
       context: context,
-      title:
-          'Set Item (${_isLocalStorageTab ? "localStorage" : "sessionStorage"})',
+      title: 'Set Item ($_activeStorageTypeName)',
       parameters: {'key': '', 'value': ''},
       requiredPaths: ['key', 'value'],
     );
@@ -424,7 +439,7 @@ class _WebStorageScreenState extends State<WebStorageScreen>
     final value = params['value']?.toString() ?? '';
     if (key.isEmpty || value.isEmpty) {
       _recordMethodResult(
-        _storageMethodKey('setItem'),
+        _storageMethodKey(PlatformLocalStorageMethod.setItem.name),
         'Key and Value are required',
         isError: true,
       );
@@ -436,14 +451,14 @@ class _WebStorageScreenState extends State<WebStorageScreen>
       final storage = _isLocalStorageTab ? _localStorage : _sessionStorage;
       await storage?.setItem(key: key, value: value);
       _recordMethodResult(
-        _storageMethodKey('setItem'),
+        _storageMethodKey(PlatformLocalStorageMethod.setItem.name),
         'Item set successfully',
         isError: false,
       );
       await _getItems();
     } catch (e) {
       _recordMethodResult(
-        _storageMethodKey('setItem'),
+        _storageMethodKey(PlatformLocalStorageMethod.setItem.name),
         'Error setting item: $e',
         isError: true,
       );
@@ -464,7 +479,7 @@ class _WebStorageScreenState extends State<WebStorageScreen>
     final index = (params['index'] as num?)?.toInt();
     if (index == null || index < 0) {
       _recordMethodResult(
-        _storageMethodKey('key'),
+        _storageMethodKey(PlatformLocalStorageMethod.key.name),
         'Please enter a valid index',
         isError: true,
       );
@@ -485,7 +500,7 @@ class _WebStorageScreenState extends State<WebStorageScreen>
     final key = params['key']?.toString() ?? '';
     if (key.isEmpty) {
       _recordMethodResult(
-        _storageMethodKey('getItem'),
+        _storageMethodKey(PlatformLocalStorageMethod.getItem.name),
         'Please enter a key',
         isError: true,
       );
@@ -530,10 +545,10 @@ class _WebStorageScreenState extends State<WebStorageScreen>
         ],
         bottom: TabBar(
           controller: _tabController,
-          tabs: const [
-            Tab(text: 'Manager'),
-            Tab(text: 'LocalStorage'),
-            Tab(text: 'SessionStorage'),
+          tabs: [
+            const Tab(text: 'Manager'),
+            Tab(text: (LocalStorage).toString()),
+            Tab(text: (SessionStorage).toString()),
           ],
           indicatorColor: Colors.white,
         ),
@@ -639,7 +654,9 @@ class _WebStorageScreenState extends State<WebStorageScreen>
             ],
           ),
           const SizedBox(height: 8),
-          _buildMethodHistory('loadUrl'),
+          _buildMethodHistory(
+            PlatformInAppWebViewControllerMethod.loadUrl.name,
+          ),
           const SizedBox(height: 8),
           Expanded(
             child: Stack(
@@ -659,7 +676,7 @@ class _WebStorageScreenState extends State<WebStorageScreen>
                   },
                   onLoadError: (controller, url, code, message) {
                     _recordMethodResult(
-                      'loadUrl',
+                      PlatformInAppWebViewControllerMethod.loadUrl.name,
                       'Load error: $message',
                       isError: true,
                     );
@@ -721,45 +738,66 @@ class _WebStorageScreenState extends State<WebStorageScreen>
       padding: const EdgeInsets.all(16),
       children: [
         _buildMethodSection(
-          'length',
+          PlatformLocalStorageMethod.length.name,
           'Get number of items in storage',
-          _getStorageMethodPlatforms('length', isLocal: isLocal),
+          _getStorageMethodPlatforms(
+            PlatformLocalStorageMethod.length.name,
+            isLocal: isLocal,
+          ),
           _getLength,
         ),
         _buildMethodSection(
-          'setItem',
+          PlatformLocalStorageMethod.setItem.name,
           'Set a key-value pair',
-          _getStorageMethodPlatforms('setItem', isLocal: isLocal),
+          _getStorageMethodPlatforms(
+            PlatformLocalStorageMethod.setItem.name,
+            isLocal: isLocal,
+          ),
           _setItem,
         ),
         _buildMethodSection(
-          'getItem',
+          PlatformLocalStorageMethod.getItem.name,
           'Get value by key',
-          _getStorageMethodPlatforms('getItem', isLocal: isLocal),
+          _getStorageMethodPlatforms(
+            PlatformLocalStorageMethod.getItem.name,
+            isLocal: isLocal,
+          ),
           _promptGetItem,
         ),
         _buildMethodSection(
-          'removeItem',
+          PlatformLocalStorageMethod.removeItem.name,
           'Remove item by key (select from list)',
-          _getStorageMethodPlatforms('removeItem', isLocal: isLocal),
+          _getStorageMethodPlatforms(
+            PlatformLocalStorageMethod.removeItem.name,
+            isLocal: isLocal,
+          ),
           _promptRemoveItem,
         ),
         _buildMethodSection(
-          'getItems',
+          PlatformLocalStorageMethod.getItems.name,
           'Get all items',
-          _getStorageMethodPlatforms('getItems', isLocal: isLocal),
+          _getStorageMethodPlatforms(
+            PlatformLocalStorageMethod.getItems.name,
+            isLocal: isLocal,
+          ),
           _getItems,
         ),
         _buildMethodSection(
-          'clear',
+          PlatformLocalStorageMethod.clear.name,
           'Clear all items',
-          _getStorageMethodPlatforms('clear', isLocal: isLocal),
+          _getStorageMethodPlatforms(
+            PlatformLocalStorageMethod.clear.name,
+            isLocal: isLocal,
+          ),
           _clear,
         ),
         _buildMethodSection(
-          'key',
+          PlatformLocalStorageMethod.key.name,
           'Get key at index',
-          _getStorageMethodPlatforms('key', isLocal: isLocal),
+          _getStorageMethodPlatforms(
+            PlatformLocalStorageMethod.key.name,
+            isLocal: isLocal,
+          ),
           _promptKeyIndex,
         ),
         const SizedBox(height: 16),
@@ -809,7 +847,7 @@ class _WebStorageScreenState extends State<WebStorageScreen>
   }
 
   Widget _buildItemsList(List<WebStorageItem> items, int? length) {
-    final storageName = _isLocalStorageTab ? 'localStorage' : 'sessionStorage';
+    final storageName = _activeStorageTypeName;
 
     if (items.isEmpty) {
       return Card(
@@ -831,7 +869,7 @@ class _WebStorageScreenState extends State<WebStorageScreen>
                 const SizedBox(height: 8),
                 Text(
                   _webViewReady
-                      ? 'Click "Get All Items" to fetch storage contents'
+                      ? 'Click "${_isLocalStorageTab ? PlatformLocalStorageMethod.getItems.name : PlatformSessionStorageMethod.getItems.name}" to fetch storage contents'
                       : 'Load a page first, then fetch items',
                   style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
                 ),
@@ -931,14 +969,14 @@ class _WebStorageScreenState extends State<WebStorageScreen>
       final origins = await _webStorageManager.getOrigins();
       setState(() => _webStorageOrigins = origins);
       _recordMethodResult(
-        'manager.getOrigins',
+        _managerMethodKey(PlatformWebStorageManagerMethod.getOrigins),
         'Found ${origins.length} origins',
         isError: false,
         value: origins.map((o) => o.toMap()).toList(),
       );
     } catch (e) {
       _recordMethodResult(
-        'manager.getOrigins',
+        _managerMethodKey(PlatformWebStorageManagerMethod.getOrigins),
         'Error getting origins: $e',
         isError: true,
       );
@@ -959,13 +997,13 @@ class _WebStorageScreenState extends State<WebStorageScreen>
       await _webStorageManager.deleteAllData();
       setState(() => _webStorageOrigins = []);
       _recordMethodResult(
-        'manager.deleteAllData',
+        _managerMethodKey(PlatformWebStorageManagerMethod.deleteAllData),
         'All web storage data deleted',
         isError: false,
       );
     } catch (e) {
       _recordMethodResult(
-        'manager.deleteAllData',
+        _managerMethodKey(PlatformWebStorageManagerMethod.deleteAllData),
         'Error deleting all data: $e',
         isError: true,
       );
@@ -979,14 +1017,14 @@ class _WebStorageScreenState extends State<WebStorageScreen>
     try {
       await _webStorageManager.deleteOrigin(origin: origin);
       _recordMethodResult(
-        'manager.deleteOrigin',
+        _managerMethodKey(PlatformWebStorageManagerMethod.deleteOrigin),
         'Deleted origin: $origin',
         isError: false,
       );
       await _getOrigins();
     } catch (e) {
       _recordMethodResult(
-        'manager.deleteOrigin',
+        _managerMethodKey(PlatformWebStorageManagerMethod.deleteOrigin),
         'Error deleting origin: $e',
         isError: true,
       );
@@ -1007,7 +1045,7 @@ class _WebStorageScreenState extends State<WebStorageScreen>
     final origin = params['origin']?.toString() ?? '';
     if (origin.isEmpty) {
       _recordMethodResult(
-        'manager.deleteOrigin',
+        _managerMethodKey(PlatformWebStorageManagerMethod.deleteOrigin),
         'Please enter an origin',
         isError: true,
       );
@@ -1028,7 +1066,7 @@ class _WebStorageScreenState extends State<WebStorageScreen>
     final origin = params['origin']?.toString() ?? '';
     if (origin.isEmpty) {
       _recordMethodResult(
-        'manager.getQuotaForOrigin',
+        _managerMethodKey(PlatformWebStorageManagerMethod.getQuotaForOrigin),
         'Please enter an origin',
         isError: true,
       );
@@ -1039,14 +1077,14 @@ class _WebStorageScreenState extends State<WebStorageScreen>
     try {
       final quota = await _webStorageManager.getQuotaForOrigin(origin: origin);
       _recordMethodResult(
-        'manager.getQuotaForOrigin',
+        _managerMethodKey(PlatformWebStorageManagerMethod.getQuotaForOrigin),
         'Quota for "$origin": $quota bytes',
         isError: false,
         value: quota,
       );
     } catch (e) {
       _recordMethodResult(
-        'manager.getQuotaForOrigin',
+        _managerMethodKey(PlatformWebStorageManagerMethod.getQuotaForOrigin),
         'Error getting quota: $e',
         isError: true,
       );
@@ -1067,7 +1105,7 @@ class _WebStorageScreenState extends State<WebStorageScreen>
     final origin = params['origin']?.toString() ?? '';
     if (origin.isEmpty) {
       _recordMethodResult(
-        'manager.getUsageForOrigin',
+        _managerMethodKey(PlatformWebStorageManagerMethod.getUsageForOrigin),
         'Please enter an origin',
         isError: true,
       );
@@ -1078,14 +1116,14 @@ class _WebStorageScreenState extends State<WebStorageScreen>
     try {
       final usage = await _webStorageManager.getUsageForOrigin(origin: origin);
       _recordMethodResult(
-        'manager.getUsageForOrigin',
+        _managerMethodKey(PlatformWebStorageManagerMethod.getUsageForOrigin),
         'Usage for "$origin": $usage bytes',
         isError: false,
         value: usage,
       );
     } catch (e) {
       _recordMethodResult(
-        'manager.getUsageForOrigin',
+        _managerMethodKey(PlatformWebStorageManagerMethod.getUsageForOrigin),
         'Error getting usage: $e',
         isError: true,
       );
@@ -1102,14 +1140,14 @@ class _WebStorageScreenState extends State<WebStorageScreen>
       );
       setState(() => _dataRecords = records);
       _recordMethodResult(
-        'manager.fetchDataRecords',
+        _managerMethodKey(PlatformWebStorageManagerMethod.fetchDataRecords),
         'Found ${records.length} data records',
         isError: false,
         value: records.map((r) => r.toMap()).toList(),
       );
     } catch (e) {
       _recordMethodResult(
-        'manager.fetchDataRecords',
+        _managerMethodKey(PlatformWebStorageManagerMethod.fetchDataRecords),
         'Error fetching data records: $e',
         isError: true,
       );
@@ -1144,13 +1182,17 @@ class _WebStorageScreenState extends State<WebStorageScreen>
       );
       setState(() => _dataRecords = []);
       _recordMethodResult(
-        'manager.removeDataModifiedSince',
+        _managerMethodKey(
+          PlatformWebStorageManagerMethod.removeDataModifiedSince,
+        ),
         'Data removed since ${date.toIso8601String()}',
         isError: false,
       );
     } catch (e) {
       _recordMethodResult(
-        'manager.removeDataModifiedSince',
+        _managerMethodKey(
+          PlatformWebStorageManagerMethod.removeDataModifiedSince,
+        ),
         'Error removing data: $e',
         isError: true,
       );
@@ -1167,14 +1209,14 @@ class _WebStorageScreenState extends State<WebStorageScreen>
         dataRecords: [record],
       );
       _recordMethodResult(
-        'manager.removeDataFor',
+        _managerMethodKey(PlatformWebStorageManagerMethod.removeDataFor),
         'Removed data for ${record.displayName}',
         isError: false,
       );
       await _fetchDataRecords();
     } catch (e) {
       _recordMethodResult(
-        'manager.removeDataFor',
+        _managerMethodKey(PlatformWebStorageManagerMethod.removeDataFor),
         'Error removing data: $e',
         isError: true,
       );
@@ -1198,7 +1240,7 @@ class _WebStorageScreenState extends State<WebStorageScreen>
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    'WebStorageManager provides platform-level storage management. '
+                    '${(WebStorageManager).toString()} provides platform-level storage management. '
                     'Methods have different platform availability - check the support badges.',
                     style: TextStyle(fontSize: 12, color: Colors.blue.shade700),
                   ),
@@ -1209,45 +1251,59 @@ class _WebStorageScreenState extends State<WebStorageScreen>
         ),
         const SizedBox(height: 16),
         _buildManagerMethodSection(
-          'getOrigins',
+          PlatformWebStorageManagerMethod.getOrigins.name,
           'Get origins using Application Cache or Web SQL Database',
-          _getManagerMethodPlatforms('getOrigins'),
+          _getManagerMethodPlatforms(
+            PlatformWebStorageManagerMethod.getOrigins.name,
+          ),
           _getOrigins,
         ),
         _buildManagerMethodSection(
-          'deleteAllData',
+          PlatformWebStorageManagerMethod.deleteAllData.name,
           'Clear all storage (App Cache, Web SQL, HTML5 Storage)',
-          _getManagerMethodPlatforms('deleteAllData'),
+          _getManagerMethodPlatforms(
+            PlatformWebStorageManagerMethod.deleteAllData.name,
+          ),
           _deleteAllData,
         ),
         _buildManagerMethodSection(
-          'deleteOrigin',
+          PlatformWebStorageManagerMethod.deleteOrigin.name,
           'Clear storage for a specific origin',
-          _getManagerMethodPlatforms('deleteOrigin'),
+          _getManagerMethodPlatforms(
+            PlatformWebStorageManagerMethod.deleteOrigin.name,
+          ),
           _promptDeleteOrigin,
         ),
         _buildManagerMethodSection(
-          'getQuotaForOrigin',
+          PlatformWebStorageManagerMethod.getQuotaForOrigin.name,
           'Get storage quota for an origin (bytes)',
-          _getManagerMethodPlatforms('getQuotaForOrigin'),
+          _getManagerMethodPlatforms(
+            PlatformWebStorageManagerMethod.getQuotaForOrigin.name,
+          ),
           _getQuotaForOrigin,
         ),
         _buildManagerMethodSection(
-          'getUsageForOrigin',
+          PlatformWebStorageManagerMethod.getUsageForOrigin.name,
           'Get storage usage for an origin (bytes)',
-          _getManagerMethodPlatforms('getUsageForOrigin'),
+          _getManagerMethodPlatforms(
+            PlatformWebStorageManagerMethod.getUsageForOrigin.name,
+          ),
           _getUsageForOrigin,
         ),
         _buildManagerMethodSection(
-          'fetchDataRecords',
+          PlatformWebStorageManagerMethod.fetchDataRecords.name,
           'Fetch website data records',
-          _getManagerMethodPlatforms('fetchDataRecords'),
+          _getManagerMethodPlatforms(
+            PlatformWebStorageManagerMethod.fetchDataRecords.name,
+          ),
           _fetchDataRecords,
         ),
         _buildManagerMethodSection(
-          'removeDataModifiedSince',
+          PlatformWebStorageManagerMethod.removeDataModifiedSince.name,
           'Remove data modified since a date',
-          _getManagerMethodPlatforms('removeDataModifiedSince'),
+          _getManagerMethodPlatforms(
+            PlatformWebStorageManagerMethod.removeDataModifiedSince.name,
+          ),
           _removeDataModifiedSince,
         ),
         const SizedBox(height: 16),
@@ -1264,7 +1320,7 @@ class _WebStorageScreenState extends State<WebStorageScreen>
     Set<SupportedPlatform> supportedPlatforms,
     VoidCallback? onPressed,
   ) {
-    final historyKey = 'manager.$methodName';
+    final historyKey = '${(WebStorageManager).toString()}.$methodName';
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       child: ListTile(
@@ -1318,7 +1374,7 @@ class _WebStorageScreenState extends State<WebStorageScreen>
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Click "getOrigins" to fetch storage origins',
+                  'Click "${PlatformWebStorageManagerMethod.getOrigins.name}" to fetch storage origins',
                   style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
                 ),
               ],
@@ -1403,7 +1459,7 @@ class _WebStorageScreenState extends State<WebStorageScreen>
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Click "fetchDataRecords" to fetch website data records',
+                  'Click "${PlatformWebStorageManagerMethod.fetchDataRecords.name}" to fetch website data records',
                   style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
                 ),
               ],

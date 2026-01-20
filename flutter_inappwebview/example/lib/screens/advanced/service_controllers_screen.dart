@@ -217,12 +217,16 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
       final value = await ServiceWorkerController.getAllowContentAccess();
       setState(() => _allowContentAccess = value);
       _recordMethodResult(
-        'getAllowContentAccess',
+        PlatformServiceWorkerControllerMethod.getAllowContentAccess.name,
         'Allow content access: $value',
         isError: false,
       );
     } catch (e) {
-      _recordMethodResult('getAllowContentAccess', 'Error: $e', isError: true);
+      _recordMethodResult(
+        PlatformServiceWorkerControllerMethod.getAllowContentAccess.name,
+        'Error: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -234,12 +238,16 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
       await ServiceWorkerController.setAllowContentAccess(value);
       setState(() => _allowContentAccess = value);
       _recordMethodResult(
-        'setAllowContentAccess',
+        PlatformServiceWorkerControllerMethod.setAllowContentAccess.name,
         'Allow content access set to: $value',
         isError: false,
       );
     } catch (e) {
-      _recordMethodResult('setAllowContentAccess', 'Error: $e', isError: true);
+      _recordMethodResult(
+        PlatformServiceWorkerControllerMethod.setAllowContentAccess.name,
+        'Error: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -251,12 +259,16 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
       final value = await ServiceWorkerController.getAllowFileAccess();
       setState(() => _allowFileAccess = value);
       _recordMethodResult(
-        'getAllowFileAccess',
+        PlatformServiceWorkerControllerMethod.getAllowFileAccess.name,
         'Allow file access: $value',
         isError: false,
       );
     } catch (e) {
-      _recordMethodResult('getAllowFileAccess', 'Error: $e', isError: true);
+      _recordMethodResult(
+        PlatformServiceWorkerControllerMethod.getAllowFileAccess.name,
+        'Error: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -268,12 +280,16 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
       await ServiceWorkerController.setAllowFileAccess(value);
       setState(() => _allowFileAccess = value);
       _recordMethodResult(
-        'setAllowFileAccess',
+        PlatformServiceWorkerControllerMethod.setAllowFileAccess.name,
         'Allow file access set to: $value',
         isError: false,
       );
     } catch (e) {
-      _recordMethodResult('setAllowFileAccess', 'Error: $e', isError: true);
+      _recordMethodResult(
+        PlatformServiceWorkerControllerMethod.setAllowFileAccess.name,
+        'Error: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -285,12 +301,16 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
       final value = await ServiceWorkerController.getBlockNetworkLoads();
       setState(() => _blockNetworkLoads = value);
       _recordMethodResult(
-        'getBlockNetworkLoads',
+        PlatformServiceWorkerControllerMethod.getBlockNetworkLoads.name,
         'Block network loads: $value',
         isError: false,
       );
     } catch (e) {
-      _recordMethodResult('getBlockNetworkLoads', 'Error: $e', isError: true);
+      _recordMethodResult(
+        PlatformServiceWorkerControllerMethod.getBlockNetworkLoads.name,
+        'Error: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -302,12 +322,16 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
       await ServiceWorkerController.setBlockNetworkLoads(value);
       setState(() => _blockNetworkLoads = value);
       _recordMethodResult(
-        'setBlockNetworkLoads',
+        PlatformServiceWorkerControllerMethod.setBlockNetworkLoads.name,
         'Block network loads set to: $value',
         isError: false,
       );
     } catch (e) {
-      _recordMethodResult('setBlockNetworkLoads', 'Error: $e', isError: true);
+      _recordMethodResult(
+        PlatformServiceWorkerControllerMethod.setBlockNetworkLoads.name,
+        'Error: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -319,12 +343,16 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
       final value = await ServiceWorkerController.getCacheMode();
       setState(() => _cacheMode = value);
       _recordMethodResult(
-        'getCacheMode',
+        PlatformServiceWorkerControllerMethod.getCacheMode.name,
         'Cache mode: ${value?.name}',
         isError: false,
       );
     } catch (e) {
-      _recordMethodResult('getCacheMode', 'Error: $e', isError: true);
+      _recordMethodResult(
+        PlatformServiceWorkerControllerMethod.getCacheMode.name,
+        'Error: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -336,12 +364,16 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
       await ServiceWorkerController.setCacheMode(mode);
       setState(() => _cacheMode = mode);
       _recordMethodResult(
-        'setCacheMode',
+        PlatformServiceWorkerControllerMethod.setCacheMode.name,
         'Cache mode set to: ${mode.name}',
         isError: false,
       );
     } catch (e) {
-      _recordMethodResult('setCacheMode', 'Error: $e', isError: true);
+      _recordMethodResult(
+        PlatformServiceWorkerControllerMethod.setCacheMode.name,
+        'Error: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -387,7 +419,7 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
         ),
       );
       _recordMethodResult(
-        'setProxyOverride',
+        PlatformProxyControllerMethod.setProxyOverride.name,
         'Proxy override set',
         isError: false,
       );
@@ -397,7 +429,11 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
         data: {'host': host, 'port': port, 'bypassList': bypassList},
       );
     } catch (e) {
-      _recordMethodResult('setProxyOverride', 'Error: $e', isError: true);
+      _recordMethodResult(
+        PlatformProxyControllerMethod.setProxyOverride.name,
+        'Error: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -408,13 +444,17 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
     try {
       await ProxyController.instance().clearProxyOverride();
       _recordMethodResult(
-        'clearProxyOverride',
+        PlatformProxyControllerMethod.clearProxyOverride.name,
         'Proxy override cleared',
         isError: false,
       );
       _logEvent(EventType.network, 'Proxy cleared');
     } catch (e) {
-      _recordMethodResult('clearProxyOverride', 'Error: $e', isError: true);
+      _recordMethodResult(
+        PlatformProxyControllerMethod.clearProxyOverride.name,
+        'Error: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -445,10 +485,18 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
         ),
       );
       setState(() => _isTracing = true);
-      _recordMethodResult('start', 'Tracing started', isError: false);
+      _recordMethodResult(
+        PlatformTracingControllerMethod.start.name,
+        'Tracing started',
+        isError: false,
+      );
       _logEvent(EventType.performance, 'Tracing started');
     } catch (e) {
-      _recordMethodResult('start', 'Error: $e', isError: true);
+      _recordMethodResult(
+        PlatformTracingControllerMethod.start.name,
+        'Error: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -459,14 +507,22 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
     try {
       final result = await TracingController.instance().stop();
       setState(() => _isTracing = false);
-      _recordMethodResult('stop', 'Tracing stopped: $result', isError: false);
+      _recordMethodResult(
+        PlatformTracingControllerMethod.stop.name,
+        'Tracing stopped: $result',
+        isError: false,
+      );
       _logEvent(
         EventType.performance,
         'Tracing stopped',
         data: {'result': result},
       );
     } catch (e) {
-      _recordMethodResult('stop', 'Error: $e', isError: true);
+      _recordMethodResult(
+        PlatformTracingControllerMethod.stop.name,
+        'Error: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -477,9 +533,17 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
     try {
       final tracing = await TracingController.instance().isTracing();
       setState(() => _isTracing = tracing);
-      _recordMethodResult('isTracing', 'Is tracing: $tracing', isError: false);
+      _recordMethodResult(
+        PlatformTracingControllerMethod.isTracing.name,
+        'Is tracing: $tracing',
+        isError: false,
+      );
     } catch (e) {
-      _recordMethodResult('isTracing', 'Error: $e', isError: true);
+      _recordMethodResult(
+        PlatformTracingControllerMethod.isTracing.name,
+        'Error: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -491,13 +555,17 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
     try {
       await context.read<SettingsManager>().recreateEnvironment();
       _recordMethodResult(
-        'create',
-        'WebViewEnvironment created',
+        PlatformWebViewEnvironmentMethod.create.name,
+        '${(WebViewEnvironment).toString()} created',
         isError: false,
       );
-      _logEvent(EventType.ui, 'WebViewEnvironment created');
+      _logEvent(EventType.ui, '${(WebViewEnvironment).toString()} created');
     } catch (e) {
-      _recordMethodResult('create', 'Error: $e', isError: true);
+      _recordMethodResult(
+        PlatformWebViewEnvironmentMethod.create.name,
+        'Error: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -509,12 +577,16 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
       final version = await WebViewEnvironment.getAvailableVersion();
       setState(() => _availableVersion = version);
       _recordMethodResult(
-        'getAvailableVersion',
+        PlatformWebViewEnvironmentMethod.getAvailableVersion.name,
         'Available version: $version',
         isError: false,
       );
     } catch (e) {
-      _recordMethodResult('getAvailableVersion', 'Error: $e', isError: true);
+      _recordMethodResult(
+        PlatformWebViewEnvironmentMethod.getAvailableVersion.name,
+        'Error: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -533,7 +605,7 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
     final version2 = params['version2']?.toString() ?? '';
     if (version1.isEmpty || version2.isEmpty) {
       _recordMethodResult(
-        'compareBrowserVersions',
+        PlatformWebViewEnvironmentMethod.compareBrowserVersions.name,
         'Both versions are required',
         isError: true,
       );
@@ -547,12 +619,16 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
         version2: version2,
       );
       _recordMethodResult(
-        'compareBrowserVersions',
+        PlatformWebViewEnvironmentMethod.compareBrowserVersions.name,
         'Compare versions: $result (positive = v1 > v2, negative = v1 < v2)',
         isError: false,
       );
     } catch (e) {
-      _recordMethodResult('compareBrowserVersions', 'Error: $e', isError: true);
+      _recordMethodResult(
+        PlatformWebViewEnvironmentMethod.compareBrowserVersions.name,
+        'Error: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -562,7 +638,7 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
     final environment = context.read<SettingsManager>().webViewEnvironment;
     if (environment == null) {
       _recordMethodResult(
-        'getProcessInfos',
+        PlatformWebViewEnvironmentMethod.getProcessInfos.name,
         'Create or select WebViewEnvironment first',
         isError: true,
       );
@@ -574,12 +650,16 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
       final infos = await environment.getProcessInfos();
       setState(() => _processInfos = infos);
       _recordMethodResult(
-        'getProcessInfos',
+        PlatformWebViewEnvironmentMethod.getProcessInfos.name,
         'Found ${infos.length} processes',
         isError: false,
       );
     } catch (e) {
-      _recordMethodResult('getProcessInfos', 'Error: $e', isError: true);
+      _recordMethodResult(
+        PlatformWebViewEnvironmentMethod.getProcessInfos.name,
+        'Error: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -589,7 +669,7 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
     final environment = context.read<SettingsManager>().webViewEnvironment;
     if (environment == null) {
       _recordMethodResult(
-        'getFailureReportFolderPath',
+        PlatformWebViewEnvironmentMethod.getFailureReportFolderPath.name,
         'Create or select WebViewEnvironment first',
         isError: true,
       );
@@ -600,13 +680,13 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
     try {
       final path = await environment.getFailureReportFolderPath();
       _recordMethodResult(
-        'getFailureReportFolderPath',
+        PlatformWebViewEnvironmentMethod.getFailureReportFolderPath.name,
         'Failure report folder: $path',
         isError: false,
       );
     } catch (e) {
       _recordMethodResult(
-        'getFailureReportFolderPath',
+        PlatformWebViewEnvironmentMethod.getFailureReportFolderPath.name,
         'Error: $e',
         isError: true,
       );
@@ -621,12 +701,16 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
       await context.read<SettingsManager>().disposeEnvironment();
       setState(() => _processInfos = []);
       _recordMethodResult(
-        'dispose',
-        'WebViewEnvironment disposed',
+        PlatformWebViewEnvironmentMethod.dispose.name,
+        '${(WebViewEnvironment).toString()} disposed',
         isError: false,
       );
     } catch (e) {
-      _recordMethodResult('dispose', 'Error: $e', isError: true);
+      _recordMethodResult(
+        PlatformWebViewEnvironmentMethod.dispose.name,
+        'Error: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -645,7 +729,7 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
     final suffix = params['dataDirectorySuffix']?.toString() ?? '';
     if (suffix.isEmpty) {
       _recordMethodResult(
-        'apply',
+        PlatformProcessGlobalConfigMethod.apply.name,
         'Please enter a data directory suffix',
         isError: true,
       );
@@ -659,17 +743,21 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
         settings: ProcessGlobalConfigSettings(dataDirectorySuffix: suffix),
       );
       _recordMethodResult(
-        'apply',
-        'ProcessGlobalConfig applied',
+        PlatformProcessGlobalConfigMethod.apply.name,
+        '${(ProcessGlobalConfig).toString()} applied',
         isError: false,
       );
       _logEvent(
         EventType.ui,
-        'ProcessGlobalConfig applied',
+        '${(ProcessGlobalConfig).toString()} applied',
         data: {'dataDirectorySuffix': suffix},
       );
     } catch (e) {
-      _recordMethodResult('apply', 'Error: $e', isError: true);
+      _recordMethodResult(
+        PlatformProcessGlobalConfigMethod.apply.name,
+        'Error: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -729,16 +817,16 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
 
   Widget _buildServiceWorkerSection() {
     final supportedPlatforms = SupportChecker.getSupportedPlatformsForClass(
-      'ServiceWorkerController',
+      (ServiceWorkerController).toString(),
     );
 
     return Card(
       child: ExpansionTile(
         title: Row(
           children: [
-            const Text(
-              'ServiceWorkerController',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            Text(
+              (ServiceWorkerController).toString(),
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(width: 8),
             Expanded(
@@ -773,8 +861,12 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
                           .setAllowContentAccess,
                     ),
                   ),
-                  getMethodName: 'getAllowContentAccess',
-                  setMethodName: 'setAllowContentAccess',
+                  getMethodName: PlatformServiceWorkerControllerMethod
+                      .getAllowContentAccess
+                      .name,
+                  setMethodName: PlatformServiceWorkerControllerMethod
+                      .setAllowContentAccess
+                      .name,
                 ),
                 _buildSwitchRow(
                   'Allow File Access',
@@ -789,8 +881,12 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
                       PlatformServiceWorkerControllerMethod.setAllowFileAccess,
                     ),
                   ),
-                  getMethodName: 'getAllowFileAccess',
-                  setMethodName: 'setAllowFileAccess',
+                  getMethodName: PlatformServiceWorkerControllerMethod
+                      .getAllowFileAccess
+                      .name,
+                  setMethodName: PlatformServiceWorkerControllerMethod
+                      .setAllowFileAccess
+                      .name,
                 ),
                 _buildSwitchRow(
                   'Block Network Loads',
@@ -807,8 +903,12 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
                           .setBlockNetworkLoads,
                     ),
                   ),
-                  getMethodName: 'getBlockNetworkLoads',
-                  setMethodName: 'setBlockNetworkLoads',
+                  getMethodName: PlatformServiceWorkerControllerMethod
+                      .getBlockNetworkLoads
+                      .name,
+                  setMethodName: PlatformServiceWorkerControllerMethod
+                      .setBlockNetworkLoads
+                      .name,
                 ),
                 const Divider(),
 
@@ -859,8 +959,16 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
                   compact: true,
                 ),
                 const SizedBox(height: 6),
-                _buildMethodHistory('getCacheMode', title: 'getCacheMode'),
-                _buildMethodHistory('setCacheMode', title: 'setCacheMode'),
+                _buildMethodHistory(
+                  PlatformServiceWorkerControllerMethod.getCacheMode.name,
+                  title:
+                      PlatformServiceWorkerControllerMethod.getCacheMode.name,
+                ),
+                _buildMethodHistory(
+                  PlatformServiceWorkerControllerMethod.setCacheMode.name,
+                  title:
+                      PlatformServiceWorkerControllerMethod.setCacheMode.name,
+                ),
               ],
             ),
           ),
@@ -903,16 +1011,16 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
 
   Widget _buildProxyControllerSection() {
     final supportedPlatforms = SupportChecker.getSupportedPlatformsForClass(
-      'ProxyController',
+      (ProxyController).toString(),
     );
 
     return Card(
       child: ExpansionTile(
         title: Row(
           children: [
-            const Text(
-              'ProxyController',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            Text(
+              (ProxyController).toString(),
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(width: 8),
             Expanded(
@@ -978,7 +1086,8 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
                         supportedPlatforms: _proxyControllerPlatforms(
                           PlatformProxyControllerMethod.setProxyOverride,
                         ),
-                        methodName: 'setProxyOverride',
+                        methodName:
+                            PlatformProxyControllerMethod.setProxyOverride.name,
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -989,7 +1098,9 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
                         supportedPlatforms: _proxyControllerPlatforms(
                           PlatformProxyControllerMethod.clearProxyOverride,
                         ),
-                        methodName: 'clearProxyOverride',
+                        methodName: PlatformProxyControllerMethod
+                            .clearProxyOverride
+                            .name,
                       ),
                     ),
                   ],
@@ -1004,16 +1115,16 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
 
   Widget _buildTracingControllerSection() {
     final supportedPlatforms = SupportChecker.getSupportedPlatformsForClass(
-      'TracingController',
+      (TracingController).toString(),
     );
 
     return Card(
       child: ExpansionTile(
         title: Row(
           children: [
-            const Text(
-              'TracingController',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            Text(
+              (TracingController).toString(),
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(width: 8),
             Expanded(
@@ -1071,7 +1182,7 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
                         supportedPlatforms: _tracingControllerPlatforms(
                           PlatformTracingControllerMethod.start,
                         ),
-                        methodName: 'start',
+                        methodName: PlatformTracingControllerMethod.start.name,
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -1082,7 +1193,7 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
                         supportedPlatforms: _tracingControllerPlatforms(
                           PlatformTracingControllerMethod.stop,
                         ),
-                        methodName: 'stop',
+                        methodName: PlatformTracingControllerMethod.stop.name,
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -1093,7 +1204,8 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
                         supportedPlatforms: _tracingControllerPlatforms(
                           PlatformTracingControllerMethod.isTracing,
                         ),
-                        methodName: 'isTracing',
+                        methodName:
+                            PlatformTracingControllerMethod.isTracing.name,
                       ),
                     ),
                   ],
@@ -1110,16 +1222,16 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
     final settingsManager = context.watch<SettingsManager>();
     final environment = settingsManager.webViewEnvironment;
     final supportedPlatforms = SupportChecker.getSupportedPlatformsForClass(
-      'WebViewEnvironment',
+      (WebViewEnvironment).toString(),
     );
 
     return Card(
       child: ExpansionTile(
         title: Row(
           children: [
-            const Text(
-              'WebViewEnvironment',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            Text(
+              (WebViewEnvironment).toString(),
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(width: 8),
             Expanded(
@@ -1202,7 +1314,8 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
                         supportedPlatforms: _webViewEnvironmentPlatforms(
                           PlatformWebViewEnvironmentMethod.create,
                         ),
-                        methodName: 'create',
+                        methodName:
+                            PlatformWebViewEnvironmentMethod.create.name,
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -1213,7 +1326,8 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
                         supportedPlatforms: _webViewEnvironmentPlatforms(
                           PlatformWebViewEnvironmentMethod.dispose,
                         ),
-                        methodName: 'dispose',
+                        methodName:
+                            PlatformWebViewEnvironmentMethod.dispose.name,
                       ),
                     ),
                   ],
@@ -1230,7 +1344,9 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
                         supportedPlatforms: _webViewEnvironmentPlatforms(
                           PlatformWebViewEnvironmentMethod.getAvailableVersion,
                         ),
-                        methodName: 'getAvailableVersion',
+                        methodName: PlatformWebViewEnvironmentMethod
+                            .getAvailableVersion
+                            .name,
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -1242,7 +1358,9 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
                           PlatformWebViewEnvironmentMethod
                               .compareBrowserVersions,
                         ),
-                        methodName: 'compareBrowserVersions',
+                        methodName: PlatformWebViewEnvironmentMethod
+                            .compareBrowserVersions
+                            .name,
                       ),
                     ),
                   ],
@@ -1259,7 +1377,9 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
                         supportedPlatforms: _webViewEnvironmentPlatforms(
                           PlatformWebViewEnvironmentMethod.getProcessInfos,
                         ),
-                        methodName: 'getProcessInfos',
+                        methodName: PlatformWebViewEnvironmentMethod
+                            .getProcessInfos
+                            .name,
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -1273,7 +1393,9 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
                           PlatformWebViewEnvironmentMethod
                               .getFailureReportFolderPath,
                         ),
-                        methodName: 'getFailureReportFolderPath',
+                        methodName: PlatformWebViewEnvironmentMethod
+                            .getFailureReportFolderPath
+                            .name,
                       ),
                     ),
                   ],
@@ -1316,16 +1438,16 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
 
   Widget _buildProcessGlobalConfigSection() {
     final supportedPlatforms = SupportChecker.getSupportedPlatformsForClass(
-      'ProcessGlobalConfig',
+      (ProcessGlobalConfig).toString(),
     );
 
     return Card(
       child: ExpansionTile(
         title: Row(
           children: [
-            const Text(
-              'ProcessGlobalConfig',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            Text(
+              (ProcessGlobalConfig).toString(),
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(width: 8),
             Expanded(
@@ -1351,14 +1473,14 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
                     color: Colors.orange.shade50,
                     borderRadius: BorderRadius.circular(4),
                   ),
-                  child: const Row(
+                  child: Row(
                     children: [
-                      Icon(Icons.warning, color: Colors.orange, size: 20),
-                      SizedBox(width: 8),
+                      const Icon(Icons.warning, color: Colors.orange, size: 20),
+                      const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          'Note: ProcessGlobalConfig can only be applied once, before any WebView is created.',
-                          style: TextStyle(fontSize: 12),
+                          'Note: ${(ProcessGlobalConfig).toString()} can only be applied once, before any WebView is created.',
+                          style: const TextStyle(fontSize: 12),
                         ),
                       ),
                     ],
@@ -1382,7 +1504,7 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
                     supportedPlatforms: _processGlobalConfigPlatforms(
                       PlatformProcessGlobalConfigMethod.apply,
                     ),
-                    methodName: 'apply',
+                    methodName: PlatformProcessGlobalConfigMethod.apply.name,
                   ),
                 ),
               ],

@@ -38,7 +38,11 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
   Future<void> _getCookies() async {
     final url = _urlController.text.trim();
     if (url.isEmpty) {
-      _recordMethodResult('getCookies', 'Please enter a URL', isError: true);
+      _recordMethodResult(
+        PlatformCookieManagerMethod.getCookies.name,
+        'Please enter a URL',
+        isError: true,
+      );
       return;
     }
 
@@ -47,13 +51,13 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
       final cookies = await _cookieManager.getCookies(url: WebUri(url));
       setState(() => _cookies = cookies);
       _recordMethodResult(
-        'getCookies',
+        PlatformCookieManagerMethod.getCookies.name,
         'Found ${cookies.length} cookies',
         isError: false,
       );
     } catch (e) {
       _recordMethodResult(
-        'getCookies',
+        PlatformCookieManagerMethod.getCookies.name,
         'Error getting cookies: $e',
         isError: true,
       );
@@ -68,13 +72,13 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
       final cookies = await _cookieManager.getAllCookies();
       setState(() => _cookies = cookies);
       _recordMethodResult(
-        'getAllCookies',
+        PlatformCookieManagerMethod.getAllCookies.name,
         'Found ${cookies.length} cookies',
         isError: false,
       );
     } catch (e) {
       _recordMethodResult(
-        'getAllCookies',
+        PlatformCookieManagerMethod.getAllCookies.name,
         'Error getting all cookies: $e',
         isError: true,
       );
@@ -93,16 +97,20 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
       if (cookie != null) {
         _showCookieDetailsDialog(cookie);
         _recordMethodResult(
-          'getCookie',
+          PlatformCookieManagerMethod.getCookie.name,
           'Cookie found for "$name"',
           isError: false,
         );
       } else {
-        _recordMethodResult('getCookie', 'Cookie not found', isError: true);
+        _recordMethodResult(
+          PlatformCookieManagerMethod.getCookie.name,
+          'Cookie not found',
+          isError: true,
+        );
       }
     } catch (e) {
       _recordMethodResult(
-        'getCookie',
+        PlatformCookieManagerMethod.getCookie.name,
         'Error getting cookie: $e',
         isError: true,
       );
@@ -114,7 +122,7 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
   Future<void> _setCookie() async {
     final params = await showParameterDialog(
       context: context,
-      title: 'Set Cookie',
+      title: PlatformCookieManagerMethod.setCookie.name,
       parameters: {
         'url': _urlController.text.trim(),
         'name': '',
@@ -137,7 +145,11 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
 
     final url = params['url']?.toString() ?? '';
     if (url.isEmpty) {
-      _recordMethodResult('setCookie', 'Please enter a URL', isError: true);
+      _recordMethodResult(
+        PlatformCookieManagerMethod.setCookie.name,
+        'Please enter a URL',
+        isError: true,
+      );
       return;
     }
 
@@ -170,17 +182,21 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
       );
       if (result) {
         _recordMethodResult(
-          'setCookie',
+          PlatformCookieManagerMethod.setCookie.name,
           'Cookie set successfully',
           isError: false,
         );
         await _getCookies();
       } else {
-        _recordMethodResult('setCookie', 'Failed to set cookie', isError: true);
+        _recordMethodResult(
+          PlatformCookieManagerMethod.setCookie.name,
+          'Failed to set cookie',
+          isError: true,
+        );
       }
     } catch (e) {
       _recordMethodResult(
-        'setCookie',
+        PlatformCookieManagerMethod.setCookie.name,
         'Error setting cookie: $e',
         isError: true,
       );
@@ -192,7 +208,11 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
   Future<void> _deleteCookie(Cookie cookie, {String? urlOverride}) async {
     final url = urlOverride ?? _urlController.text.trim();
     if (url.isEmpty) {
-      _recordMethodResult('deleteCookie', 'Please enter a URL', isError: true);
+      _recordMethodResult(
+        PlatformCookieManagerMethod.deleteCookie.name,
+        'Please enter a URL',
+        isError: true,
+      );
       return;
     }
     setState(() => _isLoading = true);
@@ -205,7 +225,7 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
       );
       if (result) {
         _recordMethodResult(
-          'deleteCookie',
+          PlatformCookieManagerMethod.deleteCookie.name,
           'Cookie "${cookie.name}" deleted',
           isError: false,
         );
@@ -220,14 +240,14 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
         });
       } else {
         _recordMethodResult(
-          'deleteCookie',
+          PlatformCookieManagerMethod.deleteCookie.name,
           'Failed to delete cookie',
           isError: true,
         );
       }
     } catch (e) {
       _recordMethodResult(
-        'deleteCookie',
+        PlatformCookieManagerMethod.deleteCookie.name,
         'Error deleting cookie: $e',
         isError: true,
       );
@@ -241,7 +261,7 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
         await showDialog<bool>(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text('Delete Cookie'),
+            title: Text(PlatformCookieManagerMethod.deleteCookie.name),
             content: Text(
               'Are you sure you want to delete the cookie "${cookie.name}"?',
             ),
@@ -275,7 +295,7 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
 
     if (url.isEmpty) {
       _recordMethodResult(
-        'deleteCookie',
+        PlatformCookieManagerMethod.deleteCookie.name,
         'Cannot delete cookie: No URL provided and cookie has no domain',
         isError: true,
       );
@@ -300,18 +320,22 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
         domain: domain,
       );
       if (result) {
-        _recordMethodResult('deleteCookie', 'Cookie deleted', isError: false);
+        _recordMethodResult(
+          PlatformCookieManagerMethod.deleteCookie.name,
+          'Cookie deleted',
+          isError: false,
+        );
         await _getCookies();
       } else {
         _recordMethodResult(
-          'deleteCookie',
+          PlatformCookieManagerMethod.deleteCookie.name,
           'Failed to delete cookie',
           isError: true,
         );
       }
     } catch (e) {
       _recordMethodResult(
-        'deleteCookie',
+        PlatformCookieManagerMethod.deleteCookie.name,
         'Error deleting cookie: $e',
         isError: true,
       );
@@ -323,7 +347,7 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
   Future<void> _promptGetCookie() async {
     final params = await showParameterDialog(
       context: context,
-      title: 'Get Cookie',
+      title: PlatformCookieManagerMethod.getCookie.name,
       parameters: {'url': _urlController.text.trim(), 'name': ''},
       requiredPaths: ['url', 'name'],
     );
@@ -333,7 +357,7 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
     final name = params['name']?.toString() ?? '';
     if (url.isEmpty || name.isEmpty) {
       _recordMethodResult(
-        'getCookie',
+        PlatformCookieManagerMethod.getCookie.name,
         'URL and name are required',
         isError: true,
       );
@@ -346,7 +370,7 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
   Future<void> _promptDeleteCookie() async {
     final params = await showParameterDialog(
       context: context,
-      title: 'Delete Cookie',
+      title: PlatformCookieManagerMethod.deleteCookie.name,
       parameters: {
         'url': _urlController.text.trim(),
         'name': '',
@@ -361,7 +385,7 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
     final name = params['name']?.toString() ?? '';
     if (url.isEmpty || name.isEmpty) {
       _recordMethodResult(
-        'deleteCookie',
+        PlatformCookieManagerMethod.deleteCookie.name,
         'URL and name are required',
         isError: true,
       );
@@ -383,12 +407,16 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
   Future<void> _deleteCookies() async {
     final url = _urlController.text.trim();
     if (url.isEmpty) {
-      _recordMethodResult('deleteCookies', 'Please enter a URL', isError: true);
+      _recordMethodResult(
+        PlatformCookieManagerMethod.deleteCookies.name,
+        'Please enter a URL',
+        isError: true,
+      );
       return;
     }
 
     final confirmed = await _showConfirmDialog(
-      'Delete All Cookies for URL',
+      PlatformCookieManagerMethod.deleteCookies.name,
       'Are you sure you want to delete all cookies for this URL?',
     );
     if (!confirmed) return;
@@ -398,21 +426,21 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
       final result = await _cookieManager.deleteCookies(url: WebUri(url));
       if (result) {
         _recordMethodResult(
-          'deleteCookies',
+          PlatformCookieManagerMethod.deleteCookies.name,
           'Cookies deleted for URL',
           isError: false,
         );
         setState(() => _cookies = []);
       } else {
         _recordMethodResult(
-          'deleteCookies',
+          PlatformCookieManagerMethod.deleteCookies.name,
           'Failed to delete cookies',
           isError: true,
         );
       }
     } catch (e) {
       _recordMethodResult(
-        'deleteCookies',
+        PlatformCookieManagerMethod.deleteCookies.name,
         'Error deleting cookies: $e',
         isError: true,
       );
@@ -423,7 +451,7 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
 
   Future<void> _deleteAllCookies() async {
     final confirmed = await _showConfirmDialog(
-      'Delete All Cookies',
+      PlatformCookieManagerMethod.deleteAllCookies.name,
       'Are you sure you want to delete ALL cookies?',
     );
     if (!confirmed) return;
@@ -433,21 +461,21 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
       final result = await _cookieManager.deleteAllCookies();
       if (result) {
         _recordMethodResult(
-          'deleteAllCookies',
+          PlatformCookieManagerMethod.deleteAllCookies.name,
           'All cookies deleted',
           isError: false,
         );
         setState(() => _cookies = []);
       } else {
         _recordMethodResult(
-          'deleteAllCookies',
+          PlatformCookieManagerMethod.deleteAllCookies.name,
           'Failed to delete all cookies',
           isError: true,
         );
       }
     } catch (e) {
       _recordMethodResult(
-        'deleteAllCookies',
+        PlatformCookieManagerMethod.deleteAllCookies.name,
         'Error deleting all cookies: $e',
         isError: true,
       );
@@ -461,13 +489,13 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
     try {
       final result = await _cookieManager.removeSessionCookies();
       _recordMethodResult(
-        'removeSessionCookies',
+        PlatformCookieManagerMethod.removeSessionCookies.name,
         result ? 'Session cookies removed' : 'No session cookies to remove',
         isError: !result,
       );
     } catch (e) {
       _recordMethodResult(
-        'removeSessionCookies',
+        PlatformCookieManagerMethod.removeSessionCookies.name,
         'Error removing session cookies: $e',
         isError: true,
       );
@@ -481,12 +509,16 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
     try {
       await _cookieManager.flush();
       _recordMethodResult(
-        'flush',
+        PlatformCookieManagerMethod.flush.name,
         'Cookies flushed to persistent storage',
         isError: false,
       );
     } catch (e) {
-      _recordMethodResult('flush', 'Error flushing cookies: $e', isError: true);
+      _recordMethodResult(
+        PlatformCookieManagerMethod.flush.name,
+        'Error flushing cookies: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -651,59 +683,50 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
               padding: const EdgeInsets.all(16),
               children: [
                 _buildMethodSection(
-                  'setCookie',
-                  'Set a cookie for the given URL',
-                  PlatformCookieManagerMethod.setCookie,
-                  _setCookie,
-                ),
+                          PlatformCookieManagerMethod.setCookie,
+                          'Set a cookie for the given URL',
+                          _setCookie,
+                        ),
                 _buildMethodSection(
-                  'getCookies',
-                  'Get all cookies for the given URL',
-                  PlatformCookieManagerMethod.getCookies,
-                  _getCookies,
-                ),
+                          PlatformCookieManagerMethod.getCookies,
+                          'Get all cookies for the given URL',
+                          _getCookies,
+                        ),
                 _buildMethodSection(
-                  'getCookie',
-                  'Get a specific cookie by name (requires cookie list)',
-                  PlatformCookieManagerMethod.getCookie,
-                  _promptGetCookie,
-                ),
+                          PlatformCookieManagerMethod.getCookie,
+                          'Get a specific cookie by name (requires cookie list)',
+                          _promptGetCookie,
+                        ),
                 _buildMethodSection(
-                  'deleteCookie',
-                  'Delete a specific cookie (select from list)',
-                  PlatformCookieManagerMethod.deleteCookie,
-                  _promptDeleteCookie,
-                ),
+                          PlatformCookieManagerMethod.deleteCookie,
+                          'Delete a specific cookie (select from list)',
+                          _promptDeleteCookie,
+                        ),
                 _buildMethodSection(
-                  'deleteCookies',
-                  'Delete all cookies for the URL',
-                  PlatformCookieManagerMethod.deleteCookies,
-                  _deleteCookies,
-                ),
+                          PlatformCookieManagerMethod.deleteCookies,
+                          'Delete all cookies for the URL',
+                          _deleteCookies,
+                        ),
                 _buildMethodSection(
-                  'deleteAllCookies',
-                  'Delete all cookies',
-                  PlatformCookieManagerMethod.deleteAllCookies,
-                  _deleteAllCookies,
-                ),
+                          PlatformCookieManagerMethod.deleteAllCookies,
+                          'Delete all cookies',
+                          _deleteAllCookies,
+                        ),
                 _buildMethodSection(
-                  'getAllCookies',
-                  'Get all cookies',
-                  PlatformCookieManagerMethod.getAllCookies,
-                  _getAllCookies,
-                ),
+                          PlatformCookieManagerMethod.getAllCookies,
+                          'Get all cookies',
+                          _getAllCookies,
+                        ),
                 _buildMethodSection(
-                  'removeSessionCookies',
-                  'Remove session cookies',
-                  PlatformCookieManagerMethod.removeSessionCookies,
-                  _removeSessionCookies,
-                ),
+                          PlatformCookieManagerMethod.removeSessionCookies,
+                          'Remove session cookies',
+                          _removeSessionCookies,
+                        ),
                 _buildMethodSection(
-                  'flush',
-                  'Flush cookies to persistent storage',
-                  PlatformCookieManagerMethod.flush,
-                  _flush,
-                ),
+                          PlatformCookieManagerMethod.flush,
+                          'Flush cookies to persistent storage',
+                          _flush,
+                        ),
                 const SizedBox(height: 16),
                 _buildCookiesList(),
               ],
@@ -737,7 +760,7 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
           const SizedBox(width: 8),
           ElevatedButton(
             onPressed: _isLoading ? null : _getCookies,
-            child: const Text('Get Cookies'),
+            child: Text(PlatformCookieManagerMethod.getCookies.name),
           ),
         ],
       ),
@@ -745,11 +768,11 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
   }
 
   Widget _buildMethodSection(
-    String methodName,
-    String description,
     PlatformCookieManagerMethod method,
+    String description,
     VoidCallback? onPressed,
   ) {
+    final methodName = method.name;
     final supportedPlatforms = SupportCheckHelper.supportedPlatformsForMethod(
       method: method,
       checker: CookieManager.isMethodSupported,
@@ -808,7 +831,7 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Enter a URL and click "Get Cookies" to fetch cookies',
+                  'Enter a URL and click "${PlatformCookieManagerMethod.getCookies.name}" to fetch cookies',
                   style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
                 ),
               ],

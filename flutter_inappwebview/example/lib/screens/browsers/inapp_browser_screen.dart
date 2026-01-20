@@ -20,22 +20,28 @@ class TestInAppBrowser extends InAppBrowser {
 
   @override
   void onBrowserCreated() {
-    onEvent?.call('onBrowserCreated', {'id': id});
+    onEvent?.call(PlatformInAppBrowserEventsMethod.onBrowserCreated.name, {
+      'id': id,
+    });
   }
 
   @override
   void onLoadStart(WebUri? url) {
-    onEvent?.call('onLoadStart', {'url': url?.toString()});
+    onEvent?.call(PlatformInAppBrowserEventsMethod.onLoadStart.name, {
+      'url': url?.toString(),
+    });
   }
 
   @override
   void onLoadStop(WebUri? url) {
-    onEvent?.call('onLoadStop', {'url': url?.toString()});
+    onEvent?.call(PlatformInAppBrowserEventsMethod.onLoadStop.name, {
+      'url': url?.toString(),
+    });
   }
 
   @override
   void onReceivedError(WebResourceRequest request, WebResourceError error) {
-    onEvent?.call('onReceivedError', {
+    onEvent?.call(PlatformInAppBrowserEventsMethod.onReceivedError.name, {
       'url': request.url.toString(),
       'errorType': error.type.name(),
       'description': error.description,
@@ -44,22 +50,27 @@ class TestInAppBrowser extends InAppBrowser {
 
   @override
   void onProgressChanged(int progress) {
-    onEvent?.call('onProgressChanged', {'progress': progress});
+    onEvent?.call(PlatformInAppBrowserEventsMethod.onProgressChanged.name, {
+      'progress': progress,
+    });
   }
 
   @override
   void onExit() {
-    onEvent?.call('onExit', null);
+    onEvent?.call(PlatformInAppBrowserEventsMethod.onExit.name, null);
   }
 
   @override
   void onMainWindowWillClose() {
-    onEvent?.call('onMainWindowWillClose', null);
+    onEvent?.call(
+      PlatformInAppBrowserEventsMethod.onMainWindowWillClose.name,
+      null,
+    );
   }
 
   @override
   void onConsoleMessage(ConsoleMessage consoleMessage) {
-    onEvent?.call('onConsoleMessage', {
+    onEvent?.call(PlatformInAppBrowserEventsMethod.onConsoleMessage.name, {
       'message': consoleMessage.message,
       'level': consoleMessage.messageLevel.name,
     });
@@ -91,13 +102,16 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
   final Map<String, int> _selectedHistoryIndex = {};
   static const int _maxHistoryEntries = 3;
 
+  String get _initStatusKey =>
+      PlatformInAppBrowserMethod.openUrlRequest.name;
+
   void _initBrowser(WebViewEnvironment? webViewEnvironment) {
     try {
       _browser = TestInAppBrowser(
         webViewEnvironment: webViewEnvironment,
         onEvent: (event, data) {
           _logEvent(EventType.ui, event, data: data);
-          if (event == 'onExit') {
+          if (event == PlatformInAppBrowserEventsMethod.onExit.name) {
             setState(() => _browserOpened = false);
           }
         },
@@ -105,6 +119,10 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
     } catch (e) {
       _showInitError('Unable to create browser: $e');
     }
+  }
+
+  String _staticMethodName(PlatformInAppBrowserMethod method) {
+    return '${method.name} (static)';
   }
 
   @override
@@ -153,7 +171,7 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
     final settingsManager = context.read<SettingsManager>();
     final params = await showParameterDialog(
       context: context,
-      title: 'openUrlRequest',
+      title: PlatformInAppBrowserMethod.openUrlRequest.name,
       parameters: {
         'url': 'https://flutter.dev',
         'toolbarTopBackgroundColor': Colors.blue,
@@ -167,7 +185,7 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
     final url = params['url']?.toString() ?? '';
     if (url.isEmpty) {
       _recordMethodResult(
-        'openUrlRequest',
+        PlatformInAppBrowserMethod.openUrlRequest.name,
         'Please enter a URL',
         isError: true,
       );
@@ -201,13 +219,13 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
       );
       setState(() => _browserOpened = true);
       _recordMethodResult(
-        'openUrlRequest',
+        PlatformInAppBrowserMethod.openUrlRequest.name,
         'Browser opened with URL',
         isError: false,
       );
     } catch (e) {
       _recordMethodResult(
-        'openUrlRequest',
+        PlatformInAppBrowserMethod.openUrlRequest.name,
         'Error opening browser: $e',
         isError: true,
       );
@@ -220,7 +238,7 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
     final settingsManager = context.read<SettingsManager>();
     final params = await showParameterDialog(
       context: context,
-      title: 'openFile',
+      title: PlatformInAppBrowserMethod.openFile.name,
       parameters: {
         'assetFilePath': 'assets/index.html',
         'toolbarTopBackgroundColor': Colors.green,
@@ -232,7 +250,7 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
     final assetFilePath = params['assetFilePath']?.toString() ?? '';
     if (assetFilePath.isEmpty) {
       _recordMethodResult(
-        'openFile',
+        PlatformInAppBrowserMethod.openFile.name,
         'Please enter an asset file path',
         isError: true,
       );
@@ -252,12 +270,16 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
       );
       setState(() => _browserOpened = true);
       _recordMethodResult(
-        'openFile',
+        PlatformInAppBrowserMethod.openFile.name,
         'Browser opened with file',
         isError: false,
       );
     } catch (e) {
-      _recordMethodResult('openFile', 'Error opening file: $e', isError: true);
+      _recordMethodResult(
+        PlatformInAppBrowserMethod.openFile.name,
+        'Error opening file: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -267,7 +289,7 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
     final settingsManager = context.read<SettingsManager>();
     final params = await showParameterDialog(
       context: context,
-      title: 'openData',
+      title: PlatformInAppBrowserMethod.openData.name,
       parameters: {
         'data':
             '<html><body><h1>Hello InAppBrowser!</h1><p>This is HTML data.</p></body></html>',
@@ -281,7 +303,11 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
     if (params == null) return;
     final data = params['data']?.toString() ?? '';
     if (data.isEmpty) {
-      _recordMethodResult('openData', 'Please enter HTML data', isError: true);
+      _recordMethodResult(
+        PlatformInAppBrowserMethod.openData.name,
+        'Please enter HTML data',
+        isError: true,
+      );
       return;
     }
 
@@ -301,12 +327,16 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
       );
       setState(() => _browserOpened = true);
       _recordMethodResult(
-        'openData',
+        PlatformInAppBrowserMethod.openData.name,
         'Browser opened with data',
         isError: false,
       );
     } catch (e) {
-      _recordMethodResult('openData', 'Error opening data: $e', isError: true);
+      _recordMethodResult(
+        PlatformInAppBrowserMethod.openData.name,
+        'Error opening data: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -315,7 +345,7 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
   Future<void> _openWithSystemBrowser() async {
     final params = await showParameterDialog(
       context: context,
-      title: 'openWithSystemBrowser',
+      title: PlatformInAppBrowserMethod.openWithSystemBrowser.name,
       parameters: {'url': 'https://flutter.dev'},
       requiredPaths: ['url'],
     );
@@ -324,7 +354,7 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
     final url = params['url']?.toString() ?? '';
     if (url.isEmpty) {
       _recordMethodResult(
-        'openWithSystemBrowser (static)',
+        _staticMethodName(PlatformInAppBrowserMethod.openWithSystemBrowser),
         'Please enter a URL',
         isError: true,
       );
@@ -335,13 +365,13 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
     try {
       await InAppBrowser.openWithSystemBrowser(url: WebUri(url));
       _recordMethodResult(
-        'openWithSystemBrowser (static)',
+        _staticMethodName(PlatformInAppBrowserMethod.openWithSystemBrowser),
         'Opened in system browser',
         isError: false,
       );
     } catch (e) {
       _recordMethodResult(
-        'openWithSystemBrowser (static)',
+        _staticMethodName(PlatformInAppBrowserMethod.openWithSystemBrowser),
         'Error opening system browser: $e',
         isError: true,
       );
@@ -356,7 +386,7 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
 
     if (id.isEmpty || title.isEmpty) {
       _recordMethodResult(
-        'addMenuItem',
+        PlatformInAppBrowserMethod.addMenuItem.name,
         'Please enter menu item ID and title',
         isError: true,
       );
@@ -369,7 +399,7 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
       onClick: () {
         _logEvent(EventType.ui, 'Menu item clicked', data: {'id': id});
         _recordMethodResult(
-          'addMenuItem',
+          PlatformInAppBrowserMethod.addMenuItem.name,
           'Menu item "$title" clicked',
           isError: false,
         );
@@ -381,7 +411,11 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
       _menuItems.add(menuItem);
     });
     _menuItemIdController.clear();
-    _recordMethodResult('addMenuItem', 'Menu item added', isError: false);
+    _recordMethodResult(
+      PlatformInAppBrowserMethod.addMenuItem.name,
+      'Menu item added',
+      isError: false,
+    );
   }
 
   void _removeMenuItem(InAppBrowserMenuItem menuItem) {
@@ -391,13 +425,13 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
         _menuItems.remove(menuItem);
       });
       _recordMethodResult(
-        'removeMenuItem',
+        PlatformInAppBrowserMethod.removeMenuItem.name,
         'Menu item removed',
         isError: false,
       );
     } else {
       _recordMethodResult(
-        'removeMenuItem',
+        PlatformInAppBrowserMethod.removeMenuItem.name,
         'Failed to remove menu item',
         isError: true,
       );
@@ -410,7 +444,7 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
       _menuItems.clear();
     });
     _recordMethodResult(
-      'removeAllMenuItems',
+      PlatformInAppBrowserMethod.removeAllMenuItems.name,
       'All menu items removed',
       isError: false,
     );
@@ -420,9 +454,17 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
     setState(() => _isLoading = true);
     try {
       await _browser?.show();
-      _recordMethodResult('show', 'Browser shown', isError: false);
+      _recordMethodResult(
+        PlatformInAppBrowserMethod.show.name,
+        'Browser shown',
+        isError: false,
+      );
     } catch (e) {
-      _recordMethodResult('show', 'Error showing browser: $e', isError: true);
+      _recordMethodResult(
+        PlatformInAppBrowserMethod.show.name,
+        'Error showing browser: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -432,9 +474,17 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
     setState(() => _isLoading = true);
     try {
       await _browser?.hide();
-      _recordMethodResult('hide', 'Browser hidden', isError: false);
+      _recordMethodResult(
+        PlatformInAppBrowserMethod.hide.name,
+        'Browser hidden',
+        isError: false,
+      );
     } catch (e) {
-      _recordMethodResult('hide', 'Error hiding browser: $e', isError: true);
+      _recordMethodResult(
+        PlatformInAppBrowserMethod.hide.name,
+        'Error hiding browser: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -445,9 +495,17 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
     try {
       await _browser?.close();
       setState(() => _browserOpened = false);
-      _recordMethodResult('close', 'Browser closed', isError: false);
+      _recordMethodResult(
+        PlatformInAppBrowserMethod.close.name,
+        'Browser closed',
+        isError: false,
+      );
     } catch (e) {
-      _recordMethodResult('close', 'Error closing browser: $e', isError: true);
+      _recordMethodResult(
+        PlatformInAppBrowserMethod.close.name,
+        'Error closing browser: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -458,13 +516,13 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
     try {
       final hidden = await _browser?.isHidden();
       _recordMethodResult(
-        'isHidden',
+        PlatformInAppBrowserMethod.isHidden.name,
         'Browser is hidden: $hidden',
         isError: false,
       );
     } catch (e) {
       _recordMethodResult(
-        'isHidden',
+        PlatformInAppBrowserMethod.isHidden.name,
         'Error checking hidden state: $e',
         isError: true,
       );
@@ -479,13 +537,13 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
       final settings = await _browser?.getSettings();
       _showSettingsDialog(settings);
       _recordMethodResult(
-        'getSettings',
+        PlatformInAppBrowserMethod.getSettings.name,
         'Settings dialog opened',
         isError: false,
       );
     } catch (e) {
       _recordMethodResult(
-        'getSettings',
+        PlatformInAppBrowserMethod.getSettings.name,
         'Error getting settings: $e',
         isError: true,
       );
@@ -497,7 +555,7 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
   Future<void> _setSettings() async {
     final params = await showParameterDialog(
       context: context,
-      title: 'setSettings',
+      title: PlatformInAppBrowserMethod.setSettings.name,
       parameters: {
         'toolbarTopBackgroundColor': Colors.orange,
         'hideToolbarTop': false,
@@ -516,10 +574,14 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
           ),
         ),
       );
-      _recordMethodResult('setSettings', 'Settings updated', isError: false);
+      _recordMethodResult(
+        PlatformInAppBrowserMethod.setSettings.name,
+        'Settings updated',
+        isError: false,
+      );
     } catch (e) {
       _recordMethodResult(
-        'setSettings',
+        PlatformInAppBrowserMethod.setSettings.name,
         'Error setting settings: $e',
         isError: true,
       );
@@ -531,7 +593,7 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
   void _checkIsOpened() {
     final opened = _browser?.isOpened() ?? false;
     _recordMethodResult(
-      'isOpened',
+      PlatformInAppBrowserMethod.isOpened.name,
       'Browser is opened: $opened',
       isError: false,
     );
@@ -598,7 +660,7 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
   }
 
   void _showInitError(String message) {
-    _recordMethodResult('initBrowser', message, isError: true);
+    _recordMethodResult(_initStatusKey, message, isError: true);
   }
 
   void _handleEnvironmentChange(WebViewEnvironment? environment) {
@@ -611,13 +673,13 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
   }
 
   Widget _buildInitStatusSection() {
-    final entries = _methodHistory['initBrowser'] ?? const [];
+    final entries = _methodHistory[_initStatusKey] ?? const [];
     if (entries.isEmpty) {
       return const SizedBox.shrink();
     }
     return Column(
       children: [
-        _buildMethodHistory('initBrowser', title: 'Initialization'),
+        _buildMethodHistory(_initStatusKey, title: 'Initialization'),
         const SizedBox(height: 16),
       ],
     );
@@ -637,7 +699,7 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('InAppBrowser'),
+        title: Text((InAppBrowser).toString()),
         actions: [
           if (_isLoading)
             const Padding(
@@ -737,25 +799,27 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
             ),
             const SizedBox(height: 12),
             _buildMethodTile(
-              'openUrlRequest',
+              PlatformInAppBrowserMethod.openUrlRequest.name,
               'Open browser with URL request',
               PlatformInAppBrowserMethod.openUrlRequest,
               _openUrlRequest,
             ),
             _buildMethodTile(
-              'openFile',
+              PlatformInAppBrowserMethod.openFile.name,
               'Open browser with local file',
               PlatformInAppBrowserMethod.openFile,
               _openFile,
             ),
             _buildMethodTile(
-              'openData',
+              PlatformInAppBrowserMethod.openData.name,
               'Open browser with HTML data',
               PlatformInAppBrowserMethod.openData,
               _openData,
             ),
             _buildMethodTile(
-              'openWithSystemBrowser (static)',
+              _staticMethodName(
+                PlatformInAppBrowserMethod.openWithSystemBrowser,
+              ),
               'Open URL in system browser',
               PlatformInAppBrowserMethod.openWithSystemBrowser,
               _openWithSystemBrowser,
@@ -810,9 +874,11 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
               ],
             ),
             const SizedBox(height: 8),
-            _buildMethodHistory('addMenuItem'),
-            _buildMethodHistory('removeMenuItem'),
-            _buildMethodHistory('removeAllMenuItems'),
+            _buildMethodHistory(PlatformInAppBrowserMethod.addMenuItem.name),
+            _buildMethodHistory(PlatformInAppBrowserMethod.removeMenuItem.name),
+            _buildMethodHistory(
+              PlatformInAppBrowserMethod.removeAllMenuItems.name,
+            ),
             const SizedBox(height: 12),
             if (_menuItems.isNotEmpty) ...[
               const Divider(),
@@ -863,31 +929,31 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
             ),
             const SizedBox(height: 12),
             _buildMethodTile(
-              'show',
+              PlatformInAppBrowserMethod.show.name,
               'Show the browser',
               PlatformInAppBrowserMethod.show,
               _browserOpened ? _show : null,
             ),
             _buildMethodTile(
-              'hide',
+              PlatformInAppBrowserMethod.hide.name,
               'Hide the browser',
               PlatformInAppBrowserMethod.hide,
               _browserOpened ? _hide : null,
             ),
             _buildMethodTile(
-              'close',
+              PlatformInAppBrowserMethod.close.name,
               'Close the browser',
               PlatformInAppBrowserMethod.close,
               _browserOpened ? _close : null,
             ),
             _buildMethodTile(
-              'isHidden',
+              PlatformInAppBrowserMethod.isHidden.name,
               'Check if browser is hidden',
               PlatformInAppBrowserMethod.isHidden,
               _browserOpened ? _isHidden : null,
             ),
             _buildMethodTile(
-              'isOpened',
+              PlatformInAppBrowserMethod.isOpened.name,
               'Check if browser is opened',
               PlatformInAppBrowserMethod.isOpened,
               _checkIsOpened,
@@ -911,13 +977,13 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
             ),
             const SizedBox(height: 12),
             _buildMethodTile(
-              'getSettings',
+              PlatformInAppBrowserMethod.getSettings.name,
               'Get current browser settings',
               PlatformInAppBrowserMethod.getSettings,
               _browserOpened ? _getSettings : null,
             ),
             _buildMethodTile(
-              'setSettings',
+              PlatformInAppBrowserMethod.setSettings.name,
               'Update browser settings',
               PlatformInAppBrowserMethod.setSettings,
               _browserOpened ? _setSettings : null,

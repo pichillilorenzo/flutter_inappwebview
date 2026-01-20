@@ -96,7 +96,9 @@ class _ControllersScreenState extends State<ControllersScreen> {
               });
               _logEvent(
                 EventType.ui,
-                'onFindResultReceived',
+                PlatformFindInteractionControllerCreationParamsProperty
+                    .onFindResultReceived
+                    .name,
                 data: {
                   'activeMatchOrdinal': activeMatchOrdinal,
                   'numberOfMatches': numberOfMatches,
@@ -112,7 +114,12 @@ class _ControllersScreenState extends State<ControllersScreen> {
           color: _pullToRefreshColor,
         ),
         onRefresh: () async {
-          _logEvent(EventType.ui, 'onRefresh');
+          _logEvent(
+            EventType.ui,
+            PlatformPullToRefreshControllerCreationParamsProperty
+                .onRefresh
+                .name,
+          );
           if (_webViewController != null) {
             await _webViewController!.reload();
           }
@@ -215,23 +222,35 @@ class _ControllersScreenState extends State<ControllersScreen> {
     if (params == null) return;
     final query = params['find']?.toString() ?? '';
     if (query.isEmpty) {
-      _recordMethodResult('findAll', 'Please enter search text', isError: true);
+      _recordMethodResult(
+        PlatformFindInteractionControllerMethod.findAll.name,
+        'Please enter search text',
+        isError: true,
+      );
       return;
     }
     _searchController.text = query;
     await _findInteractionController?.findAll(find: query);
-    _recordMethodResult('findAll', 'Searching for: $query', isError: false);
+    _recordMethodResult(
+      PlatformFindInteractionControllerMethod.findAll.name,
+      'Searching for: $query',
+      isError: false,
+    );
   }
 
   Future<void> _findNext() async {
     await _findInteractionController?.findNext(forward: true);
-    _recordMethodResult('findNext', 'Moved to next match', isError: false);
+    _recordMethodResult(
+      PlatformFindInteractionControllerMethod.findNext.name,
+      'Moved to next match',
+      isError: false,
+    );
   }
 
   Future<void> _findPrevious() async {
     await _findInteractionController?.findNext(forward: false);
     _recordMethodResult(
-      'findPrevious',
+      '${PlatformFindInteractionControllerMethod.findNext.name} (previous)',
       'Moved to previous match',
       isError: false,
     );
@@ -243,7 +262,11 @@ class _ControllersScreenState extends State<ControllersScreen> {
       _matchCount = 0;
       _currentMatch = 0;
     });
-    _recordMethodResult('clearMatches', 'Matches cleared', isError: false);
+    _recordMethodResult(
+      PlatformFindInteractionControllerMethod.clearMatches.name,
+      'Matches cleared',
+      isError: false,
+    );
   }
 
   Future<void> _setSearchText() async {
@@ -258,7 +281,7 @@ class _ControllersScreenState extends State<ControllersScreen> {
     final text = params['searchText']?.toString() ?? '';
     if (text.isEmpty) {
       _recordMethodResult(
-        'setSearchText',
+        PlatformFindInteractionControllerMethod.setSearchText.name,
         'Please enter search text',
         isError: true,
       );
@@ -266,18 +289,26 @@ class _ControllersScreenState extends State<ControllersScreen> {
     }
     _searchController.text = text;
     await _findInteractionController?.setSearchText(text);
-    _recordMethodResult('setSearchText', 'Search text set', isError: false);
+    _recordMethodResult(
+      PlatformFindInteractionControllerMethod.setSearchText.name,
+      'Search text set',
+      isError: false,
+    );
   }
 
   Future<void> _getSearchText() async {
     final text = await _findInteractionController?.getSearchText();
-    _recordMethodResult('getSearchText', 'Search text: $text', isError: false);
+    _recordMethodResult(
+      PlatformFindInteractionControllerMethod.getSearchText.name,
+      'Search text: $text',
+      isError: false,
+    );
   }
 
   Future<void> _presentFindNavigator() async {
     await _findInteractionController?.presentFindNavigator();
     _recordMethodResult(
-      'presentFindNavigator',
+      PlatformFindInteractionControllerMethod.presentFindNavigator.name,
       'Find navigator presented',
       isError: false,
     );
@@ -286,7 +317,7 @@ class _ControllersScreenState extends State<ControllersScreen> {
   Future<void> _dismissFindNavigator() async {
     await _findInteractionController?.dismissFindNavigator();
     _recordMethodResult(
-      'dismissFindNavigator',
+      PlatformFindInteractionControllerMethod.dismissFindNavigator.name,
       'Find navigator dismissed',
       isError: false,
     );
@@ -295,7 +326,7 @@ class _ControllersScreenState extends State<ControllersScreen> {
   Future<void> _isFindNavigatorVisible() async {
     final visible = await _findInteractionController?.isFindNavigatorVisible();
     _recordMethodResult(
-      'isFindNavigatorVisible',
+      PlatformFindInteractionControllerMethod.isFindNavigatorVisible.name,
       'Find navigator visible: $visible',
       isError: false,
     );
@@ -304,7 +335,7 @@ class _ControllersScreenState extends State<ControllersScreen> {
   Future<void> _getActiveFindSession() async {
     final session = await _findInteractionController?.getActiveFindSession();
     _recordMethodResult(
-      'getActiveFindSession',
+      PlatformFindInteractionControllerMethod.getActiveFindSession.name,
       'Active session: ${session?.resultCount ?? 0} results, highlight index: ${session?.highlightedResultIndex ?? -1}',
       isError: false,
     );
@@ -315,7 +346,7 @@ class _ControllersScreenState extends State<ControllersScreen> {
     await _pullToRefreshController?.setEnabled(enabled);
     setState(() => _pullToRefreshEnabled = enabled);
     _recordMethodResult(
-      'setEnabled',
+      PlatformPullToRefreshControllerMethod.setEnabled.name,
       'Pull to refresh ${enabled ? "enabled" : "disabled"}',
       isError: false,
     );
@@ -324,7 +355,7 @@ class _ControllersScreenState extends State<ControllersScreen> {
   Future<void> _isEnabled() async {
     final enabled = await _pullToRefreshController?.isEnabled();
     _recordMethodResult(
-      'isEnabled',
+      PlatformPullToRefreshControllerMethod.isEnabled.name,
       'Pull to refresh enabled: $enabled',
       isError: false,
     );
@@ -333,7 +364,7 @@ class _ControllersScreenState extends State<ControllersScreen> {
   Future<void> _beginRefreshing() async {
     await _pullToRefreshController?.beginRefreshing();
     _recordMethodResult(
-      'beginRefreshing',
+      PlatformPullToRefreshControllerMethod.beginRefreshing.name,
       'Refreshing started',
       isError: false,
     );
@@ -341,13 +372,17 @@ class _ControllersScreenState extends State<ControllersScreen> {
 
   Future<void> _endRefreshing() async {
     await _pullToRefreshController?.endRefreshing();
-    _recordMethodResult('endRefreshing', 'Refreshing ended', isError: false);
+    _recordMethodResult(
+      PlatformPullToRefreshControllerMethod.endRefreshing.name,
+      'Refreshing ended',
+      isError: false,
+    );
   }
 
   Future<void> _isRefreshing() async {
     final refreshing = await _pullToRefreshController?.isRefreshing();
     _recordMethodResult(
-      'isRefreshing',
+      PlatformPullToRefreshControllerMethod.isRefreshing.name,
       'Is refreshing: $refreshing',
       isError: false,
     );
@@ -356,13 +391,17 @@ class _ControllersScreenState extends State<ControllersScreen> {
   Future<void> _setColor(Color color) async {
     await _pullToRefreshController?.setColor(color);
     setState(() => _pullToRefreshColor = color);
-    _recordMethodResult('setColor', 'Color set', isError: false);
+    _recordMethodResult(
+      PlatformPullToRefreshControllerMethod.setColor.name,
+      'Color set',
+      isError: false,
+    );
   }
 
   Future<void> _setBackgroundColor(Color color) async {
     await _pullToRefreshController?.setBackgroundColor(color);
     _recordMethodResult(
-      'setBackgroundColor',
+      PlatformPullToRefreshControllerMethod.setBackgroundColor.name,
       'Background color set',
       isError: false,
     );
@@ -379,7 +418,11 @@ class _ControllersScreenState extends State<ControllersScreen> {
     if (params == null) return;
     final color = params['color'] as Color?;
     if (color == null) {
-      _recordMethodResult('setColor', 'Please pick a color', isError: true);
+      _recordMethodResult(
+        PlatformPullToRefreshControllerMethod.setColor.name,
+        'Please pick a color',
+        isError: true,
+      );
       return;
     }
     await _setColor(color);
@@ -397,7 +440,7 @@ class _ControllersScreenState extends State<ControllersScreen> {
     final color = params['color'] as Color?;
     if (color == null) {
       _recordMethodResult(
-        'setBackgroundColor',
+        PlatformPullToRefreshControllerMethod.setBackgroundColor.name,
         'Please pick a color',
         isError: true,
       );
@@ -410,7 +453,7 @@ class _ControllersScreenState extends State<ControllersScreen> {
     final distance = await _pullToRefreshController
         ?.getDefaultSlingshotDistance();
     _recordMethodResult(
-      'getDefaultSlingshotDistance',
+      PlatformPullToRefreshControllerMethod.getDefaultSlingshotDistance.name,
       'Default slingshot distance: $distance',
       isError: false,
     );
@@ -420,7 +463,7 @@ class _ControllersScreenState extends State<ControllersScreen> {
   Future<void> _createWebMessageChannel() async {
     if (_webViewController == null) {
       _recordMethodResult(
-        'createWebMessageChannel',
+        PlatformInAppWebViewControllerMethod.createWebMessageChannel.name,
         'WebView not ready',
         isError: true,
       );
@@ -441,14 +484,14 @@ class _ControllersScreenState extends State<ControllersScreen> {
           );
         });
         _recordMethodResult(
-          'createWebMessageChannel',
+          PlatformInAppWebViewControllerMethod.createWebMessageChannel.name,
           'Web message channel created',
           isError: false,
         );
       }
     } catch (e) {
       _recordMethodResult(
-        'createWebMessageChannel',
+        PlatformInAppWebViewControllerMethod.createWebMessageChannel.name,
         'Error creating channel: $e',
         isError: true,
       );
@@ -458,7 +501,7 @@ class _ControllersScreenState extends State<ControllersScreen> {
   Future<void> _postWebMessage() async {
     if (_webMessageChannel == null) {
       _recordMethodResult(
-        'postWebMessage',
+        PlatformInAppWebViewControllerMethod.postWebMessage.name,
         'Create a channel first',
         isError: true,
       );
@@ -476,7 +519,7 @@ class _ControllersScreenState extends State<ControllersScreen> {
     final message = params['message']?.toString() ?? '';
     if (message.isEmpty) {
       _recordMethodResult(
-        'postWebMessage',
+        PlatformInAppWebViewControllerMethod.postWebMessage.name,
         'Please enter a message',
         isError: true,
       );
@@ -486,10 +529,14 @@ class _ControllersScreenState extends State<ControllersScreen> {
 
     try {
       await _webMessageChannel!.port1.postMessage(WebMessage(data: message));
-      _recordMethodResult('postWebMessage', 'Message sent', isError: false);
+      _recordMethodResult(
+        PlatformInAppWebViewControllerMethod.postWebMessage.name,
+        'Message sent',
+        isError: false,
+      );
     } catch (e) {
       _recordMethodResult(
-        'postWebMessage',
+        PlatformInAppWebViewControllerMethod.postWebMessage.name,
         'Error sending message: $e',
         isError: true,
       );
@@ -503,7 +550,7 @@ class _ControllersScreenState extends State<ControllersScreen> {
       _receivedMessages.clear();
     });
     _recordMethodResult(
-      'closeWebMessageChannel',
+      '${(WebMessageChannel).toString()}.${PlatformWebMessageChannelMethod.dispose.name}',
       'Channel closed',
       isError: false,
     );
@@ -697,16 +744,16 @@ class _ControllersScreenState extends State<ControllersScreen> {
 
   Widget _buildFindInteractionSection() {
     final supportedPlatforms = SupportChecker.getSupportedPlatformsForClass(
-      'FindInteractionController',
+      (FindInteractionController).toString(),
     );
 
     return Card(
       child: ExpansionTile(
         title: Row(
           children: [
-            const Text(
-              'FindInteractionController',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            Text(
+              (FindInteractionController).toString(),
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(width: 8),
             Expanded(
@@ -746,7 +793,9 @@ class _ControllersScreenState extends State<ControllersScreen> {
                   ],
                 ),
                 const SizedBox(height: 8),
-                _buildMethodHistory('findAll'),
+                _buildMethodHistory(
+                  PlatformFindInteractionControllerMethod.findAll.name,
+                ),
                 const SizedBox(height: 12),
 
                 // Match navigation
@@ -792,21 +841,27 @@ class _ControllersScreenState extends State<ControllersScreen> {
                   runSpacing: 8,
                   children: [
                     _buildMethodChip(
-                      'setSearchText',
+                      PlatformFindInteractionControllerMethod
+                          .setSearchText
+                          .name,
                       _getFindSupportedPlatforms(
                         PlatformFindInteractionControllerMethod.setSearchText,
                       ),
                       _webViewReady ? _setSearchText : null,
                     ),
                     _buildMethodChip(
-                      'getSearchText',
+                      PlatformFindInteractionControllerMethod
+                          .getSearchText
+                          .name,
                       _getFindSupportedPlatforms(
                         PlatformFindInteractionControllerMethod.getSearchText,
                       ),
                       _webViewReady ? _getSearchText : null,
                     ),
                     _buildMethodChip(
-                      'presentFindNavigator',
+                      PlatformFindInteractionControllerMethod
+                          .presentFindNavigator
+                          .name,
                       _getFindSupportedPlatforms(
                         PlatformFindInteractionControllerMethod
                             .presentFindNavigator,
@@ -814,7 +869,9 @@ class _ControllersScreenState extends State<ControllersScreen> {
                       _webViewReady ? _presentFindNavigator : null,
                     ),
                     _buildMethodChip(
-                      'dismissFindNavigator',
+                      PlatformFindInteractionControllerMethod
+                          .dismissFindNavigator
+                          .name,
                       _getFindSupportedPlatforms(
                         PlatformFindInteractionControllerMethod
                             .dismissFindNavigator,
@@ -822,7 +879,9 @@ class _ControllersScreenState extends State<ControllersScreen> {
                       _webViewReady ? _dismissFindNavigator : null,
                     ),
                     _buildMethodChip(
-                      'isFindNavigatorVisible',
+                      PlatformFindInteractionControllerMethod
+                          .isFindNavigatorVisible
+                          .name,
                       _getFindSupportedPlatforms(
                         PlatformFindInteractionControllerMethod
                             .isFindNavigatorVisible,
@@ -830,7 +889,9 @@ class _ControllersScreenState extends State<ControllersScreen> {
                       _webViewReady ? _isFindNavigatorVisible : null,
                     ),
                     _buildMethodChip(
-                      'getActiveFindSession',
+                      PlatformFindInteractionControllerMethod
+                          .getActiveFindSession
+                          .name,
                       _getFindSupportedPlatforms(
                         PlatformFindInteractionControllerMethod
                             .getActiveFindSession,
@@ -849,16 +910,16 @@ class _ControllersScreenState extends State<ControllersScreen> {
 
   Widget _buildPullToRefreshSection() {
     final supportedPlatforms = SupportChecker.getSupportedPlatformsForClass(
-      'PullToRefreshController',
+      (PullToRefreshController).toString(),
     );
 
     return Card(
       child: ExpansionTile(
         title: Row(
           children: [
-            const Text(
-              'PullToRefreshController',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            Text(
+              (PullToRefreshController).toString(),
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(width: 8),
             Expanded(
@@ -883,7 +944,9 @@ class _ControllersScreenState extends State<ControllersScreen> {
                   value: _pullToRefreshEnabled,
                   onChanged: _webViewReady ? _setEnabled : null,
                 ),
-                _buildMethodHistory('setEnabled'),
+                _buildMethodHistory(
+                  PlatformPullToRefreshControllerMethod.setEnabled.name,
+                ),
                 const Divider(),
 
                 // Color selection
@@ -908,7 +971,9 @@ class _ControllersScreenState extends State<ControllersScreen> {
                   ],
                 ),
                 const SizedBox(height: 8),
-                _buildMethodHistory('setColor'),
+                _buildMethodHistory(
+                  PlatformPullToRefreshControllerMethod.setColor.name,
+                ),
                 const SizedBox(height: 16),
 
                 // Methods
@@ -917,35 +982,39 @@ class _ControllersScreenState extends State<ControllersScreen> {
                   runSpacing: 8,
                   children: [
                     _buildMethodChip(
-                      'isEnabled',
+                      PlatformPullToRefreshControllerMethod.isEnabled.name,
                       _getPullToRefreshSupportedPlatforms(
                         PlatformPullToRefreshControllerMethod.isEnabled,
                       ),
                       _webViewReady ? _isEnabled : null,
                     ),
                     _buildMethodChip(
-                      'beginRefreshing',
+                      PlatformPullToRefreshControllerMethod
+                          .beginRefreshing
+                          .name,
                       _getPullToRefreshSupportedPlatforms(
                         PlatformPullToRefreshControllerMethod.beginRefreshing,
                       ),
                       _webViewReady ? _beginRefreshing : null,
                     ),
                     _buildMethodChip(
-                      'endRefreshing',
+                      PlatformPullToRefreshControllerMethod.endRefreshing.name,
                       _getPullToRefreshSupportedPlatforms(
                         PlatformPullToRefreshControllerMethod.endRefreshing,
                       ),
                       _webViewReady ? _endRefreshing : null,
                     ),
                     _buildMethodChip(
-                      'isRefreshing',
+                      PlatformPullToRefreshControllerMethod.isRefreshing.name,
                       _getPullToRefreshSupportedPlatforms(
                         PlatformPullToRefreshControllerMethod.isRefreshing,
                       ),
                       _webViewReady ? _isRefreshing : null,
                     ),
                     _buildMethodChip(
-                      'setBackgroundColor',
+                      PlatformPullToRefreshControllerMethod
+                          .setBackgroundColor
+                          .name,
                       _getPullToRefreshSupportedPlatforms(
                         PlatformPullToRefreshControllerMethod
                             .setBackgroundColor,
@@ -953,7 +1022,9 @@ class _ControllersScreenState extends State<ControllersScreen> {
                       _webViewReady ? _promptSetBackgroundColor : null,
                     ),
                     _buildMethodChip(
-                      'getDefaultSlingshotDistance',
+                      PlatformPullToRefreshControllerMethod
+                          .getDefaultSlingshotDistance
+                          .name,
                       _getPullToRefreshSupportedPlatforms(
                         PlatformPullToRefreshControllerMethod
                             .getDefaultSlingshotDistance,
@@ -972,16 +1043,16 @@ class _ControllersScreenState extends State<ControllersScreen> {
 
   Widget _buildWebMessageChannelSection() {
     final supportedPlatforms = SupportChecker.getSupportedPlatformsForClass(
-      'WebMessageChannel',
+      (WebMessageChannel).toString(),
     );
 
     return Card(
       child: ExpansionTile(
         title: Row(
           children: [
-            const Text(
-              'WebMessageChannel',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            Text(
+              (WebMessageChannel).toString(),
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(width: 8),
             Expanded(
@@ -1064,8 +1135,14 @@ class _ControllersScreenState extends State<ControllersScreen> {
                   ],
                 ),
                 const SizedBox(height: 8),
-                _buildMethodHistory('createWebMessageChannel'),
-                _buildMethodHistory('closeWebMessageChannel'),
+                _buildMethodHistory(
+                  PlatformInAppWebViewControllerMethod
+                      .createWebMessageChannel
+                      .name,
+                ),
+                _buildMethodHistory(
+                  '${(WebMessageChannel).toString()}.${PlatformWebMessageChannelMethod.dispose.name}',
+                ),
                 const SizedBox(height: 12),
 
                 // Message input
@@ -1091,7 +1168,9 @@ class _ControllersScreenState extends State<ControllersScreen> {
                   ],
                 ),
                 const SizedBox(height: 8),
-                _buildMethodHistory('postWebMessage'),
+                _buildMethodHistory(
+                  PlatformInAppWebViewControllerMethod.postWebMessage.name,
+                ),
                 const SizedBox(height: 12),
 
                 // Received messages
@@ -1136,16 +1215,16 @@ class _ControllersScreenState extends State<ControllersScreen> {
 
   Widget _buildPrintJobSection() {
     final supportedPlatforms = SupportChecker.getSupportedPlatformsForClass(
-      'PrintJobController',
+      (PrintJobController).toString(),
     );
 
     return Card(
       child: ExpansionTile(
         title: Row(
           children: [
-            const Text(
-              'PrintJobController',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            Text(
+              (PrintJobController).toString(),
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(width: 8),
             Expanded(
@@ -1165,8 +1244,8 @@ class _ControllersScreenState extends State<ControllersScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'PrintJobController is obtained from onPrintRequest callback when printing.',
+                Text(
+                  '${(PrintJobController).toString()} is obtained from onPrintRequest callback when printing.',
                   style: TextStyle(fontSize: 12, color: Colors.grey),
                 ),
                 const SizedBox(height: 12),
@@ -1191,7 +1270,7 @@ class _ControllersScreenState extends State<ControllersScreen> {
                   runSpacing: 8,
                   children: [
                     _buildMethodChip(
-                      'cancel',
+                      PlatformPrintJobControllerMethod.cancel.name,
                       SupportCheckHelper.supportedPlatformsForMethod(
                         method: PlatformPrintJobControllerMethod.cancel,
                         checker: PrintJobController.isMethodSupported,
@@ -1200,7 +1279,7 @@ class _ControllersScreenState extends State<ControllersScreen> {
                       enabled: false,
                     ),
                     _buildMethodChip(
-                      'restart',
+                      PlatformPrintJobControllerMethod.restart.name,
                       SupportCheckHelper.supportedPlatformsForMethod(
                         method: PlatformPrintJobControllerMethod.restart,
                         checker: PrintJobController.isMethodSupported,
@@ -1209,7 +1288,7 @@ class _ControllersScreenState extends State<ControllersScreen> {
                       enabled: false,
                     ),
                     _buildMethodChip(
-                      'dismiss',
+                      PlatformPrintJobControllerMethod.dismiss.name,
                       SupportCheckHelper.supportedPlatformsForMethod(
                         method: PlatformPrintJobControllerMethod.dismiss,
                         checker: PrintJobController.isMethodSupported,
@@ -1218,7 +1297,7 @@ class _ControllersScreenState extends State<ControllersScreen> {
                       enabled: false,
                     ),
                     _buildMethodChip(
-                      'getInfo',
+                      PlatformPrintJobControllerMethod.getInfo.name,
                       SupportCheckHelper.supportedPlatformsForMethod(
                         method: PlatformPrintJobControllerMethod.getInfo,
                         checker: PrintJobController.isMethodSupported,

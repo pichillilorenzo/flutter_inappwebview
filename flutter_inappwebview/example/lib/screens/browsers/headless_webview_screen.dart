@@ -94,7 +94,11 @@ class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
     required SettingsManager settingsManager,
   }) {
     if (url.isEmpty) {
-      _recordMethodResult('run', 'Please enter a URL', isError: true);
+      _recordMethodResult(
+        PlatformHeadlessInAppWebViewMethod.run.name,
+        'Please enter a URL',
+        isError: true,
+      );
       return false;
     }
     try {
@@ -114,14 +118,14 @@ class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
           _webViewController = controller;
           _logEvent(
             EventType.ui,
-            'onWebViewCreated',
+            PlatformWebViewCreationParamsProperty.onWebViewCreated.name,
             data: {'viewId': controller.getViewId()},
           );
         },
         onLoadStart: (controller, url) {
           _logEvent(
             EventType.navigation,
-            'onLoadStart',
+            PlatformWebViewCreationParamsProperty.onLoadStart.name,
             data: {'url': url?.toString()},
           );
           setState(() => _currentUrl = url?.toString());
@@ -129,7 +133,7 @@ class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
         onLoadStop: (controller, url) async {
           _logEvent(
             EventType.navigation,
-            'onLoadStop',
+            PlatformWebViewCreationParamsProperty.onLoadStop.name,
             data: {'url': url?.toString()},
           );
           final title = await controller.getTitle();
@@ -141,7 +145,7 @@ class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
         onReceivedError: (controller, request, error) {
           _logEvent(
             EventType.error,
-            'onReceivedError',
+            PlatformWebViewCreationParamsProperty.onReceivedError.name,
             data: {
               'url': request.url.toString(),
               'errorType': error.type.name(),
@@ -152,14 +156,14 @@ class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
         onProgressChanged: (controller, progress) {
           _logEvent(
             EventType.performance,
-            'onProgressChanged',
+            PlatformWebViewCreationParamsProperty.onProgressChanged.name,
             data: {'progress': progress},
           );
         },
         onConsoleMessage: (controller, consoleMessage) {
           _logEvent(
             EventType.console,
-            'onConsoleMessage',
+            PlatformWebViewCreationParamsProperty.onConsoleMessage.name,
             data: {
               'message': consoleMessage.message,
               'level': consoleMessage.messageLevel.name(),
@@ -167,14 +171,18 @@ class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
           );
         },
         onTitleChanged: (controller, title) {
-          _logEvent(EventType.ui, 'onTitleChanged', data: {'title': title});
+          _logEvent(
+            EventType.ui,
+            PlatformWebViewCreationParamsProperty.onTitleChanged.name,
+            data: {'title': title},
+          );
           setState(() => _currentTitle = title);
         },
       );
     } catch (e) {
       _recordMethodResult(
-        'run',
-        'Error creating headless webview: $e',
+        PlatformHeadlessInAppWebViewMethod.run.name,
+        'Error creating ${(HeadlessInAppWebView).toString()}: $e',
         isError: true,
       );
       return false;
@@ -191,7 +199,11 @@ class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
     final height = double.tryParse(_heightController.text) ?? 768;
 
     if (url.isEmpty) {
-      _recordMethodResult('run', 'Please enter a URL', isError: true);
+      _recordMethodResult(
+        PlatformHeadlessInAppWebViewMethod.run.name,
+        'Please enter a URL',
+        isError: true,
+      );
       return;
     }
 
@@ -208,14 +220,14 @@ class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
       await _headlessWebView?.run();
       setState(() => _isRunning = _headlessWebView?.isRunning() ?? false);
       _recordMethodResult(
-        'run',
-        'HeadlessInAppWebView started',
+        PlatformHeadlessInAppWebViewMethod.run.name,
+        '${(HeadlessInAppWebView).toString()} started',
         isError: false,
       );
     } catch (e) {
       _recordMethodResult(
-        'run',
-        'Error starting headless webview: $e',
+        PlatformHeadlessInAppWebViewMethod.run.name,
+        'Error starting ${(HeadlessInAppWebView).toString()}: $e',
         isError: true,
       );
     } finally {
@@ -227,8 +239,8 @@ class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
     final running = _headlessWebView?.isRunning() ?? false;
     setState(() => _isRunning = running);
     _recordMethodResult(
-      'isRunning',
-      'HeadlessInAppWebView is running: $running',
+      PlatformHeadlessInAppWebViewMethod.isRunning.name,
+      '${(HeadlessInAppWebView).toString()} is running: $running',
       isError: false,
     );
   }
@@ -249,7 +261,7 @@ class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
     final height = (params['height'] as num?)?.toDouble();
     if (width == null || height == null) {
       _recordMethodResult(
-        'setSize',
+        PlatformHeadlessInAppWebViewMethod.setSize.name,
         'Please enter valid width and height',
         isError: true,
       );
@@ -262,13 +274,17 @@ class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
     try {
       await _headlessWebView?.setSize(Size(width, height));
       _recordMethodResult(
-        'setSize',
+        PlatformHeadlessInAppWebViewMethod.setSize.name,
         'Size set to ${width}x$height',
         isError: false,
       );
       await _getSize();
     } catch (e) {
-      _recordMethodResult('setSize', 'Error setting size: $e', isError: true);
+      _recordMethodResult(
+        PlatformHeadlessInAppWebViewMethod.setSize.name,
+        'Error setting size: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -280,12 +296,16 @@ class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
       final size = await _headlessWebView?.getSize();
       setState(() => _currentSize = size);
       _recordMethodResult(
-        'getSize',
+        PlatformHeadlessInAppWebViewMethod.getSize.name,
         'Current size: ${size?.width}x${size?.height}',
         isError: false,
       );
     } catch (e) {
-      _recordMethodResult('getSize', 'Error getting size: $e', isError: true);
+      _recordMethodResult(
+        PlatformHeadlessInAppWebViewMethod.getSize.name,
+        'Error getting size: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -305,12 +325,16 @@ class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
       _headlessWebView = null;
       _webViewController = null;
       _recordMethodResult(
-        'dispose',
-        'HeadlessInAppWebView disposed',
+        PlatformHeadlessInAppWebViewMethod.dispose.name,
+        '${(HeadlessInAppWebView).toString()} disposed',
         isError: false,
       );
     } catch (e) {
-      _recordMethodResult('dispose', 'Error disposing: $e', isError: true);
+      _recordMethodResult(
+        PlatformHeadlessInAppWebViewMethod.dispose.name,
+        'Error disposing: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -319,7 +343,7 @@ class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
   Future<void> _takeScreenshot() async {
     if (_webViewController == null) {
       _recordMethodResult(
-        'takeScreenshot',
+        PlatformInAppWebViewControllerMethod.takeScreenshot.name,
         'WebView not initialized',
         isError: true,
       );
@@ -332,20 +356,20 @@ class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
       setState(() => _screenshotData = screenshot);
       if (screenshot != null) {
         _recordMethodResult(
-          'takeScreenshot',
+          PlatformInAppWebViewControllerMethod.takeScreenshot.name,
           'Screenshot taken (${screenshot.length} bytes)',
           isError: false,
         );
       } else {
         _recordMethodResult(
-          'takeScreenshot',
+          PlatformInAppWebViewControllerMethod.takeScreenshot.name,
           'Failed to take screenshot',
           isError: true,
         );
       }
     } catch (e) {
       _recordMethodResult(
-        'takeScreenshot',
+        PlatformInAppWebViewControllerMethod.takeScreenshot.name,
         'Error taking screenshot: $e',
         isError: true,
       );
@@ -365,14 +389,18 @@ class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
     if (params == null) return;
     final url = params['url']?.toString() ?? '';
     if (url.isEmpty) {
-      _recordMethodResult('loadUrl', 'Please enter a URL', isError: true);
+      _recordMethodResult(
+        PlatformInAppWebViewControllerMethod.loadUrl.name,
+        'Please enter a URL',
+        isError: true,
+      );
       return;
     }
     _urlController.text = url;
 
     if (_webViewController == null) {
       _recordMethodResult(
-        'loadUrl',
+        PlatformInAppWebViewControllerMethod.loadUrl.name,
         'WebView not initialized. Run first.',
         isError: true,
       );
@@ -384,9 +412,17 @@ class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
       await _webViewController?.loadUrl(
         urlRequest: URLRequest(url: WebUri(url)),
       );
-      _recordMethodResult('loadUrl', 'Loading URL: $url', isError: false);
+      _recordMethodResult(
+        PlatformInAppWebViewControllerMethod.loadUrl.name,
+        'Loading URL: $url',
+        isError: false,
+      );
     } catch (e) {
-      _recordMethodResult('loadUrl', 'Error loading URL: $e', isError: true);
+      _recordMethodResult(
+        PlatformInAppWebViewControllerMethod.loadUrl.name,
+        'Error loading URL: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -395,7 +431,7 @@ class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
   Future<void> _evaluateJavaScript() async {
     if (_webViewController == null) {
       _recordMethodResult(
-        'evaluateJavascript',
+        PlatformInAppWebViewControllerMethod.evaluateJavascript.name,
         'WebView not initialized',
         isError: true,
       );
@@ -413,7 +449,7 @@ class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
     final source = params['source']?.toString() ?? '';
     if (source.isEmpty) {
       _recordMethodResult(
-        'evaluateJavascript',
+        PlatformInAppWebViewControllerMethod.evaluateJavascript.name,
         'Please enter JavaScript source',
         isError: true,
       );
@@ -426,13 +462,13 @@ class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
         source: source,
       );
       _recordMethodResult(
-        'evaluateJavascript',
+        PlatformInAppWebViewControllerMethod.evaluateJavascript.name,
         'JavaScript result: $result',
         isError: false,
       );
     } catch (e) {
       _recordMethodResult(
-        'evaluateJavascript',
+        PlatformInAppWebViewControllerMethod.evaluateJavascript.name,
         'Error evaluating JavaScript: $e',
         isError: true,
       );
@@ -502,7 +538,7 @@ class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('HeadlessInAppWebView'),
+        title: Text((HeadlessInAppWebView).toString()),
         actions: [
           if (_isLoading)
             const Padding(
@@ -688,19 +724,19 @@ class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
             ),
             const SizedBox(height: 12),
             _buildMethodTile(
-              'run',
+              PlatformHeadlessInAppWebViewMethod.run.name,
               'Start the headless WebView',
               PlatformHeadlessInAppWebViewMethod.run,
               !_isRunning ? _run : null,
             ),
             _buildMethodTile(
-              'isRunning',
+              PlatformHeadlessInAppWebViewMethod.isRunning.name,
               'Check if the headless WebView is running',
               PlatformHeadlessInAppWebViewMethod.isRunning,
               _checkIsRunning,
             ),
             _buildMethodTile(
-              'dispose',
+              PlatformHeadlessInAppWebViewMethod.dispose.name,
               'Stop and dispose the headless WebView',
               PlatformHeadlessInAppWebViewMethod.dispose,
               _isRunning ? _dispose : null,
@@ -724,13 +760,13 @@ class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
             ),
             const SizedBox(height: 12),
             _buildMethodTile(
-              'setSize',
+              PlatformHeadlessInAppWebViewMethod.setSize.name,
               'Set the WebView size',
               PlatformHeadlessInAppWebViewMethod.setSize,
               _isRunning ? _setSize : null,
             ),
             _buildMethodTile(
-              'getSize',
+              PlatformHeadlessInAppWebViewMethod.getSize.name,
               'Get the current WebView size',
               PlatformHeadlessInAppWebViewMethod.getSize,
               _isRunning ? _getSize : null,
@@ -780,9 +816,15 @@ class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
               ],
             ),
             const SizedBox(height: 8),
-            _buildMethodHistory('loadUrl'),
-            _buildMethodHistory('takeScreenshot'),
-            _buildMethodHistory('evaluateJavascript'),
+            _buildMethodHistory(
+              PlatformInAppWebViewControllerMethod.loadUrl.name,
+            ),
+            _buildMethodHistory(
+              PlatformInAppWebViewControllerMethod.takeScreenshot.name,
+            ),
+            _buildMethodHistory(
+              PlatformInAppWebViewControllerMethod.evaluateJavascript.name,
+            ),
           ],
         ),
       ),

@@ -19,41 +19,54 @@ class TestChromeSafariBrowser extends ChromeSafariBrowser {
 
   @override
   void onOpened() {
-    onEvent?.call('onOpened', {'id': id});
+    onEvent?.call(PlatformChromeSafariBrowserEventsMethod.onOpened.name, {
+      'id': id,
+    });
   }
 
   @override
   void onCompletedInitialLoad(bool? didLoadSuccessfully) {
-    onEvent?.call('onCompletedInitialLoad', {
-      'didLoadSuccessfully': didLoadSuccessfully,
-    });
+    onEvent?.call(
+      PlatformChromeSafariBrowserEventsMethod.onCompletedInitialLoad.name,
+      {'didLoadSuccessfully': didLoadSuccessfully},
+    );
   }
 
   @override
   void onInitialLoadDidRedirect(WebUri? url) {
-    onEvent?.call('onInitialLoadDidRedirect', {'url': url?.toString()});
+    onEvent?.call(
+      PlatformChromeSafariBrowserEventsMethod.onInitialLoadDidRedirect.name,
+      {'url': url?.toString()},
+    );
   }
 
   @override
   void onNavigationEvent(CustomTabsNavigationEventType? navigationEvent) {
-    onEvent?.call('onNavigationEvent', {
-      'navigationEvent': navigationEvent?.name(),
-    });
+    onEvent?.call(
+      PlatformChromeSafariBrowserEventsMethod.onNavigationEvent.name,
+      {'navigationEvent': navigationEvent?.name()},
+    );
   }
 
   @override
   void onServiceConnected() {
-    onEvent?.call('onServiceConnected', null);
+    onEvent?.call(
+      PlatformChromeSafariBrowserEventsMethod.onServiceConnected.name,
+      null,
+    );
   }
 
   @override
   void onClosed() {
-    onEvent?.call('onClosed', null);
+    onEvent?.call(PlatformChromeSafariBrowserEventsMethod.onClosed.name, null);
   }
 
   @override
   void onWillOpenInBrowser() {
-    onEvent?.call('onWillOpenInBrowser', null);
+    onEvent?.call(
+      PlatformChromeSafariBrowserEventsMethod.onWillOpenInBrowser.name,
+      null,
+    );
   }
 
   @override
@@ -62,38 +75,56 @@ class TestChromeSafariBrowser extends ChromeSafariBrowser {
     WebUri? requestedOrigin,
     bool result,
   ) {
-    onEvent?.call('onRelationshipValidationResult', {
-      'relation': relation?.name(),
-      'requestedOrigin': requestedOrigin?.toString(),
-      'result': result,
-    });
+    onEvent?.call(
+      PlatformChromeSafariBrowserEventsMethod
+          .onRelationshipValidationResult
+          .name,
+      {
+        'relation': relation?.name(),
+        'requestedOrigin': requestedOrigin?.toString(),
+        'result': result,
+      },
+    );
   }
 
   @override
   void onMessageChannelReady() {
-    onEvent?.call('onMessageChannelReady', null);
+    onEvent?.call(
+      PlatformChromeSafariBrowserEventsMethod.onMessageChannelReady.name,
+      null,
+    );
   }
 
   @override
   void onPostMessage(String message) {
-    onEvent?.call('onPostMessage', {'message': message});
-  }
-
-  @override
-  void onVerticalScrollEvent(bool isDirectionUp) {
-    onEvent?.call('onVerticalScrollEvent', {'isDirectionUp': isDirectionUp});
-  }
-
-  @override
-  void onGreatestScrollPercentageIncreased(int scrollPercentage) {
-    onEvent?.call('onGreatestScrollPercentageIncreased', {
-      'scrollPercentage': scrollPercentage,
+    onEvent?.call(PlatformChromeSafariBrowserEventsMethod.onPostMessage.name, {
+      'message': message,
     });
   }
 
   @override
+  void onVerticalScrollEvent(bool isDirectionUp) {
+    onEvent?.call(
+      PlatformChromeSafariBrowserEventsMethod.onVerticalScrollEvent.name,
+      {'isDirectionUp': isDirectionUp},
+    );
+  }
+
+  @override
+  void onGreatestScrollPercentageIncreased(int scrollPercentage) {
+    onEvent?.call(
+      PlatformChromeSafariBrowserEventsMethod
+          .onGreatestScrollPercentageIncreased
+          .name,
+      {'scrollPercentage': scrollPercentage},
+    );
+  }
+
+  @override
   void onSessionEnded(bool didUserInteract) {
-    onEvent?.call('onSessionEnded', {'didUserInteract': didUserInteract});
+    onEvent?.call(PlatformChromeSafariBrowserEventsMethod.onSessionEnded.name, {
+      'didUserInteract': didUserInteract,
+    });
   }
 }
 
@@ -127,9 +158,10 @@ class _ChromeSafariBrowserScreenState extends State<ChromeSafariBrowserScreen> {
       _browser = TestChromeSafariBrowser(
         onEvent: (event, data) {
           _logEvent(EventType.ui, event, data: data);
-          if (event == 'onClosed') {
+          if (event == PlatformChromeSafariBrowserEventsMethod.onClosed.name) {
             setState(() => _browserOpened = false);
-          } else if (event == 'onOpened') {
+          } else if (event ==
+              PlatformChromeSafariBrowserEventsMethod.onOpened.name) {
             setState(() => _browserOpened = true);
           }
         },
@@ -137,6 +169,10 @@ class _ChromeSafariBrowserScreenState extends State<ChromeSafariBrowserScreen> {
     } catch (e) {
       _showInitError('Unable to create browser: $e');
     }
+  }
+
+  String _staticMethodName(PlatformChromeSafariBrowserMethod method) {
+    return '${method.name} (static)';
   }
 
   @override
@@ -167,7 +203,11 @@ class _ChromeSafariBrowserScreenState extends State<ChromeSafariBrowserScreen> {
   Future<void> _open() async {
     final url = _urlController.text.trim();
     if (url.isEmpty) {
-      _recordMethodResult('open', 'Please enter a URL', isError: true);
+      _recordMethodResult(
+        PlatformChromeSafariBrowserMethod.open.name,
+        'Please enter a URL',
+        isError: true,
+      );
       return;
     }
 
@@ -186,9 +226,17 @@ class _ChromeSafariBrowserScreenState extends State<ChromeSafariBrowserScreen> {
           dismissButtonStyle: DismissButtonStyle.CLOSE,
         ),
       );
-      _recordMethodResult('open', 'Browser opened', isError: false);
+      _recordMethodResult(
+        PlatformChromeSafariBrowserMethod.open.name,
+        'Browser opened',
+        isError: false,
+      );
     } catch (e) {
-      _recordMethodResult('open', 'Error opening browser: $e', isError: true);
+      _recordMethodResult(
+        PlatformChromeSafariBrowserMethod.open.name,
+        'Error opening browser: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -197,17 +245,25 @@ class _ChromeSafariBrowserScreenState extends State<ChromeSafariBrowserScreen> {
   Future<void> _launchUrl() async {
     final url = _urlController.text.trim();
     if (url.isEmpty) {
-      _recordMethodResult('launchUrl', 'Please enter a URL', isError: true);
+      _recordMethodResult(
+        PlatformChromeSafariBrowserMethod.launchUrl.name,
+        'Please enter a URL',
+        isError: true,
+      );
       return;
     }
 
     setState(() => _isLoading = true);
     try {
       await _browser?.launchUrl(url: WebUri(url));
-      _recordMethodResult('launchUrl', 'URL launched', isError: false);
+      _recordMethodResult(
+        PlatformChromeSafariBrowserMethod.launchUrl.name,
+        'URL launched',
+        isError: false,
+      );
     } catch (e) {
       _recordMethodResult(
-        'launchUrl',
+        PlatformChromeSafariBrowserMethod.launchUrl.name,
         'Error launching URL: $e',
         isError: true,
       );
@@ -219,7 +275,11 @@ class _ChromeSafariBrowserScreenState extends State<ChromeSafariBrowserScreen> {
   Future<void> _mayLaunchUrl() async {
     final url = _urlController.text.trim();
     if (url.isEmpty) {
-      _recordMethodResult('mayLaunchUrl', 'Please enter a URL', isError: true);
+      _recordMethodResult(
+        PlatformChromeSafariBrowserMethod.mayLaunchUrl.name,
+        'Please enter a URL',
+        isError: true,
+      );
       return;
     }
 
@@ -227,12 +287,16 @@ class _ChromeSafariBrowserScreenState extends State<ChromeSafariBrowserScreen> {
     try {
       final result = await _browser?.mayLaunchUrl(url: WebUri(url));
       _recordMethodResult(
-        'mayLaunchUrl',
+        PlatformChromeSafariBrowserMethod.mayLaunchUrl.name,
         'mayLaunchUrl result: $result',
         isError: false,
       );
     } catch (e) {
-      _recordMethodResult('mayLaunchUrl', 'Error: $e', isError: true);
+      _recordMethodResult(
+        PlatformChromeSafariBrowserMethod.mayLaunchUrl.name,
+        'Error: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -242,7 +306,7 @@ class _ChromeSafariBrowserScreenState extends State<ChromeSafariBrowserScreen> {
     final url = _urlController.text.trim();
     if (url.isEmpty) {
       _recordMethodResult(
-        'validateRelationship',
+        PlatformChromeSafariBrowserMethod.validateRelationship.name,
         'Please enter a URL',
         isError: true,
       );
@@ -256,12 +320,16 @@ class _ChromeSafariBrowserScreenState extends State<ChromeSafariBrowserScreen> {
         origin: WebUri(url),
       );
       _recordMethodResult(
-        'validateRelationship',
+        PlatformChromeSafariBrowserMethod.validateRelationship.name,
         'validateRelationship result: $result',
         isError: false,
       );
     } catch (e) {
-      _recordMethodResult('validateRelationship', 'Error: $e', isError: true);
+      _recordMethodResult(
+        PlatformChromeSafariBrowserMethod.validateRelationship.name,
+        'Error: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -272,9 +340,17 @@ class _ChromeSafariBrowserScreenState extends State<ChromeSafariBrowserScreen> {
     try {
       await _browser?.close();
       setState(() => _browserOpened = false);
-      _recordMethodResult('close', 'Browser closed', isError: false);
+      _recordMethodResult(
+        PlatformChromeSafariBrowserMethod.close.name,
+        'Browser closed',
+        isError: false,
+      );
     } catch (e) {
-      _recordMethodResult('close', 'Error closing browser: $e', isError: true);
+      _recordMethodResult(
+        PlatformChromeSafariBrowserMethod.close.name,
+        'Error closing browser: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -297,7 +373,7 @@ class _ChromeSafariBrowserScreenState extends State<ChromeSafariBrowserScreen> {
               data: {'url': url?.toString(), 'title': title},
             );
             _recordMethodResult(
-              'setActionButton',
+              PlatformChromeSafariBrowserMethod.setActionButton.name,
               'Action button clicked',
               isError: false,
             );
@@ -305,13 +381,13 @@ class _ChromeSafariBrowserScreenState extends State<ChromeSafariBrowserScreen> {
         ),
       );
       _recordMethodResult(
-        'setActionButton',
+        PlatformChromeSafariBrowserMethod.setActionButton.name,
         'Action button set',
         isError: false,
       );
     } catch (e) {
       _recordMethodResult(
-        'setActionButton',
+        PlatformChromeSafariBrowserMethod.setActionButton.name,
         'Error setting action button: $e',
         isError: true,
       );
@@ -340,13 +416,13 @@ class _ChromeSafariBrowserScreenState extends State<ChromeSafariBrowserScreen> {
         description: 'Updated Action',
       );
       _recordMethodResult(
-        'updateActionButton',
+        PlatformChromeSafariBrowserMethod.updateActionButton.name,
         'Action button updated',
         isError: false,
       );
     } catch (e) {
       _recordMethodResult(
-        'updateActionButton',
+        PlatformChromeSafariBrowserMethod.updateActionButton.name,
         'Error updating action button: $e',
         isError: true,
       );
@@ -365,7 +441,11 @@ class _ChromeSafariBrowserScreenState extends State<ChromeSafariBrowserScreen> {
           'Menu item clicked',
           data: {'url': url, 'title': title},
         );
-        _recordMethodResult('addMenuItem', 'Menu item clicked', isError: false);
+        _recordMethodResult(
+          PlatformChromeSafariBrowserMethod.addMenuItem.name,
+          'Menu item clicked',
+          isError: false,
+        );
       },
     );
 
@@ -373,14 +453,18 @@ class _ChromeSafariBrowserScreenState extends State<ChromeSafariBrowserScreen> {
     setState(() {
       _menuItems.add(menuItem);
     });
-    _recordMethodResult('addMenuItem', 'Menu item added', isError: false);
+    _recordMethodResult(
+      PlatformChromeSafariBrowserMethod.addMenuItem.name,
+      'Menu item added',
+      isError: false,
+    );
   }
 
   Future<void> _requestPostMessageChannel() async {
     final url = _urlController.text.trim();
     if (url.isEmpty) {
       _recordMethodResult(
-        'requestPostMessageChannel',
+        PlatformChromeSafariBrowserMethod.requestPostMessageChannel.name,
         'Please enter a URL',
         isError: true,
       );
@@ -393,13 +477,13 @@ class _ChromeSafariBrowserScreenState extends State<ChromeSafariBrowserScreen> {
         sourceOrigin: WebUri(url),
       );
       _recordMethodResult(
-        'requestPostMessageChannel',
+        PlatformChromeSafariBrowserMethod.requestPostMessageChannel.name,
         'requestPostMessageChannel result: $result',
         isError: false,
       );
     } catch (e) {
       _recordMethodResult(
-        'requestPostMessageChannel',
+        PlatformChromeSafariBrowserMethod.requestPostMessageChannel.name,
         'Error: $e',
         isError: true,
       );
@@ -412,7 +496,7 @@ class _ChromeSafariBrowserScreenState extends State<ChromeSafariBrowserScreen> {
     final message = _messageController.text.trim();
     if (message.isEmpty) {
       _recordMethodResult(
-        'postMessage',
+        PlatformChromeSafariBrowserMethod.postMessage.name,
         'Please enter a message',
         isError: true,
       );
@@ -423,12 +507,16 @@ class _ChromeSafariBrowserScreenState extends State<ChromeSafariBrowserScreen> {
     try {
       final result = await _browser?.postMessage(message);
       _recordMethodResult(
-        'postMessage',
+        PlatformChromeSafariBrowserMethod.postMessage.name,
         'postMessage result: ${result?.name}',
         isError: false,
       );
     } catch (e) {
-      _recordMethodResult('postMessage', 'Error: $e', isError: true);
+      _recordMethodResult(
+        PlatformChromeSafariBrowserMethod.postMessage.name,
+        'Error: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -439,13 +527,13 @@ class _ChromeSafariBrowserScreenState extends State<ChromeSafariBrowserScreen> {
     try {
       final result = await _browser?.isEngagementSignalsApiAvailable();
       _recordMethodResult(
-        'isEngagementSignalsApiAvailable',
+        PlatformChromeSafariBrowserMethod.isEngagementSignalsApiAvailable.name,
         'isEngagementSignalsApiAvailable: $result',
         isError: false,
       );
     } catch (e) {
       _recordMethodResult(
-        'isEngagementSignalsApiAvailable',
+        PlatformChromeSafariBrowserMethod.isEngagementSignalsApiAvailable.name,
         'Error: $e',
         isError: true,
       );
@@ -457,7 +545,7 @@ class _ChromeSafariBrowserScreenState extends State<ChromeSafariBrowserScreen> {
   void _checkIsOpened() {
     final opened = _browser?.isOpened() ?? false;
     _recordMethodResult(
-      'isOpened',
+      PlatformChromeSafariBrowserMethod.isOpened.name,
       'Browser is opened: $opened',
       isError: false,
     );
@@ -468,12 +556,16 @@ class _ChromeSafariBrowserScreenState extends State<ChromeSafariBrowserScreen> {
     try {
       final available = await ChromeSafariBrowser.isAvailable();
       _recordMethodResult(
-        'isAvailable (static)',
-        'ChromeSafariBrowser is available: $available',
+        _staticMethodName(PlatformChromeSafariBrowserMethod.isAvailable),
+        '${(ChromeSafariBrowser).toString()} is available: $available',
         isError: false,
       );
     } catch (e) {
-      _recordMethodResult('isAvailable (static)', 'Error: $e', isError: true);
+      _recordMethodResult(
+        _staticMethodName(PlatformChromeSafariBrowserMethod.isAvailable),
+        'Error: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -484,13 +576,13 @@ class _ChromeSafariBrowserScreenState extends State<ChromeSafariBrowserScreen> {
     try {
       final maxItems = await ChromeSafariBrowser.getMaxToolbarItems();
       _recordMethodResult(
-        'getMaxToolbarItems (static)',
+        _staticMethodName(PlatformChromeSafariBrowserMethod.getMaxToolbarItems),
         'Max toolbar items: $maxItems',
         isError: false,
       );
     } catch (e) {
       _recordMethodResult(
-        'getMaxToolbarItems (static)',
+        _staticMethodName(PlatformChromeSafariBrowserMethod.getMaxToolbarItems),
         'Error: $e',
         isError: true,
       );
@@ -504,13 +596,13 @@ class _ChromeSafariBrowserScreenState extends State<ChromeSafariBrowserScreen> {
     try {
       final packageName = await ChromeSafariBrowser.getPackageName();
       _recordMethodResult(
-        'getPackageName (static)',
+        _staticMethodName(PlatformChromeSafariBrowserMethod.getPackageName),
         'Package name: $packageName',
         isError: false,
       );
     } catch (e) {
       _recordMethodResult(
-        'getPackageName (static)',
+        _staticMethodName(PlatformChromeSafariBrowserMethod.getPackageName),
         'Error: $e',
         isError: true,
       );
@@ -524,13 +616,13 @@ class _ChromeSafariBrowserScreenState extends State<ChromeSafariBrowserScreen> {
     try {
       await ChromeSafariBrowser.clearWebsiteData();
       _recordMethodResult(
-        'clearWebsiteData (static)',
+        _staticMethodName(PlatformChromeSafariBrowserMethod.clearWebsiteData),
         'Website data cleared',
         isError: false,
       );
     } catch (e) {
       _recordMethodResult(
-        'clearWebsiteData (static)',
+        _staticMethodName(PlatformChromeSafariBrowserMethod.clearWebsiteData),
         'Error: $e',
         isError: true,
       );
@@ -543,7 +635,7 @@ class _ChromeSafariBrowserScreenState extends State<ChromeSafariBrowserScreen> {
     final url = _urlController.text.trim();
     if (url.isEmpty) {
       _recordMethodResult(
-        'prewarmConnections (static)',
+        _staticMethodName(PlatformChromeSafariBrowserMethod.prewarmConnections),
         'Please enter a URL',
         isError: true,
       );
@@ -554,13 +646,13 @@ class _ChromeSafariBrowserScreenState extends State<ChromeSafariBrowserScreen> {
     try {
       final token = await ChromeSafariBrowser.prewarmConnections([WebUri(url)]);
       _recordMethodResult(
-        'prewarmConnections (static)',
+        _staticMethodName(PlatformChromeSafariBrowserMethod.prewarmConnections),
         'Prewarm token: ${token?.id}',
         isError: false,
       );
     } catch (e) {
       _recordMethodResult(
-        'prewarmConnections (static)',
+        _staticMethodName(PlatformChromeSafariBrowserMethod.prewarmConnections),
         'Error: $e',
         isError: true,
       );
@@ -798,37 +890,37 @@ class _ChromeSafariBrowserScreenState extends State<ChromeSafariBrowserScreen> {
             ),
             const SizedBox(height: 12),
             _buildMethodTile(
-              'open',
+              PlatformChromeSafariBrowserMethod.open.name,
               'Open Chrome Custom Tab / Safari View Controller',
               PlatformChromeSafariBrowserMethod.open,
               _open,
             ),
             _buildMethodTile(
-              'launchUrl',
+              PlatformChromeSafariBrowserMethod.launchUrl.name,
               'Launch URL in already opened browser',
               PlatformChromeSafariBrowserMethod.launchUrl,
               _browserOpened ? _launchUrl : null,
             ),
             _buildMethodTile(
-              'mayLaunchUrl',
+              PlatformChromeSafariBrowserMethod.mayLaunchUrl.name,
               'Hint browser to preload URL',
               PlatformChromeSafariBrowserMethod.mayLaunchUrl,
               _mayLaunchUrl,
             ),
             _buildMethodTile(
-              'validateRelationship',
+              PlatformChromeSafariBrowserMethod.validateRelationship.name,
               'Validate Digital Asset Links',
               PlatformChromeSafariBrowserMethod.validateRelationship,
               _validateRelationship,
             ),
             _buildMethodTile(
-              'close',
+              PlatformChromeSafariBrowserMethod.close.name,
               'Close the browser',
               PlatformChromeSafariBrowserMethod.close,
               _browserOpened ? _close : null,
             ),
             _buildMethodTile(
-              'isOpened',
+              PlatformChromeSafariBrowserMethod.isOpened.name,
               'Check if browser is opened',
               PlatformChromeSafariBrowserMethod.isOpened,
               _checkIsOpened,
@@ -852,19 +944,19 @@ class _ChromeSafariBrowserScreenState extends State<ChromeSafariBrowserScreen> {
             ),
             const SizedBox(height: 12),
             _buildMethodTile(
-              'setActionButton',
+              PlatformChromeSafariBrowserMethod.setActionButton.name,
               'Set action button (before open)',
               PlatformChromeSafariBrowserMethod.setActionButton,
               _setActionButton,
             ),
             _buildMethodTile(
-              'updateActionButton',
+              PlatformChromeSafariBrowserMethod.updateActionButton.name,
               'Update action button icon',
               PlatformChromeSafariBrowserMethod.updateActionButton,
               _browserOpened ? _updateActionButton : null,
             ),
             _buildMethodTile(
-              'addMenuItem',
+              PlatformChromeSafariBrowserMethod.addMenuItem.name,
               'Add menu item (before open)',
               PlatformChromeSafariBrowserMethod.addMenuItem,
               _addMenuItem,
@@ -895,19 +987,21 @@ class _ChromeSafariBrowserScreenState extends State<ChromeSafariBrowserScreen> {
             ),
             const SizedBox(height: 12),
             _buildMethodTile(
-              'requestPostMessageChannel',
+              PlatformChromeSafariBrowserMethod.requestPostMessageChannel.name,
               'Request post message channel',
               PlatformChromeSafariBrowserMethod.requestPostMessageChannel,
               _browserOpened ? _requestPostMessageChannel : null,
             ),
             _buildMethodTile(
-              'postMessage',
+              PlatformChromeSafariBrowserMethod.postMessage.name,
               'Send a message to the browser',
               PlatformChromeSafariBrowserMethod.postMessage,
               _browserOpened ? _postMessage : null,
             ),
             _buildMethodTile(
-              'isEngagementSignalsApiAvailable',
+              PlatformChromeSafariBrowserMethod
+                  .isEngagementSignalsApiAvailable
+                  .name,
               'Check if engagement signals API is available',
               PlatformChromeSafariBrowserMethod.isEngagementSignalsApiAvailable,
               _isEngagementSignalsApiAvailable,
@@ -931,31 +1025,39 @@ class _ChromeSafariBrowserScreenState extends State<ChromeSafariBrowserScreen> {
             ),
             const SizedBox(height: 12),
             _buildMethodTile(
-              'isAvailable (static)',
+              _staticMethodName(PlatformChromeSafariBrowserMethod.isAvailable),
               'Check if Chrome Custom Tabs / Safari VC is available',
               PlatformChromeSafariBrowserMethod.isAvailable,
               _isAvailable,
             ),
             _buildMethodTile(
-              'getMaxToolbarItems (static)',
+              _staticMethodName(
+                PlatformChromeSafariBrowserMethod.getMaxToolbarItems,
+              ),
               'Get max toolbar items',
               PlatformChromeSafariBrowserMethod.getMaxToolbarItems,
               _getMaxToolbarItems,
             ),
             _buildMethodTile(
-              'getPackageName (static)',
+              _staticMethodName(
+                PlatformChromeSafariBrowserMethod.getPackageName,
+              ),
               'Get Custom Tabs package name',
               PlatformChromeSafariBrowserMethod.getPackageName,
               _getPackageName,
             ),
             _buildMethodTile(
-              'clearWebsiteData (static)',
+              _staticMethodName(
+                PlatformChromeSafariBrowserMethod.clearWebsiteData,
+              ),
               'Clear website data',
               PlatformChromeSafariBrowserMethod.clearWebsiteData,
               _clearWebsiteData,
             ),
             _buildMethodTile(
-              'prewarmConnections (static)',
+              _staticMethodName(
+                PlatformChromeSafariBrowserMethod.prewarmConnections,
+              ),
               'Prewarm connections',
               PlatformChromeSafariBrowserMethod.prewarmConnections,
               _prewarmConnections,

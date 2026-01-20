@@ -343,6 +343,33 @@ class TestRunner extends ChangeNotifier {
 
       switch (step.action.type) {
         case CustomTestActionType.controllerMethod:
+          final methodId = step.action.methodId;
+          final methodEntry = methodId == null
+              ? null
+              : ControllerMethodsRegistry.instance.findMethodById(methodId);
+          final targetPlatform = _getCurrentTargetPlatform();
+
+          if (methodEntry != null &&
+              !InAppWebViewController.isMethodSupported(
+                methodEntry.methodEnum,
+                platform: targetPlatform,
+              )) {
+            stopwatch.stop();
+            return ExtendedTestResult(
+              testId: step.id,
+              testTitle: step.name,
+              category: step.category,
+              success: true,
+              message:
+                  'Skipped - method ${methodEntry.methodEnum.name} not supported',
+              duration: Duration.zero,
+              timestamp: DateTime.now(),
+              skipped: true,
+              skipReason:
+                  'Method ${methodEntry.methodEnum.name} not supported on ${targetPlatform ?? 'web'}',
+            );
+          }
+
           result = await _executeControllerMethod(step.action, controller);
           break;
         case CustomTestActionType.evaluateJavascript:
@@ -535,6 +562,11 @@ class TestRunner extends ChangeNotifier {
     };
 
     return await method.execute(controller, params);
+  }
+
+  TargetPlatform? _getCurrentTargetPlatform() {
+    if (kIsWeb) return null;
+    return defaultTargetPlatform;
   }
 
   /// Execute a wait for navigation event action

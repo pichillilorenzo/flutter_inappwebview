@@ -12,33 +12,25 @@ void main() {
     debugDefaultTargetPlatformOverride = null;
   });
 
-  test('default settings map includes core defaults', () {
-    final defaults = defaultInAppWebViewSettingsMap();
+  test('default settings map matches constructor defaults', () {
+    final defaults = defaultInAppWebViewSettings().toMap(
+      enumMethod: EnumMethod.nativeValue,
+    );
+    final expected = InAppWebViewSettings().toMap(
+      enumMethod: EnumMethod.nativeValue,
+    );
 
-    expect(defaults['javaScriptEnabled'], true);
-    expect(defaults['cacheMode'], CacheMode.LOAD_DEFAULT.toNativeValue());
+    expect(defaults, expected);
   });
 
-  test('default minimumFontSize respects platform override', () {
-    debugDefaultTargetPlatformOverride = TargetPlatform.android;
-    final androidDefaults = defaultInAppWebViewSettingsMap();
+  test('default environment settings map matches constructor defaults', () {
+    final defaults = defaultWebViewEnvironmentSettings().toMap(
+      enumMethod: EnumMethod.nativeValue,
+    );
+    final expected = WebViewEnvironmentSettings().toMap(
+      enumMethod: EnumMethod.nativeValue,
+    );
 
-    expect(androidDefaults['minimumFontSize'], 8);
-
-    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
-    final iosDefaults = defaultInAppWebViewSettingsMap();
-
-    expect(iosDefaults['minimumFontSize'], 0);
-  });
-
-  test('parseMixedContentMode returns enum for int values', () {
-    final raw = MixedContentMode.MIXED_CONTENT_ALWAYS_ALLOW.toNativeValue();
-    final parsed = parseMixedContentMode(raw);
-
-    expect(parsed, MixedContentMode.MIXED_CONTENT_ALWAYS_ALLOW);
-  });
-
-  test('parseCacheMode defaults to LOAD_DEFAULT when null', () {
-    expect(parseCacheMode(null), CacheMode.LOAD_DEFAULT);
+    expect(defaults, expected);
   });
 }

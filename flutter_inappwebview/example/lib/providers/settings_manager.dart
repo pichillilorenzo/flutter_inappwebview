@@ -6,10 +6,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_inappwebview_example/models/settings_profile.dart';
 import 'package:flutter_inappwebview_example/models/webview_environment_profile.dart';
 import 'package:flutter_inappwebview_example/models/setting_definition.dart';
+import 'package:flutter_inappwebview_example/models/environment_setting_definition.dart';
 import 'package:flutter_inappwebview_example/utils/settings_defaults.dart'
     as settings_defaults;
 import 'package:flutter_inappwebview_example/utils/settings_definitions.dart'
     as settings_definitions;
+import 'package:flutter_inappwebview_example/utils/environment_settings_definitions.dart'
+    as environment_settings_definitions;
 
 /// Settings manager for the testing interface
 /// Manages InAppWebViewSettings profiles with save/load functionality
@@ -452,108 +455,27 @@ class SettingsManager extends ChangeNotifier {
 
   /// Build InAppWebViewSettings from current settings
   InAppWebViewSettings buildSettings() {
-    return InAppWebViewSettings(
-      // General Settings
-      javaScriptEnabled: getSetting('javaScriptEnabled') ?? true,
-      userAgent: getSetting('userAgent'),
-      applicationNameForUserAgent: getSetting('applicationNameForUserAgent'),
-      cacheEnabled: getSetting('cacheEnabled') ?? true,
-      incognito: getSetting('incognito') ?? false,
-      supportZoom: getSetting('supportZoom') ?? true,
+    final defaults = _getDefaultSettings();
+    final merged = Map<String, dynamic>.from(defaults)
+      ..addAll(_currentSettings);
 
-      // Layout Settings
-      useWideViewPort: getSetting('useWideViewPort') ?? true,
-      loadWithOverviewMode: getSetting('loadWithOverviewMode') ?? true,
-      minimumFontSize: getSetting('minimumFontSize'),
-      defaultFontSize: getSetting('defaultFontSize'),
-      defaultTextEncodingName: getSetting('defaultTextEncodingName'),
-
-      // Content Settings
-      allowContentAccess: getSetting('allowContentAccess') ?? true,
-      allowFileAccess: getSetting('allowFileAccess') ?? true,
-      allowFileAccessFromFileURLs:
-          getSetting('allowFileAccessFromFileURLs') ?? false,
-      allowUniversalAccessFromFileURLs:
-          getSetting('allowUniversalAccessFromFileURLs') ?? false,
-      blockNetworkImage: getSetting('blockNetworkImage') ?? false,
-      blockNetworkLoads: getSetting('blockNetworkLoads') ?? false,
-
-      // Media Settings
-      mediaPlaybackRequiresUserGesture:
-          getSetting('mediaPlaybackRequiresUserGesture') ?? true,
-      allowsInlineMediaPlayback:
-          getSetting('allowsInlineMediaPlayback') ?? false,
-      allowsAirPlayForMediaPlayback:
-          getSetting('allowsAirPlayForMediaPlayback') ?? true,
-      allowsPictureInPictureMediaPlayback:
-          getSetting('allowsPictureInPictureMediaPlayback') ?? true,
-      automaticallyAdjustsScrollIndicatorInsets:
-          getSetting('automaticallyAdjustsScrollIndicatorInsets') ?? false,
-
-      // JavaScript Settings
-      javaScriptCanOpenWindowsAutomatically:
-          getSetting('javaScriptCanOpenWindowsAutomatically') ?? false,
-      javaScriptBridgeEnabled: getSetting('javaScriptBridgeEnabled') ?? true,
-      javaScriptBridgeForMainFrameOnly:
-          getSetting('javaScriptBridgeForMainFrameOnly') ?? false,
-
-      // Security Settings
-      mixedContentMode: _getMixedContentMode(getSetting('mixedContentMode')),
-      useShouldInterceptRequest:
-          getSetting('useShouldInterceptRequest') ?? false,
-      useShouldOverrideUrlLoading:
-          getSetting('useShouldOverrideUrlLoading') ?? false,
-      useOnLoadResource: getSetting('useOnLoadResource') ?? false,
-
-      // Cache Settings
-      cacheMode: _getCacheMode(getSetting('cacheMode')),
-
-      // Appearance Settings
-      transparentBackground: getSetting('transparentBackground') ?? false,
-      verticalScrollBarEnabled: getSetting('verticalScrollBarEnabled') ?? true,
-      horizontalScrollBarEnabled:
-          getSetting('horizontalScrollBarEnabled') ?? true,
-      scrollbarFadingEnabled: getSetting('scrollbarFadingEnabled') ?? true,
-      disableVerticalScroll: getSetting('disableVerticalScroll') ?? false,
-      disableHorizontalScroll: getSetting('disableHorizontalScroll') ?? false,
-      disableContextMenu: getSetting('disableContextMenu') ?? false,
-
-      // iOS/macOS Specific
-      allowsBackForwardNavigationGestures:
-          getSetting('allowsBackForwardNavigationGestures') ?? true,
-      isFraudulentWebsiteWarningEnabled:
-          getSetting('isFraudulentWebsiteWarningEnabled') ?? true,
-      suppressesIncrementalRendering:
-          getSetting('suppressesIncrementalRendering') ?? false,
-      ignoresViewportScaleLimits:
-          getSetting('ignoresViewportScaleLimits') ?? false,
-      allowsLinkPreview: getSetting('allowsLinkPreview') ?? true,
-
-      // Android Specific
-      hardwareAcceleration: getSetting('hardwareAcceleration') ?? true,
-      useHybridComposition: getSetting('useHybridComposition') ?? true,
-      thirdPartyCookiesEnabled: getSetting('thirdPartyCookiesEnabled') ?? true,
-      domStorageEnabled: getSetting('domStorageEnabled') ?? true,
-      databaseEnabled: getSetting('databaseEnabled') ?? true,
-      geolocationEnabled: getSetting('geolocationEnabled') ?? true,
-      safeBrowsingEnabled: getSetting('safeBrowsingEnabled') ?? true,
-      builtInZoomControls: getSetting('builtInZoomControls') ?? true,
-      displayZoomControls: getSetting('displayZoomControls') ?? false,
-
-      // Windows Specific
-      generalAutofillEnabled: getSetting('generalAutofillEnabled') ?? true,
-      passwordAutosaveEnabled: getSetting('passwordAutosaveEnabled') ?? false,
-      pinchZoomEnabled: getSetting('pinchZoomEnabled') ?? true,
-      statusBarEnabled: getSetting('statusBarEnabled') ?? true,
-      browserAcceleratorKeysEnabled:
-          getSetting('browserAcceleratorKeysEnabled') ?? true,
-      isInspectable: getSetting('isInspectable') ?? false,
-    );
+    return InAppWebViewSettings.fromMap(
+          merged,
+          enumMethod: EnumMethod.nativeValue,
+        ) ??
+        InAppWebViewSettings();
   }
 
   /// Build WebViewEnvironmentSettings from current environment settings
   WebViewEnvironmentSettings buildEnvironmentSettings() {
-    return WebViewEnvironmentSettings.fromMap(_currentEnvironmentSettings) ??
+    final defaults = _getDefaultEnvironmentSettings();
+    final merged = Map<String, dynamic>.from(defaults)
+      ..addAll(_currentEnvironmentSettings);
+
+    return WebViewEnvironmentSettings.fromMap(
+          merged,
+          enumMethod: EnumMethod.nativeValue,
+        ) ??
         WebViewEnvironmentSettings();
   }
 
@@ -603,20 +525,16 @@ class SettingsManager extends ChangeNotifier {
   }
 
   Map<String, dynamic> _getDefaultEnvironmentSettings() {
-    return settings_defaults.defaultWebViewEnvironmentSettingsMap();
-  }
-
-  MixedContentMode? _getMixedContentMode(dynamic value) {
-    return settings_defaults.parseMixedContentMode(value);
-  }
-
-  CacheMode? _getCacheMode(dynamic value) {
-    return settings_defaults.parseCacheMode(value);
+    return settings_defaults.defaultWebViewEnvironmentSettings().toMap(
+      enumMethod: EnumMethod.nativeValue,
+    );
   }
 
   /// Get default settings map
   Map<String, dynamic> _getDefaultSettings() {
-    return settings_defaults.defaultInAppWebViewSettingsMap();
+    return settings_defaults.defaultInAppWebViewSettings().toMap(
+      enumMethod: EnumMethod.nativeValue,
+    );
   }
 
   @override
@@ -628,5 +546,11 @@ class SettingsManager extends ChangeNotifier {
   /// Get all setting definitions organized by category
   static Map<String, List<SettingDefinition>> getSettingDefinitions() {
     return settings_definitions.getSettingDefinitions();
+  }
+
+  /// Get all environment setting definitions organized by category
+  static Map<String, List<EnvironmentSettingDefinition>>
+  getEnvironmentSettingDefinitions() {
+    return environment_settings_definitions.getEnvironmentSettingDefinitions();
   }
 }

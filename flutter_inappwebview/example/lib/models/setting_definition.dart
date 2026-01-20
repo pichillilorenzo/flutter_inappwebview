@@ -1,0 +1,77 @@
+import 'package:flutter/foundation.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:flutter_inappwebview_example/utils/support_checker.dart';
+
+/// Enum representing the type of a setting
+enum SettingType { boolean, string, integer, double, enumeration }
+
+/// Definition of a single setting
+class SettingDefinition {
+  final String key;
+  final String name;
+  final String description;
+  final SettingType type;
+  final dynamic defaultValue;
+  final Map<String, dynamic>? enumValues;
+
+  /// The InAppWebViewSettings property for runtime support checking.
+  /// If provided, use InAppWebViewSettings.isPropertySupported to check platform support.
+  final InAppWebViewSettingsProperty? property;
+
+  const SettingDefinition({
+    required this.key,
+    required this.name,
+    required this.description,
+    required this.type,
+    required this.defaultValue,
+    this.enumValues,
+    this.property,
+  });
+
+  /// Check if this setting is supported on the given platform.
+  /// Returns true if no property is specified (assumed to be cross-platform).
+  /// Note: Web platform is not mapped to TargetPlatform, so it's not checkable.
+  bool isSupportedOnPlatform(SupportedPlatform platform) {
+    if (property == null) return true;
+    // Web is not mapped to TargetPlatform in Flutter
+    if (platform == SupportedPlatform.web) return false;
+    final targetPlatform = platform.targetPlatform;
+    if (targetPlatform == null) return false;
+    return InAppWebViewSettings.isPropertySupported(
+      property!,
+      platform: targetPlatform,
+    );
+  }
+
+  /// Check if this setting is supported on the current platform.
+  bool get isSupportedOnCurrentPlatform {
+    if (property == null) return true;
+    // On web, we can't check without TargetPlatform
+    if (kIsWeb) return false;
+    return InAppWebViewSettings.isPropertySupported(property!);
+  }
+
+  /// Get the set of supported platforms for this setting.
+  /// Note: Web platform cannot be checked via TargetPlatform.
+  Set<SupportedPlatform> get supportedPlatforms {
+    if (property == null) {
+      // No property specified means cross-platform (excluding web which can't be verified)
+      return SupportedPlatform.values
+          .where((p) => p != SupportedPlatform.web)
+          .toSet();
+    }
+    return SupportedPlatform.values
+        .where((p) => p != SupportedPlatform.web && isSupportedOnPlatform(p))
+        .toSet();
+  }
+
+  /// Check if this setting has platform-specific support (not available on all platforms).
+  bool get hasPlatformLimitations {
+    if (property == null) return false;
+    // Check if the property is NOT supported on all native platforms
+    final nativePlatforms = SupportedPlatform.values.where(
+      (p) => p != SupportedPlatform.web,
+    );
+    return nativePlatforms.any((p) => !isSupportedOnPlatform(p));
+  }
+}

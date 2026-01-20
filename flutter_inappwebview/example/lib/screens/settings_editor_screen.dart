@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_inappwebview_example/providers/settings_manager.dart';
+import 'package:flutter_inappwebview_example/models/setting_definition.dart';
 import 'package:flutter_inappwebview_example/models/settings_profile.dart';
 import 'package:flutter_inappwebview_example/utils/platform_utils.dart';
 import 'package:flutter_inappwebview_example/utils/support_checker.dart';

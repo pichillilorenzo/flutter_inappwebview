@@ -115,7 +115,7 @@ class SupportCheckHelper {
     required SupportedPlatform platform,
     required dynamic property,
     required bool Function(dynamic property, {TargetPlatform? platform})
-    checker,
+        checker,
   }) {
     if (platform == SupportedPlatform.web) {
       return checker(property, platform: null);
@@ -155,7 +155,7 @@ class SupportCheckHelper {
   static Set<SupportedPlatform> supportedPlatformsForProperty({
     required dynamic property,
     required bool Function(dynamic property, {TargetPlatform? platform})
-    checker,
+        checker,
   }) {
     return SupportedPlatform.values
         .where(
@@ -346,7 +346,7 @@ class SupportChecker {
   static _PropertySupportResolver _buildPropertyResolver<T>({
     required List<T> values,
     required bool Function(dynamic property, {TargetPlatform? platform})
-    checker,
+        checker,
     Map<String, String> nameOverrides = const {},
   }) {
     final propertyByName = {
@@ -364,10 +364,10 @@ class SupportChecker {
     };
   }
 
-    static final Map<String, bool Function({TargetPlatform? platform})>
-    _classSupportResolvers = {
+  static final Map<String, bool Function({TargetPlatform? platform})>
+      _classSupportResolvers = {
     classNameOf(InAppWebViewController):
-      InAppWebViewController.isClassSupported,
+        InAppWebViewController.isClassSupported,
     eventClassNameOf(InAppWebView): InAppWebView.isClassSupported,
     classNameOf(HeadlessInAppWebView): HeadlessInAppWebView.isClassSupported,
     classNameOf(InAppBrowser): InAppBrowser.isClassSupported,
@@ -375,22 +375,22 @@ class SupportChecker {
     classNameOf(CookieManager): CookieManager.isClassSupported,
     classNameOf(WebStorage): WebStorage.isClassSupported,
     classNameOf(FindInteractionController):
-      FindInteractionController.isClassSupported,
+        FindInteractionController.isClassSupported,
     classNameOf(PullToRefreshController):
-      PullToRefreshController.isClassSupported,
+        PullToRefreshController.isClassSupported,
     classNameOf(PrintJobController): PrintJobController.isClassSupported,
     classNameOf(WebAuthenticationSession):
-      WebAuthenticationSession.isClassSupported,
+        WebAuthenticationSession.isClassSupported,
     classNameOf(ServiceWorkerController):
-      ServiceWorkerController.isClassSupported,
+        ServiceWorkerController.isClassSupported,
     classNameOf(ProxyController): ProxyController.isClassSupported,
     classNameOf(TracingController): TracingController.isClassSupported,
     classNameOf(HttpAuthCredentialDatabase):
-      HttpAuthCredentialDatabase.isClassSupported,
+        HttpAuthCredentialDatabase.isClassSupported,
     classNameOf(WebViewEnvironment): WebViewEnvironment.isClassSupported,
     classNameOf(ProcessGlobalConfig): ProcessGlobalConfig.isClassSupported,
     classNameOf(WebMessageChannel): WebMessageChannel.isClassSupported,
-    };
+  };
 
   static final Map<String, _MethodSupportResolver> _methodSupportResolvers = {
     classNameOf(InAppWebViewController): _buildMethodResolver(

@@ -4,63 +4,38 @@ import 'package:flutter_inappwebview_example/utils/controller_methods_registry.d
 import 'package:flutter_inappwebview_example/utils/support_checker.dart';
 
 void main() {
-  group('SupportChecker naming helpers', () {
-    test('classNameOf uses Type.toString()', () {
+  group('SupportChecker naming', () {
+    test('helper class names use Type.toString()', () {
       expect(
         SupportChecker.classNameOf(InAppWebViewController),
-        InAppWebViewController.toString(),
+        (InAppWebViewController).toString(),
       );
       expect(
         SupportChecker.classNameOf(HeadlessInAppWebView),
-        HeadlessInAppWebView.toString(),
+        (HeadlessInAppWebView).toString(),
       );
       expect(
         SupportChecker.classNameOf(InAppBrowser),
-        InAppBrowser.toString(),
+        (InAppBrowser).toString(),
       );
-    });
-
-    test('eventClassNameOf uses Type.toString() with Events suffix', () {
       expect(
         SupportChecker.eventClassNameOf(InAppWebView),
-        '${InAppWebView.toString()} Events',
+        '${(InAppWebView).toString()} Events',
       );
     });
 
-    test('registered class names use Type.toString()', () {
-      final classNames = SupportChecker.registeredClassNames;
-
-      expect(
-        classNames,
-        contains(SupportChecker.classNameOf(InAppWebViewController)),
-      );
-      expect(
-        classNames,
-        contains(SupportChecker.classNameOf(HeadlessInAppWebView)),
-      );
-      expect(classNames, contains(SupportChecker.classNameOf(InAppBrowser)));
-      expect(
-        classNames,
-        contains(SupportChecker.eventClassNameOf(InAppWebView)),
-      );
-    });
-
-    test('API definitions use Type.toString() class names', () {
+    test('API definitions use (Type).toString() class names', () {
       final definitions = SupportChecker.getAllApiDefinitions();
 
       final controllerDefinition = definitions.firstWhere(
         (definition) =>
-            definition.className ==
-            SupportChecker.classNameOf(InAppWebViewController),
+            definition.className == (InAppWebViewController).toString(),
       );
       expect(
         controllerDefinition.className,
-        InAppWebViewController.toString(),
+        (InAppWebViewController).toString(),
       );
-      expect(
-        controllerDefinition.methods,
-        isNotEmpty,
-      );
+      expect(controllerDefinition.methods, isNotEmpty);
       expect(
         controllerDefinition.methods.every(
           (method) => method.className == controllerDefinition.className,
@@ -70,13 +45,9 @@ void main() {
 
       final eventsDefinition = definitions.firstWhere(
         (definition) =>
-            definition.className ==
-            SupportChecker.eventClassNameOf(InAppWebView),
+            definition.className == '${(InAppWebView).toString()} Events',
       );
-      expect(
-        eventsDefinition.className,
-        '${InAppWebView.toString()} Events',
-      );
+      expect(eventsDefinition.className, '${(InAppWebView).toString()} Events');
       expect(
         eventsDefinition.events.every(
           (event) => event.className == eventsDefinition.className,

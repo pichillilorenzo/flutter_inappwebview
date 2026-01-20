@@ -6,7 +6,6 @@ Map<String, List<SettingDefinition>> getSettingDefinitions() {
   return {
     'General': [
       SettingDefinition(
-        key: 'javaScriptEnabled',
         name: 'JavaScript Enabled',
         description: 'Enable JavaScript execution in the WebView',
         type: SettingType.boolean,
@@ -14,7 +13,6 @@ Map<String, List<SettingDefinition>> getSettingDefinitions() {
         property: InAppWebViewSettingsProperty.javaScriptEnabled,
       ),
       SettingDefinition(
-        key: 'userAgent',
         name: 'User Agent',
         description: 'Custom user-agent string for the WebView',
         type: SettingType.string,
@@ -22,7 +20,6 @@ Map<String, List<SettingDefinition>> getSettingDefinitions() {
         property: InAppWebViewSettingsProperty.userAgent,
       ),
       SettingDefinition(
-        key: 'applicationNameForUserAgent',
         name: 'Application Name for User Agent',
         description: 'Append to the existing user-agent',
         type: SettingType.string,
@@ -30,7 +27,6 @@ Map<String, List<SettingDefinition>> getSettingDefinitions() {
         property: InAppWebViewSettingsProperty.applicationNameForUserAgent,
       ),
       SettingDefinition(
-        key: 'cacheEnabled',
         name: 'Cache Enabled',
         description: 'Enable browser caching',
         type: SettingType.boolean,
@@ -38,7 +34,6 @@ Map<String, List<SettingDefinition>> getSettingDefinitions() {
         property: InAppWebViewSettingsProperty.cacheEnabled,
       ),
       SettingDefinition(
-        key: 'incognito',
         name: 'Incognito Mode',
         description: 'Open browser in incognito/private mode',
         type: SettingType.boolean,
@@ -46,7 +41,6 @@ Map<String, List<SettingDefinition>> getSettingDefinitions() {
         property: InAppWebViewSettingsProperty.incognito,
       ),
       SettingDefinition(
-        key: 'supportZoom',
         name: 'Support Zoom',
         description: 'Enable zoom gestures and controls',
         type: SettingType.boolean,
@@ -56,7 +50,6 @@ Map<String, List<SettingDefinition>> getSettingDefinitions() {
     ],
     'Layout': [
       SettingDefinition(
-        key: 'useWideViewPort',
         name: 'Use Wide ViewPort',
         description: 'Enable support for HTML viewport meta tag',
         type: SettingType.boolean,
@@ -64,7 +57,6 @@ Map<String, List<SettingDefinition>> getSettingDefinitions() {
         property: InAppWebViewSettingsProperty.useWideViewPort,
       ),
       SettingDefinition(
-        key: 'loadWithOverviewMode',
         name: 'Load With Overview Mode',
         description: 'Zoom out content to fit on screen',
         type: SettingType.boolean,
@@ -72,7 +64,6 @@ Map<String, List<SettingDefinition>> getSettingDefinitions() {
         property: InAppWebViewSettingsProperty.loadWithOverviewMode,
       ),
       SettingDefinition(
-        key: 'minimumFontSize',
         name: 'Minimum Font Size',
         description: 'Minimum font size in pixels',
         type: SettingType.integer,
@@ -80,7 +71,6 @@ Map<String, List<SettingDefinition>> getSettingDefinitions() {
         property: InAppWebViewSettingsProperty.minimumFontSize,
       ),
       SettingDefinition(
-        key: 'defaultFontSize',
         name: 'Default Font Size',
         description: 'Default font size in pixels',
         type: SettingType.integer,
@@ -88,7 +78,6 @@ Map<String, List<SettingDefinition>> getSettingDefinitions() {
         property: InAppWebViewSettingsProperty.defaultFontSize,
       ),
       SettingDefinition(
-        key: 'defaultTextEncodingName',
         name: 'Default Text Encoding',
         description: 'Default text encoding for HTML pages',
         type: SettingType.string,
@@ -98,7 +87,6 @@ Map<String, List<SettingDefinition>> getSettingDefinitions() {
     ],
     'Content': [
       SettingDefinition(
-        key: 'allowContentAccess',
         name: 'Allow Content Access',
         description: 'Enable content URL access',
         type: SettingType.boolean,
@@ -106,7 +94,6 @@ Map<String, List<SettingDefinition>> getSettingDefinitions() {
         property: InAppWebViewSettingsProperty.allowContentAccess,
       ),
       SettingDefinition(
-        key: 'allowFileAccess',
         name: 'Allow File Access',
         description: 'Enable file system access',
         type: SettingType.boolean,
@@ -114,7 +101,6 @@ Map<String, List<SettingDefinition>> getSettingDefinitions() {
         property: InAppWebViewSettingsProperty.allowFileAccess,
       ),
       SettingDefinition(
-        key: 'allowFileAccessFromFileURLs',
         name: 'Allow File Access From File URLs',
         description: 'Allow file:// URLs to access other file:// URLs',
         type: SettingType.boolean,
@@ -122,7 +108,6 @@ Map<String, List<SettingDefinition>> getSettingDefinitions() {
         property: InAppWebViewSettingsProperty.allowFileAccessFromFileURLs,
       ),
       SettingDefinition(
-        key: 'allowUniversalAccessFromFileURLs',
         name: 'Allow Universal Access From File URLs',
         description: 'Allow file:// URLs to access any origin',
         type: SettingType.boolean,
@@ -130,7 +115,6 @@ Map<String, List<SettingDefinition>> getSettingDefinitions() {
         property: InAppWebViewSettingsProperty.allowUniversalAccessFromFileURLs,
       ),
       SettingDefinition(
-        key: 'blockNetworkImage',
         name: 'Block Network Images',
         description: 'Block loading images from the network',
         type: SettingType.boolean,
@@ -138,7 +122,6 @@ Map<String, List<SettingDefinition>> getSettingDefinitions() {
         property: InAppWebViewSettingsProperty.blockNetworkImage,
       ),
       SettingDefinition(
-        key: 'blockNetworkLoads',
         name: 'Block Network Loads',
         description: 'Block all network resource loading',
         type: SettingType.boolean,
@@ -148,7 +131,6 @@ Map<String, List<SettingDefinition>> getSettingDefinitions() {
     ],
     'Media': [
       SettingDefinition(
-        key: 'mediaPlaybackRequiresUserGesture',
         name: 'Media Requires User Gesture',
         description: 'Require user interaction to play media',
         type: SettingType.boolean,
@@ -156,7 +138,6 @@ Map<String, List<SettingDefinition>> getSettingDefinitions() {
         property: InAppWebViewSettingsProperty.mediaPlaybackRequiresUserGesture,
       ),
       SettingDefinition(
-        key: 'allowsInlineMediaPlayback',
         name: 'Allows Inline Media Playback',
         description: 'Allow HTML5 media to play inline',
         type: SettingType.boolean,
@@ -164,7 +145,6 @@ Map<String, List<SettingDefinition>> getSettingDefinitions() {
         property: InAppWebViewSettingsProperty.allowsInlineMediaPlayback,
       ),
       SettingDefinition(
-        key: 'allowsAirPlayForMediaPlayback',
         name: 'Allows AirPlay',
         description: 'Allow AirPlay for media playback',
         type: SettingType.boolean,
@@ -172,7 +152,6 @@ Map<String, List<SettingDefinition>> getSettingDefinitions() {
         property: InAppWebViewSettingsProperty.allowsAirPlayForMediaPlayback,
       ),
       SettingDefinition(
-        key: 'allowsPictureInPictureMediaPlayback',
         name: 'Allows Picture-in-Picture',
         description: 'Allow videos to play in picture-in-picture',
         type: SettingType.boolean,
@@ -181,7 +160,6 @@ Map<String, List<SettingDefinition>> getSettingDefinitions() {
             InAppWebViewSettingsProperty.allowsPictureInPictureMediaPlayback,
       ),
       SettingDefinition(
-        key: 'automaticallyAdjustsScrollIndicatorInsets',
         name: 'Auto Adjust Scroll Indicator Insets',
         description: 'Automatically adjust scroll indicator insets',
         type: SettingType.boolean,
@@ -192,7 +170,6 @@ Map<String, List<SettingDefinition>> getSettingDefinitions() {
     ],
     'JavaScript': [
       SettingDefinition(
-        key: 'javaScriptCanOpenWindowsAutomatically',
         name: 'JS Can Open Windows',
         description: 'Allow JavaScript to open windows automatically',
         type: SettingType.boolean,
@@ -201,7 +178,6 @@ Map<String, List<SettingDefinition>> getSettingDefinitions() {
             InAppWebViewSettingsProperty.javaScriptCanOpenWindowsAutomatically,
       ),
       SettingDefinition(
-        key: 'javaScriptBridgeEnabled',
         name: 'JavaScript Bridge Enabled',
         description: 'Enable the JavaScript bridge',
         type: SettingType.boolean,
@@ -209,7 +185,6 @@ Map<String, List<SettingDefinition>> getSettingDefinitions() {
         property: InAppWebViewSettingsProperty.javaScriptBridgeEnabled,
       ),
       SettingDefinition(
-        key: 'javaScriptBridgeForMainFrameOnly',
         name: 'JS Bridge Main Frame Only',
         description: 'Restrict JavaScript bridge to main frame',
         type: SettingType.boolean,
@@ -219,7 +194,6 @@ Map<String, List<SettingDefinition>> getSettingDefinitions() {
     ],
     'Security': [
       SettingDefinition(
-        key: 'mixedContentMode',
         name: 'Mixed Content Mode',
         description: 'How to handle mixed HTTP/HTTPS content',
         type: SettingType.enumeration,
@@ -236,7 +210,6 @@ Map<String, List<SettingDefinition>> getSettingDefinitions() {
         property: InAppWebViewSettingsProperty.mixedContentMode,
       ),
       SettingDefinition(
-        key: 'useShouldInterceptRequest',
         name: 'Use Should Intercept Request',
         description: 'Enable request interception events',
         type: SettingType.boolean,
@@ -244,7 +217,6 @@ Map<String, List<SettingDefinition>> getSettingDefinitions() {
         property: InAppWebViewSettingsProperty.useShouldInterceptRequest,
       ),
       SettingDefinition(
-        key: 'useShouldOverrideUrlLoading',
         name: 'Use Should Override URL Loading',
         description: 'Enable URL loading override events',
         type: SettingType.boolean,
@@ -252,7 +224,6 @@ Map<String, List<SettingDefinition>> getSettingDefinitions() {
         property: InAppWebViewSettingsProperty.useShouldOverrideUrlLoading,
       ),
       SettingDefinition(
-        key: 'useOnLoadResource',
         name: 'Use On Load Resource',
         description: 'Enable resource loading events',
         type: SettingType.boolean,
@@ -260,7 +231,6 @@ Map<String, List<SettingDefinition>> getSettingDefinitions() {
         property: InAppWebViewSettingsProperty.useOnLoadResource,
       ),
       SettingDefinition(
-        key: 'isFraudulentWebsiteWarningEnabled',
         name: 'Fraudulent Website Warning',
         description: 'Show warnings for suspected phishing/malware',
         type: SettingType.boolean,
@@ -269,7 +239,6 @@ Map<String, List<SettingDefinition>> getSettingDefinitions() {
             InAppWebViewSettingsProperty.isFraudulentWebsiteWarningEnabled,
       ),
       SettingDefinition(
-        key: 'safeBrowsingEnabled',
         name: 'Safe Browsing',
         description: 'Enable Google Safe Browsing',
         type: SettingType.boolean,
@@ -279,7 +248,6 @@ Map<String, List<SettingDefinition>> getSettingDefinitions() {
     ],
     'Cache': [
       SettingDefinition(
-        key: 'cacheMode',
         name: 'Cache Mode',
         description: 'Override the way the cache is used',
         type: SettingType.enumeration,
@@ -296,7 +264,6 @@ Map<String, List<SettingDefinition>> getSettingDefinitions() {
     ],
     'Appearance': [
       SettingDefinition(
-        key: 'transparentBackground',
         name: 'Transparent Background',
         description: 'Make the WebView background transparent',
         type: SettingType.boolean,
@@ -304,7 +271,6 @@ Map<String, List<SettingDefinition>> getSettingDefinitions() {
         property: InAppWebViewSettingsProperty.transparentBackground,
       ),
       SettingDefinition(
-        key: 'verticalScrollBarEnabled',
         name: 'Vertical Scroll Bar',
         description: 'Show vertical scroll bar',
         type: SettingType.boolean,
@@ -312,7 +278,6 @@ Map<String, List<SettingDefinition>> getSettingDefinitions() {
         property: InAppWebViewSettingsProperty.verticalScrollBarEnabled,
       ),
       SettingDefinition(
-        key: 'horizontalScrollBarEnabled',
         name: 'Horizontal Scroll Bar',
         description: 'Show horizontal scroll bar',
         type: SettingType.boolean,
@@ -320,7 +285,6 @@ Map<String, List<SettingDefinition>> getSettingDefinitions() {
         property: InAppWebViewSettingsProperty.horizontalScrollBarEnabled,
       ),
       SettingDefinition(
-        key: 'scrollbarFadingEnabled',
         name: 'Scrollbar Fading',
         description: 'Fade scrollbars when not scrolling',
         type: SettingType.boolean,
@@ -328,7 +292,6 @@ Map<String, List<SettingDefinition>> getSettingDefinitions() {
         property: InAppWebViewSettingsProperty.scrollbarFadingEnabled,
       ),
       SettingDefinition(
-        key: 'disableVerticalScroll',
         name: 'Disable Vertical Scroll',
         description: 'Disable vertical scrolling',
         type: SettingType.boolean,
@@ -336,7 +299,6 @@ Map<String, List<SettingDefinition>> getSettingDefinitions() {
         property: InAppWebViewSettingsProperty.disableVerticalScroll,
       ),
       SettingDefinition(
-        key: 'disableHorizontalScroll',
         name: 'Disable Horizontal Scroll',
         description: 'Disable horizontal scrolling',
         type: SettingType.boolean,
@@ -344,7 +306,6 @@ Map<String, List<SettingDefinition>> getSettingDefinitions() {
         property: InAppWebViewSettingsProperty.disableHorizontalScroll,
       ),
       SettingDefinition(
-        key: 'disableContextMenu',
         name: 'Disable Context Menu',
         description: 'Disable the long-press context menu',
         type: SettingType.boolean,
@@ -354,7 +315,6 @@ Map<String, List<SettingDefinition>> getSettingDefinitions() {
     ],
     'Navigation': [
       SettingDefinition(
-        key: 'allowsBackForwardNavigationGestures',
         name: 'Back/Forward Gestures',
         description: 'Enable swipe gestures for navigation',
         type: SettingType.boolean,
@@ -365,7 +325,6 @@ Map<String, List<SettingDefinition>> getSettingDefinitions() {
     ],
     'Rendering': [
       SettingDefinition(
-        key: 'suppressesIncrementalRendering',
         name: 'Suppress Incremental Rendering',
         description: 'Wait until content is fully loaded before rendering',
         type: SettingType.boolean,
@@ -373,7 +332,6 @@ Map<String, List<SettingDefinition>> getSettingDefinitions() {
         property: InAppWebViewSettingsProperty.suppressesIncrementalRendering,
       ),
       SettingDefinition(
-        key: 'hardwareAcceleration',
         name: 'Hardware Acceleration',
         description: 'Enable hardware acceleration',
         type: SettingType.boolean,
@@ -381,7 +339,6 @@ Map<String, List<SettingDefinition>> getSettingDefinitions() {
         property: InAppWebViewSettingsProperty.hardwareAcceleration,
       ),
       SettingDefinition(
-        key: 'useHybridComposition',
         name: 'Hybrid Composition',
         description: 'Use Flutter Hybrid Composition',
         type: SettingType.boolean,
@@ -391,7 +348,6 @@ Map<String, List<SettingDefinition>> getSettingDefinitions() {
     ],
     'Zoom': [
       SettingDefinition(
-        key: 'ignoresViewportScaleLimits',
         name: 'Ignore Viewport Scale Limits',
         description: 'Override user-scalable viewport setting',
         type: SettingType.boolean,
@@ -399,7 +355,6 @@ Map<String, List<SettingDefinition>> getSettingDefinitions() {
         property: InAppWebViewSettingsProperty.ignoresViewportScaleLimits,
       ),
       SettingDefinition(
-        key: 'builtInZoomControls',
         name: 'Built-In Zoom Controls',
         description: 'Use built-in zoom controls',
         type: SettingType.boolean,
@@ -407,7 +362,6 @@ Map<String, List<SettingDefinition>> getSettingDefinitions() {
         property: InAppWebViewSettingsProperty.builtInZoomControls,
       ),
       SettingDefinition(
-        key: 'displayZoomControls',
         name: 'Display Zoom Controls',
         description: 'Show on-screen zoom controls',
         type: SettingType.boolean,
@@ -415,7 +369,6 @@ Map<String, List<SettingDefinition>> getSettingDefinitions() {
         property: InAppWebViewSettingsProperty.displayZoomControls,
       ),
       SettingDefinition(
-        key: 'pinchZoomEnabled',
         name: 'Pinch Zoom',
         description: 'Enable pinch-to-zoom gesture',
         type: SettingType.boolean,
@@ -425,7 +378,6 @@ Map<String, List<SettingDefinition>> getSettingDefinitions() {
     ],
     'Interaction': [
       SettingDefinition(
-        key: 'allowsLinkPreview',
         name: 'Link Preview',
         description: 'Show link previews on long press',
         type: SettingType.boolean,
@@ -435,7 +387,6 @@ Map<String, List<SettingDefinition>> getSettingDefinitions() {
     ],
     'Storage': [
       SettingDefinition(
-        key: 'thirdPartyCookiesEnabled',
         name: 'Third-Party Cookies',
         description: 'Allow third-party cookies',
         type: SettingType.boolean,
@@ -443,7 +394,6 @@ Map<String, List<SettingDefinition>> getSettingDefinitions() {
         property: InAppWebViewSettingsProperty.thirdPartyCookiesEnabled,
       ),
       SettingDefinition(
-        key: 'domStorageEnabled',
         name: 'DOM Storage',
         description: 'Enable DOM local storage',
         type: SettingType.boolean,
@@ -451,7 +401,6 @@ Map<String, List<SettingDefinition>> getSettingDefinitions() {
         property: InAppWebViewSettingsProperty.domStorageEnabled,
       ),
       SettingDefinition(
-        key: 'databaseEnabled',
         name: 'Database',
         description: 'Enable database storage API',
         type: SettingType.boolean,
@@ -461,7 +410,6 @@ Map<String, List<SettingDefinition>> getSettingDefinitions() {
     ],
     'APIs': [
       SettingDefinition(
-        key: 'geolocationEnabled',
         name: 'Geolocation',
         description: 'Enable Geolocation API',
         type: SettingType.boolean,
@@ -471,7 +419,6 @@ Map<String, List<SettingDefinition>> getSettingDefinitions() {
     ],
     'Forms': [
       SettingDefinition(
-        key: 'generalAutofillEnabled',
         name: 'General Autofill',
         description: 'Enable autofill for forms',
         type: SettingType.boolean,
@@ -479,7 +426,6 @@ Map<String, List<SettingDefinition>> getSettingDefinitions() {
         property: InAppWebViewSettingsProperty.generalAutofillEnabled,
       ),
       SettingDefinition(
-        key: 'passwordAutosaveEnabled',
         name: 'Password Autosave',
         description: 'Enable password autosave',
         type: SettingType.boolean,
@@ -489,7 +435,6 @@ Map<String, List<SettingDefinition>> getSettingDefinitions() {
     ],
     'UI': [
       SettingDefinition(
-        key: 'statusBarEnabled',
         name: 'Status Bar',
         description: 'Show status bar',
         type: SettingType.boolean,
@@ -497,7 +442,6 @@ Map<String, List<SettingDefinition>> getSettingDefinitions() {
         property: InAppWebViewSettingsProperty.statusBarEnabled,
       ),
       SettingDefinition(
-        key: 'browserAcceleratorKeysEnabled',
         name: 'Browser Accelerator Keys',
         description: 'Enable browser keyboard shortcuts',
         type: SettingType.boolean,
@@ -507,7 +451,6 @@ Map<String, List<SettingDefinition>> getSettingDefinitions() {
     ],
     'Developer': [
       SettingDefinition(
-        key: 'isInspectable',
         name: 'Inspectable',
         description: 'Allow Web Inspector/DevTools',
         type: SettingType.boolean,

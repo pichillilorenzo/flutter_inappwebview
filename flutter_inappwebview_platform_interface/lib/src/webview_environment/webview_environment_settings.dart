@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 
 import 'platform_webview_environment.dart';
@@ -457,4 +458,13 @@ class WebViewEnvironmentSettings_ {
     this.webProcessExtensionsDirectory,
     this.sandboxPaths,
   });
+
+  ///Check if the given [property] is supported by the [defaultTargetPlatform] or a specific [platform].
+  static bool isPropertySupported(
+    WebViewEnvironmentSettingsProperty property, {
+    TargetPlatform? platform,
+  }) => _WebViewEnvironmentSettingsPropertySupported.isPropertySupported(
+    property,
+    platform: platform,
+  );
 }

@@ -10,34 +10,57 @@ enum EnvironmentSettingType {
   customSchemeRegistrations,
 }
 
+/// Enum representing known WebViewEnvironmentSettings properties.
+enum EnvironmentSettingProperty {
+  browserExecutableFolder,
+  userDataFolder,
+  additionalBrowserArguments,
+  targetCompatibleBrowserVersion,
+  channelSearchKind,
+  releaseChannels,
+  language,
+  preferredLanguages,
+  timeZoneOverride,
+  spellCheckingEnabled,
+  spellCheckingLanguages,
+  areBrowserExtensionsEnabled,
+  webProcessExtensionsDirectory,
+  allowSingleSignOnUsingOSPrimaryAccount,
+  enableTrackingPrevention,
+  exclusiveUserDataFolderAccess,
+  sandboxPaths,
+  automationAllowed,
+  isCustomCrashReportingEnabled,
+  scrollbarStyle,
+  cacheModel,
+  customSchemeRegistrations,
+}
+
 /// Definition of a single environment setting.
 class EnvironmentSettingDefinition {
-  final String key;
   final String name;
   final String description;
   final EnvironmentSettingType type;
   final dynamic defaultValue;
   final Map<String, dynamic>? enumValues;
   final String? hint;
-  final PlatformWebViewEnvironmentCreationParamsProperty? property;
+  final EnvironmentSettingProperty property;
 
   const EnvironmentSettingDefinition({
-    required this.key,
     required this.name,
     required this.description,
     required this.type,
     this.defaultValue,
     this.enumValues,
     this.hint,
-    this.property,
+    required this.property,
   });
 
-  PlatformWebViewEnvironmentCreationParamsProperty get _effectiveProperty =>
-      property ?? PlatformWebViewEnvironmentCreationParamsProperty.settings;
+  String get key => property.name;
 
   bool isSupportedOnPlatform(TargetPlatform platform) {
     return const PlatformWebViewEnvironmentCreationParams().isPropertySupported(
-      _effectiveProperty,
+      PlatformWebViewEnvironmentCreationParamsProperty.settings,
       platform: platform,
     );
   }
@@ -45,7 +68,7 @@ class EnvironmentSettingDefinition {
   bool get isSupportedOnCurrentPlatform {
     if (kIsWeb) return true;
     return const PlatformWebViewEnvironmentCreationParams().isPropertySupported(
-      _effectiveProperty,
+      PlatformWebViewEnvironmentCreationParamsProperty.settings,
     );
   }
 

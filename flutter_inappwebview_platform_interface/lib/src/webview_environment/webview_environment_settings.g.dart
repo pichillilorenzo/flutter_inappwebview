@@ -396,6 +396,15 @@ class WebViewEnvironmentSettings {
     return instance;
   }
 
+  ///Check if the given [property] is supported by the [defaultTargetPlatform] or a specific [platform].
+  static bool isPropertySupported(
+    WebViewEnvironmentSettingsProperty property, {
+    TargetPlatform? platform,
+  }) => _WebViewEnvironmentSettingsPropertySupported.isPropertySupported(
+    property,
+    platform: platform,
+  );
+
   ///Converts instance to a map.
   Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
@@ -457,5 +466,361 @@ class WebViewEnvironmentSettings {
   @override
   String toString() {
     return 'WebViewEnvironmentSettings{additionalBrowserArguments: $additionalBrowserArguments, allowSingleSignOnUsingOSPrimaryAccount: $allowSingleSignOnUsingOSPrimaryAccount, areBrowserExtensionsEnabled: $areBrowserExtensionsEnabled, automationAllowed: $automationAllowed, browserExecutableFolder: $browserExecutableFolder, cacheModel: $cacheModel, channelSearchKind: $channelSearchKind, customSchemeRegistrations: $customSchemeRegistrations, enableTrackingPrevention: $enableTrackingPrevention, exclusiveUserDataFolderAccess: $exclusiveUserDataFolderAccess, isCustomCrashReportingEnabled: $isCustomCrashReportingEnabled, language: $language, preferredLanguages: $preferredLanguages, releaseChannels: $releaseChannels, sandboxPaths: $sandboxPaths, scrollbarStyle: $scrollbarStyle, spellCheckingEnabled: $spellCheckingEnabled, spellCheckingLanguages: $spellCheckingLanguages, targetCompatibleBrowserVersion: $targetCompatibleBrowserVersion, timeZoneOverride: $timeZoneOverride, userDataFolder: $userDataFolder, webProcessExtensionsDirectory: $webProcessExtensionsDirectory}';
+  }
+}
+
+// **************************************************************************
+// SupportedPlatformsGenerator
+// **************************************************************************
+
+///List of [WebViewEnvironmentSettings]'s properties that can be used to check i they are supported or not by the current platform.
+enum WebViewEnvironmentSettingsProperty {
+  ///Can be used to check if the [WebViewEnvironmentSettings.additionalBrowserArguments] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.WebViewEnvironmentSettings.additionalBrowserArguments.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows WebView2 ([Official API - ICoreWebView2EnvironmentOptions.put_AdditionalBrowserArguments](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions?view=webview2-1.0.2210.55#put_additionalbrowserarguments))
+  ///
+  ///Use the [WebViewEnvironmentSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  additionalBrowserArguments,
+
+  ///Can be used to check if the [WebViewEnvironmentSettings.allowSingleSignOnUsingOSPrimaryAccount] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.WebViewEnvironmentSettings.allowSingleSignOnUsingOSPrimaryAccount.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows WebView2 ([Official API - ICoreWebView2EnvironmentOptions.put_AllowSingleSignOnUsingOSPrimaryAccount](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions?view=webview2-1.0.2210.55#put_allowsinglesignonusingosprimaryaccount))
+  ///
+  ///Use the [WebViewEnvironmentSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  allowSingleSignOnUsingOSPrimaryAccount,
+
+  ///Can be used to check if the [WebViewEnvironmentSettings.areBrowserExtensionsEnabled] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.WebViewEnvironmentSettings.areBrowserExtensionsEnabled.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows WebView2 1.0.2210.55+ ([Official API - ICoreWebView2EnvironmentOptions6.put_AreBrowserExtensionsEnabled](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions6?view=webview2-1.0.2849.39#put_arebrowserextensionsenabled))
+  ///
+  ///Use the [WebViewEnvironmentSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  areBrowserExtensionsEnabled,
+
+  ///Can be used to check if the [WebViewEnvironmentSettings.automationAllowed] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.WebViewEnvironmentSettings.automationAllowed.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - webkit_web_context_set_automation_allowed](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebContext.set_automation_allowed.html))
+  ///
+  ///Use the [WebViewEnvironmentSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  automationAllowed,
+
+  ///Can be used to check if the [WebViewEnvironmentSettings.browserExecutableFolder] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.WebViewEnvironmentSettings.browserExecutableFolder.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows WebView2 ([Official API - CreateCoreWebView2EnvironmentWithOptions.browserExecutableFolder](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#createcorewebview2environmentwithoptions))
+  ///
+  ///Use the [WebViewEnvironmentSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  browserExecutableFolder,
+
+  ///Can be used to check if the [WebViewEnvironmentSettings.cacheModel] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.WebViewEnvironmentSettings.cacheModel.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - webkit_web_context_set_cache_model](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebContext.set_cache_model.html))
+  ///
+  ///Use the [WebViewEnvironmentSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  cacheModel,
+
+  ///Can be used to check if the [WebViewEnvironmentSettings.channelSearchKind] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.WebViewEnvironmentSettings.channelSearchKind.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows WebView2 1.0.2478.35+ ([Official API - ICoreWebView2EnvironmentOptions7.put_ChannelSearchKind](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions7?view=webview2-1.0.2849.39#put_channelsearchkind))
+  ///
+  ///Use the [WebViewEnvironmentSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  channelSearchKind,
+
+  ///Can be used to check if the [WebViewEnvironmentSettings.customSchemeRegistrations] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.WebViewEnvironmentSettings.customSchemeRegistrations.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows WebView2 1.0.1587.40+ ([Official API - ICoreWebView2EnvironmentOptions4.SetCustomSchemeRegistrations](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions4?view=webview2-1.0.2739.15#setcustomschemeregistrations))
+  ///
+  ///Use the [WebViewEnvironmentSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  customSchemeRegistrations,
+
+  ///Can be used to check if the [WebViewEnvironmentSettings.enableTrackingPrevention] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.WebViewEnvironmentSettings.enableTrackingPrevention.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows WebView2 1.0.1661.34+ ([Official API - ICoreWebView2EnvironmentOptions5.put_EnableTrackingPrevention](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions5?view=webview2-1.0.2849.39#put_enabletrackingprevention))
+  ///
+  ///Use the [WebViewEnvironmentSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  enableTrackingPrevention,
+
+  ///Can be used to check if the [WebViewEnvironmentSettings.exclusiveUserDataFolderAccess] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.WebViewEnvironmentSettings.exclusiveUserDataFolderAccess.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows WebView2 1.0.1185.39+ ([Official API - ICoreWebView2EnvironmentOptions2.put_ExclusiveUserDataFolderAccess](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions2?view=webview2-1.0.2849.39#put_exclusiveuserdatafolderaccess))
+  ///
+  ///Use the [WebViewEnvironmentSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  exclusiveUserDataFolderAccess,
+
+  ///Can be used to check if the [WebViewEnvironmentSettings.isCustomCrashReportingEnabled] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.WebViewEnvironmentSettings.isCustomCrashReportingEnabled.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows WebView2 1.0.1518.46+ ([Official API - ICoreWebView2EnvironmentOptions3.put_IsCustomCrashReportingEnabled](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions3?view=webview2-1.0.2849.39#put_iscustomcrashreportingenabled))
+  ///
+  ///Use the [WebViewEnvironmentSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  isCustomCrashReportingEnabled,
+
+  ///Can be used to check if the [WebViewEnvironmentSettings.language] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.WebViewEnvironmentSettings.language.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows WebView2 ([Official API - ICoreWebView2EnvironmentOptions.put_Language](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions?view=webview2-1.0.2210.55#put_language))
+  ///
+  ///Use the [WebViewEnvironmentSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  language,
+
+  ///Can be used to check if the [WebViewEnvironmentSettings.preferredLanguages] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.WebViewEnvironmentSettings.preferredLanguages.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - webkit_web_context_set_preferred_languages](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebContext.set_preferred_languages.html))
+  ///
+  ///Use the [WebViewEnvironmentSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  preferredLanguages,
+
+  ///Can be used to check if the [WebViewEnvironmentSettings.releaseChannels] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.WebViewEnvironmentSettings.releaseChannels.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows WebView2 1.0.2478.35+ ([Official API - ICoreWebView2EnvironmentOptions7.put_ReleaseChannels](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions7?view=webview2-1.0.2849.39#put_releasechannels))
+  ///
+  ///Use the [WebViewEnvironmentSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  releaseChannels,
+
+  ///Can be used to check if the [WebViewEnvironmentSettings.sandboxPaths] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.WebViewEnvironmentSettings.sandboxPaths.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - webkit_web_context_add_path_to_sandbox](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebContext.add_path_to_sandbox.html))
+  ///
+  ///Use the [WebViewEnvironmentSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  sandboxPaths,
+
+  ///Can be used to check if the [WebViewEnvironmentSettings.scrollbarStyle] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.WebViewEnvironmentSettings.scrollbarStyle.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows WebView2 1.0.2535.41+ ([Official API - ICoreWebView2EnvironmentOptions8.put_ScrollBarStyle](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions8?view=webview2-1.0.2849.39#put_scrollbarstyle))
+  ///
+  ///Use the [WebViewEnvironmentSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  scrollbarStyle,
+
+  ///Can be used to check if the [WebViewEnvironmentSettings.spellCheckingEnabled] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.WebViewEnvironmentSettings.spellCheckingEnabled.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - webkit_web_context_set_spell_checking_enabled](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebContext.set_spell_checking_enabled.html))
+  ///
+  ///Use the [WebViewEnvironmentSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  spellCheckingEnabled,
+
+  ///Can be used to check if the [WebViewEnvironmentSettings.spellCheckingLanguages] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.WebViewEnvironmentSettings.spellCheckingLanguages.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - webkit_web_context_set_spell_checking_languages](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebContext.set_spell_checking_languages.html))
+  ///
+  ///Use the [WebViewEnvironmentSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  spellCheckingLanguages,
+
+  ///Can be used to check if the [WebViewEnvironmentSettings.targetCompatibleBrowserVersion] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.WebViewEnvironmentSettings.targetCompatibleBrowserVersion.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows WebView2 ([Official API - ICoreWebView2EnvironmentOptions.put_TargetCompatibleBrowserVersion](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions?view=webview2-1.0.2210.55#put_targetcompatiblebrowserversion))
+  ///
+  ///Use the [WebViewEnvironmentSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  targetCompatibleBrowserVersion,
+
+  ///Can be used to check if the [WebViewEnvironmentSettings.timeZoneOverride] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.WebViewEnvironmentSettings.timeZoneOverride.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - time-zone-override](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/class.WebContext.html)):
+  ///    - This property must be set at WebContext construction time.
+  ///
+  ///Use the [WebViewEnvironmentSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  timeZoneOverride,
+
+  ///Can be used to check if the [WebViewEnvironmentSettings.userDataFolder] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.WebViewEnvironmentSettings.userDataFolder.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows WebView2 ([Official API - CreateCoreWebView2EnvironmentWithOptions.userDataFolder](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#createcorewebview2environmentwithoptions))
+  ///
+  ///Use the [WebViewEnvironmentSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  userDataFolder,
+
+  ///Can be used to check if the [WebViewEnvironmentSettings.webProcessExtensionsDirectory] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.WebViewEnvironmentSettings.webProcessExtensionsDirectory.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - webkit_web_context_set_web_process_extensions_directory](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebContext.set_web_process_extensions_directory.html))
+  ///
+  ///Use the [WebViewEnvironmentSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  webProcessExtensionsDirectory,
+}
+
+extension _WebViewEnvironmentSettingsPropertySupported
+    on WebViewEnvironmentSettings {
+  static bool isPropertySupported(
+    WebViewEnvironmentSettingsProperty property, {
+    TargetPlatform? platform,
+  }) {
+    switch (property) {
+      case WebViewEnvironmentSettingsProperty.additionalBrowserArguments:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
+      case WebViewEnvironmentSettingsProperty
+          .allowSingleSignOnUsingOSPrimaryAccount:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
+      case WebViewEnvironmentSettingsProperty.areBrowserExtensionsEnabled:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
+      case WebViewEnvironmentSettingsProperty.automationAllowed:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
+      case WebViewEnvironmentSettingsProperty.browserExecutableFolder:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
+      case WebViewEnvironmentSettingsProperty.cacheModel:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
+      case WebViewEnvironmentSettingsProperty.channelSearchKind:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
+      case WebViewEnvironmentSettingsProperty.customSchemeRegistrations:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
+      case WebViewEnvironmentSettingsProperty.enableTrackingPrevention:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
+      case WebViewEnvironmentSettingsProperty.exclusiveUserDataFolderAccess:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
+      case WebViewEnvironmentSettingsProperty.isCustomCrashReportingEnabled:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
+      case WebViewEnvironmentSettingsProperty.language:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
+      case WebViewEnvironmentSettingsProperty.preferredLanguages:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
+      case WebViewEnvironmentSettingsProperty.releaseChannels:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
+      case WebViewEnvironmentSettingsProperty.sandboxPaths:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
+      case WebViewEnvironmentSettingsProperty.scrollbarStyle:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
+      case WebViewEnvironmentSettingsProperty.spellCheckingEnabled:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
+      case WebViewEnvironmentSettingsProperty.spellCheckingLanguages:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
+      case WebViewEnvironmentSettingsProperty.targetCompatibleBrowserVersion:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
+      case WebViewEnvironmentSettingsProperty.timeZoneOverride:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
+      case WebViewEnvironmentSettingsProperty.userDataFolder:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
+      case WebViewEnvironmentSettingsProperty.webProcessExtensionsDirectory:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
+    }
   }
 }

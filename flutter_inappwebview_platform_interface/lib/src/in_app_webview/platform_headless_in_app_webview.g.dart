@@ -16,6 +16,7 @@ extension _PlatformHeadlessInAppWebViewCreationParamsClassSupported
   ///- macOS WKWebView
   ///- Web \<iframe\>
   ///- Windows WebView2
+  ///- Linux WPE WebKit
   ///
   ///Use the [PlatformHeadlessInAppWebViewCreationParams.isClassSupported] method to check if this class is supported at runtime.
   ///{@endtemplate}
@@ -28,6 +29,7 @@ extension _PlatformHeadlessInAppWebViewCreationParamsClassSupported
                 TargetPlatform.iOS,
                 TargetPlatform.macOS,
                 TargetPlatform.windows,
+                TargetPlatform.linux,
               ].contains(platform ?? defaultTargetPlatform);
   }
 }
@@ -45,6 +47,7 @@ enum PlatformHeadlessInAppWebViewCreationParamsProperty {
   ///- macOS WKWebView
   ///- Web \<iframe\>
   ///- Windows WebView2
+  ///- Linux WPE WebKit
   ///
   ///Use the [PlatformHeadlessInAppWebViewCreationParams.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
@@ -79,6 +82,7 @@ extension _PlatformHeadlessInAppWebViewCreationParamsPropertySupported
                     TargetPlatform.iOS,
                     TargetPlatform.macOS,
                     TargetPlatform.windows,
+                    TargetPlatform.linux,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformHeadlessInAppWebViewCreationParamsProperty
           .webViewEnvironment:
@@ -101,6 +105,7 @@ extension _PlatformHeadlessInAppWebViewClassSupported
   ///- macOS WKWebView
   ///- Web \<iframe\>
   ///- Windows WebView2
+  ///- Linux WPE WebKit
   ///
   ///Use the [PlatformHeadlessInAppWebView.isClassSupported] method to check if this class is supported at runtime.
   ///{@endtemplate}
@@ -113,6 +118,7 @@ extension _PlatformHeadlessInAppWebViewClassSupported
                 TargetPlatform.iOS,
                 TargetPlatform.macOS,
                 TargetPlatform.windows,
+                TargetPlatform.linux,
               ].contains(platform ?? defaultTargetPlatform);
   }
 }
@@ -129,6 +135,7 @@ enum PlatformHeadlessInAppWebViewMethod {
   ///- macOS WKWebView
   ///- Web \<iframe\>
   ///- Windows WebView2
+  ///- Linux WPE WebKit
   ///
   ///Use the [PlatformHeadlessInAppWebView.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
@@ -143,6 +150,7 @@ enum PlatformHeadlessInAppWebViewMethod {
   ///- iOS WKWebView
   ///- macOS WKWebView
   ///- Web \<iframe\>
+  ///- Linux WPE WebKit
   ///
   ///Use the [PlatformHeadlessInAppWebView.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
@@ -158,6 +166,7 @@ enum PlatformHeadlessInAppWebViewMethod {
   ///- macOS WKWebView
   ///- Web \<iframe\>
   ///- Windows WebView2
+  ///- Linux WPE WebKit
   ///
   ///Use the [PlatformHeadlessInAppWebView.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
@@ -174,6 +183,7 @@ enum PlatformHeadlessInAppWebViewMethod {
   ///- Web \<iframe\>:
   ///    - It will append a new `iframe` to the body.
   ///- Windows WebView2
+  ///- Linux WPE WebKit
   ///
   ///Use the [PlatformHeadlessInAppWebView.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
@@ -189,6 +199,7 @@ enum PlatformHeadlessInAppWebViewMethod {
   ///- iOS WKWebView
   ///- macOS WKWebView
   ///- Web \<iframe\>
+  ///- Linux WPE WebKit
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [size]: all platforms
@@ -214,6 +225,7 @@ extension _PlatformHeadlessInAppWebViewMethodSupported
                     TargetPlatform.iOS,
                     TargetPlatform.macOS,
                     TargetPlatform.windows,
+                    TargetPlatform.linux,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformHeadlessInAppWebViewMethod.getSize:
         return kIsWeb && platform == null
@@ -223,6 +235,7 @@ extension _PlatformHeadlessInAppWebViewMethodSupported
                     TargetPlatform.android,
                     TargetPlatform.iOS,
                     TargetPlatform.macOS,
+                    TargetPlatform.linux,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformHeadlessInAppWebViewMethod.isRunning:
         return kIsWeb && platform == null
@@ -233,6 +246,7 @@ extension _PlatformHeadlessInAppWebViewMethodSupported
                     TargetPlatform.iOS,
                     TargetPlatform.macOS,
                     TargetPlatform.windows,
+                    TargetPlatform.linux,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformHeadlessInAppWebViewMethod.run:
         return kIsWeb && platform == null
@@ -243,6 +257,7 @@ extension _PlatformHeadlessInAppWebViewMethodSupported
                     TargetPlatform.iOS,
                     TargetPlatform.macOS,
                     TargetPlatform.windows,
+                    TargetPlatform.linux,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformHeadlessInAppWebViewMethod.setSize:
         return kIsWeb && platform == null
@@ -252,6 +267,7 @@ extension _PlatformHeadlessInAppWebViewMethodSupported
                     TargetPlatform.android,
                     TargetPlatform.iOS,
                     TargetPlatform.macOS,
+                    TargetPlatform.linux,
                   ].contains(platform ?? defaultTargetPlatform);
     }
   }

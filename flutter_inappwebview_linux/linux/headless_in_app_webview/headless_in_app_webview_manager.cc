@@ -180,7 +180,7 @@ void HeadlessInAppWebViewManager::Run(FlMethodCall* method_call) {
   webviews_[id] = std::move(headlessWebView);
 
   // Notify Flutter that the webview is created
-  webviews_[id]->onWebViewCreated();
+  webviews_[id]->channelDelegate()->onWebViewCreated();
 
   // Return success
   g_autoptr(FlValue) result = make_fl_value(true);

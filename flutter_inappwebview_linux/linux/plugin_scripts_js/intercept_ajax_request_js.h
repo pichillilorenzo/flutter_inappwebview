@@ -153,16 +153,47 @@ class InterceptAjaxRequestJS {
     return headers;
   },
   convertCredentialsToJson: function(credentials) {
-    if (credentials == null || credentials === 'omit' || credentials === 'same-origin' || credentials === 'include') {
-      return credentials;
+    var credentialsObj = {};
+    if (window.FederatedCredential != null && credentials instanceof FederatedCredential) {
+      credentialsObj.type = credentials.type;
+      credentialsObj.id = credentials.id;
+      credentialsObj.name = credentials.name;
+      credentialsObj.protocol = credentials.protocol;
+      credentialsObj.provider = credentials.provider;
+      credentialsObj.iconURL = credentials.iconURL;
+    } else if (window.PasswordCredential != null && credentials instanceof PasswordCredential) {
+      credentialsObj.type = credentials.type;
+      credentialsObj.id = credentials.id;
+      credentialsObj.name = credentials.name;
+      credentialsObj.password = credentials.password;
+      credentialsObj.iconURL = credentials.iconURL;
+    } else {
+      credentialsObj.type = 'default';
+      credentialsObj.value = credentials;
     }
-    return null;
+    return credentialsObj;
   },
   convertJsonToCredential: function(credentialsJson) {
-    if (credentialsJson == null) {
-      return 'same-origin';
+    var credentials;
+    if (window.FederatedCredential != null && credentialsJson.type === 'federated') {
+      credentials = new FederatedCredential({
+        id: credentialsJson.id,
+        name: credentialsJson.name,
+        protocol: credentialsJson.protocol,
+        provider: credentialsJson.provider,
+        iconURL: credentialsJson.iconURL
+      });
+    } else if (window.PasswordCredential != null && credentialsJson.type === 'password') {
+      credentials = new PasswordCredential({
+        id: credentialsJson.id,
+        name: credentialsJson.name,
+        password: credentialsJson.password,
+        iconURL: credentialsJson.iconURL
+      });
+    } else {
+      credentials = credentialsJson.value == null ? undefined : credentialsJson.value;
     }
-    return credentialsJson;
+    return credentials;
   }
 };
 )JS";

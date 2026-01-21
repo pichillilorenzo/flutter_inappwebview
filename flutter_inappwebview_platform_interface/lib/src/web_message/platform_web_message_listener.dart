@@ -19,7 +19,7 @@ part 'platform_web_message_listener.g.dart';
 ///
 ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageListenerCreationParams.supported_platforms}
 @SupportedPlatforms(
-  platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()],
+  platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform(), LinuxPlatform()],
 )
 @immutable
 class PlatformWebMessageListenerCreationParams {
@@ -36,7 +36,7 @@ class PlatformWebMessageListenerCreationParams {
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageListenerCreationParams.jsObjectName.supported_platforms}
   @SupportedPlatforms(
-    platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()],
+    platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform(), LinuxPlatform()],
   )
   final String jsObjectName;
 
@@ -46,7 +46,7 @@ class PlatformWebMessageListenerCreationParams {
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageListenerCreationParams.allowedOriginRules.supported_platforms}
   @SupportedPlatforms(
-    platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()],
+    platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform(), LinuxPlatform()],
   )
   final Set<String>? allowedOriginRules;
 
@@ -71,6 +71,7 @@ class PlatformWebMessageListenerCreationParams {
       ),
       IOSPlatform(),
       MacOSPlatform(),
+      LinuxPlatform(),
     ],
   )
   final OnPostMessageCallback? onPostMessage;
@@ -107,7 +108,7 @@ class PlatformWebMessageListenerCreationParams {
 ///
 ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageListener.supported_platforms}
 @SupportedPlatforms(
-  platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()],
+  platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform(), LinuxPlatform()],
 )
 abstract class PlatformWebMessageListener extends PlatformInterface
     implements Disposable {
@@ -189,7 +190,7 @@ abstract class PlatformWebMessageListener extends PlatformInterface
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageListener.dispose.supported_platforms}
   @SupportedPlatforms(
-    platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()],
+    platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform(), LinuxPlatform()],
   )
   @override
   void dispose() {

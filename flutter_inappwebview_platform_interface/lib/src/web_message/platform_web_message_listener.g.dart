@@ -14,6 +14,7 @@ extension _PlatformWebMessageListenerCreationParamsClassSupported
   ///- Android WebView
   ///- iOS WKWebView
   ///- macOS WKWebView
+  ///- Linux WPE WebKit
   ///
   ///Use the [PlatformWebMessageListenerCreationParams.isClassSupported] method to check if this class is supported at runtime.
   ///{@endtemplate}
@@ -23,6 +24,7 @@ extension _PlatformWebMessageListenerCreationParamsClassSupported
           TargetPlatform.android,
           TargetPlatform.iOS,
           TargetPlatform.macOS,
+          TargetPlatform.linux,
         ].contains(platform ?? defaultTargetPlatform);
   }
 }
@@ -37,6 +39,7 @@ enum PlatformWebMessageListenerCreationParamsProperty {
   ///- Android WebView
   ///- iOS WKWebView
   ///- macOS WKWebView
+  ///- Linux WPE WebKit
   ///
   ///Use the [PlatformWebMessageListenerCreationParams.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
@@ -50,6 +53,7 @@ enum PlatformWebMessageListenerCreationParamsProperty {
   ///- Android WebView
   ///- iOS WKWebView
   ///- macOS WKWebView
+  ///- Linux WPE WebKit
   ///
   ///Use the [PlatformWebMessageListenerCreationParams.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
@@ -63,6 +67,7 @@ enum PlatformWebMessageListenerCreationParamsProperty {
   ///- Android WebView ([Official API - WebViewCompat.WebMessageListener.onPostMessage](https://developer.android.com/reference/androidx/webkit/WebViewCompat.WebMessageListener#onPostMessage(android.webkit.WebView,%20androidx.webkit.WebMessageCompat,%20android.net.Uri,%20boolean,%20androidx.webkit.JavaScriptReplyProxy)))
   ///- iOS WKWebView
   ///- macOS WKWebView
+  ///- Linux WPE WebKit
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [message]: all platforms
@@ -88,6 +93,7 @@ extension _PlatformWebMessageListenerCreationParamsPropertySupported
               TargetPlatform.android,
               TargetPlatform.iOS,
               TargetPlatform.macOS,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebMessageListenerCreationParamsProperty.jsObjectName:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -95,6 +101,7 @@ extension _PlatformWebMessageListenerCreationParamsPropertySupported
               TargetPlatform.android,
               TargetPlatform.iOS,
               TargetPlatform.macOS,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebMessageListenerCreationParamsProperty.onPostMessage:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -102,6 +109,7 @@ extension _PlatformWebMessageListenerCreationParamsPropertySupported
               TargetPlatform.android,
               TargetPlatform.iOS,
               TargetPlatform.macOS,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
     }
   }
@@ -115,6 +123,7 @@ extension _PlatformWebMessageListenerClassSupported
   ///- Android WebView
   ///- iOS WKWebView
   ///- macOS WKWebView
+  ///- Linux WPE WebKit
   ///
   ///Use the [PlatformWebMessageListener.isClassSupported] method to check if this class is supported at runtime.
   ///{@endtemplate}
@@ -124,6 +133,7 @@ extension _PlatformWebMessageListenerClassSupported
           TargetPlatform.android,
           TargetPlatform.iOS,
           TargetPlatform.macOS,
+          TargetPlatform.linux,
         ].contains(platform ?? defaultTargetPlatform);
   }
 }
@@ -138,6 +148,7 @@ enum PlatformWebMessageListenerMethod {
   ///- Android WebView
   ///- iOS WKWebView
   ///- macOS WKWebView
+  ///- Linux WPE WebKit
   ///
   ///Use the [PlatformWebMessageListener.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
@@ -157,6 +168,7 @@ extension _PlatformWebMessageListenerMethodSupported
               TargetPlatform.android,
               TargetPlatform.iOS,
               TargetPlatform.macOS,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
     }
   }

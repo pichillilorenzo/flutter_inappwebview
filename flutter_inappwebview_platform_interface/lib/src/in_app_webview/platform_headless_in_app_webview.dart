@@ -26,6 +26,7 @@ part 'platform_headless_in_app_webview.g.dart';
     MacOSPlatform(),
     WebPlatform(requiresSameOrigin: false),
     WindowsPlatform(),
+    LinuxPlatform(),
   ],
 )
 class PlatformHeadlessInAppWebViewCreationParams
@@ -170,6 +171,7 @@ class PlatformHeadlessInAppWebViewCreationParams
       MacOSPlatform(),
       WebPlatform(requiresSameOrigin: false),
       WindowsPlatform(),
+      LinuxPlatform(),
     ],
   )
   final Size initialSize;
@@ -229,6 +231,7 @@ class PlatformHeadlessInAppWebViewCreationParams
     MacOSPlatform(),
     WebPlatform(requiresSameOrigin: false),
     WindowsPlatform(),
+    LinuxPlatform(),
   ],
 )
 abstract class PlatformHeadlessInAppWebView extends PlatformInterface
@@ -310,6 +313,7 @@ abstract class PlatformHeadlessInAppWebView extends PlatformInterface
         note: 'It will append a new `iframe` to the body.',
       ),
       WindowsPlatform(),
+      LinuxPlatform(),
     ],
   )
   Future<void> run() {
@@ -328,6 +332,7 @@ abstract class PlatformHeadlessInAppWebView extends PlatformInterface
       MacOSPlatform(),
       WebPlatform(requiresSameOrigin: false),
       WindowsPlatform(),
+      LinuxPlatform(),
     ],
   )
   bool isRunning() {
@@ -355,6 +360,7 @@ abstract class PlatformHeadlessInAppWebView extends PlatformInterface
       IOSPlatform(),
       MacOSPlatform(),
       WebPlatform(requiresSameOrigin: false),
+      LinuxPlatform(),
     ],
   )
   Future<void> setSize(Size size) {
@@ -376,6 +382,7 @@ abstract class PlatformHeadlessInAppWebView extends PlatformInterface
       IOSPlatform(),
       MacOSPlatform(),
       WebPlatform(requiresSameOrigin: false),
+      LinuxPlatform(),
     ],
   )
   Future<Size?> getSize() {
@@ -396,6 +403,7 @@ abstract class PlatformHeadlessInAppWebView extends PlatformInterface
       MacOSPlatform(),
       WebPlatform(requiresSameOrigin: false),
       WindowsPlatform(),
+      LinuxPlatform(),
     ],
   )
   Future<void> dispose() {

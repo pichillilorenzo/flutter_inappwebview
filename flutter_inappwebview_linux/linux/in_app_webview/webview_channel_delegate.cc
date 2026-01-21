@@ -2014,18 +2014,21 @@ void WebViewChannelDelegate::onNavigationResponse(
     return;
   }
 
-  // Build the response map (matching platform interface NavigationResponse structure)
+  // Build the response map (matching platform interface URLResponse structure)
   g_autoptr(FlValue) responseMap = to_fl_map({
       {"url", make_fl_value(url)},
+      {"mimeType", mimeType ? make_fl_value(*mimeType) : make_fl_value()},
+      {"expectedContentLength", make_fl_value(contentLength)},
       {"statusCode", make_fl_value(static_cast<int64_t>(statusCode))},
       {"headers", make_fl_value()}  // Headers not easily available from WebKit response
   });
 
   // Build the main arguments map (matching platform interface format)
+  // Note: Use "canShowMIMEType" to match Dart's NavigationResponse.fromMap expectations
   g_autoptr(FlValue) args = to_fl_map({
       {"response", responseMap},
       {"isForMainFrame", make_fl_value(isForMainFrame)},
-      {"canShowMimeType", make_fl_value(canShowMimeType)}
+      {"canShowMIMEType", make_fl_value(canShowMimeType)}
   });
 
   // Don't unref responseMap - it's now owned by args

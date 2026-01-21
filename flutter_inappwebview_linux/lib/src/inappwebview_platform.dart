@@ -11,6 +11,7 @@ import 'proxy_controller/proxy_controller.dart';
 import 'web_message/web_message_channel.dart';
 import 'web_message/web_message_listener.dart';
 import 'web_message/web_message_port.dart';
+import 'web_storage/web_storage.dart';
 import 'web_storage/web_storage_manager.dart';
 import 'webview_environment/webview_environment.dart';
 
@@ -247,6 +248,71 @@ class LinuxInAppWebViewPlatform extends InAppWebViewPlatform {
     PlatformWebMessageListenerCreationParams params,
   ) {
     return LinuxWebMessageListener(params);
+  }
+
+  /// Creates a new [LinuxWebStorage].
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [WebStorage] in `flutter_inappwebview` instead.
+  @override
+  LinuxWebStorage createPlatformWebStorage(
+    PlatformWebStorageCreationParams params,
+  ) {
+    return LinuxWebStorage(params);
+  }
+
+  /// Creates a new empty [LinuxWebStorage] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [WebStorage] in `flutter_inappwebview` instead.
+  @override
+  LinuxWebStorage createPlatformWebStorageStatic() {
+    return LinuxWebStorage(
+      LinuxWebStorageCreationParams(
+        localStorage: createPlatformLocalStorageStatic(),
+        sessionStorage: createPlatformSessionStorageStatic(),
+      ),
+    );
+  }
+
+  /// Creates a new [LinuxLocalStorage].
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [LocalStorage] in `flutter_inappwebview` instead.
+  @override
+  LinuxLocalStorage createPlatformLocalStorage(
+    PlatformLocalStorageCreationParams params,
+  ) {
+    return LinuxLocalStorage(params);
+  }
+
+  /// Creates a new empty [LinuxLocalStorage] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [LocalStorage] in `flutter_inappwebview` instead.
+  @override
+  LinuxLocalStorage createPlatformLocalStorageStatic() {
+    return LinuxLocalStorage.defaultStorage(controller: null);
+  }
+
+  /// Creates a new [LinuxSessionStorage].
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [SessionStorage] in `flutter_inappwebview` instead.
+  @override
+  LinuxSessionStorage createPlatformSessionStorage(
+    PlatformSessionStorageCreationParams params,
+  ) {
+    return LinuxSessionStorage(params);
+  }
+
+  /// Creates a new empty [LinuxSessionStorage] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [SessionStorage] in `flutter_inappwebview` instead.
+  @override
+  LinuxSessionStorage createPlatformSessionStorageStatic() {
+    return LinuxSessionStorage.defaultStorage(controller: null);
   }
 
   /// Creates a new empty [PlatformWebStorageManager] to access static methods.

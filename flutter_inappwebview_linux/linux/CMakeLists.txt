@@ -182,6 +182,7 @@ list(APPEND PLUGIN_SOURCES
   "find_interaction/find_interaction_channel_delegate.cc"
   "headless_in_app_webview/headless_in_app_webview.cc"
   "headless_in_app_webview/headless_in_app_webview_manager.cc"
+  "headless_in_app_webview/headless_webview_channel_delegate.cc"
   "in_app_browser/in_app_browser.cc"
   "in_app_browser/in_app_browser_channel_delegate.cc"
   "in_app_browser/in_app_browser_manager.cc"

@@ -7,6 +7,7 @@
 #include <string>
 
 #include "../in_app_webview/in_app_webview.h"
+#include "headless_webview_channel_delegate.h"
 
 namespace flutter_inappwebview_plugin {
 
@@ -25,8 +26,6 @@ struct HeadlessInAppWebViewCreationParams {
 /// this is essentially InAppWebView without texture registration.
 class HeadlessInAppWebView {
  public:
-  static constexpr const char* METHOD_CHANNEL_NAME_PREFIX =
-      "com.pichillilorenzo/flutter_headless_inappwebview_";
 
   HeadlessInAppWebView(HeadlessInAppWebViewManager* manager,
                        const HeadlessInAppWebViewCreationParams& params,
@@ -41,8 +40,11 @@ class HeadlessInAppWebView {
   void setSize(double width, double height);
   void getSize(double* width, double* height) const;
 
-  // Notify Dart that the webview is created
-  void onWebViewCreated();
+  // Get the channel delegate
+  HeadlessWebViewChannelDelegate* channelDelegate() const { return channelDelegate_.get(); }
+
+  // Dispose this headless webview (called by channel delegate)
+  void dispose();
 
  private:
   HeadlessInAppWebViewManager* manager_ = nullptr;
@@ -53,13 +55,8 @@ class HeadlessInAppWebView {
   // The underlying InAppWebView
   std::shared_ptr<InAppWebView> webview_;
 
-  // Method channel for this headless webview
-  FlMethodChannel* channel_ = nullptr;
-
-  // Handle method calls from Flutter for this specific headless webview
-  static void HandleMethodCall(FlMethodChannel* channel, FlMethodCall* method_call,
-                               gpointer user_data);
-  void HandleMethodCallImpl(FlMethodCall* method_call);
+  // Channel delegate for this headless webview
+  std::unique_ptr<HeadlessWebViewChannelDelegate> channelDelegate_;
 };
 
 }  // namespace flutter_inappwebview_plugin

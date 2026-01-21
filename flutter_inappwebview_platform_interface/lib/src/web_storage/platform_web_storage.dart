@@ -29,6 +29,7 @@ part 'platform_web_storage.g.dart';
     MacOSPlatform(),
     WebPlatform(),
     WindowsPlatform(),
+    LinuxPlatform()
   ],
 )
 @immutable
@@ -49,6 +50,7 @@ class PlatformWebStorageCreationParams {
       MacOSPlatform(),
       WebPlatform(),
       WindowsPlatform(),
+      LinuxPlatform(),
     ],
   )
   final PlatformLocalStorage localStorage;
@@ -63,6 +65,7 @@ class PlatformWebStorageCreationParams {
       MacOSPlatform(),
       WebPlatform(),
       WindowsPlatform(),
+      LinuxPlatform(),
     ],
   )
   final PlatformSessionStorage sessionStorage;
@@ -99,6 +102,7 @@ class PlatformWebStorageCreationParams {
     MacOSPlatform(),
     WebPlatform(),
     WindowsPlatform(),
+    LinuxPlatform()
   ],
 )
 abstract class PlatformWebStorage extends PlatformInterface
@@ -157,6 +161,7 @@ abstract class PlatformWebStorage extends PlatformInterface
       MacOSPlatform(),
       WebPlatform(),
       WindowsPlatform(),
+      LinuxPlatform(),
     ],
   )
   PlatformLocalStorage get localStorage => params.localStorage;
@@ -173,6 +178,7 @@ abstract class PlatformWebStorage extends PlatformInterface
       MacOSPlatform(),
       WebPlatform(),
       WindowsPlatform(),
+      LinuxPlatform(),
     ],
   )
   PlatformSessionStorage get sessionStorage => params.sessionStorage;
@@ -189,6 +195,7 @@ abstract class PlatformWebStorage extends PlatformInterface
       MacOSPlatform(),
       WebPlatform(),
       WindowsPlatform(),
+      LinuxPlatform(),
     ],
   )
   void dispose() {
@@ -243,6 +250,7 @@ abstract class PlatformWebStorage extends PlatformInterface
     MacOSPlatform(),
     WebPlatform(),
     WindowsPlatform(),
+    LinuxPlatform()
   ],
 )
 @immutable
@@ -263,6 +271,7 @@ class PlatformStorageCreationParams {
       MacOSPlatform(),
       WebPlatform(),
       WindowsPlatform(),
+      LinuxPlatform(),
     ],
   )
   final PlatformInAppWebViewController? controller;
@@ -277,6 +286,7 @@ class PlatformStorageCreationParams {
       MacOSPlatform(),
       WebPlatform(),
       WindowsPlatform(),
+      LinuxPlatform(),
     ],
   )
   final WebStorageType webStorageType;
@@ -313,6 +323,7 @@ class PlatformStorageCreationParams {
     MacOSPlatform(),
     WebPlatform(),
     WindowsPlatform(),
+    LinuxPlatform()
   ],
 )
 abstract mixin class PlatformStorage implements Disposable {
@@ -326,6 +337,7 @@ abstract mixin class PlatformStorage implements Disposable {
       MacOSPlatform(),
       WebPlatform(),
       WindowsPlatform(),
+      LinuxPlatform()
     ],
   )
   PlatformInAppWebViewController? get controller;
@@ -340,6 +352,7 @@ abstract mixin class PlatformStorage implements Disposable {
       MacOSPlatform(),
       WebPlatform(),
       WindowsPlatform(),
+      LinuxPlatform()
     ],
   )
   WebStorageType get webStorageType {
@@ -361,6 +374,7 @@ abstract mixin class PlatformStorage implements Disposable {
             'This method has an effect only if the iframe has the same origin.',
       ),
       WindowsPlatform(),
+      LinuxPlatform(),
     ],
   )
   Future<int?> length() {
@@ -382,6 +396,7 @@ abstract mixin class PlatformStorage implements Disposable {
             'This method has an effect only if the iframe has the same origin.',
       ),
       WindowsPlatform(),
+      LinuxPlatform(),
     ],
   )
   Future<void> setItem({required String key, required dynamic value}) {
@@ -403,6 +418,7 @@ abstract mixin class PlatformStorage implements Disposable {
             'This method has an effect only if the iframe has the same origin.',
       ),
       WindowsPlatform(),
+      LinuxPlatform(),
     ],
   )
   Future<dynamic> getItem({required String key}) {
@@ -424,6 +440,7 @@ abstract mixin class PlatformStorage implements Disposable {
             'This method has an effect only if the iframe has the same origin.',
       ),
       WindowsPlatform(),
+      LinuxPlatform(),
     ],
   )
   Future<void> removeItem({required String key}) {
@@ -445,6 +462,7 @@ abstract mixin class PlatformStorage implements Disposable {
             'This method has an effect only if the iframe has the same origin.',
       ),
       WindowsPlatform(),
+      LinuxPlatform(),
     ],
   )
   Future<List<WebStorageItem>> getItems() {
@@ -466,6 +484,7 @@ abstract mixin class PlatformStorage implements Disposable {
             'This method has an effect only if the iframe has the same origin.',
       ),
       WindowsPlatform(),
+      LinuxPlatform(),
     ],
   )
   Future<void> clear() {
@@ -488,6 +507,7 @@ abstract mixin class PlatformStorage implements Disposable {
             'This method has an effect only if the iframe has the same origin.',
       ),
       WindowsPlatform(),
+      LinuxPlatform(),
     ],
   )
   Future<String> key({required int index}) {
@@ -502,6 +522,7 @@ abstract mixin class PlatformStorage implements Disposable {
       MacOSPlatform(),
       WebPlatform(),
       WindowsPlatform(),
+      LinuxPlatform(),
     ],
   )
   void dispose() {
@@ -523,6 +544,7 @@ abstract mixin class PlatformStorage implements Disposable {
     MacOSPlatform(),
     WebPlatform(),
     WindowsPlatform(),
+    LinuxPlatform()
   ],
 )
 class PlatformLocalStorageCreationParams extends PlatformStorageCreationParams {
@@ -564,6 +586,7 @@ class PlatformLocalStorageCreationParams extends PlatformStorageCreationParams {
     MacOSPlatform(),
     WebPlatform(),
     WindowsPlatform(),
+    LinuxPlatform()
   ],
 )
 abstract class PlatformLocalStorage extends PlatformInterface
@@ -645,6 +668,7 @@ abstract class PlatformLocalStorage extends PlatformInterface
       MacOSPlatform(),
       WebPlatform(),
       WindowsPlatform(),
+      LinuxPlatform(),
     ],
   )
   Future<int?> length() => super.length();
@@ -657,6 +681,7 @@ abstract class PlatformLocalStorage extends PlatformInterface
       MacOSPlatform(),
       WebPlatform(),
       WindowsPlatform(),
+      LinuxPlatform(),
     ],
   )
   Future<void> setItem({required String key, required dynamic value}) =>
@@ -670,6 +695,7 @@ abstract class PlatformLocalStorage extends PlatformInterface
       MacOSPlatform(),
       WebPlatform(),
       WindowsPlatform(),
+      LinuxPlatform(),
     ],
   )
   Future<dynamic> getItem({required String key}) => super.getItem(key: key);
@@ -682,6 +708,7 @@ abstract class PlatformLocalStorage extends PlatformInterface
       MacOSPlatform(),
       WebPlatform(),
       WindowsPlatform(),
+      LinuxPlatform(),
     ],
   )
   Future<void> removeItem({required String key}) => super.removeItem(key: key);
@@ -694,6 +721,7 @@ abstract class PlatformLocalStorage extends PlatformInterface
       MacOSPlatform(),
       WebPlatform(),
       WindowsPlatform(),
+      LinuxPlatform(),
     ],
   )
   Future<List<WebStorageItem>> getItems() => super.getItems();
@@ -706,6 +734,7 @@ abstract class PlatformLocalStorage extends PlatformInterface
       MacOSPlatform(),
       WebPlatform(),
       WindowsPlatform(),
+      LinuxPlatform(),
     ],
   )
   Future<void> clear() => super.clear();
@@ -718,6 +747,7 @@ abstract class PlatformLocalStorage extends PlatformInterface
       MacOSPlatform(),
       WebPlatform(),
       WindowsPlatform(),
+      LinuxPlatform(),
     ],
   )
   Future<String> key({required int index}) => super.key(index: index);
@@ -730,6 +760,7 @@ abstract class PlatformLocalStorage extends PlatformInterface
       MacOSPlatform(),
       WebPlatform(),
       WindowsPlatform(),
+      LinuxPlatform(),
     ],
   )
   void dispose() => super.dispose();
@@ -747,6 +778,7 @@ abstract class PlatformLocalStorage extends PlatformInterface
     MacOSPlatform(),
     WebPlatform(),
     WindowsPlatform(),
+    LinuxPlatform()
   ],
 )
 class PlatformSessionStorageCreationParams
@@ -789,6 +821,7 @@ class PlatformSessionStorageCreationParams
     MacOSPlatform(),
     WebPlatform(),
     WindowsPlatform(),
+    LinuxPlatform()
   ],
 )
 abstract class PlatformSessionStorage extends PlatformInterface
@@ -872,6 +905,7 @@ abstract class PlatformSessionStorage extends PlatformInterface
       MacOSPlatform(),
       WebPlatform(),
       WindowsPlatform(),
+      LinuxPlatform(),
     ],
   )
   Future<int?> length() => super.length();
@@ -884,6 +918,7 @@ abstract class PlatformSessionStorage extends PlatformInterface
       MacOSPlatform(),
       WebPlatform(),
       WindowsPlatform(),
+      LinuxPlatform(),
     ],
   )
   Future<void> setItem({required String key, required dynamic value}) =>
@@ -897,6 +932,7 @@ abstract class PlatformSessionStorage extends PlatformInterface
       MacOSPlatform(),
       WebPlatform(),
       WindowsPlatform(),
+      LinuxPlatform(),
     ],
   )
   Future<dynamic> getItem({required String key}) => super.getItem(key: key);
@@ -909,6 +945,7 @@ abstract class PlatformSessionStorage extends PlatformInterface
       MacOSPlatform(),
       WebPlatform(),
       WindowsPlatform(),
+      LinuxPlatform(),
     ],
   )
   Future<void> removeItem({required String key}) => super.removeItem(key: key);
@@ -921,6 +958,7 @@ abstract class PlatformSessionStorage extends PlatformInterface
       MacOSPlatform(),
       WebPlatform(),
       WindowsPlatform(),
+      LinuxPlatform(),
     ],
   )
   Future<List<WebStorageItem>> getItems() => super.getItems();
@@ -933,6 +971,7 @@ abstract class PlatformSessionStorage extends PlatformInterface
       MacOSPlatform(),
       WebPlatform(),
       WindowsPlatform(),
+      LinuxPlatform(),
     ],
   )
   Future<void> clear() => super.clear();
@@ -945,6 +984,7 @@ abstract class PlatformSessionStorage extends PlatformInterface
       MacOSPlatform(),
       WebPlatform(),
       WindowsPlatform(),
+      LinuxPlatform(),
     ],
   )
   Future<String> key({required int index}) => super.key(index: index);
@@ -957,6 +997,7 @@ abstract class PlatformSessionStorage extends PlatformInterface
       MacOSPlatform(),
       WebPlatform(),
       WindowsPlatform(),
+      LinuxPlatform(),
     ],
   )
   void dispose() => super.dispose();

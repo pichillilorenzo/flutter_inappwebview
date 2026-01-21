@@ -4,10 +4,10 @@
 # customers of the plugin.
 cmake_minimum_required(VERSION 3.14)
 
-set(WIL_VERSION "1.0.231216.1")
-set(WEBVIEW_VERSION "1.0.2849.39")
-set(NLOHMANN_JSON_VERSION "3.11.2")
-set(CPP_WINRT_VERSION "2.0.240405.15")
+set(WIL_VERSION "1.0.250325.1")
+set(WEBVIEW_VERSION "1.0.3650.58")
+set(NLOHMANN_JSON_VERSION "3.12.0")
+set(CPP_WINRT_VERSION "2.0.250303.1")
 
 message(VERBOSE "CMake system version is ${CMAKE_SYSTEM_VERSION} (using SDK ${CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION})")
 
@@ -299,9 +299,15 @@ add_executable(${TEST_RUNNER}
   ${PLUGIN_SOURCES}
 )
 apply_standard_settings(${TEST_RUNNER})
+target_compile_options(${TEST_RUNNER} PRIVATE /bigobj)
+target_compile_options(${TEST_RUNNER} PRIVATE /WX-)
 target_include_directories(${TEST_RUNNER} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 target_link_libraries(${TEST_RUNNER} PRIVATE flutter_wrapper_plugin)
 target_link_libraries(${TEST_RUNNER} PRIVATE gtest_main gmock)
+add_dependencies(${TEST_RUNNER} ${PROJECT_NAME}_DEPS)
+target_link_libraries(${TEST_RUNNER} PRIVATE ${CMAKE_BINARY_DIR}/packages/Microsoft.Web.WebView2/build/native/Microsoft.Web.WebView2.targets)
+target_link_libraries(${TEST_RUNNER} PRIVATE ${CMAKE_BINARY_DIR}/packages/Microsoft.Windows.ImplementationLibrary/build/native/Microsoft.Windows.ImplementationLibrary.targets)
+target_link_libraries(${TEST_RUNNER} PRIVATE ${CMAKE_BINARY_DIR}/packages/nlohmann.json/build/native/nlohmann.json.targets)
 # flutter_wrapper_plugin has link dependencies on the Flutter DLL.
 add_custom_command(TARGET ${TEST_RUNNER} POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E copy_if_different

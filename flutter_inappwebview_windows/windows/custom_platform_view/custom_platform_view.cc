@@ -134,7 +134,7 @@ namespace flutter_inappwebview_plugin
         }));
 #else
     texture_bridge_ = std::make_unique<TextureBridgeFallback>(
-      graphics_context, webview_->surface());
+      graphics_context, view->surface());
 
     flutter_texture_ =
       std::make_unique<flutter::TextureVariant>(flutter::PixelBufferTexture(

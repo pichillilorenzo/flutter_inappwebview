@@ -2,12 +2,15 @@
 #include <filesystem>
 #include <nlohmann/json.hpp>
 #include <regex>
+#include <set>
 #include <Shlwapi.h>
 #include <wil/wrl.h>
 #include <winrt/Windows.Foundation.h>
 
 #include "../custom_platform_view/util/composition.desktop.interop.h"
 #include "../plugin_scripts_js/javascript_bridge_js.h"
+#include "../plugin_scripts_js/web_message_channel_js.h"
+#include "../plugin_scripts_js/web_message_listener_js.h"
 #include "../types/client_cert_response.h"
 #include "../types/create_window_action.h"
 #include "../types/http_auth_response.h"
@@ -1845,6 +1848,203 @@ namespace flutter_inappwebview_plugin
     userContentController->removeAllUserOnlyScripts();
   }
 
+  void InAppWebView::addWebMessageListener(const std::string& jsObjectName,
+    const std::vector<std::string>& allowedOriginRules,
+    const std::string& listenerId)
+  {
+    if (!webView || jsObjectName.empty() || !plugin || !plugin->registrar) {
+      return;
+    }
+
+    std::set<std::string> originRulesSet(allowedOriginRules.begin(), allowedOriginRules.end());
+    auto listener = std::make_unique<WebMessageListener>(
+      plugin->registrar->messenger(), listenerId, jsObjectName, originRulesSet, this);
+    webMessageListeners_[jsObjectName] = std::move(listener);
+
+    std::string allowedOriginRulesJs = "[";
+    for (size_t i = 0; i < allowedOriginRules.size(); ++i) {
+      const std::string& rule = allowedOriginRules[i];
+      if (rule == "*") {
+        allowedOriginRulesJs += "'*'";
+      }
+      else {
+        std::string scheme, host;
+        int port = 0;
+
+        size_t schemeEnd = rule.find("://");
+        if (schemeEnd != std::string::npos) {
+          scheme = rule.substr(0, schemeEnd);
+          std::string rest = rule.substr(schemeEnd + 3);
+
+          size_t portStart = rest.find(':');
+          if (portStart != std::string::npos) {
+            host = rest.substr(0, portStart);
+            try {
+              port = std::stoi(rest.substr(portStart + 1));
+            }
+            catch (...) {
+              port = 0;
+            }
+          }
+          else {
+            host = rest;
+          }
+        }
+
+        std::string hostEscaped = host;
+        size_t pos = 0;
+        while ((pos = hostEscaped.find("'", pos)) != std::string::npos) {
+          hostEscaped.replace(pos, 1, "\\'");
+          pos += 2;
+        }
+
+        allowedOriginRulesJs += "{scheme: '" + scheme + "', host: ";
+        if (host.empty()) {
+          allowedOriginRulesJs += "null";
+        }
+        else {
+          allowedOriginRulesJs += "'" + hostEscaped + "'";
+        }
+        allowedOriginRulesJs += ", port: ";
+        if (port == 0) {
+          allowedOriginRulesJs += "null";
+        }
+        else {
+          allowedOriginRulesJs += std::to_string(port);
+        }
+        allowedOriginRulesJs += "}";
+      }
+      if (i < allowedOriginRules.size() - 1) {
+        allowedOriginRulesJs += ", ";
+      }
+    }
+    allowedOriginRulesJs += "]";
+
+    std::string jsSource = WebMessageListenerJS::createWebMessageListenerInjectionJs(
+      jsObjectName, allowedOriginRulesJs);
+
+    std::string groupName = "WebMessageListener-" + jsObjectName;
+
+    auto userScript = std::make_shared<UserScript>(
+      groupName,
+      jsSource,
+      UserScriptInjectionTime::atDocumentStart,
+      true,
+      std::nullopt,
+      ContentWorld::page()
+    );
+
+    if (userContentController) {
+      userContentController->addUserOnlyScript(userScript);
+    }
+  }
+
+  void InAppWebView::createWebMessageChannel(
+    const std::function<void(const std::optional<std::string>&)> callback)
+  {
+    if (!webView || !plugin || !plugin->registrar) {
+      if (callback) callback(std::nullopt);
+      return;
+    }
+
+    std::string channelId = get_uuid();
+    std::string js = WebMessageChannelJS::createWebMessageChannelJs(channelId);
+
+    evaluateJavascript(js, ContentWorld::page(), [this, callback, channelId](const std::string& result)
+      {
+        if (!result.empty() && result != "null") {
+          auto channel = std::make_unique<WebMessageChannel>(
+            plugin->registrar->messenger(), channelId, this);
+          webMessageChannels_[channelId] = std::move(channel);
+          if (callback) callback(channelId);
+        }
+        else {
+          if (callback) callback(std::nullopt);
+        }
+      });
+  }
+
+  WebMessageChannel* InAppWebView::getWebMessageChannel(const std::string& channelId) const
+  {
+    auto it = webMessageChannels_.find(channelId);
+    if (it != webMessageChannels_.end()) {
+      return it->second.get();
+    }
+    return nullptr;
+  }
+
+  void InAppWebView::postWebMessage(const std::string& messageData,
+    const std::string& targetOrigin,
+    int64_t messageType)
+  {
+    if (!webView) return;
+
+    if (messageType == 1) {
+      std::string jsonArray = "[" + messageData + "]";
+      failedLog(webView->PostWebMessageAsJson(utf8_to_wide(jsonArray).c_str()));
+      return;
+    }
+
+    failedLog(webView->PostWebMessageAsString(utf8_to_wide(messageData).c_str()));
+  }
+
+  void InAppWebView::setWebMessageCallback(const std::string& channelId, int portIndex)
+  {
+    if (!webView || channelId.empty()) return;
+
+    std::string js = WebMessageChannelJS::setWebMessageCallbackJs(channelId, portIndex);
+    evaluateJavascript(js, ContentWorld::page(), nullptr);
+  }
+
+  void InAppWebView::postWebMessageOnPort(const std::string& channelId, int portIndex,
+    const std::string& messageData, int64_t messageType)
+  {
+    if (!webView || channelId.empty()) return;
+
+    std::string messageDataJs;
+    if (messageType == 1) {
+      messageDataJs = "new Uint8Array([" + messageData + "]).buffer";
+    }
+    else {
+      std::string escaped;
+      escaped.reserve(messageData.size() * 2);
+      for (char c : messageData) {
+        switch (c) {
+        case '\\': escaped += "\\\\"; break;
+        case '"': escaped += "\\\""; break;
+        case '\n': escaped += "\\n"; break;
+        case '\r': escaped += "\\r"; break;
+        case '\t': escaped += "\\t"; break;
+        default: escaped += c; break;
+        }
+      }
+      messageDataJs = "\"" + escaped + "\"";
+    }
+
+    std::string js = WebMessageChannelJS::postMessageJs(channelId, portIndex, messageDataJs);
+    evaluateJavascript(js, ContentWorld::page(), nullptr);
+  }
+
+  void InAppWebView::closeWebMessagePort(const std::string& channelId, int portIndex)
+  {
+    if (!webView || channelId.empty()) return;
+
+    std::string js = WebMessageChannelJS::closePortJs(channelId, portIndex);
+    evaluateJavascript(js, ContentWorld::page(), nullptr);
+  }
+
+  void InAppWebView::disposeWebMessageChannel(const std::string& channelId)
+  {
+    if (channelId.empty()) return;
+
+    if (webView) {
+      std::string js = WebMessageChannelJS::disposeChannelJs(channelId);
+      evaluateJavascript(js, ContentWorld::page(), nullptr);
+    }
+
+    webMessageChannels_.erase(channelId);
+  }
+
   void InAppWebView::takeScreenshot(const std::optional<std::shared_ptr<ScreenshotConfiguration>> screenshotConfiguration, const std::function<void(const std::optional<std::string>)> completionHandler) const
   {
     if (!webView) {
@@ -2838,6 +3038,130 @@ namespace flutter_inappwebview_plugin
             return S_OK;
           }
 
+          auto resolveInternalHandler = [this, callHandlerID]()
+            {
+              evaluateJavascript("if (window." + JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + "[" + std::to_string(callHandlerID) + "] != null) { \
+                      window." + JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + "[" + std::to_string(callHandlerID) + "].resolve(null); \
+                      delete window." + JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + "[" + std::to_string(callHandlerID) + "]; \
+                    }", ContentWorld::page(), nullptr);
+            };
+
+          if (handlerName == "onWebMessagePortMessageReceived") {
+            std::string webMessageChannelId = "";
+            int portIndex = 0;
+            std::string messageData = "";
+            int64_t messageType = 0;
+
+            if (!handlerArgs.empty()) {
+              try {
+                auto argsJson = nlohmann::json::parse(handlerArgs);
+                if (argsJson.is_array() && !argsJson.empty()) {
+                  auto firstArg = argsJson[0];
+                  if (firstArg.contains("webMessageChannelId") && firstArg["webMessageChannelId"].is_string()) {
+                    webMessageChannelId = firstArg["webMessageChannelId"].get<std::string>();
+                  }
+                  if (firstArg.contains("index") && firstArg["index"].is_number()) {
+                    portIndex = firstArg["index"].get<int>();
+                  }
+                  if (firstArg.contains("message") && firstArg["message"].is_object()) {
+                    auto messageObj = firstArg["message"];
+                    if (messageObj.contains("type") && messageObj["type"].is_number()) {
+                      messageType = messageObj["type"].get<int64_t>();
+                    }
+                    if (messageObj.contains("data")) {
+                      if (messageType == 1 && messageObj["data"].is_array()) {
+                        std::string bytes;
+                        for (auto& byte : messageObj["data"]) {
+                          if (!bytes.empty()) bytes += ",";
+                          bytes += std::to_string(byte.get<int>());
+                        }
+                        messageData = bytes;
+                      }
+                      else if (messageObj["data"].is_string()) {
+                        messageData = messageObj["data"].get<std::string>();
+                      }
+                      else if (!messageObj["data"].is_null()) {
+                        messageData = messageObj["data"].dump();
+                      }
+                    }
+                  }
+                }
+              }
+              catch (nlohmann::json::parse_error&) {}
+            }
+
+            if (!webMessageChannelId.empty()) {
+              auto channel = getWebMessageChannel(webMessageChannelId);
+              if (channel != nullptr) {
+                channel->onMessage(portIndex, messageData.empty() ? nullptr : &messageData, messageType);
+              }
+            }
+            resolveInternalHandler();
+            return S_OK;
+          }
+
+          if (handlerName == "onWebMessageListenerPostMessageReceived") {
+            std::string jsObjectName = "";
+            std::string messageData = "";
+            int64_t messageType = 0;
+            std::string sourceOriginStr = "";
+            bool isMainFrameMsg = true;
+
+            if (!handlerArgs.empty()) {
+              try {
+                auto argsJson = nlohmann::json::parse(handlerArgs);
+                if (argsJson.is_array() && !argsJson.empty()) {
+                  auto firstArg = argsJson[0];
+                  if (firstArg.contains("jsObjectName") && firstArg["jsObjectName"].is_string()) {
+                    jsObjectName = firstArg["jsObjectName"].get<std::string>();
+                  }
+                  if (firstArg.contains("sourceOrigin") && firstArg["sourceOrigin"].is_string()) {
+                    sourceOriginStr = firstArg["sourceOrigin"].get<std::string>();
+                  }
+                  if (firstArg.contains("isMainFrame") && firstArg["isMainFrame"].is_boolean()) {
+                    isMainFrameMsg = firstArg["isMainFrame"].get<bool>();
+                  }
+                  if (firstArg.contains("message") && firstArg["message"].is_object()) {
+                    auto messageObj = firstArg["message"];
+                    if (messageObj.contains("type") && messageObj["type"].is_number()) {
+                      messageType = messageObj["type"].get<int64_t>();
+                    }
+                    if (messageObj.contains("data")) {
+                      if (messageType == 1 && messageObj["data"].is_array()) {
+                        std::string bytes;
+                        for (auto& byte : messageObj["data"]) {
+                          if (!bytes.empty()) bytes += ",";
+                          bytes += std::to_string(byte.get<int>());
+                        }
+                        messageData = bytes;
+                      }
+                      else if (messageObj["data"].is_string()) {
+                        messageData = messageObj["data"].get<std::string>();
+                      }
+                      else if (!messageObj["data"].is_null()) {
+                        messageData = messageObj["data"].dump();
+                      }
+                    }
+                  }
+                }
+              }
+              catch (nlohmann::json::parse_error&) {}
+            }
+
+            if (!jsObjectName.empty()) {
+              auto it = webMessageListeners_.find(jsObjectName);
+              if (it != webMessageListeners_.end() && it->second) {
+                it->second->onPostMessage(
+                  messageData.empty() ? nullptr : &messageData,
+                  messageType,
+                  sourceOriginStr,
+                  isMainFrameMsg);
+              }
+            }
+            resolveInternalHandler();
+            return S_OK;
+          }
+
           bool isOriginAllowed = false;
           if (settings->javaScriptHandlersOriginAllowList.has_value()) {
             for (auto& allowedOrigin : settings->javaScriptHandlersOriginAllowList.value()) {
@@ -2930,6 +3254,18 @@ namespace flutter_inappwebview_plugin
     if (webViewController) {
       failedLog(webViewController->Close());
     }
+    for (auto& [id, channel] : webMessageChannels_) {
+      if (channel) {
+        channel->dispose();
+      }
+    }
+    webMessageChannels_.clear();
+    for (auto& [name, listener] : webMessageListeners_) {
+      if (listener) {
+        listener->dispose();
+      }
+    }
+    webMessageListeners_.clear();
     navigationActions_.clear();
     inAppBrowser = nullptr;
     plugin = nullptr;

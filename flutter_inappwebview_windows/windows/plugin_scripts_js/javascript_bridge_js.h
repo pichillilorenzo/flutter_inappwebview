@@ -31,6 +31,7 @@ namespace flutter_inappwebview_plugin
     static std::string JAVASCRIPT_BRIDGE_JS_SOURCE()
     {
       return "window." + get_JAVASCRIPT_BRIDGE_NAME() + " = {}; \
+        window." + get_JAVASCRIPT_BRIDGE_NAME() + "._webMessageChannels = {}; \
         (function(window) {\
           var bridgeSecret = '" + VAR_JAVASCRIPT_BRIDGE_BRIDGE_SECRET + "';\
           var origin = '';\

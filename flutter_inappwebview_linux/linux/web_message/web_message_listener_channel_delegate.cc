@@ -22,11 +22,10 @@ WebMessageListenerChannelDelegate::WebMessageListenerChannelDelegate(
     const std::string& channelName)
     : ChannelDelegate(messenger, channelName),
       webMessageListener_(webMessageListener) {
-  debugLog("WebMessageListenerChannelDelegate created: " + channelName);
 }
 
 WebMessageListenerChannelDelegate::~WebMessageListenerChannelDelegate() {
-  debugLog("WebMessageListenerChannelDelegate destroyed");
+  debugLog("dealloc WebMessageListenerChannelDelegate");
   webMessageListener_ = nullptr;
 }
 

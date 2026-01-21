@@ -227,6 +227,58 @@ namespace flutter_inappwebview_plugin
       webView->removeAllUserScripts();
       result->Success(true);
     }
+    else if (string_equals(methodName, "addWebMessageListener")) {
+      auto listenerValue = get_fl_map_value<flutter::EncodableMap>(arguments, "webMessageListener");
+      auto listenerId = get_fl_map_value<std::string>(listenerValue, "id");
+      auto jsObjectName = get_fl_map_value<std::string>(listenerValue, "jsObjectName");
+      auto allowedOriginRules = get_fl_map_value<std::vector<std::string>>(
+        listenerValue, "allowedOriginRules", std::vector<std::string>{});
+      if (!jsObjectName.empty() && !listenerId.empty()) {
+        webView->addWebMessageListener(jsObjectName, allowedOriginRules, listenerId);
+      }
+      result->Success(true);
+    }
+    else if (string_equals(methodName, "createWebMessageChannel")) {
+      auto result_ = std::shared_ptr<flutter::MethodResult<flutter::EncodableValue>>(std::move(result));
+      webView->createWebMessageChannel([result_ = std::move(result_)](const std::optional<std::string>& channelId)
+        {
+          if (channelId.has_value()) {
+            flutter::EncodableMap map = {
+              {make_fl_value("id"), make_fl_value(channelId.value())}
+            };
+            result_->Success(make_fl_value(map));
+          }
+          else {
+            result_->Success(make_fl_value());
+          }
+        });
+    }
+    else if (string_equals(methodName, "postWebMessage")) {
+      auto messageValue = get_fl_map_value<flutter::EncodableMap>(arguments, "message");
+      auto targetOrigin = get_fl_map_value<std::string>(arguments, "targetOrigin", "*");
+      std::string messageData = "";
+      int64_t messageType = 0;
+
+      if (fl_map_contains_not_null(messageValue, "type")) {
+        messageType = messageValue.at(make_fl_value("type")).LongValue();
+      }
+      if (fl_map_contains_not_null(messageValue, "data")) {
+        const auto& dataValue = messageValue.at(make_fl_value("data"));
+        if (std::holds_alternative<std::string>(dataValue)) {
+          messageData = std::get<std::string>(dataValue);
+        } else if (std::holds_alternative<std::vector<uint8_t>>(dataValue)) {
+          const auto& bytes = std::get<std::vector<uint8_t>>(dataValue);
+          for (size_t i = 0; i < bytes.size(); i++) {
+            if (i > 0) messageData += ",";
+            messageData += std::to_string(bytes[i]);
+          }
+          messageType = 1;
+        }
+      }
+
+      webView->postWebMessage(messageData, targetOrigin, messageType);
+      result->Success(true);
+    }
     else if (string_equals(methodName, "takeScreenshot")) {
       auto result_ = std::shared_ptr<flutter::MethodResult<flutter::EncodableValue>>(std::move(result));
       auto screenshotConfigurationMap = get_optional_fl_map_value<flutter::EncodableMap>(arguments, "screenshotConfiguration");

@@ -21,6 +21,8 @@
 #include "in_app_webview_settings.h"
 #include "user_content_controller.h"
 #include "webview_channel_delegate.h"
+#include "../web_message/web_message_channel.h"
+#include "../web_message/web_message_listener.h"
 
 #include <WebView2EnvironmentOptions.h>
 
@@ -191,6 +193,21 @@ namespace flutter_inappwebview_plugin
     void injectCSSCode(const std::string& source) const;
     void injectCSSFileFromUrl(const std::string& urlFile) const;
 
+    void addWebMessageListener(const std::string& jsObjectName,
+      const std::vector<std::string>& allowedOriginRules,
+      const std::string& listenerId);
+    void createWebMessageChannel(
+      const std::function<void(const std::optional<std::string>&)> callback);
+    WebMessageChannel* getWebMessageChannel(const std::string& channelId) const;
+    void postWebMessage(const std::string& messageData,
+      const std::string& targetOrigin,
+      int64_t messageType);
+    void setWebMessageCallback(const std::string& channelId, int portIndex);
+    void postWebMessageOnPort(const std::string& channelId, int portIndex,
+      const std::string& messageData, int64_t messageType);
+    void closeWebMessagePort(const std::string& channelId, int portIndex);
+    void disposeWebMessageChannel(const std::string& channelId);
+
     std::string pageFrameId() const
     {
       return pageFrameId_;
@@ -216,6 +233,8 @@ namespace flutter_inappwebview_plugin
     int64_t previousAuthRequestFailureCount = 0;
     double zoomScaleFactor_ = 1.0;
     int64_t progress_ = 0;
+    std::map<std::string, std::unique_ptr<WebMessageChannel>> webMessageChannels_;
+    std::map<std::string, std::unique_ptr<WebMessageListener>> webMessageListeners_;
 
     void registerEventHandlers();
     void registerSurfaceEventHandlers();

@@ -21,16 +21,14 @@ WebMessageChannel::WebMessageChannel(FlBinaryMessenger* messenger,
     : ChannelDelegate(messenger, std::string(METHOD_CHANNEL_NAME_PREFIX) + channelId),
       id_(channelId),
       webView_(webView) {
-  debugLog("WebMessageChannel created with id: " + channelId);
 }
 
 WebMessageChannel::~WebMessageChannel() {
-  debugLog("WebMessageChannel destroyed with id: " + id_);
+  debugLog("dealloc WebMessageChannel");
   webView_ = nullptr;
 }
 
 void WebMessageChannel::dispose() {
-  debugLog("WebMessageChannel::dispose for id: " + id_);
   unregisterMethodCallHandler();
   webView_ = nullptr;
 }

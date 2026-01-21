@@ -6,6 +6,7 @@ import 'package:flutter_inappwebview_example/widgets/common/event_log_card.dart'
 import 'package:flutter_inappwebview_example/widgets/common/method_card.dart';
 import 'package:flutter_inappwebview_example/widgets/common/status_card.dart';
 import 'package:flutter_inappwebview_example/utils/support_checker.dart';
+import 'package:flutter_inappwebview_example/utils/responsive_utils.dart';
 import 'package:flutter_inappwebview_example/widgets/common/parameter_dialog.dart';
 import 'package:flutter_inappwebview_example/widgets/common/method_result_history.dart';
 import 'package:provider/provider.dart';
@@ -703,6 +704,7 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
       ),
       drawer: AppDrawer(),
       body: ListView(
+        key: const Key('inapp_browser_main_list'),
         padding: const EdgeInsets.all(16),
         children: [
           ProfileSelectorCard(
@@ -794,36 +796,64 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _menuItemIdController,
-                    decoration: const InputDecoration(
-                      labelText: 'ID',
-                      border: OutlineInputBorder(),
-                      isDense: true,
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final isMobile = ResponsiveBreakpoints.isMobileWidth(
+                  constraints.maxWidth,
+                );
+                const spacing = 8.0;
+                const buttonWidth = 96.0;
+                final availableWidth = constraints.maxWidth;
+                final remainingWidth = isMobile
+                    ? availableWidth
+                    : (availableWidth - buttonWidth - spacing * 2);
+                final idWidth = isMobile
+                    ? availableWidth
+                    : remainingWidth * 0.35;
+                final titleWidth = isMobile
+                    ? availableWidth
+                    : remainingWidth * 0.65;
+
+                return Wrap(
+                  key: const Key('inapp_browser_menu_items_layout'),
+                  spacing: spacing,
+                  runSpacing: spacing,
+                  children: [
+                    SizedBox(
+                      width: idWidth,
+                      child: TextField(
+                        key: const Key('inapp_browser_menu_id_field'),
+                        controller: _menuItemIdController,
+                        decoration: const InputDecoration(
+                          labelText: 'ID',
+                          border: OutlineInputBorder(),
+                          isDense: true,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  flex: 2,
-                  child: TextField(
-                    controller: _menuItemTitleController,
-                    decoration: const InputDecoration(
-                      labelText: 'Title',
-                      border: OutlineInputBorder(),
-                      isDense: true,
+                    SizedBox(
+                      width: titleWidth,
+                      child: TextField(
+                        key: const Key('inapp_browser_menu_title_field'),
+                        controller: _menuItemTitleController,
+                        decoration: const InputDecoration(
+                          labelText: 'Title',
+                          border: OutlineInputBorder(),
+                          isDense: true,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                ElevatedButton(
-                  onPressed: _addMenuItem,
-                  child: const Text('Add'),
-                ),
-              ],
+                    SizedBox(
+                      width: isMobile ? availableWidth : buttonWidth,
+                      child: ElevatedButton(
+                        key: const Key('inapp_browser_menu_add_button'),
+                        onPressed: _addMenuItem,
+                        child: const Text('Add'),
+                      ),
+                    ),
+                  ],
+                );
+              },
             ),
             const SizedBox(height: 8),
             _buildMethodHistory(PlatformInAppBrowserMethod.addMenuItem.name),

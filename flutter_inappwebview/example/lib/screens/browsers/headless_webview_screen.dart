@@ -7,6 +7,8 @@ import 'package:flutter_inappwebview_example/utils/support_checker.dart';
 import 'package:flutter_inappwebview_example/widgets/common/support_badge.dart';
 import 'package:flutter_inappwebview_example/widgets/common/parameter_dialog.dart';
 import 'package:flutter_inappwebview_example/widgets/common/method_result_history.dart';
+import 'package:flutter_inappwebview_example/widgets/common/responsive_row.dart';
+import 'package:flutter_inappwebview_example/utils/responsive_utils.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_inappwebview_example/providers/event_log_provider.dart';
 import 'package:flutter_inappwebview_example/models/event_log_entry.dart';
@@ -563,6 +565,7 @@ class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
       ),
       drawer: AppDrawer(),
       body: ListView(
+        key: const Key('headless_webview_main_list'),
         padding: const EdgeInsets.all(16),
         children: [
           ProfileSelectorCard(
@@ -678,32 +681,50 @@ class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
               ),
             ),
             const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _widthController,
-                    decoration: const InputDecoration(
-                      labelText: 'Width',
-                      border: OutlineInputBorder(),
-                      isDense: true,
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final isMobile = ResponsiveBreakpoints.isMobileWidth(
+                  constraints.maxWidth,
+                );
+                const spacing = 12.0;
+                final fieldWidth = isMobile
+                    ? constraints.maxWidth
+                    : (constraints.maxWidth - spacing) / 2;
+
+                return ResponsiveRow(
+                  key: const Key('headless_webview_size_layout'),
+                  spacing: spacing,
+                  runSpacing: spacing,
+                  children: [
+                    SizedBox(
+                      width: fieldWidth,
+                      child: TextField(
+                        key: const Key('headless_webview_width_field'),
+                        controller: _widthController,
+                        decoration: const InputDecoration(
+                          labelText: 'Width',
+                          border: OutlineInputBorder(),
+                          isDense: true,
+                        ),
+                        keyboardType: TextInputType.number,
+                      ),
                     ),
-                    keyboardType: TextInputType.number,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: TextField(
-                    controller: _heightController,
-                    decoration: const InputDecoration(
-                      labelText: 'Height',
-                      border: OutlineInputBorder(),
-                      isDense: true,
+                    SizedBox(
+                      width: fieldWidth,
+                      child: TextField(
+                        key: const Key('headless_webview_height_field'),
+                        controller: _heightController,
+                        decoration: const InputDecoration(
+                          labelText: 'Height',
+                          border: OutlineInputBorder(),
+                          isDense: true,
+                        ),
+                        keyboardType: TextInputType.number,
+                      ),
                     ),
-                    keyboardType: TextInputType.number,
-                  ),
-                ),
-              ],
+                  ],
+                );
+              },
             ),
           ],
         ),

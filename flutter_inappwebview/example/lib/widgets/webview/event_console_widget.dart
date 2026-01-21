@@ -17,10 +17,17 @@ class _EventConsoleWidgetState extends State<EventConsoleWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        _buildHeader(),
-        Expanded(child: _buildEventList()),
+    return CustomScrollView(
+      slivers: [
+        SliverPersistentHeader(
+          pinned: true,
+          delegate: _StickyHeaderDelegate(
+            minHeight: 70,
+            maxHeight: 70,
+            child: _buildHeader(),
+          ),
+        ),
+        _buildEventList(),
       ],
     );
   }
@@ -85,21 +92,22 @@ class _EventConsoleWidgetState extends State<EventConsoleWidget> {
             : provider.filterByType(_selectedFilter);
 
         if (events.isEmpty) {
-          return const Center(
-            child: Text(
-              'No events logged yet',
-              style: TextStyle(color: Colors.grey),
+          return const SliverFillRemaining(
+            hasScrollBody: false,
+            child: Center(
+              child: Text(
+                'No events logged yet',
+                style: TextStyle(color: Colors.grey),
+              ),
             ),
           );
         }
 
-        return ListView.builder(
-          itemCount: events.length,
-          reverse: true, // Show latest at top
-          itemBuilder: (context, index) {
+        return SliverList(
+          delegate: SliverChildBuilderDelegate((context, index) {
             final event = events[events.length - 1 - index];
             return _buildEventItem(event);
-          },
+          }, childCount: events.length),
         );
       },
     );
@@ -172,26 +180,59 @@ class _EventConsoleWidgetState extends State<EventConsoleWidget> {
 
   Color _getEventTypeColor(EventType type) {
     switch (type) {
-      case EventType.navigation:
-        return Colors.blue.shade50;
-      case EventType.javascript:
-        return Colors.purple.shade50;
-      case EventType.console:
-        return Colors.orange.shade50;
-      case EventType.network:
-        return Colors.green.shade50;
       case EventType.error:
-        return Colors.red.shade50;
+        return Colors.red.shade100;
+      case EventType.navigation:
+        return Colors.blue.shade100;
+      case EventType.javascript:
+        return Colors.yellow.shade100;
+      case EventType.console:
+        return Colors.grey.shade200;
+      case EventType.network:
+        return Colors.purple.shade100;
       case EventType.performance:
-        return Colors.teal.shade50;
+        return Colors.orange.shade100;
       case EventType.storage:
-        return Colors.amber.shade50;
       case EventType.cookies:
-        return Colors.brown.shade50;
+        return Colors.teal.shade100;
       case EventType.messaging:
-        return Colors.indigo.shade50;
+        return Colors.indigo.shade100;
       case EventType.ui:
-        return Colors.cyan.shade50;
+        return Colors.pink.shade100;
     }
+  }
+}
+
+class _StickyHeaderDelegate extends SliverPersistentHeaderDelegate {
+  final Widget child;
+  final double minHeight;
+  final double maxHeight;
+
+  _StickyHeaderDelegate({
+    required this.child,
+    required this.minHeight,
+    required this.maxHeight,
+  });
+
+  @override
+  Widget build(
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
+    return SizedBox.expand(child: child);
+  }
+
+  @override
+  double get maxExtent => maxHeight;
+
+  @override
+  double get minExtent => minHeight;
+
+  @override
+  bool shouldRebuild(_StickyHeaderDelegate oldDelegate) {
+    return maxHeight != oldDelegate.maxHeight ||
+        minHeight != oldDelegate.minHeight ||
+        child != oldDelegate.child;
   }
 }

@@ -33,11 +33,11 @@ class _UserScriptTesterWidgetState extends State<UserScriptTesterWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        _buildHeader(),
-        _buildForm(),
-        Expanded(child: _buildScriptList()),
+    return CustomScrollView(
+      slivers: [
+        SliverToBoxAdapter(child: _buildHeader()),
+        SliverToBoxAdapter(child: _buildForm()),
+        _buildScriptList(),
       ],
     );
   }
@@ -168,20 +168,22 @@ class _UserScriptTesterWidgetState extends State<UserScriptTesterWidget> {
     final scripts = widget.scripts ?? [];
 
     if (scripts.isEmpty) {
-      return const Center(
-        child: Text(
-          'No user scripts added',
-          style: TextStyle(color: Colors.grey),
+      return const SliverFillRemaining(
+        hasScrollBody: false,
+        child: Center(
+          child: Text(
+            'No user scripts added',
+            style: TextStyle(color: Colors.grey),
+          ),
         ),
       );
     }
 
-    return ListView.builder(
-      itemCount: scripts.length,
-      itemBuilder: (context, index) {
+    return SliverList(
+      delegate: SliverChildBuilderDelegate((context, index) {
         final script = scripts[index];
         return _buildScriptItem(script, index);
-      },
+      }, childCount: scripts.length),
     );
   }
 

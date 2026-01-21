@@ -10,10 +10,10 @@ class NetworkMonitorWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        _buildHeader(context),
-        Expanded(child: _buildRequestList()),
+    return CustomScrollView(
+      slivers: [
+        SliverToBoxAdapter(child: _buildHeader(context)),
+        _buildRequestList(),
       ],
     );
   }
@@ -66,21 +66,22 @@ class NetworkMonitorWidget extends StatelessWidget {
         final requests = monitor.requests;
 
         if (requests.isEmpty) {
-          return const Center(
-            child: Text(
-              'No network requests yet',
-              style: TextStyle(color: Colors.grey),
+          return const SliverFillRemaining(
+            hasScrollBody: false,
+            child: Center(
+              child: Text(
+                'No network requests yet',
+                style: TextStyle(color: Colors.grey),
+              ),
             ),
           );
         }
 
-        return ListView.builder(
-          itemCount: requests.length,
-          reverse: true, // Show latest at top
-          itemBuilder: (context, index) {
+        return SliverList(
+          delegate: SliverChildBuilderDelegate((context, index) {
             final request = requests[requests.length - 1 - index];
             return _buildRequestItem(request);
-          },
+          }, childCount: requests.length),
         );
       },
     );

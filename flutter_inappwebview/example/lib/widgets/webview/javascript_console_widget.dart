@@ -47,11 +47,11 @@ class _JavaScriptConsoleWidgetState extends State<JavaScriptConsoleWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        _buildHeader(),
-        _buildInputArea(),
-        Expanded(child: _buildResultsArea()),
+    return CustomScrollView(
+      slivers: [
+        SliverToBoxAdapter(child: _buildHeader()),
+        SliverToBoxAdapter(child: _buildInputArea()),
+        _buildResultsArea(),
       ],
     );
   }
@@ -59,6 +59,7 @@ class _JavaScriptConsoleWidgetState extends State<JavaScriptConsoleWidget> {
   Widget _buildHeader() {
     return Container(
       padding: const EdgeInsets.all(8.0),
+      // ... (unchanged code, but I need to include it for context match or just replace build)
       decoration: BoxDecoration(
         color: Colors.grey.shade100,
         border: Border(bottom: BorderSide(color: Colors.grey.shade300)),
@@ -138,21 +139,22 @@ class _JavaScriptConsoleWidgetState extends State<JavaScriptConsoleWidget> {
 
   Widget _buildResultsArea() {
     if (_history.isEmpty) {
-      return const Center(
-        child: Text(
-          'Execute JavaScript to see results',
-          style: TextStyle(color: Colors.grey),
+      return const SliverFillRemaining(
+        hasScrollBody: false,
+        child: Center(
+          child: Text(
+            'Execute JavaScript to see results',
+            style: TextStyle(color: Colors.grey),
+          ),
         ),
       );
     }
 
-    return ListView.builder(
-      itemCount: _history.length,
-      reverse: true,
-      itemBuilder: (context, index) {
-        final result = _history[_history.length - 1 - index];
+    return SliverList(
+      delegate: SliverChildBuilderDelegate((context, index) {
+        final result = _history[index];
         return _buildResultItem(result);
-      },
+      }, childCount: _history.length),
     );
   }
 

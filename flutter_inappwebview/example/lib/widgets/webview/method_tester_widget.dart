@@ -1522,114 +1522,105 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
       (sum, cat) => sum + cat.methods.length,
     );
 
-    return Column(
-      children: [
+    return CustomScrollView(
+      slivers: [
         // Header with search
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: Colors.grey.shade100,
-            border: Border(bottom: BorderSide(color: Colors.grey.shade300)),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  const Icon(Icons.developer_mode, size: 20),
-                  const SizedBox(width: 8),
-                  Text(
-                    'Method Tester ($totalMethods methods)',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
+        SliverPersistentHeader(
+          pinned: true,
+          delegate: _StickyHeaderDelegate(
+            minHeight: 80,
+            maxHeight: 80,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade100,
+                border: Border(bottom: BorderSide(color: Colors.grey.shade300)),
+              ),
+              child: Center(
+                child: TextField(
+                  controller: _searchController,
+                  decoration: InputDecoration(
+                    hintText: 'Search $totalMethods methods...',
+                    prefixIcon: const Icon(Icons.search, size: 20),
+                    suffixIcon: _searchQuery.isNotEmpty
+                        ? IconButton(
+                            icon: const Icon(Icons.clear, size: 20),
+                            onPressed: () {
+                              _searchController.clear();
+                              setState(() => _searchQuery = '');
+                            },
+                          )
+                        : null,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
                     ),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
+                    fillColor: Colors.white,
+                    filled: true,
+                    isDense: true,
                   ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              TextField(
-                controller: _searchController,
-                decoration: InputDecoration(
-                  hintText: 'Search methods...',
-                  prefixIcon: const Icon(Icons.search, size: 20),
-                  suffixIcon: _searchQuery.isNotEmpty
-                      ? IconButton(
-                          icon: const Icon(Icons.clear, size: 20),
-                          onPressed: () {
-                            _searchController.clear();
-                            setState(() => _searchQuery = '');
-                          },
-                        )
-                      : null,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 8,
-                  ),
-                  isDense: true,
+                  onChanged: (value) => setState(() => _searchQuery = value),
                 ),
-                onChanged: (value) => setState(() => _searchQuery = value),
               ),
-            ],
+            ),
           ),
         ),
 
         // Controller status
         if (widget.controller == null)
-          Container(
-            padding: const EdgeInsets.all(12),
-            color: Colors.orange.shade50,
-            child: const Row(
-              children: [
-                Icon(Icons.warning, color: Colors.orange, size: 20),
-                SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    'WebView controller not available. Create a WebView first.',
-                    style: TextStyle(color: Colors.orange),
+          SliverToBoxAdapter(
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              color: Colors.orange.shade50,
+              child: const Row(
+                children: [
+                  Icon(Icons.warning, color: Colors.orange, size: 20),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'WebView controller not available. Create a WebView first.',
+                      style: TextStyle(color: Colors.orange),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
 
         // Method categories
-        Expanded(
-          child: ListView.builder(
-            itemCount: filteredCategories.length,
-            itemBuilder: (context, categoryIndex) {
-              final category = filteredCategories[categoryIndex];
-              final originalIndex = _categories.indexOf(category);
-              final isExpanded =
-                  _searchQuery.isNotEmpty ||
-                  _expandedCategories.contains(originalIndex);
+        SliverList(
+          delegate: SliverChildBuilderDelegate((context, categoryIndex) {
+            final category = filteredCategories[categoryIndex];
+            final originalIndex = _categories.indexOf(category);
+            final isExpanded =
+                _searchQuery.isNotEmpty ||
+                _expandedCategories.contains(originalIndex);
 
-              return ExpansionTile(
-                key: Key(category.name),
-                initiallyExpanded: isExpanded,
-                leading: Icon(category.icon, size: 24),
-                title: Text(
-                  '${category.name} (${category.methods.length})',
-                  style: const TextStyle(fontWeight: FontWeight.w600),
-                ),
-                onExpansionChanged: (expanded) {
-                  setState(() {
-                    if (expanded) {
-                      _expandedCategories.add(originalIndex);
-                    } else {
-                      _expandedCategories.remove(originalIndex);
-                    }
-                  });
-                },
-                children: category.methods
-                    .map((method) => _buildMethodTile(method))
-                    .toList(),
-              );
-            },
-          ),
+            return ExpansionTile(
+              key: Key(category.name),
+              initiallyExpanded: isExpanded,
+              leading: Icon(category.icon, size: 24),
+              title: Text(
+                '${category.name} (${category.methods.length})',
+                style: const TextStyle(fontWeight: FontWeight.w600),
+              ),
+              onExpansionChanged: (expanded) {
+                setState(() {
+                  if (expanded) {
+                    _expandedCategories.add(originalIndex);
+                  } else {
+                    _expandedCategories.remove(originalIndex);
+                  }
+                });
+              },
+              children: category.methods
+                  .map((method) => _buildMethodTile(method))
+                  .toList(),
+            );
+          }, childCount: filteredCategories.length),
         ),
       ],
     );
@@ -1775,22 +1766,53 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
 
   /// Attempts to convert a result to a Map using common toMap/toJson patterns.
   /// Returns null if conversion is not possible.
-  dynamic _toMapIfPossible(dynamic value) {
-    if (value == null) return null;
-    if (value is Map || value is List) return value;
-
-    // Try toMap() - common in flutter_inappwebview objects
+  Map<String, dynamic>? _toMapIfPossible(dynamic result) {
+    if (result == null) return null;
+    if (result is Map) return Map<String, dynamic>.from(result);
     try {
-      final toMapResult = (value as dynamic).toMap?.call();
-      if (toMapResult is Map) return toMapResult;
-    } catch (_) {}
+      // ignore: avoid_dynamic_calls
+      return (result as dynamic).toMap();
+    } catch (_) {
+      try {
+        // ignore: avoid_dynamic_calls
+        return (result as dynamic).toJson();
+      } catch (_) {
+        return null;
+      }
+    }
+  }
+}
 
-    // Try toJson() - common in many Flutter/Dart packages
-    try {
-      final toJsonResult = (value as dynamic).toJson?.call();
-      if (toJsonResult is Map) return toJsonResult;
-    } catch (_) {}
+class _StickyHeaderDelegate extends SliverPersistentHeaderDelegate {
+  final Widget child;
+  final double minHeight;
+  final double maxHeight;
 
-    return null;
+  _StickyHeaderDelegate({
+    required this.child,
+    required this.minHeight,
+    required this.maxHeight,
+  });
+
+  @override
+  Widget build(
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
+    return SizedBox.expand(child: child);
+  }
+
+  @override
+  double get maxExtent => maxHeight;
+
+  @override
+  double get minExtent => minHeight;
+
+  @override
+  bool shouldRebuild(_StickyHeaderDelegate oldDelegate) {
+    return maxHeight != oldDelegate.maxHeight ||
+        minHeight != oldDelegate.minHeight ||
+        child != oldDelegate.child;
   }
 }

@@ -36,8 +36,8 @@ void main() {
     ) async {
       await tester.pumpWidget(const MaterialApp(home: PlatformInfoScreen()));
 
-      // Should have the "Supported Features" section title
-      expect(find.text('Supported Features'), findsOneWidget);
+      // Should show the Core WebView Features section
+      expect(find.text('Core WebView Features'), findsOneWidget);
     });
 
     testWidgets('has back button', (WidgetTester tester) async {

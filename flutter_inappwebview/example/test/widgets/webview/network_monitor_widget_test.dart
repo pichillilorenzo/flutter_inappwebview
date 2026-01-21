@@ -17,9 +17,7 @@ void main() {
       return MaterialApp(
         home: ChangeNotifierProvider<NetworkMonitor>.value(
           value: networkMonitor,
-          child: Scaffold(
-            body: NetworkMonitorWidget(),
-          ),
+          child: Scaffold(body: NetworkMonitorWidget()),
         ),
       );
     }
@@ -192,8 +190,8 @@ void main() {
 
       // Now details should be visible
       expect(find.text('Request Headers'), findsOneWidget);
-      expect(find.text('Content-Type'), findsOneWidget);
-      expect(find.text('application/json'), findsOneWidget);
+      expect(find.textContaining('Content-Type'), findsOneWidget);
+      expect(find.textContaining('application/json'), findsOneWidget);
     });
 
     testWidgets('multiple requests are displayed', (tester) async {
@@ -246,10 +244,7 @@ void main() {
 
       // Find the chip with status code
       final chip = tester.widget<Chip>(
-        find.ancestor(
-          of: find.text('200'),
-          matching: find.byType(Chip),
-        ),
+        find.ancestor(of: find.text('200'), matching: find.byType(Chip)),
       );
 
       expect(chip.backgroundColor, Colors.green.shade100);

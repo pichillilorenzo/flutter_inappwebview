@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_inappwebview_example/models/test_configuration.dart';
+import 'package:flutter_inappwebview_example/utils/constants.dart';
 import 'package:flutter_inappwebview_example/widgets/common/parameter_dialog.dart';
 
 void main() {
@@ -11,14 +12,14 @@ void main() {
         id: 'step_1',
         name: 'Test Step',
         description: 'A test step',
-        category: 'navigation',
+        category: TestCategory.navigation,
         action: CustomTestAction.loadUrl('https://example.com'),
       );
 
       expect(step.id, 'step_1');
       expect(step.name, 'Test Step');
       expect(step.description, 'A test step');
-      expect(step.category, 'navigation');
+      expect(step.category, TestCategory.navigation);
       expect(step.enabled, true);
       expect(step.order, 0);
       expect(step.expectedResultType, ExpectedResultType.any);
@@ -29,7 +30,7 @@ void main() {
         id: 'step_1',
         name: 'Test Step',
         description: 'A test step',
-        category: 'navigation',
+        category: TestCategory.navigation,
         action: CustomTestAction.loadUrl('https://example.com'),
         expectedResult: 'success',
         expectedResultType: ExpectedResultType.contains,
@@ -41,7 +42,7 @@ void main() {
       expect(json['id'], 'step_1');
       expect(json['name'], 'Test Step');
       expect(json['description'], 'A test step');
-      expect(json['category'], 'navigation');
+      expect(json['category'], TestCategory.navigation.name);
       expect(json['expectedResult'], 'success');
       expect(json['expectedResultType'], 'contains');
       expect(json['enabled'], true);
@@ -53,7 +54,7 @@ void main() {
         'id': 'step_1',
         'name': 'Test Step',
         'description': 'A test step',
-        'category': 'navigation',
+        'category': TestCategory.navigation.name,
         'action': {'type': 'loadUrl', 'url': 'https://example.com'},
         'parameters': <String, dynamic>{},
         'expectedResult': 'success',
@@ -66,7 +67,7 @@ void main() {
       expect(step.id, 'step_1');
       expect(step.name, 'Test Step');
       expect(step.description, 'A test step');
-      expect(step.category, 'navigation');
+      expect(step.category, TestCategory.navigation);
       expect(step.expectedResult, 'success');
       expect(step.expectedResultType, ExpectedResultType.contains);
       expect(step.enabled, true);
@@ -78,7 +79,7 @@ void main() {
         id: 'step_1',
         name: 'Original',
         description: 'Original description',
-        category: 'navigation',
+        category: TestCategory.navigation,
         action: CustomTestAction.loadUrl('https://example.com'),
       );
 
@@ -97,7 +98,7 @@ void main() {
         id: 'step_1',
         name: 'Test',
         description: '',
-        category: 'test',
+        category: TestCategory.navigation,
         action: CustomTestAction.evaluateJs(''),
         expectedResult: 'hello',
         expectedResultType: ExpectedResultType.exact,
@@ -113,7 +114,7 @@ void main() {
         id: 'step_1',
         name: 'Test',
         description: '',
-        category: 'test',
+        category: TestCategory.navigation,
         action: CustomTestAction.evaluateJs(''),
         expectedResult: 'world',
         expectedResultType: ExpectedResultType.contains,
@@ -129,7 +130,7 @@ void main() {
         id: 'step_1',
         name: 'Test',
         description: '',
-        category: 'test',
+        category: TestCategory.navigation,
         action: CustomTestAction.evaluateJs(''),
         expectedResult: 'world',
         expectedResultType: ExpectedResultType.containsIgnoreCase,
@@ -145,7 +146,7 @@ void main() {
         id: 'step_1',
         name: 'Test',
         description: '',
-        category: 'test',
+        category: TestCategory.navigation,
         action: CustomTestAction.evaluateJs(''),
         expectedResult: r'^\d{3}-\d{4}$',
         expectedResultType: ExpectedResultType.regex,
@@ -161,7 +162,7 @@ void main() {
         id: 'step_1',
         name: 'Test',
         description: '',
-        category: 'test',
+        category: TestCategory.navigation,
         action: CustomTestAction.evaluateJs(''),
         expectedResultType: ExpectedResultType.notNull,
       );
@@ -176,7 +177,7 @@ void main() {
         id: 'step_1',
         name: 'Test',
         description: '',
-        category: 'test',
+        category: TestCategory.navigation,
         action: CustomTestAction.evaluateJs(''),
         expectedResultType: ExpectedResultType.isNull,
       );
@@ -190,7 +191,7 @@ void main() {
         id: 'step_1',
         name: 'Test',
         description: '',
-        category: 'test',
+        category: TestCategory.navigation,
         action: CustomTestAction.evaluateJs(''),
         expectedResultType: ExpectedResultType.truthy,
       );
@@ -212,7 +213,7 @@ void main() {
         id: 'step_1',
         name: 'Test',
         description: '',
-        category: 'test',
+        category: TestCategory.navigation,
         action: CustomTestAction.evaluateJs(''),
         expectedResultType: ExpectedResultType.falsy,
       );
@@ -231,7 +232,7 @@ void main() {
         id: 'step_1',
         name: 'Test',
         description: '',
-        category: 'test',
+        category: TestCategory.navigation,
         action: CustomTestAction.evaluateJs(''),
         expectedResult: 'String',
         expectedResultType: ExpectedResultType.typeIs,
@@ -246,7 +247,7 @@ void main() {
         id: 'step_1',
         name: 'Test',
         description: '',
-        category: 'test',
+        category: TestCategory.navigation,
         action: CustomTestAction.evaluateJs(''),
         expectedResult: '3',
         expectedResultType: ExpectedResultType.lengthEquals,
@@ -263,7 +264,7 @@ void main() {
         id: 'step_1',
         name: 'Test',
         description: '',
-        category: 'test',
+        category: TestCategory.navigation,
         action: CustomTestAction.evaluateJs(''),
         expectedResult: '10',
         expectedResultType: ExpectedResultType.greaterThan,
@@ -279,7 +280,7 @@ void main() {
         id: 'step_1',
         name: 'Test',
         description: '',
-        category: 'test',
+        category: TestCategory.navigation,
         action: CustomTestAction.evaluateJs(''),
         expectedResult: '10',
         expectedResultType: ExpectedResultType.lessThan,
@@ -450,7 +451,7 @@ void main() {
             id: 'step_1',
             name: 'Step 1',
             description: 'First step',
-            category: 'navigation',
+            category: TestCategory.navigation,
             action: CustomTestAction.loadUrl('https://example.com'),
           ),
         ],
@@ -479,7 +480,7 @@ void main() {
             'id': 'step_1',
             'name': 'Step 1',
             'description': 'First step',
-            'category': 'navigation',
+            'category': TestCategory.navigation.name,
             'action': {'type': 'loadUrl', 'url': 'https://example.com'},
             'parameters': <String, dynamic>{},
             'expectedResultType': 'any',
@@ -514,7 +515,7 @@ void main() {
             id: 'step_1',
             name: 'Load URL',
             description: 'Load a URL',
-            category: 'navigation',
+            category: TestCategory.navigation,
             action: CustomTestAction.controllerMethod(
               'loadUrl',
               parameters: {
@@ -570,7 +571,7 @@ void main() {
             id: 'step_1',
             name: 'Load URL with body',
             description: 'Test',
-            category: 'navigation',
+            category: TestCategory.navigation,
             action: CustomTestAction.controllerMethod(
               'loadUrl',
               parameters: {
@@ -611,7 +612,7 @@ void main() {
             id: 'step_1',
             name: 'POST with data',
             description: 'Test',
-            category: 'navigation',
+            category: TestCategory.navigation,
             action: CustomTestAction.controllerMethod(
               'postUrl',
               parameters: {
@@ -645,7 +646,7 @@ void main() {
             id: 'step_1',
             name: 'Load URL',
             description: 'Test',
-            category: 'navigation',
+            category: TestCategory.navigation,
             action: CustomTestAction.controllerMethod(
               'loadUrl',
               parameters: {

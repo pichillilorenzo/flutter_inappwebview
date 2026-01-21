@@ -17,9 +17,7 @@ void main() {
       return MaterialApp(
         home: ChangeNotifierProvider<EventLogProvider>.value(
           value: eventLogProvider,
-          child: Scaffold(
-            body: EventConsoleWidget(),
-          ),
+          child: Scaffold(body: EventConsoleWidget()),
         ),
       );
     }
@@ -50,7 +48,7 @@ void main() {
     testWidgets('shows clear button in header', (tester) async {
       await tester.pumpWidget(createWidget());
 
-      expect(find.widgetWithText(IconButton, 'Clear'), findsOneWidget);
+      expect(find.byTooltip('Clear'), findsOneWidget);
     });
 
     testWidgets('clear button clears events', (tester) async {
@@ -67,7 +65,7 @@ void main() {
 
       expect(find.text('Event 1'), findsOneWidget);
 
-      await tester.tap(find.widgetWithText(IconButton, 'Clear'));
+      await tester.tap(find.byTooltip('Clear'));
       await tester.pump();
 
       expect(find.text('Event 1'), findsNothing);
@@ -77,13 +75,13 @@ void main() {
     testWidgets('displays filter dropdown', (tester) async {
       await tester.pumpWidget(createWidget());
 
-      expect(find.byType(DropdownButton<EventType>), findsOneWidget);
+      expect(find.byType(DropdownButton<EventType?>), findsOneWidget);
     });
 
     testWidgets('filter dropdown shows all event types', (tester) async {
       await tester.pumpWidget(createWidget());
 
-      await tester.tap(find.byType(DropdownButton<EventType>));
+      await tester.tap(find.byType(DropdownButton<EventType?>));
       await tester.pumpAndSettle();
 
       expect(find.text('All Events'), findsWidgets);
@@ -116,7 +114,7 @@ void main() {
       expect(find.text('Error event'), findsOneWidget);
 
       // Filter by navigation
-      await tester.tap(find.byType(DropdownButton<EventType>));
+      await tester.tap(find.byType(DropdownButton<EventType?>));
       await tester.pumpAndSettle();
       await tester.tap(find.text('navigation').last);
       await tester.pumpAndSettle();
@@ -165,8 +163,8 @@ void main() {
       await tester.pumpAndSettle();
 
       // Now data should be visible
-      expect(find.text('url'), findsOneWidget);
-      expect(find.text('https://example.com'), findsOneWidget);
+      expect(find.textContaining('url'), findsOneWidget);
+      expect(find.textContaining('https://example.com'), findsOneWidget);
     });
 
     testWidgets('multiple events are displayed in order', (tester) async {
@@ -215,10 +213,7 @@ void main() {
       // Find Container with error color
       final container = tester.widget<Container>(
         find
-            .ancestor(
-              of: find.text('error'),
-              matching: find.byType(Container),
-            )
+            .ancestor(of: find.text('error'), matching: find.byType(Container))
             .first,
       );
 

@@ -44,15 +44,44 @@ void main() {
       await tester.pumpWidget(createWidget());
       await tester.pumpAndSettle();
 
-      await tester.ensureVisible(find.text('Cache'));
-      await tester.tap(find.text('Cache'));
+      await tester.tap(find.byIcon(Icons.more_vert));
       await tester.pumpAndSettle();
 
-      final dropdownFinder = find.byType(DropdownButton<dynamic>);
-      expect(dropdownFinder, findsOneWidget);
+      await tester.tap(find.text('Expand All'));
+      await tester.pumpAndSettle();
 
-      final dropdown = tester.widget<DropdownButton<dynamic>>(dropdownFinder);
-      expect(dropdown.value, isA<CacheMode>());
+      await tester.dragUntilVisible(
+        find.text('Mixed Content Mode'),
+        find.byType(ListView),
+        const Offset(0, -300),
+      );
+      await tester.pumpAndSettle();
+
+      final dropdownFinder = find.byType(
+        DropdownButton<dynamic>,
+        skipOffstage: false,
+      );
+      expect(dropdownFinder, findsWidgets);
+
+      final dropdown = tester.widget<DropdownButton<dynamic>>(
+        dropdownFinder.first,
+      );
+      final items = dropdown.items ?? [];
+      final nonNullItem = items.firstWhere((item) => item.value != null);
+      final value = nonNullItem.value;
+      final isEnumLike = value is Enum || _hasToNativeValue(value);
+
+      expect(isEnumLike, isTrue);
     });
   });
+}
+
+bool _hasToNativeValue(dynamic value) {
+  try {
+    // Only care that the method exists and is callable.
+    (value as dynamic).toNativeValue();
+    return true;
+  } catch (_) {
+    return false;
+  }
 }

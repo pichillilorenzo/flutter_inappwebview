@@ -7,6 +7,7 @@ import 'package:flutter_inappwebview_example/providers/event_log_provider.dart';
 import 'package:flutter_inappwebview_example/providers/settings_manager.dart';
 import 'package:flutter_inappwebview_example/providers/test_runner.dart';
 import 'package:flutter_inappwebview_example/providers/network_monitor.dart';
+import 'package:flutter_inappwebview_example/utils/platform_utils.dart';
 
 void main() {
   group('HomeScreen', () {
@@ -79,7 +80,8 @@ void main() {
       await tester.pumpWidget(createTestWidget());
 
       // Should show current platform somewhere
-      expect(find.byIcon(Icons.android), findsAny);
+      final platformIcon = PlatformUtils.getPlatformIcon();
+      expect(find.byIcon(platformIcon), findsAny);
     });
 
     testWidgets('category cards have icons', (WidgetTester tester) async {

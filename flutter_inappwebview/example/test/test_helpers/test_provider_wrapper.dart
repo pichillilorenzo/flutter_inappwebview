@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_inappwebview_example/providers/event_log_provider.dart';
 import 'package:flutter_inappwebview_example/providers/network_monitor.dart';
 import 'package:flutter_inappwebview_example/providers/settings_manager.dart';
@@ -14,6 +15,15 @@ class MockSettingsManager extends SettingsManager {
         environmentFactory: (_) async => null,
         environmentSupportChecker: () => false,
       );
+
+  @override
+  WebViewEnvironmentSettings buildEnvironmentSettings() =>
+      WebViewEnvironmentSettings(
+        releaseChannels: EnvironmentReleaseChannels.STABLE,
+      );
+
+  @override
+  InAppWebViewSettings buildSettings() => InAppWebViewSettings();
 }
 
 /// A wrapper widget that provides all common providers needed for testing.

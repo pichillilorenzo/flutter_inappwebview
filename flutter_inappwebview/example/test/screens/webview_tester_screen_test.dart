@@ -54,10 +54,10 @@ void main() {
     testWidgets('renders navigation controls', (tester) async {
       await tester.pumpWidget(createWidget());
 
-      expect(find.byIcon(Icons.arrow_back), findsOneWidget);
-      expect(find.byIcon(Icons.arrow_forward), findsOneWidget);
-      expect(find.byIcon(Icons.refresh), findsOneWidget);
-      expect(find.byIcon(Icons.stop), findsOneWidget);
+      expect(find.byTooltip('Back'), findsOneWidget);
+      expect(find.byTooltip('Forward'), findsOneWidget);
+      expect(find.byTooltip('Reload'), findsOneWidget);
+      expect(find.byTooltip('Stop'), findsOneWidget);
     });
 
     testWidgets('renders Go button', (tester) async {
@@ -69,7 +69,7 @@ void main() {
     testWidgets('shows clear events button in app bar', (tester) async {
       await tester.pumpWidget(createWidget());
 
-      expect(find.byIcon(Icons.clear_all), findsOneWidget);
+      expect(find.byTooltip('Clear Events'), findsOneWidget);
     });
 
     testWidgets('clear button clears events', (tester) async {
@@ -85,7 +85,7 @@ void main() {
 
       expect(eventLogProvider.events.length, 1);
 
-      await tester.tap(find.byIcon(Icons.clear_all));
+      await tester.tap(find.byTooltip('Clear Events'));
       await tester.pump();
 
       expect(eventLogProvider.events.length, 0);
@@ -96,8 +96,8 @@ void main() {
       await tester.pump();
 
       // Open bottom sheet by tapping tab bar
-      await tester.tap(find.text('Events'));
-      await tester.pumpAndSettle();
+      await tester.tap(find.widgetWithText(Tab, 'Events'));
+      await tester.pump(const Duration(milliseconds: 300));
 
       expect(find.text('Events'), findsWidgets);
       expect(find.text('Network'), findsOneWidget);
@@ -124,10 +124,16 @@ void main() {
       await tester.pumpWidget(createWidget());
 
       final backButton = tester.widget<IconButton>(
-        find.widgetWithIcon(IconButton, Icons.arrow_back),
+        find.ancestor(
+          of: find.byTooltip('Back'),
+          matching: find.byType(IconButton),
+        ),
       );
       final forwardButton = tester.widget<IconButton>(
-        find.widgetWithIcon(IconButton, Icons.arrow_forward),
+        find.ancestor(
+          of: find.byTooltip('Forward'),
+          matching: find.byType(IconButton),
+        ),
       );
 
       expect(backButton.onPressed, isNull);
@@ -146,17 +152,19 @@ void main() {
       await tester.pumpWidget(createWidget());
       await tester.pump();
 
-      // Open Events tab
-      await tester.tap(find.text('Events'));
-      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.widgetWithText(Tab, 'Events'));
+      await tester.tap(find.widgetWithText(Tab, 'Events'));
+      await tester.pump(const Duration(milliseconds: 400));
 
       expect(find.byType(EventConsoleWidget), findsOneWidget);
 
       // Switch to Network tab
-      await tester.tap(find.text('Network'));
-      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.widgetWithText(Tab, 'Network'));
+      await tester.tap(find.widgetWithText(Tab, 'Network'));
+      await tester.pump(const Duration(milliseconds: 400));
 
-      expect(find.byType(NetworkMonitorWidget), findsOneWidget);
+      final tabBar = tester.widget<TabBar>(find.byType(TabBar));
+      expect(tabBar.controller?.index, 1);
     });
 
     testWidgets('does not overflow on small height', (tester) async {

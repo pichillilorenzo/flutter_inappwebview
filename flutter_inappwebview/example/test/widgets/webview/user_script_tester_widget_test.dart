@@ -35,7 +35,9 @@ void main() {
 
       expect(find.text('Injection Time'), findsOneWidget);
       expect(
-          find.byType(DropdownButton<UserScriptInjectionTime>), findsOneWidget);
+        find.byType(DropdownButton<UserScriptInjectionTime>),
+        findsOneWidget,
+      );
     });
 
     testWidgets('shows forMainFrameOnly switch', (tester) async {
@@ -168,8 +170,9 @@ void main() {
       expect(find.byIcon(Icons.delete), findsOneWidget);
     });
 
-    testWidgets('calls onRemoveScript when remove button is pressed',
-        (tester) async {
+    testWidgets('calls onRemoveScript when remove button is pressed', (
+      tester,
+    ) async {
       final script = UserScript(
         source: 'console.log("test")',
         injectionTime: UserScriptInjectionTime.AT_DOCUMENT_START,
@@ -210,6 +213,7 @@ void main() {
       );
 
       await tester.enterText(find.byType(TextField), 'test code');
+      await tester.pump();
       await tester.tap(find.widgetWithText(ElevatedButton, 'Add Script'));
       await tester.pumpAndSettle();
 

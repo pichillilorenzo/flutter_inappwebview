@@ -96,11 +96,13 @@ class MethodResultHistory extends StatefulWidget {
 
 class _MethodResultHistoryState extends State<MethodResultHistory> {
   late bool _isExpanded;
+  late int _localSelectedIndex;
 
   @override
   void initState() {
     super.initState();
     _isExpanded = widget.initiallyExpanded;
+    _localSelectedIndex = widget.selectedIndex ?? 0;
   }
 
   @override
@@ -123,7 +125,9 @@ class _MethodResultHistoryState extends State<MethodResultHistory> {
         widget.selectedIndex != null &&
             widget.selectedIndex! < visibleEntries.length
         ? widget.selectedIndex!
-        : 0;
+        : (_localSelectedIndex < visibleEntries.length
+              ? _localSelectedIndex
+              : 0);
     final selectedEntry = visibleEntries[effectiveSelectedIndex];
     final latestEntry = visibleEntries.first;
 
@@ -213,7 +217,7 @@ class _MethodResultHistoryState extends State<MethodResultHistory> {
               entry: visibleEntries[index],
               isSelected: index == effectiveSelectedIndex,
               onTap: widget.onSelected == null
-                  ? null
+                  ? () => setState(() => _localSelectedIndex = index)
                   : () => widget.onSelected!(index),
             ),
         ],

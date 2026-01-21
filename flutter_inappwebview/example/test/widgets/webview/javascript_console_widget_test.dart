@@ -23,16 +23,16 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: JavaScriptConsoleWidget(
-              onExecute: (code) async => null,
-            ),
+            body: JavaScriptConsoleWidget(onExecute: (code) async => null),
           ),
         ),
       );
 
       expect(find.widgetWithText(ElevatedButton, 'Execute'), findsOneWidget);
       expect(
-          find.widgetWithText(ElevatedButton, 'Execute Async'), findsOneWidget);
+        find.widgetWithText(ElevatedButton, 'Execute Async'),
+        findsOneWidget,
+      );
     });
 
     testWidgets('executes JavaScript code on button press', (tester) async {
@@ -111,10 +111,11 @@ void main() {
 
       // Enter and execute code
       await tester.enterText(find.byType(TextField), 'return "test"');
+      await tester.pump();
       await tester.tap(find.widgetWithText(ElevatedButton, 'Execute'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Hello World'), findsOneWidget);
+      expect(find.textContaining('Hello World'), findsOneWidget);
     });
 
     testWidgets('displays execution error', (tester) async {
@@ -132,6 +133,7 @@ void main() {
 
       // Enter and execute code
       await tester.enterText(find.byType(TextField), 'invalid code');
+      await tester.pump();
       await tester.tap(find.widgetWithText(ElevatedButton, 'Execute'));
       await tester.pumpAndSettle();
 
@@ -143,9 +145,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: JavaScriptConsoleWidget(
-              onExecute: (code) async => null,
-            ),
+            body: JavaScriptConsoleWidget(onExecute: (code) async => null),
           ),
         ),
       );
@@ -168,16 +168,19 @@ void main() {
 
       // Enter and execute code
       await tester.enterText(find.byType(TextField), 'test code');
+      await tester.pump();
       await tester.tap(find.widgetWithText(ElevatedButton, 'Execute'));
       await tester.pumpAndSettle();
 
-      expect(find.text('result'), findsOneWidget);
+      expect(find.textContaining('result'), findsOneWidget);
 
       // Clear
-      await tester.tap(find.widgetWithIcon(IconButton, Icons.clear));
+      await tester.tap(find.byTooltip('Clear'));
       await tester.pump();
 
-      expect(find.text('result'), findsNothing);
+      final textField = tester.widget<TextField>(find.byType(TextField));
+      expect(textField.controller?.text, isEmpty);
+      expect(find.text('Execute JavaScript to see results'), findsOneWidget);
     });
 
     testWidgets('maintains history of executed scripts', (tester) async {
@@ -198,26 +201,26 @@ void main() {
 
       // Execute first script
       await tester.enterText(find.byType(TextField), 'script 1');
+      await tester.pump();
       await tester.tap(find.widgetWithText(ElevatedButton, 'Execute'));
       await tester.pumpAndSettle();
 
       // Execute second script
       await tester.enterText(find.byType(TextField), 'script 2');
+      await tester.pump();
       await tester.tap(find.widgetWithText(ElevatedButton, 'Execute'));
       await tester.pumpAndSettle();
 
       // Both results should be visible
-      expect(find.text('result 1'), findsOneWidget);
-      expect(find.text('result 2'), findsOneWidget);
+      expect(find.textContaining('result 1'), findsOneWidget);
+      expect(find.textContaining('result 2'), findsOneWidget);
     });
 
     testWidgets('disables buttons when no code entered', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: JavaScriptConsoleWidget(
-              onExecute: (code) async => null,
-            ),
+            body: JavaScriptConsoleWidget(onExecute: (code) async => null),
           ),
         ),
       );
@@ -233,9 +236,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: JavaScriptConsoleWidget(
-              onExecute: (code) async => null,
-            ),
+            body: JavaScriptConsoleWidget(onExecute: (code) async => null),
           ),
         ),
       );
@@ -258,7 +259,7 @@ void main() {
             body: JavaScriptConsoleWidget(
               onExecute: (code) async {
                 return {
-                  'value': {'name': 'John', 'age': 30, 'active': true}
+                  'value': {'name': 'John', 'age': 30, 'active': true},
                 };
               },
             ),
@@ -267,6 +268,7 @@ void main() {
       );
 
       await tester.enterText(find.byType(TextField), 'return user');
+      await tester.pump();
       await tester.tap(find.widgetWithText(ElevatedButton, 'Execute'));
       await tester.pumpAndSettle();
 

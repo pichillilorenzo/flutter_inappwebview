@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_inappwebview_example/screens/webview_environment_settings_editor_screen.dart';
@@ -27,7 +28,12 @@ void main() {
     }
 
     testWidgets('renders app bar title', (tester) async {
-      await tester.pumpWidget(createWidget());
+      debugDefaultTargetPlatformOverride = TargetPlatform.windows;
+      try {
+        await tester.pumpWidget(createWidget());
+      } finally {
+        debugDefaultTargetPlatformOverride = null;
+      }
 
       expect(find.byType(AppBar), findsOneWidget);
       expect(find.text('Environment Settings'), findsOneWidget);
@@ -36,8 +42,13 @@ void main() {
     testWidgets('renders release channels as multi-select chips', (
       tester,
     ) async {
-      await tester.pumpWidget(createWidget());
-      await tester.pumpAndSettle();
+      debugDefaultTargetPlatformOverride = TargetPlatform.windows;
+      try {
+        await tester.pumpWidget(createWidget());
+        await tester.pumpAndSettle();
+      } finally {
+        debugDefaultTargetPlatformOverride = null;
+      }
 
       await tester.ensureVisible(find.text('Release Channel'));
       await tester.tap(find.text('Release Channel'));

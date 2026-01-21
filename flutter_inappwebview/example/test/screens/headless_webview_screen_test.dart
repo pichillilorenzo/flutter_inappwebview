@@ -47,9 +47,7 @@ void main() {
       await tester.pumpWidget(createWidget());
       await tester.pump();
 
-      final widthField = find.byKey(
-        const Key('headless_webview_width_field'),
-      );
+      final widthField = find.byKey(const Key('headless_webview_width_field'));
       final heightField = find.byKey(
         const Key('headless_webview_height_field'),
       );

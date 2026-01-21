@@ -20,6 +20,10 @@ class TestRunnerScreen extends StatefulWidget {
 class _TestRunnerScreenState extends State<TestRunnerScreen> {
   static const String _lastConfigKey = 'test_runner_last_config';
   static const String _lastWebViewTypeKey = 'test_runner_last_webview_type';
+  static const ValueKey<String> _panelLayoutKey = ValueKey('testRunnerPanels');
+  static const ValueKey<String> _controlBarWrapKey = ValueKey(
+    'testRunnerControlBarWrap',
+  );
 
   ResultFilter _resultFilter = ResultFilter.all;
 
@@ -152,46 +156,55 @@ class _TestRunnerScreenState extends State<TestRunnerScreen> {
         ],
       ),
       drawer: AppDrawer(),
-      body: Consumer<TestRunner>(
-        builder: (context, runner, child) {
-          return Column(
-            children: [
-              _buildConfigurationBanner(),
-              _buildWebViewTypeSelector(),
-              _buildControlBar(),
-              _buildProgressSection(),
-              _buildFilterBar(),
-              Expanded(
-                child: Row(
-                  children: [
-                    // WebView for testing (visible or hidden based on type)
-                    if (runner.webViewType == TestWebViewType.inAppWebView)
-                      Expanded(
-                        flex: 1,
-                        child: Container(
-                          margin: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey.shade300),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: _buildVisibleWebView(runner),
-                          ),
-                        ),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final isNarrow = constraints.maxWidth < 600;
+          return Consumer<TestRunner>(
+            builder: (context, runner, child) {
+              final panelChildren = <Widget>[
+                if (runner.webViewType == TestWebViewType.inAppWebView)
+                  Flexible(
+                    key: const ValueKey('testRunnerWebViewPanel'),
+                    flex: 1,
+                    child: Container(
+                      margin: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey.shade300),
+                        borderRadius: BorderRadius.circular(8),
                       ),
-                    // Results list
-                    Expanded(
-                      flex: runner.webViewType == TestWebViewType.inAppWebView
-                          ? 1
-                          : 2,
-                      child: _buildResultsList(),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: _buildVisibleWebView(runner),
+                      ),
                     ),
-                  ],
+                  ),
+                Flexible(
+                  key: const ValueKey('testRunnerResultsPanel'),
+                  flex: runner.webViewType == TestWebViewType.inAppWebView
+                      ? 1
+                      : 2,
+                  child: _buildResultsList(),
                 ),
-              ),
-              _buildSummaryBar(),
-            ],
+              ];
+
+              return Column(
+                children: [
+                  _buildConfigurationBanner(),
+                  _buildWebViewTypeSelector(isNarrow: isNarrow),
+                  _buildControlBar(isNarrow: isNarrow),
+                  _buildProgressSection(),
+                  _buildFilterBar(isNarrow: isNarrow),
+                  Expanded(
+                    child: Flex(
+                      key: _panelLayoutKey,
+                      direction: isNarrow ? Axis.vertical : Axis.horizontal,
+                      children: panelChildren,
+                    ),
+                  ),
+                  _buildSummaryBar(),
+                ],
+              );
+            },
           );
         },
       ),
@@ -247,50 +260,77 @@ class _TestRunnerScreenState extends State<TestRunnerScreen> {
     );
   }
 
-  Widget _buildWebViewTypeSelector() {
+  Widget _buildWebViewTypeSelector({required bool isNarrow}) {
     return Consumer<TestRunner>(
       builder: (context, runner, child) {
+        final selector = SegmentedButton<TestWebViewType>(
+          segments: const [
+            ButtonSegment(
+              value: TestWebViewType.inAppWebView,
+              label: Text('Visible'),
+              icon: Icon(Icons.visibility, size: 18),
+            ),
+            ButtonSegment(
+              value: TestWebViewType.headless,
+              label: Text('Headless'),
+              icon: Icon(Icons.visibility_off, size: 18),
+            ),
+          ],
+          selected: {runner.webViewType},
+          onSelectionChanged: (selection) {
+            runner.setWebViewType(selection.first);
+            _saveLastConfiguration();
+          },
+        );
+
+        final helperText = runner.webViewType == TestWebViewType.inAppWebView
+            ? Text(
+                'Real-time rendering enabled',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.green.shade700,
+                  fontStyle: FontStyle.italic,
+                ),
+              )
+            : null;
+
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           decoration: BoxDecoration(
             color: Colors.white,
             border: Border(bottom: BorderSide(color: Colors.grey.shade200)),
           ),
-          child: Row(
-            children: [
-              const Text('WebView Mode: '),
-              const SizedBox(width: 8),
-              SegmentedButton<TestWebViewType>(
-                segments: const [
-                  ButtonSegment(
-                    value: TestWebViewType.inAppWebView,
-                    label: Text('Visible'),
-                    icon: Icon(Icons.visibility, size: 18),
-                  ),
-                  ButtonSegment(
-                    value: TestWebViewType.headless,
-                    label: Text('Headless'),
-                    icon: Icon(Icons.visibility_off, size: 18),
-                  ),
-                ],
-                selected: {runner.webViewType},
-                onSelectionChanged: (selection) {
-                  runner.setWebViewType(selection.first);
-                  _saveLastConfiguration();
-                },
-              ),
-              const Spacer(),
-              if (runner.webViewType == TestWebViewType.inAppWebView)
-                Text(
-                  'Real-time rendering enabled',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.green.shade700,
-                    fontStyle: FontStyle.italic,
-                  ),
+          child: isNarrow
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Text('WebView Mode: '),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: selector,
+                          ),
+                        ),
+                      ],
+                    ),
+                    if (helperText != null) ...[
+                      const SizedBox(height: 6),
+                      helperText,
+                    ],
+                  ],
+                )
+              : Row(
+                  children: [
+                    const Text('WebView Mode: '),
+                    const SizedBox(width: 8),
+                    selector,
+                    const Spacer(),
+                    if (helperText != null) helperText,
+                  ],
                 ),
-            ],
-          ),
         );
       },
     );
@@ -496,13 +536,42 @@ class _TestRunnerScreenState extends State<TestRunnerScreen> {
     }
   }
 
-  Widget _buildControlBar() {
+  Widget _buildControlBar({required bool isNarrow}) {
     return Consumer<TestRunner>(
       builder: (context, runner, child) {
         final isRunning = runner.status == TestStatus.running;
         final hasFailed = runner.failed > 0;
         final config =
             _currentConfiguration ?? TestConfiguration.defaultConfig();
+        final statusChip = _buildWebViewStatusChip(runner);
+
+        final actions = Wrap(
+          key: _controlBarWrapKey,
+          spacing: 8,
+          runSpacing: 8,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            ElevatedButton.icon(
+              icon: Icon(isRunning ? Icons.stop : Icons.play_arrow),
+              label: Text(
+                isRunning ? 'Stop' : 'Run Tests (${config.customSteps.length})',
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: isRunning ? Colors.red : Colors.green,
+                foregroundColor: Colors.white,
+              ),
+              onPressed: isRunning
+                  ? () => runner.stopTests()
+                  : () => _runSelectedTests(),
+            ),
+            if (hasFailed && !isRunning)
+              OutlinedButton.icon(
+                icon: const Icon(Icons.refresh),
+                label: const Text('Re-run Failed'),
+                onPressed: _rerunFailedTests,
+              ),
+          ],
+        );
 
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -512,60 +581,49 @@ class _TestRunnerScreenState extends State<TestRunnerScreen> {
           ),
           child: Row(
             children: [
-              ElevatedButton.icon(
-                icon: Icon(isRunning ? Icons.stop : Icons.play_arrow),
-                label: Text(
-                  isRunning
-                      ? 'Stop'
-                      : 'Run Tests (${config.customSteps.length})',
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: isRunning ? Colors.red : Colors.green,
-                  foregroundColor: Colors.white,
-                ),
-                onPressed: isRunning
-                    ? () => runner.stopTests()
-                    : () => _runSelectedTests(),
-              ),
-              const SizedBox(width: 8),
-              if (hasFailed && !isRunning)
-                OutlinedButton.icon(
-                  icon: const Icon(Icons.refresh),
-                  label: const Text('Re-run Failed'),
-                  onPressed: _rerunFailedTests,
-                ),
-              const Spacer(),
-              if (!runner.webViewReady &&
-                  runner.webViewType == TestWebViewType.inAppWebView)
-                const Chip(
-                  avatar: SizedBox(
-                    width: 16,
-                    height: 16,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  ),
-                  label: Text('WebView loading...'),
-                ),
-              if (runner.webViewReady ||
-                  runner.webViewType == TestWebViewType.headless)
-                Chip(
-                  avatar: Icon(
-                    runner.webViewType == TestWebViewType.headless
-                        ? Icons.visibility_off
-                        : Icons.check_circle,
-                    color: Colors.green,
-                    size: 18,
-                  ),
-                  label: Text(
-                    runner.webViewType == TestWebViewType.headless
-                        ? 'Headless mode'
-                        : 'WebView ready',
-                  ),
-                ),
+              Expanded(child: actions),
+              if (statusChip != null) ...[
+                const SizedBox(width: 12),
+                statusChip,
+              ],
             ],
           ),
         );
       },
     );
+  }
+
+  Widget? _buildWebViewStatusChip(TestRunner runner) {
+    if (!runner.webViewReady &&
+        runner.webViewType == TestWebViewType.inAppWebView) {
+      return const Chip(
+        avatar: SizedBox(
+          width: 16,
+          height: 16,
+          child: CircularProgressIndicator(strokeWidth: 2),
+        ),
+        label: Text('WebView loading...'),
+      );
+    }
+
+    if (runner.webViewReady || runner.webViewType == TestWebViewType.headless) {
+      return Chip(
+        avatar: Icon(
+          runner.webViewType == TestWebViewType.headless
+              ? Icons.visibility_off
+              : Icons.check_circle,
+          color: Colors.green,
+          size: 18,
+        ),
+        label: Text(
+          runner.webViewType == TestWebViewType.headless
+              ? 'Headless mode'
+              : 'WebView ready',
+        ),
+      );
+    }
+
+    return null;
   }
 
   Widget _buildProgressSection() {
@@ -618,12 +676,49 @@ class _TestRunnerScreenState extends State<TestRunnerScreen> {
     );
   }
 
-  Widget _buildFilterBar() {
+  Widget _buildFilterBar({required bool isNarrow}) {
     return Consumer<TestRunner>(
       builder: (context, runner, child) {
         if (runner.results.isEmpty) {
           return const SizedBox.shrink();
         }
+
+        final filterButtons = SegmentedButton<ResultFilter>(
+          segments: [
+            ButtonSegment(
+              value: ResultFilter.all,
+              label: Text('All (${runner.results.length})'),
+            ),
+            ButtonSegment(
+              value: ResultFilter.passed,
+              label: Text('Passed (${runner.passed})'),
+              icon: const Icon(Icons.check_circle, size: 16),
+            ),
+            ButtonSegment(
+              value: ResultFilter.failed,
+              label: Text('Failed (${runner.failed})'),
+              icon: const Icon(Icons.cancel, size: 16),
+            ),
+            ButtonSegment(
+              value: ResultFilter.skipped,
+              label: Text('Skipped (${runner.skipped})'),
+              icon: const Icon(Icons.skip_next, size: 16),
+            ),
+          ],
+          selected: {_resultFilter},
+          onSelectionChanged: (selection) {
+            setState(() {
+              _resultFilter = selection.first;
+            });
+          },
+        );
+
+        final filterContent = isNarrow
+            ? SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: filterButtons,
+              )
+            : filterButtons;
 
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -631,41 +726,22 @@ class _TestRunnerScreenState extends State<TestRunnerScreen> {
             color: Colors.grey.shade100,
             border: Border(bottom: BorderSide(color: Colors.grey.shade300)),
           ),
-          child: Row(
-            children: [
-              const Text('Filter: '),
-              const SizedBox(width: 8),
-              SegmentedButton<ResultFilter>(
-                segments: [
-                  ButtonSegment(
-                    value: ResultFilter.all,
-                    label: Text('All (${runner.results.length})'),
-                  ),
-                  ButtonSegment(
-                    value: ResultFilter.passed,
-                    label: Text('Passed (${runner.passed})'),
-                    icon: const Icon(Icons.check_circle, size: 16),
-                  ),
-                  ButtonSegment(
-                    value: ResultFilter.failed,
-                    label: Text('Failed (${runner.failed})'),
-                    icon: const Icon(Icons.cancel, size: 16),
-                  ),
-                  ButtonSegment(
-                    value: ResultFilter.skipped,
-                    label: Text('Skipped (${runner.skipped})'),
-                    icon: const Icon(Icons.skip_next, size: 16),
-                  ),
-                ],
-                selected: {_resultFilter},
-                onSelectionChanged: (selection) {
-                  setState(() {
-                    _resultFilter = selection.first;
-                  });
-                },
-              ),
-            ],
-          ),
+          child: isNarrow
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(children: const [Text('Filter: '), SizedBox(width: 8)]),
+                    const SizedBox(height: 8),
+                    filterContent,
+                  ],
+                )
+              : Row(
+                  children: [
+                    const Text('Filter: '),
+                    const SizedBox(width: 8),
+                    Flexible(child: filterContent),
+                  ],
+                ),
         );
       },
     );

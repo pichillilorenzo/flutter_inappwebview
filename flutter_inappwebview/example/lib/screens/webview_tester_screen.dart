@@ -33,6 +33,7 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
   bool _canGoBack = false;
   bool _canGoForward = false;
   double _progress = 0;
+  bool _forceShowReloadAfterStop = false;
   String? _currentUrl;
   String? _currentTitle;
   late TabController _tabController;
@@ -43,6 +44,10 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
   static const double _dividerHeight = 6;
   static const double _minChromeHeight = 140;
   bool _settingsExpanded = false;
+
+  bool get _shouldShowStopButton {
+    return _progress > 0 && _progress < 1.0 && !_forceShowReloadAfterStop;
+  }
 
   @override
   void initState() {
@@ -99,11 +104,6 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
     return Column(
       children: [
         _buildCombinedControlBar(isMobile),
-        if (_progress < 1.0)
-          LinearProgressIndicator(
-            value: _progress,
-            backgroundColor: Colors.grey.shade200,
-          ),
         Expanded(child: _buildResizableContent(settingsManager, isMobile)),
       ],
     );
@@ -115,14 +115,9 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
       child: Column(
         children: [
           _buildCombinedControlBar(isMobile),
-          if (_progress < 1.0)
-            LinearProgressIndicator(
-              value: _progress,
-              backgroundColor: Colors.grey.shade200,
-            ),
           SizedBox(
             height: _minWebViewHeight,
-            child: _buildWebView(settingsManager),
+            child: _buildWebViewWithProgress(settingsManager),
           ),
           if (isMobile)
             _buildCollapsibleSettings()
@@ -165,10 +160,7 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
 
         return Column(
           children: [
-            SizedBox(
-              height: webViewHeight,
-              child: _buildWebView(settingsManager),
-            ),
+            _buildWebViewWithProgress(settingsManager, height: webViewHeight),
             if (isMobile)
               _buildCollapsibleSettings()
             else
@@ -219,6 +211,35 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
     );
   }
 
+  Widget _buildWebViewWithProgress(
+    SettingsManager settingsManager, {
+    double? height,
+  }) {
+    final webView = _buildWebView(settingsManager);
+
+    final stack = Stack(
+      children: [
+        Positioned.fill(child: webView),
+        if (_progress < 1.0)
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: LinearProgressIndicator(
+              value: _progress,
+              backgroundColor: Colors.grey.shade200,
+            ),
+          ),
+      ],
+    );
+
+    if (height != null) {
+      return SizedBox(height: height, child: stack);
+    }
+
+    return stack;
+  }
+
   /// Combined URL bar and navigation controls - optimized for mobile
   Widget _buildCombinedControlBar(bool isMobile) {
     if (isMobile) {
@@ -243,9 +264,17 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
               _canGoForward ? () => _webViewController?.goForward() : null,
             ),
             _buildCompactNavButton(
-              Icons.refresh,
-              'Reload',
-              () => _webViewController?.reload(),
+              _shouldShowStopButton ? Icons.stop : Icons.refresh,
+              _shouldShowStopButton ? 'Stop' : 'Reload',
+              _shouldShowStopButton
+                  ? () {
+                      setState(() => _forceShowReloadAfterStop = true);
+                      _webViewController?.stopLoading();
+                    }
+                  : () {
+                      setState(() => _forceShowReloadAfterStop = false);
+                      _webViewController?.reload();
+                    },
             ),
             const SizedBox(width: 4),
             // URL field takes remaining space
@@ -507,6 +536,7 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
 
       // 2. onLoadStart
       onLoadStart: (controller, url) {
+        _forceShowReloadAfterStop = false;
         _logEvent(
           EventType.navigation,
           PlatformWebViewCreationParamsProperty.onLoadStart.name,
@@ -520,6 +550,7 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
 
       // 3. onLoadStop
       onLoadStop: (controller, url) async {
+        _forceShowReloadAfterStop = false;
         _logEvent(
           EventType.navigation,
           PlatformWebViewCreationParamsProperty.onLoadStop.name,
@@ -566,6 +597,9 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
       onProgressChanged: (controller, progress) {
         setState(() {
           _progress = progress / 100;
+          if (_progress >= 1.0) {
+            _forceShowReloadAfterStop = false;
+          }
         });
         _logEvent(
           EventType.performance,

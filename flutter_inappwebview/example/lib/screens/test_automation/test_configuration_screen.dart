@@ -39,73 +39,79 @@ class _TestConfigurationScreenState extends State<TestConfigurationScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<TestConfigurationManager>(
-      builder: (context, manager, child) => Scaffold(
-        appBar: AppBar(
-          title: const Text('Test Configuration'),
-          backgroundColor: Colors.blue,
-          foregroundColor: Colors.white,
-          bottom: TabBar(
-            controller: _tabController,
-            indicatorColor: Colors.white,
-            labelColor: Colors.white,
-            unselectedLabelColor: Colors.white70,
-            tabs: const [
-              Tab(icon: Icon(Icons.edit_note), text: 'Custom Steps'),
-              Tab(icon: Icon(Icons.settings), text: 'Settings'),
-              Tab(icon: Icon(Icons.import_export), text: 'Import/Export'),
-            ],
-          ),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.save),
-              tooltip: 'Save Configuration',
-              onPressed: () => _saveConfiguration(context, manager),
-            ),
-            PopupMenuButton<String>(
-              icon: const Icon(Icons.more_vert),
-              onSelected: (action) =>
-                  _handleMenuAction(context, action, manager),
-              itemBuilder: (context) => [
-                const PopupMenuItem(
-                  value: 'new',
-                  child: ListTile(
-                    leading: Icon(Icons.add),
-                    title: Text('New Configuration'),
-                    contentPadding: EdgeInsets.zero,
-                  ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isNarrow = constraints.maxWidth < 600;
+        return Consumer<TestConfigurationManager>(
+          builder: (context, manager, child) => Scaffold(
+            appBar: AppBar(
+              title: const Text('Test Configuration'),
+              backgroundColor: Colors.blue,
+              foregroundColor: Colors.white,
+              bottom: TabBar(
+                controller: _tabController,
+                indicatorColor: Colors.white,
+                labelColor: Colors.white,
+                unselectedLabelColor: Colors.white70,
+                isScrollable: isNarrow,
+                tabs: const [
+                  Tab(icon: Icon(Icons.edit_note), text: 'Custom Steps'),
+                  Tab(icon: Icon(Icons.settings), text: 'Settings'),
+                  Tab(icon: Icon(Icons.import_export), text: 'Import/Export'),
+                ],
+              ),
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.save),
+                  tooltip: 'Save Configuration',
+                  onPressed: () => _saveConfiguration(context, manager),
                 ),
-                const PopupMenuItem(
-                  value: 'load',
-                  child: ListTile(
-                    leading: Icon(Icons.folder_open),
-                    title: Text('Load Configuration'),
-                    contentPadding: EdgeInsets.zero,
-                  ),
-                ),
-                const PopupMenuDivider(),
-                const PopupMenuItem(
-                  value: 'reset',
-                  child: ListTile(
-                    leading: Icon(Icons.restart_alt, color: Colors.orange),
-                    title: Text('Reset to Default'),
-                    contentPadding: EdgeInsets.zero,
-                  ),
+                PopupMenuButton<String>(
+                  icon: const Icon(Icons.more_vert),
+                  onSelected: (action) =>
+                      _handleMenuAction(context, action, manager),
+                  itemBuilder: (context) => [
+                    const PopupMenuItem(
+                      value: 'new',
+                      child: ListTile(
+                        leading: Icon(Icons.add),
+                        title: Text('New Configuration'),
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                    ),
+                    const PopupMenuItem(
+                      value: 'load',
+                      child: ListTile(
+                        leading: Icon(Icons.folder_open),
+                        title: Text('Load Configuration'),
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                    ),
+                    const PopupMenuDivider(),
+                    const PopupMenuItem(
+                      value: 'reset',
+                      child: ListTile(
+                        leading: Icon(Icons.restart_alt, color: Colors.orange),
+                        title: Text('Reset to Default'),
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
-          ],
-        ),
-        drawer: AppDrawer(),
-        body: TabBarView(
-          controller: _tabController,
-          children: [
-            _buildCustomStepsTab(manager),
-            _buildSettingsTab(manager),
-            _buildImportExportTab(manager),
-          ],
-        ),
-      ),
+            drawer: AppDrawer(),
+            body: TabBarView(
+              controller: _tabController,
+              children: [
+                _buildCustomStepsTab(manager),
+                _buildSettingsTab(manager),
+                _buildImportExportTab(manager),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 

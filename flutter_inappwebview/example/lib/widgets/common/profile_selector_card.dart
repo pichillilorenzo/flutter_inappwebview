@@ -212,7 +212,7 @@ class ProfileSelectorCard extends StatelessWidget {
                 items: [
                   const DropdownMenuItem(
                     value: null,
-                    child: Text('No Environment (Default)'),
+                    child: Text('No Environment'),
                   ),
                   ...settingsManager.environmentProfiles.map(
                     (profile) => DropdownMenuItem(

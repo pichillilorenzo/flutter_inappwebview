@@ -51,9 +51,7 @@ void main() {
       final titleField = find.byKey(
         const Key('inapp_browser_menu_title_field'),
       );
-      final addButton = find.byKey(
-        const Key('inapp_browser_menu_add_button'),
-      );
+      final addButton = find.byKey(const Key('inapp_browser_menu_add_button'));
 
       final mainScrollView = find
           .descendant(
@@ -62,11 +60,7 @@ void main() {
           )
           .first;
 
-      await tester.scrollUntilVisible(
-        idField,
-        200,
-        scrollable: mainScrollView,
-      );
+      await tester.scrollUntilVisible(idField, 200, scrollable: mainScrollView);
       await tester.pump();
 
       expect(idField, findsOneWidget);

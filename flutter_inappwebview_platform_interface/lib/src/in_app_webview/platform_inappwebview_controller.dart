@@ -2529,6 +2529,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
       IOSPlatform(note: 'This method is implemented using JavaScript.'),
       MacOSPlatform(note: 'This method is implemented using JavaScript.'),
       LinuxPlatform(note: 'Implemented via JavaScript MessageChannel API.'),
+      WindowsPlatform(note: 'Implemented via JavaScript MessageChannel API.'),
     ],
   )
   Future<PlatformWebMessageChannel?> createWebMessageChannel() {
@@ -2557,6 +2558,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
       IOSPlatform(note: 'This method is implemented using JavaScript.'),
       MacOSPlatform(note: 'This method is implemented using JavaScript.'),
       LinuxPlatform(note: 'Implemented via JavaScript MessageChannel API.'),
+      WindowsPlatform(note: 'Implemented via JavaScript MessageChannel API.'),
     ],
   )
   Future<void> postWebMessage({
@@ -2742,6 +2744,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
             'https://webkitgtk.org/reference/webkit2gtk/stable/method.UserContentManager.add_script.html',
       ),
       MacOSPlatform(note: 'This method is implemented using JavaScript.'),
+      WindowsPlatform(note: 'This method is implemented using JavaScript.'),
     ],
   )
   Future<void> addWebMessageListener(

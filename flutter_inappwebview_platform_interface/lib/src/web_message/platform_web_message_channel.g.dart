@@ -16,6 +16,8 @@ extension _PlatformWebMessageChannelCreationParamsClassSupported
   ///- macOS WKWebView
   ///- Linux WPE WebKit:
   ///    - Implemented via JavaScript MessageChannel API.
+  ///- Windows WebView2:
+  ///    - Implemented via JavaScript MessageChannel API.
   ///
   ///Use the [PlatformWebMessageChannelCreationParams.isClassSupported] method to check if this class is supported at runtime.
   ///{@endtemplate}
@@ -26,6 +28,7 @@ extension _PlatformWebMessageChannelCreationParamsClassSupported
           TargetPlatform.iOS,
           TargetPlatform.macOS,
           TargetPlatform.linux,
+          TargetPlatform.windows,
         ].contains(platform ?? defaultTargetPlatform);
   }
 }
@@ -42,6 +45,8 @@ enum PlatformWebMessageChannelCreationParamsProperty {
   ///- macOS WKWebView
   ///- Linux WPE WebKit:
   ///    - Implemented via JavaScript MessageChannel API.
+  ///- Windows WebView2:
+  ///    - Implemented via JavaScript MessageChannel API.
   ///
   ///Use the [PlatformWebMessageChannelCreationParams.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
@@ -57,6 +62,8 @@ enum PlatformWebMessageChannelCreationParamsProperty {
   ///- macOS WKWebView
   ///- Linux WPE WebKit:
   ///    - Implemented via JavaScript MessageChannel API.
+  ///- Windows WebView2:
+  ///    - Implemented via JavaScript MessageChannel API.
   ///
   ///Use the [PlatformWebMessageChannelCreationParams.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
@@ -71,6 +78,8 @@ enum PlatformWebMessageChannelCreationParamsProperty {
   ///- iOS WKWebView
   ///- macOS WKWebView
   ///- Linux WPE WebKit:
+  ///    - Implemented via JavaScript MessageChannel API.
+  ///- Windows WebView2:
   ///    - Implemented via JavaScript MessageChannel API.
   ///
   ///Use the [PlatformWebMessageChannelCreationParams.isPropertySupported] method to check if this property is supported at runtime.
@@ -92,6 +101,7 @@ extension _PlatformWebMessageChannelCreationParamsPropertySupported
               TargetPlatform.iOS,
               TargetPlatform.macOS,
               TargetPlatform.linux,
+              TargetPlatform.windows,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebMessageChannelCreationParamsProperty.port1:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -100,6 +110,7 @@ extension _PlatformWebMessageChannelCreationParamsPropertySupported
               TargetPlatform.iOS,
               TargetPlatform.macOS,
               TargetPlatform.linux,
+              TargetPlatform.windows,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebMessageChannelCreationParamsProperty.port2:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -108,6 +119,7 @@ extension _PlatformWebMessageChannelCreationParamsPropertySupported
               TargetPlatform.iOS,
               TargetPlatform.macOS,
               TargetPlatform.linux,
+              TargetPlatform.windows,
             ].contains(platform ?? defaultTargetPlatform);
     }
   }
@@ -123,6 +135,8 @@ extension _PlatformWebMessageChannelClassSupported
   ///- macOS WKWebView
   ///- Linux WPE WebKit:
   ///    - Implemented via JavaScript MessageChannel API.
+  ///- Windows WebView2:
+  ///    - Implemented via JavaScript MessageChannel API.
   ///
   ///Use the [PlatformWebMessageChannel.isClassSupported] method to check if this class is supported at runtime.
   ///{@endtemplate}
@@ -133,6 +147,7 @@ extension _PlatformWebMessageChannelClassSupported
           TargetPlatform.iOS,
           TargetPlatform.macOS,
           TargetPlatform.linux,
+          TargetPlatform.windows,
         ].contains(platform ?? defaultTargetPlatform);
   }
 }
@@ -148,6 +163,8 @@ enum PlatformWebMessageChannelMethod {
   ///- iOS WKWebView
   ///- macOS WKWebView
   ///- Linux WPE WebKit:
+  ///    - Implemented via JavaScript MessageChannel API.
+  ///- Windows WebView2:
   ///    - Implemented via JavaScript MessageChannel API.
   ///
   ///Use the [PlatformWebMessageChannel.isMethodSupported] method to check if this method is supported at runtime.
@@ -169,6 +186,7 @@ extension _PlatformWebMessageChannelMethodSupported
               TargetPlatform.iOS,
               TargetPlatform.macOS,
               TargetPlatform.linux,
+              TargetPlatform.windows,
             ].contains(platform ?? defaultTargetPlatform);
     }
   }

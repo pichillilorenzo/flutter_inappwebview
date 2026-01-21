@@ -15,6 +15,7 @@ extension _PlatformWebMessageListenerCreationParamsClassSupported
   ///- iOS WKWebView
   ///- macOS WKWebView
   ///- Linux WPE WebKit
+  ///- Windows WebView2
   ///
   ///Use the [PlatformWebMessageListenerCreationParams.isClassSupported] method to check if this class is supported at runtime.
   ///{@endtemplate}
@@ -25,6 +26,7 @@ extension _PlatformWebMessageListenerCreationParamsClassSupported
           TargetPlatform.iOS,
           TargetPlatform.macOS,
           TargetPlatform.linux,
+          TargetPlatform.windows,
         ].contains(platform ?? defaultTargetPlatform);
   }
 }
@@ -40,6 +42,7 @@ enum PlatformWebMessageListenerCreationParamsProperty {
   ///- iOS WKWebView
   ///- macOS WKWebView
   ///- Linux WPE WebKit
+  ///- Windows WebView2
   ///
   ///Use the [PlatformWebMessageListenerCreationParams.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
@@ -54,6 +57,7 @@ enum PlatformWebMessageListenerCreationParamsProperty {
   ///- iOS WKWebView
   ///- macOS WKWebView
   ///- Linux WPE WebKit
+  ///- Windows WebView2
   ///
   ///Use the [PlatformWebMessageListenerCreationParams.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
@@ -68,6 +72,7 @@ enum PlatformWebMessageListenerCreationParamsProperty {
   ///- iOS WKWebView
   ///- macOS WKWebView
   ///- Linux WPE WebKit
+  ///- Windows WebView2
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [message]: all platforms
@@ -94,6 +99,7 @@ extension _PlatformWebMessageListenerCreationParamsPropertySupported
               TargetPlatform.iOS,
               TargetPlatform.macOS,
               TargetPlatform.linux,
+              TargetPlatform.windows,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebMessageListenerCreationParamsProperty.jsObjectName:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -102,6 +108,7 @@ extension _PlatformWebMessageListenerCreationParamsPropertySupported
               TargetPlatform.iOS,
               TargetPlatform.macOS,
               TargetPlatform.linux,
+              TargetPlatform.windows,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebMessageListenerCreationParamsProperty.onPostMessage:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -110,6 +117,7 @@ extension _PlatformWebMessageListenerCreationParamsPropertySupported
               TargetPlatform.iOS,
               TargetPlatform.macOS,
               TargetPlatform.linux,
+              TargetPlatform.windows,
             ].contains(platform ?? defaultTargetPlatform);
     }
   }
@@ -124,6 +132,7 @@ extension _PlatformWebMessageListenerClassSupported
   ///- iOS WKWebView
   ///- macOS WKWebView
   ///- Linux WPE WebKit
+  ///- Windows WebView2
   ///
   ///Use the [PlatformWebMessageListener.isClassSupported] method to check if this class is supported at runtime.
   ///{@endtemplate}
@@ -134,6 +143,7 @@ extension _PlatformWebMessageListenerClassSupported
           TargetPlatform.iOS,
           TargetPlatform.macOS,
           TargetPlatform.linux,
+          TargetPlatform.windows,
         ].contains(platform ?? defaultTargetPlatform);
   }
 }
@@ -149,6 +159,7 @@ enum PlatformWebMessageListenerMethod {
   ///- iOS WKWebView
   ///- macOS WKWebView
   ///- Linux WPE WebKit
+  ///- Windows WebView2
   ///
   ///Use the [PlatformWebMessageListener.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
@@ -169,6 +180,7 @@ extension _PlatformWebMessageListenerMethodSupported
               TargetPlatform.iOS,
               TargetPlatform.macOS,
               TargetPlatform.linux,
+              TargetPlatform.windows,
             ].contains(platform ?? defaultTargetPlatform);
     }
   }

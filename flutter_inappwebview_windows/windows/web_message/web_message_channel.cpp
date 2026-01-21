@@ -20,7 +20,7 @@ WebMessageChannel::WebMessageChannel(flutter::BinaryMessenger* messenger,
 
 WebMessageChannel::~WebMessageChannel() {
   debugLog("dealloc WebMessageChannel");
-  webView_ = nullptr;
+  dispose();
 }
 
 void WebMessageChannel::dispose() {

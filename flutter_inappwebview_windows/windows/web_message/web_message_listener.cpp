@@ -34,7 +34,7 @@ std::unique_ptr<WebMessageListener> WebMessageListener::fromEncodableValue(
   }
 
   if (id.empty() || jsObjectName.empty()) {
-    ::flutter_inappwebview_plugin::debugLog("WebMessageListener::fromEncodableValue: missing id or jsObjectName", true);
+    debugLog("WebMessageListener::fromEncodableValue: missing id or jsObjectName");
     return nullptr;
   }
 

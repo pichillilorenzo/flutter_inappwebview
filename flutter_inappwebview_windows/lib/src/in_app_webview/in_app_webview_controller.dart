@@ -10,6 +10,8 @@ import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_pla
 
 import '../in_app_browser/in_app_browser.dart';
 import '../print_job/main.dart';
+import '../web_message/web_message_channel.dart';
+import '../web_message/web_message_listener.dart';
 import '../web_storage/web_storage.dart';
 import '_static_channel.dart';
 import 'headless_in_app_webview.dart';
@@ -55,7 +57,9 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
     UserScriptInjectionTime.AT_DOCUMENT_START: <UserScript>[],
     UserScriptInjectionTime.AT_DOCUMENT_END: <UserScript>[],
   };
+  Set<WindowsWebMessageListener> _webMessageListeners = Set();
   Set<String> _webMessageListenerObjNames = Set();
+  Set<WindowsWebMessageChannel> _webMessageChannels = Set();
   Map<String, ScriptHtmlTagAttributes> _injectedScriptsFromURL = {};
   Map<String, Function(dynamic data)> _devToolsProtocolEventListenerMap =
       HashMap();
@@ -1826,6 +1830,48 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
               onErrorCallback();
             }
             return null;
+          case "onWebMessageListenerPostMessageReceived":
+            Map<String, dynamic> arguments = handlerData.args[0]
+                .cast<String, dynamic>();
+            String jsObjectName = arguments["jsObjectName"];
+            for (var listener in _webMessageListeners) {
+              if (listener.params.jsObjectName == jsObjectName) {
+                Map<String, dynamic>? messageMap = arguments["message"]
+                    ?.cast<String, dynamic>();
+                WebMessage? message = messageMap != null
+                    ? WebMessage.fromMap(messageMap)
+                    : null;
+                String? sourceOrigin = arguments["sourceOrigin"];
+                bool isMainFrame = arguments["isMainFrame"] ?? true;
+                listener.channel?.invokeMethod("onPostMessage", {
+                  "message": message?.toMap(),
+                  "sourceOrigin": sourceOrigin,
+                  "isMainFrame": isMainFrame,
+                });
+                break;
+              }
+            }
+            return null;
+          case "onWebMessagePortMessageReceived":
+            Map<String, dynamic> arguments = handlerData.args[0]
+                .cast<String, dynamic>();
+            String webMessageChannelId = arguments["webMessageChannelId"];
+            int index = arguments["index"];
+            for (var webMessageChannel in _webMessageChannels) {
+              if (webMessageChannel.id == webMessageChannelId) {
+                Map<String, dynamic>? messageMap = arguments["message"]
+                    ?.cast<String, dynamic>();
+                WebMessage? message = messageMap != null
+                    ? WebMessage.fromMap(messageMap)
+                    : null;
+                webMessageChannel.internalChannel?.invokeMethod("onMessage", {
+                  "index": index,
+                  "message": message?.toMap(),
+                });
+                break;
+              }
+            }
+            return null;
         }
 
         if (_javaScriptHandlersMap.containsKey(handlerName)) {
@@ -2843,6 +2889,64 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
   }
 
   @override
+  Future<void> addWebMessageListener(
+    PlatformWebMessageListener webMessageListener,
+  ) async {
+    assert(
+      !_webMessageListeners.contains(webMessageListener),
+      "${webMessageListener} was already added.",
+    );
+    assert(
+      !_webMessageListenerObjNames.contains(
+        webMessageListener.params.jsObjectName,
+      ),
+      "jsObjectName ${webMessageListener.params.jsObjectName} was already added.",
+    );
+    _webMessageListeners.add(webMessageListener as WindowsWebMessageListener);
+    _webMessageListenerObjNames.add(webMessageListener.params.jsObjectName);
+
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('webMessageListener', () => webMessageListener.toMap());
+    await channel?.invokeMethod('addWebMessageListener', args);
+  }
+
+  @override
+  bool hasWebMessageListener(PlatformWebMessageListener webMessageListener) {
+    return _webMessageListeners.contains(webMessageListener) ||
+        _webMessageListenerObjNames.contains(
+          webMessageListener.params.jsObjectName,
+        );
+  }
+
+  @override
+  Future<WindowsWebMessageChannel?> createWebMessageChannel() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    Map<String, dynamic>? result = (await channel?.invokeMethod(
+      'createWebMessageChannel',
+      args,
+    ))?.cast<String, dynamic>();
+    final webMessageChannel = WindowsWebMessageChannel.static().fromMap(result);
+    if (webMessageChannel != null) {
+      _webMessageChannels.add(webMessageChannel);
+    }
+    return webMessageChannel;
+  }
+
+  @override
+  Future<void> postWebMessage({
+    required WebMessage message,
+    WebUri? targetOrigin,
+  }) async {
+    if (targetOrigin == null) {
+      targetOrigin = WebUri('');
+    }
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('message', () => message.toMap());
+    args.putIfAbsent('targetOrigin', () => targetOrigin.toString());
+    await channel?.invokeMethod('postWebMessage', args);
+  }
+
+  @override
   Future<CallAsyncJavaScriptResult?> callAsyncJavaScript({
     required String functionBody,
     Map<String, dynamic> arguments = const <String, dynamic>{},
@@ -3160,6 +3264,14 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
     _inAppBrowser = null;
     webStorage.dispose();
     if (!isKeepAlive) {
+      for (final webMessageListener in _webMessageListeners) {
+        webMessageListener.dispose();
+      }
+      _webMessageListeners.clear();
+      for (final webMessageChannel in _webMessageChannels) {
+        webMessageChannel.dispose();
+      }
+      _webMessageChannels.clear();
       _controllerFromPlatform = null;
       _javaScriptHandlersMap.clear();
       _userScripts.clear();

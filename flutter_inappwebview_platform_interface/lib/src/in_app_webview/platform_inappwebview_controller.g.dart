@@ -218,6 +218,8 @@ enum PlatformInAppWebViewControllerMethod {
   ///    - This method is implemented using JavaScript.
   ///- macOS WKWebView:
   ///    - This method is implemented using JavaScript.
+  ///- Windows WebView2:
+  ///    - This method is implemented using JavaScript.
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [webMessageListener]: all platforms
@@ -502,6 +504,8 @@ enum PlatformInAppWebViewControllerMethod {
   ///- macOS WKWebView:
   ///    - This method is implemented using JavaScript.
   ///- Linux WPE WebKit:
+  ///    - Implemented via JavaScript MessageChannel API.
+  ///- Windows WebView2:
   ///    - Implemented via JavaScript MessageChannel API.
   ///
   ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
@@ -1727,6 +1731,8 @@ enum PlatformInAppWebViewControllerMethod {
   ///    - This method is implemented using JavaScript.
   ///- Linux WPE WebKit:
   ///    - Implemented via JavaScript MessageChannel API.
+  ///- Windows WebView2:
+  ///    - Implemented via JavaScript MessageChannel API.
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [message]: all platforms
@@ -2530,6 +2536,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
               TargetPlatform.iOS,
               TargetPlatform.linux,
               TargetPlatform.macOS,
+              TargetPlatform.windows,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.callAsyncJavaScript:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -2669,6 +2676,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
               TargetPlatform.iOS,
               TargetPlatform.macOS,
               TargetPlatform.linux,
+              TargetPlatform.windows,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.disableWebView:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -3297,6 +3305,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
               TargetPlatform.iOS,
               TargetPlatform.macOS,
               TargetPlatform.linux,
+              TargetPlatform.windows,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.printCurrentPage:
         return kIsWeb && platform == null

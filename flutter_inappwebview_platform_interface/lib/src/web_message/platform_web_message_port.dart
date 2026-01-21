@@ -53,6 +53,7 @@ class PlatformWebMessagePortCreationParams {
     IOSPlatform(),
     MacOSPlatform(),
     LinuxPlatform(note: 'Implemented via JavaScript MessageChannel API.'),
+    WindowsPlatform(note: 'Implemented via JavaScript MessageChannel API.'),
   ],
 )
 abstract class PlatformWebMessagePort extends PlatformInterface
@@ -102,6 +103,7 @@ abstract class IWebMessagePort {
       IOSPlatform(),
       MacOSPlatform(),
       LinuxPlatform(note: 'Implemented via JavaScript MessageChannel API.'),
+      WindowsPlatform(note: 'Implemented via JavaScript MessageChannel API.'),
     ],
   )
   Future<void> setWebMessageCallback(WebMessageCallback? onMessage) {
@@ -121,6 +123,7 @@ abstract class IWebMessagePort {
       IOSPlatform(),
       MacOSPlatform(),
       LinuxPlatform(note: 'Implemented via JavaScript MessageChannel API.'),
+      WindowsPlatform(note: 'Implemented via JavaScript MessageChannel API.'),
     ],
   )
   Future<void> postMessage(WebMessage message) {
@@ -140,6 +143,7 @@ abstract class IWebMessagePort {
       IOSPlatform(),
       MacOSPlatform(),
       LinuxPlatform(note: 'Implemented via JavaScript MessageChannel API.'),
+      WindowsPlatform(note: 'Implemented via JavaScript MessageChannel API.'),
     ],
   )
   Future<void> close() {

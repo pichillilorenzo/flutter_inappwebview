@@ -22,6 +22,7 @@ part 'platform_web_message_channel.g.dart';
     IOSPlatform(),
     MacOSPlatform(),
     LinuxPlatform(note: 'Implemented via JavaScript MessageChannel API.'),
+    WindowsPlatform(note: 'Implemented via JavaScript MessageChannel API.'),
   ],
 )
 @immutable
@@ -44,6 +45,7 @@ class PlatformWebMessageChannelCreationParams {
       IOSPlatform(),
       MacOSPlatform(),
       LinuxPlatform(note: 'Implemented via JavaScript MessageChannel API.'),
+      WindowsPlatform(note: 'Implemented via JavaScript MessageChannel API.'),
     ],
   )
   final String id;
@@ -59,6 +61,7 @@ class PlatformWebMessageChannelCreationParams {
       IOSPlatform(),
       MacOSPlatform(),
       LinuxPlatform(note: 'Implemented via JavaScript MessageChannel API.'),
+      WindowsPlatform(note: 'Implemented via JavaScript MessageChannel API.'),
     ],
   )
   final PlatformWebMessagePort port1;
@@ -74,6 +77,7 @@ class PlatformWebMessageChannelCreationParams {
       IOSPlatform(),
       MacOSPlatform(),
       LinuxPlatform(note: 'Implemented via JavaScript MessageChannel API.'),
+      WindowsPlatform(note: 'Implemented via JavaScript MessageChannel API.'),
     ],
   )
   final PlatformWebMessagePort port2;
@@ -115,6 +119,7 @@ class PlatformWebMessageChannelCreationParams {
     IOSPlatform(),
     MacOSPlatform(),
     LinuxPlatform(note: 'Implemented via JavaScript MessageChannel API.'),
+    WindowsPlatform(note: 'Implemented via JavaScript MessageChannel API.'),
   ],
 )
 abstract class PlatformWebMessageChannel extends PlatformInterface
@@ -196,6 +201,7 @@ abstract class PlatformWebMessageChannel extends PlatformInterface
       IOSPlatform(),
       MacOSPlatform(),
       LinuxPlatform(note: 'Implemented via JavaScript MessageChannel API.'),
+      WindowsPlatform(note: 'Implemented via JavaScript MessageChannel API.'),
     ],
   )
   @override

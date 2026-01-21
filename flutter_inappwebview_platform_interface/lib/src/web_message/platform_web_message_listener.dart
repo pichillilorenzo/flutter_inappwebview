@@ -19,7 +19,13 @@ part 'platform_web_message_listener.g.dart';
 ///
 ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageListenerCreationParams.supported_platforms}
 @SupportedPlatforms(
-  platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform(), LinuxPlatform()],
+  platforms: [
+    AndroidPlatform(),
+    IOSPlatform(),
+    MacOSPlatform(),
+    LinuxPlatform(),
+    WindowsPlatform(),
+  ],
 )
 @immutable
 class PlatformWebMessageListenerCreationParams {
@@ -36,7 +42,13 @@ class PlatformWebMessageListenerCreationParams {
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageListenerCreationParams.jsObjectName.supported_platforms}
   @SupportedPlatforms(
-    platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform(), LinuxPlatform()],
+    platforms: [
+      AndroidPlatform(),
+      IOSPlatform(),
+      MacOSPlatform(),
+      LinuxPlatform(),
+      WindowsPlatform(),
+    ],
   )
   final String jsObjectName;
 
@@ -46,7 +58,13 @@ class PlatformWebMessageListenerCreationParams {
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageListenerCreationParams.allowedOriginRules.supported_platforms}
   @SupportedPlatforms(
-    platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform(), LinuxPlatform()],
+    platforms: [
+      AndroidPlatform(),
+      IOSPlatform(),
+      MacOSPlatform(),
+      LinuxPlatform(),
+      WindowsPlatform(),
+    ],
   )
   final Set<String>? allowedOriginRules;
 
@@ -72,6 +90,7 @@ class PlatformWebMessageListenerCreationParams {
       IOSPlatform(),
       MacOSPlatform(),
       LinuxPlatform(),
+      WindowsPlatform(),
     ],
   )
   final OnPostMessageCallback? onPostMessage;
@@ -108,7 +127,13 @@ class PlatformWebMessageListenerCreationParams {
 ///
 ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageListener.supported_platforms}
 @SupportedPlatforms(
-  platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform(), LinuxPlatform()],
+  platforms: [
+    AndroidPlatform(),
+    IOSPlatform(),
+    MacOSPlatform(),
+    LinuxPlatform(),
+    WindowsPlatform(),
+  ],
 )
 abstract class PlatformWebMessageListener extends PlatformInterface
     implements Disposable {
@@ -190,7 +215,13 @@ abstract class PlatformWebMessageListener extends PlatformInterface
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageListener.dispose.supported_platforms}
   @SupportedPlatforms(
-    platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform(), LinuxPlatform()],
+    platforms: [
+      AndroidPlatform(),
+      IOSPlatform(),
+      MacOSPlatform(),
+      LinuxPlatform(),
+      WindowsPlatform(),
+    ],
   )
   @override
   void dispose() {
@@ -251,6 +282,17 @@ class PlatformJavaScriptReplyProxyCreationParams {
 ///
 ///There is a 1:1 relationship between this object and the JavaScript object in a frame.
 ///{@endtemplate}
+///
+///{@macro flutter_inappwebview_platform_interface.PlatformJavaScriptReplyProxy.supported_platforms}
+@SupportedPlatforms(
+  platforms: [
+    AndroidPlatform(),
+    IOSPlatform(),
+    MacOSPlatform(),
+    LinuxPlatform(),
+    WindowsPlatform(),
+  ],
+)
 abstract class PlatformJavaScriptReplyProxy extends PlatformInterface {
   /// Creates a new [PlatformWebMessageListener]
   factory PlatformJavaScriptReplyProxy(
@@ -291,6 +333,17 @@ abstract class PlatformJavaScriptReplyProxy extends PlatformInterface {
   ///
   ///**Official Android API**: https://developer.android.com/reference/androidx/webkit/JavaScriptReplyProxy#postMessage(java.lang.String)
   ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformJavaScriptReplyProxy.postMessage.supported_platforms}
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(),
+      IOSPlatform(),
+      MacOSPlatform(),
+      LinuxPlatform(),
+      WindowsPlatform(),
+    ],
+  )
   Future<void> postMessage(WebMessage message) {
     throw UnimplementedError(
       'postMessage is not implemented on the current platform.',

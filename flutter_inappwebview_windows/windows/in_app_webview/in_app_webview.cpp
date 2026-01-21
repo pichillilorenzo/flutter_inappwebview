@@ -1979,13 +1979,28 @@ namespace flutter_inappwebview_plugin
   {
     if (!webView) return;
 
+    std::string messageDataJs;
     if (messageType == 1) {
-      std::string jsonArray = "[" + messageData + "]";
-      failedLog(webView->PostWebMessageAsJson(utf8_to_wide(jsonArray).c_str()));
-      return;
+      messageDataJs = "new Uint8Array([" + messageData + "]).buffer";
+    }
+    else {
+      std::string escaped;
+      escaped.reserve(messageData.size() * 2);
+      for (char c : messageData) {
+        switch (c) {
+        case '\\': escaped += "\\\\"; break;
+        case '"': escaped += "\\\""; break;
+        case '\n': escaped += "\\n"; break;
+        case '\r': escaped += "\\r"; break;
+        case '\t': escaped += "\\t"; break;
+        default: escaped += c; break;
+        }
+      }
+      messageDataJs = "\"" + escaped + "\"";
     }
 
-    failedLog(webView->PostWebMessageAsString(utf8_to_wide(messageData).c_str()));
+    std::string js = WebMessageChannelJS::postWebMessageJs(messageDataJs, targetOrigin, "");
+    evaluateJavascript(js, ContentWorld::page(), nullptr);
   }
 
   void InAppWebView::setWebMessageCallback(const std::string& channelId, int portIndex)
@@ -2042,6 +2057,10 @@ namespace flutter_inappwebview_plugin
       evaluateJavascript(js, ContentWorld::page(), nullptr);
     }
 
+    auto it = webMessageChannels_.find(channelId);
+    if (it != webMessageChannels_.end() && it->second) {
+      it->second->dispose();
+    }
     webMessageChannels_.erase(channelId);
   }
 

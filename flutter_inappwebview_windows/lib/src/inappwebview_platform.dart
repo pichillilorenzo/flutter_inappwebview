@@ -5,6 +5,9 @@ import 'in_app_browser/in_app_browser.dart';
 import 'in_app_webview/headless_in_app_webview.dart';
 import 'in_app_webview/in_app_webview.dart';
 import 'in_app_webview/in_app_webview_controller.dart';
+import 'web_message/web_message_channel.dart';
+import 'web_message/web_message_listener.dart';
+import 'web_message/web_message_port.dart';
 import 'web_storage/web_storage.dart';
 import 'webview_environment/webview_environment.dart';
 
@@ -310,13 +313,46 @@ class WindowsInAppWebViewPlatform extends InAppWebViewPlatform {
     return _PlatformWebAuthenticationSession.static();
   }
 
+  /// Creates a new [WindowsWebMessageChannel].
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [WebMessageChannel] in `flutter_inappwebview` instead.
+  @override
+  WindowsWebMessageChannel createPlatformWebMessageChannel(
+    PlatformWebMessageChannelCreationParams params,
+  ) {
+    return WindowsWebMessageChannel(params);
+  }
+
   /// Creates a new empty [PlatformWebMessageChannel] to access static methods.
   ///
   /// This function should only be called by the app-facing package.
   /// Look at using [WebMessageChannel] in `flutter_inappwebview` instead.
   @override
   PlatformWebMessageChannel createPlatformWebMessageChannelStatic() {
-    return _PlatformWebMessageChannel.static();
+    return WindowsWebMessageChannel.static();
+  }
+
+  /// Creates a new [WindowsWebMessagePort].
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [WebMessagePort] in `flutter_inappwebview` instead.
+  @override
+  WindowsWebMessagePort createPlatformWebMessagePort(
+    PlatformWebMessagePortCreationParams params,
+  ) {
+    return WindowsWebMessagePort(params);
+  }
+
+  /// Creates a new [WindowsWebMessageListener].
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [WebMessageListener] in `flutter_inappwebview` instead.
+  @override
+  WindowsWebMessageListener createPlatformWebMessageListener(
+    PlatformWebMessageListenerCreationParams params,
+  ) {
+    return WindowsWebMessageListener(params);
   }
 
   /// Creates a new empty [PlatformWebMessageListener] to access static methods.
@@ -325,7 +361,18 @@ class WindowsInAppWebViewPlatform extends InAppWebViewPlatform {
   /// Look at using [WebMessageListener] in `flutter_inappwebview` instead.
   @override
   PlatformWebMessageListener createPlatformWebMessageListenerStatic() {
-    return _PlatformWebMessageListener.static();
+    return WindowsWebMessageListener.static();
+  }
+
+  /// Creates a new [WindowsJavaScriptReplyProxy].
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [JavaScriptReplyProxy] in `flutter_inappwebview` instead.
+  @override
+  WindowsJavaScriptReplyProxy createPlatformJavaScriptReplyProxy(
+    PlatformJavaScriptReplyProxyCreationParams params,
+  ) {
+    return WindowsJavaScriptReplyProxy(params);
   }
 }
 
@@ -450,74 +497,6 @@ class _PlatformWebAuthenticationSession
       );
 
   factory _PlatformWebAuthenticationSession.static() => _staticValue;
-}
-
-class _PlatformWebMessageChannel extends PlatformWebMessageChannel {
-  _PlatformWebMessageChannel(PlatformWebMessageChannelCreationParams params)
-    : super.implementation(params);
-
-  static final _PlatformWebMessageChannel _staticValue =
-      _PlatformWebMessageChannel(
-        PlatformWebMessageChannelCreationParams(
-          id: '',
-          port1: _PlatformWebMessagePort(
-            const PlatformWebMessagePortCreationParams(index: 0),
-          ),
-          port2: _PlatformWebMessagePort(
-            const PlatformWebMessagePortCreationParams(index: 1),
-          ),
-        ),
-      );
-
-  factory _PlatformWebMessageChannel.static() => _staticValue;
-}
-
-class _PlatformWebMessageListener extends PlatformWebMessageListener {
-  _PlatformWebMessageListener(PlatformWebMessageListenerCreationParams params)
-    : super.implementation(params);
-
-  static final _PlatformWebMessageListener _staticValue =
-      _PlatformWebMessageListener(
-        const PlatformWebMessageListenerCreationParams(jsObjectName: ''),
-      );
-
-  factory _PlatformWebMessageListener.static() => _staticValue;
-}
-
-class _PlatformWebMessagePort extends PlatformWebMessagePort {
-  _PlatformWebMessagePort(PlatformWebMessagePortCreationParams params)
-    : super.implementation(params);
-
-  static final _PlatformWebMessagePort _staticValue = _PlatformWebMessagePort(
-    const PlatformWebMessagePortCreationParams(index: 0),
-  );
-
-  factory _PlatformWebMessagePort.static() => _staticValue;
-
-  @override
-  Future<void> close() {
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<void> postMessage(WebMessage message) {
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<void> setWebMessageCallback(WebMessageCallback? onMessage) {
-    throw UnimplementedError();
-  }
-
-  @override
-  Map<String, dynamic> toJson() {
-    throw UnimplementedError();
-  }
-
-  @override
-  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
-    throw UnimplementedError();
-  }
 }
 
 class _PlatformWebStorageManager extends PlatformWebStorageManager {

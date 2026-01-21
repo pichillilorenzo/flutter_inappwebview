@@ -13,6 +13,7 @@ import 'package:flutter_inappwebview_example/widgets/webview/user_script_tester_
 import 'package:flutter_inappwebview_example/widgets/common/app_drawer.dart';
 import 'package:flutter_inappwebview_example/providers/settings_manager.dart';
 import 'package:flutter_inappwebview_example/widgets/common/profile_selector_card.dart';
+import 'package:flutter_inappwebview_example/utils/responsive_utils.dart';
 
 /// Main screen for testing InAppWebView functionality
 class WebViewTesterScreen extends StatefulWidget {
@@ -41,6 +42,7 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
   static const double _minTabsHeight = 220;
   static const double _dividerHeight = 6;
   static const double _minChromeHeight = 140;
+  bool _settingsExpanded = false;
 
   @override
   void initState() {
@@ -93,26 +95,26 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
   }
 
   Widget _buildStandardBody(SettingsManager settingsManager) {
+    final isMobile = context.isMobile;
     return Column(
       children: [
-        _buildUrlBar(),
-        _buildNavigationControls(),
+        _buildCombinedControlBar(isMobile),
         if (_progress < 1.0)
           LinearProgressIndicator(
             value: _progress,
             backgroundColor: Colors.grey.shade200,
           ),
-        Expanded(child: _buildResizableContent(settingsManager)),
+        Expanded(child: _buildResizableContent(settingsManager, isMobile)),
       ],
     );
   }
 
   Widget _buildScrollableBody(SettingsManager settingsManager) {
+    final isMobile = context.isMobile;
     return SingleChildScrollView(
       child: Column(
         children: [
-          _buildUrlBar(),
-          _buildNavigationControls(),
+          _buildCombinedControlBar(isMobile),
           if (_progress < 1.0)
             LinearProgressIndicator(
               value: _progress,
@@ -122,13 +124,16 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
             height: _minWebViewHeight,
             child: _buildWebView(settingsManager),
           ),
-          ProfileSelectorCard(
-            compact: true,
-            onEditSettingsProfile: () =>
-                Navigator.pushNamed(context, '/settings'),
-            onEditEnvironmentProfile: () =>
-                Navigator.pushNamed(context, '/environment-settings'),
-          ),
+          if (isMobile)
+            _buildCollapsibleSettings()
+          else
+            ProfileSelectorCard(
+              compact: true,
+              onEditSettingsProfile: () =>
+                  Navigator.pushNamed(context, '/settings'),
+              onEditEnvironmentProfile: () =>
+                  Navigator.pushNamed(context, '/environment-settings'),
+            ),
           Container(height: _dividerHeight, color: Colors.grey.shade300),
           SizedBox(height: _minTabsHeight, child: _buildBottomTabs()),
         ],
@@ -136,11 +141,16 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
     );
   }
 
-  Widget _buildResizableContent(SettingsManager settingsManager) {
+  Widget _buildResizableContent(
+    SettingsManager settingsManager,
+    bool isMobile,
+  ) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        // Account for ProfileSelectorCard height (approximately 120 for compact mode)
-        const profileCardHeight = 120.0;
+        // Account for ProfileSelectorCard height - smaller on mobile when collapsed
+        final profileCardHeight = isMobile
+            ? (_settingsExpanded ? 100.0 : 40.0)
+            : 120.0;
         final maxWebViewHeight =
             constraints.maxHeight -
             _minTabsHeight -
@@ -159,13 +169,16 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
               height: webViewHeight,
               child: _buildWebView(settingsManager),
             ),
-            ProfileSelectorCard(
-              compact: true,
-              onEditSettingsProfile: () =>
-                  Navigator.pushNamed(context, '/settings'),
-              onEditEnvironmentProfile: () =>
-                  Navigator.pushNamed(context, '/environment-settings'),
-            ),
+            if (isMobile)
+              _buildCollapsibleSettings()
+            else
+              ProfileSelectorCard(
+                compact: true,
+                onEditSettingsProfile: () =>
+                    Navigator.pushNamed(context, '/settings'),
+                onEditEnvironmentProfile: () =>
+                    Navigator.pushNamed(context, '/environment-settings'),
+              ),
             _buildResizeHandle(
               onDrag: (delta) {
                 setState(() {
@@ -206,99 +219,250 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
     );
   }
 
-  Widget _buildUrlBar() {
-    return Container(
-      padding: const EdgeInsets.all(8.0),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border(bottom: BorderSide(color: Colors.grey.shade300)),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: TextField(
-              controller: _urlController,
-              decoration: const InputDecoration(
-                hintText: 'Enter URL',
-                border: OutlineInputBorder(),
-                contentPadding: EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 8,
-                ),
-              ),
-              onSubmitted: (_) => _loadUrl(),
+  /// Combined URL bar and navigation controls - optimized for mobile
+  Widget _buildCombinedControlBar(bool isMobile) {
+    if (isMobile) {
+      // Mobile: single compact row with URL field containing nav buttons
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border(bottom: BorderSide(color: Colors.grey.shade300)),
+        ),
+        child: Row(
+          children: [
+            // Compact nav buttons
+            _buildCompactNavButton(
+              Icons.arrow_back,
+              'Back',
+              _canGoBack ? () => _webViewController?.goBack() : null,
             ),
+            _buildCompactNavButton(
+              Icons.arrow_forward,
+              'Forward',
+              _canGoForward ? () => _webViewController?.goForward() : null,
+            ),
+            _buildCompactNavButton(
+              Icons.refresh,
+              'Reload',
+              () => _webViewController?.reload(),
+            ),
+            const SizedBox(width: 4),
+            // URL field takes remaining space
+            Expanded(child: _buildUrlTextField(isMobile: true)),
+          ],
+        ),
+      );
+    }
+
+    // Desktop: separate URL bar and navigation controls
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(8.0),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border(bottom: BorderSide(color: Colors.grey.shade300)),
           ),
-          const SizedBox(width: 8),
-          IconButton(
-            icon: const Icon(Icons.arrow_forward),
-            tooltip: 'Go',
-            onPressed: _loadUrl,
+          child: Row(
+            children: [
+              Expanded(child: _buildUrlTextField()),
+              const SizedBox(width: 8),
+              IconButton(
+                icon: const Icon(Icons.arrow_forward),
+                tooltip: 'Go',
+                onPressed: _loadUrl,
+              ),
+            ],
           ),
-        ],
+        ),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.grey.shade100,
+            border: Border(bottom: BorderSide(color: Colors.grey.shade300)),
+          ),
+          child: Row(
+            children: [
+              _buildNavigationButtons(false),
+              const SizedBox(width: 12),
+              Expanded(child: _buildTitleAndUrlInfo(false)),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCompactNavButton(
+    IconData icon,
+    String tooltip,
+    VoidCallback? onPressed,
+  ) {
+    return SizedBox(
+      width: 32,
+      height: 32,
+      child: IconButton(
+        icon: Icon(icon, size: 18),
+        tooltip: tooltip,
+        padding: EdgeInsets.zero,
+        constraints: const BoxConstraints(),
+        onPressed: onPressed,
       ),
     );
   }
 
-  Widget _buildNavigationControls() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: Colors.grey.shade100,
-        border: Border(bottom: BorderSide(color: Colors.grey.shade300)),
-      ),
-      child: Row(
-        children: [
-          IconButton(
-            icon: const Icon(Icons.arrow_back),
-            tooltip: 'Back',
-            onPressed: _canGoBack ? () => _webViewController?.goBack() : null,
-          ),
-          IconButton(
-            icon: const Icon(Icons.arrow_forward),
-            tooltip: 'Forward',
-            onPressed: _canGoForward
-                ? () => _webViewController?.goForward()
-                : null,
-          ),
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            tooltip: 'Reload',
-            onPressed: () => _webViewController?.reload(),
-          ),
-          IconButton(
-            icon: const Icon(Icons.stop),
-            tooltip: 'Stop',
-            onPressed: () => _webViewController?.stopLoading(),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
+  /// Collapsible settings section for mobile
+  Widget _buildCollapsibleSettings() {
+    return GestureDetector(
+      onTap: () => setState(() => _settingsExpanded = !_settingsExpanded),
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: Colors.grey.shade50,
+          borderRadius: BorderRadius.circular(4),
+          border: Border.all(color: Colors.grey.shade300),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
               children: [
-                if (_currentTitle != null)
-                  Text(
-                    _currentTitle!,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                Icon(
+                  _settingsExpanded ? Icons.expand_less : Icons.expand_more,
+                  size: 18,
+                  color: Colors.grey.shade600,
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  'Settings',
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.grey.shade700,
                   ),
-                if (_currentUrl != null)
-                  Text(
-                    _currentUrl!,
-                    style: TextStyle(fontSize: 10, color: Colors.grey.shade600),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                ),
+                const Spacer(),
+                Text(
+                  context.watch<SettingsManager>().currentProfile?.name ??
+                      'Default',
+                  style: TextStyle(fontSize: 10, color: Colors.grey.shade600),
+                ),
+                const SizedBox(width: 8),
+                InkWell(
+                  onTap: () => Navigator.pushNamed(context, '/settings'),
+                  child: Icon(
+                    Icons.edit,
+                    size: 14,
+                    color: Colors.blue.shade400,
                   ),
+                ),
               ],
             ),
-          ),
-        ],
+            if (_settingsExpanded) ...[
+              const SizedBox(height: 8),
+              ProfileSelectorCard(
+                compact: true,
+                onEditSettingsProfile: () =>
+                    Navigator.pushNamed(context, '/settings'),
+                onEditEnvironmentProfile: () =>
+                    Navigator.pushNamed(context, '/environment-settings'),
+              ),
+            ],
+          ],
+        ),
       ),
+    );
+  }
+
+  Widget _buildUrlTextField({bool isMobile = false}) {
+    return TextField(
+      controller: _urlController,
+      style: TextStyle(fontSize: isMobile ? 13 : 14),
+      decoration: InputDecoration(
+        hintText: 'Enter URL',
+        isDense: isMobile,
+        border: const OutlineInputBorder(),
+        contentPadding: EdgeInsets.symmetric(
+          horizontal: isMobile ? 8 : 12,
+          vertical: isMobile ? 6 : 8,
+        ),
+        suffixIcon: isMobile
+            ? SizedBox(
+                width: 32,
+                child: IconButton(
+                  icon: const Icon(Icons.arrow_forward, size: 18),
+                  tooltip: 'Go',
+                  padding: EdgeInsets.zero,
+                  onPressed: _loadUrl,
+                ),
+              )
+            : null,
+      ),
+      onSubmitted: (_) => _loadUrl(),
+    );
+  }
+
+  Widget _buildNavigationButtons(bool isMobile) {
+    final buttons = <Widget>[
+      IconButton(
+        icon: const Icon(Icons.arrow_back),
+        tooltip: 'Back',
+        onPressed: _canGoBack ? () => _webViewController?.goBack() : null,
+      ),
+      IconButton(
+        icon: const Icon(Icons.arrow_forward),
+        tooltip: 'Forward',
+        onPressed: _canGoForward ? () => _webViewController?.goForward() : null,
+      ),
+      IconButton(
+        icon: const Icon(Icons.refresh),
+        tooltip: 'Reload',
+        onPressed: () => _webViewController?.reload(),
+      ),
+      IconButton(
+        icon: const Icon(Icons.stop),
+        tooltip: 'Stop',
+        onPressed: () => _webViewController?.stopLoading(),
+      ),
+    ];
+
+    if (isMobile) {
+      return Wrap(spacing: 4, runSpacing: 4, children: buttons);
+    }
+
+    return Row(mainAxisSize: MainAxisSize.min, children: buttons);
+  }
+
+  Widget _buildTitleAndUrlInfo(bool isMobile) {
+    final titleStyle = TextStyle(
+      fontSize: isMobile ? 11 : 12,
+      fontWeight: FontWeight.bold,
+    );
+    final urlStyle = TextStyle(
+      fontSize: isMobile ? 9 : 10,
+      color: Colors.grey.shade600,
+    );
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (_currentTitle != null)
+          Text(
+            _currentTitle!,
+            style: titleStyle,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        if (_currentUrl != null)
+          Text(
+            _currentUrl!,
+            style: urlStyle,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+      ],
     );
   }
 
@@ -811,11 +975,11 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
 
       // 34. onOverScrolled
       onOverScrolled: (controller, x, y, clampedX, clampedY) {
-        _logEvent(
-          EventType.ui,
-          PlatformWebViewCreationParamsProperty.onOverScrolled.name,
-          data: {'x': x, 'y': y, 'clampedX': clampedX, 'clampedY': clampedY},
-        );
+        // _logEvent(
+        //   EventType.ui,
+        //   PlatformWebViewCreationParamsProperty.onOverScrolled.name,
+        //   data: {'x': x, 'y': y, 'clampedX': clampedX, 'clampedY': clampedY},
+        // );
       },
 
       // ============================================================
@@ -1170,6 +1334,7 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
   }
 
   Widget _buildBottomTabs() {
+    final isMobile = context.isMobile;
     return Container(
       decoration: BoxDecoration(
         border: Border(top: BorderSide(color: Colors.grey.shade300)),
@@ -1178,9 +1343,15 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
         children: [
           TabBar(
             controller: _tabController,
+            isScrollable: isMobile,
             labelColor: Colors.blue,
             unselectedLabelColor: Colors.grey,
             indicatorColor: Colors.blue,
+            labelStyle: TextStyle(fontSize: isMobile ? 12 : 14),
+            unselectedLabelStyle: TextStyle(fontSize: isMobile ? 12 : 14),
+            labelPadding: isMobile
+                ? const EdgeInsets.symmetric(horizontal: 10)
+                : null,
             tabs: const [
               Tab(text: 'Events'),
               Tab(text: 'Network'),

@@ -5,7 +5,6 @@ import 'package:flutter_inappwebview_example/providers/event_log_provider.dart';
 import 'package:flutter_inappwebview_example/providers/network_monitor.dart';
 import 'package:flutter_inappwebview_example/screens/webview_tester_screen.dart';
 import 'package:flutter_inappwebview_example/widgets/webview/event_console_widget.dart';
-import 'package:flutter_inappwebview_example/widgets/webview/network_monitor_widget.dart';
 
 import '../test_helpers/mock_inappwebview_platform.dart';
 import '../test_helpers/test_provider_wrapper.dart';
@@ -179,6 +178,35 @@ void main() {
       await tester.pump();
 
       expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('test_webview_tester_mobile_layout', (tester) async {
+      tester.binding.window.physicalSizeTestValue = const Size(360, 640);
+      tester.binding.window.devicePixelRatioTestValue = 1.0;
+      addTearDown(() {
+        tester.binding.window.clearPhysicalSizeTestValue();
+        tester.binding.window.clearDevicePixelRatioTestValue();
+      });
+
+      await tester.pumpWidget(createWidget());
+      await tester.pump();
+
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('test_tabbar_is_scrollable_on_mobile', (tester) async {
+      tester.binding.window.physicalSizeTestValue = const Size(360, 700);
+      tester.binding.window.devicePixelRatioTestValue = 1.0;
+      addTearDown(() {
+        tester.binding.window.clearPhysicalSizeTestValue();
+        tester.binding.window.clearDevicePixelRatioTestValue();
+      });
+
+      await tester.pumpWidget(createWidget());
+      await tester.pump();
+
+      final tabBar = tester.widget<TabBar>(find.byType(TabBar));
+      expect(tabBar.isScrollable, isTrue);
     });
   });
 }

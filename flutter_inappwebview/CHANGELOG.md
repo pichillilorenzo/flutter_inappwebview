@@ -41,6 +41,7 @@
 
 ### Windows
 - Updated Microsoft.Web.WebView2 SDK version from `1.0.2849.39` to `1.0.3650.58`
+- Added native FindInteractionController implementation using WebView2 `ICoreWebView2Find`.
 - Merged "windows: fix WebViewEnvironment dispose crash" [#2433](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2433) (thanks to [GooRingX](https://github.com/GooRingX))
 - Merged "fix #2484, Remove not-empty assert for Cookie.value" [#2486](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2486) (thanks to [laishere](https://github.com/laishere))
 - Merged "Prevent Unpredictable Close On Windows" [#2543](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2543) (thanks to [momadvisor](https://github.com/momadvisor))

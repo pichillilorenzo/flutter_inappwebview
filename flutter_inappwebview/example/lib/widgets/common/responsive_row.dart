@@ -41,10 +41,7 @@ class ResponsiveRow extends StatelessWidget {
       mainAxisAlignment: mainAxisAlignment,
       crossAxisAlignment: crossAxisAlignment,
       mainAxisSize: mainAxisSize,
-      children: _withSpacing(
-        axis: Axis.horizontal,
-        spacing: spacing,
-      ),
+      children: _withSpacing(axis: Axis.horizontal, spacing: spacing),
     );
   }
 
@@ -60,10 +57,7 @@ class ResponsiveRow extends StatelessWidget {
     );
   }
 
-  List<Widget> _withSpacing({
-    required Axis axis,
-    required double spacing,
-  }) {
+  List<Widget> _withSpacing({required Axis axis, required double spacing}) {
     if (children.isEmpty) {
       return const <Widget>[];
     }

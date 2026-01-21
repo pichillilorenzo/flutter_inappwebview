@@ -5,18 +5,9 @@ import 'package:flutter_inappwebview_example/utils/responsive_utils.dart';
 void main() {
   group('ResponsiveBreakpoints', () {
     test('test_responsive_breakpoint_detection', () {
-      expect(
-        ResponsiveBreakpoints.fromWidth(599),
-        ResponsiveBreakpoint.mobile,
-      );
-      expect(
-        ResponsiveBreakpoints.fromWidth(600),
-        ResponsiveBreakpoint.tablet,
-      );
-      expect(
-        ResponsiveBreakpoints.fromWidth(900),
-        ResponsiveBreakpoint.tablet,
-      );
+      expect(ResponsiveBreakpoints.fromWidth(599), ResponsiveBreakpoint.mobile);
+      expect(ResponsiveBreakpoints.fromWidth(600), ResponsiveBreakpoint.tablet);
+      expect(ResponsiveBreakpoints.fromWidth(900), ResponsiveBreakpoint.tablet);
       expect(
         ResponsiveBreakpoints.fromWidth(901),
         ResponsiveBreakpoint.desktop,
@@ -52,8 +43,7 @@ void main() {
       expect(isDesktop, isFalse);
     });
 
-    testWidgets('test_responsive_build_context_getters_tablet',
-        (tester) async {
+    testWidgets('test_responsive_build_context_getters_tablet', (tester) async {
       late bool isMobile;
       late bool isTablet;
       late bool isDesktop;
@@ -77,8 +67,9 @@ void main() {
       expect(isDesktop, isFalse);
     });
 
-    testWidgets('test_responsive_build_context_getters_desktop',
-        (tester) async {
+    testWidgets('test_responsive_build_context_getters_desktop', (
+      tester,
+    ) async {
       late bool isMobile;
       late bool isTablet;
       late bool isDesktop;

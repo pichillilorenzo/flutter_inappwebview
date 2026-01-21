@@ -9,9 +9,7 @@ void main() {
         home: Scaffold(
           body: SizedBox(
             width: 500,
-            child: ResponsiveRow(
-              children: [Text('A'), Text('B')],
-            ),
+            child: ResponsiveRow(children: [Text('A'), Text('B')]),
           ),
         ),
       ),
@@ -37,9 +35,7 @@ void main() {
         home: Scaffold(
           body: SizedBox(
             width: 600,
-            child: ResponsiveRow(
-              children: [Text('A'), Text('B')],
-            ),
+            child: ResponsiveRow(children: [Text('A'), Text('B')]),
           ),
         ),
       ),

@@ -2594,6 +2594,12 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
   }
 
   @override
+  Future<double?> getZoomScale() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    return await channel?.invokeMethod<double?>('getZoomScale', args);
+  }
+
+  @override
   @Deprecated('Use getZoomScale instead')
   Future<double?> getScale() async {
     return await getZoomScale();

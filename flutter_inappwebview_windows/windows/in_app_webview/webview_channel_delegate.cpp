@@ -315,6 +315,72 @@ namespace flutter_inappwebview_plugin
     else if (string_equals(methodName, "getZoomScale")) {
       result->Success(webView->getZoomScale());
     }
+    else if (string_equals(methodName, "getProgress")) {
+      result->Success(webView->getProgress());
+    }
+    else if (string_equals(methodName, "getOriginalUrl")) {
+      // WebView2 does not distinguish between original and current URL
+      result->Success(make_fl_value(webView->getUrl()));
+    }
+    else if (string_equals(methodName, "scrollTo")) {
+      auto x = get_fl_map_value<int>(arguments, "x");
+      auto y = get_fl_map_value<int>(arguments, "y");
+      auto animated = get_fl_map_value<bool>(arguments, "animated", false);
+      webView->scrollTo(x, y, animated);
+      result->Success(true);
+    }
+    else if (string_equals(methodName, "scrollBy")) {
+      auto x = get_fl_map_value<int>(arguments, "x");
+      auto y = get_fl_map_value<int>(arguments, "y");
+      auto animated = get_fl_map_value<bool>(arguments, "animated", false);
+      webView->scrollBy(x, y, animated);
+      result->Success(true);
+    }
+    else if (string_equals(methodName, "getScrollX")) {
+      auto result_ = std::shared_ptr<flutter::MethodResult<flutter::EncodableValue>>(std::move(result));
+      webView->getScrollX([result_ = std::move(result_)](const std::optional<int64_t> value)
+        {
+          result_->Success(make_fl_value(value));
+        });
+    }
+    else if (string_equals(methodName, "getScrollY")) {
+      auto result_ = std::shared_ptr<flutter::MethodResult<flutter::EncodableValue>>(std::move(result));
+      webView->getScrollY([result_ = std::move(result_)](const std::optional<int64_t> value)
+        {
+          result_->Success(make_fl_value(value));
+        });
+    }
+    else if (string_equals(methodName, "getContentHeight")) {
+      auto result_ = std::shared_ptr<flutter::MethodResult<flutter::EncodableValue>>(std::move(result));
+      webView->getContentHeight([result_ = std::move(result_)](const std::optional<int64_t> value)
+        {
+          result_->Success(make_fl_value(value));
+        });
+    }
+    else if (string_equals(methodName, "getContentWidth")) {
+      auto result_ = std::shared_ptr<flutter::MethodResult<flutter::EncodableValue>>(std::move(result));
+      webView->getContentWidth([result_ = std::move(result_)](const std::optional<int64_t> value)
+        {
+          result_->Success(make_fl_value(value));
+        });
+    }
+    else if (string_equals(methodName, "isSecureContext")) {
+      auto result_ = std::shared_ptr<flutter::MethodResult<flutter::EncodableValue>>(std::move(result));
+      webView->isSecureContext([result_ = std::move(result_)](const bool value)
+        {
+          result_->Success(value);
+        });
+    }
+    else if (string_equals(methodName, "injectCSSCode")) {
+      auto source = get_fl_map_value<std::string>(arguments, "source");
+      webView->injectCSSCode(source);
+      result->Success(true);
+    }
+    else if (string_equals(methodName, "injectCSSFileFromUrl")) {
+      auto urlFile = get_fl_map_value<std::string>(arguments, "urlFile");
+      webView->injectCSSFileFromUrl(urlFile);
+      result->Success(true);
+    }
     // for inAppBrowser
     else if (webView->inAppBrowser && string_equals(methodName, "show")) {
       webView->inAppBrowser->show();

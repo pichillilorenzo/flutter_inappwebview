@@ -180,6 +180,16 @@ namespace flutter_inappwebview_plugin
     void clearSslPreferences(const std::function<void()> completionHandler) const;
     bool isInterfaceSupported(const std::string& interfaceName) const;
     double getZoomScale() const;
+    int64_t getProgress() const;
+    void scrollTo(const int64_t& x, const int64_t& y, const bool& animated) const;
+    void scrollBy(const int64_t& x, const int64_t& y, const bool& animated) const;
+    void getScrollX(const std::function<void(const std::optional<int64_t>)> completionHandler) const;
+    void getScrollY(const std::function<void(const std::optional<int64_t>)> completionHandler) const;
+    void getContentHeight(const std::function<void(const std::optional<int64_t>)> completionHandler) const;
+    void getContentWidth(const std::function<void(const std::optional<int64_t>)> completionHandler) const;
+    void isSecureContext(const std::function<void(const bool)> completionHandler) const;
+    void injectCSSCode(const std::string& source) const;
+    void injectCSSFileFromUrl(const std::string& urlFile) const;
 
     std::string pageFrameId() const
     {
@@ -205,6 +215,7 @@ namespace flutter_inappwebview_plugin
     std::map<std::string, std::pair<wil::com_ptr<ICoreWebView2DevToolsProtocolEventReceiver>, EventRegistrationToken>> devToolsProtocolEventListener_ = {};
     int64_t previousAuthRequestFailureCount = 0;
     double zoomScaleFactor_ = 1.0;
+    int64_t progress_ = 0;
 
     void registerEventHandlers();
     void registerSurfaceEventHandlers();

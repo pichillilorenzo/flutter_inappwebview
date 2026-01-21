@@ -285,6 +285,10 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
         apiUrl:
             'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebView.get_estimated_load_progress.html',
       ),
+      WindowsPlatform(
+        note:
+            'Progress is tracked through navigation events: NavigationStarting (0), ContentLoading (33), DOMContentLoaded (66), NavigationCompleted (100).',
+      ),
     ],
   )
   Future<int?> getProgress() {
@@ -1090,6 +1094,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
       LinuxPlatform(note: 'This method is implemented using JavaScript.'),
       MacOSPlatform(),
       WebPlatform(),
+      WindowsPlatform(note: 'This method is implemented using JavaScript.'),
     ],
   )
   Future<void> injectCSSCode({required String source}) {
@@ -1117,6 +1122,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
       LinuxPlatform(note: 'This method is implemented using JavaScript.'),
       MacOSPlatform(),
       WebPlatform(),
+      WindowsPlatform(note: 'This method is implemented using JavaScript.'),
     ],
   )
   Future<void> injectCSSFileFromUrl({
@@ -1428,6 +1434,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
         apiUrl:
             'https://developer.mozilla.org/en-US/docs/Web/API/Window/scrollTo',
       ),
+      WindowsPlatform(note: 'This method is implemented using JavaScript.'),
     ],
   )
   Future<void> scrollTo({
@@ -1470,6 +1477,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
         apiUrl:
             'https://developer.mozilla.org/en-US/docs/Web/API/Window/scrollBy',
       ),
+      WindowsPlatform(note: 'This method is implemented using JavaScript.'),
     ],
   )
   Future<void> scrollBy({
@@ -1605,6 +1613,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
             'https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollHeight',
       ),
       LinuxPlatform(),
+      WindowsPlatform(note: 'This method is implemented using JavaScript.'),
     ],
   )
   Future<int?> getContentHeight() {
@@ -1633,6 +1642,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
             'https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollWidth',
       ),
       LinuxPlatform(),
+      WindowsPlatform(note: 'This method is implemented using JavaScript.'),
     ],
   )
   Future<int?> getContentWidth() {
@@ -1705,6 +1715,10 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
       MacOSPlatform(),
       WebPlatform(
         note: 'It will return the current value of the `iframe.src` attribute.',
+      ),
+      WindowsPlatform(
+        note:
+            'Returns the current URL. WebView2 does not distinguish between original and current URL.',
       ),
     ],
   )
@@ -2078,6 +2092,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
         apiUrl:
             'https://developer.mozilla.org/en-US/docs/Web/API/Window/scrollX',
       ),
+      WindowsPlatform(note: 'This method is implemented using JavaScript.'),
     ],
   )
   Future<int?> getScrollX() {
@@ -2110,6 +2125,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
         apiUrl:
             'https://developer.mozilla.org/en-US/docs/Web/API/Window/scrollY',
       ),
+      WindowsPlatform(note: 'This method is implemented using JavaScript.'),
     ],
   )
   Future<int?> getScrollY() {
@@ -2482,6 +2498,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
         apiUrl:
             'https://developer.mozilla.org/en-US/docs/Web/API/Window/isSecureContext',
       ),
+      WindowsPlatform(note: 'This method is implemented using JavaScript.'),
     ],
   )
   Future<bool> isSecureContext() {

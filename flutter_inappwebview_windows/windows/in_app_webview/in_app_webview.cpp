@@ -396,7 +396,8 @@ namespace flutter_inappwebview_plugin
                     // if shouldOverrideUrlLoading is used, then call onLoadStart and onProgressChanged here
                     // to match the behaviour of the other platforms
                     channelDelegate->onLoadStart(url);
-                    channelDelegate->onProgressChanged(0);
+                    progress_ = 0;
+                    channelDelegate->onProgressChanged(progress_);
                   }
                 };
 
@@ -589,7 +590,8 @@ namespace flutter_inappwebview_plugin
           // if shouldOverrideUrlLoading is not used, then call onLoadStart and onProgressChanged here
           if (!settings->useShouldOverrideUrlLoading) {
             channelDelegate->onLoadStart(url);
-            channelDelegate->onProgressChanged(0);
+            progress_ = 0;
+            channelDelegate->onProgressChanged(progress_);
           }
           args->put_Cancel(false);
 
@@ -603,7 +605,8 @@ namespace flutter_inappwebview_plugin
         [this](ICoreWebView2* sender, ICoreWebView2ContentLoadingEventArgs* args)
         {
           if (channelDelegate) {
-            channelDelegate->onProgressChanged(33);
+            progress_ = 33;
+            channelDelegate->onProgressChanged(progress_);
           }
           return S_OK;
         }
@@ -638,7 +641,8 @@ namespace flutter_inappwebview_plugin
             wil::unique_cotaskmem_string uri;
             std::optional<std::string> url = SUCCEEDED(webView->get_Source(&uri)) ? wide_to_utf8(uri.get()) : std::optional<std::string>{};
 
-            channelDelegate->onProgressChanged(100);
+            progress_ = 100;
+            channelDelegate->onProgressChanged(progress_);
             if (isSuccess) {
               channelDelegate->onLoadStop(url);
             }
@@ -1031,7 +1035,8 @@ namespace flutter_inappwebview_plugin
           [this](ICoreWebView2* sender, ICoreWebView2DOMContentLoadedEventArgs* args)
           {
             if (channelDelegate) {
-              channelDelegate->onProgressChanged(66);
+              progress_ = 66;
+              channelDelegate->onProgressChanged(progress_);
             }
             return S_OK;
           }
@@ -2323,6 +2328,179 @@ namespace flutter_inappwebview_plugin
   double InAppWebView::getZoomScale() const
   {
     return zoomScaleFactor_;
+  }
+
+  int64_t InAppWebView::getProgress() const
+  {
+    // Return the progress value tracked natively through navigation events:
+    // NavigationStarting (0), ContentLoading (33), DOMContentLoaded (66), NavigationCompleted (100)
+    return progress_;
+  }
+
+  void InAppWebView::scrollTo(const int64_t& x, const int64_t& y, const bool& animated) const
+  {
+    if (!webView) {
+      return;
+    }
+
+    std::string script = animated
+      ? "window.scrollTo({top: " + std::to_string(y) + ", left: " + std::to_string(x) + ", behavior: 'smooth'});"
+      : "window.scrollTo(" + std::to_string(x) + ", " + std::to_string(y) + ");";
+    evaluateJavascript(script, ContentWorld::page(), nullptr);
+  }
+
+  void InAppWebView::scrollBy(const int64_t& x, const int64_t& y, const bool& animated) const
+  {
+    if (!webView) {
+      return;
+    }
+
+    std::string script = animated
+      ? "window.scrollBy({top: " + std::to_string(y) + ", left: " + std::to_string(x) + ", behavior: 'smooth'});"
+      : "window.scrollBy(" + std::to_string(x) + ", " + std::to_string(y) + ");";
+    evaluateJavascript(script, ContentWorld::page(), nullptr);
+  }
+
+  void InAppWebView::getScrollX(const std::function<void(const std::optional<int64_t>)> completionHandler) const
+  {
+    if (!webView || !completionHandler) {
+      if (completionHandler) completionHandler(std::nullopt);
+      return;
+    }
+
+    evaluateJavascript(
+      "window.scrollX || window.pageXOffset || document.documentElement.scrollLeft || 0",
+      ContentWorld::page(),
+      [completionHandler](const std::string& value) {
+        try {
+          auto scrollX = std::stoll(value);
+          completionHandler(scrollX);
+        }
+        catch (...) {
+          completionHandler(0);
+        }
+      }
+    );
+  }
+
+  void InAppWebView::getScrollY(const std::function<void(const std::optional<int64_t>)> completionHandler) const
+  {
+    if (!webView || !completionHandler) {
+      if (completionHandler) completionHandler(std::nullopt);
+      return;
+    }
+
+    evaluateJavascript(
+      "window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0",
+      ContentWorld::page(),
+      [completionHandler](const std::string& value) {
+        try {
+          auto scrollY = std::stoll(value);
+          completionHandler(scrollY);
+        }
+        catch (...) {
+          completionHandler(0);
+        }
+      }
+    );
+  }
+
+  void InAppWebView::getContentHeight(const std::function<void(const std::optional<int64_t>)> completionHandler) const
+  {
+    if (!webView || !completionHandler) {
+      if (completionHandler) completionHandler(std::nullopt);
+      return;
+    }
+
+    evaluateJavascript(
+      "Math.max(document.body.scrollHeight, document.documentElement.scrollHeight)",
+      ContentWorld::page(),
+      [completionHandler](const std::string& value) {
+        try {
+          auto height = std::stoll(value);
+          completionHandler(height);
+        }
+        catch (...) {
+          completionHandler(0);
+        }
+      }
+    );
+  }
+
+  void InAppWebView::getContentWidth(const std::function<void(const std::optional<int64_t>)> completionHandler) const
+  {
+    if (!webView || !completionHandler) {
+      if (completionHandler) completionHandler(std::nullopt);
+      return;
+    }
+
+    evaluateJavascript(
+      "Math.max(document.body.scrollWidth, document.documentElement.scrollWidth)",
+      ContentWorld::page(),
+      [completionHandler](const std::string& value) {
+        try {
+          auto width = std::stoll(value);
+          completionHandler(width);
+        }
+        catch (...) {
+          completionHandler(0);
+        }
+      }
+    );
+  }
+
+  void InAppWebView::isSecureContext(const std::function<void(const bool)> completionHandler) const
+  {
+    if (!webView || !completionHandler) {
+      if (completionHandler) completionHandler(false);
+      return;
+    }
+
+    evaluateJavascript(
+      "window.isSecureContext",
+      ContentWorld::page(),
+      [completionHandler](const std::string& value) {
+        completionHandler(value == "true");
+      }
+    );
+  }
+
+  void InAppWebView::injectCSSCode(const std::string& source) const
+  {
+    if (!webView) {
+      return;
+    }
+
+    // Escape single quotes and newlines in CSS
+    std::string escaped_source = source;
+    escaped_source = replace_all_copy(escaped_source, "\\", "\\\\");
+    escaped_source = replace_all_copy(escaped_source, "'", "\\'");
+    escaped_source = replace_all_copy(escaped_source, "\n", "\\n");
+    escaped_source = replace_all_copy(escaped_source, "\r", "\\r");
+
+    std::string script =
+      "(function() {"
+      "  var style = document.createElement('style');"
+      "  style.textContent = '" + escaped_source + "';"
+      "  document.head.appendChild(style);"
+      "})();";
+    evaluateJavascript(script, ContentWorld::page(), nullptr);
+  }
+
+  void InAppWebView::injectCSSFileFromUrl(const std::string& urlFile) const
+  {
+    if (!webView) {
+      return;
+    }
+
+    std::string script =
+      "(function() {"
+      "  var link = document.createElement('link');"
+      "  link.rel = 'stylesheet';"
+      "  link.href = '" + urlFile + "';"
+      "  document.head.appendChild(link);"
+      "})();";
+    evaluateJavascript(script, ContentWorld::page(), nullptr);
   }
 
   // flutter_view

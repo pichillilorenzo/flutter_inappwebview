@@ -664,6 +664,8 @@ enum PlatformInAppWebViewControllerMethod {
   ///    - This method is implemented using JavaScript.
   ///- Web \<iframe\> but requires same origin ([Official API - Document.documentElement.scrollHeight](https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollHeight))
   ///- Linux WPE WebKit
+  ///- Windows WebView2:
+  ///    - This method is implemented using JavaScript.
   ///
   ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
@@ -681,6 +683,8 @@ enum PlatformInAppWebViewControllerMethod {
   ///    - This method is implemented using JavaScript.
   ///- Web \<iframe\> but requires same origin ([Official API - Document.documentElement.scrollWidth](https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollWidth))
   ///- Linux WPE WebKit
+  ///- Windows WebView2:
+  ///    - This method is implemented using JavaScript.
   ///
   ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
@@ -885,6 +889,8 @@ enum PlatformInAppWebViewControllerMethod {
   ///- macOS WKWebView
   ///- Web \<iframe\> but requires same origin:
   ///    - It will return the current value of the `iframe.src` attribute.
+  ///- Windows WebView2:
+  ///    - Returns the current URL. WebView2 does not distinguish between original and current URL.
   ///
   ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
@@ -899,6 +905,8 @@ enum PlatformInAppWebViewControllerMethod {
   ///- iOS WKWebView ([Official API - WKWebView.estimatedProgress](https://developer.apple.com/documentation/webkit/wkwebview/1415007-estimatedprogress))
   ///- macOS WKWebView ([Official API - WKWebView.estimatedProgress](https://developer.apple.com/documentation/webkit/wkwebview/1415007-estimatedprogress))
   ///- Linux WPE WebKit ([Official API - webkit_web_view_get_estimated_load_progress](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebView.get_estimated_load_progress.html))
+  ///- Windows WebView2:
+  ///    - Progress is tracked through navigation events: NavigationStarting (0), ContentLoading (33), DOMContentLoaded (66), NavigationCompleted (100).
   ///
   ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
@@ -952,6 +960,8 @@ enum PlatformInAppWebViewControllerMethod {
   ///    - This method is implemented using JavaScript.
   ///- Linux WPE WebKit
   ///- Web \<iframe\> but requires same origin ([Official API - Window.scrollX](https://developer.mozilla.org/en-US/docs/Web/API/Window/scrollX))
+  ///- Windows WebView2:
+  ///    - This method is implemented using JavaScript.
   ///
   ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
@@ -968,6 +978,8 @@ enum PlatformInAppWebViewControllerMethod {
   ///    - This method is implemented using JavaScript.
   ///- Linux WPE WebKit
   ///- Web \<iframe\> but requires same origin ([Official API - Window.scrollY](https://developer.mozilla.org/en-US/docs/Web/API/Window/scrollY))
+  ///- Windows WebView2:
+  ///    - This method is implemented using JavaScript.
   ///
   ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
@@ -1300,6 +1312,8 @@ enum PlatformInAppWebViewControllerMethod {
   ///    - This method is implemented using JavaScript.
   ///- macOS WKWebView
   ///- Web \<iframe\> but requires same origin
+  ///- Windows WebView2:
+  ///    - This method is implemented using JavaScript.
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [source]: all platforms
@@ -1336,6 +1350,8 @@ enum PlatformInAppWebViewControllerMethod {
   ///    - This method is implemented using JavaScript.
   ///- macOS WKWebView
   ///- Web \<iframe\> but requires same origin
+  ///- Windows WebView2:
+  ///    - This method is implemented using JavaScript.
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [urlFile]: all platforms
@@ -1475,6 +1491,8 @@ enum PlatformInAppWebViewControllerMethod {
   ///- macOS WKWebView:
   ///    - This method is implemented using JavaScript.
   ///- Web \<iframe\> but requires same origin ([Official API - Window.isSecureContext](https://developer.mozilla.org/en-US/docs/Web/API/Window/isSecureContext))
+  ///- Windows WebView2:
+  ///    - This method is implemented using JavaScript.
   ///
   ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
@@ -2078,6 +2096,8 @@ enum PlatformInAppWebViewControllerMethod {
   ///    - This method is implemented using JavaScript.
   ///- Linux WPE WebKit
   ///- Web \<iframe\> but requires same origin ([Official API - Window.scrollBy](https://developer.mozilla.org/en-US/docs/Web/API/Window/scrollBy))
+  ///- Windows WebView2:
+  ///    - This method is implemented using JavaScript.
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [x]: all platforms
@@ -2099,6 +2119,8 @@ enum PlatformInAppWebViewControllerMethod {
   ///    - This method is implemented using JavaScript.
   ///- Linux WPE WebKit
   ///- Web \<iframe\> but requires same origin ([Official API - Window.scrollTo](https://developer.mozilla.org/en-US/docs/Web/API/Window/scrollTo))
+  ///- Windows WebView2:
+  ///    - This method is implemented using JavaScript.
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [x]: all platforms
@@ -2727,6 +2749,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
                     TargetPlatform.iOS,
                     TargetPlatform.macOS,
                     TargetPlatform.linux,
+                    TargetPlatform.windows,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.getContentWidth:
         return kIsWeb && platform == null
@@ -2737,6 +2760,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
                     TargetPlatform.iOS,
                     TargetPlatform.macOS,
                     TargetPlatform.linux,
+                    TargetPlatform.windows,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.getCopyBackForwardList:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -2854,6 +2878,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
                     TargetPlatform.iOS,
                     TargetPlatform.linux,
                     TargetPlatform.macOS,
+                    TargetPlatform.windows,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.getProgress:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -2862,6 +2887,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
               TargetPlatform.iOS,
               TargetPlatform.macOS,
               TargetPlatform.linux,
+              TargetPlatform.windows,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.getSafeBrowsingPrivacyPolicyUrl:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -2887,6 +2913,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
                     TargetPlatform.iOS,
                     TargetPlatform.macOS,
                     TargetPlatform.linux,
+                    TargetPlatform.windows,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.getScrollY:
         return kIsWeb && platform == null
@@ -2897,6 +2924,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
                     TargetPlatform.iOS,
                     TargetPlatform.macOS,
                     TargetPlatform.linux,
+                    TargetPlatform.windows,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.getSelectedText:
         return kIsWeb && platform == null
@@ -3086,6 +3114,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
                     TargetPlatform.iOS,
                     TargetPlatform.linux,
                     TargetPlatform.macOS,
+                    TargetPlatform.windows,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.injectCSSFileFromAsset:
         return kIsWeb && platform == null
@@ -3105,6 +3134,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
                     TargetPlatform.iOS,
                     TargetPlatform.linux,
                     TargetPlatform.macOS,
+                    TargetPlatform.windows,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.injectJavascriptFileFromAsset:
         return kIsWeb && platform == null
@@ -3170,6 +3200,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
                     TargetPlatform.iOS,
                     TargetPlatform.linux,
                     TargetPlatform.macOS,
+                    TargetPlatform.windows,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.isVisible:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -3439,6 +3470,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
                     TargetPlatform.iOS,
                     TargetPlatform.macOS,
                     TargetPlatform.linux,
+                    TargetPlatform.windows,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.scrollTo:
         return kIsWeb && platform == null
@@ -3449,6 +3481,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
                     TargetPlatform.iOS,
                     TargetPlatform.macOS,
                     TargetPlatform.linux,
+                    TargetPlatform.windows,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.setAllMediaPlaybackSuspended:
         return ((kIsWeb && platform != null) || !kIsWeb) &&

@@ -1,6 +1,7 @@
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
 import 'cookie_manager.dart';
+import 'find_interaction/find_interaction_controller.dart';
 import 'in_app_browser/in_app_browser.dart';
 import 'in_app_webview/headless_in_app_webview.dart';
 import 'in_app_webview/in_app_webview.dart';
@@ -274,6 +275,17 @@ class WindowsInAppWebViewPlatform extends InAppWebViewPlatform {
     return _PlatformTracingController.static();
   }
 
+  /// Creates a new [WindowsFindInteractionController].
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [FindInteractionController] in `flutter_inappwebview` instead.
+  @override
+  WindowsFindInteractionController createPlatformFindInteractionController(
+    PlatformFindInteractionControllerCreationParams params,
+  ) {
+    return WindowsFindInteractionController(params);
+  }
+
   /// Creates a new empty [PlatformFindInteractionController] to access static methods.
   ///
   /// This function should only be called by the app-facing package.
@@ -281,7 +293,7 @@ class WindowsInAppWebViewPlatform extends InAppWebViewPlatform {
   @override
   PlatformFindInteractionController
   createPlatformFindInteractionControllerStatic() {
-    return _PlatformFindInteractionController.static();
+    return WindowsFindInteractionController.static();
   }
 
   /// Creates a new empty [PlatformPrintJobController] to access static methods.

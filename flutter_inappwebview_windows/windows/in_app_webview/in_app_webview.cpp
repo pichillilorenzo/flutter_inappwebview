@@ -192,6 +192,7 @@ namespace flutter_inappwebview_plugin
     }
     channelDelegate = channelName.has_value() ? std::make_unique<WebViewChannelDelegate>(this, plugin->registrar->messenger(), channelName.value()) :
       std::make_unique<WebViewChannelDelegate>(this, plugin->registrar->messenger());
+    findInteractionController = std::make_unique<FindInteractionController>(this, plugin->registrar->messenger());
   }
 
   void InAppWebView::prepare(const InAppWebViewCreationParams& params)
@@ -3285,6 +3286,10 @@ namespace flutter_inappwebview_plugin
       }
     }
     webMessageListeners_.clear();
+    if (findInteractionController) {
+      findInteractionController->dispose();
+      findInteractionController.reset();
+    }
     navigationActions_.clear();
     inAppBrowser = nullptr;
     plugin = nullptr;

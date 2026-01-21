@@ -23,6 +23,7 @@
 #include "webview_channel_delegate.h"
 #include "../web_message/web_message_channel.h"
 #include "../web_message/web_message_listener.h"
+#include "../find_interaction/find_interaction_controller.h"
 
 #include <WebView2EnvironmentOptions.h>
 
@@ -101,6 +102,7 @@ namespace flutter_inappwebview_plugin
     wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController;
     wil::com_ptr<ICoreWebView2> webView;
     std::unique_ptr<WebViewChannelDelegate> channelDelegate;
+    std::unique_ptr<FindInteractionController> findInteractionController;
     std::shared_ptr<InAppWebViewSettings> settings;
     InAppBrowser* inAppBrowser = nullptr;
     std::unique_ptr<UserContentController> userContentController;

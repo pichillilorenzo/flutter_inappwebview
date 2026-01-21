@@ -23,6 +23,7 @@ part 'platform_find_interaction_controller.g.dart';
     IOSPlatform(),
     MacOSPlatform(),
     LinuxPlatform(),
+    WindowsPlatform(),
   ],
 )
 @immutable
@@ -60,6 +61,11 @@ class PlatformFindInteractionControllerCreationParams {
         apiName: 'WebKitFindController::counted-matches',
         apiUrl:
             'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/signal.FindController.counted-matches.html',
+      ),
+      WindowsPlatform(
+        apiName: 'ICoreWebView2Find.ActiveMatchIndexChanged/MatchCountChanged',
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2find',
       ),
     ],
   )
@@ -104,6 +110,7 @@ class PlatformFindInteractionControllerCreationParams {
     IOSPlatform(),
     MacOSPlatform(),
     LinuxPlatform(),
+    WindowsPlatform(),
   ],
 )
 abstract class PlatformFindInteractionController extends PlatformInterface
@@ -196,6 +203,11 @@ abstract class PlatformFindInteractionController extends PlatformInterface
         apiUrl:
             'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.FindController.search.html',
       ),
+      WindowsPlatform(
+        apiName: 'ICoreWebView2Find.Start',
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2find#start',
+      ),
     ],
   )
   Future<void> findAll({String? find}) {
@@ -228,6 +240,11 @@ abstract class PlatformFindInteractionController extends PlatformInterface
         apiUrl:
             'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.FindController.search_next.html',
       ),
+      WindowsPlatform(
+        apiName: 'ICoreWebView2Find.FindNext/FindPrevious',
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2find#findnext',
+      ),
     ],
   )
   Future<void> findNext({bool forward = true}) {
@@ -258,6 +275,11 @@ abstract class PlatformFindInteractionController extends PlatformInterface
         apiUrl:
             'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.FindController.search_finish.html',
       ),
+      WindowsPlatform(
+        apiName: 'ICoreWebView2Find.Stop',
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2find#stop',
+      ),
     ],
   )
   Future<void> clearMatches() {
@@ -286,6 +308,11 @@ abstract class PlatformFindInteractionController extends PlatformInterface
         apiName: 'webkit_find_controller_search',
         apiUrl:
             'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.FindController.search.html',
+      ),
+      WindowsPlatform(
+        apiName: 'ICoreWebView2FindOptions.put_FindTerm',
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2findoptions',
       ),
     ],
   )
@@ -316,6 +343,7 @@ abstract class PlatformFindInteractionController extends PlatformInterface
         apiUrl:
             'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.FindController.get_search_text.html',
       ),
+      WindowsPlatform(),
     ],
   )
   Future<String?> getSearchText() {
@@ -431,6 +459,11 @@ abstract class PlatformFindInteractionController extends PlatformInterface
         apiUrl:
             'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/class.FindController.html',
       ),
+      WindowsPlatform(
+        apiName: 'ICoreWebView2Find.ActiveMatchIndex/MatchCount',
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2find',
+      ),
     ],
   )
   Future<FindSession?> getActiveFindSession() {
@@ -450,6 +483,7 @@ abstract class PlatformFindInteractionController extends PlatformInterface
       IOSPlatform(),
       MacOSPlatform(),
       LinuxPlatform(),
+      WindowsPlatform(),
     ],
   )
   @override

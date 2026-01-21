@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
@@ -37,6 +39,7 @@ class _MyAppState extends State<MyApp> {
   InAppWebViewSettings settings = InAppWebViewSettings(
     isInspectable: kDebugMode,
     javaScriptEnabled: true,
+    isFindInteractionEnabled: true,
   );
 
   String currentUrl = '';
@@ -45,9 +48,8 @@ class _MyAppState extends State<MyApp> {
   String findStatus = 'No find results yet';
   bool canPostWebMessage = false;
   bool canAddWebMessageListener = false;
-  bool webMessageAutoTested = false;
-  bool webMessageAutoTestReceived = false;
-  static const String _autoTestFlutterMessage = 'Auto message from Flutter';
+  bool findAutoTested = false;
+  Completer<int>? _findAutoTestCompleter;
 
   static const String _testHtml = '''
 <!DOCTYPE html>
@@ -123,6 +125,11 @@ class _MyAppState extends State<MyApp> {
             findStatus =
                 'Match $activeMatchOrdinal of $numberOfMatches (done: $isDoneCounting)';
           });
+          if (isDoneCounting && _findAutoTestCompleter != null) {
+            if (!_findAutoTestCompleter!.isCompleted) {
+              _findAutoTestCompleter!.complete(numberOfMatches);
+            }
+          }
         },
       ),
     );
@@ -175,6 +182,35 @@ class _MyAppState extends State<MyApp> {
     setState(() {
       findStatus = 'Matches cleared';
     });
+  }
+
+  Future<void> _runFindAutoTest() async {
+    final query = findController.text.trim();
+    if (query.isEmpty) {
+      setState(() {
+        findStatus = 'Auto-test skipped: empty query';
+      });
+      return;
+    }
+
+    try {
+      _findAutoTestCompleter = Completer<int>();
+      await findInteractionController.setSearchText(query);
+      await findInteractionController.findAll(find: query);
+      final matchCount = await _findAutoTestCompleter!.future.timeout(
+        const Duration(seconds: 2),
+      );
+      setState(() {
+        findStatus =
+            'Auto-test completed: $matchCount matches for "$query"';
+      });
+    } catch (e) {
+      setState(() {
+        findStatus = 'Auto-test error: $e';
+      });
+    } finally {
+      _findAutoTestCompleter = null;
+    }
   }
 
   @override
@@ -242,7 +278,6 @@ class _MyAppState extends State<MyApp> {
                                       lastWebMessage =
                                           message?.data?.toString() ??
                                               'Empty message received';
-                                      webMessageAutoTestReceived = true;
                                     });
                                   },
                                 ),
@@ -272,68 +307,11 @@ class _MyAppState extends State<MyApp> {
                             currentUrl = url.toString();
                             urlController.text = currentUrl;
                           });
-
-                          // Auto-test WebMessage (once)
-                          if (!webMessageAutoTested &&
-                              canPostWebMessage &&
-                              canAddWebMessageListener) {
+                          if (!findAutoTested) {
                             setState(() {
-                              webMessageAutoTested = true;
-                              webMessageAutoTestReceived = false;
+                              findAutoTested = true;
                             });
-                            debugPrint(
-                                '[WebMessage] Starting auto-test...');
-                            try {
-                              // Trigger JS -> Flutter message
-                              await controller.evaluateJavascript(
-                                source: 'sendToFlutter();',
-                              );
-
-                              // Send Flutter -> JS message
-                              await controller.postWebMessage(
-                                message: WebMessage(
-                                  data: _autoTestFlutterMessage,
-                                ),
-                                targetOrigin: WebUri('*'),
-                              );
-
-                              // Wait a bit for messages to propagate
-                              await Future.delayed(
-                                const Duration(milliseconds: 500),
-                              );
-
-                              // Check if JS received the Flutter message
-                              final flutterMessageText =
-                                  await controller.evaluateJavascript(
-                                source:
-                                    "document.getElementById('flutterMessage')?.textContent",
-                              );
-
-                              if (!webMessageAutoTestReceived) {
-                                setState(() {
-                                  lastWebMessage =
-                                      'Auto-test failed: no JS message received.';
-                                });
-                              } else if (flutterMessageText is! String ||
-                                  !flutterMessageText.contains(
-                                    _autoTestFlutterMessage,
-                                  )) {
-                                setState(() {
-                                  lastWebMessage =
-                                      'Auto-test failed: JS did not receive message.';
-                                });
-                              } else {
-                                setState(() {
-                                  lastWebMessage =
-                                      'Auto-test PASSED! Bidirectional messaging works.';
-                                });
-                              }
-                            } catch (e) {
-                              debugPrint('[WebMessage] Auto-test error: $e');
-                              setState(() {
-                                lastWebMessage = 'Auto-test error: $e';
-                              });
-                            }
+                            await _runFindAutoTest();
                           }
                         },
                         onProgressChanged: (controller, progressValue) {

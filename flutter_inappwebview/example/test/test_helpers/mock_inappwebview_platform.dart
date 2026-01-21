@@ -40,6 +40,13 @@ class MockInAppWebViewPlatform extends InAppWebViewPlatform
   }
 
   @override
+  PlatformCookieManager createPlatformCookieManager(
+    PlatformCookieManagerCreationParams params,
+  ) {
+    return MockPlatformCookieManager(params);
+  }
+
+  @override
   PlatformInAppWebViewWidget createPlatformInAppWebViewWidget(
     PlatformInAppWebViewWidgetCreationParams params,
   ) {
@@ -238,6 +245,107 @@ class MockInAppWebViewPlatform extends InAppWebViewPlatform
       const PlatformPrintJobControllerCreationParams(id: 'mock_print_job'),
     );
   }
+
+  @override
+  PlatformWebAuthenticationSession createPlatformWebAuthenticationSession(
+    PlatformWebAuthenticationSessionCreationParams params,
+  ) {
+    return MockPlatformWebAuthenticationSession(params);
+  }
+
+  @override
+  PlatformWebAuthenticationSession
+  createPlatformWebAuthenticationSessionStatic() {
+    return MockPlatformWebAuthenticationSession(
+      const PlatformWebAuthenticationSessionCreationParams(),
+    );
+  }
+
+  @override
+  PlatformHttpAuthCredentialDatabase createPlatformHttpAuthCredentialDatabase(
+    PlatformHttpAuthCredentialDatabaseCreationParams params,
+  ) {
+    return MockPlatformHttpAuthCredentialDatabase(params);
+  }
+
+  @override
+  PlatformHttpAuthCredentialDatabase
+  createPlatformHttpAuthCredentialDatabaseStatic() {
+    return MockPlatformHttpAuthCredentialDatabase(
+      const PlatformHttpAuthCredentialDatabaseCreationParams(),
+    );
+  }
+
+  @override
+  PlatformWebStorage createPlatformWebStorage(
+    PlatformWebStorageCreationParams params,
+  ) {
+    return MockPlatformWebStorage(params);
+  }
+
+  @override
+  PlatformWebStorage createPlatformWebStorageStatic() {
+    final localStorage = MockPlatformLocalStorage(
+      PlatformLocalStorageCreationParams(
+        const PlatformStorageCreationParams(
+          controller: null,
+          webStorageType: WebStorageType.LOCAL_STORAGE,
+        ),
+      ),
+    );
+    final sessionStorage = MockPlatformSessionStorage(
+      PlatformSessionStorageCreationParams(
+        const PlatformStorageCreationParams(
+          controller: null,
+          webStorageType: WebStorageType.SESSION_STORAGE,
+        ),
+      ),
+    );
+    return MockPlatformWebStorage(
+      PlatformWebStorageCreationParams(
+        localStorage: localStorage,
+        sessionStorage: sessionStorage,
+      ),
+    );
+  }
+
+  @override
+  PlatformLocalStorage createPlatformLocalStorage(
+    PlatformLocalStorageCreationParams params,
+  ) {
+    return MockPlatformLocalStorage(params);
+  }
+
+  @override
+  PlatformLocalStorage createPlatformLocalStorageStatic() {
+    return MockPlatformLocalStorage(
+      PlatformLocalStorageCreationParams(
+        const PlatformStorageCreationParams(
+          controller: null,
+          webStorageType: WebStorageType.LOCAL_STORAGE,
+        ),
+      ),
+    );
+  }
+
+  @override
+  PlatformSessionStorage createPlatformSessionStorage(
+    PlatformSessionStorageCreationParams params,
+  ) {
+    return MockPlatformSessionStorage(params);
+  }
+
+  @override
+  PlatformSessionStorage createPlatformSessionStorageStatic() {
+    return MockPlatformSessionStorage(
+      PlatformSessionStorageCreationParams(
+        const PlatformStorageCreationParams(
+          controller: null,
+          webStorageType: WebStorageType.SESSION_STORAGE,
+        ),
+      ),
+    );
+  }
 }
 
 /// Mock static controller for testing
@@ -366,6 +474,17 @@ class MockPlatformCookieManagerStatic extends PlatformCookieManager
   }) {
     return true;
   }
+}
+
+class MockPlatformCookieManager extends PlatformCookieManager
+    with MockPlatformInterfaceMixin {
+  MockPlatformCookieManager(super.params) : super.implementation();
+
+  @override
+  bool isMethodSupported(
+    PlatformCookieManagerMethod method, {
+    TargetPlatform? platform,
+  }) => true;
 }
 
 class MockPlatformServiceWorkerController
@@ -760,4 +879,67 @@ class MockPlatformPrintJobController extends PlatformPrintJobController
 
   @override
   void dispose() {}
+}
+
+class MockPlatformWebAuthenticationSession
+    extends PlatformWebAuthenticationSession
+    with MockPlatformInterfaceMixin {
+  MockPlatformWebAuthenticationSession(super.params) : super.implementation();
+
+  @override
+  bool isMethodSupported(
+    PlatformWebAuthenticationSessionMethod method, {
+    TargetPlatform? platform,
+  }) => true;
+}
+
+class MockPlatformHttpAuthCredentialDatabase
+    extends PlatformHttpAuthCredentialDatabase
+    with MockPlatformInterfaceMixin {
+  MockPlatformHttpAuthCredentialDatabase(super.params) : super.implementation();
+
+  @override
+  bool isMethodSupported(
+    PlatformHttpAuthCredentialDatabaseMethod method, {
+    TargetPlatform? platform,
+  }) => true;
+}
+
+class MockPlatformWebStorage extends PlatformWebStorage
+    with MockPlatformInterfaceMixin {
+  MockPlatformWebStorage(super.params) : super.implementation();
+
+  @override
+  PlatformLocalStorage get localStorage => params.localStorage;
+
+  @override
+  PlatformSessionStorage get sessionStorage => params.sessionStorage;
+}
+
+class MockPlatformLocalStorage extends PlatformLocalStorage
+    with MockPlatformInterfaceMixin {
+  MockPlatformLocalStorage(super.params) : super.implementation();
+
+  @override
+  PlatformInAppWebViewController? get controller => params.controller;
+
+  @override
+  bool isMethodSupported(
+    PlatformLocalStorageMethod method, {
+    TargetPlatform? platform,
+  }) => true;
+}
+
+class MockPlatformSessionStorage extends PlatformSessionStorage
+    with MockPlatformInterfaceMixin {
+  MockPlatformSessionStorage(super.params) : super.implementation();
+
+  @override
+  PlatformInAppWebViewController? get controller => params.controller;
+
+  @override
+  bool isMethodSupported(
+    PlatformSessionStorageMethod method, {
+    TargetPlatform? platform,
+  }) => true;
 }

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../utils/support_checker.dart';
+import '../../utils/responsive_utils.dart';
 import '../../widgets/common/support_badge.dart';
 import '../../widgets/common/app_drawer.dart';
+import '../../widgets/common/responsive_row.dart';
 
 /// Screen displaying a comprehensive support matrix showing all APIs with platform availability.
 class SupportMatrixScreen extends StatefulWidget {
@@ -256,27 +258,36 @@ class _SupportMatrixScreenState extends State<SupportMatrixScreen>
   }
 
   Widget _buildSummaryHeader() {
+    final isMobile = context.isMobile;
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: EdgeInsets.all(isMobile ? 8 : 12),
       color: Colors.blue.shade50,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
+            key: const Key('support_matrix_summary_row'),
             children: [
               const Icon(Icons.analytics, color: Colors.blue),
               const SizedBox(width: 8),
-              Text(
-                'Total APIs: ${_summary.totalApis}',
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
+              Flexible(
+                child: Text(
+                  'Total APIs: ${_summary.totalApis}',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: isMobile ? 14 : 16,
+                  ),
                 ),
               ),
-              const SizedBox(width: 16),
-              Text(
-                '(${_summary.totalMethods} methods, ${_summary.totalEvents} events)',
-                style: TextStyle(color: Colors.grey.shade700, fontSize: 14),
+              const SizedBox(width: 8),
+              Flexible(
+                child: Text(
+                  '(${_summary.totalMethods} methods, ${_summary.totalEvents} events)',
+                  style: TextStyle(
+                    color: Colors.grey.shade700,
+                    fontSize: isMobile ? 12 : 14,
+                  ),
+                ),
               ),
             ],
           ),
@@ -325,6 +336,7 @@ class _SupportMatrixScreenState extends State<SupportMatrixScreen>
   }
 
   Widget _buildSearchAndFilters() {
+    final isMobile = context.isMobile;
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -424,26 +436,33 @@ class _SupportMatrixScreenState extends State<SupportMatrixScreen>
           ),
           const SizedBox(height: 4),
 
-          // Additional filters
-          Row(
+          // Additional filters - always in a row
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               FilterChip(
                 selected: _showMethods,
-                label: const Text('Methods', style: TextStyle(fontSize: 11)),
+                label: Text(
+                  'Methods',
+                  style: TextStyle(fontSize: isMobile ? 10 : 11),
+                ),
                 onSelected: (v) => setState(() => _showMethods = v),
               ),
-              const SizedBox(width: 4),
               FilterChip(
                 selected: _showEvents,
-                label: const Text('Events', style: TextStyle(fontSize: 11)),
+                label: Text(
+                  'Events',
+                  style: TextStyle(fontSize: isMobile ? 10 : 11),
+                ),
                 onSelected: (v) => setState(() => _showEvents = v),
               ),
-              const SizedBox(width: 8),
               FilterChip(
                 selected: _showOnlySupported,
-                label: const Text(
+                label: Text(
                   'Only supported',
-                  style: TextStyle(fontSize: 11),
+                  style: TextStyle(fontSize: isMobile ? 10 : 11),
                 ),
                 onSelected: (v) => setState(() => _showOnlySupported = v),
               ),
@@ -455,6 +474,7 @@ class _SupportMatrixScreenState extends State<SupportMatrixScreen>
   }
 
   Widget _buildClassTab(ApiClassDefinition classDef) {
+    final isMobile = context.isMobile;
     final filteredMethods = _getFilteredMethods(classDef);
     final filteredEvents = _getFilteredEvents(classDef);
     final classSupportedPlatforms =
@@ -483,29 +503,40 @@ class _SupportMatrixScreenState extends State<SupportMatrixScreen>
         Card(
           color: Colors.blue.shade50,
           child: Padding(
-            padding: const EdgeInsets.all(12),
+            padding: EdgeInsets.all(isMobile ? 8 : 12),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
+                ResponsiveRow(
+                  spacing: 8,
+                  runSpacing: 8,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       classDef.className,
-                      style: const TextStyle(
-                        fontSize: 18,
+                      style: TextStyle(
+                        fontSize: isMobile ? 16 : 18,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: SingleChildScrollView(
+                    if (isMobile)
+                      SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
                         child: SupportBadgesRow(
                           supportedPlatforms: classSupportedPlatforms,
                           compact: true,
                         ),
+                      )
+                    else
+                      Flexible(
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: SupportBadgesRow(
+                            supportedPlatforms: classSupportedPlatforms,
+                            compact: true,
+                          ),
+                        ),
                       ),
-                    ),
                   ],
                 ),
                 if (classDef.description.isNotEmpty) ...[
@@ -596,11 +627,20 @@ class _SupportMatrixScreenState extends State<SupportMatrixScreen>
     String? category,
     required bool isMethod,
   }) {
+    final isMobile = context.isMobile;
     return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+      margin: EdgeInsets.symmetric(horizontal: isMobile ? 2 : 4, vertical: 2),
       child: ExpansionTile(
-        tilePadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
-        childrenPadding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+        tilePadding: EdgeInsets.symmetric(
+          horizontal: isMobile ? 8 : 12,
+          vertical: 0,
+        ),
+        childrenPadding: EdgeInsets.fromLTRB(
+          isMobile ? 8 : 12,
+          0,
+          isMobile ? 8 : 12,
+          isMobile ? 8 : 12,
+        ),
         title: Row(
           children: [
             Expanded(
@@ -608,7 +648,7 @@ class _SupportMatrixScreenState extends State<SupportMatrixScreen>
                 children: [
                   Icon(
                     isMethod ? Icons.functions : Icons.bolt,
-                    size: 16,
+                    size: isMobile ? 14 : 16,
                     color: isMethod ? Colors.blue : Colors.orange,
                   ),
                   const SizedBox(width: 8),
@@ -617,7 +657,7 @@ class _SupportMatrixScreenState extends State<SupportMatrixScreen>
                       name,
                       style: TextStyle(
                         fontWeight: FontWeight.w500,
-                        fontSize: 13,
+                        fontSize: isMobile ? 12 : 13,
                         decoration: isDeprecated
                             ? TextDecoration.lineThrough
                             : null,
@@ -700,11 +740,6 @@ class _SupportMatrixScreenState extends State<SupportMatrixScreen>
                 ),
               ),
             ),
-          const SizedBox(height: 8),
-          SupportBadgesRow(
-            supportedPlatforms: supportedPlatforms,
-            showLabels: true,
-          ),
         ],
       ),
     );

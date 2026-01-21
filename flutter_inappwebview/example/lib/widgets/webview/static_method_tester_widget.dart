@@ -745,11 +745,13 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
                 children: [
                   const Icon(Icons.functions, size: 20),
                   const SizedBox(width: 8),
-                  Text(
-                    'Static Method Tester ($totalMethods methods)',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
+                  Flexible(
+                    child: Text(
+                      'Static Method Tester ($totalMethods methods)',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
                     ),
                   ),
                 ],

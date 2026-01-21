@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import '../utils/platform_utils.dart';
+import '../widgets/common/section_card.dart';
 
 /// Screen displaying detailed platform information and capabilities.
 class PlatformInfoScreen extends StatelessWidget {
@@ -13,8 +14,7 @@ class PlatformInfoScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16.0),
         children: [
-          _buildSection(
-            context,
+          InfoSection(
             title: 'Platform Details',
             icon: PlatformUtils.getPlatformIcon(),
             children: [
@@ -41,81 +41,42 @@ class PlatformInfoScreen extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 24),
-          _buildSection(
-            context,
+          InfoSection(
             title: 'Core WebView Features',
             icon: Icons.web,
             children: [_buildFeaturesList(context, _getCoreWebViewFeatures())],
           ),
           const SizedBox(height: 24),
-          _buildSection(
-            context,
+          InfoSection(
             title: 'Browser Features',
             icon: Icons.open_in_browser,
             children: [_buildFeaturesList(context, _getBrowserFeatures())],
           ),
           const SizedBox(height: 24),
-          _buildSection(
-            context,
+          InfoSection(
             title: 'Storage & Data',
             icon: Icons.storage,
             children: [_buildFeaturesList(context, _getStorageFeatures())],
           ),
           const SizedBox(height: 24),
-          _buildSection(
-            context,
+          InfoSection(
             title: 'Controllers',
             icon: Icons.tune,
             children: [_buildFeaturesList(context, _getControllerFeatures())],
           ),
           const SizedBox(height: 24),
-          _buildSection(
-            context,
+          InfoSection(
             title: 'Messaging & Communication',
             icon: Icons.message,
             children: [_buildFeaturesList(context, _getMessagingFeatures())],
           ),
           const SizedBox(height: 24),
-          _buildSection(
-            context,
+          InfoSection(
             title: 'Advanced Features',
             icon: Icons.settings_applications,
             children: [_buildFeaturesList(context, _getAdvancedFeatures())],
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildSection(
-    BuildContext context, {
-    required String title,
-    required IconData icon,
-    required List<Widget> children,
-  }) {
-    return Card(
-      elevation: 2,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(icon, color: Theme.of(context).primaryColor),
-                const SizedBox(width: 8),
-                Text(
-                  title,
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-            const Divider(height: 24),
-            ...children,
-          ],
-        ),
       ),
     );
   }

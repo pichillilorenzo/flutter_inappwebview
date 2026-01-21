@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_inappwebview_example/models/navigation_section.dart';
+import 'package:flutter_inappwebview_example/utils/responsive_utils.dart';
 
 class AppDrawer extends StatelessWidget {
   AppDrawer({super.key, List<NavigationSection>? sections})
@@ -10,15 +11,22 @@ class AppDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isMobile = context.isMobile;
     return Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
-        children: _buildChildren(context),
+        children: _buildChildren(context, isMobile),
       ),
     );
   }
 
-  List<Widget> _buildChildren(BuildContext context) {
+  List<Widget> _buildChildren(BuildContext context, bool isMobile) {
+    final headerTitleSize = isMobile ? 22.0 : 24.0;
+    final headerSubtitleSize = isMobile ? 12.0 : 14.0;
+    final sectionTitleSize = isMobile ? 11.0 : 12.0;
+    final itemTitleSize = isMobile ? 13.0 : 14.0;
+    final tilePadding = EdgeInsets.symmetric(horizontal: 16);
+    final tileVerticalPadding = 8.0;
     final children = <Widget>[
       DrawerHeader(
         decoration: const BoxDecoration(color: Colors.blue),
@@ -30,13 +38,16 @@ class AppDrawer extends StatelessWidget {
               '$InAppWebView',
               style: TextStyle(
                 color: Colors.white,
-                fontSize: 24,
+                fontSize: headerTitleSize,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const Text(
+            Text(
               'Test Suite',
-              style: TextStyle(color: Colors.white70, fontSize: 14),
+              style: TextStyle(
+                color: Colors.white70,
+                fontSize: headerSubtitleSize,
+              ),
             ),
           ],
         ),
@@ -56,7 +67,7 @@ class AppDrawer extends StatelessWidget {
               section.title!,
               style: TextStyle(
                 color: Colors.grey.shade600,
-                fontSize: 12,
+                fontSize: sectionTitleSize,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -66,7 +77,9 @@ class AppDrawer extends StatelessWidget {
       for (final item in section.items) {
         children.add(
           ListTile(
-            title: Text(item.title),
+            contentPadding: tilePadding,
+            minVerticalPadding: tileVerticalPadding,
+            title: Text(item.title, style: TextStyle(fontSize: itemTitleSize)),
             leading: Icon(item.icon),
             onTap: () => _navigateTo(context, item),
           ),

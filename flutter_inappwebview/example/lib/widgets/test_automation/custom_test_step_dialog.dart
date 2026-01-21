@@ -4,6 +4,7 @@ import '../../models/test_configuration.dart';
 import '../../utils/constants.dart';
 import '../../utils/controller_methods_registry.dart';
 import '../../widgets/common/parameter_dialog.dart';
+import '../../widgets/test_automation/method_selector_widget.dart';
 
 /// Dialog for creating/editing custom test steps
 class CustomTestStepDialog extends StatefulWidget {
@@ -754,10 +755,10 @@ class _CustomTestStepDialogState extends State<CustomTestStepDialog> {
   }
 
   Future<void> _showMethodPickerDialog() async {
-    final result = await showDialog<ControllerMethodEntry>(
+    final result = await showMethodPickerDialog(
       context: context,
-      builder: (context) =>
-          _MethodPickerDialog(selectedMethodId: _selectedMethod?.id),
+      selectedMethodId: _selectedMethod?.id,
+      title: 'Select Controller Method',
     );
 
     if (result != null) {
@@ -1176,124 +1177,5 @@ class _CustomTestStepDialogState extends State<CustomTestStepDialog> {
           parameters: _methodParameters.isNotEmpty ? _methodParameters : null,
         );
     }
-  }
-}
-
-/// Dialog for picking a controller method
-class _MethodPickerDialog extends StatefulWidget {
-  final String? selectedMethodId;
-
-  const _MethodPickerDialog({this.selectedMethodId});
-
-  @override
-  State<_MethodPickerDialog> createState() => _MethodPickerDialogState();
-}
-
-class _MethodPickerDialogState extends State<_MethodPickerDialog> {
-  final _searchController = TextEditingController();
-  String _searchQuery = '';
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final registry = ControllerMethodsRegistry.instance;
-    final filteredCategories = registry.searchCategories(_searchQuery);
-
-    return AlertDialog(
-      title: const Text('Select Controller Method'),
-      content: SizedBox(
-        width: 500,
-        height: 450,
-        child: Column(
-          children: [
-            TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                hintText: 'Search methods...',
-                prefixIcon: const Icon(Icons.search),
-                suffixIcon: _searchQuery.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.clear),
-                        onPressed: () {
-                          _searchController.clear();
-                          setState(() => _searchQuery = '');
-                        },
-                      )
-                    : null,
-                border: const OutlineInputBorder(),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 8,
-                ),
-              ),
-              onChanged: (value) {
-                setState(() => _searchQuery = value);
-              },
-            ),
-            const SizedBox(height: 12),
-            Expanded(
-              child: filteredCategories.isEmpty
-                  ? const Center(child: Text('No methods found'))
-                  : ListView.builder(
-                      itemCount: filteredCategories.length,
-                      itemBuilder: (context, index) {
-                        final category = filteredCategories[index];
-                        return ExpansionTile(
-                          leading: Icon(category.icon, size: 20),
-                          title: Text(
-                            category.name,
-                            style: const TextStyle(fontSize: 14),
-                          ),
-                          subtitle: Text('${category.methods.length} methods'),
-                          children: category.methods.map((method) {
-                            final isSelected =
-                                widget.selectedMethodId == method.id;
-                            return ListTile(
-                              dense: true,
-                              selected: isSelected,
-                              leading: isSelected
-                                  ? const Icon(
-                                      Icons.check_circle,
-                                      color: Colors.green,
-                                      size: 20,
-                                    )
-                                  : const Icon(Icons.code, size: 20),
-                              title: Text(method.name),
-                              subtitle: Text(
-                                method.description,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(fontSize: 11),
-                              ),
-                              trailing: method.parameters.isNotEmpty
-                                  ? Chip(
-                                      label: Text(
-                                        '${method.parameters.length}',
-                                      ),
-                                      visualDensity: VisualDensity.compact,
-                                    )
-                                  : null,
-                              onTap: () => Navigator.of(context).pop(method),
-                            );
-                          }).toList(),
-                        );
-                      },
-                    ),
-            ),
-          ],
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
-        ),
-      ],
-    );
   }
 }

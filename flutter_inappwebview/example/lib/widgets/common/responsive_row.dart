@@ -13,6 +13,8 @@ class ResponsiveRow extends StatelessWidget {
     this.mainAxisSize = MainAxisSize.max,
     this.showDivider = false,
     this.divider,
+    this.rowKey,
+    this.columnKey,
   });
 
   final List<Widget> children;
@@ -23,6 +25,8 @@ class ResponsiveRow extends StatelessWidget {
   final MainAxisSize mainAxisSize;
   final bool showDivider;
   final Widget? divider;
+  final Key? rowKey;
+  final Key? columnKey;
 
   @override
   Widget build(BuildContext context) {
@@ -38,6 +42,7 @@ class ResponsiveRow extends StatelessWidget {
 
   Widget _buildRow() {
     return Row(
+      key: rowKey,
       mainAxisAlignment: mainAxisAlignment,
       crossAxisAlignment: crossAxisAlignment,
       mainAxisSize: mainAxisSize,
@@ -47,9 +52,10 @@ class ResponsiveRow extends StatelessWidget {
 
   Widget _buildColumn() {
     return Column(
+      key: columnKey,
       mainAxisAlignment: mainAxisAlignment,
       crossAxisAlignment: crossAxisAlignment,
-      mainAxisSize: mainAxisSize,
+      mainAxisSize: MainAxisSize.min,
       children: _withSpacing(
         axis: Axis.vertical,
         spacing: runSpacing > 0 ? runSpacing : spacing,

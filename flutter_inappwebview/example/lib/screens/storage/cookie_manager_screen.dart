@@ -7,6 +7,8 @@ import 'package:flutter_inappwebview_example/widgets/common/method_card.dart';
 import 'package:flutter_inappwebview_example/utils/support_checker.dart';
 import 'package:flutter_inappwebview_example/widgets/common/parameter_dialog.dart';
 import 'package:flutter_inappwebview_example/widgets/common/method_result_history.dart';
+import 'package:flutter_inappwebview_example/utils/responsive_utils.dart';
+import 'package:flutter_inappwebview_example/widgets/common/responsive_row.dart';
 
 /// Screen for testing CookieManager functionality
 class CookieManagerScreen extends StatefulWidget {
@@ -718,25 +720,38 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
         color: Colors.blue.shade50,
         border: Border(bottom: BorderSide(color: Colors.grey.shade300)),
       ),
-      child: Row(
-        children: [
-          Expanded(
-            child: TextField(
-              controller: _urlController,
-              decoration: const InputDecoration(
-                labelText: 'URL',
-                hintText: 'https://example.com',
-                border: OutlineInputBorder(),
-                isDense: true,
-              ),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final isMobile = ResponsiveBreakpoints.isMobileWidth(
+            constraints.maxWidth,
+          );
+          final urlField = TextField(
+            controller: _urlController,
+            decoration: const InputDecoration(
+              labelText: 'URL',
+              hintText: 'https://example.com',
+              border: OutlineInputBorder(),
+              isDense: true,
             ),
-          ),
-          const SizedBox(width: 8),
-          ElevatedButton(
-            onPressed: _isLoading ? null : _getCookies,
-            child: Text(PlatformCookieManagerMethod.getCookies.name),
-          ),
-        ],
+          );
+          return ResponsiveRow(
+            rowKey: const Key('cookie_manager_url_row'),
+            columnKey: const Key('cookie_manager_url_column'),
+            spacing: 8,
+            runSpacing: 8,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              isMobile ? urlField : Expanded(child: urlField),
+              SizedBox(
+                width: isMobile ? double.infinity : null,
+                child: ElevatedButton(
+                  onPressed: _isLoading ? null : _getCookies,
+                  child: Text(PlatformCookieManagerMethod.getCookies.name),
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

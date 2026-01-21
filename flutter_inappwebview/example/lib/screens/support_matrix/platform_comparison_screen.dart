@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../utils/support_checker.dart';
+import '../../utils/responsive_utils.dart';
 import '../../widgets/common/support_badge.dart';
 import '../../widgets/common/app_drawer.dart';
 
@@ -305,42 +306,52 @@ class _PlatformComparisonScreenState extends State<PlatformComparisonScreen> {
     return Container(
       padding: const EdgeInsets.all(12),
       color: Colors.blue.shade50,
-      child: Row(
-        children: [
-          Expanded(
-            child: _buildPlatformDropdown(
-              value: _platform1,
-              label: 'Platform 1',
-              onChanged: (p) => setState(() => _platform1 = p!),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Column(
-              children: [
-                const Icon(Icons.compare_arrows, color: Colors.blue),
-                const SizedBox(height: 4),
-                TextButton(
-                  onPressed: () {
-                    setState(() {
-                      final temp = _platform1;
-                      _platform1 = _platform2;
-                      _platform2 = temp;
-                    });
-                  },
-                  child: const Text('Swap', style: TextStyle(fontSize: 12)),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final swapWidget = Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.compare_arrows, color: Colors.blue),
+              const SizedBox(height: 4),
+              TextButton(
+                onPressed: () {
+                  setState(() {
+                    final temp = _platform1;
+                    _platform1 = _platform2;
+                    _platform2 = temp;
+                  });
+                },
+                child: const Text('Swap', style: TextStyle(fontSize: 12)),
+              ),
+            ],
+          );
+
+          // Always use Row layout - expand to fill available space
+          return Row(
+            key: const Key('platform_comparison_selectors_row'),
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                child: _buildPlatformDropdown(
+                  value: _platform1,
+                  label: 'Platform 1',
+                  onChanged: (p) => setState(() => _platform1 = p!),
                 ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: _buildPlatformDropdown(
-              value: _platform2,
-              label: 'Platform 2',
-              onChanged: (p) => setState(() => _platform2 = p!),
-            ),
-          ),
-        ],
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: swapWidget,
+              ),
+              Expanded(
+                child: _buildPlatformDropdown(
+                  value: _platform2,
+                  label: 'Platform 2',
+                  onChanged: (p) => setState(() => _platform2 = p!),
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
@@ -404,28 +415,35 @@ class _PlatformComparisonScreenState extends State<PlatformComparisonScreen> {
 
     return Container(
       padding: const EdgeInsets.all(12),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          _buildStatCard(
-            _platform1.displayName,
-            p1Total.toString(),
-            _platform1.color,
-            _platform1.icon,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: IntrinsicWidth(
+          child: Row(
+            key: const Key('platform_comparison_stats_row'),
+            children: [
+              _buildStatCard(
+                _platform1.displayName,
+                p1Total.toString(),
+                _platform1.color,
+                _platform1.icon,
+              ),
+              const SizedBox(width: 12),
+              _buildStatCard(
+                'Common',
+                commonTotal.toString(),
+                Colors.green,
+                Icons.handshake,
+              ),
+              const SizedBox(width: 12),
+              _buildStatCard(
+                _platform2.displayName,
+                p2Total.toString(),
+                _platform2.color,
+                _platform2.icon,
+              ),
+            ],
           ),
-          _buildStatCard(
-            'Common',
-            commonTotal.toString(),
-            Colors.green,
-            Icons.handshake,
-          ),
-          _buildStatCard(
-            _platform2.displayName,
-            p2Total.toString(),
-            _platform2.color,
-            _platform2.icon,
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -626,93 +644,167 @@ class _PlatformComparisonScreenState extends State<PlatformComparisonScreen> {
       statusText = 'Neither';
     }
 
-    return Container(
-      color: rowColor,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Row(
-        children: [
-          // API name and type
-          Expanded(
-            flex: 3,
-            child: Row(
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isMobile = ResponsiveBreakpoints.isMobileWidth(
+          constraints.maxWidth,
+        );
+
+        if (isMobile) {
+          return Container(
+            color: rowColor,
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(
-                  item.isMethod ? Icons.functions : Icons.bolt,
-                  size: 16,
-                  color: item.isMethod ? Colors.blue : Colors.orange,
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
+                Row(
+                  children: [
+                    Icon(
+                      item.isMethod ? Icons.functions : Icons.bolt,
+                      size: 16,
+                      color: item.isMethod ? Colors.blue : Colors.orange,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
                         item.name,
                         style: const TextStyle(
-                          fontWeight: FontWeight.w500,
+                          fontWeight: FontWeight.w600,
                           fontSize: 13,
                         ),
                       ),
-                      if (item.description.isNotEmpty)
-                        Text(
-                          item.description,
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: Colors.grey.shade600,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                    ],
+                    ),
+                  ],
+                ),
+                if (item.description.isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    item.description,
+                    style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
+                ],
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    SupportBadge(
+                      platform: _platform1,
+                      isSupported: item.platform1Supported,
+                      compact: true,
+                    ),
+                    Tooltip(
+                      message: statusText,
+                      child: Icon(
+                        statusIcon,
+                        size: 18,
+                        color:
+                            item.platform1Supported && item.platform2Supported
+                            ? Colors.green
+                            : item.platform1Supported
+                            ? _platform1.color
+                            : item.platform2Supported
+                            ? _platform2.color
+                            : Colors.grey,
+                      ),
+                    ),
+                    SupportBadge(
+                      platform: _platform2,
+                      isSupported: item.platform2Supported,
+                      compact: true,
+                    ),
+                  ],
                 ),
               ],
             ),
-          ),
+          );
+        }
 
-          // Platform 1 status
-          Expanded(
-            child: Center(
-              child: SupportBadge(
-                platform: _platform1,
-                isSupported: item.platform1Supported,
-                compact: true,
-              ),
-            ),
-          ),
-
-          // Status indicator
-          Expanded(
-            child: Center(
-              child: Tooltip(
-                message: statusText,
-                child: Icon(
-                  statusIcon,
-                  size: 18,
-                  color: item.platform1Supported && item.platform2Supported
-                      ? Colors.green
-                      : item.platform1Supported
-                      ? _platform1.color
-                      : item.platform2Supported
-                      ? _platform2.color
-                      : Colors.grey,
+        return Container(
+          color: rowColor,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Row(
+            children: [
+              Expanded(
+                flex: 3,
+                child: Row(
+                  children: [
+                    Icon(
+                      item.isMethod ? Icons.functions : Icons.bolt,
+                      size: 16,
+                      color: item.isMethod ? Colors.blue : Colors.orange,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            item.name,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 13,
+                            ),
+                          ),
+                          if (item.description.isNotEmpty)
+                            Text(
+                              item.description,
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: Colors.grey.shade600,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ),
-          ),
-
-          // Platform 2 status
-          Expanded(
-            child: Center(
-              child: SupportBadge(
-                platform: _platform2,
-                isSupported: item.platform2Supported,
-                compact: true,
+              Expanded(
+                child: Center(
+                  child: SupportBadge(
+                    platform: _platform1,
+                    isSupported: item.platform1Supported,
+                    compact: true,
+                  ),
+                ),
               ),
-            ),
+              Expanded(
+                child: Center(
+                  child: Tooltip(
+                    message: statusText,
+                    child: Icon(
+                      statusIcon,
+                      size: 18,
+                      color: item.platform1Supported && item.platform2Supported
+                          ? Colors.green
+                          : item.platform1Supported
+                          ? _platform1.color
+                          : item.platform2Supported
+                          ? _platform2.color
+                          : Colors.grey,
+                    ),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Center(
+                  child: SupportBadge(
+                    platform: _platform2,
+                    isSupported: item.platform2Supported,
+                    compact: true,
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

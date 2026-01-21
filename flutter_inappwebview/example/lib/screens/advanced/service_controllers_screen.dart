@@ -10,6 +10,8 @@ import 'package:flutter_inappwebview_example/widgets/common/parameter_dialog.dar
 import 'package:flutter_inappwebview_example/widgets/common/method_result_history.dart';
 import 'package:flutter_inappwebview_example/providers/settings_manager.dart';
 import 'package:flutter_inappwebview_example/widgets/common/profile_selector_card.dart';
+import 'package:flutter_inappwebview_example/utils/responsive_utils.dart';
+import 'package:flutter_inappwebview_example/widgets/common/responsive_row.dart';
 
 /// Screen for testing service-level controllers
 class ServiceControllersScreen extends StatefulWidget {
@@ -989,16 +991,33 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            Expanded(child: Text(label)),
-            Switch(value: value, onChanged: onChanged),
-            IconButton(
-              icon: const Icon(Icons.refresh, size: 20),
-              onPressed: onRefresh,
-              tooltip: 'Get current',
-            ),
-          ],
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final isMobile = ResponsiveBreakpoints.isMobileWidth(
+              constraints.maxWidth,
+            );
+            final controls = Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Switch(value: value, onChanged: onChanged),
+                IconButton(
+                  icon: const Icon(Icons.refresh, size: 20),
+                  onPressed: onRefresh,
+                  tooltip: 'Get current',
+                ),
+              ],
+            );
+
+            return ResponsiveRow(
+              spacing: 8,
+              runSpacing: 8,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                isMobile ? Text(label) : Expanded(child: Text(label)),
+                controls,
+              ],
+            );
+          },
         ),
         SupportBadgesRow(supportedPlatforms: supportedPlatforms, compact: true),
         const SizedBox(height: 6),
@@ -1039,32 +1058,43 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
             padding: const EdgeInsets.all(16),
             child: Column(
               children: [
-                Row(
-                  children: [
-                    Expanded(
-                      flex: 2,
-                      child: TextField(
-                        controller: _proxyHostController,
-                        decoration: const InputDecoration(
-                          labelText: 'Host',
-                          border: OutlineInputBorder(),
-                          isDense: true,
-                        ),
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final isMobile = ResponsiveBreakpoints.isMobileWidth(
+                      constraints.maxWidth,
+                    );
+                    final hostField = TextField(
+                      controller: _proxyHostController,
+                      decoration: const InputDecoration(
+                        labelText: 'Host',
+                        border: OutlineInputBorder(),
+                        isDense: true,
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: TextField(
-                        controller: _proxyPortController,
-                        decoration: const InputDecoration(
-                          labelText: 'Port',
-                          border: OutlineInputBorder(),
-                          isDense: true,
-                        ),
-                        keyboardType: TextInputType.number,
+                    );
+                    final portField = TextField(
+                      controller: _proxyPortController,
+                      decoration: const InputDecoration(
+                        labelText: 'Port',
+                        border: OutlineInputBorder(),
+                        isDense: true,
                       ),
-                    ),
-                  ],
+                      keyboardType: TextInputType.number,
+                    );
+
+                    return ResponsiveRow(
+                      rowKey: const Key('service_controllers_proxy_row'),
+                      columnKey: const Key('service_controllers_proxy_column'),
+                      spacing: 8,
+                      runSpacing: 8,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        isMobile
+                            ? hostField
+                            : Expanded(flex: 2, child: hostField),
+                        isMobile ? portField : Expanded(child: portField),
+                      ],
+                    );
+                  },
                 ),
                 const SizedBox(height: 12),
                 TextField(
@@ -1077,33 +1107,40 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
                   ),
                 ),
                 const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Expanded(
-                      child: _buildMethodButton(
-                        'Set Proxy',
-                        _setProxyOverride,
-                        supportedPlatforms: _proxyControllerPlatforms(
-                          PlatformProxyControllerMethod.setProxyOverride,
-                        ),
-                        methodName:
-                            PlatformProxyControllerMethod.setProxyOverride.name,
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final isMobile = ResponsiveBreakpoints.isMobileWidth(
+                      constraints.maxWidth,
+                    );
+                    final setButton = _buildMethodButton(
+                      'Set Proxy',
+                      _setProxyOverride,
+                      supportedPlatforms: _proxyControllerPlatforms(
+                        PlatformProxyControllerMethod.setProxyOverride,
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: _buildMethodButton(
-                        'Clear Proxy',
-                        _clearProxyOverride,
-                        supportedPlatforms: _proxyControllerPlatforms(
-                          PlatformProxyControllerMethod.clearProxyOverride,
-                        ),
-                        methodName: PlatformProxyControllerMethod
-                            .clearProxyOverride
-                            .name,
+                      methodName:
+                          PlatformProxyControllerMethod.setProxyOverride.name,
+                    );
+                    final clearButton = _buildMethodButton(
+                      'Clear Proxy',
+                      _clearProxyOverride,
+                      supportedPlatforms: _proxyControllerPlatforms(
+                        PlatformProxyControllerMethod.clearProxyOverride,
                       ),
-                    ),
-                  ],
+                      methodName:
+                          PlatformProxyControllerMethod.clearProxyOverride.name,
+                    );
+
+                    return ResponsiveRow(
+                      spacing: 8,
+                      runSpacing: 8,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        isMobile ? setButton : Expanded(child: setButton),
+                        isMobile ? clearButton : Expanded(child: clearButton),
+                      ],
+                    );
+                  },
                 ),
               ],
             ),
@@ -1173,42 +1210,48 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
                 const SizedBox(height: 12),
 
                 // Control buttons
-                Row(
-                  children: [
-                    Expanded(
-                      child: _buildMethodButton(
-                        'Start',
-                        !_isTracing ? _startTracing : null,
-                        supportedPlatforms: _tracingControllerPlatforms(
-                          PlatformTracingControllerMethod.start,
-                        ),
-                        methodName: PlatformTracingControllerMethod.start.name,
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final isMobile = ResponsiveBreakpoints.isMobileWidth(
+                      constraints.maxWidth,
+                    );
+                    final startButton = _buildMethodButton(
+                      'Start',
+                      !_isTracing ? _startTracing : null,
+                      supportedPlatforms: _tracingControllerPlatforms(
+                        PlatformTracingControllerMethod.start,
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: _buildMethodButton(
-                        'Stop',
-                        _isTracing ? _stopTracing : null,
-                        supportedPlatforms: _tracingControllerPlatforms(
-                          PlatformTracingControllerMethod.stop,
-                        ),
-                        methodName: PlatformTracingControllerMethod.stop.name,
+                      methodName: PlatformTracingControllerMethod.start.name,
+                    );
+                    final stopButton = _buildMethodButton(
+                      'Stop',
+                      _isTracing ? _stopTracing : null,
+                      supportedPlatforms: _tracingControllerPlatforms(
+                        PlatformTracingControllerMethod.stop,
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: _buildMethodButton(
-                        'Is Tracing',
-                        _checkIsTracing,
-                        supportedPlatforms: _tracingControllerPlatforms(
-                          PlatformTracingControllerMethod.isTracing,
-                        ),
-                        methodName:
-                            PlatformTracingControllerMethod.isTracing.name,
+                      methodName: PlatformTracingControllerMethod.stop.name,
+                    );
+                    final statusButton = _buildMethodButton(
+                      'Is Tracing',
+                      _checkIsTracing,
+                      supportedPlatforms: _tracingControllerPlatforms(
+                        PlatformTracingControllerMethod.isTracing,
                       ),
-                    ),
-                  ],
+                      methodName:
+                          PlatformTracingControllerMethod.isTracing.name,
+                    );
+
+                    return ResponsiveRow(
+                      spacing: 8,
+                      runSpacing: 8,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        isMobile ? startButton : Expanded(child: startButton),
+                        isMobile ? stopButton : Expanded(child: stopButton),
+                        isMobile ? statusButton : Expanded(child: statusButton),
+                      ],
+                    );
+                  },
                 ),
               ],
             ),
@@ -1305,100 +1348,128 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
                 const SizedBox(height: 12),
 
                 // Create/Dispose buttons
-                Row(
-                  children: [
-                    Expanded(
-                      child: _buildMethodButton(
-                        'Create',
-                        environment == null ? _createWebViewEnvironment : null,
-                        supportedPlatforms: _webViewEnvironmentPlatforms(
-                          PlatformWebViewEnvironmentMethod.create,
-                        ),
-                        methodName:
-                            PlatformWebViewEnvironmentMethod.create.name,
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final isMobile = ResponsiveBreakpoints.isMobileWidth(
+                      constraints.maxWidth,
+                    );
+                    final createButton = _buildMethodButton(
+                      'Create',
+                      environment == null ? _createWebViewEnvironment : null,
+                      supportedPlatforms: _webViewEnvironmentPlatforms(
+                        PlatformWebViewEnvironmentMethod.create,
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: _buildMethodButton(
-                        'Dispose',
-                        environment != null ? _disposeWebViewEnvironment : null,
-                        supportedPlatforms: _webViewEnvironmentPlatforms(
-                          PlatformWebViewEnvironmentMethod.dispose,
-                        ),
-                        methodName:
-                            PlatformWebViewEnvironmentMethod.dispose.name,
+                      methodName: PlatformWebViewEnvironmentMethod.create.name,
+                    );
+                    final disposeButton = _buildMethodButton(
+                      'Dispose',
+                      environment != null ? _disposeWebViewEnvironment : null,
+                      supportedPlatforms: _webViewEnvironmentPlatforms(
+                        PlatformWebViewEnvironmentMethod.dispose,
                       ),
-                    ),
-                  ],
+                      methodName: PlatformWebViewEnvironmentMethod.dispose.name,
+                    );
+
+                    return ResponsiveRow(
+                      spacing: 8,
+                      runSpacing: 8,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        isMobile ? createButton : Expanded(child: createButton),
+                        isMobile
+                            ? disposeButton
+                            : Expanded(child: disposeButton),
+                      ],
+                    );
+                  },
                 ),
                 const SizedBox(height: 8),
 
                 // Static methods
-                Row(
-                  children: [
-                    Expanded(
-                      child: _buildMethodButton(
-                        'Get Version',
-                        _getAvailableVersion,
-                        supportedPlatforms: _webViewEnvironmentPlatforms(
-                          PlatformWebViewEnvironmentMethod.getAvailableVersion,
-                        ),
-                        methodName: PlatformWebViewEnvironmentMethod
-                            .getAvailableVersion
-                            .name,
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final isMobile = ResponsiveBreakpoints.isMobileWidth(
+                      constraints.maxWidth,
+                    );
+                    final versionButton = _buildMethodButton(
+                      'Get Version',
+                      _getAvailableVersion,
+                      supportedPlatforms: _webViewEnvironmentPlatforms(
+                        PlatformWebViewEnvironmentMethod.getAvailableVersion,
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: _buildMethodButton(
-                        'Compare Versions',
-                        _compareBrowserVersions,
-                        supportedPlatforms: _webViewEnvironmentPlatforms(
-                          PlatformWebViewEnvironmentMethod
-                              .compareBrowserVersions,
-                        ),
-                        methodName: PlatformWebViewEnvironmentMethod
-                            .compareBrowserVersions
-                            .name,
+                      methodName: PlatformWebViewEnvironmentMethod
+                          .getAvailableVersion
+                          .name,
+                    );
+                    final compareButton = _buildMethodButton(
+                      'Compare Versions',
+                      _compareBrowserVersions,
+                      supportedPlatforms: _webViewEnvironmentPlatforms(
+                        PlatformWebViewEnvironmentMethod.compareBrowserVersions,
                       ),
-                    ),
-                  ],
+                      methodName: PlatformWebViewEnvironmentMethod
+                          .compareBrowserVersions
+                          .name,
+                    );
+
+                    return ResponsiveRow(
+                      spacing: 8,
+                      runSpacing: 8,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        isMobile
+                            ? versionButton
+                            : Expanded(child: versionButton),
+                        isMobile
+                            ? compareButton
+                            : Expanded(child: compareButton),
+                      ],
+                    );
+                  },
                 ),
                 const SizedBox(height: 8),
 
                 // Instance methods
-                Row(
-                  children: [
-                    Expanded(
-                      child: _buildMethodButton(
-                        'Get Processes',
-                        environment != null ? _getProcessInfos : null,
-                        supportedPlatforms: _webViewEnvironmentPlatforms(
-                          PlatformWebViewEnvironmentMethod.getProcessInfos,
-                        ),
-                        methodName: PlatformWebViewEnvironmentMethod
-                            .getProcessInfos
-                            .name,
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final isMobile = ResponsiveBreakpoints.isMobileWidth(
+                      constraints.maxWidth,
+                    );
+                    final processesButton = _buildMethodButton(
+                      'Get Processes',
+                      environment != null ? _getProcessInfos : null,
+                      supportedPlatforms: _webViewEnvironmentPlatforms(
+                        PlatformWebViewEnvironmentMethod.getProcessInfos,
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: _buildMethodButton(
-                        'Failure Folder',
-                        environment != null
-                            ? _getFailureReportFolderPath
-                            : null,
-                        supportedPlatforms: _webViewEnvironmentPlatforms(
-                          PlatformWebViewEnvironmentMethod
-                              .getFailureReportFolderPath,
-                        ),
-                        methodName: PlatformWebViewEnvironmentMethod
-                            .getFailureReportFolderPath
-                            .name,
+                      methodName:
+                          PlatformWebViewEnvironmentMethod.getProcessInfos.name,
+                    );
+                    final failureButton = _buildMethodButton(
+                      'Failure Folder',
+                      environment != null ? _getFailureReportFolderPath : null,
+                      supportedPlatforms: _webViewEnvironmentPlatforms(
+                        PlatformWebViewEnvironmentMethod
+                            .getFailureReportFolderPath,
                       ),
-                    ),
-                  ],
+                      methodName: PlatformWebViewEnvironmentMethod
+                          .getFailureReportFolderPath
+                          .name,
+                    );
+
+                    return ResponsiveRow(
+                      spacing: 8,
+                      runSpacing: 8,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        isMobile
+                            ? processesButton
+                            : Expanded(child: processesButton),
+                        isMobile
+                            ? failureButton
+                            : Expanded(child: failureButton),
+                      ],
+                    );
+                  },
                 ),
 
                 // Process list
@@ -1473,17 +1544,30 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
                     color: Colors.orange.shade50,
                     borderRadius: BorderRadius.circular(4),
                   ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.warning, color: Colors.orange, size: 20),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          'Note: $ProcessGlobalConfig can only be applied once, before any WebView is created.',
-                          style: const TextStyle(fontSize: 12),
-                        ),
-                      ),
-                    ],
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      final isMobile = ResponsiveBreakpoints.isMobileWidth(
+                        constraints.maxWidth,
+                      );
+                      final noteText = Text(
+                        'Note: $ProcessGlobalConfig can only be applied once, before any WebView is created.',
+                        style: const TextStyle(fontSize: 12),
+                      );
+
+                      return ResponsiveRow(
+                        spacing: 8,
+                        runSpacing: 8,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Icon(
+                            Icons.warning,
+                            color: Colors.orange,
+                            size: 20,
+                          ),
+                          isMobile ? noteText : Expanded(child: noteText),
+                        ],
+                      );
+                    },
                   ),
                 ),
                 const SizedBox(height: 12),

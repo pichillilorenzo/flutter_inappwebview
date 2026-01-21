@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview_example/utils/controller_methods_registry.dart';
+import 'package:flutter_inappwebview_example/widgets/common/method_card.dart';
 import 'package:flutter_inappwebview_example/widgets/common/parameter_dialog.dart';
 
 /// A widget that allows users to select a controller method and configure its parameters
@@ -107,50 +108,26 @@ class _MethodSelectorWidgetState extends State<MethodSelectorWidget> {
 
   Widget _buildSelectedMethodCard() {
     final method = _selectedMethod!;
-    return Card(
-      color: Theme.of(context).colorScheme.primaryContainer,
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                const Icon(Icons.check_circle, color: Colors.green),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    method.name,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.close),
-                  onPressed: () {
-                    setState(() {
-                      _selectedMethod = null;
-                      _parameters = {};
-                    });
-                    widget.onMethodSelected(null);
-                    widget.onParametersChanged({});
-                  },
-                  tooltip: 'Clear selection',
-                ),
-              ],
-            ),
-            Text(
-              method.description,
-              style: Theme.of(context).textTheme.bodySmall,
-            ),
-            if (method.parameters.isNotEmpty) ...[
-              const Divider(),
-              _buildParametersSection(),
-            ],
-          ],
-        ),
+    return MethodCard(
+      methodName: method.name,
+      description: method.description,
+      leading: const Icon(Icons.check_circle, color: Colors.green),
+      backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+      trailing: IconButton(
+        icon: const Icon(Icons.close),
+        onPressed: () {
+          setState(() {
+            _selectedMethod = null;
+            _parameters = {};
+          });
+          widget.onMethodSelected(null);
+          widget.onParametersChanged({});
+        },
+        tooltip: 'Clear selection',
       ),
+      extraContent: method.parameters.isNotEmpty
+          ? _buildParametersSection()
+          : null,
     );
   }
 
@@ -345,26 +322,51 @@ class CompactMethodSelector extends StatelessWidget {
   }
 
   Future<void> _showMethodPickerDialog(BuildContext context) async {
-    final result = await showDialog<ControllerMethodEntry>(
+    final result = await showMethodPickerDialog(
       context: context,
-      builder: (context) =>
-          _MethodPickerDialog(selectedMethodId: selectedMethodId),
+      selectedMethodId: selectedMethodId,
     );
 
     onMethodSelected(result);
   }
 }
 
-class _MethodPickerDialog extends StatefulWidget {
-  final String? selectedMethodId;
-
-  const _MethodPickerDialog({this.selectedMethodId});
-
-  @override
-  State<_MethodPickerDialog> createState() => _MethodPickerDialogState();
+/// Shows a dialog for picking a controller method.
+///
+/// Returns the selected [ControllerMethodEntry] or null if cancelled.
+Future<ControllerMethodEntry?> showMethodPickerDialog({
+  required BuildContext context,
+  String? selectedMethodId,
+  String title = 'Select Method',
+}) {
+  return showDialog<ControllerMethodEntry>(
+    context: context,
+    builder: (context) =>
+        MethodPickerDialog(selectedMethodId: selectedMethodId, title: title),
+  );
 }
 
-class _MethodPickerDialogState extends State<_MethodPickerDialog> {
+/// Dialog for picking a controller method from the registry.
+///
+/// Displays categorized methods with search functionality.
+class MethodPickerDialog extends StatefulWidget {
+  /// The currently selected method ID, if any.
+  final String? selectedMethodId;
+
+  /// The title to display in the dialog.
+  final String title;
+
+  const MethodPickerDialog({
+    super.key,
+    this.selectedMethodId,
+    this.title = 'Select Method',
+  });
+
+  @override
+  State<MethodPickerDialog> createState() => _MethodPickerDialogState();
+}
+
+class _MethodPickerDialogState extends State<MethodPickerDialog> {
   final _searchController = TextEditingController();
   String _searchQuery = '';
 
@@ -380,7 +382,7 @@ class _MethodPickerDialogState extends State<_MethodPickerDialog> {
     final filteredCategories = registry.searchCategories(_searchQuery);
 
     return AlertDialog(
-      title: const Text('Select Method'),
+      title: Text(widget.title),
       content: SizedBox(
         width: double.maxFinite,
         height: 400,
@@ -412,34 +414,53 @@ class _MethodPickerDialogState extends State<_MethodPickerDialog> {
             ),
             const SizedBox(height: 12),
             Expanded(
-              child: ListView.builder(
-                itemCount: filteredCategories.length,
-                itemBuilder: (context, index) {
-                  final category = filteredCategories[index];
-                  return ExpansionTile(
-                    leading: Icon(category.icon, size: 20),
-                    title: Text(
-                      category.name,
-                      style: const TextStyle(fontSize: 14),
+              child: filteredCategories.isEmpty
+                  ? const Center(child: Text('No methods found'))
+                  : ListView.builder(
+                      itemCount: filteredCategories.length,
+                      itemBuilder: (context, index) {
+                        final category = filteredCategories[index];
+                        return ExpansionTile(
+                          leading: Icon(category.icon, size: 20),
+                          title: Text(
+                            category.name,
+                            style: const TextStyle(fontSize: 14),
+                          ),
+                          subtitle: Text('${category.methods.length} methods'),
+                          children: category.methods.map((method) {
+                            final isSelected =
+                                widget.selectedMethodId == method.id;
+                            return ListTile(
+                              dense: true,
+                              selected: isSelected,
+                              leading: isSelected
+                                  ? const Icon(
+                                      Icons.check_circle,
+                                      color: Colors.green,
+                                      size: 20,
+                                    )
+                                  : const Icon(Icons.code, size: 20),
+                              title: Text(method.name),
+                              subtitle: Text(
+                                method.description,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(fontSize: 11),
+                              ),
+                              trailing: method.parameters.isNotEmpty
+                                  ? Chip(
+                                      label: Text(
+                                        '${method.parameters.length}',
+                                      ),
+                                      visualDensity: VisualDensity.compact,
+                                    )
+                                  : null,
+                              onTap: () => Navigator.of(context).pop(method),
+                            );
+                          }).toList(),
+                        );
+                      },
                     ),
-                    children: category.methods.map((method) {
-                      final isSelected = widget.selectedMethodId == method.id;
-                      return ListTile(
-                        dense: true,
-                        selected: isSelected,
-                        title: Text(method.name),
-                        subtitle: Text(
-                          method.description,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(fontSize: 11),
-                        ),
-                        onTap: () => Navigator.of(context).pop(method),
-                      );
-                    }).toList(),
-                  );
-                },
-              ),
             ),
           ],
         ),

@@ -5,7 +5,10 @@ import 'package:flutter_inappwebview_example/providers/settings_manager.dart';
 import 'package:flutter_inappwebview_example/models/environment_setting_definition.dart';
 import 'package:flutter_inappwebview_example/models/webview_environment_profile.dart';
 import 'package:flutter_inappwebview_example/utils/platform_utils.dart';
+import 'package:flutter_inappwebview_example/utils/responsive_utils.dart';
 import 'package:flutter_inappwebview_example/widgets/common/app_drawer.dart';
+import 'package:flutter_inappwebview_example/widgets/settings/responsive_setting_tile.dart';
+import 'package:flutter_inappwebview_example/widgets/common/support_badge.dart';
 
 import '../utils/support_checker.dart';
 
@@ -291,6 +294,30 @@ class _WebViewEnvironmentSettingsEditorScreenState
 
     final isExpanded =
         _expandedCategories.contains(category) || _searchQuery.isNotEmpty;
+    final header = Row(
+      children: [
+        Text(
+          category,
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+        ),
+        const SizedBox(width: 8),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+          decoration: BoxDecoration(
+            color: Colors.grey.shade200,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Text(
+            '${filteredSettings.length}',
+            style: TextStyle(fontSize: 12, color: Colors.grey.shade700),
+          ),
+        ),
+      ],
+    );
+    final subtitle = Text(
+      '${filteredSettings.length} setting${filteredSettings.length == 1 ? '' : 's'}',
+      style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+    );
 
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
@@ -306,30 +333,8 @@ class _WebViewEnvironmentSettingsEditorScreenState
             }
           });
         },
-        title: Row(
-          children: [
-            Text(
-              category,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-            ),
-            const SizedBox(width: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade200,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                '${filteredSettings.length}',
-                style: TextStyle(fontSize: 12, color: Colors.grey.shade700),
-              ),
-            ),
-          ],
-        ),
-        subtitle: Text(
-          '${filteredSettings.length} setting${filteredSettings.length == 1 ? '' : 's'}',
-          style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
-        ),
+        title: header,
+        subtitle: subtitle,
         children: filteredSettings.map((setting) {
           return _buildSettingTile(setting, settingsManager);
         }).toList(),
@@ -343,6 +348,7 @@ class _WebViewEnvironmentSettingsEditorScreenState
   ) {
     final isModified = _modifiedKeys.contains(setting.key);
     final currentValue = _localSettings[setting.key] ?? setting.defaultValue;
+    final hasPlatformLimitations = setting.supportedPlatforms.isNotEmpty;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -350,70 +356,53 @@ class _WebViewEnvironmentSettingsEditorScreenState
         color: isModified ? Colors.orange.shade50 : null,
         border: Border(bottom: BorderSide(color: Colors.grey.shade200)),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Flexible(
-                          child: Text(
-                            setting.name,
-                            style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              color: Colors.black87,
-                            ),
-                          ),
-                        ),
-                        if (isModified) ...[
-                          const SizedBox(width: 8),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 6,
-                              vertical: 2,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.orange.shade200,
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: const Text(
-                              'Modified',
-                              style: TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      setting.description,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey.shade600,
-                      ),
-                    ),
-                  ],
+      child: ResponsiveSettingTile(
+        title: Row(
+          children: [
+            Flexible(
+              child: Text(
+                setting.name,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black87,
                 ),
               ),
-              if (isModified)
-                IconButton(
-                  icon: const Icon(Icons.restore, size: 20),
-                  tooltip: 'Reset to default',
-                  onPressed: () => _resetSetting(setting.key),
+            ),
+            if (isModified) ...[
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Colors.orange.shade200,
+                  borderRadius: BorderRadius.circular(4),
                 ),
+                child: const Text(
+                  'Modified',
+                  style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+                ),
+              ),
             ],
-          ),
-          const SizedBox(height: 8),
-          _buildSettingControl(setting, currentValue),
-        ],
+          ],
+        ),
+        description: Text(
+          setting.description,
+          style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+        ),
+        badges: hasPlatformLimitations
+            ? SupportBadgesRow(
+                supportedPlatforms: setting.supportedPlatforms,
+                compact: true,
+              )
+            : null,
+        trailing: isModified
+            ? IconButton(
+                icon: const Icon(Icons.restore, size: 20),
+                tooltip: 'Reset to default',
+                onPressed: () => _resetSetting(setting.key),
+              )
+            : null,
+        control: _buildSettingControl(setting, currentValue),
+        inlineControl: setting.type == EnvironmentSettingType.boolean,
       ),
     );
   }
@@ -809,6 +798,34 @@ class _WebViewEnvironmentSettingsEditorScreenState
   }
 
   Widget _buildBottomBar(SettingsManager settingsManager) {
+    final isMobile = context.isMobile;
+    final resetButton = OutlinedButton.icon(
+      icon: const Icon(Icons.restore),
+      label: const Text('Reset All'),
+      onPressed: () => _showResetConfirmDialog(settingsManager),
+    );
+    final recreateButton = OutlinedButton.icon(
+      icon: const Icon(Icons.refresh),
+      label: const Text('Recreate Env'),
+      onPressed: () async {
+        await settingsManager.recreateEnvironment();
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('$WebViewEnvironment recreated')),
+          );
+        }
+      },
+    );
+    final applyButton = ElevatedButton.icon(
+      icon: const Icon(Icons.check),
+      label: const Text('Apply & Create'),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.purple,
+        foregroundColor: Colors.white,
+      ),
+      onPressed: () => _applySettings(settingsManager),
+    );
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -822,39 +839,27 @@ class _WebViewEnvironmentSettingsEditorScreenState
           ),
         ],
       ),
-      child: Row(
-        children: [
-          OutlinedButton.icon(
-            icon: const Icon(Icons.restore),
-            label: const Text('Reset All'),
-            onPressed: () => _showResetConfirmDialog(settingsManager),
-          ),
-          const SizedBox(width: 8),
-          if (settingsManager.webViewEnvironment != null)
-            OutlinedButton.icon(
-              icon: const Icon(Icons.refresh),
-              label: const Text('Recreate Env'),
-              onPressed: () async {
-                await settingsManager.recreateEnvironment();
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('$WebViewEnvironment recreated')),
-                  );
-                }
-              },
+      child: isMobile
+          ? Wrap(
+              key: const ValueKey('settings_bottom_bar_actions'),
+              spacing: 12,
+              runSpacing: 8,
+              children: [
+                resetButton,
+                if (settingsManager.webViewEnvironment != null) recreateButton,
+                applyButton,
+              ],
+            )
+          : Row(
+              key: const ValueKey('settings_bottom_bar_actions'),
+              children: [
+                resetButton,
+                const SizedBox(width: 8),
+                if (settingsManager.webViewEnvironment != null) recreateButton,
+                const Spacer(),
+                applyButton,
+              ],
             ),
-          const Spacer(),
-          ElevatedButton.icon(
-            icon: const Icon(Icons.check),
-            label: const Text('Apply & Create'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.purple,
-              foregroundColor: Colors.white,
-            ),
-            onPressed: () => _applySettings(settingsManager),
-          ),
-        ],
-      ),
     );
   }
 

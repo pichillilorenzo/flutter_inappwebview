@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:flutter_inappwebview_example/utils/support_checker.dart';
 
 /// Enum representing the type of an environment setting.
 enum EnvironmentSettingType {
@@ -54,10 +55,13 @@ class EnvironmentSettingDefinition {
 
   String get key => property.name;
 
-  bool isSupportedOnPlatform(TargetPlatform platform) {
+  bool isSupportedOnPlatform(SupportedPlatform platform) {
+    if (platform == SupportedPlatform.web) return false;
+    final targetPlatform = platform.targetPlatform;
+    if (targetPlatform == null) return false;
     return WebViewEnvironmentSettings.isPropertySupported(
       property,
-      platform: platform,
+      platform: targetPlatform,
     );
   }
 
@@ -66,9 +70,22 @@ class EnvironmentSettingDefinition {
     return WebViewEnvironmentSettings.isPropertySupported(property);
   }
 
+  /// Platforms that support this setting (web cannot be checked via TargetPlatform).
+  Set<SupportedPlatform> get supportedPlatforms {
+    return SupportCheckHelper.supportedPlatformsForProperty(
+      property: property,
+      checker: (property, {platform}) =>
+          WebViewEnvironmentSettings.isPropertySupported(
+            property,
+            platform: platform,
+          ),
+    ).where((platform) => platform != SupportedPlatform.web).toSet();
+  }
+
   bool get hasPlatformLimitations {
-    if (kIsWeb) return false;
-    final nativePlatforms = TargetPlatform.values;
+    final nativePlatforms = SupportedPlatform.values.where(
+      (platform) => platform != SupportedPlatform.web,
+    );
     return nativePlatforms.any((platform) => !isSupportedOnPlatform(platform));
   }
 }

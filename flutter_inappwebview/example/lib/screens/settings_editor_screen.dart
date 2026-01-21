@@ -5,9 +5,11 @@ import 'package:flutter_inappwebview_example/providers/settings_manager.dart';
 import 'package:flutter_inappwebview_example/models/setting_definition.dart';
 import 'package:flutter_inappwebview_example/models/settings_profile.dart';
 import 'package:flutter_inappwebview_example/utils/platform_utils.dart';
+import 'package:flutter_inappwebview_example/utils/responsive_utils.dart';
 import 'package:flutter_inappwebview_example/utils/support_checker.dart';
 import 'package:flutter_inappwebview_example/widgets/common/support_badge.dart';
 import 'package:flutter_inappwebview_example/widgets/common/app_drawer.dart';
+import 'package:flutter_inappwebview_example/widgets/settings/responsive_setting_tile.dart';
 
 /// Comprehensive settings editor for InAppWebViewSettings
 class SettingsEditorScreen extends StatefulWidget {
@@ -246,6 +248,30 @@ class _SettingsEditorScreenState extends State<SettingsEditorScreen> {
 
     final isExpanded =
         _expandedCategories.contains(category) || _searchQuery.isNotEmpty;
+    final header = Row(
+      children: [
+        Text(
+          category,
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+        ),
+        const SizedBox(width: 8),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+          decoration: BoxDecoration(
+            color: Colors.grey.shade200,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Text(
+            '${filteredSettings.length}',
+            style: TextStyle(fontSize: 12, color: Colors.grey.shade700),
+          ),
+        ),
+      ],
+    );
+    final subtitle = Text(
+      '${filteredSettings.length} setting${filteredSettings.length == 1 ? '' : 's'}',
+      style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+    );
 
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
@@ -261,30 +287,8 @@ class _SettingsEditorScreenState extends State<SettingsEditorScreen> {
             }
           });
         },
-        title: Row(
-          children: [
-            Text(
-              category,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-            ),
-            const SizedBox(width: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade200,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                '${filteredSettings.length}',
-                style: TextStyle(fontSize: 12, color: Colors.grey.shade700),
-              ),
-            ),
-          ],
-        ),
-        subtitle: Text(
-          '${filteredSettings.length} setting${filteredSettings.length == 1 ? '' : 's'}',
-          style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
-        ),
+        title: header,
+        subtitle: subtitle,
         children: filteredSettings.map((setting) {
           return _buildSettingTile(setting, settingsManager);
         }).toList(),
@@ -306,77 +310,53 @@ class _SettingsEditorScreenState extends State<SettingsEditorScreen> {
         color: isModified ? Colors.orange.shade50 : null,
         border: Border(bottom: BorderSide(color: Colors.grey.shade200)),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Flexible(
-                          child: Text(
-                            setting.name,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w600,
-                              color: Colors.black87,
-                            ),
-                          ),
-                        ),
-                        if (isModified) ...[
-                          const SizedBox(width: 8),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 6,
-                              vertical: 2,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.orange.shade200,
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: const Text(
-                              'Modified',
-                              style: TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      setting.description,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey.shade600,
-                      ),
-                    ),
-                    if (hasPlatformLimitations) ...[
-                      const SizedBox(height: 8),
-                      SupportBadgesRow(
-                        supportedPlatforms: setting.supportedPlatforms,
-                        compact: true,
-                      ),
-                    ],
-                  ],
+      child: ResponsiveSettingTile(
+        title: Row(
+          children: [
+            Flexible(
+              child: Text(
+                setting.name,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black87,
                 ),
               ),
-              if (isModified)
-                IconButton(
-                  icon: const Icon(Icons.restore, size: 20),
-                  tooltip: 'Reset to default',
-                  onPressed: () => settingsManager.resetSetting(setting.key),
+            ),
+            if (isModified) ...[
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Colors.orange.shade200,
+                  borderRadius: BorderRadius.circular(4),
                 ),
+                child: const Text(
+                  'Modified',
+                  style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+                ),
+              ),
             ],
-          ),
-          const SizedBox(height: 8),
-          _buildSettingControl(setting, currentValue, settingsManager),
-        ],
+          ],
+        ),
+        description: Text(
+          setting.description,
+          style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+        ),
+        badges: hasPlatformLimitations
+            ? SupportBadgesRow(
+                supportedPlatforms: setting.supportedPlatforms,
+                compact: true,
+              )
+            : null,
+        trailing: isModified
+            ? IconButton(
+                icon: const Icon(Icons.restore, size: 20),
+                tooltip: 'Reset to default',
+                onPressed: () => settingsManager.resetSetting(setting.key),
+              )
+            : null,
+        control: _buildSettingControl(setting, currentValue, settingsManager),
+        inlineControl: setting.type == SettingType.boolean,
       ),
     );
   }
@@ -395,68 +375,59 @@ class _SettingsEditorScreenState extends State<SettingsEditorScreen> {
         );
 
       case SettingType.string:
-        return SizedBox(
-          width: 150,
-          child: TextField(
-            controller: TextEditingController(
-              text: currentValue?.toString() ?? '',
-            ),
-            decoration: const InputDecoration(
-              isDense: true,
-              contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-              border: OutlineInputBorder(),
-            ),
-            style: const TextStyle(fontSize: 14),
-            onChanged: (value) =>
-                settingsManager.updateSetting(setting.key, value),
+        return TextField(
+          controller: TextEditingController(
+            text: currentValue?.toString() ?? '',
           ),
+          decoration: const InputDecoration(
+            isDense: true,
+            contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+            border: OutlineInputBorder(),
+          ),
+          style: const TextStyle(fontSize: 14),
+          onChanged: (value) =>
+              settingsManager.updateSetting(setting.key, value),
         );
 
       case SettingType.integer:
-        return SizedBox(
-          width: 80,
-          child: TextField(
-            controller: TextEditingController(
-              text: currentValue?.toString() ?? '',
-            ),
-            keyboardType: TextInputType.number,
-            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-            decoration: const InputDecoration(
-              isDense: true,
-              contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-              border: OutlineInputBorder(),
-            ),
-            style: const TextStyle(fontSize: 14),
-            onChanged: (value) {
-              final intValue = int.tryParse(value);
-              if (intValue != null) {
-                settingsManager.updateSetting(setting.key, intValue);
-              }
-            },
+        return TextField(
+          controller: TextEditingController(
+            text: currentValue?.toString() ?? '',
           ),
+          keyboardType: TextInputType.number,
+          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+          decoration: const InputDecoration(
+            isDense: true,
+            contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+            border: OutlineInputBorder(),
+          ),
+          style: const TextStyle(fontSize: 14),
+          onChanged: (value) {
+            final intValue = int.tryParse(value);
+            if (intValue != null) {
+              settingsManager.updateSetting(setting.key, intValue);
+            }
+          },
         );
 
       case SettingType.double:
-        return SizedBox(
-          width: 80,
-          child: TextField(
-            controller: TextEditingController(
-              text: currentValue?.toString() ?? '',
-            ),
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            decoration: const InputDecoration(
-              isDense: true,
-              contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-              border: OutlineInputBorder(),
-            ),
-            style: const TextStyle(fontSize: 14),
-            onChanged: (value) {
-              final doubleValue = double.tryParse(value);
-              if (doubleValue != null) {
-                settingsManager.updateSetting(setting.key, doubleValue);
-              }
-            },
+        return TextField(
+          controller: TextEditingController(
+            text: currentValue?.toString() ?? '',
           ),
+          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+          decoration: const InputDecoration(
+            isDense: true,
+            contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+            border: OutlineInputBorder(),
+          ),
+          style: const TextStyle(fontSize: 14),
+          onChanged: (value) {
+            final doubleValue = double.tryParse(value);
+            if (doubleValue != null) {
+              settingsManager.updateSetting(setting.key, doubleValue);
+            }
+          },
         );
 
       case SettingType.enumeration:
@@ -466,6 +437,7 @@ class _SettingsEditorScreenState extends State<SettingsEditorScreen> {
         final selectedValue = _resolveEnumSelection(setting, currentValue);
         return DropdownButton<dynamic>(
           value: selectedValue,
+          isExpanded: true,
           items: [
             const DropdownMenuItem(
               value: null,
@@ -512,6 +484,25 @@ class _SettingsEditorScreenState extends State<SettingsEditorScreen> {
   }
 
   Widget _buildBottomBar(SettingsManager settingsManager) {
+    final isMobile = context.isMobile;
+    final resetButton = OutlinedButton.icon(
+      icon: const Icon(Icons.restore),
+      label: const Text('Reset All'),
+      onPressed: () => _showResetConfirmDialog(settingsManager),
+    );
+    final applyButton = ElevatedButton.icon(
+      icon: const Icon(Icons.check),
+      label: const Text('Apply to WebView'),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
+      ),
+      onPressed: () {
+        final settings = settingsManager.buildSettings();
+        Navigator.pop(context, settings);
+      },
+    );
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -525,28 +516,17 @@ class _SettingsEditorScreenState extends State<SettingsEditorScreen> {
           ),
         ],
       ),
-      child: Row(
-        children: [
-          OutlinedButton.icon(
-            icon: const Icon(Icons.restore),
-            label: const Text('Reset All'),
-            onPressed: () => _showResetConfirmDialog(settingsManager),
-          ),
-          const Spacer(),
-          ElevatedButton.icon(
-            icon: const Icon(Icons.check),
-            label: const Text('Apply to WebView'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue,
-              foregroundColor: Colors.white,
+      child: isMobile
+          ? Wrap(
+              key: const ValueKey('settings_bottom_bar_actions'),
+              spacing: 12,
+              runSpacing: 8,
+              children: [resetButton, applyButton],
+            )
+          : Row(
+              key: const ValueKey('settings_bottom_bar_actions'),
+              children: [resetButton, const Spacer(), applyButton],
             ),
-            onPressed: () {
-              final settings = settingsManager.buildSettings();
-              Navigator.pop(context, settings);
-            },
-          ),
-        ],
-      ),
     );
   }
 

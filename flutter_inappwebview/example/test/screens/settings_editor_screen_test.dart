@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_inappwebview_example/screens/settings_editor_screen.dart';
+import 'package:flutter_inappwebview_example/widgets/settings/responsive_setting_tile.dart';
 
 import '../test_helpers/mock_inappwebview_platform.dart';
 import '../test_helpers/test_provider_wrapper.dart';
@@ -17,9 +18,12 @@ void main() {
   });
 
   group('SettingsEditorScreen', () {
-    Widget createWidget() {
-      return const MaterialApp(
-        home: TestProviderWrapper(child: SettingsEditorScreen()),
+    Widget createWidget({Size size = const Size(800, 600)}) {
+      return MaterialApp(
+        home: MediaQuery(
+          data: MediaQueryData(size: size),
+          child: const TestProviderWrapper(child: SettingsEditorScreen()),
+        ),
       );
     }
 
@@ -72,6 +76,52 @@ void main() {
       final isEnumLike = value is Enum || _hasToNativeValue(value);
 
       expect(isEnumLike, isTrue);
+    });
+
+    testWidgets('test_setting_tile_mobile_layout', (tester) async {
+      await tester.pumpWidget(createWidget(size: const Size(375, 812)));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byIcon(Icons.more_vert));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Expand All'));
+      await tester.pumpAndSettle();
+
+      final tileFinder = find.byType(ResponsiveSettingTile);
+      expect(tileFinder, findsWidgets);
+
+      final mobileLayoutFinder = find.descendant(
+        of: tileFinder.first,
+        matching: find.byKey(
+          const ValueKey('responsive_setting_tile_mobile_layout'),
+        ),
+      );
+      final inlineLayoutFinder = find.descendant(
+        of: tileFinder.first,
+        matching: find.byKey(
+          const ValueKey('responsive_setting_tile_inline_control'),
+        ),
+      );
+
+      expect(
+        mobileLayoutFinder.evaluate().isNotEmpty ||
+            inlineLayoutFinder.evaluate().isNotEmpty,
+        isTrue,
+      );
+    });
+
+    testWidgets('test_settings_bottom_bar_wraps', (tester) async {
+      await tester.pumpWidget(createWidget(size: const Size(375, 812)));
+      await tester.pumpAndSettle();
+
+      final actionsFinder = find.byKey(
+        const ValueKey('settings_bottom_bar_actions'),
+      );
+      expect(actionsFinder, findsOneWidget);
+
+      final actionsWidget = tester.widget(actionsFinder);
+      expect(actionsWidget, isA<Wrap>());
     });
   });
 }

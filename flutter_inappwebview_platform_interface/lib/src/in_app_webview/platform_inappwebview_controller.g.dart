@@ -950,6 +950,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///- iOS WKWebView ([Official API - UIScrollView.contentOffset](https://developer.apple.com/documentation/uikit/uiscrollview/1619404-contentoffset))
   ///- macOS WKWebView:
   ///    - This method is implemented using JavaScript.
+  ///- Linux WPE WebKit
   ///- Web \<iframe\> but requires same origin ([Official API - Window.scrollX](https://developer.mozilla.org/en-US/docs/Web/API/Window/scrollX))
   ///
   ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
@@ -965,6 +966,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///- iOS WKWebView ([Official API - UIScrollView.contentOffset](https://developer.apple.com/documentation/uikit/uiscrollview/1619404-contentoffset))
   ///- macOS WKWebView:
   ///    - This method is implemented using JavaScript.
+  ///- Linux WPE WebKit
   ///- Web \<iframe\> but requires same origin ([Official API - Window.scrollY](https://developer.mozilla.org/en-US/docs/Web/API/Window/scrollY))
   ///
   ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
@@ -2074,6 +2076,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///- iOS WKWebView ([Official API - UIScrollView.setContentOffset](https://developer.apple.com/documentation/uikit/uiscrollview/1619400-setcontentoffset))
   ///- macOS WKWebView:
   ///    - This method is implemented using JavaScript.
+  ///- Linux WPE WebKit
   ///- Web \<iframe\> but requires same origin ([Official API - Window.scrollBy](https://developer.mozilla.org/en-US/docs/Web/API/Window/scrollBy))
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
@@ -2094,6 +2097,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///- iOS WKWebView ([Official API - UIScrollView.setContentOffset](https://developer.apple.com/documentation/uikit/uiscrollview/1619400-setcontentoffset))
   ///- macOS WKWebView:
   ///    - This method is implemented using JavaScript.
+  ///- Linux WPE WebKit
   ///- Web \<iframe\> but requires same origin ([Official API - Window.scrollTo](https://developer.mozilla.org/en-US/docs/Web/API/Window/scrollTo))
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
@@ -2882,6 +2886,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
                     TargetPlatform.android,
                     TargetPlatform.iOS,
                     TargetPlatform.macOS,
+                    TargetPlatform.linux,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.getScrollY:
         return kIsWeb && platform == null
@@ -2891,6 +2896,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
                     TargetPlatform.android,
                     TargetPlatform.iOS,
                     TargetPlatform.macOS,
+                    TargetPlatform.linux,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.getSelectedText:
         return kIsWeb && platform == null
@@ -3432,6 +3438,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
                     TargetPlatform.android,
                     TargetPlatform.iOS,
                     TargetPlatform.macOS,
+                    TargetPlatform.linux,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.scrollTo:
         return kIsWeb && platform == null
@@ -3441,6 +3448,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
                     TargetPlatform.android,
                     TargetPlatform.iOS,
                     TargetPlatform.macOS,
+                    TargetPlatform.linux,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.setAllMediaPlaybackSuspended:
         return ((kIsWeb && platform != null) || !kIsWeb) &&

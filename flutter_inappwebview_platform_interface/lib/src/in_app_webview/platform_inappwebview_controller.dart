@@ -1422,6 +1422,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
             'https://developer.apple.com/documentation/uikit/uiscrollview/1619400-setcontentoffset',
       ),
       MacOSPlatform(note: 'This method is implemented using JavaScript.'),
+      LinuxPlatform(),
       WebPlatform(
         apiName: 'Window.scrollTo',
         apiUrl:
@@ -1463,6 +1464,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
             'https://developer.apple.com/documentation/uikit/uiscrollview/1619400-setcontentoffset',
       ),
       MacOSPlatform(note: 'This method is implemented using JavaScript.'),
+      LinuxPlatform(),
       WebPlatform(
         apiName: 'Window.scrollBy',
         apiUrl:
@@ -2070,6 +2072,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
             'https://developer.apple.com/documentation/uikit/uiscrollview/1619404-contentoffset',
       ),
       MacOSPlatform(note: 'This method is implemented using JavaScript.'),
+      LinuxPlatform(),
       WebPlatform(
         apiName: 'Window.scrollX',
         apiUrl:
@@ -2101,6 +2104,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
             'https://developer.apple.com/documentation/uikit/uiscrollview/1619404-contentoffset',
       ),
       MacOSPlatform(note: 'This method is implemented using JavaScript.'),
+      LinuxPlatform(),
       WebPlatform(
         apiName: 'Window.scrollY',
         apiUrl:

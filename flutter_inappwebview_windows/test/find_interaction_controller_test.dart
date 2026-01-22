@@ -1,5 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 import 'package:flutter_inappwebview_windows/src/find_interaction/find_interaction_controller.dart';
 
 void main() {
@@ -106,6 +107,22 @@ void main() {
     expect(result?.highlightedResultIndex, 1);
     expect(result?.resultCount, 3);
     expect(result?.searchResultDisplayStyle.name(), 'CURRENT_AND_TOTAL');
+  });
+
+  test('test_set_find_options', () async {
+    final options = FindOptions(
+      findTerm: 'example',
+      shouldMatchCase: true,
+      shouldHighlightAllMatches: true,
+    );
+
+    await controller.setFindOptions(options: options);
+
+    expect(lastMethodCall?.method, 'setFindOptions');
+    final args = (lastMethodCall?.arguments as Map?)?.cast<String, dynamic>();
+    expect(args?['options']['findTerm'], 'example');
+    expect(args?['options']['shouldMatchCase'], true);
+    expect(args?['options']['shouldHighlightAllMatches'], true);
   });
 
   test('test_static_factory', () {

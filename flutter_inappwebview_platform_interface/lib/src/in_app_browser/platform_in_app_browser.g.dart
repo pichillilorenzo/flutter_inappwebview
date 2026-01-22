@@ -1237,6 +1237,21 @@ enum PlatformInAppBrowserEventsMethod {
   ///{@endtemplate}
   onExitFullscreen,
 
+  ///Can be used to check if the [PlatformInAppBrowserEvents.onFaviconChanged] method is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppBrowserEvents.onFaviconChanged.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android WebView ([Official API - WebChromeClient.onReceivedIcon](https://developer.android.com/reference/android/webkit/WebChromeClient#onReceivedIcon(android.webkit.WebView,%20android.graphics.Bitmap)))
+  ///- Windows WebView2 ([Official API - ICoreWebView2_15.add_FaviconChanged](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_15?view=webview2-1.0.2849.39#add_faviconchanged))
+  ///
+  ///**Parameters - Officially Supported Platforms/Implementations**:
+  ///- [faviconChangedRequest]: all platforms
+  ///
+  ///Use the [PlatformInAppBrowserEvents.isMethodSupported] method to check if this method is supported at runtime.
+  ///{@endtemplate}
+  onFaviconChanged,
+
   ///Can be used to check if the [PlatformInAppBrowserEvents.onFindResultReceived] method is supported at runtime.
   ///
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppBrowserEvents.onFindResultReceived.supported_platforms}
@@ -1342,6 +1357,20 @@ enum PlatformInAppBrowserEventsMethod {
   ///Use the [PlatformInAppBrowserEvents.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
   onJsPrompt,
+
+  ///Can be used to check if the [PlatformInAppBrowserEvents.onLaunchingExternalUriScheme] method is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppBrowserEvents.onLaunchingExternalUriScheme.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows WebView2 ([Official API - ICoreWebView2_18.add_LaunchingExternalUriScheme](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_18?view=webview2-1.0.2849.39#add_launchingexternalurischeme))
+  ///
+  ///**Parameters - Officially Supported Platforms/Implementations**:
+  ///- [request]: all platforms
+  ///
+  ///Use the [PlatformInAppBrowserEvents.isMethodSupported] method to check if this method is supported at runtime.
+  ///{@endtemplate}
+  onLaunchingExternalUriScheme,
 
   ///Can be used to check if the [PlatformInAppBrowserEvents.onLoadError] method is supported at runtime.
   ///
@@ -1524,6 +1553,20 @@ enum PlatformInAppBrowserEventsMethod {
   ///Use the [PlatformInAppBrowserEvents.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
   onNavigationResponse,
+
+  ///Can be used to check if the [PlatformInAppBrowserEvents.onNotificationReceived] method is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppBrowserEvents.onNotificationReceived.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows WebView2 ([Official API - ICoreWebView2_24.add_NotificationReceived](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_24?view=webview2-1.0.2849.39#add_notificationreceived))
+  ///
+  ///**Parameters - Officially Supported Platforms/Implementations**:
+  ///- [request]: all platforms
+  ///
+  ///Use the [PlatformInAppBrowserEvents.isMethodSupported] method to check if this method is supported at runtime.
+  ///{@endtemplate}
+  onNotificationReceived,
 
   ///Can be used to check if the [PlatformInAppBrowserEvents.onOverScrolled] method is supported at runtime.
   ///
@@ -1739,6 +1782,7 @@ enum PlatformInAppBrowserEventsMethod {
   ///
   ///Use the [PlatformInAppBrowserEvents.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
+  @Deprecated('Use onFaviconChanged instead')
   onReceivedIcon,
 
   ///Can be used to check if the [PlatformInAppBrowserEvents.onReceivedLoginRequest] method is supported at runtime.
@@ -1858,6 +1902,48 @@ enum PlatformInAppBrowserEventsMethod {
   ///Use the [PlatformInAppBrowserEvents.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
   onSafeBrowsingHit,
+
+  ///Can be used to check if the [PlatformInAppBrowserEvents.onSaveAsUIShowing] method is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppBrowserEvents.onSaveAsUIShowing.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows WebView2 ([Official API - ICoreWebView2_25.add_SaveAsUIShowing](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_25?view=webview2-1.0.2849.39#add_saveasuishowing))
+  ///
+  ///**Parameters - Officially Supported Platforms/Implementations**:
+  ///- [request]: all platforms
+  ///
+  ///Use the [PlatformInAppBrowserEvents.isMethodSupported] method to check if this method is supported at runtime.
+  ///{@endtemplate}
+  onSaveAsUIShowing,
+
+  ///Can be used to check if the [PlatformInAppBrowserEvents.onSaveFileSecurityCheckStarting] method is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppBrowserEvents.onSaveFileSecurityCheckStarting.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows WebView2 ([Official API - ICoreWebView2_26.add_SaveFileSecurityCheckStarting](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_26?view=webview2-1.0.2849.39#add_savefilesecuritycheckstarting))
+  ///
+  ///**Parameters - Officially Supported Platforms/Implementations**:
+  ///- [request]: all platforms
+  ///
+  ///Use the [PlatformInAppBrowserEvents.isMethodSupported] method to check if this method is supported at runtime.
+  ///{@endtemplate}
+  onSaveFileSecurityCheckStarting,
+
+  ///Can be used to check if the [PlatformInAppBrowserEvents.onScreenCaptureStarting] method is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppBrowserEvents.onScreenCaptureStarting.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows WebView2 ([Official API - ICoreWebView2_27.add_ScreenCaptureStarting](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_27?view=webview2-1.0.2849.39#add_screencapturestarting))
+  ///
+  ///**Parameters - Officially Supported Platforms/Implementations**:
+  ///- [request]: all platforms
+  ///
+  ///Use the [PlatformInAppBrowserEvents.isMethodSupported] method to check if this method is supported at runtime.
+  ///{@endtemplate}
+  onScreenCaptureStarting,
 
   ///Can be used to check if the [PlatformInAppBrowserEvents.onScrollChanged] method is supported at runtime.
   ///
@@ -2286,6 +2372,12 @@ extension _PlatformInAppBrowserEventsMethodSupported
               TargetPlatform.macOS,
               TargetPlatform.windows,
             ].contains(platform ?? defaultTargetPlatform);
+      case PlatformInAppBrowserEventsMethod.onFaviconChanged:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [
+              TargetPlatform.android,
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onFindResultReceived:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
@@ -2328,6 +2420,11 @@ extension _PlatformInAppBrowserEventsMethodSupported
               TargetPlatform.android,
               TargetPlatform.iOS,
               TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
+      case PlatformInAppBrowserEventsMethod.onLaunchingExternalUriScheme:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [
+              TargetPlatform.windows,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onLoadError:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -2401,6 +2498,11 @@ extension _PlatformInAppBrowserEventsMethodSupported
             [
               TargetPlatform.iOS,
               TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
+      case PlatformInAppBrowserEventsMethod.onNotificationReceived:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [
+              TargetPlatform.windows,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onOverScrolled:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -2535,6 +2637,21 @@ extension _PlatformInAppBrowserEventsMethodSupported
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
+      case PlatformInAppBrowserEventsMethod.onSaveAsUIShowing:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
+      case PlatformInAppBrowserEventsMethod.onSaveFileSecurityCheckStarting:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
+      case PlatformInAppBrowserEventsMethod.onScreenCaptureStarting:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [
+              TargetPlatform.windows,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onScrollChanged:
         return ((kIsWeb && platform != null) || !kIsWeb) &&

@@ -115,6 +115,14 @@ class WindowsFindInteractionController extends PlatformFindInteractionController
     await channel?.invokeMethod('setSearchText', args);
   }
 
+  ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.setFindOptions}
+  @override
+  Future<void> setFindOptions({FindOptions? options}) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('options', () => options?.toMap());
+    await channel?.invokeMethod('setFindOptions', args);
+  }
+
   ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.getSearchText}
   @override
   Future<String?> getSearchText() async {

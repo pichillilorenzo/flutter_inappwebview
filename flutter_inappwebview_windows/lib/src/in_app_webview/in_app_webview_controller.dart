@@ -379,6 +379,26 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
           ))?.toNativeValue();
         }
         break;
+      case "onLaunchingExternalUriScheme":
+        if ((webviewParams != null &&
+                webviewParams!.onLaunchingExternalUriScheme != null) ||
+            _inAppBrowserEventHandler != null) {
+          Map<String, dynamic> arguments = call.arguments
+              .cast<String, dynamic>();
+          LaunchingExternalUriSchemeRequest request =
+              LaunchingExternalUriSchemeRequest.fromMap(arguments)!;
+
+          if (webviewParams != null &&
+              webviewParams!.onLaunchingExternalUriScheme != null)
+            return (await webviewParams!.onLaunchingExternalUriScheme!(
+              _controllerFromPlatform,
+              request,
+            ))?.toMap();
+          return (await _inAppBrowserEventHandler!.onLaunchingExternalUriScheme(
+            request,
+          ))?.toMap();
+        }
+        break;
       case "onConsoleMessage":
         if ((webviewParams != null &&
                 webviewParams!.onConsoleMessage != null) ||
@@ -797,6 +817,21 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
             // ignore: deprecated_member_use_from_same_package
             _inAppBrowserEventHandler!.androidOnReceivedIcon(icon);
           }
+        }
+        break;
+      case "onFaviconChanged":
+        if ((webviewParams != null && webviewParams!.onFaviconChanged != null) ||
+            _inAppBrowserEventHandler != null) {
+          Map<String, dynamic> arguments = call.arguments
+              .cast<String, dynamic>();
+          FaviconChangedRequest request = FaviconChangedRequest.fromMap(
+            arguments,
+          )!;
+
+          if (webviewParams != null && webviewParams!.onFaviconChanged != null)
+            webviewParams!.onFaviconChanged!(_controllerFromPlatform, request);
+          else
+            _inAppBrowserEventHandler!.onFaviconChanged(request);
         }
         break;
       case "onReceivedTouchIconUrl":
@@ -1674,6 +1709,78 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
             _inAppBrowserEventHandler!.onProcessFailed(detail);
         }
         break;
+      case "onNotificationReceived":
+        if ((webviewParams != null && webviewParams!.onNotificationReceived != null) ||
+            _inAppBrowserEventHandler != null) {
+          Map<String, dynamic> arguments = call.arguments
+              .cast<String, dynamic>();
+          final request = NotificationReceivedRequest.fromMap(arguments)!;
+
+          if (webviewParams != null && webviewParams!.onNotificationReceived != null)
+            return (await webviewParams!.onNotificationReceived!(
+              _controllerFromPlatform,
+              request,
+            ))?.toMap();
+          return (await _inAppBrowserEventHandler!.onNotificationReceived(
+            request,
+          ))?.toMap();
+        }
+        break;
+      case "onSaveAsUIShowing":
+        if ((webviewParams != null && webviewParams!.onSaveAsUIShowing != null) ||
+            _inAppBrowserEventHandler != null) {
+          Map<String, dynamic> arguments = call.arguments
+              .cast<String, dynamic>();
+          final request = SaveAsUIShowingRequest.fromMap(arguments)!;
+
+          if (webviewParams != null && webviewParams!.onSaveAsUIShowing != null)
+            return (await webviewParams!.onSaveAsUIShowing!(
+              _controllerFromPlatform,
+              request,
+            ))?.toMap();
+          return (await _inAppBrowserEventHandler!.onSaveAsUIShowing(
+            request,
+          ))?.toMap();
+        }
+        break;
+      case "onSaveFileSecurityCheckStarting":
+        if ((webviewParams != null &&
+                webviewParams!.onSaveFileSecurityCheckStarting != null) ||
+            _inAppBrowserEventHandler != null) {
+          Map<String, dynamic> arguments = call.arguments
+              .cast<String, dynamic>();
+          final request = SaveFileSecurityCheckStartingRequest.fromMap(
+            arguments,
+          )!;
+
+          if (webviewParams != null &&
+              webviewParams!.onSaveFileSecurityCheckStarting != null)
+            return (await webviewParams!.onSaveFileSecurityCheckStarting!(
+              _controllerFromPlatform,
+              request,
+            ))?.toMap();
+          return (await _inAppBrowserEventHandler!
+                  .onSaveFileSecurityCheckStarting(request))
+              ?.toMap();
+        }
+        break;
+      case "onScreenCaptureStarting":
+        if ((webviewParams != null && webviewParams!.onScreenCaptureStarting != null) ||
+            _inAppBrowserEventHandler != null) {
+          Map<String, dynamic> arguments = call.arguments
+              .cast<String, dynamic>();
+          final request = ScreenCaptureStartingRequest.fromMap(arguments)!;
+
+          if (webviewParams != null && webviewParams!.onScreenCaptureStarting != null)
+            return (await webviewParams!.onScreenCaptureStarting!(
+              _controllerFromPlatform,
+              request,
+            ))?.toMap();
+          return (await _inAppBrowserEventHandler!.onScreenCaptureStarting(
+            request,
+          ))?.toMap();
+        }
+        break;
       case "onAcceleratorKeyPressed":
         if ((webviewParams != null &&
                 webviewParams!.onAcceleratorKeyPressed != null) ||
@@ -1951,6 +2058,27 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
   }
 
   @override
+  Future<int?> getFrameId() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    return await channel?.invokeMethod<int?>('getFrameId', args);
+  }
+
+  @override
+  Future<MemoryUsageTargetLevel?> getMemoryUsageTargetLevel() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    final nativeValue =
+        await channel?.invokeMethod<int?>('getMemoryUsageTargetLevel', args);
+    return MemoryUsageTargetLevel.fromNativeValue(nativeValue);
+  }
+
+  @override
+  Future<void> setMemoryUsageTargetLevel(MemoryUsageTargetLevel level) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('level', () => level.toNativeValue());
+    await channel?.invokeMethod('setMemoryUsageTargetLevel', args);
+  }
+
+  @override
   Future<String?> getHtml() async {
     String? html;
 
@@ -2143,6 +2271,30 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
     }
 
     return favicons;
+  }
+
+  @override
+  Future<Uint8List?> getFavicon({required WebUri url}) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('url', () => url.toString());
+    final data = await channel?.invokeMethod('getFavicon', args);
+    if (data == null) {
+      return null;
+    }
+    if (data is Uint8List) {
+      return data;
+    }
+    if (data is List) {
+      return Uint8List.fromList(data.cast<int>());
+    }
+    return null;
+  }
+
+  @override
+  Future<SaveAsUIResult?> showSaveAsUI() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    final result = await channel?.invokeMethod<int?>('showSaveAsUI', args);
+    return SaveAsUIResult.fromNativeValue(result);
   }
 
   bool _isUrlAbsolute(String url) {

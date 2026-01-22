@@ -994,6 +994,24 @@ Also, this event is not called for POST requests and is not called on the first 
     return null;
   }
 
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onLaunchingExternalUriScheme}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppBrowserEvents.onLaunchingExternalUriScheme.supported_platforms}
+  @SupportedPlatforms(
+    platforms: [
+      WindowsPlatform(
+        apiName: 'ICoreWebView2_18.add_LaunchingExternalUriScheme',
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_18?view=webview2-1.0.2849.39#add_launchingexternalurischeme',
+      ),
+    ],
+  )
+  FutureOr<LaunchingExternalUriSchemeResponse?>? onLaunchingExternalUriScheme(
+    LaunchingExternalUriSchemeRequest request,
+  ) {
+    return null;
+  }
+
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onLoadResource}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppBrowserEvents.onLoadResource.supported_platforms}
@@ -2046,7 +2064,27 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
       ),
     ],
   )
+  @Deprecated('Use onFaviconChanged instead')
   void onReceivedIcon(Uint8List icon) {}
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onFaviconChanged}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppBrowserEvents.onFaviconChanged.supported_platforms}
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(
+        apiName: 'WebChromeClient.onReceivedIcon',
+        apiUrl:
+            'https://developer.android.com/reference/android/webkit/WebChromeClient#onReceivedIcon(android.webkit.WebView,%20android.graphics.Bitmap)',
+      ),
+      WindowsPlatform(
+        apiName: 'ICoreWebView2_15.add_FaviconChanged',
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_15?view=webview2-1.0.2849.39#add_faviconchanged',
+      ),
+    ],
+  )
+  void onFaviconChanged(FaviconChangedRequest faviconChangedRequest) {}
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.androidOnReceivedTouchIconUrl}
   ///
@@ -2313,6 +2351,79 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
     ],
   )
   void onProcessFailed(ProcessFailedDetail detail) {}
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onNotificationReceived}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppBrowserEvents.onNotificationReceived.supported_platforms}
+  @SupportedPlatforms(
+    platforms: [
+      WindowsPlatform(
+        apiName: 'ICoreWebView2_24.add_NotificationReceived',
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_24?view=webview2-1.0.2849.39#add_notificationreceived',
+      ),
+    ],
+  )
+  FutureOr<NotificationReceivedResponse?>? onNotificationReceived(
+    NotificationReceivedRequest request,
+  ) {
+    return null;
+  }
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onSaveAsUIShowing}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppBrowserEvents.onSaveAsUIShowing.supported_platforms}
+  @SupportedPlatforms(
+    platforms: [
+      WindowsPlatform(
+        apiName: 'ICoreWebView2_25.add_SaveAsUIShowing',
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_25?view=webview2-1.0.2849.39#add_saveasuishowing',
+      ),
+    ],
+  )
+  FutureOr<SaveAsUIShowingResponse?>? onSaveAsUIShowing(
+    SaveAsUIShowingRequest request,
+  ) {
+    return null;
+  }
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onSaveFileSecurityCheckStarting}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppBrowserEvents.onSaveFileSecurityCheckStarting.supported_platforms}
+  @SupportedPlatforms(
+    platforms: [
+      WindowsPlatform(
+        apiName: 'ICoreWebView2_26.add_SaveFileSecurityCheckStarting',
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_26?view=webview2-1.0.2849.39#add_savefilesecuritycheckstarting',
+      ),
+    ],
+  )
+  FutureOr<SaveFileSecurityCheckStartingResponse?>?
+      onSaveFileSecurityCheckStarting(
+    SaveFileSecurityCheckStartingRequest request,
+  ) {
+    return null;
+  }
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onScreenCaptureStarting}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppBrowserEvents.onScreenCaptureStarting.supported_platforms}
+  @SupportedPlatforms(
+    platforms: [
+      WindowsPlatform(
+        apiName: 'ICoreWebView2_27.add_ScreenCaptureStarting',
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_27?view=webview2-1.0.2849.39#add_screencapturestarting',
+      ),
+    ],
+  )
+  FutureOr<ScreenCaptureStartingResponse?>? onScreenCaptureStarting(
+    ScreenCaptureStartingRequest request,
+  ) {
+    return null;
+  }
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onAcceleratorKeyPressed}
   ///

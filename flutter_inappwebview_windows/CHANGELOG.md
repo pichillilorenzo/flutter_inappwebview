@@ -2,6 +2,9 @@
 
 - Updated flutter_inappwebview_platform_interface version to ^1.4.0-beta.3
 - Updated Microsoft.Web.WebView2 SDK version from `1.0.2849.39` to `1.0.3650.58`
+- Added Windows method channel wiring for `getFrameId`, memory usage target level accessors, `getFavicon`, and `showSaveAsUI`.
+- Added Windows event wiring for `onLaunchingExternalUriScheme`, `onFaviconChanged`, `onNotificationReceived`, `onSaveAsUIShowing`, `onSaveFileSecurityCheckStarting`, and `onScreenCaptureStarting`.
+- Added Windows `FindInteractionController.setFindOptions` method channel wiring and tests.
 - Added support for `onEnterFullscreen`, `onExitFullscreen`, `onContentLoading` and `onDOMContentLoaded` WebView events.
 - Added native FindInteractionController implementation using WebView2 `ICoreWebView2Find`.
 - Merged "windows: fix WebViewEnvironment dispose crash" [#2433](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2433) (thanks to [GooRingX](https://github.com/GooRingX))

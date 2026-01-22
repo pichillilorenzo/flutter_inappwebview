@@ -8,6 +8,7 @@
 - Added `onShowFileChooser`, `onContentLoading` and `onDOMContentLoaded` WebView events
 - Update code documentation
 - Added Windows WebView2 contract extensions (favicon change + bytes, external URI scheme launch, memory usage target level, frame ID, notification/save-as/security/screen capture events, Save As UI result/kind types, and PrintJobController Windows support)
+- Exposed new WebView2 event callbacks on `PlatformInAppWebViewWidgetCreationParams` constructor to allow platform implementations to forward them
 - Deprecated `onReceivedIcon` in favor of `onFaviconChanged` and removed `executeScriptWithResult` and WebResourceRequested request source kind filter contracts
 
 ## 1.4.0-beta.2

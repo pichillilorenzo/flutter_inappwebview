@@ -459,6 +459,12 @@ class InAppBrowser implements PlatformInAppBrowserEvents {
   @override
   void onExitFullscreen() {}
 
+  @override
+  void onContentLoading(WebUri? url) {}
+
+  @override
+  void onDOMContentLoaded(WebUri? url) {}
+
   ///Use [FindInteractionController.onFindResultReceived] instead.
   @Deprecated('Use FindInteractionController.onFindResultReceived instead')
   @override

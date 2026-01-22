@@ -106,6 +106,8 @@ namespace flutter_inappwebview_plugin
 
     void onLoadStart(const std::optional<std::string>& url) const;
     void onLoadStop(const std::optional<std::string>& url) const;
+    void onContentLoading(const std::optional<std::string>& url) const;
+    void onDOMContentLoaded(const std::optional<std::string>& url) const;
     void onProgressChanged(const int64_t& progress) const;
     void shouldOverrideUrlLoading(std::shared_ptr<NavigationAction> navigationAction, std::unique_ptr<ShouldOverrideUrlLoadingCallback> callback) const;
     void onReceivedError(std::shared_ptr<WebResourceRequest> request, std::shared_ptr<WebResourceError> error) const;
@@ -130,6 +132,8 @@ namespace flutter_inappwebview_plugin
     void onDownloadStarting(std::shared_ptr<DownloadStartRequest> request, std::unique_ptr<DownloadStartRequestCallback> callback) const;
     void onAcceleratorKeyPressed(std::shared_ptr<AcceleratorKeyPressedDetail> detail) const;
     void onZoomScaleChanged(const double& oldScale, const double& newScale) const;
+    void onEnterFullscreen() const;
+    void onExitFullscreen() const;
   };
 }
 

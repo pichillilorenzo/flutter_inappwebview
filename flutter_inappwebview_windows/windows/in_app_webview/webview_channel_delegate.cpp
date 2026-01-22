@@ -475,6 +475,30 @@ namespace flutter_inappwebview_plugin
     channel->InvokeMethod("onLoadStop", std::move(arguments));
   }
 
+  void WebViewChannelDelegate::onContentLoading(const std::optional<std::string>& url) const
+  {
+    if (!channel) {
+      return;
+    }
+
+    auto arguments = std::make_unique<flutter::EncodableValue>(flutter::EncodableMap{
+      {"url", make_fl_value(url)},
+      });
+    channel->InvokeMethod("onContentLoading", std::move(arguments));
+  }
+
+  void WebViewChannelDelegate::onDOMContentLoaded(const std::optional<std::string>& url) const
+  {
+    if (!channel) {
+      return;
+    }
+
+    auto arguments = std::make_unique<flutter::EncodableValue>(flutter::EncodableMap{
+      {"url", make_fl_value(url)},
+      });
+    channel->InvokeMethod("onDOMContentLoaded", std::move(arguments));
+  }
+
   void WebViewChannelDelegate::shouldOverrideUrlLoading(std::shared_ptr<NavigationAction> navigationAction, std::unique_ptr<ShouldOverrideUrlLoadingCallback> callback) const
   {
     if (!channel) {
@@ -758,6 +782,26 @@ namespace flutter_inappwebview_plugin
       {"newScale", make_fl_value(newScale)},
       });
     channel->InvokeMethod("onZoomScaleChanged", std::move(arguments));
+  }
+
+  void WebViewChannelDelegate::onEnterFullscreen() const
+  {
+    if (!channel) {
+      return;
+    }
+
+    auto arguments = std::make_unique<flutter::EncodableValue>(flutter::EncodableMap{});
+    channel->InvokeMethod("onEnterFullscreen", std::move(arguments));
+  }
+
+  void WebViewChannelDelegate::onExitFullscreen() const
+  {
+    if (!channel) {
+      return;
+    }
+
+    auto arguments = std::make_unique<flutter::EncodableValue>(flutter::EncodableMap{});
+    channel->InvokeMethod("onExitFullscreen", std::move(arguments));
   }
 
   WebViewChannelDelegate::~WebViewChannelDelegate()

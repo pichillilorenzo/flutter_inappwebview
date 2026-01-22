@@ -83,6 +83,10 @@ class InAppWebView extends StatefulWidget {
     FindInteractionController? findInteractionController,
     ContextMenu? contextMenu,
     void Function(InAppWebViewController controller, WebUri? url)?
+    onContentLoading,
+    void Function(InAppWebViewController controller, WebUri? url)?
+    onDOMContentLoaded,
+    void Function(InAppWebViewController controller, WebUri? url)?
     onPageCommitVisible,
     void Function(InAppWebViewController controller, String? title)?
     onTitleChanged,
@@ -605,6 +609,12 @@ class InAppWebView extends StatefulWidget {
                : null,
            onExitFullscreen: onExitFullscreen != null
                ? (controller) => onExitFullscreen.call(controller)
+               : null,
+             onContentLoading: onContentLoading != null
+               ? (controller, url) => onContentLoading.call(controller, url)
+               : null,
+             onDOMContentLoaded: onDOMContentLoaded != null
+               ? (controller, url) => onDOMContentLoaded.call(controller, url)
                : null,
            onPageCommitVisible: onPageCommitVisible != null
                ? (controller, url) => onPageCommitVisible.call(controller, url)

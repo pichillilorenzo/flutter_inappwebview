@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
@@ -48,67 +46,6 @@ class _MyAppState extends State<MyApp> {
   String findStatus = 'No find results yet';
   bool canPostWebMessage = false;
   bool canAddWebMessageListener = false;
-  bool findAutoTested = false;
-  Completer<int>? _findAutoTestCompleter;
-
-  static const String _testHtml = '''
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <style>
-    body { font-family: Arial, sans-serif; padding: 16px; }
-    .box { padding: 12px; border: 1px solid #ccc; margin-top: 12px; }
-    .label { font-weight: bold; }
-  </style>
-</head>
-<body>
-  <h2>Windows InAppWebView Demo</h2>
-  <p>Try FindInteractionController by searching for the word "Flutter".</p>
-  <p>Flutter makes it easy to build apps with Flutter on Windows. Flutter is fast.</p>
-
-  <div class="box">
-    <div class="label">WebMessage JS → Flutter</div>
-    <input id="jsMessageInput" placeholder="Message to Flutter" value="Hello from JS" />
-    <button onclick="sendToFlutter()">Send to Flutter</button>
-  </div>
-
-  <div class="box">
-    <div class="label">WebMessage Flutter → JS</div>
-    <div id="flutterMessage">No message received yet</div>
-  </div>
-
-  <script>
-    function sendToFlutter() {
-      const value = document.getElementById('jsMessageInput').value || 'Hello from JS';
-      if (window.flutterMessageListener && window.flutterMessageListener.postMessage) {
-        window.flutterMessageListener.postMessage(value);
-      } else if (window.chrome && window.chrome.webview) {
-        window.chrome.webview.postMessage(value);
-      } else {
-        console.log('No message bridge available');
-      }
-    }
-
-    function handleMessage(data) {
-      const target = document.getElementById('flutterMessage');
-      target.textContent = 'From Flutter: ' + data;
-    }
-
-    window.addEventListener('message', (event) => {
-      handleMessage(event.data);
-    });
-
-    if (window.chrome && window.chrome.webview) {
-      window.chrome.webview.addEventListener('message', (event) => {
-        handleMessage(event.data);
-      });
-    }
-  </script>
-</body>
-</html>
-''';
 
   @override
   void initState() {
@@ -125,11 +62,6 @@ class _MyAppState extends State<MyApp> {
             findStatus =
                 'Match $activeMatchOrdinal of $numberOfMatches (done: $isDoneCounting)';
           });
-          if (isDoneCounting && _findAutoTestCompleter != null) {
-            if (!_findAutoTestCompleter!.isCompleted) {
-              _findAutoTestCompleter!.complete(numberOfMatches);
-            }
-          }
         },
       ),
     );
@@ -184,35 +116,6 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
-  Future<void> _runFindAutoTest() async {
-    final query = findController.text.trim();
-    if (query.isEmpty) {
-      setState(() {
-        findStatus = 'Auto-test skipped: empty query';
-      });
-      return;
-    }
-
-    try {
-      _findAutoTestCompleter = Completer<int>();
-      await findInteractionController.setSearchText(query);
-      await findInteractionController.findAll(find: query);
-      final matchCount = await _findAutoTestCompleter!.future.timeout(
-        const Duration(seconds: 2),
-      );
-      setState(() {
-        findStatus =
-            'Auto-test completed: $matchCount matches for "$query"';
-      });
-    } catch (e) {
-      setState(() {
-        findStatus = 'Auto-test error: $e';
-      });
-    } finally {
-      _findAutoTestCompleter = null;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -243,11 +146,15 @@ class _MyAppState extends State<MyApp> {
                     child: WindowsInAppWebViewWidget(
                       WindowsInAppWebViewWidgetCreationParams(
                         key: webViewKey,
-                        // Don't use initialData - load AFTER adding listener
                         initialSettings: settings,
                         findInteractionController: findInteractionController,
                         onWebViewCreated: (controller) async {
                           webViewController = controller;
+                          controller.loadUrl(
+                            urlRequest: URLRequest(
+                              url: WebUri('https://flutter.dev'),
+                            ),
+                          );
                           final canPost = controller.isMethodSupported(
                             PlatformInAppWebViewControllerMethod.postWebMessage,
                           );
@@ -259,62 +166,35 @@ class _MyAppState extends State<MyApp> {
                             canPostWebMessage = canPost;
                             canAddWebMessageListener = canAddListener;
                           });
-                          debugPrint(
-                              '[WebMessage] canPost=$canPost, canAddListener=$canAddListener');
-
-                          // Step 1: Add WebMessageListener FIRST
-                          if (canAddListener) {
-                            debugPrint(
-                                '[WebMessage] Adding WebMessageListener...');
-                            await controller.addWebMessageListener(
-                              PlatformWebMessageListener(
-                                PlatformWebMessageListenerCreationParams(
-                                  jsObjectName: 'flutterMessageListener',
-                                  onPostMessage: (message, sourceOrigin,
-                                      isMainFrame, reply) {
-                                    debugPrint(
-                                        '[WebMessage] Received: ${message?.data}');
-                                    setState(() {
-                                      lastWebMessage =
-                                          message?.data?.toString() ??
-                                              'Empty message received';
-                                    });
-                                  },
-                                ),
-                              ),
-                            );
-                            debugPrint(
-                                '[WebMessage] Listener added successfully');
-                          }
-
-                          // Step 2: Load the page AFTER listener is registered
-                          debugPrint('[WebMessage] Loading test page...');
-                          await controller.loadData(
-                            data: _testHtml,
-                            baseUrl: WebUri('https://local'),
-                            mimeType: 'text/html',
-                            encoding: 'utf-8',
-                          );
                         },
                         onLoadStart: (controller, url) {
+                          debugPrint('Page started loading: $url');
                           setState(() {
                             currentUrl = url.toString();
                             urlController.text = currentUrl;
                           });
                         },
                         onLoadStop: (controller, url) async {
+                          debugPrint('Page finished loading: $url');
                           setState(() {
                             currentUrl = url.toString();
                             urlController.text = currentUrl;
                           });
-                          if (!findAutoTested) {
-                            setState(() {
-                              findAutoTested = true;
-                            });
-                            await _runFindAutoTest();
-                          }
+                        },
+                        onEnterFullscreen: (controller) {
+                          debugPrint('Entered fullscreen');
+                        },
+                        onExitFullscreen: (controller) {
+                          debugPrint('Exited fullscreen');
+                        },
+                        onDOMContentLoaded: (controller, url) => {
+                          debugPrint('DOM fully loaded: $url'),
+                        },
+                        onContentLoading: (controller, url) => {
+                          debugPrint('Content loading: $url'),
                         },
                         onProgressChanged: (controller, progressValue) {
+                          debugPrint('Progress changed: $progressValue');
                           setState(() {
                             progress = progressValue / 100.0;
                           });

@@ -609,6 +609,9 @@ namespace flutter_inappwebview_plugin
         [this](ICoreWebView2* sender, ICoreWebView2ContentLoadingEventArgs* args)
         {
           if (channelDelegate) {
+            wil::unique_cotaskmem_string uri;
+            std::optional<std::string> url = SUCCEEDED(webView->get_Source(&uri)) ? wide_to_utf8(uri.get()) : std::optional<std::string>{};
+            channelDelegate->onContentLoading(url);
             progress_ = 33;
             channelDelegate->onProgressChanged(progress_);
           }
@@ -687,6 +690,28 @@ namespace flutter_inappwebview_plugin
       }
     ).Get(), nullptr);
     failedLog(add_DocumentTitleChanged_HResult);
+
+    auto add_ContainsFullScreenElementChanged_HResult = webView->add_ContainsFullScreenElementChanged(
+      Callback<ICoreWebView2ContainsFullScreenElementChangedEventHandler>(
+        [this](ICoreWebView2* sender, IUnknown* args)
+        {
+          if (!channelDelegate) {
+            return S_OK;
+          }
+
+          BOOL containsFullScreenElement = FALSE;
+          if (succeededOrLog(sender->get_ContainsFullScreenElement(&containsFullScreenElement))) {
+            if (containsFullScreenElement) {
+              channelDelegate->onEnterFullscreen();
+            }
+            else {
+              channelDelegate->onExitFullscreen();
+            }
+          }
+          return S_OK;
+        }
+      ).Get(), nullptr);
+    failedLog(add_ContainsFullScreenElementChanged_HResult);
 
     auto add_HistoryChanged_HResult = webView->add_HistoryChanged(Callback<ICoreWebView2HistoryChangedEventHandler>(
       [this](ICoreWebView2* sender, IUnknown* args)
@@ -1039,6 +1064,9 @@ namespace flutter_inappwebview_plugin
           [this](ICoreWebView2* sender, ICoreWebView2DOMContentLoadedEventArgs* args)
           {
             if (channelDelegate) {
+              wil::unique_cotaskmem_string uri;
+              std::optional<std::string> url = SUCCEEDED(webView->get_Source(&uri)) ? wide_to_utf8(uri.get()) : std::optional<std::string>{};
+              channelDelegate->onDOMContentLoaded(url);
               progress_ = 66;
               channelDelegate->onProgressChanged(progress_);
             }

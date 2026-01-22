@@ -233,6 +233,30 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
             _inAppBrowserEventHandler!.onLoadStop(uri);
         }
         break;
+      case "onContentLoading":
+        if ((webviewParams != null && webviewParams!.onContentLoading != null) ||
+            _inAppBrowserEventHandler != null) {
+          String? url = call.arguments["url"];
+          WebUri? uri = url != null ? WebUri(url) : null;
+          if (webviewParams != null && webviewParams!.onContentLoading != null)
+            webviewParams!.onContentLoading!(_controllerFromPlatform, uri);
+          else
+            _inAppBrowserEventHandler!.onContentLoading(uri);
+        }
+        break;
+      case "onDOMContentLoaded":
+        if ((webviewParams != null &&
+                webviewParams!.onDOMContentLoaded != null) ||
+            _inAppBrowserEventHandler != null) {
+          String? url = call.arguments["url"];
+          WebUri? uri = url != null ? WebUri(url) : null;
+          if (webviewParams != null &&
+              webviewParams!.onDOMContentLoaded != null)
+            webviewParams!.onDOMContentLoaded!(_controllerFromPlatform, uri);
+          else
+            _inAppBrowserEventHandler!.onDOMContentLoaded(uri);
+        }
+        break;
       case "onReceivedError":
         if ((webviewParams != null &&
                 (webviewParams!.onReceivedError != null ||

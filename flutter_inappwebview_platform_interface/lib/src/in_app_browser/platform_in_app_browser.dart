@@ -1593,6 +1593,11 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
         apiUrl:
             'https://developer.apple.com/documentation/appkit/nswindow/1419651-didenterfullscreennotification',
       ),
+      WindowsPlatform(
+        apiName: 'ICoreWebView2.add_ContainsFullScreenElementChanged',
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#add_containsfullscreenelementchanged',
+      ),
     ],
   )
   void onEnterFullscreen() {}
@@ -1617,9 +1622,42 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
         apiUrl:
             'https://developer.apple.com/documentation/appkit/nswindow/1419177-didexitfullscreennotification',
       ),
+      WindowsPlatform(
+        apiName: 'ICoreWebView2.add_ContainsFullScreenElementChanged',
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#add_containsfullscreenelementchanged',
+      ),
     ],
   )
   void onExitFullscreen() {}
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onContentLoading}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppBrowserEvents.onContentLoading.supported_platforms}
+  @SupportedPlatforms(
+    platforms: [
+      WindowsPlatform(
+        apiName: 'ICoreWebView2.add_ContentLoading',
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#add_contentloading',
+      ),
+    ],
+  )
+  void onContentLoading(WebUri? url) {}
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onDOMContentLoaded}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppBrowserEvents.onDOMContentLoaded.supported_platforms}
+  @SupportedPlatforms(
+    platforms: [
+      WindowsPlatform(
+        apiName: 'ICoreWebView2_2.add_DOMContentLoaded',
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_2?view=webview2-1.0.2210.55#add_domcontentloaded',
+      ),
+    ],
+  )
+  void onDOMContentLoaded(WebUri? url) {}
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onPageCommitVisible}
   ///

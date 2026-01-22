@@ -160,6 +160,52 @@ class PlatformWebViewCreationParams<T> {
   )
   final void Function(T controller, WebUri? url)? onLoadStop;
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onContentLoading}
+  ///Called when the `WebView` is about to load content for the current
+  ///navigation.
+  ///
+  ///This fires before any content is loaded (including scripts added with
+  ///`addScriptToExecuteOnDocumentCreated`), after [onLoadStart] and before
+  ///[onDOMContentLoaded].
+  ///
+  ///This event does not fire for same-page navigations such as fragment
+  ///changes or `history.pushState`.
+  ///
+  ///[url] represents the URL corresponding to the page navigation that
+  ///triggered this callback.
+  ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onContentLoading.supported_platforms}
+  @SupportedPlatforms(
+    platforms: [
+      WindowsPlatform(
+        apiName: 'ICoreWebView2.add_ContentLoading',
+        apiUrl:
+        'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#add_contentloading',
+      ),
+    ],
+  )
+  final void Function(T controller, WebUri? url)? onContentLoading;
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onDOMContentLoaded}
+  ///Called when the HTML document has been parsed and the DOM is ready.
+  ///
+  ///[url] represents the URL corresponding to the page navigation that
+  ///triggered this callback.
+  ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onDOMContentLoaded.supported_platforms}
+  @SupportedPlatforms(
+    platforms: [
+      WindowsPlatform(
+        apiName: 'ICoreWebView2_2.add_DOMContentLoaded',
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_2?view=webview2-1.0.2210.55#add_domcontentloaded',
+      ),
+    ],
+  )
+  final void Function(T controller, WebUri? url)? onDOMContentLoaded;
+
   ///{@template flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onLoadError}
   ///Use [onReceivedError] instead.
   ///{@endtemplate}
@@ -1240,6 +1286,11 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
         apiUrl:
             'https://developer.mozilla.org/en-US/docs/Web/API/Document/fullscreenchange_event',
       ),
+      WindowsPlatform(
+        apiName: 'ICoreWebView2.add_ContainsFullScreenElementChanged',
+        apiUrl:
+        'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#add_containsfullscreenelementchanged',
+      ),
       LinuxPlatform(
         apiName: 'WebKitWebView::enter-fullscreen',
         apiUrl:
@@ -1275,6 +1326,11 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
         apiName: 'Document.onfullscreenchange',
         apiUrl:
             'https://developer.mozilla.org/en-US/docs/Web/API/Document/fullscreenchange_event',
+      ),
+      WindowsPlatform(
+        apiName: 'ICoreWebView2.add_ContainsFullScreenElementChanged',
+        apiUrl:
+        'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#add_containsfullscreenelementchanged',
       ),
       LinuxPlatform(
         apiName: 'WebKitWebView::leave-fullscreen',
@@ -2451,6 +2507,8 @@ This is a limitation of the native WebKit APIs.""",
     this.onWebViewCreated,
     this.onLoadStart,
     this.onLoadStop,
+    this.onContentLoading,
+    this.onDOMContentLoaded,
     @Deprecated('Use onReceivedError instead') this.onLoadError,
     this.onReceivedError,
     @Deprecated("Use onReceivedHttpError instead") this.onLoadHttpError,

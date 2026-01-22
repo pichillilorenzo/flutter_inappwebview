@@ -198,7 +198,7 @@ enum PlatformFindInteractionControllerMethod {
   ///- iOS WKWebView ([Official API - UIFindInteraction.activeFindSession](https://developer.apple.com/documentation/uikit/uifindinteraction/3975825-activefindsession?changes=_7____4_8&language=objc))
   ///- macOS WKWebView
   ///- Linux WPE WebKit ([Official API - WebKitFindController](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/class.FindController.html))
-  ///- Windows WebView2 ([Official API - ICoreWebView2Find.ActiveMatchIndex/MatchCount](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2find))
+  ///- Windows WebView2 ([Official API - ICoreWebView2Find](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2find))
   ///
   ///Use the [PlatformFindInteractionController.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
@@ -243,6 +243,20 @@ enum PlatformFindInteractionControllerMethod {
   ///Use the [PlatformFindInteractionController.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
   presentFindNavigator,
+
+  ///Can be used to check if the [PlatformFindInteractionController.setFindOptions] method is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PlatformFindInteractionController.setFindOptions.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows WebView2 ([Official API - ICoreWebView2Environment15.CreateFindOptions](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environment15?view=webview2-1.0.2849.39#createfindoptions))
+  ///
+  ///**Parameters - Officially Supported Platforms/Implementations**:
+  ///- [options]: all platforms
+  ///
+  ///Use the [PlatformFindInteractionController.isMethodSupported] method to check if this method is supported at runtime.
+  ///{@endtemplate}
+  setFindOptions,
 
   ///Can be used to check if the [PlatformFindInteractionController.setSearchText] method is supported at runtime.
   ///
@@ -346,6 +360,11 @@ extension _PlatformFindInteractionControllerMethodSupported
       case PlatformFindInteractionControllerMethod.presentFindNavigator:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
+      case PlatformFindInteractionControllerMethod.setFindOptions:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformFindInteractionControllerMethod.setSearchText:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [

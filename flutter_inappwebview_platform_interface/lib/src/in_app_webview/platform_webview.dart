@@ -419,6 +419,26 @@ Also, this event is not called for POST requests and is not called on the first 
   )?
   shouldOverrideUrlLoading;
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onLaunchingExternalUriScheme}
+  ///Event fired when an external URI scheme is about to be launched.
+  ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onLaunchingExternalUriScheme.supported_platforms}
+  @SupportedPlatforms(
+    platforms: [
+      WindowsPlatform(
+        apiName: 'ICoreWebView2_18.add_LaunchingExternalUriScheme',
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_18?view=webview2-1.0.2849.39#add_launchingexternalurischeme',
+      ),
+    ],
+  )
+  final FutureOr<LaunchingExternalUriSchemeResponse?> Function(
+    T controller,
+    LaunchingExternalUriSchemeRequest request,
+  )?
+  onLaunchingExternalUriScheme;
+
   ///{@template flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onLoadResource}
   ///Event fired when the `WebView` loads a resource.
   ///
@@ -1872,6 +1892,8 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
   ///Event fired when there is new favicon for the current page.
   ///
   ///[icon] represents the favicon for the current page.
+  ///
+  ///Deprecated: use [onFaviconChanged] instead.
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onReceivedIcon.supported_platforms}
@@ -1884,7 +1906,32 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
       ),
     ],
   )
+  @Deprecated('Use onFaviconChanged instead')
   final void Function(T controller, Uint8List icon)? onReceivedIcon;
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onFaviconChanged}
+  ///Event fired when the favicon for the current page changes.
+  ///
+  ///[faviconChangedRequest] contains the favicon URL and/or icon bytes, if available.
+  ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onFaviconChanged.supported_platforms}
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(
+        apiName: 'WebChromeClient.onReceivedIcon',
+        apiUrl:
+            'https://developer.android.com/reference/android/webkit/WebChromeClient#onReceivedIcon(android.webkit.WebView,%20android.graphics.Bitmap)',
+      ),
+      WindowsPlatform(
+        apiName: 'ICoreWebView2_15.add_FaviconChanged',
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_15?view=webview2-1.0.2849.39#add_faviconchanged',
+      ),
+    ],
+  )
+  final void Function(T controller, FaviconChangedRequest faviconChangedRequest)?
+  onFaviconChanged;
 
   ///{@template flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.androidOnReceivedTouchIconUrl}
   ///Use [onReceivedTouchIconUrl] instead.
@@ -2279,6 +2326,86 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
   final void Function(T controller, ProcessFailedDetail detail)?
   onProcessFailed;
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onNotificationReceived}
+  ///Event fired when a web notification is received.
+  ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onNotificationReceived.supported_platforms}
+  @SupportedPlatforms(
+    platforms: [
+      WindowsPlatform(
+        apiName: 'ICoreWebView2_24.add_NotificationReceived',
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_24?view=webview2-1.0.2849.39#add_notificationreceived',
+      ),
+    ],
+  )
+  final FutureOr<NotificationReceivedResponse?> Function(
+    T controller,
+    NotificationReceivedRequest request,
+  )?
+  onNotificationReceived;
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onSaveAsUIShowing}
+  ///Event fired when Save As UI is showing.
+  ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onSaveAsUIShowing.supported_platforms}
+  @SupportedPlatforms(
+    platforms: [
+      WindowsPlatform(
+        apiName: 'ICoreWebView2_25.add_SaveAsUIShowing',
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_25?view=webview2-1.0.2849.39#add_saveasuishowing',
+      ),
+    ],
+  )
+  final FutureOr<SaveAsUIShowingResponse?> Function(
+    T controller,
+    SaveAsUIShowingRequest request,
+  )?
+  onSaveAsUIShowing;
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onSaveFileSecurityCheckStarting}
+  ///Event fired when a save file security check is starting.
+  ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onSaveFileSecurityCheckStarting.supported_platforms}
+  @SupportedPlatforms(
+    platforms: [
+      WindowsPlatform(
+        apiName: 'ICoreWebView2_26.add_SaveFileSecurityCheckStarting',
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_26?view=webview2-1.0.2849.39#add_savefilesecuritycheckstarting',
+      ),
+    ],
+  )
+  final FutureOr<SaveFileSecurityCheckStartingResponse?> Function(
+    T controller,
+    SaveFileSecurityCheckStartingRequest request,
+  )?
+  onSaveFileSecurityCheckStarting;
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onScreenCaptureStarting}
+  ///Event fired when screen capture is starting.
+  ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onScreenCaptureStarting.supported_platforms}
+  @SupportedPlatforms(
+    platforms: [
+      WindowsPlatform(
+        apiName: 'ICoreWebView2_27.add_ScreenCaptureStarting',
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_27?view=webview2-1.0.2849.39#add_screencapturestarting',
+      ),
+    ],
+  )
+  final FutureOr<ScreenCaptureStartingResponse?> Function(
+    T controller,
+    ScreenCaptureStartingRequest request,
+  )?
+  onScreenCaptureStarting;
+
   ///{@template flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onAcceleratorKeyPressed}
   ///This event runs when an accelerator key or key combo is pressed or
   ///released while the WebView is focused.
@@ -2489,6 +2616,7 @@ This is a limitation of the native WebKit APIs.""",
       AndroidPlatform(),
       IOSPlatform(),
       MacOSPlatform(),
+      WindowsPlatform(),
       LinuxPlatform(
         apiName: 'WebKitFindController',
         apiUrl:
@@ -2516,6 +2644,7 @@ This is a limitation of the native WebKit APIs.""",
     this.onProgressChanged,
     this.onConsoleMessage,
     this.shouldOverrideUrlLoading,
+    this.onLaunchingExternalUriScheme,
     this.onLoadResource,
     this.onScrollChanged,
     @Deprecated('Use onDownloadStarting instead') this.onDownloadStart,
@@ -2578,7 +2707,8 @@ This is a limitation of the native WebKit APIs.""",
     this.onFormResubmission,
     @Deprecated('Use onZoomScaleChanged instead') this.androidOnScaleChanged,
     @Deprecated('Use onReceivedIcon instead') this.androidOnReceivedIcon,
-    this.onReceivedIcon,
+    @Deprecated('Use onFaviconChanged instead') this.onReceivedIcon,
+    this.onFaviconChanged,
     @Deprecated('Use onReceivedTouchIconUrl instead')
     this.androidOnReceivedTouchIconUrl,
     this.onReceivedTouchIconUrl,
@@ -2607,6 +2737,10 @@ This is a limitation of the native WebKit APIs.""",
     this.onMicrophoneCaptureStateChanged,
     this.onContentSizeChanged,
     this.onProcessFailed,
+    this.onNotificationReceived,
+    this.onSaveAsUIShowing,
+    this.onSaveFileSecurityCheckStarting,
+    this.onScreenCaptureStarting,
     this.onAcceleratorKeyPressed,
     this.onShowFileChooser,
     this.initialUrlRequest,

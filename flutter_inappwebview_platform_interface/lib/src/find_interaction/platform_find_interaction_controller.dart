@@ -216,6 +216,26 @@ abstract class PlatformFindInteractionController extends PlatformInterface
     );
   }
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformFindInteractionController.setFindOptions}
+  ///Sets the options used for find-on-page operations.
+  ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.setFindOptions.supported_platforms}
+  @SupportedPlatforms(
+    platforms: [
+      WindowsPlatform(
+        apiName: 'ICoreWebView2Environment15.CreateFindOptions',
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environment15?view=webview2-1.0.2849.39#createfindoptions',
+      ),
+    ],
+  )
+  Future<void> setFindOptions({FindOptions? options}) {
+    throw UnimplementedError(
+      'setFindOptions is not implemented on the current platform',
+    );
+  }
+
   ///{@template flutter_inappwebview_platform_interface.PlatformFindInteractionController.findNext}
   ///Highlights and scrolls to the next match found by [findAll]. Notifies [PlatformFindInteractionController.onFindResultReceived] listener.
   ///
@@ -460,7 +480,7 @@ abstract class PlatformFindInteractionController extends PlatformInterface
             'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/class.FindController.html',
       ),
       WindowsPlatform(
-        apiName: 'ICoreWebView2Find.ActiveMatchIndex/MatchCount',
+        apiName: 'ICoreWebView2Find',
         apiUrl:
             'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2find',
       ),

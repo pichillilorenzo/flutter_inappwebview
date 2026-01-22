@@ -30,7 +30,7 @@ cd ../flutter_inappwebview && flutter pub get
 ### Code Generation (After Modifying Annotated Files)
 ```bash
 # From repo root - REQUIRED after editing @ExchangeableObject/@ExchangeableEnum files
-npm run build
+npm run build # or npm run build:windows for Windows only
 # Or directly:
 cd flutter_inappwebview_platform_interface && flutter pub run build_runner build --delete-conflicting-outputs
 ```
@@ -44,7 +44,7 @@ cd flutter_inappwebview && dart analyze
 
 ### Code Formatting
 ```bash
-npm run format
+npm run format # or npm run format:windows for Windows only
 ```
 
 ### Unit Tests

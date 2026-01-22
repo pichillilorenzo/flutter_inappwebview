@@ -234,8 +234,8 @@ enum PlatformInAppWebViewControllerMethod {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView 21+
-  ///- iOS WKWebView 10.3+ ([Official API - WKWebView.callAsyncJavaScript](https://developer.apple.com/documentation/webkit/wkwebview/3656441-callasyncjavascript))
-  ///- macOS WKWebView ([Official API - WKWebView.callAsyncJavaScript](https://developer.apple.com/documentation/webkit/wkwebview/3656441-callasyncjavascript))
+  ///- iOS WKWebView 14.3+ ([Official API - WKWebView.callAsyncJavaScript](https://developer.apple.com/documentation/webkit/wkwebview/3656441-callasyncjavascript))
+  ///- macOS WKWebView 11.0+ ([Official API - WKWebView.callAsyncJavaScript](https://developer.apple.com/documentation/webkit/wkwebview/3656441-callasyncjavascript))
   ///- Windows WebView2
   ///- Linux WPE WebKit 2.40+ ([Official API - webkit_web_view_call_async_javascript_function](https://webkitgtk.org/reference/webkit2gtk/stable/method.WebView.call_async_javascript_function.html)):
   ///    - Uses WPE WebKit call_async_javascript_function API which handles JavaScript Promises automatically.
@@ -734,6 +734,20 @@ enum PlatformInAppWebViewControllerMethod {
   ///{@endtemplate}
   getDefaultUserAgent,
 
+  ///Can be used to check if the [PlatformInAppWebViewController.getFavicon] method is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getFavicon.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows WebView2 ([Official API - ICoreWebView2_15.GetFavicon](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_15?view=webview2-1.0.2849.39#getfavicon))
+  ///
+  ///**Parameters - Officially Supported Platforms/Implementations**:
+  ///- [url]: all platforms
+  ///
+  ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
+  ///{@endtemplate}
+  getFavicon,
+
   ///Can be used to check if the [PlatformInAppWebViewController.getFavicons] method is supported at runtime.
   ///
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getFavicons.supported_platforms}
@@ -749,6 +763,17 @@ enum PlatformInAppWebViewControllerMethod {
   ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
   getFavicons,
+
+  ///Can be used to check if the [PlatformInAppWebViewController.getFrameId] method is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getFrameId.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows WebView2 ([Official API - ICoreWebView2_20.get_FrameId](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_20?view=webview2-1.0.2849.39#get_frameid))
+  ///
+  ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
+  ///{@endtemplate}
+  getFrameId,
 
   ///Can be used to check if the [PlatformInAppWebViewController.getHitTestResult] method is supported at runtime.
   ///
@@ -808,6 +833,17 @@ enum PlatformInAppWebViewControllerMethod {
   ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
   getJavaScriptBridgeName,
+
+  ///Can be used to check if the [PlatformInAppWebViewController.getMemoryUsageTargetLevel] method is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getMemoryUsageTargetLevel.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows WebView2 ([Official API - ICoreWebView2_19.get_MemoryUsageTargetLevel](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_19?view=webview2-1.0.2849.39#get_memoryusagetargetlevel))
+  ///
+  ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
+  ///{@endtemplate}
+  getMemoryUsageTargetLevel,
 
   ///Can be used to check if the [PlatformInAppWebViewController.getMetaTags] method is supported at runtime.
   ///
@@ -1753,6 +1789,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///    - If macOS version is less than 11.0, it will use [Official API - NSView.printView](https://developer.apple.com/documentation/appkit/nsview/1483705-printview).
   ///- Web \<iframe\> but requires same origin ([Official API - Window.print](https://developer.mozilla.org/en-US/docs/Web/API/Window/print)):
   ///    - [PlatformPrintJobController] is always `null`.
+  ///- Windows WebView2 ([Official API - ICoreWebView2_16.Print](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_16?view=webview2-1.0.2849.39#print))
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [settings]: all platforms
@@ -2219,6 +2256,20 @@ enum PlatformInAppWebViewControllerMethod {
   ///{@endtemplate}
   setJavaScriptBridgeName,
 
+  ///Can be used to check if the [PlatformInAppWebViewController.setMemoryUsageTargetLevel] method is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.setMemoryUsageTargetLevel.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows WebView2 ([Official API - ICoreWebView2_19.put_MemoryUsageTargetLevel](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_19?view=webview2-1.0.2849.39#put_memoryusagetargetlevel))
+  ///
+  ///**Parameters - Officially Supported Platforms/Implementations**:
+  ///- [level]: all platforms
+  ///
+  ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
+  ///{@endtemplate}
+  setMemoryUsageTargetLevel,
+
   ///Can be used to check if the [PlatformInAppWebViewController.setMicrophoneCaptureState] method is supported at runtime.
   ///
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.setMicrophoneCaptureState.supported_platforms}
@@ -2384,6 +2435,17 @@ enum PlatformInAppWebViewControllerMethod {
   ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
   showInputMethod,
+
+  ///Can be used to check if the [PlatformInAppWebViewController.showSaveAsUI] method is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.showSaveAsUI.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows WebView2 ([Official API - ICoreWebView2_25.ShowSaveAsUI](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_25?view=webview2-1.0.2849.39#showsaveasui))
+  ///
+  ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
+  ///{@endtemplate}
+  showSaveAsUI,
 
   ///Can be used to check if the [PlatformInAppWebViewController.startSafeBrowsing] method is supported at runtime.
   ///
@@ -2793,6 +2855,11 @@ extension _PlatformInAppWebViewControllerMethodSupported
                     TargetPlatform.iOS,
                     TargetPlatform.macOS,
                   ].contains(platform ?? defaultTargetPlatform);
+      case PlatformInAppWebViewControllerMethod.getFavicon:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.getFavicons:
         return kIsWeb && platform == null
             ? true
@@ -2804,6 +2871,11 @@ extension _PlatformInAppWebViewControllerMethodSupported
                     TargetPlatform.windows,
                     TargetPlatform.linux,
                   ].contains(platform ?? defaultTargetPlatform);
+      case PlatformInAppWebViewControllerMethod.getFrameId:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.getHitTestResult:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
@@ -2838,6 +2910,11 @@ extension _PlatformInAppWebViewControllerMethodSupported
                     TargetPlatform.windows,
                     TargetPlatform.linux,
                   ].contains(platform ?? defaultTargetPlatform);
+      case PlatformInAppWebViewControllerMethod.getMemoryUsageTargetLevel:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.getMetaTags:
         return kIsWeb && platform == null
             ? true
@@ -3315,6 +3392,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
                     TargetPlatform.android,
                     TargetPlatform.iOS,
                     TargetPlatform.macOS,
+                    TargetPlatform.windows,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.reload:
         return kIsWeb && platform == null
@@ -3526,6 +3604,11 @@ extension _PlatformInAppWebViewControllerMethodSupported
                     TargetPlatform.windows,
                     TargetPlatform.linux,
                   ].contains(platform ?? defaultTargetPlatform);
+      case PlatformInAppWebViewControllerMethod.setMemoryUsageTargetLevel:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.setMicrophoneCaptureState:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
@@ -3585,6 +3668,11 @@ extension _PlatformInAppWebViewControllerMethodSupported
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
+      case PlatformInAppWebViewControllerMethod.showSaveAsUI:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [
+              TargetPlatform.windows,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.startSafeBrowsing:
         return ((kIsWeb && platform != null) || !kIsWeb) &&

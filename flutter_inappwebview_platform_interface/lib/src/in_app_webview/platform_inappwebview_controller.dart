@@ -258,6 +258,68 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
     );
   }
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getFrameId}
+  ///Gets the ID of the main frame.
+  ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getFrameId.supported_platforms}
+  @SupportedPlatforms(
+    platforms: [
+      WindowsPlatform(
+        apiName: 'ICoreWebView2_20.get_FrameId',
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_20?view=webview2-1.0.2849.39#get_frameid',
+      ),
+    ],
+  )
+  Future<int?> getFrameId() {
+    throw UnimplementedError(
+      '${PlatformInAppWebViewControllerMethod.getFrameId.name} is not implemented on the current platform',
+    );
+  }
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getMemoryUsageTargetLevel}
+  ///Gets the WebView memory usage target level.
+  ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getMemoryUsageTargetLevel.supported_platforms}
+  @SupportedPlatforms(
+    platforms: [
+      WindowsPlatform(
+        apiName: 'ICoreWebView2_19.get_MemoryUsageTargetLevel',
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_19?view=webview2-1.0.2849.39#get_memoryusagetargetlevel',
+      ),
+    ],
+  )
+  Future<MemoryUsageTargetLevel?> getMemoryUsageTargetLevel() {
+    throw UnimplementedError(
+      '${PlatformInAppWebViewControllerMethod.getMemoryUsageTargetLevel.name} is not implemented on the current platform',
+    );
+  }
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.setMemoryUsageTargetLevel}
+  ///Sets the WebView memory usage target level.
+  ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.setMemoryUsageTargetLevel.supported_platforms}
+  @SupportedPlatforms(
+    platforms: [
+      WindowsPlatform(
+        apiName: 'ICoreWebView2_19.put_MemoryUsageTargetLevel',
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_19?view=webview2-1.0.2849.39#put_memoryusagetargetlevel',
+      ),
+    ],
+  )
+  Future<void> setMemoryUsageTargetLevel(
+    MemoryUsageTargetLevel level,
+  ) {
+    throw UnimplementedError(
+      '${PlatformInAppWebViewControllerMethod.setMemoryUsageTargetLevel.name} is not implemented on the current platform',
+    );
+  }
+
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getProgress}
   ///Gets the progress for the current page. The progress value is between 0 and 100.
   ///{@endtemplate}
@@ -341,6 +403,26 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   Future<List<Favicon>> getFavicons() {
     throw UnimplementedError(
       '${PlatformInAppWebViewControllerMethod.getFavicons.name} is not implemented on the current platform',
+    );
+  }
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getFavicon}
+  ///Gets the favicon bytes for the given favicon [url].
+  ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getFavicon.supported_platforms}
+  @SupportedPlatforms(
+    platforms: [
+      WindowsPlatform(
+        apiName: 'ICoreWebView2_15.GetFavicon',
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_15?view=webview2-1.0.2849.39#getfavicon',
+      ),
+    ],
+  )
+  Future<Uint8List?> getFavicon({required WebUri url}) {
+    throw UnimplementedError(
+      '${PlatformInAppWebViewControllerMethod.getFavicon.name} is not implemented on the current platform',
     );
   }
 
@@ -1579,6 +1661,11 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
         apiUrl: 'https://developer.mozilla.org/en-US/docs/Web/API/Window/print',
         note: '[PlatformPrintJobController] is always `null`.',
       ),
+      WindowsPlatform(
+        apiName: 'ICoreWebView2_16.Print',
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_16?view=webview2-1.0.2849.39#print',
+      ),
     ],
   )
   Future<PlatformPrintJobController?> printCurrentPage({
@@ -2476,6 +2563,26 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   }) {
     throw UnimplementedError(
       '${PlatformInAppWebViewControllerMethod.saveWebArchive.name} is not implemented on the current platform',
+    );
+  }
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.showSaveAsUI}
+  ///Shows the Save As UI for the current document.
+  ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.showSaveAsUI.supported_platforms}
+  @SupportedPlatforms(
+    platforms: [
+      WindowsPlatform(
+        apiName: 'ICoreWebView2_25.ShowSaveAsUI',
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_25?view=webview2-1.0.2849.39#showsaveasui',
+      ),
+    ],
+  )
+  Future<SaveAsUIResult?> showSaveAsUI() {
+    throw UnimplementedError(
+      '${PlatformInAppWebViewControllerMethod.showSaveAsUI.name} is not implemented on the current platform',
     );
   }
 

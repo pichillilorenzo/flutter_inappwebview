@@ -35,6 +35,7 @@ export 'dismiss_button_style.dart'
     show DismissButtonStyle, IOSSafariDismissButtonStyle;
 export 'download_start_request.dart' show DownloadStartRequest;
 export 'favicon.dart' show Favicon;
+export 'favicon_changed_request.dart' show FaviconChangedRequest;
 export 'fetch_request.dart' show FetchRequest;
 export 'fetch_request_action.dart' show FetchRequestAction;
 export 'fetch_request_credential.dart' show FetchRequestCredential;
@@ -206,6 +207,7 @@ export 'webview_package_info.dart'
     show WebViewPackageInfo, AndroidWebViewPackageInfo;
 export 'webview_render_process_action.dart' show WebViewRenderProcessAction;
 export 'window_features.dart' show WindowFeatures, IOSWKWindowFeatures;
+export 'find_options.dart' show FindOptions;
 export 'find_session.dart' show FindSession;
 export 'search_result_display_style.dart' show SearchResultDisplayStyle;
 export 'content_blocker_trigger_load_context.dart'
@@ -230,6 +232,30 @@ export 'tracing_category.dart' show TracingCategory;
 export 'custom_tabs_post_message_result_type.dart'
     show CustomTabsPostMessageResultType;
 export 'custom_scheme_registration.dart' show CustomSchemeRegistration;
+export 'launching_external_uri_scheme_request.dart'
+    show LaunchingExternalUriSchemeRequest;
+export 'launching_external_uri_scheme_response.dart'
+    show LaunchingExternalUriSchemeResponse;
+export 'memory_usage_target_level.dart' show MemoryUsageTargetLevel;
+export 'notification_direction.dart' show NotificationDirection;
+export 'notification_received_request.dart' show NotificationReceivedRequest;
+export 'notification_received_response.dart' show NotificationReceivedResponse;
+export 'save_as_kind.dart' show SaveAsKind;
+export 'save_as_ui_result.dart' show SaveAsUIResult;
+export 'save_as_ui_showing_request.dart' show SaveAsUIShowingRequest;
+export 'save_as_ui_showing_response.dart' show SaveAsUIShowingResponse;
+export 'save_file_security_check_starting_request.dart'
+    show SaveFileSecurityCheckStartingRequest;
+export 'save_file_security_check_starting_response.dart'
+    show SaveFileSecurityCheckStartingResponse;
+export 'screen_capture_starting_request.dart'
+    show ScreenCaptureStartingRequest;
+export 'screen_capture_starting_response.dart'
+    show ScreenCaptureStartingResponse;
+export 'web_notification.dart' show WebNotification;
+export 'web_resource_context.dart' show WebResourceContext;
+export 'web_resource_request_source_kind.dart'
+    show WebResourceRequestSourceKind;
 export 'disposable.dart';
 export 'frame_kind.dart' show FrameKind;
 export 'process_failed_kind.dart' show ProcessFailedKind;

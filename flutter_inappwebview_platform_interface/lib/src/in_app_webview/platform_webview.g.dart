@@ -267,6 +267,7 @@ enum PlatformWebViewCreationParamsProperty {
   ///- Android WebView
   ///- iOS WKWebView
   ///- macOS WKWebView
+  ///- Windows WebView2
   ///- Linux WPE WebKit ([Official API - WebKitFindController](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/class.FindController.html))
   ///
   ///Use the [PlatformWebViewCreationParams.isPropertySupported] method to check if this property is supported at runtime.
@@ -696,6 +697,21 @@ enum PlatformWebViewCreationParamsProperty {
   ///{@endtemplate}
   onExitFullscreen,
 
+  ///Can be used to check if the [PlatformWebViewCreationParams.onFaviconChanged] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onFaviconChanged.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android WebView ([Official API - WebChromeClient.onReceivedIcon](https://developer.android.com/reference/android/webkit/WebChromeClient#onReceivedIcon(android.webkit.WebView,%20android.graphics.Bitmap)))
+  ///- Windows WebView2 ([Official API - ICoreWebView2_15.add_FaviconChanged](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_15?view=webview2-1.0.2849.39#add_faviconchanged))
+  ///
+  ///**Parameters - Officially Supported Platforms/Implementations**:
+  ///- [faviconChangedRequest]: all platforms
+  ///
+  ///Use the [PlatformWebViewCreationParams.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  onFaviconChanged,
+
   ///Can be used to check if the [PlatformWebViewCreationParams.onFindResultReceived] property is supported at runtime.
   ///
   ///{@template flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onFindResultReceived.supported_platforms}
@@ -823,6 +839,20 @@ enum PlatformWebViewCreationParamsProperty {
   ///Use the [PlatformWebViewCreationParams.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
   onJsPrompt,
+
+  ///Can be used to check if the [PlatformWebViewCreationParams.onLaunchingExternalUriScheme] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onLaunchingExternalUriScheme.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows WebView2 ([Official API - ICoreWebView2_18.add_LaunchingExternalUriScheme](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_18?view=webview2-1.0.2849.39#add_launchingexternalurischeme))
+  ///
+  ///**Parameters - Officially Supported Platforms/Implementations**:
+  ///- [request]: all platforms
+  ///
+  ///Use the [PlatformWebViewCreationParams.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  onLaunchingExternalUriScheme,
 
   ///Can be used to check if the [PlatformWebViewCreationParams.onLoadError] property is supported at runtime.
   ///
@@ -1008,6 +1038,20 @@ enum PlatformWebViewCreationParamsProperty {
   ///Use the [PlatformWebViewCreationParams.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
   onNavigationResponse,
+
+  ///Can be used to check if the [PlatformWebViewCreationParams.onNotificationReceived] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onNotificationReceived.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows WebView2 ([Official API - ICoreWebView2_24.add_NotificationReceived](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_24?view=webview2-1.0.2849.39#add_notificationreceived))
+  ///
+  ///**Parameters - Officially Supported Platforms/Implementations**:
+  ///- [request]: all platforms
+  ///
+  ///Use the [PlatformWebViewCreationParams.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  onNotificationReceived,
 
   ///Can be used to check if the [PlatformWebViewCreationParams.onOverScrolled] property is supported at runtime.
   ///
@@ -1238,6 +1282,7 @@ enum PlatformWebViewCreationParamsProperty {
   ///
   ///Use the [PlatformWebViewCreationParams.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
+  @Deprecated('Use onFaviconChanged instead')
   onReceivedIcon,
 
   ///Can be used to check if the [PlatformWebViewCreationParams.onReceivedLoginRequest] property is supported at runtime.
@@ -1360,6 +1405,48 @@ enum PlatformWebViewCreationParamsProperty {
   ///Use the [PlatformWebViewCreationParams.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
   onSafeBrowsingHit,
+
+  ///Can be used to check if the [PlatformWebViewCreationParams.onSaveAsUIShowing] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onSaveAsUIShowing.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows WebView2 ([Official API - ICoreWebView2_25.add_SaveAsUIShowing](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_25?view=webview2-1.0.2849.39#add_saveasuishowing))
+  ///
+  ///**Parameters - Officially Supported Platforms/Implementations**:
+  ///- [request]: all platforms
+  ///
+  ///Use the [PlatformWebViewCreationParams.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  onSaveAsUIShowing,
+
+  ///Can be used to check if the [PlatformWebViewCreationParams.onSaveFileSecurityCheckStarting] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onSaveFileSecurityCheckStarting.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows WebView2 ([Official API - ICoreWebView2_26.add_SaveFileSecurityCheckStarting](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_26?view=webview2-1.0.2849.39#add_savefilesecuritycheckstarting))
+  ///
+  ///**Parameters - Officially Supported Platforms/Implementations**:
+  ///- [request]: all platforms
+  ///
+  ///Use the [PlatformWebViewCreationParams.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  onSaveFileSecurityCheckStarting,
+
+  ///Can be used to check if the [PlatformWebViewCreationParams.onScreenCaptureStarting] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onScreenCaptureStarting.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows WebView2 ([Official API - ICoreWebView2_27.add_ScreenCaptureStarting](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_27?view=webview2-1.0.2849.39#add_screencapturestarting))
+  ///
+  ///**Parameters - Officially Supported Platforms/Implementations**:
+  ///- [request]: all platforms
+  ///
+  ///Use the [PlatformWebViewCreationParams.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  onScreenCaptureStarting,
 
   ///Can be used to check if the [PlatformWebViewCreationParams.onScrollChanged] property is supported at runtime.
   ///
@@ -1725,6 +1812,7 @@ extension _PlatformWebViewCreationParamsPropertySupported
               TargetPlatform.android,
               TargetPlatform.iOS,
               TargetPlatform.macOS,
+              TargetPlatform.windows,
               TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.initialData:
@@ -1930,6 +2018,12 @@ extension _PlatformWebViewCreationParamsPropertySupported
                     TargetPlatform.windows,
                     TargetPlatform.linux,
                   ].contains(platform ?? defaultTargetPlatform);
+      case PlatformWebViewCreationParamsProperty.onFaviconChanged:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [
+              TargetPlatform.android,
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onFindResultReceived:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
@@ -1983,6 +2077,11 @@ extension _PlatformWebViewCreationParamsPropertySupported
               TargetPlatform.iOS,
               TargetPlatform.macOS,
               TargetPlatform.linux,
+            ].contains(platform ?? defaultTargetPlatform);
+      case PlatformWebViewCreationParamsProperty.onLaunchingExternalUriScheme:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [
+              TargetPlatform.windows,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onLoadError:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -2064,6 +2163,11 @@ extension _PlatformWebViewCreationParamsPropertySupported
               TargetPlatform.iOS,
               TargetPlatform.macOS,
               TargetPlatform.linux,
+            ].contains(platform ?? defaultTargetPlatform);
+      case PlatformWebViewCreationParamsProperty.onNotificationReceived:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [
+              TargetPlatform.windows,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onOverScrolled:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -2211,6 +2315,22 @@ extension _PlatformWebViewCreationParamsPropertySupported
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
+      case PlatformWebViewCreationParamsProperty.onSaveAsUIShowing:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
+      case PlatformWebViewCreationParamsProperty
+          .onSaveFileSecurityCheckStarting:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
+      case PlatformWebViewCreationParamsProperty.onScreenCaptureStarting:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [
+              TargetPlatform.windows,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onScrollChanged:
         return kIsWeb && platform == null

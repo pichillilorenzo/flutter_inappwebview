@@ -54,6 +54,11 @@ class InAppWebViewController {
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getTitle.supported_platforms}
   Future<String?> getTitle() => platform.getTitle();
 
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getFrameId}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getFrameId.supported_platforms}
+  Future<int?> getFrameId() => platform.getFrameId();
+
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getProgress}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getProgress.supported_platforms}
@@ -68,6 +73,34 @@ class InAppWebViewController {
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getFavicons.supported_platforms}
   Future<List<Favicon>> getFavicons() => platform.getFavicons();
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getFavicon}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getFavicon.supported_platforms}
+  Future<Uint8List?> getFavicon({
+    required WebUri url,
+    FaviconImageFormat faviconImageFormat = FaviconImageFormat.PNG,
+  }) => platform.getFavicon(
+    url: url,
+    faviconImageFormat: faviconImageFormat,
+  );
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.showSaveAsUI}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.showSaveAsUI.supported_platforms}
+  Future<SaveAsUIResult?> showSaveAsUI() => platform.showSaveAsUI();
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getMemoryUsageTargetLevel}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getMemoryUsageTargetLevel.supported_platforms}
+  Future<MemoryUsageTargetLevel?> getMemoryUsageTargetLevel() =>
+      platform.getMemoryUsageTargetLevel();
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.setMemoryUsageTargetLevel}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.setMemoryUsageTargetLevel.supported_platforms}
+  Future<void> setMemoryUsageTargetLevel(MemoryUsageTargetLevel level) =>
+      platform.setMemoryUsageTargetLevel(level);
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.loadUrl}
   ///

@@ -9,6 +9,7 @@
   - `flutter_inappwebview_web`: `^1.2.0-beta.2` -> `^1.2.0-beta.3`
   - `flutter_inappwebview_windows`: `^0.7.0-beta.2` -> `^0.7.0-beta.3`
   - `flutter_inappwebview_linux`: `^0.1.0-beta.1`
+- Added `InAppWebViewController.getFavicon` wrapper with `faviconImageFormat` support.
 - Fixed "When useShouldInterceptAjaxRequest is true, some ajax requests doesn't work" [#2197](https://github.com/pichillilorenzo/flutter_inappwebview/issues/2197)
 - Mapped `isClassSupported`, `isPropertySupported`, `isMethodSupported` platform interface static methods to the corresponding plugin classes such as `InAppWebViewController`, `InAppWebView`, `InAppBrowser`, etc., in order to check if a class, property, or method is supported by the platform at runtime
 - Updated code generator

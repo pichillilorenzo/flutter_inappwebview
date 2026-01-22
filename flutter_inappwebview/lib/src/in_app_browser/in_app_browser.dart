@@ -614,8 +614,12 @@ class InAppBrowser implements PlatformInAppBrowserEvents {
     WebResourceResponse errorResponse,
   ) {}
 
+  ///Use [onFaviconChanged] instead.
+  @Deprecated('Use onFaviconChanged instead')
   @override
   void onReceivedIcon(Uint8List icon) {}
+
+  void onFaviconChanged(FaviconChangedRequest faviconChangedRequest) {}
 
   @override
   void onReceivedLoginRequest(LoginRequest loginRequest) {}
@@ -629,6 +633,38 @@ class InAppBrowser implements PlatformInAppBrowserEvents {
 
   @override
   void onReceivedTouchIconUrl(WebUri url, bool precomposed) {}
+
+  FutureOr<NotificationReceivedResponse?>? onNotificationReceived(
+    NotificationReceivedRequest request,
+  ) {
+    return null;
+  }
+
+  FutureOr<SaveAsUIShowingResponse?>? onSaveAsUIShowing(
+    SaveAsUIShowingRequest request,
+  ) {
+    return null;
+  }
+
+  FutureOr<SaveFileSecurityCheckStartingResponse?>?
+      onSaveFileSecurityCheckStarting(
+    SaveFileSecurityCheckStartingRequest request,
+  ) {
+    return null;
+  }
+
+  FutureOr<ScreenCaptureStartingResponse?>? onScreenCaptureStarting(
+    ScreenCaptureStartingRequest request,
+  ) {
+    return null;
+  }
+
+  @override
+  FutureOr<LaunchingExternalUriSchemeResponse?>? onLaunchingExternalUriScheme(
+    LaunchingExternalUriSchemeRequest request,
+  ) {
+    return null;
+  }
 
   @override
   void onRenderProcessGone(RenderProcessGoneDetail detail) {}

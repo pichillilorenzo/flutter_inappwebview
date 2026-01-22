@@ -363,8 +363,14 @@ class InAppWebView extends StatefulWidget {
       PermissionRequest permissionRequest,
     )?
     onPermissionRequest,
+    @Deprecated('Use onFaviconChanged instead')
     void Function(InAppWebViewController controller, Uint8List icon)?
     onReceivedIcon,
+    void Function(
+      InAppWebViewController controller,
+      FaviconChangedRequest faviconChangedRequest,
+    )?
+    onFaviconChanged,
     void Function(InAppWebViewController controller, LoginRequest loginRequest)?
     onReceivedLoginRequest,
     void Function(
@@ -435,6 +441,26 @@ class InAppWebView extends StatefulWidget {
       ProcessFailedDetail detail,
     )?
     onProcessFailed,
+    FutureOr<NotificationReceivedResponse?> Function(
+      InAppWebViewController controller,
+      NotificationReceivedRequest request,
+    )?
+    onNotificationReceived,
+    FutureOr<SaveAsUIShowingResponse?> Function(
+      InAppWebViewController controller,
+      SaveAsUIShowingRequest request,
+    )?
+    onSaveAsUIShowing,
+    FutureOr<SaveFileSecurityCheckStartingResponse?> Function(
+      InAppWebViewController controller,
+      SaveFileSecurityCheckStartingRequest request,
+    )?
+    onSaveFileSecurityCheckStarting,
+    FutureOr<ScreenCaptureStartingResponse?> Function(
+      InAppWebViewController controller,
+      ScreenCaptureStartingRequest request,
+    )?
+    onScreenCaptureStarting,
     void Function(
       InAppWebViewController controller,
       AcceleratorKeyPressedDetail detail,
@@ -445,6 +471,11 @@ class InAppWebView extends StatefulWidget {
       ShowFileChooserRequest request,
     )?
     onShowFileChooser,
+    FutureOr<LaunchingExternalUriSchemeResponse?> Function(
+      InAppWebViewController controller,
+      LaunchingExternalUriSchemeRequest request,
+    )?
+    onLaunchingExternalUriScheme,
   }) : this.fromPlatformCreationParams(
          key: key,
          params: PlatformInAppWebViewWidgetCreationParams(
@@ -727,6 +758,10 @@ class InAppWebView extends StatefulWidget {
            onReceivedIcon: onReceivedIcon != null
                ? (controller, icon) => onReceivedIcon.call(controller, icon)
                : null,
+             onFaviconChanged: onFaviconChanged != null
+               ? (controller, request) =>
+                 onFaviconChanged.call(controller, request)
+               : null,
            androidOnReceivedTouchIconUrl: androidOnReceivedTouchIconUrl != null
                ? (controller, url, precomposed) => androidOnReceivedTouchIconUrl
                      .call(controller, url, precomposed)
@@ -823,6 +858,23 @@ class InAppWebView extends StatefulWidget {
                ? (controller, detail) =>
                      onProcessFailed.call(controller, detail)
                : null,
+               onNotificationReceived: onNotificationReceived != null
+               ? (controller, request) =>
+                 onNotificationReceived.call(controller, request)
+               : null,
+               onSaveAsUIShowing: onSaveAsUIShowing != null
+               ? (controller, request) =>
+                 onSaveAsUIShowing.call(controller, request)
+               : null,
+               onSaveFileSecurityCheckStarting:
+               onSaveFileSecurityCheckStarting != null
+               ? (controller, request) =>
+                 onSaveFileSecurityCheckStarting.call(controller, request)
+               : null,
+               onScreenCaptureStarting: onScreenCaptureStarting != null
+               ? (controller, request) =>
+                 onScreenCaptureStarting.call(controller, request)
+               : null,
            onAcceleratorKeyPressed: onAcceleratorKeyPressed != null
                ? (controller, detail) =>
                      onAcceleratorKeyPressed.call(controller, detail)
@@ -830,6 +882,10 @@ class InAppWebView extends StatefulWidget {
            onShowFileChooser: onShowFileChooser != null
                ? (controller, request) =>
                      onShowFileChooser.call(controller, request)
+               : null,
+           onLaunchingExternalUriScheme: onLaunchingExternalUriScheme != null
+               ? (controller, request) =>
+                     onLaunchingExternalUriScheme.call(controller, request)
                : null,
            gestureRecognizers: gestureRecognizers,
            headlessWebView: headlessWebView?.platform,

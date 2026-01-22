@@ -1,6 +1,11 @@
 #ifndef FLUTTER_INAPPWEBVIEW_PLUGIN_UTIL_H_
 #define FLUTTER_INAPPWEBVIEW_PLUGIN_UTIL_H_
 
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <windows.h>
+
 #include <limits>
 #include <objidl.h>
 #include <optional>
@@ -53,7 +58,8 @@ namespace flutter_inappwebview_plugin
       return std::nullopt;
     }
 
-    if (size64 > static_cast<ULONGLONG>(std::numeric_limits<ULONG>::max())) {
+    // Use parentheses around max() to prevent Windows macro expansion
+    if (size64 > static_cast<ULONGLONG>((std::numeric_limits<ULONG>::max)())) {
       return std::nullopt;
     }
 

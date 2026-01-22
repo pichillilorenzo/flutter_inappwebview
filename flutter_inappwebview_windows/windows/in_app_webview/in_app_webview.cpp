@@ -44,6 +44,7 @@
 #include "../utils/string.h"
 #include "../utils/uri.h"
 #include "../utils/util.h"
+#include "../utils/flutter.h"
 #include "in_app_webview.h"
 #include "in_app_webview_manager.h"
 
@@ -51,47 +52,38 @@ namespace flutter_inappwebview_plugin
 {
   using namespace Microsoft::WRL;
 
-  namespace {
-    static inline bool fl_map_contains_not_null(const flutter::EncodableMap& map, const char* key)
-    {
-      auto fl_key = flutter::EncodableValue(key);
-      auto it = map.find(fl_key);
-      return it != map.end() && !it->second.IsNull();
+  InAppWebView::InAppWebView(const FlutterInappwebviewWindowsPlugin* plugin, const InAppWebViewCreationParams& params, const HWND parentWindow, wil::com_ptr<ICoreWebView2Environment> webViewEnv,
+    wil::com_ptr<ICoreWebView2Controller> webViewController,
+    wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController)
+    : plugin(plugin), id(params.id),
+    webViewEnv(std::move(webViewEnv)), webViewController(std::move(webViewController)), webViewCompositionController(std::move(webViewCompositionController)),
+    settings(params.initialSettings), userContentController(std::make_unique<UserContentController>(this))
+  {
+    if (failedAndLog(this->webViewController->get_CoreWebView2(webView.put()))) {
+      std::cerr << "Cannot create CoreWebView2." << std::endl;
     }
+
+    if (this->webViewCompositionController) {
+      if (!createSurface(parentWindow, plugin->inAppWebViewManager->compositor())) {
+        std::cerr << "Cannot create InAppWebView surface." << std::endl;
+      }
+      registerSurfaceEventHandlers();
+    }
+    else {
+      this->webViewController->put_IsVisible(true);
+      // Resize WebView to fit the bounds of the parent window
+      RECT bounds;
+      GetClientRect(parentWindow, &bounds);
+      this->webViewController->put_Bounds(bounds);
+    }
+
+    prepare(params);
   }
 
-  namespace {
-    std::optional<std::vector<uint8_t>> readStreamBytes(IStream* stream)
-    {
-      if (!stream) {
-        return std::nullopt;
-      }
-
-      STATSTG stat = {};
-      if (FAILED(stream->Stat(&stat, STATFLAG_NONAME))) {
-        return std::nullopt;
-      }
-
-      auto size64 = stat.cbSize.QuadPart;
-      if (size64 <= 0) {
-        return std::vector<uint8_t>{};
-      }
-
-      if (size64 > static_cast<ULONGLONG>(std::numeric_limits<ULONG>::max())) {
-        return std::nullopt;
-      }
-
-      LARGE_INTEGER pos = {};
-      stream->Seek(pos, STREAM_SEEK_SET, nullptr);
-
-      auto size = static_cast<ULONG>(size64);
-      std::vector<uint8_t> data(size);
-      ULONG bytesRead = 0;
-      if (FAILED(stream->Read(data.data(), size, &bytesRead))) {
-        return std::nullopt;
-      }
-
-      data.resize(bytesRead);
+  InAppWebView::InAppWebView(InAppBrowser* inAppBrowser, const FlutterInappwebviewWindowsPlugin* plugin, const InAppWebViewCreationParams& params, const HWND parentWindow, wil::com_ptr<ICoreWebView2Environment> webViewEnv,
+    wil::com_ptr<ICoreWebView2Controller> webViewController,
+    wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController)
+    : InAppWebView(plugin, params, parentWindow, std::move(webViewEnv), std::move(webViewController), std::move(webViewCompositionController))
   {
     this->inAppBrowser = inAppBrowser;
   }
@@ -1628,7 +1620,7 @@ namespace flutter_inappwebview_plugin
               BOOL requiresInteraction = FALSE;
               BOOL shouldRenotify = FALSE;
               double timestamp = 0;
-              COREWEBVIEW2_NOTIFICATION_DIRECTION direction = COREWEBVIEW2_NOTIFICATION_DIRECTION_LEFT_TO_RIGHT;
+              COREWEBVIEW2_TEXT_DIRECTION_KIND direction = COREWEBVIEW2_TEXT_DIRECTION_KIND_DEFAULT;
 
               notification->get_BadgeUri(&badgeUri);
               notification->get_Body(&body);
@@ -1851,7 +1843,7 @@ namespace flutter_inappwebview_plugin
 
             wil::com_ptr<ICoreWebView2FrameInfo> frameInfo;
             std::optional<std::shared_ptr<FrameInfo>> frame = std::nullopt;
-            if (succeededOrLog(args->get_Frame(&frameInfo)) && frameInfo) {
+            if (succeededOrLog(args->get_OriginalSourceFrameInfo(&frameInfo)) && frameInfo) {
               auto framePtr = FrameInfo::fromICoreWebView2FrameInfo(frameInfo);
               if (framePtr) {
                 frame = std::shared_ptr<FrameInfo>(std::move(framePtr));
@@ -2775,7 +2767,7 @@ namespace flutter_inappwebview_plugin
   flutter::EncodableValue InAppWebView::getSettings() const
   {
     if (!settings || !webView) {
-      return flutter::EncodableValue();
+      return make_fl_value();
     }
 
     return settings->getRealSettings(this);

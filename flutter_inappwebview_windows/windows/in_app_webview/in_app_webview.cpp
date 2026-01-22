@@ -1,9 +1,11 @@
 #include <cstring>
 #include <filesystem>
 #include <nlohmann/json.hpp>
+#include <limits>
 #include <regex>
 #include <set>
 #include <Shlwapi.h>
+#include <flutter/encodable_value.h>
 #include <wil/wrl.h>
 #include <winrt/Windows.Foundation.h>
 
@@ -13,11 +15,26 @@
 #include "../plugin_scripts_js/web_message_listener_js.h"
 #include "../types/client_cert_response.h"
 #include "../types/create_window_action.h"
+#include "../types/favicon_changed_request.h"
+#include "../types/favicon_image_format.h"
 #include "../types/http_auth_response.h"
 #include "../types/javascript_handler_function_data.h"
+#include "../types/launching_external_uri_scheme_request.h"
+#include "../types/launching_external_uri_scheme_response.h"
+#include "../types/notification_direction.h"
+#include "../types/notification_received_request.h"
+#include "../types/notification_received_response.h"
+#include "../types/save_as_kind.h"
+#include "../types/save_as_ui_showing_request.h"
+#include "../types/save_as_ui_showing_response.h"
+#include "../types/save_file_security_check_starting_request.h"
+#include "../types/save_file_security_check_starting_response.h"
+#include "../types/screen_capture_starting_request.h"
+#include "../types/screen_capture_starting_response.h"
 #include "../types/server_trust_auth_response.h"
 #include "../types/ssl_error.h"
 #include "../types/url_credential.h"
+#include "../types/web_notification.h"
 #include "../types/web_resource_error.h"
 #include "../types/web_resource_request.h"
 #include "../utils/base64.h"
@@ -26,6 +43,7 @@
 #include "../utils/strconv.h"
 #include "../utils/string.h"
 #include "../utils/uri.h"
+#include "../utils/util.h"
 #include "in_app_webview.h"
 #include "in_app_webview_manager.h"
 
@@ -33,38 +51,47 @@ namespace flutter_inappwebview_plugin
 {
   using namespace Microsoft::WRL;
 
-  InAppWebView::InAppWebView(const FlutterInappwebviewWindowsPlugin* plugin, const InAppWebViewCreationParams& params, const HWND parentWindow, wil::com_ptr<ICoreWebView2Environment> webViewEnv,
-    wil::com_ptr<ICoreWebView2Controller> webViewController,
-    wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController)
-    : plugin(plugin), id(params.id),
-    webViewEnv(std::move(webViewEnv)), webViewController(std::move(webViewController)), webViewCompositionController(std::move(webViewCompositionController)),
-    settings(params.initialSettings), userContentController(std::make_unique<UserContentController>(this))
-  {
-    if (failedAndLog(this->webViewController->get_CoreWebView2(webView.put()))) {
-      std::cerr << "Cannot create CoreWebView2." << std::endl;
+  namespace {
+    static inline bool fl_map_contains_not_null(const flutter::EncodableMap& map, const char* key)
+    {
+      auto fl_key = flutter::EncodableValue(key);
+      auto it = map.find(fl_key);
+      return it != map.end() && !it->second.IsNull();
     }
-
-    if (this->webViewCompositionController) {
-      if (!createSurface(parentWindow, plugin->inAppWebViewManager->compositor())) {
-        std::cerr << "Cannot create InAppWebView surface." << std::endl;
-      }
-      registerSurfaceEventHandlers();
-    }
-    else {
-      this->webViewController->put_IsVisible(true);
-      // Resize WebView to fit the bounds of the parent window
-      RECT bounds;
-      GetClientRect(parentWindow, &bounds);
-      this->webViewController->put_Bounds(bounds);
-    }
-
-    prepare(params);
   }
 
-  InAppWebView::InAppWebView(InAppBrowser* inAppBrowser, const FlutterInappwebviewWindowsPlugin* plugin, const InAppWebViewCreationParams& params, const HWND parentWindow, wil::com_ptr<ICoreWebView2Environment> webViewEnv,
-    wil::com_ptr<ICoreWebView2Controller> webViewController,
-    wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController)
-    : InAppWebView(plugin, params, parentWindow, std::move(webViewEnv), std::move(webViewController), std::move(webViewCompositionController))
+  namespace {
+    std::optional<std::vector<uint8_t>> readStreamBytes(IStream* stream)
+    {
+      if (!stream) {
+        return std::nullopt;
+      }
+
+      STATSTG stat = {};
+      if (FAILED(stream->Stat(&stat, STATFLAG_NONAME))) {
+        return std::nullopt;
+      }
+
+      auto size64 = stat.cbSize.QuadPart;
+      if (size64 <= 0) {
+        return std::vector<uint8_t>{};
+      }
+
+      if (size64 > static_cast<ULONGLONG>(std::numeric_limits<ULONG>::max())) {
+        return std::nullopt;
+      }
+
+      LARGE_INTEGER pos = {};
+      stream->Seek(pos, STREAM_SEEK_SET, nullptr);
+
+      auto size = static_cast<ULONG>(size64);
+      std::vector<uint8_t> data(size);
+      ULONG bytesRead = 0;
+      if (FAILED(stream->Read(data.data(), size, &bytesRead))) {
+        return std::nullopt;
+      }
+
+      data.resize(bytesRead);
   {
     this->inAppBrowser = inAppBrowser;
   }
@@ -903,7 +930,15 @@ namespace flutter_inappwebview_plugin
     ).Get(), nullptr);
     failedLog(add_PermissionRequested_HResult);
 
-    failedLog(webView->AddWebResourceRequestedFilter(L"*", COREWEBVIEW2_WEB_RESOURCE_CONTEXT_ALL));
+    if (auto webView22 = webView.try_query<ICoreWebView2_22>()) {
+      failedLog(webView22->AddWebResourceRequestedFilterWithRequestSourceKinds(
+        L"*",
+        COREWEBVIEW2_WEB_RESOURCE_CONTEXT_ALL,
+        COREWEBVIEW2_WEB_RESOURCE_REQUEST_SOURCE_KINDS_ALL));
+    }
+    else {
+      failedLog(webView->AddWebResourceRequestedFilter(L"*", COREWEBVIEW2_WEB_RESOURCE_CONTEXT_ALL));
+    }
     auto add_WebResourceRequested_HResult = webView->add_WebResourceRequested(
       Callback<ICoreWebView2WebResourceRequestedEventHandler>(
         [this](
@@ -1456,6 +1491,418 @@ namespace flutter_inappwebview_plugin
       failedLog(add_ServerCertificateErrorDetected_HResult);
     }
 
+    if (auto webView15 = webView.try_query<ICoreWebView2_15>()) {
+      auto add_FaviconChanged_HResult = webView15->add_FaviconChanged(
+        Callback<ICoreWebView2FaviconChangedEventHandler>(
+          [this, webView15](ICoreWebView2* sender, IUnknown* args)
+          {
+            if (!channelDelegate) {
+              return S_OK;
+            }
+
+            wil::unique_cotaskmem_string faviconUri;
+            std::optional<std::string> faviconUrl = succeededOrLog(webView15->get_FaviconUri(&faviconUri)) && faviconUri ?
+              std::optional<std::string>{ wide_to_utf8(faviconUri.get()) } : std::optional<std::string>{};
+
+            auto hr = webView15->GetFavicon(COREWEBVIEW2_FAVICON_IMAGE_FORMAT_PNG,
+              Callback<ICoreWebView2GetFaviconCompletedHandler>(
+                [this, faviconUrl](HRESULT errorCode, IStream* faviconStream)
+                {
+                  std::optional<std::vector<uint8_t>> icon = std::nullopt;
+                  if (succeededOrLog(errorCode) && faviconStream) {
+                    icon = readStreamBytes(faviconStream);
+                  }
+                  if (channelDelegate) {
+                    auto request = std::make_shared<FaviconChangedRequest>(icon, faviconUrl);
+                    channelDelegate->onFaviconChanged(std::move(request));
+                  }
+                  return S_OK;
+                })
+              .Get());
+
+            if (failedAndLog(hr)) {
+              if (channelDelegate) {
+                auto request = std::make_shared<FaviconChangedRequest>(std::nullopt, faviconUrl);
+                channelDelegate->onFaviconChanged(std::move(request));
+              }
+            }
+
+            return S_OK;
+          })
+        .Get(), nullptr);
+      failedLog(add_FaviconChanged_HResult);
+    }
+
+    if (auto webView18 = webView.try_query<ICoreWebView2_18>()) {
+      auto add_LaunchingExternalUriScheme_HResult = webView18->add_LaunchingExternalUriScheme(
+        Callback<ICoreWebView2LaunchingExternalUriSchemeEventHandler>(
+          [this](ICoreWebView2* sender, ICoreWebView2LaunchingExternalUriSchemeEventArgs* args)
+          {
+            wil::com_ptr<ICoreWebView2Deferral> deferral;
+            failedLog(args->GetDeferral(&deferral));
+
+            if (!channelDelegate) {
+              failedLog(args->put_Cancel(FALSE));
+              if (deferral) {
+                failedLog(deferral->Complete());
+              }
+              return S_OK;
+            }
+
+            wil::unique_cotaskmem_string uri;
+            std::string uriValue = SUCCEEDED(args->get_Uri(&uri)) && uri ? wide_to_utf8(uri.get()) : "";
+
+            wil::unique_cotaskmem_string initiatingOrigin;
+            std::optional<std::string> origin = SUCCEEDED(args->get_InitiatingOrigin(&initiatingOrigin)) && initiatingOrigin ?
+              std::optional<std::string>{ wide_to_utf8(initiatingOrigin.get()) } : std::optional<std::string>{};
+
+            BOOL isUserInitiated = FALSE;
+            failedLog(args->get_IsUserInitiated(&isUserInitiated));
+
+            auto request = std::make_shared<LaunchingExternalUriSchemeRequest>(
+              uriValue,
+              origin,
+              static_cast<bool>(isUserInitiated));
+
+            auto callback = std::make_unique<WebViewChannelDelegate::LaunchingExternalUriSchemeCallback>();
+            auto defaultBehaviour = [deferral, args](const std::optional<std::shared_ptr<LaunchingExternalUriSchemeResponse>> response)
+              {
+                failedLog(args->put_Cancel(FALSE));
+                if (deferral) {
+                  failedLog(deferral->Complete());
+                }
+              };
+            callback->nonNullSuccess = [deferral, args](const std::shared_ptr<LaunchingExternalUriSchemeResponse> response)
+              {
+                failedLog(args->put_Cancel(response ? response->cancel : FALSE));
+                if (deferral) {
+                  failedLog(deferral->Complete());
+                }
+                return false;
+              };
+            callback->defaultBehaviour = defaultBehaviour;
+            callback->error = [defaultBehaviour](const std::string& error_code, const std::string& error_message, const flutter::EncodableValue* error_details)
+              {
+                debugLog(error_code + ", " + error_message);
+                defaultBehaviour(std::nullopt);
+              };
+            channelDelegate->onLaunchingExternalUriScheme(std::move(request), std::move(callback));
+            return S_OK;
+          })
+        .Get(), nullptr);
+      failedLog(add_LaunchingExternalUriScheme_HResult);
+    }
+
+    if (auto webView24 = webView.try_query<ICoreWebView2_24>()) {
+      auto add_NotificationReceived_HResult = webView24->add_NotificationReceived(
+        Callback<ICoreWebView2NotificationReceivedEventHandler>(
+          [this](ICoreWebView2* sender, ICoreWebView2NotificationReceivedEventArgs* args)
+          {
+            wil::com_ptr<ICoreWebView2Deferral> deferral;
+            failedLog(args->GetDeferral(&deferral));
+
+            if (!channelDelegate) {
+              failedLog(args->put_Handled(FALSE));
+              if (deferral) {
+                failedLog(deferral->Complete());
+              }
+              return S_OK;
+            }
+
+            wil::unique_cotaskmem_string senderOrigin;
+            std::optional<std::string> senderOriginValue = SUCCEEDED(args->get_SenderOrigin(&senderOrigin)) && senderOrigin ?
+              std::optional<std::string>{ wide_to_utf8(senderOrigin.get()) } : std::optional<std::string>{};
+
+            std::shared_ptr<WebNotification> notificationPtr;
+            wil::com_ptr<ICoreWebView2Notification> notification;
+            if (succeededOrLog(args->get_Notification(&notification)) && notification) {
+              wil::unique_cotaskmem_string badgeUri;
+              wil::unique_cotaskmem_string body;
+              wil::unique_cotaskmem_string bodyImageUri;
+              wil::unique_cotaskmem_string iconUri;
+              wil::unique_cotaskmem_string language;
+              wil::unique_cotaskmem_string tag;
+              wil::unique_cotaskmem_string title;
+
+              BOOL isSilent = FALSE;
+              BOOL requiresInteraction = FALSE;
+              BOOL shouldRenotify = FALSE;
+              double timestamp = 0;
+              COREWEBVIEW2_NOTIFICATION_DIRECTION direction = COREWEBVIEW2_NOTIFICATION_DIRECTION_LEFT_TO_RIGHT;
+
+              notification->get_BadgeUri(&badgeUri);
+              notification->get_Body(&body);
+              notification->get_BodyImageUri(&bodyImageUri);
+              notification->get_IconUri(&iconUri);
+              notification->get_IsSilent(&isSilent);
+              notification->get_Language(&language);
+              notification->get_RequiresInteraction(&requiresInteraction);
+              notification->get_ShouldRenotify(&shouldRenotify);
+              notification->get_Tag(&tag);
+              notification->get_Timestamp(&timestamp);
+              notification->get_Title(&title);
+              notification->get_Direction(&direction);
+
+              notificationPtr = std::make_shared<WebNotification>(
+                title ? std::optional<std::string>{ wide_to_utf8(title.get()) } : std::optional<std::string>{},
+                body ? std::optional<std::string>{ wide_to_utf8(body.get()) } : std::optional<std::string>{},
+                NotificationDirectionFromOptionalInteger(std::optional<int64_t>{ static_cast<int64_t>(direction) }),
+                language ? std::optional<std::string>{ wide_to_utf8(language.get()) } : std::optional<std::string>{},
+                tag ? std::optional<std::string>{ wide_to_utf8(tag.get()) } : std::optional<std::string>{},
+                iconUri ? std::optional<std::string>{ wide_to_utf8(iconUri.get()) } : std::optional<std::string>{},
+                badgeUri ? std::optional<std::string>{ wide_to_utf8(badgeUri.get()) } : std::optional<std::string>{},
+                bodyImageUri ? std::optional<std::string>{ wide_to_utf8(bodyImageUri.get()) } : std::optional<std::string>{},
+                static_cast<bool>(shouldRenotify),
+                static_cast<bool>(requiresInteraction),
+                static_cast<bool>(isSilent),
+                timestamp,
+                std::optional<std::vector<int64_t>>{});
+            }
+
+            auto request = std::make_shared<NotificationReceivedRequest>(senderOriginValue, notificationPtr);
+
+            auto callback = std::make_unique<WebViewChannelDelegate::NotificationReceivedCallback>();
+            auto defaultBehaviour = [deferral, args](const std::optional<std::shared_ptr<NotificationReceivedResponse>> response)
+              {
+                failedLog(args->put_Handled(FALSE));
+                if (deferral) {
+                  failedLog(deferral->Complete());
+                }
+              };
+            callback->nonNullSuccess = [deferral, args](const std::shared_ptr<NotificationReceivedResponse> response)
+              {
+                failedLog(args->put_Handled(response ? response->handled : FALSE));
+                if (deferral) {
+                  failedLog(deferral->Complete());
+                }
+                return false;
+              };
+            callback->defaultBehaviour = defaultBehaviour;
+            callback->error = [defaultBehaviour](const std::string& error_code, const std::string& error_message, const flutter::EncodableValue* error_details)
+              {
+                debugLog(error_code + ", " + error_message);
+                defaultBehaviour(std::nullopt);
+              };
+            channelDelegate->onNotificationReceived(std::move(request), std::move(callback));
+            return S_OK;
+          })
+        .Get(), nullptr);
+      failedLog(add_NotificationReceived_HResult);
+    }
+
+    if (auto webView25 = webView.try_query<ICoreWebView2_25>()) {
+      auto add_SaveAsUIShowing_HResult = webView25->add_SaveAsUIShowing(
+        Callback<ICoreWebView2SaveAsUIShowingEventHandler>(
+          [this](ICoreWebView2* sender, ICoreWebView2SaveAsUIShowingEventArgs* args)
+          {
+            wil::com_ptr<ICoreWebView2Deferral> deferral;
+            failedLog(args->GetDeferral(&deferral));
+
+            BOOL allowReplace = FALSE;
+            BOOL cancel = FALSE;
+            BOOL suppressDefaultDialog = FALSE;
+            COREWEBVIEW2_SAVE_AS_KIND kind = COREWEBVIEW2_SAVE_AS_KIND_DEFAULT;
+            wil::unique_cotaskmem_string contentMimeType;
+            wil::unique_cotaskmem_string saveAsFilePath;
+
+            failedLog(args->get_AllowReplace(&allowReplace));
+            failedLog(args->get_Cancel(&cancel));
+            failedLog(args->get_SuppressDefaultDialog(&suppressDefaultDialog));
+            failedLog(args->get_Kind(&kind));
+            failedLog(args->get_ContentMimeType(&contentMimeType));
+            failedLog(args->get_SaveAsFilePath(&saveAsFilePath));
+
+            if (!channelDelegate) {
+              if (deferral) {
+                failedLog(deferral->Complete());
+              }
+              return S_OK;
+            }
+
+            auto request = std::make_shared<SaveAsUIShowingRequest>(
+              contentMimeType ? std::optional<std::string>{ wide_to_utf8(contentMimeType.get()) } : std::optional<std::string>{},
+              static_cast<bool>(cancel),
+              static_cast<bool>(suppressDefaultDialog),
+              saveAsFilePath ? std::optional<std::string>{ wide_to_utf8(saveAsFilePath.get()) } : std::optional<std::string>{},
+              static_cast<bool>(allowReplace),
+              SaveAsKindFromOptionalInteger(std::optional<int64_t>{ static_cast<int64_t>(kind) }));
+
+            auto callback = std::make_unique<WebViewChannelDelegate::SaveAsUIShowingCallback>();
+            auto defaultBehaviour = [deferral](const std::optional<std::shared_ptr<SaveAsUIShowingResponse>> response)
+              {
+                if (deferral) {
+                  failedLog(deferral->Complete());
+                }
+              };
+            callback->nonNullSuccess = [deferral, args](const std::shared_ptr<SaveAsUIShowingResponse> response)
+              {
+                if (response && response->allowReplace.has_value()) {
+                  failedLog(args->put_AllowReplace(response->allowReplace.value()));
+                }
+                if (response && response->cancel.has_value()) {
+                  failedLog(args->put_Cancel(response->cancel.value()));
+                }
+                if (response && response->kind.has_value()) {
+                  failedLog(args->put_Kind(static_cast<COREWEBVIEW2_SAVE_AS_KIND>(response->kind.value())));
+                }
+                if (response && response->saveAsFilePath.has_value()) {
+                  failedLog(args->put_SaveAsFilePath(utf8_to_wide(response->saveAsFilePath.value()).c_str()));
+                }
+                if (response && response->suppressDefaultDialog.has_value()) {
+                  failedLog(args->put_SuppressDefaultDialog(response->suppressDefaultDialog.value()));
+                }
+                if (deferral) {
+                  failedLog(deferral->Complete());
+                }
+                return false;
+              };
+            callback->defaultBehaviour = defaultBehaviour;
+            callback->error = [defaultBehaviour](const std::string& error_code, const std::string& error_message, const flutter::EncodableValue* error_details)
+              {
+                debugLog(error_code + ", " + error_message);
+                defaultBehaviour(std::nullopt);
+              };
+            channelDelegate->onSaveAsUIShowing(std::move(request), std::move(callback));
+            return S_OK;
+          })
+        .Get(), nullptr);
+      failedLog(add_SaveAsUIShowing_HResult);
+    }
+
+    if (auto webView26 = webView.try_query<ICoreWebView2_26>()) {
+      auto add_SaveFileSecurityCheckStarting_HResult = webView26->add_SaveFileSecurityCheckStarting(
+        Callback<ICoreWebView2SaveFileSecurityCheckStartingEventHandler>(
+          [this](ICoreWebView2* sender, ICoreWebView2SaveFileSecurityCheckStartingEventArgs* args)
+          {
+            wil::com_ptr<ICoreWebView2Deferral> deferral;
+            failedLog(args->GetDeferral(&deferral));
+
+            BOOL cancelSave = FALSE;
+            BOOL suppressDefaultPolicy = FALSE;
+            wil::unique_cotaskmem_string documentOriginUri;
+            wil::unique_cotaskmem_string fileExtension;
+            wil::unique_cotaskmem_string filePath;
+
+            failedLog(args->get_CancelSave(&cancelSave));
+            failedLog(args->get_SuppressDefaultPolicy(&suppressDefaultPolicy));
+            failedLog(args->get_DocumentOriginUri(&documentOriginUri));
+            failedLog(args->get_FileExtension(&fileExtension));
+            failedLog(args->get_FilePath(&filePath));
+
+            if (!channelDelegate) {
+              if (deferral) {
+                failedLog(deferral->Complete());
+              }
+              return S_OK;
+            }
+
+            auto request = std::make_shared<SaveFileSecurityCheckStartingRequest>(
+              documentOriginUri ? std::optional<std::string>{ wide_to_utf8(documentOriginUri.get()) } : std::optional<std::string>{},
+              fileExtension ? std::optional<std::string>{ wide_to_utf8(fileExtension.get()) } : std::optional<std::string>{},
+              filePath ? std::optional<std::string>{ wide_to_utf8(filePath.get()) } : std::optional<std::string>{},
+              static_cast<bool>(cancelSave),
+              static_cast<bool>(suppressDefaultPolicy));
+
+            auto callback = std::make_unique<WebViewChannelDelegate::SaveFileSecurityCheckStartingCallback>();
+            auto defaultBehaviour = [deferral](const std::optional<std::shared_ptr<SaveFileSecurityCheckStartingResponse>> response)
+              {
+                if (deferral) {
+                  failedLog(deferral->Complete());
+                }
+              };
+            callback->nonNullSuccess = [deferral, args](const std::shared_ptr<SaveFileSecurityCheckStartingResponse> response)
+              {
+                if (response && response->cancelSave.has_value()) {
+                  failedLog(args->put_CancelSave(response->cancelSave.value()));
+                }
+                if (response && response->suppressDefaultPolicy.has_value()) {
+                  failedLog(args->put_SuppressDefaultPolicy(response->suppressDefaultPolicy.value()));
+                }
+                if (deferral) {
+                  failedLog(deferral->Complete());
+                }
+                return false;
+              };
+            callback->defaultBehaviour = defaultBehaviour;
+            callback->error = [defaultBehaviour](const std::string& error_code, const std::string& error_message, const flutter::EncodableValue* error_details)
+              {
+                debugLog(error_code + ", " + error_message);
+                defaultBehaviour(std::nullopt);
+              };
+            channelDelegate->onSaveFileSecurityCheckStarting(std::move(request), std::move(callback));
+            return S_OK;
+          })
+        .Get(), nullptr);
+      failedLog(add_SaveFileSecurityCheckStarting_HResult);
+    }
+
+    if (auto webView27 = webView.try_query<ICoreWebView2_27>()) {
+      auto add_ScreenCaptureStarting_HResult = webView27->add_ScreenCaptureStarting(
+        Callback<ICoreWebView2ScreenCaptureStartingEventHandler>(
+          [this](ICoreWebView2* sender, ICoreWebView2ScreenCaptureStartingEventArgs* args)
+          {
+            wil::com_ptr<ICoreWebView2Deferral> deferral;
+            failedLog(args->GetDeferral(&deferral));
+
+            BOOL cancel = FALSE;
+            BOOL handled = FALSE;
+            failedLog(args->get_Cancel(&cancel));
+            failedLog(args->get_Handled(&handled));
+
+            wil::com_ptr<ICoreWebView2FrameInfo> frameInfo;
+            std::optional<std::shared_ptr<FrameInfo>> frame = std::nullopt;
+            if (succeededOrLog(args->get_Frame(&frameInfo)) && frameInfo) {
+              auto framePtr = FrameInfo::fromICoreWebView2FrameInfo(frameInfo);
+              if (framePtr) {
+                frame = std::shared_ptr<FrameInfo>(std::move(framePtr));
+              }
+            }
+
+            if (!channelDelegate) {
+              if (deferral) {
+                failedLog(deferral->Complete());
+              }
+              return S_OK;
+            }
+
+            auto request = std::make_shared<ScreenCaptureStartingRequest>(
+              frame,
+              static_cast<bool>(cancel),
+              static_cast<bool>(handled));
+
+            auto callback = std::make_unique<WebViewChannelDelegate::ScreenCaptureStartingCallback>();
+            auto defaultBehaviour = [deferral](const std::optional<std::shared_ptr<ScreenCaptureStartingResponse>> response)
+              {
+                if (deferral) {
+                  failedLog(deferral->Complete());
+                }
+              };
+            callback->nonNullSuccess = [deferral, args](const std::shared_ptr<ScreenCaptureStartingResponse> response)
+              {
+                if (response && response->cancel.has_value()) {
+                  failedLog(args->put_Cancel(response->cancel.value()));
+                }
+                if (response && response->handled.has_value()) {
+                  failedLog(args->put_Handled(response->handled.value()));
+                }
+                if (deferral) {
+                  failedLog(deferral->Complete());
+                }
+                return false;
+              };
+            callback->defaultBehaviour = defaultBehaviour;
+            callback->error = [defaultBehaviour](const std::string& error_code, const std::string& error_message, const flutter::EncodableValue* error_details)
+              {
+                debugLog(error_code + ", " + error_message);
+                defaultBehaviour(std::nullopt);
+              };
+            channelDelegate->onScreenCaptureStarting(std::move(request), std::move(callback));
+            return S_OK;
+          })
+        .Get(), nullptr);
+      failedLog(add_ScreenCaptureStarting_HResult);
+    }
+
     if (userContentController) {
       userContentController->registerEventHandlers();
     }
@@ -1492,6 +1939,101 @@ namespace flutter_inappwebview_plugin
   {
     wil::unique_cotaskmem_string title;
     return webView && succeededOrLog(webView->get_DocumentTitle(&title)) ? wide_to_utf8(title.get()) : std::optional<std::string>{};
+  }
+
+  std::optional<int64_t> InAppWebView::getFrameId() const
+  {
+    if (auto webView20 = webView.try_query<ICoreWebView2_20>()) {
+      UINT32 frameId = 0;
+      if (succeededOrLog(webView20->get_FrameId(&frameId))) {
+        return static_cast<int64_t>(frameId);
+      }
+    }
+    return std::nullopt;
+  }
+
+  std::optional<int64_t> InAppWebView::getMemoryUsageTargetLevel() const
+  {
+    if (auto webView19 = webView.try_query<ICoreWebView2_19>()) {
+      COREWEBVIEW2_MEMORY_USAGE_TARGET_LEVEL level = COREWEBVIEW2_MEMORY_USAGE_TARGET_LEVEL_NORMAL;
+      if (succeededOrLog(webView19->get_MemoryUsageTargetLevel(&level))) {
+        return static_cast<int64_t>(level);
+      }
+    }
+    return std::nullopt;
+  }
+
+  void InAppWebView::setMemoryUsageTargetLevel(const int64_t& level) const
+  {
+    if (auto webView19 = webView.try_query<ICoreWebView2_19>()) {
+      failedLog(webView19->put_MemoryUsageTargetLevel(static_cast<COREWEBVIEW2_MEMORY_USAGE_TARGET_LEVEL>(level)));
+    }
+  }
+
+  void InAppWebView::getFavicon(const std::optional<std::string>& url, const std::optional<FaviconImageFormat>& faviconImageFormat,
+    const std::function<void(const std::optional<std::vector<uint8_t>>)> completionHandler) const
+  {
+    (void)url;
+    if (!completionHandler) {
+      return;
+    }
+
+    auto webView15 = webView.try_query<ICoreWebView2_15>();
+    if (!webView15) {
+      completionHandler(std::nullopt);
+      return;
+    }
+
+    auto format = faviconImageFormat.has_value() ? faviconImageFormat.value() : FaviconImageFormat::png;
+    auto hr = webView15->GetFavicon(
+      FaviconImageFormatToCoreWebView2(format),
+      Callback<ICoreWebView2GetFaviconCompletedHandler>(
+        [completionHandler](HRESULT errorCode, IStream* faviconStream)
+        {
+          if (succeededOrLog(errorCode) && faviconStream) {
+            completionHandler(readStreamBytes(faviconStream));
+          }
+          else {
+            completionHandler(std::nullopt);
+          }
+          return S_OK;
+        })
+      .Get());
+
+    if (failedAndLog(hr)) {
+      completionHandler(std::nullopt);
+    }
+  }
+
+  void InAppWebView::showSaveAsUI(const std::function<void(const std::optional<int64_t>)> completionHandler) const
+  {
+    if (!completionHandler) {
+      return;
+    }
+
+    auto webView25 = webView.try_query<ICoreWebView2_25>();
+    if (!webView25) {
+      completionHandler(std::nullopt);
+      return;
+    }
+
+    auto hr = webView25->ShowSaveAsUI(
+      Callback<ICoreWebView2ShowSaveAsUICompletedHandler>(
+        [completionHandler](HRESULT errorCode, COREWEBVIEW2_SAVE_AS_UI_RESULT result)
+        {
+          if (succeededOrLog(errorCode)) {
+            completionHandler(static_cast<int64_t>(result));
+          }
+          else {
+            completionHandler(std::nullopt);
+          }
+          return S_OK;
+        })
+      .Get());
+
+    if (failedAndLog(hr)) {
+      completionHandler(std::nullopt);
+    }
   }
 
   void InAppWebView::loadUrl(const std::shared_ptr<URLRequest> urlRequest) const
@@ -2233,7 +2775,7 @@ namespace flutter_inappwebview_plugin
   flutter::EncodableValue InAppWebView::getSettings() const
   {
     if (!settings || !webView) {
-      return make_fl_value();
+      return flutter::EncodableValue();
     }
 
     return settings->getRealSettings(this);
@@ -2472,6 +3014,10 @@ namespace flutter_inappwebview_plugin
         return webView.try_query<ICoreWebView2_25>() != nullptr;
       case string_hash("ICoreWebView2_26"):
         return webView.try_query<ICoreWebView2_26>() != nullptr;
+      case string_hash("ICoreWebView2_27"):
+        return webView.try_query<ICoreWebView2_27>() != nullptr;
+      case string_hash("ICoreWebView2_28"):
+        return webView.try_query<ICoreWebView2_28>() != nullptr;
       default:
         return false;
       }
@@ -2565,6 +3111,8 @@ namespace flutter_inappwebview_plugin
         return webViewEnv.try_query<ICoreWebView2Environment13>() != nullptr;
       case string_hash("ICoreWebView2Environment14"):
         return webViewEnv.try_query<ICoreWebView2Environment14>() != nullptr;
+      case string_hash("ICoreWebView2Environment15"):
+        return webViewEnv.try_query<ICoreWebView2Environment15>() != nullptr;
       default:
         return false;
       }

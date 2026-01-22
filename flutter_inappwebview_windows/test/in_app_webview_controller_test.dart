@@ -75,6 +75,7 @@ void main() {
     expect(lastMethodCall?.method, 'getFavicon');
     final args = (lastMethodCall?.arguments as Map?)?.cast<String, dynamic>();
     expect(args?['url'], 'https://example.com/favicon.ico');
+    expect(args?['faviconImageFormat'], FaviconImageFormat.PNG.toNativeValue());
     expect(result, isNotNull);
     expect(result?.toList(), [1, 2, 3]);
   });

@@ -36,6 +36,7 @@ export 'dismiss_button_style.dart'
 export 'download_start_request.dart' show DownloadStartRequest;
 export 'favicon.dart' show Favicon;
 export 'favicon_changed_request.dart' show FaviconChangedRequest;
+export 'favicon_image_format.dart' show FaviconImageFormat;
 export 'fetch_request.dart' show FetchRequest;
 export 'fetch_request_action.dart' show FetchRequestAction;
 export 'fetch_request_credential.dart' show FetchRequestCredential;

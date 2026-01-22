@@ -76,6 +76,10 @@ class WebViewInterface {
     'ICoreWebView2Environment14',
     'ICoreWebView2Environment14',
   );
+  static const ICoreWebView2Environment15 = WebViewInterface._internal(
+    'ICoreWebView2Environment15',
+    'ICoreWebView2Environment15',
+  );
   static const ICoreWebView2Environment2 = WebViewInterface._internal(
     'ICoreWebView2Environment2',
     'ICoreWebView2Environment2',
@@ -216,6 +220,14 @@ class WebViewInterface {
     'ICoreWebView2_26',
     'ICoreWebView2_26',
   );
+  static const ICoreWebView2_27 = WebViewInterface._internal(
+    'ICoreWebView2_27',
+    'ICoreWebView2_27',
+  );
+  static const ICoreWebView2_28 = WebViewInterface._internal(
+    'ICoreWebView2_28',
+    'ICoreWebView2_28',
+  );
   static const ICoreWebView2_3 = WebViewInterface._internal(
     'ICoreWebView2_3',
     'ICoreWebView2_3',
@@ -262,6 +274,7 @@ class WebViewInterface {
     WebViewInterface.ICoreWebView2Environment12,
     WebViewInterface.ICoreWebView2Environment13,
     WebViewInterface.ICoreWebView2Environment14,
+    WebViewInterface.ICoreWebView2Environment15,
     WebViewInterface.ICoreWebView2Environment2,
     WebViewInterface.ICoreWebView2Environment3,
     WebViewInterface.ICoreWebView2Environment4,
@@ -297,6 +310,8 @@ class WebViewInterface {
     WebViewInterface.ICoreWebView2_24,
     WebViewInterface.ICoreWebView2_25,
     WebViewInterface.ICoreWebView2_26,
+    WebViewInterface.ICoreWebView2_27,
+    WebViewInterface.ICoreWebView2_28,
     WebViewInterface.ICoreWebView2_3,
     WebViewInterface.ICoreWebView2_4,
     WebViewInterface.ICoreWebView2_5,
@@ -404,6 +419,8 @@ class WebViewInterface {
         return 'ICoreWebView2Environment13';
       case 'ICoreWebView2Environment14':
         return 'ICoreWebView2Environment14';
+      case 'ICoreWebView2Environment15':
+        return 'ICoreWebView2Environment15';
       case 'ICoreWebView2Environment2':
         return 'ICoreWebView2Environment2';
       case 'ICoreWebView2Environment3':
@@ -474,6 +491,10 @@ class WebViewInterface {
         return 'ICoreWebView2_25';
       case 'ICoreWebView2_26':
         return 'ICoreWebView2_26';
+      case 'ICoreWebView2_27':
+        return 'ICoreWebView2_27';
+      case 'ICoreWebView2_28':
+        return 'ICoreWebView2_28';
       case 'ICoreWebView2_3':
         return 'ICoreWebView2_3';
       case 'ICoreWebView2_4':

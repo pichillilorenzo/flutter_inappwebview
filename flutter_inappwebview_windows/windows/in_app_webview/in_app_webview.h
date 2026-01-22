@@ -11,6 +11,7 @@
 #include "../flutter_inappwebview_windows_plugin.h"
 #include "../plugin_scripts_js/plugin_scripts_util.h"
 #include "../types/content_world.h"
+#include "../types/favicon_image_format.h"
 #include "../types/navigation_action.h"
 #include "../types/screenshot_configuration.h"
 #include "../types/ssl_certificate.h"
@@ -149,6 +150,12 @@ namespace flutter_inappwebview_plugin
     void prepare(const InAppWebViewCreationParams& params);
     std::optional<std::string> getUrl() const;
     std::optional<std::string> getTitle() const;
+    std::optional<int64_t> getFrameId() const;
+    std::optional<int64_t> getMemoryUsageTargetLevel() const;
+    void setMemoryUsageTargetLevel(const int64_t& level) const;
+    void getFavicon(const std::optional<std::string>& url, const std::optional<FaviconImageFormat>& faviconImageFormat,
+      const std::function<void(const std::optional<std::vector<uint8_t>>)> completionHandler) const;
+    void showSaveAsUI(const std::function<void(const std::optional<int64_t>)> completionHandler) const;
     void loadUrl(const std::shared_ptr<URLRequest> urlRequest) const;
     void loadFile(const std::string& assetFilePath) const;
     void loadData(const std::string& data) const;

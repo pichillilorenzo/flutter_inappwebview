@@ -51,6 +51,9 @@ class WebViewInterface_ {
   static const ICoreWebView2Environment14 = const WebViewInterface_._internal(
     "ICoreWebView2Environment14",
   );
+  static const ICoreWebView2Environment15 = const WebViewInterface_._internal(
+    "ICoreWebView2Environment15",
+  );
 
   static const ICoreWebView2Controller = const WebViewInterface_._internal(
     "ICoreWebView2Controller",
@@ -151,6 +154,12 @@ class WebViewInterface_ {
   );
   static const ICoreWebView2_26 = const WebViewInterface_._internal(
     "ICoreWebView2_26",
+  );
+  static const ICoreWebView2_27 = const WebViewInterface_._internal(
+    "ICoreWebView2_27",
+  );
+  static const ICoreWebView2_28 = const WebViewInterface_._internal(
+    "ICoreWebView2_28",
   );
 
   static const ICoreWebView2Settings = const WebViewInterface_._internal(

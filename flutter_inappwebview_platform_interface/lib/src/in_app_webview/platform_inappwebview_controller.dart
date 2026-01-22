@@ -408,6 +408,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
 
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getFavicon}
   ///Gets the favicon bytes for the given favicon [url].
+  ///
+  ///[faviconImageFormat] specifies the favicon image format to return.
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getFavicon.supported_platforms}
@@ -420,7 +422,10 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
       ),
     ],
   )
-  Future<Uint8List?> getFavicon({required WebUri url}) {
+  Future<Uint8List?> getFavicon({
+    required WebUri url,
+    FaviconImageFormat faviconImageFormat = FaviconImageFormat.PNG,
+  }) {
     throw UnimplementedError(
       '${PlatformInAppWebViewControllerMethod.getFavicon.name} is not implemented on the current platform',
     );

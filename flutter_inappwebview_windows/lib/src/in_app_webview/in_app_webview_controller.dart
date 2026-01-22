@@ -2274,9 +2274,16 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
   }
 
   @override
-  Future<Uint8List?> getFavicon({required WebUri url}) async {
+  Future<Uint8List?> getFavicon({
+    required WebUri url,
+    FaviconImageFormat faviconImageFormat = FaviconImageFormat.PNG,
+  }) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('url', () => url.toString());
+    args.putIfAbsent(
+      'faviconImageFormat',
+      () => faviconImageFormat.toNativeValue(),
+    );
     final data = await channel?.invokeMethod('getFavicon', args);
     if (data == null) {
       return null;

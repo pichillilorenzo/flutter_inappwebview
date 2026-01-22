@@ -2,6 +2,8 @@
 #define FLUTTER_INAPPWEBVIEW_PLUGIN_WEBVIEW_CHANNEL_DELEGATE_H_
 
 #include <flutter/standard_message_codec.h>
+#include <optional>
+#include <vector>
 
 #include "../types/accelerator_key_pressed_detail.h"
 #include "../types/base_callback_result.h"
@@ -12,13 +14,24 @@
 #include "../types/custom_scheme_response.h"
 #include "../types/download_start_request.h"
 #include "../types/download_start_response.h"
+#include "../types/favicon_changed_request.h"
 #include "../types/http_auth_response.h"
 #include "../types/http_authentication_challenge.h"
 #include "../types/javascript_handler_function_data.h"
+#include "../types/launching_external_uri_scheme_request.h"
+#include "../types/launching_external_uri_scheme_response.h"
 #include "../types/navigation_action.h"
+#include "../types/notification_received_request.h"
+#include "../types/notification_received_response.h"
 #include "../types/permission_response.h"
 #include "../types/process_failed_detail.h"
 #include "../types/render_process_gone_detail.h"
+#include "../types/save_as_ui_showing_request.h"
+#include "../types/save_as_ui_showing_response.h"
+#include "../types/save_file_security_check_starting_request.h"
+#include "../types/save_file_security_check_starting_response.h"
+#include "../types/screen_capture_starting_request.h"
+#include "../types/screen_capture_starting_response.h"
 #include "../types/server_trust_auth_response.h"
 #include "../types/server_trust_challenge.h"
 #include "../types/web_resource_error.h"
@@ -96,6 +109,36 @@ namespace flutter_inappwebview_plugin
       ~DownloadStartRequestCallback() = default;
     };
 
+    class LaunchingExternalUriSchemeCallback : public BaseCallbackResult<const std::shared_ptr<LaunchingExternalUriSchemeResponse>> {
+    public:
+      LaunchingExternalUriSchemeCallback();
+      ~LaunchingExternalUriSchemeCallback() = default;
+    };
+
+    class NotificationReceivedCallback : public BaseCallbackResult<const std::shared_ptr<NotificationReceivedResponse>> {
+    public:
+      NotificationReceivedCallback();
+      ~NotificationReceivedCallback() = default;
+    };
+
+    class SaveAsUIShowingCallback : public BaseCallbackResult<const std::shared_ptr<SaveAsUIShowingResponse>> {
+    public:
+      SaveAsUIShowingCallback();
+      ~SaveAsUIShowingCallback() = default;
+    };
+
+    class SaveFileSecurityCheckStartingCallback : public BaseCallbackResult<const std::shared_ptr<SaveFileSecurityCheckStartingResponse>> {
+    public:
+      SaveFileSecurityCheckStartingCallback();
+      ~SaveFileSecurityCheckStartingCallback() = default;
+    };
+
+    class ScreenCaptureStartingCallback : public BaseCallbackResult<const std::shared_ptr<ScreenCaptureStartingResponse>> {
+    public:
+      ScreenCaptureStartingCallback();
+      ~ScreenCaptureStartingCallback() = default;
+    };
+
     WebViewChannelDelegate(InAppWebView* webView, flutter::BinaryMessenger* messenger);
     WebViewChannelDelegate(InAppWebView* webView, flutter::BinaryMessenger* messenger, const std::string& name);
     ~WebViewChannelDelegate();
@@ -134,6 +177,12 @@ namespace flutter_inappwebview_plugin
     void onZoomScaleChanged(const double& oldScale, const double& newScale) const;
     void onEnterFullscreen() const;
     void onExitFullscreen() const;
+    void onFaviconChanged(std::shared_ptr<FaviconChangedRequest> request) const;
+    void onLaunchingExternalUriScheme(std::shared_ptr<LaunchingExternalUriSchemeRequest> request, std::unique_ptr<LaunchingExternalUriSchemeCallback> callback) const;
+    void onNotificationReceived(std::shared_ptr<NotificationReceivedRequest> request, std::unique_ptr<NotificationReceivedCallback> callback) const;
+    void onSaveAsUIShowing(std::shared_ptr<SaveAsUIShowingRequest> request, std::unique_ptr<SaveAsUIShowingCallback> callback) const;
+    void onSaveFileSecurityCheckStarting(std::shared_ptr<SaveFileSecurityCheckStartingRequest> request, std::unique_ptr<SaveFileSecurityCheckStartingCallback> callback) const;
+    void onScreenCaptureStarting(std::shared_ptr<ScreenCaptureStartingRequest> request, std::unique_ptr<ScreenCaptureStartingCallback> callback) const;
   };
 }
 

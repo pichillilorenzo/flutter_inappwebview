@@ -15,9 +15,10 @@ namespace flutter_inappwebview_plugin
   {
   public:
     const std::optional<std::string> senderOrigin;
+    const std::string notificationControllerId;
     const std::shared_ptr<WebNotification> notification;
 
-    NotificationReceivedRequest(const std::optional<std::string>& senderOrigin, const std::shared_ptr<WebNotification> notification);
+    NotificationReceivedRequest(const std::optional<std::string>& senderOrigin, const std::string& notificationControllerId, const std::shared_ptr<WebNotification> notification);
     ~NotificationReceivedRequest() = default;
 
     flutter::EncodableMap toEncodableMap() const;

@@ -619,6 +619,7 @@ class InAppBrowser implements PlatformInAppBrowserEvents {
   @override
   void onReceivedIcon(Uint8List icon) {}
 
+  @override
   void onFaviconChanged(FaviconChangedRequest faviconChangedRequest) {}
 
   @override
@@ -634,18 +635,21 @@ class InAppBrowser implements PlatformInAppBrowserEvents {
   @override
   void onReceivedTouchIconUrl(WebUri url, bool precomposed) {}
 
+  @override
   FutureOr<NotificationReceivedResponse?>? onNotificationReceived(
     NotificationReceivedRequest request,
   ) {
     return null;
   }
 
+  @override
   FutureOr<SaveAsUIShowingResponse?>? onSaveAsUIShowing(
     SaveAsUIShowingRequest request,
   ) {
     return null;
   }
 
+  @override
   FutureOr<SaveFileSecurityCheckStartingResponse?>?
       onSaveFileSecurityCheckStarting(
     SaveFileSecurityCheckStartingRequest request,
@@ -653,6 +657,7 @@ class InAppBrowser implements PlatformInAppBrowserEvents {
     return null;
   }
 
+  @override
   FutureOr<ScreenCaptureStartingResponse?>? onScreenCaptureStarting(
     ScreenCaptureStartingRequest request,
   ) {

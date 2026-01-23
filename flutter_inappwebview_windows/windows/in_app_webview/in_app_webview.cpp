@@ -21,7 +21,7 @@
 #include "../types/javascript_handler_function_data.h"
 #include "../types/launching_external_uri_scheme_request.h"
 #include "../types/launching_external_uri_scheme_response.h"
-#include "../types/notification_direction.h"
+#include "../types/text_direction_kind.h"
 #include "../types/notification_received_request.h"
 #include "../types/notification_received_response.h"
 #include "../types/save_as_kind.h"
@@ -45,6 +45,7 @@
 #include "../utils/uri.h"
 #include "../utils/util.h"
 #include "../utils/flutter.h"
+#include "../web_notification/web_notification_controller.h"
 #include "in_app_webview.h"
 #include "in_app_webview_manager.h"
 
@@ -1635,10 +1636,24 @@ namespace flutter_inappwebview_plugin
               notification->get_Title(&title);
               notification->get_Direction(&direction);
 
+              // Get vibration pattern
+              UINT32 vibrationPatternCount = 0;
+              UINT64* vibrationPatternValues = nullptr;
+              std::optional<std::vector<int64_t>> vibrationPattern = std::nullopt;
+              if (SUCCEEDED(notification->GetVibrationPattern(&vibrationPatternCount, &vibrationPatternValues)) && vibrationPatternCount > 0) {
+                std::vector<int64_t> pattern;
+                pattern.reserve(vibrationPatternCount);
+                for (UINT32 i = 0; i < vibrationPatternCount; ++i) {
+                  pattern.push_back(static_cast<int64_t>(vibrationPatternValues[i]));
+                }
+                CoTaskMemFree(vibrationPatternValues);
+                vibrationPattern = std::move(pattern);
+              }
+
               notificationPtr = std::make_shared<WebNotification>(
                 title ? std::optional<std::string>{ wide_to_utf8(title.get()) } : std::optional<std::string>{},
                 body ? std::optional<std::string>{ wide_to_utf8(body.get()) } : std::optional<std::string>{},
-                NotificationDirectionFromOptionalInteger(std::optional<int64_t>{ static_cast<int64_t>(direction) }),
+                TextDirectionKindFromOptionalInteger(std::optional<int64_t>{ static_cast<int64_t>(direction) }),
                 language ? std::optional<std::string>{ wide_to_utf8(language.get()) } : std::optional<std::string>{},
                 tag ? std::optional<std::string>{ wide_to_utf8(tag.get()) } : std::optional<std::string>{},
                 iconUri ? std::optional<std::string>{ wide_to_utf8(iconUri.get()) } : std::optional<std::string>{},
@@ -1648,20 +1663,28 @@ namespace flutter_inappwebview_plugin
                 static_cast<bool>(requiresInteraction),
                 static_cast<bool>(isSilent),
                 timestamp,
-                std::optional<std::vector<int64_t>>{});
+                vibrationPattern);
             }
 
-            auto request = std::make_shared<NotificationReceivedRequest>(senderOriginValue, notificationPtr);
+            // Create WebNotificationController with unique ID, passing this InAppWebView pointer
+            std::string notificationControllerId = get_uuid();
+            auto notificationController = std::make_shared<WebNotificationController>(
+              notificationControllerId, notification, notificationPtr, plugin->registrar->messenger(), this);
+
+            // Store the controller in the map to prevent deallocation
+            webNotificationControllers_[notificationControllerId] = notificationController;
+
+            auto request = std::make_shared<NotificationReceivedRequest>(senderOriginValue, notificationControllerId, notificationPtr);
 
             auto callback = std::make_unique<WebViewChannelDelegate::NotificationReceivedCallback>();
-            auto defaultBehaviour = [deferral, args](const std::optional<std::shared_ptr<NotificationReceivedResponse>> response)
+            auto defaultBehaviour = [deferral, args, notificationController](const std::optional<std::shared_ptr<NotificationReceivedResponse>> response)
               {
                 failedLog(args->put_Handled(FALSE));
                 if (deferral) {
                   failedLog(deferral->Complete());
                 }
               };
-            callback->nonNullSuccess = [deferral, args](const std::shared_ptr<NotificationReceivedResponse> response)
+            callback->nonNullSuccess = [deferral, args, notificationController](const std::shared_ptr<NotificationReceivedResponse> response)
               {
                 failedLog(args->put_Handled(response ? response->handled : FALSE));
                 if (deferral) {
@@ -2625,6 +2648,41 @@ namespace flutter_inappwebview_plugin
       it->second->dispose();
     }
     webMessageChannels_.erase(channelId);
+  }
+
+  void InAppWebView::addWebNotificationController(const std::string& id, std::shared_ptr<WebNotificationController> controller)
+  {
+    if (id.empty() || !controller) return;
+    webNotificationControllers_[id] = std::move(controller);
+  }
+
+  WebNotificationController* InAppWebView::getWebNotificationController(const std::string& id) const
+  {
+    auto it = webNotificationControllers_.find(id);
+    return it != webNotificationControllers_.end() ? it->second.get() : nullptr;
+  }
+
+  void InAppWebView::eraseWebNotificationController(const std::string& id)
+  {
+    webNotificationControllers_.erase(id);
+  }
+
+  void InAppWebView::disposeAllWebNotificationControllers()
+  {
+    // First pass: invalidate parent pointers to prevent controllers from trying
+    // to erase themselves during dispose (since we're destroying the webview)
+    for (auto& pair : webNotificationControllers_) {
+      if (pair.second) {
+        pair.second->invalidateParentWebView();
+      }
+    }
+    // Second pass: now safe to dispose (won't try to access webview)
+    for (auto& pair : webNotificationControllers_) {
+      if (pair.second) {
+        pair.second->dispose();
+      }
+    }
+    webNotificationControllers_.clear();
   }
 
   void InAppWebView::takeScreenshot(const std::optional<std::shared_ptr<ScreenshotConfiguration>> screenshotConfiguration, const std::function<void(const std::optional<std::string>)> completionHandler) const
@@ -3854,6 +3912,7 @@ namespace flutter_inappwebview_plugin
       }
     }
     webMessageListeners_.clear();
+    disposeAllWebNotificationControllers();
     if (findInteractionController) {
       findInteractionController->dispose();
       findInteractionController.reset();

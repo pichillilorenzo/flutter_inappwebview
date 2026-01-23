@@ -542,6 +542,16 @@ class AndroidInAppWebViewPlatform extends InAppWebViewPlatform {
   createPlatformWebAuthenticationSessionStatic() {
     return _PlatformWebAuthenticationSession.static();
   }
+
+  /// Creates a new empty [PlatformWebNotificationController] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [WebNotificationController] in `flutter_inappwebview` instead.
+  @override
+  PlatformWebNotificationController
+  createPlatformWebNotificationControllerStatic() {
+    return _PlatformWebNotificationController.static();
+  }
 }
 
 class _PlatformWebAuthenticationSession
@@ -567,4 +577,21 @@ class _PlatformWebViewEnvironment extends PlatformWebViewEnvironment {
       );
 
   factory _PlatformWebViewEnvironment.static() => _staticValue;
+}
+
+class _PlatformWebNotificationController
+    extends PlatformWebNotificationController {
+  _PlatformWebNotificationController(
+    PlatformWebNotificationControllerCreationParams params,
+  ) : super.implementation(params);
+
+  static final _PlatformWebNotificationController _staticValue =
+      _PlatformWebNotificationController(
+        PlatformWebNotificationControllerCreationParams(
+          id: '',
+          notification: WebNotification(),
+        ),
+      );
+
+  factory _PlatformWebNotificationController.static() => _staticValue;
 }

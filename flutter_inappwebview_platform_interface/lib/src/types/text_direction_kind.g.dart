@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'notification_direction.dart';
+part of 'text_direction_kind.dart';
 
 // **************************************************************************
 // ExchangeableEnumGenerator

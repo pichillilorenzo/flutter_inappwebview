@@ -12,6 +12,7 @@ import '../in_app_browser/in_app_browser.dart';
 import '../print_job/main.dart';
 import '../web_message/web_message_channel.dart';
 import '../web_message/web_message_listener.dart';
+import '../web_notification/main.dart';
 import '../web_storage/web_storage.dart';
 import '_static_channel.dart';
 import 'headless_in_app_webview.dart';
@@ -1714,7 +1715,27 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
             _inAppBrowserEventHandler != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
-          final request = NotificationReceivedRequest.fromMap(arguments)!;
+          
+          // Extract data from native
+          final String notificationControllerId = arguments['notificationControllerId'];
+          final String? senderOriginString = arguments['senderOrigin'];
+          final notification = WebNotification.fromMap(
+            arguments['notification']?.cast<String, dynamic>(),
+          )!;
+          
+          // Create the notification controller
+          final notificationController = WindowsWebNotificationController(
+            WindowsWebNotificationControllerCreationParams(
+              id: notificationControllerId,
+              notification: notification,
+            ),
+          );
+          
+          // Create the request with senderOrigin and controller
+          final request = NotificationReceivedRequest(
+            senderOrigin: senderOriginString != null ? WebUri(senderOriginString) : null,
+            notificationController: notificationController,
+          );
 
           if (webviewParams != null && webviewParams!.onNotificationReceived != null)
             return (await webviewParams!.onNotificationReceived!(

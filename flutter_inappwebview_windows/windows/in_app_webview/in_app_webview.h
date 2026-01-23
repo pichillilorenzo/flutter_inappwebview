@@ -25,6 +25,7 @@
 #include "../web_message/web_message_channel.h"
 #include "../web_message/web_message_listener.h"
 #include "../find_interaction/find_interaction_controller.h"
+#include "../web_notification/web_notification_controller.h"
 
 #include <WebView2EnvironmentOptions.h>
 
@@ -217,6 +218,11 @@ namespace flutter_inappwebview_plugin
     void closeWebMessagePort(const std::string& channelId, int portIndex);
     void disposeWebMessageChannel(const std::string& channelId);
 
+    void addWebNotificationController(const std::string& id, std::shared_ptr<WebNotificationController> controller);
+    WebNotificationController* getWebNotificationController(const std::string& id) const;
+    void eraseWebNotificationController(const std::string& id);
+    void disposeAllWebNotificationControllers();
+
     std::string pageFrameId() const
     {
       return pageFrameId_;
@@ -244,6 +250,7 @@ namespace flutter_inappwebview_plugin
     int64_t progress_ = 0;
     std::map<std::string, std::unique_ptr<WebMessageChannel>> webMessageChannels_;
     std::map<std::string, std::unique_ptr<WebMessageListener>> webMessageListeners_;
+    std::map<std::string, std::shared_ptr<WebNotificationController>> webNotificationControllers_;
 
     void registerEventHandlers();
     void registerSurfaceEventHandlers();

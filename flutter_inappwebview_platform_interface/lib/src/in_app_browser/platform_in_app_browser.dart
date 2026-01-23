@@ -18,6 +18,7 @@ import '../pull_to_refresh/main.dart';
 import '../pull_to_refresh/platform_pull_to_refresh_controller.dart';
 import '../types/main.dart';
 import '../web_uri.dart';
+import '../web_notification/main.dart';
 import '../webview_environment/platform_webview_environment.dart';
 import 'in_app_browser_menu_item.dart';
 import 'in_app_browser_settings.dart';

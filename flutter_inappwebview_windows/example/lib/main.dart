@@ -46,6 +46,10 @@ class _MyAppState extends State<MyApp> {
   String findStatus = 'No find results yet';
   bool canPostWebMessage = false;
   bool canAddWebMessageListener = false;
+  
+  // WebNotification state
+  String notificationStatus = 'No notifications yet';
+  WindowsWebNotificationController? activeNotificationController;
 
   @override
   void initState() {
@@ -73,6 +77,7 @@ class _MyAppState extends State<MyApp> {
     webMessageController.dispose();
     findController.dispose();
     findInteractionController.dispose();
+    activeNotificationController?.dispose();
     super.dispose();
   }
 
@@ -180,6 +185,92 @@ class _MyAppState extends State<MyApp> {
                             currentUrl = url.toString();
                             urlController.text = currentUrl;
                           });
+                          
+                          // Inject JavaScript to test Web Notifications API
+                          await controller.evaluateJavascript(source: '''
+                            (function() {
+                              // Check if notifications are supported
+                              if (!('Notification' in window)) {
+                                console.log('Notifications not supported');
+                                return;
+                              }
+                              
+                              console.log('Current Notification permission: ' + Notification.permission);
+                              
+                              // Request notification permission and create a test notification
+                              Notification.requestPermission().then(function(permission) {
+                                console.log('Notification permission result: ' + permission);
+                                if (permission === 'granted') {
+                                  // Create a notification
+                                  var notification = new Notification('Test Notification from WebView', {
+                                    body: 'This notification was triggered from JavaScript!',
+                                    icon: 'https://flutter.dev/favicon.ico',
+                                    tag: 'test-notification-1'
+                                  });
+                                  
+                                  notification.onclick = function() {
+                                    console.log('Notification clicked!');
+                                  };
+                                  
+                                  notification.onclose = function() {
+                                    console.log('Notification closed!');
+                                  };
+                                  
+                                  console.log('Notification created successfully');
+                                }
+                              });
+                            })();
+                          ''');
+                          debugPrint('Notification JavaScript injected');
+                        },
+                        onPermissionRequest: (controller, permissionRequest) {
+                          debugPrint(
+                            'Permission requested for ${permissionRequest.resources}',
+                          );
+                          return PermissionResponse(
+                            resources: permissionRequest.resources,
+                            action: PermissionResponseAction.GRANT,
+                          );
+                        },
+                        onNotificationReceived: (controller, request) async {
+                          final notification = request.notificationController?.notification;
+                          final senderOrigin = request.senderOrigin;
+                          
+                          debugPrint('=== onNotificationReceived ===');
+                          debugPrint('Sender Origin: $senderOrigin');
+                          debugPrint('Notification ID: ${request.notificationController?.id}');
+                          debugPrint('Title: ${notification?.title}');
+                          debugPrint('Body: ${notification?.body}');
+                          debugPrint('Tag: ${notification?.tag}');
+                          debugPrint('Icon URI: ${notification?.iconUri}');
+                          debugPrint('Badge URI: ${notification?.badgeUri}');
+                          debugPrint('Body Image URI: ${notification?.bodyImageUri}');
+                          debugPrint('Language: ${notification?.language}');
+                          debugPrint('Direction: ${notification?.direction}');
+                          debugPrint('Is Silent: ${notification?.isSilent}');
+                          debugPrint('Requires Interaction: ${notification?.requiresInteraction}');
+                          debugPrint('Should Renotify: ${notification?.shouldRenotify}');
+                          debugPrint('Timestamp: ${notification?.timestamp}');
+                          debugPrint('Vibration Pattern: ${notification?.vibrationPattern}');
+                          debugPrint('==============================');
+                          
+                          setState(() {
+                            notificationStatus = 'Received: ${notification?.title ?? "Unknown"}';
+                            activeNotificationController = request.notificationController as WindowsWebNotificationController?;
+                          });
+                          
+                          // Set up the onClose handler
+                          request.notificationController?.onClose = () async {
+                            debugPrint('Notification close requested from web code');
+                            setState(() {
+                              notificationStatus = 'Notification closed by web code';
+                              activeNotificationController = null;
+                            });
+                          };
+                          
+                          // Return a response indicating we'll handle it
+                          // (handled: true means we take control, handled: false lets the browser handle it)
+                          return NotificationReceivedResponse(handled: true);
                         },
                         onEnterFullscreen: (controller) {
                           debugPrint('Entered fullscreen');
@@ -198,6 +289,11 @@ class _MyAppState extends State<MyApp> {
                           setState(() {
                             progress = progressValue / 100.0;
                           });
+                        },
+                        onConsoleMessage: (controller, consoleMessage) {
+                          debugPrint(
+                            'Console message: [${consoleMessage.messageLevel}] ${consoleMessage.message}',
+                          );
                         },
                       ),
                     ).build(context),
@@ -280,6 +376,70 @@ class _MyAppState extends State<MyApp> {
                     ],
                   ),
                   Text('Find status: $findStatus'),
+                  const SizedBox(height: 12),
+                  const Text(
+                    'WebNotification',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  Text('Status: $notificationStatus'),
+                  Wrap(
+                    spacing: 8,
+                    children: [
+                      ElevatedButton(
+                        onPressed: activeNotificationController != null
+                            ? () async {
+                                debugPrint('Reporting notification as shown...');
+                                await activeNotificationController?.reportShown();
+                                debugPrint('Notification reported as shown');
+                                setState(() {
+                                  notificationStatus = 'Notification shown';
+                                });
+                              }
+                            : null,
+                        child: const Text('Report Shown'),
+                      ),
+                      ElevatedButton(
+                        onPressed: activeNotificationController != null
+                            ? () async {
+                                debugPrint('Reporting notification as clicked...');
+                                await activeNotificationController?.reportClicked();
+                                debugPrint('Notification reported as clicked');
+                                setState(() {
+                                  notificationStatus = 'Notification clicked';
+                                });
+                              }
+                            : null,
+                        child: const Text('Report Clicked'),
+                      ),
+                      ElevatedButton(
+                        onPressed: activeNotificationController != null
+                            ? () async {
+                                debugPrint('Reporting notification as closed...');
+                                await activeNotificationController?.reportClosed();
+                                debugPrint('Notification reported as closed');
+                                setState(() {
+                                  notificationStatus = 'Notification closed';
+                                });
+                              }
+                            : null,
+                        child: const Text('Report Closed'),
+                      ),
+                      ElevatedButton(
+                        onPressed: activeNotificationController != null
+                            ? () {
+                                debugPrint('Disposing notification controller...');
+                                activeNotificationController?.dispose();
+                                debugPrint('Notification controller disposed');
+                                setState(() {
+                                  notificationStatus = 'Controller disposed';
+                                  activeNotificationController = null;
+                                });
+                              }
+                            : null,
+                        child: const Text('Dispose'),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),

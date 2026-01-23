@@ -4,7 +4,7 @@ namespace flutter_inappwebview_plugin
 {
   WebNotification::WebNotification(const std::optional<std::string>& title,
     const std::optional<std::string>& body,
-    const std::optional<NotificationDirection>& direction,
+    const std::optional<TextDirectionKind>& direction,
     const std::optional<std::string>& language,
     const std::optional<std::string>& tag,
     const std::optional<std::string>& iconUri,
@@ -23,7 +23,7 @@ namespace flutter_inappwebview_plugin
   WebNotification::WebNotification(const flutter::EncodableMap& map)
     : WebNotification(get_optional_fl_map_value<std::string>(map, "title"),
       get_optional_fl_map_value<std::string>(map, "body"),
-      NotificationDirectionFromOptionalInteger(get_optional_fl_map_value<int64_t>(map, "direction")),
+      TextDirectionKindFromOptionalInteger(get_optional_fl_map_value<int64_t>(map, "direction")),
       get_optional_fl_map_value<std::string>(map, "language"),
       get_optional_fl_map_value<std::string>(map, "tag"),
       get_optional_fl_map_value<std::string>(map, "iconUri"),
@@ -41,7 +41,7 @@ namespace flutter_inappwebview_plugin
     return flutter::EncodableMap{
       {"title", make_fl_value(title)},
       {"body", make_fl_value(body)},
-      {"direction", make_fl_value(NotificationDirectionToInteger(direction))},
+      {"direction", make_fl_value(TextDirectionKindToInteger(direction))},
       {"language", make_fl_value(language)},
       {"tag", make_fl_value(tag)},
       {"iconUri", make_fl_value(iconUri)},

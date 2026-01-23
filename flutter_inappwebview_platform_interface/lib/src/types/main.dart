@@ -238,7 +238,7 @@ export 'launching_external_uri_scheme_request.dart'
 export 'launching_external_uri_scheme_response.dart'
     show LaunchingExternalUriSchemeResponse;
 export 'memory_usage_target_level.dart' show MemoryUsageTargetLevel;
-export 'notification_direction.dart' show NotificationDirection;
+export 'text_direction_kind.dart' show TextDirectionKind;
 export 'notification_received_request.dart' show NotificationReceivedRequest;
 export 'notification_received_response.dart' show NotificationReceivedResponse;
 export 'save_as_kind.dart' show SaveAsKind;

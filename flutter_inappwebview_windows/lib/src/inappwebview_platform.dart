@@ -9,6 +9,7 @@ import 'in_app_webview/in_app_webview_controller.dart';
 import 'web_message/web_message_channel.dart';
 import 'web_message/web_message_listener.dart';
 import 'web_message/web_message_port.dart';
+import 'web_notification/web_notification_controller.dart';
 import 'web_storage/web_storage.dart';
 import 'webview_environment/webview_environment.dart';
 
@@ -305,6 +306,27 @@ class WindowsInAppWebViewPlatform extends InAppWebViewPlatform {
     return _PlatformPrintJobController.static();
   }
 
+  /// Creates a new [WindowsWebNotificationController].
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [WebNotificationController] in `flutter_inappwebview` instead.
+  @override
+  WindowsWebNotificationController createPlatformWebNotificationController(
+    PlatformWebNotificationControllerCreationParams params,
+  ) {
+    return WindowsWebNotificationController(params);
+  }
+
+  /// Creates a new empty [PlatformWebNotificationController] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [WebNotificationController] in `flutter_inappwebview` instead.
+  @override
+  PlatformWebNotificationController
+  createPlatformWebNotificationControllerStatic() {
+    return WindowsWebNotificationController.static();
+  }
+
   /// Creates a new empty [PlatformPullToRefreshController] to access static methods.
   ///
   /// This function should only be called by the app-facing package.
@@ -457,19 +479,6 @@ class _PlatformTracingController extends PlatformTracingController {
       );
 
   factory _PlatformTracingController.static() => _staticValue;
-}
-
-class _PlatformFindInteractionController
-    extends PlatformFindInteractionController {
-  _PlatformFindInteractionController(
-    PlatformFindInteractionControllerCreationParams params,
-  ) : super.implementation(params);
-  static final _PlatformFindInteractionController _staticValue =
-      _PlatformFindInteractionController(
-        const PlatformFindInteractionControllerCreationParams(),
-      );
-
-  factory _PlatformFindInteractionController.static() => _staticValue;
 }
 
 class _PlatformPrintJobController extends PlatformPrintJobController {

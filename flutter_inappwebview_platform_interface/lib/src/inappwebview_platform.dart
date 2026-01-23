@@ -22,6 +22,7 @@ import 'web_authentication_session/platform_web_authenticate_session.dart';
 import 'web_message/platform_web_message_channel.dart';
 import 'web_message/platform_web_message_listener.dart';
 import 'web_message/platform_web_message_port.dart';
+import 'web_notification/platform_web_notification_controller.dart';
 import 'web_storage/platform_web_storage.dart';
 import 'web_storage/platform_web_storage_manager.dart';
 import 'webview_environment/platform_webview_environment.dart';
@@ -641,6 +642,29 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
   PlatformWebViewEnvironment createPlatformWebViewEnvironmentStatic() {
     throw UnimplementedError(
       'createPlatformWebViewEnvironmentStatic is not implemented on the current platform.',
+    );
+  }
+
+  /// Creates a new [PlatformWebNotificationController].
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [WebNotificationController] in `flutter_inappwebview` instead.
+  PlatformWebNotificationController createPlatformWebNotificationController(
+    PlatformWebNotificationControllerCreationParams params,
+  ) {
+    throw UnimplementedError(
+      'createPlatformWebNotificationController is not implemented on the current platform.',
+    );
+  }
+
+  /// Creates a new empty [PlatformWebNotificationController] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [WebNotificationController] in `flutter_inappwebview` instead.
+  PlatformWebNotificationController
+  createPlatformWebNotificationControllerStatic() {
+    throw UnimplementedError(
+      'createPlatformWebNotificationControllerStatic is not implemented on the current platform.',
     );
   }
 }

@@ -1,6 +1,6 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 
-part 'notification_direction.g.dart';
+part 'text_direction_kind.g.dart';
 
 ///Constants that describe the text direction.
 ///

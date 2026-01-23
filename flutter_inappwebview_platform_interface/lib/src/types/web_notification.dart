@@ -1,12 +1,14 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 
 import '../web_uri.dart';
-import 'notification_direction.dart';
+import 'text_direction_kind.dart';
 import 'enum_method.dart';
 
 part 'web_notification.g.dart';
 
-///Class that represents a web notification.
+///Class that represents the data of a web notification.
+///
+///This corresponds to the properties of the [ICoreWebView2Notification](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2notification?view=webview2-1.0.3595.46) interface.
 @ExchangeableObject()
 class WebNotification_ {
   ///The title of the notification.
@@ -16,7 +18,7 @@ class WebNotification_ {
   String? body;
 
   ///The text direction.
-  NotificationDirection_? direction;
+  TextDirectionKind_? direction;
 
   ///The language of the notification.
   String? language;
@@ -45,7 +47,12 @@ class WebNotification_ {
   ///The timestamp of the notification, in milliseconds since UNIX epoch.
   double? timestamp;
 
-  ///The vibration pattern, if any.
+  ///The vibration pattern for devices with vibration hardware to emit.
+  ///
+  ///The vibration pattern can be represented by an array of 64-bit unsigned integers
+  ///describing a pattern of vibrations and pauses. See [Vibration API](https://developer.mozilla.org/docs/Web/API/Vibration_API) for more information.
+  ///This corresponds to [Notification.vibrate](https://developer.mozilla.org/docs/Web/API/Notification/vibrate) DOM API.
+  ///An empty list is returned if no vibration patterns are specified.
   List<int>? vibrationPattern;
 
   WebNotification_({

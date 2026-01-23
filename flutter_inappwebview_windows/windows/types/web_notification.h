@@ -7,7 +7,7 @@
 #include <vector>
 
 #include "../utils/flutter.h"
-#include "notification_direction.h"
+#include "text_direction_kind.h"
 
 namespace flutter_inappwebview_plugin
 {
@@ -16,7 +16,7 @@ namespace flutter_inappwebview_plugin
   public:
     const std::optional<std::string> title;
     const std::optional<std::string> body;
-    const std::optional<NotificationDirection> direction;
+    const std::optional<TextDirectionKind> direction;
     const std::optional<std::string> language;
     const std::optional<std::string> tag;
     const std::optional<std::string> iconUri;
@@ -30,7 +30,7 @@ namespace flutter_inappwebview_plugin
 
     WebNotification(const std::optional<std::string>& title,
       const std::optional<std::string>& body,
-      const std::optional<NotificationDirection>& direction,
+      const std::optional<TextDirectionKind>& direction,
       const std::optional<std::string>& language,
       const std::optional<std::string>& tag,
       const std::optional<std::string>& iconUri,

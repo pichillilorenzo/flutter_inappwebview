@@ -214,6 +214,13 @@ class LinuxInAppWebViewPlatform extends InAppWebViewPlatform {
     return _PlatformWebAuthenticationSession.static();
   }
 
+  /// Creates a new empty [PlatformWebNotificationController] to access static methods.
+  @override
+  PlatformWebNotificationController
+  createPlatformWebNotificationControllerStatic() {
+    return _PlatformWebNotificationController.static();
+  }
+
   /// Creates a new empty [LinuxWebMessageChannel] to access static methods.
   @override
   LinuxWebMessageChannel createPlatformWebMessageChannelStatic() {
@@ -417,4 +424,21 @@ class _PlatformWebAuthenticationSession
       );
 
   factory _PlatformWebAuthenticationSession.static() => _staticValue;
+}
+
+class _PlatformWebNotificationController
+    extends PlatformWebNotificationController {
+  _PlatformWebNotificationController(
+    PlatformWebNotificationControllerCreationParams params,
+  ) : super.implementation(params);
+
+  static final _PlatformWebNotificationController _staticValue =
+      _PlatformWebNotificationController(
+        PlatformWebNotificationControllerCreationParams(
+          id: '',
+          notification: WebNotification(),
+        ),
+      );
+
+  factory _PlatformWebNotificationController.static() => _staticValue;
 }

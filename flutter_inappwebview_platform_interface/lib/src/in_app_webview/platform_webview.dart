@@ -18,6 +18,7 @@ import 'platform_inappwebview_widget.dart';
 import 'platform_headless_in_app_webview.dart';
 import '../platform_webview_feature.dart';
 import '../in_app_browser/platform_in_app_browser.dart';
+import '../web_notification/main.dart';
 
 part 'platform_webview.g.dart';
 
@@ -2328,6 +2329,11 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
 
   ///{@template flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onNotificationReceived}
   ///Event fired when a web notification is received.
+  ///
+  ///The [request] contains the [NotificationReceivedRequest.senderOrigin] (the origin of the web content
+  ///that sends the notification) and the [NotificationReceivedRequest.notificationController] which provides
+  ///methods to report the notification status (shown, clicked, closed) back to the web content,
+  ///as well as listen for the close event when the notification is closed by web code.
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onNotificationReceived.supported_platforms}

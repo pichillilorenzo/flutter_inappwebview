@@ -74,6 +74,69 @@ Add `flutter_inappwebview` as a [dependency in your pubspec.yaml file](https://f
 
 Did you find this plugin useful? Please consider to [make a donation](https://inappwebview.dev/donate/) to help improve it!
 
+## Testing (unit / widget tests)
+
+In unit/widget tests, the platform implementation may not be registered, causing an assertion like:
+
+`InAppWebViewPlatform.instance != null`
+
+If you don't need a real WebView in tests, you can provide a fake platform implementation:
+
+<details>
+<summary>Minimal example: set a fake platform for unit/widget tests</summary>
+
+```dart
+// test/fakes/fake_inappwebview_platform.dart
+import 'package:flutter/widgets.dart';
+import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
+import 'package:plugin_platform_interface/plugin_platform_interface.dart';
+
+class FakeInAppWebViewPlatform extends InAppWebViewPlatform
+    with MockPlatformInterfaceMixin {
+  @override
+  PlatformInAppWebViewWidget createPlatformInAppWebViewWidget(
+      PlatformInAppWebViewWidgetCreationParams params) {
+    return _FakePlatformInAppWebViewWidget(params);
+  }
+}
+
+class _FakePlatformInAppWebViewWidget extends PlatformInAppWebViewWidget {
+  _FakePlatformInAppWebViewWidget(super.params);
+
+  @override
+  Widget build(BuildContext context) => const SizedBox.shrink();
+}
+
+// test/widget_test.dart
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
+
+import 'fakes/fake_inappwebview_platform.dart';
+
+void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
+  setUpAll(() {
+    InAppWebViewPlatform.instance = FakeInAppWebViewPlatform();
+  });
+
+  testWidgets('renders a widget that uses InAppWebView', (tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(home: Scaffold(body: InAppWebView())),
+    );
+    expect(find.byType(InAppWebView), findsOneWidget);
+  });
+}
+```
+
+Note: For testing real navigation/JS/page loading, use integration_test on a real device or emulator.
+
+</details>
+
+Related: #2019
+
 ## Contributors ✨
 
 Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):

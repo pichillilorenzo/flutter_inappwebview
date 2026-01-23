@@ -12,6 +12,7 @@ part of 'print_job_settings.dart';
 ///- Android WebView
 ///- iOS WKWebView
 ///- macOS WKWebView
+///- Windows WebView2
 class PrintJobSettings {
   ///`true` to animate the display of the sheet, `false` to display the sheet immediately.
   ///
@@ -75,6 +76,13 @@ class PrintJobSettings {
   ///- iOS WKWebView
   double? footerHeight;
 
+  ///The URI in the footer when [shouldPrintHeaderAndFooter] is `true`.
+  ///The default value is the current URI.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows WebView2
+  String? footerUri;
+
   ///Force rendering quality.
   ///
   ///**Officially Supported Platforms/Implementations**:
@@ -96,6 +104,7 @@ class PrintJobSettings {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- macOS WKWebView
+  ///- Windows WebView2
   bool? headerAndFooter;
 
   ///The height of the page header.
@@ -106,6 +115,13 @@ class PrintJobSettings {
   ///**Officially Supported Platforms/Implementations**:
   ///- iOS WKWebView
   double? headerHeight;
+
+  ///The title in the header when [shouldPrintHeaderAndFooter] is `true`.
+  ///The default value is the title of the current document.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows WebView2
+  String? headerTitle;
 
   ///The horizontal pagination mode.
   ///
@@ -162,6 +178,7 @@ class PrintJobSettings {
   ///**Officially Supported Platforms/Implementations**:
   ///- iOS WKWebView
   ///- macOS WKWebView
+  ///- Windows WebView2
   EdgeInsets? margins;
 
   ///The maximum height of the content area.
@@ -210,6 +227,7 @@ class PrintJobSettings {
   ///- Android WebView
   ///- iOS WKWebView
   ///- macOS WKWebView
+  ///- Windows WebView2
   PrintJobOrientation? orientation;
 
   ///The kind of printable content.
@@ -218,11 +236,25 @@ class PrintJobSettings {
   ///- iOS WKWebView
   PrintJobOutputType? outputType;
 
+  ///The page height in inches.
+  ///The default height is 11 inches.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows WebView2
+  double? pageHeight;
+
   ///The print order for the pages of the operation.
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- macOS WKWebView
   PrintJobPageOrder? pageOrder;
+
+  ///The page width in inches.
+  ///The default width is 8.5 inches.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows WebView2
+  double? pageWidth;
 
   ///The number of logical pages to be tiled horizontally on a physical sheet of paper.
   ///
@@ -242,6 +274,13 @@ class PrintJobSettings {
   ///- macOS WKWebView
   String? paperName;
 
+  ///The print dialog kind to show when [showUI] is `true`.
+  ///The default value is [PrintJobDialogKind.BROWSER].
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows WebView2
+  PrintJobDialogKind? printDialogKind;
+
   ///The supported resolution in DPI (dots per inch).
   ///
   ///**Officially Supported Platforms/Implementations**:
@@ -252,7 +291,36 @@ class PrintJobSettings {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- macOS WKWebView
+  ///- Windows WebView2
   double? scalingFactor;
+
+  ///`true` if background colors and images should be printed.
+  ///The default is `false`.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows WebView2
+  bool? shouldPrintBackgrounds;
+
+  ///`true` if header and footer should be printed.
+  ///The default is `false`.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows WebView2
+  bool? shouldPrintHeaderAndFooter;
+
+  ///`true` if only the current selection of HTML in the document should be printed.
+  ///The default is `false`.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows WebView2
+  bool? shouldPrintSelectionOnly;
+
+  ///A Boolean value that determines whether the print UI should be shown.
+  ///The default value is `true`.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows WebView2
+  bool? showUI;
 
   ///A Boolean value that determines whether the printing options include the number of copies.
   ///The default value is `true`.
@@ -360,6 +428,7 @@ class PrintJobSettings {
   ///- Android WebView
   ///- iOS WKWebView
   ///- macOS WKWebView
+  ///- Windows WebView2
   PrintJobSettings({
     this.animated = true,
     this.canSpawnSeparateThread = true,
@@ -370,10 +439,12 @@ class PrintJobSettings {
     this.faxNumber,
     this.firstPage,
     this.footerHeight,
+    this.footerUri,
     this.forceRenderingQuality,
     this.handledByClient = false,
     this.headerAndFooter = true,
     this.headerHeight,
+    this.headerTitle,
     this.horizontalPagination,
     this.isHorizontallyCentered = true,
     this.isVerticallyCentered = true,
@@ -389,12 +460,19 @@ class PrintJobSettings {
     this.numberOfPages,
     this.orientation,
     this.outputType,
+    this.pageHeight,
     this.pageOrder,
+    this.pageWidth,
     this.pagesAcross,
     this.pagesDown,
     this.paperName,
+    this.printDialogKind = PrintJobDialogKind.BROWSER,
     this.resolution,
     this.scalingFactor,
+    this.shouldPrintBackgrounds,
+    this.shouldPrintHeaderAndFooter,
+    this.shouldPrintSelectionOnly,
+    this.showUI = true,
     this.showsNumberOfCopies = true,
     this.showsPageRange = true,
     this.showsPageSetupAccessory = true,
@@ -436,6 +514,7 @@ class PrintJobSettings {
       faxNumber: map['faxNumber'],
       firstPage: map['firstPage'],
       footerHeight: map['footerHeight'],
+      footerUri: map['footerUri'],
       forceRenderingQuality: switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => PrintJobRenderingQuality.fromNativeValue(
           map['forceRenderingQuality'],
@@ -448,6 +527,7 @@ class PrintJobSettings {
         ),
       },
       headerHeight: map['headerHeight'],
+      headerTitle: map['headerTitle'],
       horizontalPagination: switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => PrintJobPaginationMode.fromNativeValue(
           map['horizontalPagination'],
@@ -496,6 +576,7 @@ class PrintJobSettings {
         EnumMethod.value => PrintJobOutputType.fromValue(map['outputType']),
         EnumMethod.name => PrintJobOutputType.byName(map['outputType']),
       },
+      pageHeight: map['pageHeight'],
       pageOrder: switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => PrintJobPageOrder.fromNativeValue(
           map['pageOrder'],
@@ -503,6 +584,7 @@ class PrintJobSettings {
         EnumMethod.value => PrintJobPageOrder.fromValue(map['pageOrder']),
         EnumMethod.name => PrintJobPageOrder.byName(map['pageOrder']),
       },
+      pageWidth: map['pageWidth'],
       pagesAcross: map['pagesAcross'],
       pagesDown: map['pagesDown'],
       paperName: map['paperName'],
@@ -511,6 +593,9 @@ class PrintJobSettings {
         enumMethod: enumMethod,
       ),
       scalingFactor: map['scalingFactor'],
+      shouldPrintBackgrounds: map['shouldPrintBackgrounds'],
+      shouldPrintHeaderAndFooter: map['shouldPrintHeaderAndFooter'],
+      shouldPrintSelectionOnly: map['shouldPrintSelectionOnly'],
       time: map['time'],
       verticalPagination: switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => PrintJobPaginationMode.fromNativeValue(
@@ -532,6 +617,14 @@ class PrintJobSettings {
     instance.headerAndFooter = map['headerAndFooter'];
     instance.isHorizontallyCentered = map['isHorizontallyCentered'];
     instance.isVerticallyCentered = map['isVerticallyCentered'];
+    instance.printDialogKind = switch (enumMethod ?? EnumMethod.nativeValue) {
+      EnumMethod.nativeValue => PrintJobDialogKind.fromNativeValue(
+        map['printDialogKind'],
+      ),
+      EnumMethod.value => PrintJobDialogKind.fromValue(map['printDialogKind']),
+      EnumMethod.name => PrintJobDialogKind.byName(map['printDialogKind']),
+    };
+    instance.showUI = map['showUI'];
     instance.showsNumberOfCopies = map['showsNumberOfCopies'];
     instance.showsPageRange = map['showsPageRange'];
     instance.showsPageSetupAccessory = map['showsPageSetupAccessory'];
@@ -576,6 +669,7 @@ class PrintJobSettings {
       "faxNumber": faxNumber,
       "firstPage": firstPage,
       "footerHeight": footerHeight,
+      "footerUri": footerUri,
       "forceRenderingQuality": switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => forceRenderingQuality?.toNativeValue(),
         EnumMethod.value => forceRenderingQuality?.toValue(),
@@ -584,6 +678,7 @@ class PrintJobSettings {
       "handledByClient": handledByClient,
       "headerAndFooter": headerAndFooter,
       "headerHeight": headerHeight,
+      "headerTitle": headerTitle,
       "horizontalPagination": switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => horizontalPagination?.toNativeValue(),
         EnumMethod.value => horizontalPagination?.toValue(),
@@ -615,16 +710,27 @@ class PrintJobSettings {
         EnumMethod.value => outputType?.toValue(),
         EnumMethod.name => outputType?.name(),
       },
+      "pageHeight": pageHeight,
       "pageOrder": switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => pageOrder?.toNativeValue(),
         EnumMethod.value => pageOrder?.toValue(),
         EnumMethod.name => pageOrder?.name(),
       },
+      "pageWidth": pageWidth,
       "pagesAcross": pagesAcross,
       "pagesDown": pagesDown,
       "paperName": paperName,
+      "printDialogKind": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => printDialogKind?.toNativeValue(),
+        EnumMethod.value => printDialogKind?.toValue(),
+        EnumMethod.name => printDialogKind?.name(),
+      },
       "resolution": resolution?.toMap(enumMethod: enumMethod),
       "scalingFactor": scalingFactor,
+      "shouldPrintBackgrounds": shouldPrintBackgrounds,
+      "shouldPrintHeaderAndFooter": shouldPrintHeaderAndFooter,
+      "shouldPrintSelectionOnly": shouldPrintSelectionOnly,
+      "showUI": showUI,
       "showsNumberOfCopies": showsNumberOfCopies,
       "showsPageRange": showsPageRange,
       "showsPageSetupAccessory": showsPageSetupAccessory,
@@ -657,7 +763,7 @@ class PrintJobSettings {
 
   @override
   String toString() {
-    return 'PrintJobSettings{animated: $animated, canSpawnSeparateThread: $canSpawnSeparateThread, colorMode: $colorMode, copies: $copies, detailedErrorReporting: $detailedErrorReporting, duplexMode: $duplexMode, faxNumber: $faxNumber, firstPage: $firstPage, footerHeight: $footerHeight, forceRenderingQuality: $forceRenderingQuality, handledByClient: $handledByClient, headerAndFooter: $headerAndFooter, headerHeight: $headerHeight, horizontalPagination: $horizontalPagination, isHorizontallyCentered: $isHorizontallyCentered, isVerticallyCentered: $isVerticallyCentered, jobDisposition: $jobDisposition, jobName: $jobName, jobSavingURL: $jobSavingURL, lastPage: $lastPage, margins: $margins, maximumContentHeight: $maximumContentHeight, maximumContentWidth: $maximumContentWidth, mediaSize: $mediaSize, mustCollate: $mustCollate, numberOfPages: $numberOfPages, orientation: $orientation, outputType: $outputType, pageOrder: $pageOrder, pagesAcross: $pagesAcross, pagesDown: $pagesDown, paperName: $paperName, resolution: $resolution, scalingFactor: $scalingFactor, showsNumberOfCopies: $showsNumberOfCopies, showsPageRange: $showsPageRange, showsPageSetupAccessory: $showsPageSetupAccessory, showsPaperOrientation: $showsPaperOrientation, showsPaperSelectionForLoadedPapers: $showsPaperSelectionForLoadedPapers, showsPaperSize: $showsPaperSize, showsPreview: $showsPreview, showsPrintPanel: $showsPrintPanel, showsPrintSelection: $showsPrintSelection, showsProgressPanel: $showsProgressPanel, showsScaling: $showsScaling, time: $time, verticalPagination: $verticalPagination}';
+    return 'PrintJobSettings{animated: $animated, canSpawnSeparateThread: $canSpawnSeparateThread, colorMode: $colorMode, copies: $copies, detailedErrorReporting: $detailedErrorReporting, duplexMode: $duplexMode, faxNumber: $faxNumber, firstPage: $firstPage, footerHeight: $footerHeight, footerUri: $footerUri, forceRenderingQuality: $forceRenderingQuality, handledByClient: $handledByClient, headerAndFooter: $headerAndFooter, headerHeight: $headerHeight, headerTitle: $headerTitle, horizontalPagination: $horizontalPagination, isHorizontallyCentered: $isHorizontallyCentered, isVerticallyCentered: $isVerticallyCentered, jobDisposition: $jobDisposition, jobName: $jobName, jobSavingURL: $jobSavingURL, lastPage: $lastPage, margins: $margins, maximumContentHeight: $maximumContentHeight, maximumContentWidth: $maximumContentWidth, mediaSize: $mediaSize, mustCollate: $mustCollate, numberOfPages: $numberOfPages, orientation: $orientation, outputType: $outputType, pageHeight: $pageHeight, pageOrder: $pageOrder, pageWidth: $pageWidth, pagesAcross: $pagesAcross, pagesDown: $pagesDown, paperName: $paperName, printDialogKind: $printDialogKind, resolution: $resolution, scalingFactor: $scalingFactor, shouldPrintBackgrounds: $shouldPrintBackgrounds, shouldPrintHeaderAndFooter: $shouldPrintHeaderAndFooter, shouldPrintSelectionOnly: $shouldPrintSelectionOnly, showUI: $showUI, showsNumberOfCopies: $showsNumberOfCopies, showsPageRange: $showsPageRange, showsPageSetupAccessory: $showsPageSetupAccessory, showsPaperOrientation: $showsPaperOrientation, showsPaperSelectionForLoadedPapers: $showsPaperSelectionForLoadedPapers, showsPaperSize: $showsPaperSize, showsPreview: $showsPreview, showsPrintPanel: $showsPrintPanel, showsPrintSelection: $showsPrintSelection, showsProgressPanel: $showsProgressPanel, showsScaling: $showsScaling, time: $time, verticalPagination: $verticalPagination}';
   }
 }
 
@@ -768,6 +874,17 @@ enum PrintJobSettingsProperty {
   ///{@endtemplate}
   footerHeight,
 
+  ///Can be used to check if the [PrintJobSettings.footerUri] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PrintJobSettings.footerUri.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows WebView2
+  ///
+  ///Use the [PrintJobSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  footerUri,
+
   ///Can be used to check if the [PrintJobSettings.forceRenderingQuality] property is supported at runtime.
   ///
   ///{@template flutter_inappwebview_platform_interface.PrintJobSettings.forceRenderingQuality.supported_platforms}
@@ -798,6 +915,7 @@ enum PrintJobSettingsProperty {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- macOS WKWebView
+  ///- Windows WebView2
   ///
   ///Use the [PrintJobSettings.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
@@ -813,6 +931,17 @@ enum PrintJobSettingsProperty {
   ///Use the [PrintJobSettings.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
   headerHeight,
+
+  ///Can be used to check if the [PrintJobSettings.headerTitle] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PrintJobSettings.headerTitle.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows WebView2
+  ///
+  ///Use the [PrintJobSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  headerTitle,
 
   ///Can be used to check if the [PrintJobSettings.horizontalPagination] property is supported at runtime.
   ///
@@ -900,6 +1029,7 @@ enum PrintJobSettingsProperty {
   ///**Officially Supported Platforms/Implementations**:
   ///- iOS WKWebView
   ///- macOS WKWebView
+  ///- Windows WebView2
   ///
   ///Use the [PrintJobSettings.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
@@ -969,6 +1099,7 @@ enum PrintJobSettingsProperty {
   ///- Android WebView
   ///- iOS WKWebView
   ///- macOS WKWebView
+  ///- Windows WebView2
   ///
   ///Use the [PrintJobSettings.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
@@ -985,6 +1116,17 @@ enum PrintJobSettingsProperty {
   ///{@endtemplate}
   outputType,
 
+  ///Can be used to check if the [PrintJobSettings.pageHeight] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PrintJobSettings.pageHeight.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows WebView2
+  ///
+  ///Use the [PrintJobSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  pageHeight,
+
   ///Can be used to check if the [PrintJobSettings.pageOrder] property is supported at runtime.
   ///
   ///{@template flutter_inappwebview_platform_interface.PrintJobSettings.pageOrder.supported_platforms}
@@ -995,6 +1137,17 @@ enum PrintJobSettingsProperty {
   ///Use the [PrintJobSettings.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
   pageOrder,
+
+  ///Can be used to check if the [PrintJobSettings.pageWidth] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PrintJobSettings.pageWidth.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows WebView2
+  ///
+  ///Use the [PrintJobSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  pageWidth,
 
   ///Can be used to check if the [PrintJobSettings.pagesAcross] property is supported at runtime.
   ///
@@ -1029,6 +1182,17 @@ enum PrintJobSettingsProperty {
   ///{@endtemplate}
   paperName,
 
+  ///Can be used to check if the [PrintJobSettings.printDialogKind] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PrintJobSettings.printDialogKind.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows WebView2
+  ///
+  ///Use the [PrintJobSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  printDialogKind,
+
   ///Can be used to check if the [PrintJobSettings.resolution] property is supported at runtime.
   ///
   ///{@template flutter_inappwebview_platform_interface.PrintJobSettings.resolution.supported_platforms}
@@ -1046,10 +1210,55 @@ enum PrintJobSettingsProperty {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- macOS WKWebView
+  ///- Windows WebView2
   ///
   ///Use the [PrintJobSettings.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
   scalingFactor,
+
+  ///Can be used to check if the [PrintJobSettings.shouldPrintBackgrounds] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PrintJobSettings.shouldPrintBackgrounds.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows WebView2
+  ///
+  ///Use the [PrintJobSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  shouldPrintBackgrounds,
+
+  ///Can be used to check if the [PrintJobSettings.shouldPrintHeaderAndFooter] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PrintJobSettings.shouldPrintHeaderAndFooter.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows WebView2
+  ///
+  ///Use the [PrintJobSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  shouldPrintHeaderAndFooter,
+
+  ///Can be used to check if the [PrintJobSettings.shouldPrintSelectionOnly] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PrintJobSettings.shouldPrintSelectionOnly.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows WebView2
+  ///
+  ///Use the [PrintJobSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  shouldPrintSelectionOnly,
+
+  ///Can be used to check if the [PrintJobSettings.showUI] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PrintJobSettings.showUI.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows WebView2
+  ///
+  ///Use the [PrintJobSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  showUI,
 
   ///Can be used to check if the [PrintJobSettings.showsNumberOfCopies] property is supported at runtime.
   ///
@@ -1236,6 +1445,11 @@ extension _PrintJobSettingsPropertySupported on PrintJobSettings {
       case PrintJobSettingsProperty.footerHeight:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
+      case PrintJobSettingsProperty.footerUri:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.forceRenderingQuality:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
@@ -1248,10 +1462,18 @@ extension _PrintJobSettingsPropertySupported on PrintJobSettings {
             ].contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.headerAndFooter:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.macOS,
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.headerHeight:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
+      case PrintJobSettingsProperty.headerTitle:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.horizontalPagination:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
@@ -1282,6 +1504,7 @@ extension _PrintJobSettingsPropertySupported on PrintJobSettings {
             [
               TargetPlatform.iOS,
               TargetPlatform.macOS,
+              TargetPlatform.windows,
             ].contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.maximumContentHeight:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -1309,13 +1532,24 @@ extension _PrintJobSettingsPropertySupported on PrintJobSettings {
               TargetPlatform.android,
               TargetPlatform.iOS,
               TargetPlatform.macOS,
+              TargetPlatform.windows,
             ].contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.outputType:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
+      case PrintJobSettingsProperty.pageHeight:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.pageOrder:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
+      case PrintJobSettingsProperty.pageWidth:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.pagesAcross:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
@@ -1325,6 +1559,11 @@ extension _PrintJobSettingsPropertySupported on PrintJobSettings {
       case PrintJobSettingsProperty.paperName:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
+      case PrintJobSettingsProperty.printDialogKind:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.resolution:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
@@ -1332,7 +1571,30 @@ extension _PrintJobSettingsPropertySupported on PrintJobSettings {
             ].contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.scalingFactor:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.macOS,
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
+      case PrintJobSettingsProperty.shouldPrintBackgrounds:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
+      case PrintJobSettingsProperty.shouldPrintHeaderAndFooter:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
+      case PrintJobSettingsProperty.shouldPrintSelectionOnly:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
+      case PrintJobSettingsProperty.showUI:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.showsNumberOfCopies:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [

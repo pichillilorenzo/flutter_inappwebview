@@ -111,6 +111,7 @@ export 'permission_response_action.dart'
     show PermissionResponseAction, PermissionRequestResponseAction;
 export 'print_job_attributes.dart' show PrintJobAttributes;
 export 'print_job_color_mode.dart' show PrintJobColorMode;
+export 'print_job_dialog_kind.dart' show PrintJobDialogKind;
 export 'print_job_duplex_mode.dart' show PrintJobDuplexMode;
 export 'print_job_info.dart' show PrintJobInfo;
 export 'print_job_media_size.dart' show PrintJobMediaSize;

@@ -4,6 +4,7 @@ import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_i
 
 import '../types/main.dart';
 import '../types/print_job_color_mode.dart';
+import '../types/print_job_dialog_kind.dart';
 import '../types/print_job_disposition.dart';
 import '../types/print_job_duplex_mode.dart';
 import '../types/print_job_media_size.dart';
@@ -22,7 +23,7 @@ part 'print_job_settings.g.dart';
 ///Class that represents the settings of a [PlatformPrintJobController].
 @ExchangeableObject(copyMethod: true)
 @SupportedPlatforms(
-  platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()],
+  platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform(), WindowsPlatform()],
 )
 class PrintJobSettings_ {
   ///Set this to `true` to handle the [PlatformPrintJobController].
@@ -45,9 +46,19 @@ class PrintJobSettings_ {
   @SupportedPlatforms(platforms: [IOSPlatform()])
   bool? animated;
 
+  ///A Boolean value that determines whether the print UI should be shown.
+  ///The default value is `true`.
+  @SupportedPlatforms(platforms: [WindowsPlatform()])
+  bool? showUI;
+
+  ///The print dialog kind to show when [showUI] is `true`.
+  ///The default value is [PrintJobDialogKind.BROWSER].
+  @SupportedPlatforms(platforms: [WindowsPlatform()])
+  PrintJobDialogKind_? printDialogKind;
+
   ///The orientation of the printed content, portrait or landscape.
   @SupportedPlatforms(
-    platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()],
+    platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform(), WindowsPlatform()],
   )
   PrintJobOrientation_? orientation;
 
@@ -62,7 +73,7 @@ class PrintJobSettings_ {
   ///The margins for each printed page.
   ///Margins define the white space around the content where the left margin defines
   ///the amount of white space on the left of the content and so on.
-  @SupportedPlatforms(platforms: [IOSPlatform(), MacOSPlatform()])
+  @SupportedPlatforms(platforms: [IOSPlatform(), MacOSPlatform(), WindowsPlatform()])
   EdgeInsets? margins;
 
   ///The media size.
@@ -192,8 +203,43 @@ class PrintJobSettings_ {
   double? maximumContentWidth;
 
   ///The current scaling factor. From `0.0` to `1.0`.
-  @SupportedPlatforms(platforms: [MacOSPlatform()])
+  @SupportedPlatforms(platforms: [MacOSPlatform(), WindowsPlatform()])
   double? scalingFactor;
+
+  ///The page height in inches.
+  ///The default height is 11 inches.
+  @SupportedPlatforms(platforms: [WindowsPlatform()])
+  double? pageHeight;
+
+  ///The page width in inches.
+  ///The default width is 8.5 inches.
+  @SupportedPlatforms(platforms: [WindowsPlatform()])
+  double? pageWidth;
+
+  ///`true` if background colors and images should be printed.
+  ///The default is `false`.
+  @SupportedPlatforms(platforms: [WindowsPlatform()])
+  bool? shouldPrintBackgrounds;
+
+  ///`true` if header and footer should be printed.
+  ///The default is `false`.
+  @SupportedPlatforms(platforms: [WindowsPlatform()])
+  bool? shouldPrintHeaderAndFooter;
+
+  ///`true` if only the current selection of HTML in the document should be printed.
+  ///The default is `false`.
+  @SupportedPlatforms(platforms: [WindowsPlatform()])
+  bool? shouldPrintSelectionOnly;
+
+  ///The title in the header when [shouldPrintHeaderAndFooter] is `true`.
+  ///The default value is the title of the current document.
+  @SupportedPlatforms(platforms: [WindowsPlatform()])
+  String? headerTitle;
+
+  ///The URI in the footer when [shouldPrintHeaderAndFooter] is `true`.
+  ///The default value is the current URI.
+  @SupportedPlatforms(platforms: [WindowsPlatform()])
+  String? footerUri;
 
   ///The action specified for the job.
   @SupportedPlatforms(platforms: [MacOSPlatform()])
@@ -258,7 +304,7 @@ class PrintJobSettings_ {
 
   ///If `true`, a standard header and footer are added outside the margins of each page.
   ///The default value is `true`.
-  @SupportedPlatforms(platforms: [MacOSPlatform()])
+  @SupportedPlatforms(platforms: [MacOSPlatform(), WindowsPlatform()])
   bool? headerAndFooter;
 
   ///If `true`, collates output.
@@ -281,6 +327,8 @@ class PrintJobSettings_ {
     this.handledByClient = false,
     this.jobName,
     this.animated = true,
+    this.showUI = true,
+    this.printDialogKind = PrintJobDialogKind_.BROWSER,
     this.orientation,
     this.numberOfPages,
     this.forceRenderingQuality,
@@ -304,6 +352,13 @@ class PrintJobSettings_ {
     this.showsPreview = true,
     this.showsPrintSelection = true,
     this.scalingFactor,
+    this.pageHeight,
+    this.pageWidth,
+    this.shouldPrintBackgrounds,
+    this.shouldPrintHeaderAndFooter,
+    this.shouldPrintSelectionOnly,
+    this.headerTitle,
+    this.footerUri,
     this.showsPrintPanel = true,
     this.showsProgressPanel = true,
     this.jobDisposition,

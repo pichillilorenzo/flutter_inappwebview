@@ -77,11 +77,11 @@ class PrintJobSettings_ {
   EdgeInsets? margins;
 
   ///The media size.
-  @SupportedPlatforms(platforms: [AndroidPlatform()])
+  @SupportedPlatforms(platforms: [AndroidPlatform(), WindowsPlatform()])
   PrintJobMediaSize_? mediaSize;
 
   ///The color mode.
-  @SupportedPlatforms(platforms: [AndroidPlatform(), MacOSPlatform()])
+  @SupportedPlatforms(platforms: [AndroidPlatform(), MacOSPlatform(), WindowsPlatform()])
   PrintJobColorMode_? colorMode;
 
   ///The duplex mode to use for the print job.
@@ -89,6 +89,7 @@ class PrintJobSettings_ {
     platforms: [
       AndroidPlatform(available: "23"),
       IOSPlatform(),
+      WindowsPlatform(),
     ],
   )
   PrintJobDuplexMode_? duplexMode;
@@ -241,6 +242,30 @@ class PrintJobSettings_ {
   @SupportedPlatforms(platforms: [WindowsPlatform()])
   String? footerUri;
 
+  ///Whether printed pages should be collated.
+  ///The default value is `true`.
+  @SupportedPlatforms(platforms: [WindowsPlatform()])
+  bool? collate;
+
+  ///The page ranges to print.
+  ///Pages are specified as a comma-separated list of page ranges where each page range specifies
+  ///a start and end inclusive page numbers. For example "1-5, 13, 17-19".
+  ///Use an empty string to specify printing all the pages.
+  ///The default value is empty string.
+  @SupportedPlatforms(platforms: [WindowsPlatform()])
+  String? pageRanges;
+
+  ///The number of pages to print on each sheet.
+  ///The value must be 1, 2, 4, 6, 9, or 16.
+  ///The default value is `1`.
+  @SupportedPlatforms(platforms: [WindowsPlatform()])
+  int? pagesPerSide;
+
+  ///The name of the printer to use.
+  ///Defaults to the user default printer.
+  @SupportedPlatforms(platforms: [WindowsPlatform()])
+  String? printerName;
+
   ///The action specified for the job.
   @SupportedPlatforms(platforms: [MacOSPlatform()])
   PrintJobDisposition_? jobDisposition;
@@ -282,7 +307,7 @@ class PrintJobSettings_ {
 
   ///How many copies to print.
   ///The default value is `1`.
-  @SupportedPlatforms(platforms: [MacOSPlatform()])
+  @SupportedPlatforms(platforms: [MacOSPlatform(), WindowsPlatform()])
   int? copies;
 
   ///An integer value that specifies the first page in the print job.
@@ -359,6 +384,10 @@ class PrintJobSettings_ {
     this.shouldPrintSelectionOnly,
     this.headerTitle,
     this.footerUri,
+    this.collate,
+    this.pageRanges,
+    this.pagesPerSide,
+    this.printerName,
     this.showsPrintPanel = true,
     this.showsProgressPanel = true,
     this.jobDisposition,

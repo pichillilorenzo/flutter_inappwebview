@@ -26,12 +26,15 @@
 #include "../web_message/web_message_listener.h"
 #include "../find_interaction/find_interaction_controller.h"
 #include "../web_notification/web_notification_controller.h"
+#include "../print_job/print_job_settings.h"
 
 #include <WebView2EnvironmentOptions.h>
 
 namespace flutter_inappwebview_plugin
 {
   class InAppBrowser;
+  class PrintJobManager;
+  class PrintJobController;
 
   using namespace Microsoft::WRL;
 
@@ -105,6 +108,7 @@ namespace flutter_inappwebview_plugin
     wil::com_ptr<ICoreWebView2> webView;
     std::unique_ptr<WebViewChannelDelegate> channelDelegate;
     std::unique_ptr<FindInteractionController> findInteractionController;
+    std::unique_ptr<PrintJobManager> printJobManager;
     std::shared_ptr<InAppWebViewSettings> settings;
     InAppBrowser* inAppBrowser = nullptr;
     std::unique_ptr<UserContentController> userContentController;
@@ -223,6 +227,17 @@ namespace flutter_inappwebview_plugin
     void eraseWebNotificationController(const std::string& id);
     void disposeAllWebNotificationControllers();
 
+    void addPrintJobController(const std::string& id, std::shared_ptr<PrintJobController> controller);
+    PrintJobController* getPrintJobController(const std::string& id) const;
+    void erasePrintJobController(const std::string& id);
+    void disposeAllPrintJobControllers();
+
+    void printCurrentPage(std::shared_ptr<PrintJobSettings> settings,
+      const std::function<void(const std::optional<std::string>&)> completionHandler);
+
+    void createPdf(std::shared_ptr<PrintJobSettings> settings,
+      const std::function<void(const std::optional<std::vector<uint8_t>>&)> completionHandler);
+
     std::string pageFrameId() const
     {
       return pageFrameId_;
@@ -251,6 +266,7 @@ namespace flutter_inappwebview_plugin
     std::map<std::string, std::unique_ptr<WebMessageChannel>> webMessageChannels_;
     std::map<std::string, std::unique_ptr<WebMessageListener>> webMessageListeners_;
     std::map<std::string, std::shared_ptr<WebNotificationController>> webNotificationControllers_;
+    std::map<std::string, std::shared_ptr<PrintJobController>> printJobControllers_;
 
     void registerEventHandlers();
     void registerSurfaceEventHandlers();

@@ -3212,6 +3212,11 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
             'https://developer.apple.com/documentation/webkit/wkwebview/3650490-createpdf',
         available: '11.0',
       ),
+      WindowsPlatform(
+        apiName: 'ICoreWebView2_16.PrintToPdfStream',
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_16#printtopdfstream',
+      ),
     ],
   )
   Future<Uint8List?> createPdf({

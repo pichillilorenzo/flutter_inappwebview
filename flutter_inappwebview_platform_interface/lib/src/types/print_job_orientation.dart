@@ -18,6 +18,7 @@ class PrintJobOrientation_ {
       EnumAndroidPlatform(value: 0),
       EnumIOSPlatform(value: 0),
       EnumMacOSPlatform(value: 0),
+      EnumWindowsPlatform(value: 0),
     ],
   )
   static const PORTRAIT = const PrintJobOrientation_._internal(0);
@@ -28,6 +29,7 @@ class PrintJobOrientation_ {
       EnumAndroidPlatform(value: 1),
       EnumIOSPlatform(value: 1),
       EnumMacOSPlatform(value: 1),
+      EnumWindowsPlatform(value: 1),
     ],
   )
   static const LANDSCAPE = const PrintJobOrientation_._internal(1);

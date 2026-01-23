@@ -21,6 +21,7 @@ class PrintJobDuplexMode_ {
       EnumAndroidPlatform(value: 1),
       EnumIOSPlatform(value: 0),
       EnumMacOSPlatform(value: 1),
+      EnumWindowsPlatform(value: 1),
     ],
   )
   static const NONE = PrintJobDuplexMode_._internal('NONE');
@@ -32,6 +33,7 @@ class PrintJobDuplexMode_ {
       EnumAndroidPlatform(value: 2),
       EnumIOSPlatform(value: 1),
       EnumMacOSPlatform(value: 2),
+      EnumWindowsPlatform(value: 2),
     ],
   )
   static const LONG_EDGE = PrintJobDuplexMode_._internal('LONG_EDGE');
@@ -43,6 +45,7 @@ class PrintJobDuplexMode_ {
       EnumAndroidPlatform(value: 4),
       EnumIOSPlatform(value: 2),
       EnumMacOSPlatform(value: 3),
+      EnumWindowsPlatform(value: 3),
     ],
   )
   static const SHORT_EDGE = PrintJobDuplexMode_._internal('SHORT_EDGE');

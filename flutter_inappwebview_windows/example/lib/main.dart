@@ -46,10 +46,14 @@ class _MyAppState extends State<MyApp> {
   String findStatus = 'No find results yet';
   bool canPostWebMessage = false;
   bool canAddWebMessageListener = false;
-  
+
   // WebNotification state
   String notificationStatus = 'No notifications yet';
   WindowsWebNotificationController? activeNotificationController;
+
+  // Print/PDF state
+  String printStatus = 'Ready';
+  bool isPrinting = false;
 
   @override
   void initState() {
@@ -121,6 +125,113 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
+  Future<void> _printPage({bool showUI = false}) async {
+    if (isPrinting) return;
+
+    setState(() {
+      isPrinting = true;
+      printStatus = showUI ? 'Opening print dialog...' : 'Printing...';
+    });
+
+    try {
+      final settings = PrintJobSettings(
+        showUI: showUI,
+        printDialogKind: PrintJobDialogKind.BROWSER,
+        colorMode: PrintJobColorMode.COLOR,
+        copies: 1,
+        duplexMode: PrintJobDuplexMode.NONE,
+        orientation: PrintJobOrientation.PORTRAIT,
+        pagesPerSide: 1,
+        shouldPrintBackgrounds: true,
+        shouldPrintHeaderAndFooter: true,
+        headerTitle: 'Flutter InAppWebView Windows Example',
+        footerUri: 'https://flutter.dev',
+      );
+
+      final printJobController = await webViewController?.printCurrentPage(
+        settings: settings,
+      );
+
+      debugPrint('Print job controller: $printJobController');
+      debugPrint('Print job ID: ${printJobController?.id}');
+
+      // Get print job info
+      final info = await printJobController?.getInfo();
+      debugPrint('Print job info: $info');
+      debugPrint('  State: ${info?.state}');
+      debugPrint('  Copies: ${info?.copies}');
+      debugPrint('  Number of Pages: ${info?.numberOfPages}');
+
+      setState(() {
+        if (showUI) {
+          printStatus = 'Print dialog opened';
+        } else {
+          printStatus =
+              'Print job created: ${printJobController?.id ?? "unknown"}';
+        }
+      });
+    } catch (e) {
+      debugPrint('Print error: $e');
+      setState(() {
+        printStatus = 'Print error: $e';
+      });
+    } finally {
+      setState(() {
+        isPrinting = false;
+      });
+    }
+  }
+
+  Future<void> _createPdf() async {
+    if (isPrinting) return;
+
+    setState(() {
+      isPrinting = true;
+      printStatus = 'Creating PDF...';
+    });
+
+    try {
+      final pdfSettings = PrintJobSettings(
+        colorMode: PrintJobColorMode.COLOR,
+        orientation: PrintJobOrientation.PORTRAIT,
+        shouldPrintBackgrounds: true,
+      );
+
+      final pdfConfig = PDFConfiguration(
+        settings: pdfSettings,
+      );
+
+      final pdfData = await webViewController?.createPdf(
+        pdfConfiguration: pdfConfig,
+      );
+
+      if (pdfData != null) {
+        debugPrint('PDF created successfully! Size: ${pdfData.length} bytes');
+        setState(() {
+          printStatus = 'PDF created: ${pdfData.length} bytes';
+        });
+
+        // You could save the PDF to a file here:
+        // final file = File('output.pdf');
+        // await file.writeAsBytes(pdfData);
+      } else {
+        debugPrint('PDF creation returned null');
+        setState(() {
+          printStatus = 'PDF creation failed (null data)';
+        });
+      }
+    } catch (e) {
+      debugPrint('PDF creation error: $e');
+      setState(() {
+        printStatus = 'PDF error: $e';
+      });
+    } finally {
+      setState(() {
+        isPrinting = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -185,7 +296,7 @@ class _MyAppState extends State<MyApp> {
                             currentUrl = url.toString();
                             urlController.text = currentUrl;
                           });
-                          
+
                           // Inject JavaScript to test Web Notifications API
                           await controller.evaluateJavascript(source: '''
                             (function() {
@@ -233,41 +344,52 @@ class _MyAppState extends State<MyApp> {
                           );
                         },
                         onNotificationReceived: (controller, request) async {
-                          final notification = request.notificationController?.notification;
+                          final notification =
+                              request.notificationController?.notification;
                           final senderOrigin = request.senderOrigin;
-                          
+
                           debugPrint('=== onNotificationReceived ===');
                           debugPrint('Sender Origin: $senderOrigin');
-                          debugPrint('Notification ID: ${request.notificationController?.id}');
+                          debugPrint(
+                              'Notification ID: ${request.notificationController?.id}');
                           debugPrint('Title: ${notification?.title}');
                           debugPrint('Body: ${notification?.body}');
                           debugPrint('Tag: ${notification?.tag}');
                           debugPrint('Icon URI: ${notification?.iconUri}');
                           debugPrint('Badge URI: ${notification?.badgeUri}');
-                          debugPrint('Body Image URI: ${notification?.bodyImageUri}');
+                          debugPrint(
+                              'Body Image URI: ${notification?.bodyImageUri}');
                           debugPrint('Language: ${notification?.language}');
                           debugPrint('Direction: ${notification?.direction}');
                           debugPrint('Is Silent: ${notification?.isSilent}');
-                          debugPrint('Requires Interaction: ${notification?.requiresInteraction}');
-                          debugPrint('Should Renotify: ${notification?.shouldRenotify}');
+                          debugPrint(
+                              'Requires Interaction: ${notification?.requiresInteraction}');
+                          debugPrint(
+                              'Should Renotify: ${notification?.shouldRenotify}');
                           debugPrint('Timestamp: ${notification?.timestamp}');
-                          debugPrint('Vibration Pattern: ${notification?.vibrationPattern}');
+                          debugPrint(
+                              'Vibration Pattern: ${notification?.vibrationPattern}');
                           debugPrint('==============================');
-                          
+
                           setState(() {
-                            notificationStatus = 'Received: ${notification?.title ?? "Unknown"}';
-                            activeNotificationController = request.notificationController as WindowsWebNotificationController?;
+                            notificationStatus =
+                                'Received: ${notification?.title ?? "Unknown"}';
+                            activeNotificationController =
+                                request.notificationController
+                                    as WindowsWebNotificationController?;
                           });
-                          
+
                           // Set up the onClose handler
                           request.notificationController?.onClose = () async {
-                            debugPrint('Notification close requested from web code');
+                            debugPrint(
+                                'Notification close requested from web code');
                             setState(() {
-                              notificationStatus = 'Notification closed by web code';
+                              notificationStatus =
+                                  'Notification closed by web code';
                               activeNotificationController = null;
                             });
                           };
-                          
+
                           // Return a response indicating we'll handle it
                           // (handled: true means we take control, handled: false lets the browser handle it)
                           return NotificationReceivedResponse(handled: true);
@@ -388,8 +510,10 @@ class _MyAppState extends State<MyApp> {
                       ElevatedButton(
                         onPressed: activeNotificationController != null
                             ? () async {
-                                debugPrint('Reporting notification as shown...');
-                                await activeNotificationController?.reportShown();
+                                debugPrint(
+                                    'Reporting notification as shown...');
+                                await activeNotificationController
+                                    ?.reportShown();
                                 debugPrint('Notification reported as shown');
                                 setState(() {
                                   notificationStatus = 'Notification shown';
@@ -401,8 +525,10 @@ class _MyAppState extends State<MyApp> {
                       ElevatedButton(
                         onPressed: activeNotificationController != null
                             ? () async {
-                                debugPrint('Reporting notification as clicked...');
-                                await activeNotificationController?.reportClicked();
+                                debugPrint(
+                                    'Reporting notification as clicked...');
+                                await activeNotificationController
+                                    ?.reportClicked();
                                 debugPrint('Notification reported as clicked');
                                 setState(() {
                                   notificationStatus = 'Notification clicked';
@@ -414,8 +540,10 @@ class _MyAppState extends State<MyApp> {
                       ElevatedButton(
                         onPressed: activeNotificationController != null
                             ? () async {
-                                debugPrint('Reporting notification as closed...');
-                                await activeNotificationController?.reportClosed();
+                                debugPrint(
+                                    'Reporting notification as closed...');
+                                await activeNotificationController
+                                    ?.reportClosed();
                                 debugPrint('Notification reported as closed');
                                 setState(() {
                                   notificationStatus = 'Notification closed';
@@ -427,7 +555,8 @@ class _MyAppState extends State<MyApp> {
                       ElevatedButton(
                         onPressed: activeNotificationController != null
                             ? () {
-                                debugPrint('Disposing notification controller...');
+                                debugPrint(
+                                    'Disposing notification controller...');
                                 activeNotificationController?.dispose();
                                 debugPrint('Notification controller disposed');
                                 setState(() {
@@ -437,6 +566,31 @@ class _MyAppState extends State<MyApp> {
                               }
                             : null,
                         child: const Text('Dispose'),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  const Text(
+                    'Print / PDF',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  Text('Status: $printStatus'),
+                  Wrap(
+                    spacing: 8,
+                    children: [
+                      ElevatedButton(
+                        onPressed:
+                            isPrinting ? null : () => _printPage(showUI: false),
+                        child: const Text('Print (Silent)'),
+                      ),
+                      ElevatedButton(
+                        onPressed:
+                            isPrinting ? null : () => _printPage(showUI: true),
+                        child: const Text('Print (UI)'),
+                      ),
+                      ElevatedButton(
+                        onPressed: isPrinting ? null : _createPdf,
+                        child: const Text('Create PDF'),
                       ),
                     ],
                   ),

@@ -46,6 +46,8 @@
 #include "../utils/util.h"
 #include "../utils/flutter.h"
 #include "../web_notification/web_notification_controller.h"
+#include "../print_job/print_job_controller.h"
+#include "../print_job/print_job_manager.h"
 #include "in_app_webview.h"
 #include "in_app_webview_manager.h"
 
@@ -213,6 +215,7 @@ namespace flutter_inappwebview_plugin
     channelDelegate = channelName.has_value() ? std::make_unique<WebViewChannelDelegate>(this, plugin->registrar->messenger(), channelName.value()) :
       std::make_unique<WebViewChannelDelegate>(this, plugin->registrar->messenger());
     findInteractionController = std::make_unique<FindInteractionController>(this, plugin->registrar->messenger());
+    printJobManager = std::make_unique<PrintJobManager>(this, plugin->registrar->messenger());
   }
 
   void InAppWebView::prepare(const InAppWebViewCreationParams& params)
@@ -2685,6 +2688,232 @@ namespace flutter_inappwebview_plugin
     webNotificationControllers_.clear();
   }
 
+  void InAppWebView::addPrintJobController(const std::string& id, std::shared_ptr<PrintJobController> controller)
+  {
+    if (id.empty() || !controller) return;
+    printJobControllers_[id] = std::move(controller);
+  }
+
+  PrintJobController* InAppWebView::getPrintJobController(const std::string& id) const
+  {
+    auto it = printJobControllers_.find(id);
+    return it != printJobControllers_.end() ? it->second.get() : nullptr;
+  }
+
+  void InAppWebView::erasePrintJobController(const std::string& id)
+  {
+    printJobControllers_.erase(id);
+  }
+
+  void InAppWebView::disposeAllPrintJobControllers()
+  {
+    // First pass: invalidate parent pointers to prevent controllers from trying
+    // to erase themselves during dispose (since we're destroying the webview)
+    for (auto& pair : printJobControllers_) {
+      if (pair.second) {
+        pair.second->invalidateParentWebView();
+      }
+    }
+    // Second pass: now safe to dispose (won't try to access webview)
+    for (auto& pair : printJobControllers_) {
+      if (pair.second) {
+        pair.second->dispose();
+      }
+    }
+    printJobControllers_.clear();
+  }
+
+  void InAppWebView::printCurrentPage(std::shared_ptr<PrintJobSettings> settings,
+    const std::function<void(const std::optional<std::string>&)> completionHandler)
+  {
+    if (!webView || !webViewEnv) {
+      if (completionHandler) {
+        completionHandler(std::nullopt);
+      }
+      return;
+    }
+
+    wil::com_ptr<ICoreWebView2_16> webView16;
+    if (failedAndLog(webView->QueryInterface(IID_PPV_ARGS(&webView16))) || !webView16) {
+      if (completionHandler) {
+        completionHandler(std::nullopt);
+      }
+      return;
+    }
+
+    // Check if showUI is true - use ShowPrintUI instead of Print
+    bool showUI = settings && settings->showUI.value_or(true);
+    
+    if (showUI) {
+      // Use ShowPrintUI to display the print dialog
+      COREWEBVIEW2_PRINT_DIALOG_KIND dialogKind = COREWEBVIEW2_PRINT_DIALOG_KIND_BROWSER;
+      if (settings && settings->printDialogKind.has_value()) {
+        dialogKind = static_cast<COREWEBVIEW2_PRINT_DIALOG_KIND>(settings->printDialogKind.value());
+      }
+      
+      if (failedAndLog(webView16->ShowPrintUI(dialogKind))) {
+        if (completionHandler) {
+          completionHandler(std::nullopt);
+        }
+        return;
+      }
+      
+      // ShowPrintUI is fire-and-forget, return immediately with no job ID
+      if (completionHandler) {
+        completionHandler(std::nullopt);
+      }
+      return;
+    }
+
+    // Generate print job ID if handledByClient is true
+    std::optional<std::string> printJobId = std::nullopt;
+    if (settings && settings->handledByClient.value_or(false)) {
+      printJobId = get_uuid();
+    }
+
+    // Create print settings using PrintJobSettings helper method
+    wil::com_ptr<ICoreWebView2Environment6> environment6;
+    if (failedAndLog(webViewEnv->QueryInterface(IID_PPV_ARGS(&environment6))) || !environment6) {
+      if (completionHandler) {
+        completionHandler(std::nullopt);
+      }
+      return;
+    }
+
+    wil::com_ptr<ICoreWebView2PrintSettings> printSettings;
+    if (settings) {
+      printSettings = settings->createPrintSettings(environment6.get());
+    }
+    else {
+      // Create default print settings if no settings provided
+      if (failedAndLog(environment6->CreatePrintSettings(&printSettings))) {
+        printSettings = nullptr;
+      }
+    }
+
+    if (!printSettings) {
+      if (completionHandler) {
+        completionHandler(std::nullopt);
+      }
+      return;
+    }
+
+    // Create PrintJobController if handledByClient
+    std::shared_ptr<PrintJobController> printJobController = nullptr;
+    if (printJobId.has_value() && printJobManager) {
+      printJobController = printJobManager->createPrintJobController(printJobId.value(), settings);
+      if (printJobController) {
+        addPrintJobController(printJobId.value(), printJobController);
+      }
+    }
+
+    // Perform the print operation
+    auto printJobIdCapture = printJobId;
+    auto completionHandlerCapture = completionHandler;
+    auto printJobControllerCapture = printJobController;
+
+    webView16->Print(printSettings.get(), Callback<ICoreWebView2PrintCompletedHandler>(
+      [this, printJobIdCapture, completionHandlerCapture, printJobControllerCapture](HRESULT errorCode, COREWEBVIEW2_PRINT_STATUS printStatus) -> HRESULT
+      {
+        bool success = SUCCEEDED(errorCode) && printStatus == COREWEBVIEW2_PRINT_STATUS_SUCCEEDED;
+
+        if (printJobControllerCapture) {
+          // Notify the print job controller of completion
+          std::optional<std::string> error = std::nullopt;
+          if (!success) {
+            if (printStatus == COREWEBVIEW2_PRINT_STATUS_PRINTER_UNAVAILABLE) {
+              error = "Printer unavailable";
+            }
+            else if (errorCode == E_INVALIDARG) {
+              error = "Invalid print settings";
+            }
+            else if (errorCode == E_ABORT) {
+              error = "Print operation aborted - another print job in progress";
+            }
+            else {
+              error = "Print operation failed";
+            }
+          }
+          printJobControllerCapture->onComplete(success, error);
+        }
+
+        if (completionHandlerCapture) {
+          completionHandlerCapture(printJobIdCapture);
+        }
+
+        return S_OK;
+      }).Get());
+  }
+
+  void InAppWebView::createPdf(std::shared_ptr<PrintJobSettings> settings,
+    const std::function<void(const std::optional<std::vector<uint8_t>>&)> completionHandler)
+  {
+    if (!webView || !webViewEnv) {
+      if (completionHandler) {
+        completionHandler(std::nullopt);
+      }
+      return;
+    }
+
+    wil::com_ptr<ICoreWebView2_16> webView16;
+    if (failedAndLog(webView->QueryInterface(IID_PPV_ARGS(&webView16))) || !webView16) {
+      if (completionHandler) {
+        completionHandler(std::nullopt);
+      }
+      return;
+    }
+
+    // Create print settings using PrintJobSettings helper method or default
+    wil::com_ptr<ICoreWebView2Environment6> environment6;
+    if (failedAndLog(webViewEnv->QueryInterface(IID_PPV_ARGS(&environment6))) || !environment6) {
+      if (completionHandler) {
+        completionHandler(std::nullopt);
+      }
+      return;
+    }
+
+    wil::com_ptr<ICoreWebView2PrintSettings> printSettings;
+    if (settings) {
+      printSettings = settings->createPrintSettings(environment6.get());
+    }
+    else {
+      // Create default print settings if no settings provided
+      if (failedAndLog(environment6->CreatePrintSettings(&printSettings))) {
+        printSettings = nullptr;
+      }
+    }
+
+    if (!printSettings) {
+      if (completionHandler) {
+        completionHandler(std::nullopt);
+      }
+      return;
+    }
+
+    // Perform the PrintToPdfStream operation
+    auto completionHandlerCapture = completionHandler;
+
+    webView16->PrintToPdfStream(printSettings.get(), Callback<ICoreWebView2PrintToPdfStreamCompletedHandler>(
+      [completionHandlerCapture](HRESULT errorCode, IStream* pdfStream) -> HRESULT
+      {
+        if (FAILED(errorCode) || !pdfStream) {
+          if (completionHandlerCapture) {
+            completionHandlerCapture(std::nullopt);
+          }
+          return S_OK;
+        }
+
+        // Read the PDF data from the stream using utility function
+        auto pdfData = readStreamBytes(pdfStream);
+
+        if (completionHandlerCapture) {
+          completionHandlerCapture(pdfData);
+        }
+
+        return S_OK;
+      }).Get());
+  }
+
   void InAppWebView::takeScreenshot(const std::optional<std::shared_ptr<ScreenshotConfiguration>> screenshotConfiguration, const std::function<void(const std::optional<std::string>)> completionHandler) const
   {
     if (!webView) {
@@ -3912,6 +4141,10 @@ namespace flutter_inappwebview_plugin
       }
     }
     webMessageListeners_.clear();
+    if (printJobManager) {
+      printJobManager->dispose();
+      printJobManager.reset();
+    }
     disposeAllWebNotificationControllers();
     if (findInteractionController) {
       findInteractionController->dispose();

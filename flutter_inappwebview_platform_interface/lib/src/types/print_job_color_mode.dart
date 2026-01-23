@@ -19,6 +19,7 @@ class PrintJobColorMode_ {
     platforms: [
       EnumAndroidPlatform(value: 1),
       EnumMacOSPlatform(value: "Gray"),
+      EnumWindowsPlatform(value: 1),
     ],
   )
   static const MONOCHROME = const PrintJobColorMode_._internal(1);
@@ -28,6 +29,7 @@ class PrintJobColorMode_ {
     platforms: [
       EnumAndroidPlatform(value: 1),
       EnumMacOSPlatform(value: "RGB"),
+      EnumWindowsPlatform(value: 0),
     ],
   )
   static const COLOR = const PrintJobColorMode_._internal(2);

@@ -1,10 +1,12 @@
 #include "../in_app_browser/in_app_browser.h"
+#include "../print_job/print_job_settings.h"
 #include "../types/base_callback_result.h"
 #include "../types/content_world.h"
 #include "../utils/flutter.h"
 #include "../utils/log.h"
 #include "../utils/strconv.h"
 #include "../utils/string.h"
+#include "../utils/uuid.h"
 #include "in_app_webview.h"
 #include "webview_channel_delegate.h"
 
@@ -500,6 +502,39 @@ namespace flutter_inappwebview_plugin
       auto urlFile = get_fl_map_value<std::string>(arguments, "urlFile");
       webView->injectCSSFileFromUrl(urlFile);
       result->Success(true);
+    }
+    else if (string_equals(methodName, "printCurrentPage")) {
+      auto result_ = std::shared_ptr<flutter::MethodResult<flutter::EncodableValue>>(std::move(result));
+      auto settingsMap = get_optional_fl_map_value<flutter::EncodableMap>(arguments, "settings");
+      std::shared_ptr<PrintJobSettings> settings = settingsMap.has_value() 
+        ? std::make_shared<PrintJobSettings>(settingsMap.value()) 
+        : nullptr;
+      webView->printCurrentPage(settings, [result_ = std::move(result_)](const std::optional<std::string>& printJobId)
+        {
+          result_->Success(make_fl_value(printJobId));
+        });
+    }
+    else if (string_equals(methodName, "createPdf")) {
+      auto result_ = std::shared_ptr<flutter::MethodResult<flutter::EncodableValue>>(std::move(result));
+      
+      // Parse settings from pdfConfiguration if provided
+      std::shared_ptr<PrintJobSettings> settings = nullptr;
+      if (fl_map_contains_not_null(arguments, "pdfConfiguration")) {
+        auto pdfConfig = get_fl_map_value<flutter::EncodableMap>(arguments, "pdfConfiguration");
+        if (fl_map_contains_not_null(pdfConfig, "settings")) {
+          auto settingsMap = get_fl_map_value<flutter::EncodableMap>(pdfConfig, "settings");
+          settings = std::make_shared<PrintJobSettings>(settingsMap);
+        }
+      }
+      
+      webView->createPdf(settings, [result_ = std::move(result_)](const std::optional<std::vector<uint8_t>>& pdfData)
+        {
+          if (pdfData.has_value()) {
+            result_->Success(flutter::EncodableValue(pdfData.value()));
+          } else {
+            result_->Success(flutter::EncodableValue());
+          }
+        });
     }
     // for inAppBrowser
     else if (webView->inAppBrowser && string_equals(methodName, "show")) {

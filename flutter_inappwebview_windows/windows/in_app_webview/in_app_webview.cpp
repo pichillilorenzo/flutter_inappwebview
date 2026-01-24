@@ -2807,13 +2807,11 @@ namespace flutter_inappwebview_plugin
       }
     }
 
-    // Perform the print operation
-    auto printJobIdCapture = printJobId;
-    auto completionHandlerCapture = completionHandler;
+    // Capture for the async callback
     auto printJobControllerCapture = printJobController;
 
-    webView16->Print(printSettings.get(), Callback<ICoreWebView2PrintCompletedHandler>(
-      [this, printJobIdCapture, completionHandlerCapture, printJobControllerCapture](HRESULT errorCode, COREWEBVIEW2_PRINT_STATUS printStatus) -> HRESULT
+    HRESULT printHr = webView16->Print(printSettings.get(), Callback<ICoreWebView2PrintCompletedHandler>(
+      [this, printJobId, printJobControllerCapture](HRESULT errorCode, COREWEBVIEW2_PRINT_STATUS printStatus) -> HRESULT
       {
         bool success = SUCCEEDED(errorCode) && printStatus == COREWEBVIEW2_PRINT_STATUS_SUCCEEDED;
 
@@ -2831,18 +2829,27 @@ namespace flutter_inappwebview_plugin
               error = "Print operation aborted - another print job in progress";
             }
             else {
-              error = "Print operation failed";
+              error = "Print operation failed with status " + std::to_string(static_cast<int>(printStatus));
             }
           }
           printJobControllerCapture->onComplete(success, error);
         }
 
-        if (completionHandlerCapture) {
-          completionHandlerCapture(printJobIdCapture);
-        }
-
         return S_OK;
       }).Get());
+
+    // Return immediately with the print job ID - don't wait for Print callback
+    // The callback will notify completion via PrintJobController.onComplete
+    if (failedAndLog(printHr)) {
+      if (completionHandler) {
+        completionHandler(std::nullopt);
+      }
+    }
+    else {
+      if (completionHandler) {
+        completionHandler(printJobId);
+      }
+    }
   }
 
   void InAppWebView::createPdf(std::shared_ptr<PrintJobSettings> settings,

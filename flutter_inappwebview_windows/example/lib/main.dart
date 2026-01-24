@@ -137,20 +137,44 @@ class _MyAppState extends State<MyApp> {
       final settings = PrintJobSettings(
         showUI: showUI,
         printDialogKind: PrintJobDialogKind.BROWSER,
-        colorMode: PrintJobColorMode.COLOR,
+        colorMode: PrintJobColorMode.MONOCHROME,
         copies: 1,
         duplexMode: PrintJobDuplexMode.NONE,
         orientation: PrintJobOrientation.PORTRAIT,
         pagesPerSide: 1,
+        pageHeight: 1,
+        pageRanges: '1',
+        handledByClient: !showUI,
         shouldPrintBackgrounds: true,
         shouldPrintHeaderAndFooter: true,
         headerTitle: 'Flutter InAppWebView Windows Example',
         footerUri: 'https://flutter.dev',
       );
 
+      debugPrint('Starting print job with settings: $settings');
       final printJobController = await webViewController?.printCurrentPage(
         settings: settings,
       );
+
+      printJobController?.onComplete = (completed, error) async {
+        if (error != null) {
+          debugPrint('Print job error: $error');
+          setState(() {
+            printStatus = 'Print job error: $error';
+          });
+        } else if (completed) {
+          debugPrint('Print job completed successfully');
+          setState(() {
+            printStatus = 'Print job completed successfully';
+          });
+        } else {
+          debugPrint('Print job was not completed');
+          setState(() {
+            printStatus = 'Print job was not completed';
+          });
+        }
+        printJobController.dispose();
+      };
 
       debugPrint('Print job controller: $printJobController');
       debugPrint('Print job ID: ${printJobController?.id}');
@@ -333,6 +357,9 @@ class _MyAppState extends State<MyApp> {
                             })();
                           ''');
                           debugPrint('Notification JavaScript injected');
+
+                          debugPrint('Test print page silently');
+                          _printPage(showUI: false);
                         },
                         onPermissionRequest: (controller, permissionRequest) {
                           debugPrint(
@@ -346,30 +373,29 @@ class _MyAppState extends State<MyApp> {
                         onNotificationReceived: (controller, request) async {
                           final notification =
                               request.notificationController?.notification;
-                          final senderOrigin = request.senderOrigin;
-
-                          debugPrint('=== onNotificationReceived ===');
-                          debugPrint('Sender Origin: $senderOrigin');
-                          debugPrint(
-                              'Notification ID: ${request.notificationController?.id}');
-                          debugPrint('Title: ${notification?.title}');
-                          debugPrint('Body: ${notification?.body}');
-                          debugPrint('Tag: ${notification?.tag}');
-                          debugPrint('Icon URI: ${notification?.iconUri}');
-                          debugPrint('Badge URI: ${notification?.badgeUri}');
-                          debugPrint(
-                              'Body Image URI: ${notification?.bodyImageUri}');
-                          debugPrint('Language: ${notification?.language}');
-                          debugPrint('Direction: ${notification?.direction}');
-                          debugPrint('Is Silent: ${notification?.isSilent}');
-                          debugPrint(
-                              'Requires Interaction: ${notification?.requiresInteraction}');
-                          debugPrint(
-                              'Should Renotify: ${notification?.shouldRenotify}');
-                          debugPrint('Timestamp: ${notification?.timestamp}');
-                          debugPrint(
-                              'Vibration Pattern: ${notification?.vibrationPattern}');
-                          debugPrint('==============================');
+                          // final senderOrigin = request.senderOrigin;
+                          // debugPrint('=== onNotificationReceived ===');
+                          // debugPrint('Sender Origin: $senderOrigin');
+                          // debugPrint(
+                          //     'Notification ID: ${request.notificationController?.id}');
+                          // debugPrint('Title: ${notification?.title}');
+                          // debugPrint('Body: ${notification?.body}');
+                          // debugPrint('Tag: ${notification?.tag}');
+                          // debugPrint('Icon URI: ${notification?.iconUri}');
+                          // debugPrint('Badge URI: ${notification?.badgeUri}');
+                          // debugPrint(
+                          //     'Body Image URI: ${notification?.bodyImageUri}');
+                          // debugPrint('Language: ${notification?.language}');
+                          // debugPrint('Direction: ${notification?.direction}');
+                          // debugPrint('Is Silent: ${notification?.isSilent}');
+                          // debugPrint(
+                          //     'Requires Interaction: ${notification?.requiresInteraction}');
+                          // debugPrint(
+                          //     'Should Renotify: ${notification?.shouldRenotify}');
+                          // debugPrint('Timestamp: ${notification?.timestamp}');
+                          // debugPrint(
+                          //     'Vibration Pattern: ${notification?.vibrationPattern}');
+                          // debugPrint('==============================');
 
                           setState(() {
                             notificationStatus =

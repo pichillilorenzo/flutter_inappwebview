@@ -26,9 +26,26 @@ class PrintJobColorMode {
   static final COLOR = PrintJobColorMode._internalMultiPlatform(2, () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
-        return 1;
+        return 2;
       case TargetPlatform.macOS:
         return 'RGB';
+      case TargetPlatform.windows:
+        return 1;
+      default:
+        break;
+    }
+    return null;
+  });
+
+  ///Monochrome color scheme, for example one color is used.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android WebView
+  ///- Windows WebView2
+  static final DEFAULT = PrintJobColorMode._internalMultiPlatform(0, () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+        return 0;
       case TargetPlatform.windows:
         return 0;
       default:
@@ -50,7 +67,7 @@ class PrintJobColorMode {
       case TargetPlatform.macOS:
         return 'Gray';
       case TargetPlatform.windows:
-        return 1;
+        return 2;
       default:
         break;
     }
@@ -60,6 +77,7 @@ class PrintJobColorMode {
   ///Set of all values of [PrintJobColorMode].
   static final Set<PrintJobColorMode> values = [
     PrintJobColorMode.COLOR,
+    PrintJobColorMode.DEFAULT,
     PrintJobColorMode.MONOCHROME,
   ].toSet();
 
@@ -133,6 +151,8 @@ class PrintJobColorMode {
     switch (_value) {
       case 2:
         return 'COLOR';
+      case 0:
+        return 'DEFAULT';
       case 1:
         return 'MONOCHROME';
     }

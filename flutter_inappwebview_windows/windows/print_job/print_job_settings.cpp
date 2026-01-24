@@ -38,11 +38,11 @@ namespace flutter_inappwebview_plugin
     showUI = get_optional_fl_map_value<bool>(map, "showUI");
 
     if (auto dialogKindVal = get_optional_fl_map_value<int64_t>(map, "printDialogKind")) {
-      printDialogKind = static_cast<PrintJobDialogKind>(*dialogKindVal);
+      printDialogKind = *dialogKindVal;
     }
 
     if (auto orientationVal = get_optional_fl_map_value<int64_t>(map, "orientation")) {
-      orientation = static_cast<PrintJobOrientation>(*orientationVal);
+      orientation = *orientationVal;
     }
 
     if (fl_map_contains_not_null(map, "margins")) {
@@ -64,7 +64,7 @@ namespace flutter_inappwebview_plugin
     collate = get_optional_fl_map_value<bool>(map, "collate");
 
     if (auto colorModeVal = get_optional_fl_map_value<int64_t>(map, "colorMode")) {
-      colorMode = static_cast<PrintColorMode>(*colorModeVal);
+      colorMode = *colorModeVal;
     }
 
     if (auto copiesVal = get_optional_fl_map_value<int64_t>(map, "copies")) {
@@ -72,16 +72,7 @@ namespace flutter_inappwebview_plugin
     }
 
     if (auto duplexVal = get_optional_fl_map_value<int64_t>(map, "duplexMode")) {
-      duplex = static_cast<PrintDuplex>(*duplexVal);
-    }
-
-    // Parse mediaSize from PrintJobMediaSize object
-    if (fl_map_contains_not_null(map, "mediaSize")) {
-      auto mediaSizeMap = get_fl_map_value<flutter::EncodableMap>(map, "mediaSize");
-      auto mediaSizeId = get_optional_fl_map_value<std::string>(mediaSizeMap, "id");
-      if (mediaSizeId.has_value()) {
-        mediaSize = mediaSizeIdToEnum(*mediaSizeId);
-      }
+      duplex = *duplexVal;
     }
 
     pageRanges = get_optional_fl_map_value<std::string>(map, "pageRanges");
@@ -103,10 +94,8 @@ namespace flutter_inappwebview_plugin
 
     // Windows-specific (ICoreWebView2PrintSettings)
     map.insert({ make_fl_value("showUI"), make_fl_value(showUI) });
-    map.insert({ make_fl_value("printDialogKind"),
-      printDialogKind.has_value() ? make_fl_value(static_cast<int64_t>(*printDialogKind)) : make_fl_value() });
-    map.insert({ make_fl_value("orientation"),
-      orientation.has_value() ? make_fl_value(static_cast<int64_t>(*orientation)) : make_fl_value() });
+    map.insert({ make_fl_value("printDialogKind"), make_fl_value(printDialogKind) });
+    map.insert({ make_fl_value("orientation"), make_fl_value(orientation) });
     map.insert({ make_fl_value("margins"),
       margins.has_value() ? make_fl_value(margins->toEncodableMap()) : make_fl_value() });
     map.insert({ make_fl_value("scalingFactor"), make_fl_value(scalingFactor) });
@@ -121,14 +110,10 @@ namespace flutter_inappwebview_plugin
 
     // ICoreWebView2PrintSettings2 properties
     map.insert({ make_fl_value("collate"), make_fl_value(collate) });
-    map.insert({ make_fl_value("colorMode"),
-      colorMode.has_value() ? make_fl_value(static_cast<int64_t>(*colorMode)) : make_fl_value() });
+    map.insert({ make_fl_value("colorMode"), make_fl_value(colorMode) });
     map.insert({ make_fl_value("copies"),
       copies.has_value() ? make_fl_value(static_cast<int64_t>(*copies)) : make_fl_value() });
-    map.insert({ make_fl_value("duplexMode"),
-      duplex.has_value() ? make_fl_value(static_cast<int64_t>(*duplex)) : make_fl_value() });
-    map.insert({ make_fl_value("mediaSize"),
-      mediaSize.has_value() ? make_fl_value(mediaSizeEnumToId(*mediaSize)) : make_fl_value() });
+    map.insert({ make_fl_value("duplexMode"), make_fl_value(duplex) });
     map.insert({ make_fl_value("pageRanges"), make_fl_value(pageRanges) });
     map.insert({ make_fl_value("pagesPerSide"),
       pagesPerSide.has_value() ? make_fl_value(static_cast<int64_t>(*pagesPerSide)) : make_fl_value() });
@@ -209,8 +194,6 @@ namespace flutter_inappwebview_plugin
       if (printerName.has_value()) {
         printSettings2->put_PrinterName(utf8_to_wide(printerName.value()).c_str());
       }
-      // mediaSize: WebView2 uses PageWidth/PageHeight for custom sizes
-      // Standard media sizes are handled by the printer driver based on printerName
     }
 
     return printSettings;

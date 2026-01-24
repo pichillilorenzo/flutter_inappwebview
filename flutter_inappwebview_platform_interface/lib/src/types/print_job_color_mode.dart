@@ -17,9 +17,18 @@ class PrintJobColorMode_ {
   ///Monochrome color scheme, for example one color is used.
   @EnumSupportedPlatforms(
     platforms: [
+      EnumAndroidPlatform(value: 0),
+      EnumWindowsPlatform(value: 0),
+    ],
+  )
+  static const DEFAULT = const PrintJobColorMode_._internal(0);
+
+  ///Monochrome color scheme, for example one color is used.
+  @EnumSupportedPlatforms(
+    platforms: [
       EnumAndroidPlatform(value: 1),
       EnumMacOSPlatform(value: "Gray"),
-      EnumWindowsPlatform(value: 1),
+      EnumWindowsPlatform(value: 2),
     ],
   )
   static const MONOCHROME = const PrintJobColorMode_._internal(1);
@@ -27,9 +36,9 @@ class PrintJobColorMode_ {
   ///Color color scheme, for example many colors are used.
   @EnumSupportedPlatforms(
     platforms: [
-      EnumAndroidPlatform(value: 1),
+      EnumAndroidPlatform(value: 2),
       EnumMacOSPlatform(value: "RGB"),
-      EnumWindowsPlatform(value: 0),
+      EnumWindowsPlatform(value: 1),
     ],
   )
   static const COLOR = const PrintJobColorMode_._internal(2);

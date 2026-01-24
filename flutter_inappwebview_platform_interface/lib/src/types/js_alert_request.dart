@@ -23,9 +23,10 @@ class JsAlertRequest_ {
   @SupportedPlatforms(platforms: [IOSPlatform(), MacOSPlatform()])
   bool? isMainFrame;
 
-  JsAlertRequest_(
-      {this.url,
-      this.message,
-      @Deprecated("Use isMainFrame instead") this.iosIsMainFrame,
-      this.isMainFrame});
+  JsAlertRequest_({
+    this.url,
+    this.message,
+    @Deprecated("Use isMainFrame instead") this.iosIsMainFrame,
+    this.isMainFrame,
+  });
 }

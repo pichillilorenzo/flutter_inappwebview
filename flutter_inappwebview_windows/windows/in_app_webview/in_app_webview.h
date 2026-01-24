@@ -11,6 +11,7 @@
 #include "../flutter_inappwebview_windows_plugin.h"
 #include "../plugin_scripts_js/plugin_scripts_util.h"
 #include "../types/content_world.h"
+#include "../types/favicon_image_format.h"
 #include "../types/navigation_action.h"
 #include "../types/screenshot_configuration.h"
 #include "../types/ssl_certificate.h"
@@ -21,12 +22,19 @@
 #include "in_app_webview_settings.h"
 #include "user_content_controller.h"
 #include "webview_channel_delegate.h"
+#include "../web_message/web_message_channel.h"
+#include "../web_message/web_message_listener.h"
+#include "../find_interaction/find_interaction_controller.h"
+#include "../web_notification/web_notification_controller.h"
+#include "../print_job/print_job_settings.h"
 
 #include <WebView2EnvironmentOptions.h>
 
 namespace flutter_inappwebview_plugin
 {
   class InAppBrowser;
+  class PrintJobManager;
+  class PrintJobController;
 
   using namespace Microsoft::WRL;
 
@@ -99,6 +107,8 @@ namespace flutter_inappwebview_plugin
     wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController;
     wil::com_ptr<ICoreWebView2> webView;
     std::unique_ptr<WebViewChannelDelegate> channelDelegate;
+    std::unique_ptr<FindInteractionController> findInteractionController;
+    std::unique_ptr<PrintJobManager> printJobManager;
     std::shared_ptr<InAppWebViewSettings> settings;
     InAppBrowser* inAppBrowser = nullptr;
     std::unique_ptr<UserContentController> userContentController;
@@ -145,6 +155,12 @@ namespace flutter_inappwebview_plugin
     void prepare(const InAppWebViewCreationParams& params);
     std::optional<std::string> getUrl() const;
     std::optional<std::string> getTitle() const;
+    std::optional<int64_t> getFrameId() const;
+    std::optional<int64_t> getMemoryUsageTargetLevel() const;
+    void setMemoryUsageTargetLevel(const int64_t& level) const;
+    void getFavicon(const std::optional<std::string>& url, const std::optional<FaviconImageFormat>& faviconImageFormat,
+      const std::function<void(const std::optional<std::vector<uint8_t>>)> completionHandler) const;
+    void showSaveAsUI(const std::function<void(const std::optional<int64_t>)> completionHandler) const;
     void loadUrl(const std::shared_ptr<URLRequest> urlRequest) const;
     void loadFile(const std::string& assetFilePath) const;
     void loadData(const std::string& data) const;
@@ -180,6 +196,47 @@ namespace flutter_inappwebview_plugin
     void clearSslPreferences(const std::function<void()> completionHandler) const;
     bool isInterfaceSupported(const std::string& interfaceName) const;
     double getZoomScale() const;
+    int64_t getProgress() const;
+    void scrollTo(const int64_t& x, const int64_t& y, const bool& animated) const;
+    void scrollBy(const int64_t& x, const int64_t& y, const bool& animated) const;
+    void getScrollX(const std::function<void(const std::optional<int64_t>)> completionHandler) const;
+    void getScrollY(const std::function<void(const std::optional<int64_t>)> completionHandler) const;
+    void getContentHeight(const std::function<void(const std::optional<int64_t>)> completionHandler) const;
+    void getContentWidth(const std::function<void(const std::optional<int64_t>)> completionHandler) const;
+    void isSecureContext(const std::function<void(const bool)> completionHandler) const;
+    void injectCSSCode(const std::string& source) const;
+    void injectCSSFileFromUrl(const std::string& urlFile) const;
+
+    void addWebMessageListener(const std::string& jsObjectName,
+      const std::vector<std::string>& allowedOriginRules,
+      const std::string& listenerId);
+    void createWebMessageChannel(
+      const std::function<void(const std::optional<std::string>&)> callback);
+    WebMessageChannel* getWebMessageChannel(const std::string& channelId) const;
+    void postWebMessage(const std::string& messageData,
+      const std::string& targetOrigin,
+      int64_t messageType);
+    void setWebMessageCallback(const std::string& channelId, int portIndex);
+    void postWebMessageOnPort(const std::string& channelId, int portIndex,
+      const std::string& messageData, int64_t messageType);
+    void closeWebMessagePort(const std::string& channelId, int portIndex);
+    void disposeWebMessageChannel(const std::string& channelId);
+
+    void addWebNotificationController(const std::string& id, std::shared_ptr<WebNotificationController> controller);
+    WebNotificationController* getWebNotificationController(const std::string& id) const;
+    void eraseWebNotificationController(const std::string& id);
+    void disposeAllWebNotificationControllers();
+
+    void addPrintJobController(const std::string& id, std::shared_ptr<PrintJobController> controller);
+    PrintJobController* getPrintJobController(const std::string& id) const;
+    void erasePrintJobController(const std::string& id);
+    void disposeAllPrintJobControllers();
+
+    void printCurrentPage(std::shared_ptr<PrintJobSettings> settings,
+      const std::function<void(const std::optional<std::string>&)> completionHandler);
+
+    void createPdf(std::shared_ptr<PrintJobSettings> settings,
+      const std::function<void(const std::optional<std::vector<uint8_t>>&)> completionHandler);
 
     std::string pageFrameId() const
     {
@@ -205,6 +262,11 @@ namespace flutter_inappwebview_plugin
     std::map<std::string, std::pair<wil::com_ptr<ICoreWebView2DevToolsProtocolEventReceiver>, EventRegistrationToken>> devToolsProtocolEventListener_ = {};
     int64_t previousAuthRequestFailureCount = 0;
     double zoomScaleFactor_ = 1.0;
+    int64_t progress_ = 0;
+    std::map<std::string, std::unique_ptr<WebMessageChannel>> webMessageChannels_;
+    std::map<std::string, std::unique_ptr<WebMessageListener>> webMessageListeners_;
+    std::map<std::string, std::shared_ptr<WebNotificationController>> webNotificationControllers_;
+    std::map<std::string, std::shared_ptr<PrintJobController>> printJobControllers_;
 
     void registerEventHandlers();
     void registerSurfaceEventHandlers();

@@ -11,40 +11,45 @@ class PrintJobDisposition {
   final String _value;
   final String _nativeValue;
   const PrintJobDisposition._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory PrintJobDisposition._internalMultiPlatform(
-          String value, Function nativeValue) =>
-      PrintJobDisposition._internal(value, nativeValue());
+    String value,
+    Function nativeValue,
+  ) => PrintJobDisposition._internal(value, nativeValue());
 
   ///Cancel print job.
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- macOS WKWebView
-  static final CANCEL =
-      PrintJobDisposition._internalMultiPlatform('CANCEL', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.macOS:
-        return 'cancel';
-      default:
-        break;
-    }
-    return null;
-  });
+  static final CANCEL = PrintJobDisposition._internalMultiPlatform(
+    'CANCEL',
+    () {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.macOS:
+          return 'cancel';
+        default:
+          break;
+      }
+      return null;
+    },
+  );
 
   ///Send to Preview application.
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- macOS WKWebView
-  static final PREVIEW =
-      PrintJobDisposition._internalMultiPlatform('PREVIEW', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.macOS:
-        return 'preview';
-      default:
-        break;
-    }
-    return null;
-  });
+  static final PREVIEW = PrintJobDisposition._internalMultiPlatform(
+    'PREVIEW',
+    () {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.macOS:
+          return 'preview';
+        default:
+          break;
+      }
+      return null;
+    },
+  );
 
   ///Save to a file.
   ///
@@ -86,8 +91,9 @@ class PrintJobDisposition {
   static PrintJobDisposition? fromValue(String? value) {
     if (value != null) {
       try {
-        return PrintJobDisposition.values
-            .firstWhere((element) => element.toValue() == value);
+        return PrintJobDisposition.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -99,8 +105,9 @@ class PrintJobDisposition {
   static PrintJobDisposition? fromNativeValue(String? value) {
     if (value != null) {
       try {
-        return PrintJobDisposition.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return PrintJobDisposition.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -116,8 +123,9 @@ class PrintJobDisposition {
   static PrintJobDisposition? byName(String? name) {
     if (name != null) {
       try {
-        return PrintJobDisposition.values
-            .firstWhere((element) => element.name() == name);
+        return PrintJobDisposition.values.firstWhere(
+          (element) => element.name() == name,
+        );
       } catch (e) {
         return null;
       }
@@ -135,7 +143,7 @@ class PrintJobDisposition {
   /// them will be represented in the returned map.
   static Map<String, PrintJobDisposition> asNameMap() =>
       <String, PrintJobDisposition>{
-        for (final value in PrintJobDisposition.values) value.name(): value
+        for (final value in PrintJobDisposition.values) value.name(): value,
       };
 
   ///Gets [String] value.

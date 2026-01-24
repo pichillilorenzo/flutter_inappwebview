@@ -208,64 +208,80 @@ class ChromeSafariBrowserSettings implements ChromeSafariBrowserOptions {
   ///**Officially Supported Platforms/Implementations**:
   ///- Android Chrome Custom Tabs
   ///- iOS SFSafariViewController
-  ChromeSafariBrowserSettings(
-      {this.shareState = CustomTabsShareState.SHARE_STATE_DEFAULT,
-      this.showTitle = true,
-      this.toolbarBackgroundColor,
-      this.navigationBarColor,
-      this.navigationBarDividerColor,
-      this.secondaryToolbarColor,
-      this.enableUrlBarHiding = false,
-      this.instantAppsEnabled = false,
-      this.packageName,
-      this.keepAliveEnabled = false,
-      this.isSingleInstance = false,
-      this.noHistory = false,
-      this.isTrustedWebActivity = false,
-      this.additionalTrustedOrigins = const [],
-      this.displayMode,
-      this.screenOrientation = TrustedWebActivityScreenOrientation.DEFAULT,
-      this.startAnimations,
-      this.exitAnimations,
-      this.alwaysUseBrowserUI = false,
-      this.entersReaderIfAvailable = false,
-      this.barCollapsingEnabled = false,
-      this.dismissButtonStyle = DismissButtonStyle.DONE,
-      this.preferredBarTintColor,
-      this.preferredControlTintColor,
-      this.presentationStyle = ModalPresentationStyle.FULL_SCREEN,
-      this.transitionStyle = ModalTransitionStyle.COVER_VERTICAL,
-      this.activityButton,
-      this.eventAttribution}) {
+  ChromeSafariBrowserSettings({
+    this.shareState = CustomTabsShareState.SHARE_STATE_DEFAULT,
+    this.showTitle = true,
+    this.toolbarBackgroundColor,
+    this.navigationBarColor,
+    this.navigationBarDividerColor,
+    this.secondaryToolbarColor,
+    this.enableUrlBarHiding = false,
+    this.instantAppsEnabled = false,
+    this.packageName,
+    this.keepAliveEnabled = false,
+    this.isSingleInstance = false,
+    this.noHistory = false,
+    this.isTrustedWebActivity = false,
+    this.additionalTrustedOrigins = const [],
+    this.displayMode,
+    this.screenOrientation = TrustedWebActivityScreenOrientation.DEFAULT,
+    this.startAnimations,
+    this.exitAnimations,
+    this.alwaysUseBrowserUI = false,
+    this.entersReaderIfAvailable = false,
+    this.barCollapsingEnabled = false,
+    this.dismissButtonStyle = DismissButtonStyle.DONE,
+    this.preferredBarTintColor,
+    this.preferredControlTintColor,
+    this.presentationStyle = ModalPresentationStyle.FULL_SCREEN,
+    this.transitionStyle = ModalTransitionStyle.COVER_VERTICAL,
+    this.activityButton,
+    this.eventAttribution,
+  }) {
     if (startAnimations != null) {
-      assert(startAnimations!.length == 2,
-          "start animations must be have 2 android resources");
+      assert(
+        startAnimations!.length == 2,
+        "start animations must be have 2 android resources",
+      );
     }
     if (exitAnimations != null) {
-      assert(exitAnimations!.length == 2,
-          "exit animations must be have 2 android resources");
+      assert(
+        exitAnimations!.length == 2,
+        "exit animations must be have 2 android resources",
+      );
     }
   }
 
   ///Gets a possible [ChromeSafariBrowserSettings] instance from a [Map] value.
-  static ChromeSafariBrowserSettings? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static ChromeSafariBrowserSettings? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
     final instance = ChromeSafariBrowserSettings(
       activityButton: ActivityButton.fromMap(
-          map['activityButton']?.cast<String, dynamic>(),
-          enumMethod: enumMethod),
-      displayMode:
-          _deserializeDisplayMode(map['displayMode'], enumMethod: enumMethod),
+        map['activityButton']?.cast<String, dynamic>(),
+        enumMethod: enumMethod,
+      ),
+      displayMode: _deserializeDisplayMode(
+        map['displayMode'],
+        enumMethod: enumMethod,
+      ),
       eventAttribution: UIEventAttribution.fromMap(
-          map['eventAttribution']?.cast<String, dynamic>(),
-          enumMethod: enumMethod),
+        map['eventAttribution']?.cast<String, dynamic>(),
+        enumMethod: enumMethod,
+      ),
       exitAnimations: map['exitAnimations'] != null
-          ? List<AndroidResource>.from(map['exitAnimations'].map((e) =>
-              AndroidResource.fromMap(e?.cast<String, dynamic>(),
-                  enumMethod: enumMethod)!))
+          ? List<AndroidResource>.from(
+              map['exitAnimations'].map(
+                (e) => AndroidResource.fromMap(
+                  e?.cast<String, dynamic>(),
+                  enumMethod: enumMethod,
+                )!,
+              ),
+            )
           : null,
       navigationBarColor: map['navigationBarColor'] != null
           ? UtilColor.fromStringRepresentation(map['navigationBarColor'])
@@ -284,9 +300,14 @@ class ChromeSafariBrowserSettings implements ChromeSafariBrowserOptions {
           ? UtilColor.fromStringRepresentation(map['secondaryToolbarColor'])
           : null,
       startAnimations: map['startAnimations'] != null
-          ? List<AndroidResource>.from(map['startAnimations'].map((e) =>
-              AndroidResource.fromMap(e?.cast<String, dynamic>(),
-                  enumMethod: enumMethod)!))
+          ? List<AndroidResource>.from(
+              map['startAnimations'].map(
+                (e) => AndroidResource.fromMap(
+                  e?.cast<String, dynamic>(),
+                  enumMethod: enumMethod,
+                )!,
+              ),
+            )
           : null,
       toolbarBackgroundColor: map['toolbarBackgroundColor'] != null
           ? UtilColor.fromStringRepresentation(map['toolbarBackgroundColor'])
@@ -297,13 +318,15 @@ class ChromeSafariBrowserSettings implements ChromeSafariBrowserOptions {
         : null;
     instance.alwaysUseBrowserUI = map['alwaysUseBrowserUI'];
     instance.barCollapsingEnabled = map['barCollapsingEnabled'];
-    instance.dismissButtonStyle =
-        switch (enumMethod ?? EnumMethod.nativeValue) {
-      EnumMethod.nativeValue =>
-        DismissButtonStyle.fromNativeValue(map['dismissButtonStyle']),
-      EnumMethod.value =>
-        DismissButtonStyle.fromValue(map['dismissButtonStyle']),
-      EnumMethod.name => DismissButtonStyle.byName(map['dismissButtonStyle'])
+    instance.dismissButtonStyle = switch (enumMethod ??
+        EnumMethod.nativeValue) {
+      EnumMethod.nativeValue => DismissButtonStyle.fromNativeValue(
+        map['dismissButtonStyle'],
+      ),
+      EnumMethod.value => DismissButtonStyle.fromValue(
+        map['dismissButtonStyle'],
+      ),
+      EnumMethod.name => DismissButtonStyle.byName(map['dismissButtonStyle']),
     };
     instance.enableUrlBarHiding = map['enableUrlBarHiding'];
     instance.entersReaderIfAvailable = map['entersReaderIfAvailable'];
@@ -313,44 +336,56 @@ class ChromeSafariBrowserSettings implements ChromeSafariBrowserOptions {
     instance.keepAliveEnabled = map['keepAliveEnabled'];
     instance.noHistory = map['noHistory'];
     instance.presentationStyle = switch (enumMethod ?? EnumMethod.nativeValue) {
-      EnumMethod.nativeValue =>
-        ModalPresentationStyle.fromNativeValue(map['presentationStyle']),
-      EnumMethod.value =>
-        ModalPresentationStyle.fromValue(map['presentationStyle']),
-      EnumMethod.name => ModalPresentationStyle.byName(map['presentationStyle'])
+      EnumMethod.nativeValue => ModalPresentationStyle.fromNativeValue(
+        map['presentationStyle'],
+      ),
+      EnumMethod.value => ModalPresentationStyle.fromValue(
+        map['presentationStyle'],
+      ),
+      EnumMethod.name => ModalPresentationStyle.byName(
+        map['presentationStyle'],
+      ),
     };
     instance.screenOrientation = switch (enumMethod ?? EnumMethod.nativeValue) {
       EnumMethod.nativeValue =>
         TrustedWebActivityScreenOrientation.fromNativeValue(
-            map['screenOrientation']),
-      EnumMethod.value =>
-        TrustedWebActivityScreenOrientation.fromValue(map['screenOrientation']),
-      EnumMethod.name =>
-        TrustedWebActivityScreenOrientation.byName(map['screenOrientation'])
+          map['screenOrientation'],
+        ),
+      EnumMethod.value => TrustedWebActivityScreenOrientation.fromValue(
+        map['screenOrientation'],
+      ),
+      EnumMethod.name => TrustedWebActivityScreenOrientation.byName(
+        map['screenOrientation'],
+      ),
     };
     instance.shareState = switch (enumMethod ?? EnumMethod.nativeValue) {
-      EnumMethod.nativeValue =>
-        CustomTabsShareState.fromNativeValue(map['shareState']),
+      EnumMethod.nativeValue => CustomTabsShareState.fromNativeValue(
+        map['shareState'],
+      ),
       EnumMethod.value => CustomTabsShareState.fromValue(map['shareState']),
-      EnumMethod.name => CustomTabsShareState.byName(map['shareState'])
+      EnumMethod.name => CustomTabsShareState.byName(map['shareState']),
     };
     instance.showTitle = map['showTitle'];
     instance.transitionStyle = switch (enumMethod ?? EnumMethod.nativeValue) {
-      EnumMethod.nativeValue =>
-        ModalTransitionStyle.fromNativeValue(map['transitionStyle']),
-      EnumMethod.value =>
-        ModalTransitionStyle.fromValue(map['transitionStyle']),
-      EnumMethod.name => ModalTransitionStyle.byName(map['transitionStyle'])
+      EnumMethod.nativeValue => ModalTransitionStyle.fromNativeValue(
+        map['transitionStyle'],
+      ),
+      EnumMethod.value => ModalTransitionStyle.fromValue(
+        map['transitionStyle'],
+      ),
+      EnumMethod.name => ModalTransitionStyle.byName(map['transitionStyle']),
     };
     return instance;
   }
 
   ///Check if the given [property] is supported by the [defaultTargetPlatform] or a specific [platform].
-  static bool isPropertySupported(ChromeSafariBrowserSettingsProperty property,
-          {TargetPlatform? platform}) =>
-      _ChromeSafariBrowserSettingsPropertySupported.isPropertySupported(
-          property,
-          platform: platform);
+  static bool isPropertySupported(
+    ChromeSafariBrowserSettingsProperty property, {
+    TargetPlatform? platform,
+  }) => _ChromeSafariBrowserSettingsPropertySupported.isPropertySupported(
+    property,
+    platform: platform,
+  );
 
   ///Converts instance to a map.
   Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
@@ -362,14 +397,15 @@ class ChromeSafariBrowserSettings implements ChromeSafariBrowserOptions {
       "dismissButtonStyle": switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => dismissButtonStyle?.toNativeValue(),
         EnumMethod.value => dismissButtonStyle?.toValue(),
-        EnumMethod.name => dismissButtonStyle?.name()
+        EnumMethod.name => dismissButtonStyle?.name(),
       },
       "displayMode": displayMode?.toMap(enumMethod: enumMethod),
       "enableUrlBarHiding": enableUrlBarHiding,
       "entersReaderIfAvailable": entersReaderIfAvailable,
       "eventAttribution": eventAttribution?.toMap(enumMethod: enumMethod),
-      "exitAnimations":
-          exitAnimations?.map((e) => e.toMap(enumMethod: enumMethod)).toList(),
+      "exitAnimations": exitAnimations
+          ?.map((e) => e.toMap(enumMethod: enumMethod))
+          .toList(),
       "instantAppsEnabled": instantAppsEnabled,
       "isSingleInstance": isSingleInstance,
       "isTrustedWebActivity": isTrustedWebActivity,
@@ -383,27 +419,28 @@ class ChromeSafariBrowserSettings implements ChromeSafariBrowserOptions {
       "presentationStyle": switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => presentationStyle?.toNativeValue(),
         EnumMethod.value => presentationStyle?.toValue(),
-        EnumMethod.name => presentationStyle?.name()
+        EnumMethod.name => presentationStyle?.name(),
       },
       "screenOrientation": switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => screenOrientation?.toNativeValue(),
         EnumMethod.value => screenOrientation?.toValue(),
-        EnumMethod.name => screenOrientation?.name()
+        EnumMethod.name => screenOrientation?.name(),
       },
       "secondaryToolbarColor": secondaryToolbarColor?.toHex(),
       "shareState": switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => shareState?.toNativeValue(),
         EnumMethod.value => shareState?.toValue(),
-        EnumMethod.name => shareState?.name()
+        EnumMethod.name => shareState?.name(),
       },
       "showTitle": showTitle,
-      "startAnimations":
-          startAnimations?.map((e) => e.toMap(enumMethod: enumMethod)).toList(),
+      "startAnimations": startAnimations
+          ?.map((e) => e.toMap(enumMethod: enumMethod))
+          .toList(),
       "toolbarBackgroundColor": toolbarBackgroundColor?.toHex(),
       "transitionStyle": switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => transitionStyle?.toNativeValue(),
         EnumMethod.value => transitionStyle?.toValue(),
-        EnumMethod.name => transitionStyle?.name()
+        EnumMethod.name => transitionStyle?.name(),
       },
     };
   }
@@ -749,20 +786,24 @@ enum ChromeSafariBrowserSettingsProperty {
 
 extension _ChromeSafariBrowserSettingsPropertySupported
     on ChromeSafariBrowserSettings {
-  static bool isPropertySupported(ChromeSafariBrowserSettingsProperty property,
-      {TargetPlatform? platform}) {
+  static bool isPropertySupported(
+    ChromeSafariBrowserSettingsProperty property, {
+    TargetPlatform? platform,
+  }) {
     switch (property) {
       case ChromeSafariBrowserSettingsProperty.activityButton:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
       case ChromeSafariBrowserSettingsProperty.additionalTrustedOrigins:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
       case ChromeSafariBrowserSettingsProperty.alwaysUseBrowserUI:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
       case ChromeSafariBrowserSettingsProperty.barCollapsingEnabled:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
@@ -771,12 +812,14 @@ extension _ChromeSafariBrowserSettingsPropertySupported
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
       case ChromeSafariBrowserSettingsProperty.displayMode:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
       case ChromeSafariBrowserSettingsProperty.enableUrlBarHiding:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
       case ChromeSafariBrowserSettingsProperty.entersReaderIfAvailable:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
@@ -785,40 +828,49 @@ extension _ChromeSafariBrowserSettingsPropertySupported
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
       case ChromeSafariBrowserSettingsProperty.exitAnimations:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
       case ChromeSafariBrowserSettingsProperty.instantAppsEnabled:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
       case ChromeSafariBrowserSettingsProperty.isSingleInstance:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
       case ChromeSafariBrowserSettingsProperty.isTrustedWebActivity:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
       case ChromeSafariBrowserSettingsProperty.keepAliveEnabled:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
       case ChromeSafariBrowserSettingsProperty.navigationBarColor:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
       case ChromeSafariBrowserSettingsProperty.navigationBarDividerColor:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
       case ChromeSafariBrowserSettingsProperty.noHistory:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
       case ChromeSafariBrowserSettingsProperty.packageName:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
       case ChromeSafariBrowserSettingsProperty.preferredBarTintColor:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
@@ -830,28 +882,34 @@ extension _ChromeSafariBrowserSettingsPropertySupported
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
       case ChromeSafariBrowserSettingsProperty.screenOrientation:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
       case ChromeSafariBrowserSettingsProperty.secondaryToolbarColor:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
       case ChromeSafariBrowserSettingsProperty.shareState:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
       case ChromeSafariBrowserSettingsProperty.showTitle:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
       case ChromeSafariBrowserSettingsProperty.startAnimations:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
       case ChromeSafariBrowserSettingsProperty.toolbarBackgroundColor:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
       case ChromeSafariBrowserSettingsProperty.transitionStyle:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);

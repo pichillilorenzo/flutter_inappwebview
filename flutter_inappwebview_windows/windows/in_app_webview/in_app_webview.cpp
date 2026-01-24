@@ -1,20 +1,40 @@
 #include <cstring>
 #include <filesystem>
 #include <nlohmann/json.hpp>
+#include <limits>
 #include <regex>
+#include <set>
 #include <Shlwapi.h>
+#include <flutter/encodable_value.h>
 #include <wil/wrl.h>
 #include <winrt/Windows.Foundation.h>
 
 #include "../custom_platform_view/util/composition.desktop.interop.h"
 #include "../plugin_scripts_js/javascript_bridge_js.h"
+#include "../plugin_scripts_js/web_message_channel_js.h"
+#include "../plugin_scripts_js/web_message_listener_js.h"
 #include "../types/client_cert_response.h"
 #include "../types/create_window_action.h"
+#include "../types/favicon_changed_request.h"
+#include "../types/favicon_image_format.h"
 #include "../types/http_auth_response.h"
 #include "../types/javascript_handler_function_data.h"
+#include "../types/launching_external_uri_scheme_request.h"
+#include "../types/launching_external_uri_scheme_response.h"
+#include "../types/text_direction_kind.h"
+#include "../types/notification_received_request.h"
+#include "../types/notification_received_response.h"
+#include "../types/save_as_kind.h"
+#include "../types/save_as_ui_showing_request.h"
+#include "../types/save_as_ui_showing_response.h"
+#include "../types/save_file_security_check_starting_request.h"
+#include "../types/save_file_security_check_starting_response.h"
+#include "../types/screen_capture_starting_request.h"
+#include "../types/screen_capture_starting_response.h"
 #include "../types/server_trust_auth_response.h"
 #include "../types/ssl_error.h"
 #include "../types/url_credential.h"
+#include "../types/web_notification.h"
 #include "../types/web_resource_error.h"
 #include "../types/web_resource_request.h"
 #include "../utils/base64.h"
@@ -23,6 +43,11 @@
 #include "../utils/strconv.h"
 #include "../utils/string.h"
 #include "../utils/uri.h"
+#include "../utils/util.h"
+#include "../utils/flutter.h"
+#include "../web_notification/web_notification_controller.h"
+#include "../print_job/print_job_controller.h"
+#include "../print_job/print_job_manager.h"
 #include "in_app_webview.h"
 #include "in_app_webview_manager.h"
 
@@ -189,6 +214,8 @@ namespace flutter_inappwebview_plugin
     }
     channelDelegate = channelName.has_value() ? std::make_unique<WebViewChannelDelegate>(this, plugin->registrar->messenger(), channelName.value()) :
       std::make_unique<WebViewChannelDelegate>(this, plugin->registrar->messenger());
+    findInteractionController = std::make_unique<FindInteractionController>(this, plugin->registrar->messenger());
+    printJobManager = std::make_unique<PrintJobManager>(this, plugin->registrar->messenger());
   }
 
   void InAppWebView::prepare(const InAppWebViewCreationParams& params)
@@ -396,7 +423,8 @@ namespace flutter_inappwebview_plugin
                     // if shouldOverrideUrlLoading is used, then call onLoadStart and onProgressChanged here
                     // to match the behaviour of the other platforms
                     channelDelegate->onLoadStart(url);
-                    channelDelegate->onProgressChanged(0);
+                    progress_ = 0;
+                    channelDelegate->onProgressChanged(progress_);
                   }
                 };
 
@@ -589,7 +617,8 @@ namespace flutter_inappwebview_plugin
           // if shouldOverrideUrlLoading is not used, then call onLoadStart and onProgressChanged here
           if (!settings->useShouldOverrideUrlLoading) {
             channelDelegate->onLoadStart(url);
-            channelDelegate->onProgressChanged(0);
+            progress_ = 0;
+            channelDelegate->onProgressChanged(progress_);
           }
           args->put_Cancel(false);
 
@@ -603,7 +632,11 @@ namespace flutter_inappwebview_plugin
         [this](ICoreWebView2* sender, ICoreWebView2ContentLoadingEventArgs* args)
         {
           if (channelDelegate) {
-            channelDelegate->onProgressChanged(33);
+            wil::unique_cotaskmem_string uri;
+            std::optional<std::string> url = SUCCEEDED(webView->get_Source(&uri)) ? wide_to_utf8(uri.get()) : std::optional<std::string>{};
+            channelDelegate->onContentLoading(url);
+            progress_ = 33;
+            channelDelegate->onProgressChanged(progress_);
           }
           return S_OK;
         }
@@ -638,7 +671,8 @@ namespace flutter_inappwebview_plugin
             wil::unique_cotaskmem_string uri;
             std::optional<std::string> url = SUCCEEDED(webView->get_Source(&uri)) ? wide_to_utf8(uri.get()) : std::optional<std::string>{};
 
-            channelDelegate->onProgressChanged(100);
+            progress_ = 100;
+            channelDelegate->onProgressChanged(progress_);
             if (isSuccess) {
               channelDelegate->onLoadStop(url);
             }
@@ -679,6 +713,28 @@ namespace flutter_inappwebview_plugin
       }
     ).Get(), nullptr);
     failedLog(add_DocumentTitleChanged_HResult);
+
+    auto add_ContainsFullScreenElementChanged_HResult = webView->add_ContainsFullScreenElementChanged(
+      Callback<ICoreWebView2ContainsFullScreenElementChangedEventHandler>(
+        [this](ICoreWebView2* sender, IUnknown* args)
+        {
+          if (!channelDelegate) {
+            return S_OK;
+          }
+
+          BOOL containsFullScreenElement = FALSE;
+          if (succeededOrLog(sender->get_ContainsFullScreenElement(&containsFullScreenElement))) {
+            if (containsFullScreenElement) {
+              channelDelegate->onEnterFullscreen();
+            }
+            else {
+              channelDelegate->onExitFullscreen();
+            }
+          }
+          return S_OK;
+        }
+      ).Get(), nullptr);
+    failedLog(add_ContainsFullScreenElementChanged_HResult);
 
     auto add_HistoryChanged_HResult = webView->add_HistoryChanged(Callback<ICoreWebView2HistoryChangedEventHandler>(
       [this](ICoreWebView2* sender, IUnknown* args)
@@ -870,7 +926,15 @@ namespace flutter_inappwebview_plugin
     ).Get(), nullptr);
     failedLog(add_PermissionRequested_HResult);
 
-    failedLog(webView->AddWebResourceRequestedFilter(L"*", COREWEBVIEW2_WEB_RESOURCE_CONTEXT_ALL));
+    if (auto webView22 = webView.try_query<ICoreWebView2_22>()) {
+      failedLog(webView22->AddWebResourceRequestedFilterWithRequestSourceKinds(
+        L"*",
+        COREWEBVIEW2_WEB_RESOURCE_CONTEXT_ALL,
+        COREWEBVIEW2_WEB_RESOURCE_REQUEST_SOURCE_KINDS_ALL));
+    }
+    else {
+      failedLog(webView->AddWebResourceRequestedFilter(L"*", COREWEBVIEW2_WEB_RESOURCE_CONTEXT_ALL));
+    }
     auto add_WebResourceRequested_HResult = webView->add_WebResourceRequested(
       Callback<ICoreWebView2WebResourceRequestedEventHandler>(
         [this](
@@ -1031,7 +1095,11 @@ namespace flutter_inappwebview_plugin
           [this](ICoreWebView2* sender, ICoreWebView2DOMContentLoadedEventArgs* args)
           {
             if (channelDelegate) {
-              channelDelegate->onProgressChanged(66);
+              wil::unique_cotaskmem_string uri;
+              std::optional<std::string> url = SUCCEEDED(webView->get_Source(&uri)) ? wide_to_utf8(uri.get()) : std::optional<std::string>{};
+              channelDelegate->onDOMContentLoaded(url);
+              progress_ = 66;
+              channelDelegate->onProgressChanged(progress_);
             }
             return S_OK;
           }
@@ -1419,6 +1487,440 @@ namespace flutter_inappwebview_plugin
       failedLog(add_ServerCertificateErrorDetected_HResult);
     }
 
+    if (auto webView15 = webView.try_query<ICoreWebView2_15>()) {
+      auto add_FaviconChanged_HResult = webView15->add_FaviconChanged(
+        Callback<ICoreWebView2FaviconChangedEventHandler>(
+          [this, webView15](ICoreWebView2* sender, IUnknown* args)
+          {
+            if (!channelDelegate) {
+              return S_OK;
+            }
+
+            wil::unique_cotaskmem_string faviconUri;
+            std::optional<std::string> faviconUrl = succeededOrLog(webView15->get_FaviconUri(&faviconUri)) && faviconUri ?
+              std::optional<std::string>{ wide_to_utf8(faviconUri.get()) } : std::optional<std::string>{};
+
+            auto hr = webView15->GetFavicon(COREWEBVIEW2_FAVICON_IMAGE_FORMAT_PNG,
+              Callback<ICoreWebView2GetFaviconCompletedHandler>(
+                [this, faviconUrl](HRESULT errorCode, IStream* faviconStream)
+                {
+                  std::optional<std::vector<uint8_t>> icon = std::nullopt;
+                  if (succeededOrLog(errorCode) && faviconStream) {
+                    icon = readStreamBytes(faviconStream);
+                  }
+                  if (channelDelegate) {
+                    auto request = std::make_shared<FaviconChangedRequest>(icon, faviconUrl);
+                    channelDelegate->onFaviconChanged(std::move(request));
+                  }
+                  return S_OK;
+                })
+              .Get());
+
+            if (failedAndLog(hr)) {
+              if (channelDelegate) {
+                auto request = std::make_shared<FaviconChangedRequest>(std::nullopt, faviconUrl);
+                channelDelegate->onFaviconChanged(std::move(request));
+              }
+            }
+
+            return S_OK;
+          })
+        .Get(), nullptr);
+      failedLog(add_FaviconChanged_HResult);
+    }
+
+    if (auto webView18 = webView.try_query<ICoreWebView2_18>()) {
+      auto add_LaunchingExternalUriScheme_HResult = webView18->add_LaunchingExternalUriScheme(
+        Callback<ICoreWebView2LaunchingExternalUriSchemeEventHandler>(
+          [this](ICoreWebView2* sender, ICoreWebView2LaunchingExternalUriSchemeEventArgs* args)
+          {
+            wil::com_ptr<ICoreWebView2Deferral> deferral;
+            failedLog(args->GetDeferral(&deferral));
+
+            if (!channelDelegate) {
+              failedLog(args->put_Cancel(FALSE));
+              if (deferral) {
+                failedLog(deferral->Complete());
+              }
+              return S_OK;
+            }
+
+            wil::unique_cotaskmem_string uri;
+            std::string uriValue = SUCCEEDED(args->get_Uri(&uri)) && uri ? wide_to_utf8(uri.get()) : "";
+
+            wil::unique_cotaskmem_string initiatingOrigin;
+            std::optional<std::string> origin = SUCCEEDED(args->get_InitiatingOrigin(&initiatingOrigin)) && initiatingOrigin ?
+              std::optional<std::string>{ wide_to_utf8(initiatingOrigin.get()) } : std::optional<std::string>{};
+
+            BOOL isUserInitiated = FALSE;
+            failedLog(args->get_IsUserInitiated(&isUserInitiated));
+
+            auto request = std::make_shared<LaunchingExternalUriSchemeRequest>(
+              uriValue,
+              origin,
+              static_cast<bool>(isUserInitiated));
+
+            auto callback = std::make_unique<WebViewChannelDelegate::LaunchingExternalUriSchemeCallback>();
+            auto defaultBehaviour = [deferral, args](const std::optional<std::shared_ptr<LaunchingExternalUriSchemeResponse>> response)
+              {
+                failedLog(args->put_Cancel(FALSE));
+                if (deferral) {
+                  failedLog(deferral->Complete());
+                }
+              };
+            callback->nonNullSuccess = [deferral, args](const std::shared_ptr<LaunchingExternalUriSchemeResponse> response)
+              {
+                failedLog(args->put_Cancel(response ? response->cancel : FALSE));
+                if (deferral) {
+                  failedLog(deferral->Complete());
+                }
+                return false;
+              };
+            callback->defaultBehaviour = defaultBehaviour;
+            callback->error = [defaultBehaviour](const std::string& error_code, const std::string& error_message, const flutter::EncodableValue* error_details)
+              {
+                debugLog(error_code + ", " + error_message);
+                defaultBehaviour(std::nullopt);
+              };
+            channelDelegate->onLaunchingExternalUriScheme(std::move(request), std::move(callback));
+            return S_OK;
+          })
+        .Get(), nullptr);
+      failedLog(add_LaunchingExternalUriScheme_HResult);
+    }
+
+    if (auto webView24 = webView.try_query<ICoreWebView2_24>()) {
+      auto add_NotificationReceived_HResult = webView24->add_NotificationReceived(
+        Callback<ICoreWebView2NotificationReceivedEventHandler>(
+          [this](ICoreWebView2* sender, ICoreWebView2NotificationReceivedEventArgs* args)
+          {
+            wil::com_ptr<ICoreWebView2Deferral> deferral;
+            failedLog(args->GetDeferral(&deferral));
+
+            if (!channelDelegate) {
+              failedLog(args->put_Handled(FALSE));
+              if (deferral) {
+                failedLog(deferral->Complete());
+              }
+              return S_OK;
+            }
+
+            wil::unique_cotaskmem_string senderOrigin;
+            std::optional<std::string> senderOriginValue = SUCCEEDED(args->get_SenderOrigin(&senderOrigin)) && senderOrigin ?
+              std::optional<std::string>{ wide_to_utf8(senderOrigin.get()) } : std::optional<std::string>{};
+
+            std::shared_ptr<WebNotification> notificationPtr;
+            wil::com_ptr<ICoreWebView2Notification> notification;
+            if (succeededOrLog(args->get_Notification(&notification)) && notification) {
+              wil::unique_cotaskmem_string badgeUri;
+              wil::unique_cotaskmem_string body;
+              wil::unique_cotaskmem_string bodyImageUri;
+              wil::unique_cotaskmem_string iconUri;
+              wil::unique_cotaskmem_string language;
+              wil::unique_cotaskmem_string tag;
+              wil::unique_cotaskmem_string title;
+
+              BOOL isSilent = FALSE;
+              BOOL requiresInteraction = FALSE;
+              BOOL shouldRenotify = FALSE;
+              double timestamp = 0;
+              COREWEBVIEW2_TEXT_DIRECTION_KIND direction = COREWEBVIEW2_TEXT_DIRECTION_KIND_DEFAULT;
+
+              notification->get_BadgeUri(&badgeUri);
+              notification->get_Body(&body);
+              notification->get_BodyImageUri(&bodyImageUri);
+              notification->get_IconUri(&iconUri);
+              notification->get_IsSilent(&isSilent);
+              notification->get_Language(&language);
+              notification->get_RequiresInteraction(&requiresInteraction);
+              notification->get_ShouldRenotify(&shouldRenotify);
+              notification->get_Tag(&tag);
+              notification->get_Timestamp(&timestamp);
+              notification->get_Title(&title);
+              notification->get_Direction(&direction);
+
+              // Get vibration pattern
+              UINT32 vibrationPatternCount = 0;
+              UINT64* vibrationPatternValues = nullptr;
+              std::optional<std::vector<int64_t>> vibrationPattern = std::nullopt;
+              if (SUCCEEDED(notification->GetVibrationPattern(&vibrationPatternCount, &vibrationPatternValues)) && vibrationPatternCount > 0) {
+                std::vector<int64_t> pattern;
+                pattern.reserve(vibrationPatternCount);
+                for (UINT32 i = 0; i < vibrationPatternCount; ++i) {
+                  pattern.push_back(static_cast<int64_t>(vibrationPatternValues[i]));
+                }
+                CoTaskMemFree(vibrationPatternValues);
+                vibrationPattern = std::move(pattern);
+              }
+
+              notificationPtr = std::make_shared<WebNotification>(
+                title ? std::optional<std::string>{ wide_to_utf8(title.get()) } : std::optional<std::string>{},
+                body ? std::optional<std::string>{ wide_to_utf8(body.get()) } : std::optional<std::string>{},
+                TextDirectionKindFromOptionalInteger(std::optional<int64_t>{ static_cast<int64_t>(direction) }),
+                language ? std::optional<std::string>{ wide_to_utf8(language.get()) } : std::optional<std::string>{},
+                tag ? std::optional<std::string>{ wide_to_utf8(tag.get()) } : std::optional<std::string>{},
+                iconUri ? std::optional<std::string>{ wide_to_utf8(iconUri.get()) } : std::optional<std::string>{},
+                badgeUri ? std::optional<std::string>{ wide_to_utf8(badgeUri.get()) } : std::optional<std::string>{},
+                bodyImageUri ? std::optional<std::string>{ wide_to_utf8(bodyImageUri.get()) } : std::optional<std::string>{},
+                static_cast<bool>(shouldRenotify),
+                static_cast<bool>(requiresInteraction),
+                static_cast<bool>(isSilent),
+                timestamp,
+                vibrationPattern);
+            }
+
+            // Create WebNotificationController with unique ID, passing this InAppWebView pointer
+            std::string notificationControllerId = get_uuid();
+            auto notificationController = std::make_shared<WebNotificationController>(
+              notificationControllerId, notification, notificationPtr, plugin->registrar->messenger(), this);
+
+            // Store the controller in the map to prevent deallocation
+            webNotificationControllers_[notificationControllerId] = notificationController;
+
+            auto request = std::make_shared<NotificationReceivedRequest>(senderOriginValue, notificationControllerId, notificationPtr);
+
+            auto callback = std::make_unique<WebViewChannelDelegate::NotificationReceivedCallback>();
+            auto defaultBehaviour = [deferral, args, notificationController](const std::optional<std::shared_ptr<NotificationReceivedResponse>> response)
+              {
+                failedLog(args->put_Handled(FALSE));
+                if (deferral) {
+                  failedLog(deferral->Complete());
+                }
+              };
+            callback->nonNullSuccess = [deferral, args, notificationController](const std::shared_ptr<NotificationReceivedResponse> response)
+              {
+                failedLog(args->put_Handled(response ? response->handled : FALSE));
+                if (deferral) {
+                  failedLog(deferral->Complete());
+                }
+                return false;
+              };
+            callback->defaultBehaviour = defaultBehaviour;
+            callback->error = [defaultBehaviour](const std::string& error_code, const std::string& error_message, const flutter::EncodableValue* error_details)
+              {
+                debugLog(error_code + ", " + error_message);
+                defaultBehaviour(std::nullopt);
+              };
+            channelDelegate->onNotificationReceived(std::move(request), std::move(callback));
+            return S_OK;
+          })
+        .Get(), nullptr);
+      failedLog(add_NotificationReceived_HResult);
+    }
+
+    if (auto webView25 = webView.try_query<ICoreWebView2_25>()) {
+      auto add_SaveAsUIShowing_HResult = webView25->add_SaveAsUIShowing(
+        Callback<ICoreWebView2SaveAsUIShowingEventHandler>(
+          [this](ICoreWebView2* sender, ICoreWebView2SaveAsUIShowingEventArgs* args)
+          {
+            wil::com_ptr<ICoreWebView2Deferral> deferral;
+            failedLog(args->GetDeferral(&deferral));
+
+            BOOL allowReplace = FALSE;
+            BOOL cancel = FALSE;
+            BOOL suppressDefaultDialog = FALSE;
+            COREWEBVIEW2_SAVE_AS_KIND kind = COREWEBVIEW2_SAVE_AS_KIND_DEFAULT;
+            wil::unique_cotaskmem_string contentMimeType;
+            wil::unique_cotaskmem_string saveAsFilePath;
+
+            failedLog(args->get_AllowReplace(&allowReplace));
+            failedLog(args->get_Cancel(&cancel));
+            failedLog(args->get_SuppressDefaultDialog(&suppressDefaultDialog));
+            failedLog(args->get_Kind(&kind));
+            failedLog(args->get_ContentMimeType(&contentMimeType));
+            failedLog(args->get_SaveAsFilePath(&saveAsFilePath));
+
+            if (!channelDelegate) {
+              if (deferral) {
+                failedLog(deferral->Complete());
+              }
+              return S_OK;
+            }
+
+            auto request = std::make_shared<SaveAsUIShowingRequest>(
+              contentMimeType ? std::optional<std::string>{ wide_to_utf8(contentMimeType.get()) } : std::optional<std::string>{},
+              static_cast<bool>(cancel),
+              static_cast<bool>(suppressDefaultDialog),
+              saveAsFilePath ? std::optional<std::string>{ wide_to_utf8(saveAsFilePath.get()) } : std::optional<std::string>{},
+              static_cast<bool>(allowReplace),
+              SaveAsKindFromOptionalInteger(std::optional<int64_t>{ static_cast<int64_t>(kind) }));
+
+            auto callback = std::make_unique<WebViewChannelDelegate::SaveAsUIShowingCallback>();
+            auto defaultBehaviour = [deferral](const std::optional<std::shared_ptr<SaveAsUIShowingResponse>> response)
+              {
+                if (deferral) {
+                  failedLog(deferral->Complete());
+                }
+              };
+            callback->nonNullSuccess = [deferral, args](const std::shared_ptr<SaveAsUIShowingResponse> response)
+              {
+                if (response && response->allowReplace.has_value()) {
+                  failedLog(args->put_AllowReplace(response->allowReplace.value()));
+                }
+                if (response && response->cancel.has_value()) {
+                  failedLog(args->put_Cancel(response->cancel.value()));
+                }
+                if (response && response->kind.has_value()) {
+                  failedLog(args->put_Kind(static_cast<COREWEBVIEW2_SAVE_AS_KIND>(response->kind.value())));
+                }
+                if (response && response->saveAsFilePath.has_value()) {
+                  failedLog(args->put_SaveAsFilePath(utf8_to_wide(response->saveAsFilePath.value()).c_str()));
+                }
+                if (response && response->suppressDefaultDialog.has_value()) {
+                  failedLog(args->put_SuppressDefaultDialog(response->suppressDefaultDialog.value()));
+                }
+                if (deferral) {
+                  failedLog(deferral->Complete());
+                }
+                return false;
+              };
+            callback->defaultBehaviour = defaultBehaviour;
+            callback->error = [defaultBehaviour](const std::string& error_code, const std::string& error_message, const flutter::EncodableValue* error_details)
+              {
+                debugLog(error_code + ", " + error_message);
+                defaultBehaviour(std::nullopt);
+              };
+            channelDelegate->onSaveAsUIShowing(std::move(request), std::move(callback));
+            return S_OK;
+          })
+        .Get(), nullptr);
+      failedLog(add_SaveAsUIShowing_HResult);
+    }
+
+    if (auto webView26 = webView.try_query<ICoreWebView2_26>()) {
+      auto add_SaveFileSecurityCheckStarting_HResult = webView26->add_SaveFileSecurityCheckStarting(
+        Callback<ICoreWebView2SaveFileSecurityCheckStartingEventHandler>(
+          [this](ICoreWebView2* sender, ICoreWebView2SaveFileSecurityCheckStartingEventArgs* args)
+          {
+            wil::com_ptr<ICoreWebView2Deferral> deferral;
+            failedLog(args->GetDeferral(&deferral));
+
+            BOOL cancelSave = FALSE;
+            BOOL suppressDefaultPolicy = FALSE;
+            wil::unique_cotaskmem_string documentOriginUri;
+            wil::unique_cotaskmem_string fileExtension;
+            wil::unique_cotaskmem_string filePath;
+
+            failedLog(args->get_CancelSave(&cancelSave));
+            failedLog(args->get_SuppressDefaultPolicy(&suppressDefaultPolicy));
+            failedLog(args->get_DocumentOriginUri(&documentOriginUri));
+            failedLog(args->get_FileExtension(&fileExtension));
+            failedLog(args->get_FilePath(&filePath));
+
+            if (!channelDelegate) {
+              if (deferral) {
+                failedLog(deferral->Complete());
+              }
+              return S_OK;
+            }
+
+            auto request = std::make_shared<SaveFileSecurityCheckStartingRequest>(
+              documentOriginUri ? std::optional<std::string>{ wide_to_utf8(documentOriginUri.get()) } : std::optional<std::string>{},
+              fileExtension ? std::optional<std::string>{ wide_to_utf8(fileExtension.get()) } : std::optional<std::string>{},
+              filePath ? std::optional<std::string>{ wide_to_utf8(filePath.get()) } : std::optional<std::string>{},
+              static_cast<bool>(cancelSave),
+              static_cast<bool>(suppressDefaultPolicy));
+
+            auto callback = std::make_unique<WebViewChannelDelegate::SaveFileSecurityCheckStartingCallback>();
+            auto defaultBehaviour = [deferral](const std::optional<std::shared_ptr<SaveFileSecurityCheckStartingResponse>> response)
+              {
+                if (deferral) {
+                  failedLog(deferral->Complete());
+                }
+              };
+            callback->nonNullSuccess = [deferral, args](const std::shared_ptr<SaveFileSecurityCheckStartingResponse> response)
+              {
+                if (response && response->cancelSave.has_value()) {
+                  failedLog(args->put_CancelSave(response->cancelSave.value()));
+                }
+                if (response && response->suppressDefaultPolicy.has_value()) {
+                  failedLog(args->put_SuppressDefaultPolicy(response->suppressDefaultPolicy.value()));
+                }
+                if (deferral) {
+                  failedLog(deferral->Complete());
+                }
+                return false;
+              };
+            callback->defaultBehaviour = defaultBehaviour;
+            callback->error = [defaultBehaviour](const std::string& error_code, const std::string& error_message, const flutter::EncodableValue* error_details)
+              {
+                debugLog(error_code + ", " + error_message);
+                defaultBehaviour(std::nullopt);
+              };
+            channelDelegate->onSaveFileSecurityCheckStarting(std::move(request), std::move(callback));
+            return S_OK;
+          })
+        .Get(), nullptr);
+      failedLog(add_SaveFileSecurityCheckStarting_HResult);
+    }
+
+    if (auto webView27 = webView.try_query<ICoreWebView2_27>()) {
+      auto add_ScreenCaptureStarting_HResult = webView27->add_ScreenCaptureStarting(
+        Callback<ICoreWebView2ScreenCaptureStartingEventHandler>(
+          [this](ICoreWebView2* sender, ICoreWebView2ScreenCaptureStartingEventArgs* args)
+          {
+            wil::com_ptr<ICoreWebView2Deferral> deferral;
+            failedLog(args->GetDeferral(&deferral));
+
+            BOOL cancel = FALSE;
+            BOOL handled = FALSE;
+            failedLog(args->get_Cancel(&cancel));
+            failedLog(args->get_Handled(&handled));
+
+            wil::com_ptr<ICoreWebView2FrameInfo> frameInfo;
+            std::optional<std::shared_ptr<FrameInfo>> frame = std::nullopt;
+            if (succeededOrLog(args->get_OriginalSourceFrameInfo(&frameInfo)) && frameInfo) {
+              auto framePtr = FrameInfo::fromICoreWebView2FrameInfo(frameInfo);
+              if (framePtr) {
+                frame = std::shared_ptr<FrameInfo>(std::move(framePtr));
+              }
+            }
+
+            if (!channelDelegate) {
+              if (deferral) {
+                failedLog(deferral->Complete());
+              }
+              return S_OK;
+            }
+
+            auto request = std::make_shared<ScreenCaptureStartingRequest>(
+              frame,
+              static_cast<bool>(cancel),
+              static_cast<bool>(handled));
+
+            auto callback = std::make_unique<WebViewChannelDelegate::ScreenCaptureStartingCallback>();
+            auto defaultBehaviour = [deferral](const std::optional<std::shared_ptr<ScreenCaptureStartingResponse>> response)
+              {
+                if (deferral) {
+                  failedLog(deferral->Complete());
+                }
+              };
+            callback->nonNullSuccess = [deferral, args](const std::shared_ptr<ScreenCaptureStartingResponse> response)
+              {
+                if (response && response->cancel.has_value()) {
+                  failedLog(args->put_Cancel(response->cancel.value()));
+                }
+                if (response && response->handled.has_value()) {
+                  failedLog(args->put_Handled(response->handled.value()));
+                }
+                if (deferral) {
+                  failedLog(deferral->Complete());
+                }
+                return false;
+              };
+            callback->defaultBehaviour = defaultBehaviour;
+            callback->error = [defaultBehaviour](const std::string& error_code, const std::string& error_message, const flutter::EncodableValue* error_details)
+              {
+                debugLog(error_code + ", " + error_message);
+                defaultBehaviour(std::nullopt);
+              };
+            channelDelegate->onScreenCaptureStarting(std::move(request), std::move(callback));
+            return S_OK;
+          })
+        .Get(), nullptr);
+      failedLog(add_ScreenCaptureStarting_HResult);
+    }
+
     if (userContentController) {
       userContentController->registerEventHandlers();
     }
@@ -1455,6 +1957,101 @@ namespace flutter_inappwebview_plugin
   {
     wil::unique_cotaskmem_string title;
     return webView && succeededOrLog(webView->get_DocumentTitle(&title)) ? wide_to_utf8(title.get()) : std::optional<std::string>{};
+  }
+
+  std::optional<int64_t> InAppWebView::getFrameId() const
+  {
+    if (auto webView20 = webView.try_query<ICoreWebView2_20>()) {
+      UINT32 frameId = 0;
+      if (succeededOrLog(webView20->get_FrameId(&frameId))) {
+        return static_cast<int64_t>(frameId);
+      }
+    }
+    return std::nullopt;
+  }
+
+  std::optional<int64_t> InAppWebView::getMemoryUsageTargetLevel() const
+  {
+    if (auto webView19 = webView.try_query<ICoreWebView2_19>()) {
+      COREWEBVIEW2_MEMORY_USAGE_TARGET_LEVEL level = COREWEBVIEW2_MEMORY_USAGE_TARGET_LEVEL_NORMAL;
+      if (succeededOrLog(webView19->get_MemoryUsageTargetLevel(&level))) {
+        return static_cast<int64_t>(level);
+      }
+    }
+    return std::nullopt;
+  }
+
+  void InAppWebView::setMemoryUsageTargetLevel(const int64_t& level) const
+  {
+    if (auto webView19 = webView.try_query<ICoreWebView2_19>()) {
+      failedLog(webView19->put_MemoryUsageTargetLevel(static_cast<COREWEBVIEW2_MEMORY_USAGE_TARGET_LEVEL>(level)));
+    }
+  }
+
+  void InAppWebView::getFavicon(const std::optional<std::string>& url, const std::optional<FaviconImageFormat>& faviconImageFormat,
+    const std::function<void(const std::optional<std::vector<uint8_t>>)> completionHandler) const
+  {
+    (void)url;
+    if (!completionHandler) {
+      return;
+    }
+
+    auto webView15 = webView.try_query<ICoreWebView2_15>();
+    if (!webView15) {
+      completionHandler(std::nullopt);
+      return;
+    }
+
+    auto format = faviconImageFormat.has_value() ? faviconImageFormat.value() : FaviconImageFormat::png;
+    auto hr = webView15->GetFavicon(
+      FaviconImageFormatToCoreWebView2(format),
+      Callback<ICoreWebView2GetFaviconCompletedHandler>(
+        [completionHandler](HRESULT errorCode, IStream* faviconStream)
+        {
+          if (succeededOrLog(errorCode) && faviconStream) {
+            completionHandler(readStreamBytes(faviconStream));
+          }
+          else {
+            completionHandler(std::nullopt);
+          }
+          return S_OK;
+        })
+      .Get());
+
+    if (failedAndLog(hr)) {
+      completionHandler(std::nullopt);
+    }
+  }
+
+  void InAppWebView::showSaveAsUI(const std::function<void(const std::optional<int64_t>)> completionHandler) const
+  {
+    if (!completionHandler) {
+      return;
+    }
+
+    auto webView25 = webView.try_query<ICoreWebView2_25>();
+    if (!webView25) {
+      completionHandler(std::nullopt);
+      return;
+    }
+
+    auto hr = webView25->ShowSaveAsUI(
+      Callback<ICoreWebView2ShowSaveAsUICompletedHandler>(
+        [completionHandler](HRESULT errorCode, COREWEBVIEW2_SAVE_AS_UI_RESULT result)
+        {
+          if (succeededOrLog(errorCode)) {
+            completionHandler(static_cast<int64_t>(result));
+          }
+          else {
+            completionHandler(std::nullopt);
+          }
+          return S_OK;
+        })
+      .Get());
+
+    if (failedAndLog(hr)) {
+      completionHandler(std::nullopt);
+    }
   }
 
   void InAppWebView::loadUrl(const std::shared_ptr<URLRequest> urlRequest) const
@@ -1840,6 +2437,490 @@ namespace flutter_inappwebview_plugin
     userContentController->removeAllUserOnlyScripts();
   }
 
+  void InAppWebView::addWebMessageListener(const std::string& jsObjectName,
+    const std::vector<std::string>& allowedOriginRules,
+    const std::string& listenerId)
+  {
+    if (!webView || jsObjectName.empty() || !plugin || !plugin->registrar) {
+      return;
+    }
+
+    std::set<std::string> originRulesSet(allowedOriginRules.begin(), allowedOriginRules.end());
+    auto listener = std::make_unique<WebMessageListener>(
+      plugin->registrar->messenger(), listenerId, jsObjectName, originRulesSet, this);
+    webMessageListeners_[jsObjectName] = std::move(listener);
+
+    std::string allowedOriginRulesJs = "[";
+    for (size_t i = 0; i < allowedOriginRules.size(); ++i) {
+      const std::string& rule = allowedOriginRules[i];
+      if (rule == "*") {
+        allowedOriginRulesJs += "'*'";
+      }
+      else {
+        std::string scheme, host;
+        int port = 0;
+
+        size_t schemeEnd = rule.find("://");
+        if (schemeEnd != std::string::npos) {
+          scheme = rule.substr(0, schemeEnd);
+          std::string rest = rule.substr(schemeEnd + 3);
+
+          size_t portStart = rest.find(':');
+          if (portStart != std::string::npos) {
+            host = rest.substr(0, portStart);
+            try {
+              port = std::stoi(rest.substr(portStart + 1));
+            }
+            catch (...) {
+              port = 0;
+            }
+          }
+          else {
+            host = rest;
+          }
+        }
+
+        std::string hostEscaped = host;
+        size_t pos = 0;
+        while ((pos = hostEscaped.find("'", pos)) != std::string::npos) {
+          hostEscaped.replace(pos, 1, "\\'");
+          pos += 2;
+        }
+
+        allowedOriginRulesJs += "{scheme: '" + scheme + "', host: ";
+        if (host.empty()) {
+          allowedOriginRulesJs += "null";
+        }
+        else {
+          allowedOriginRulesJs += "'" + hostEscaped + "'";
+        }
+        allowedOriginRulesJs += ", port: ";
+        if (port == 0) {
+          allowedOriginRulesJs += "null";
+        }
+        else {
+          allowedOriginRulesJs += std::to_string(port);
+        }
+        allowedOriginRulesJs += "}";
+      }
+      if (i < allowedOriginRules.size() - 1) {
+        allowedOriginRulesJs += ", ";
+      }
+    }
+    allowedOriginRulesJs += "]";
+
+    std::string jsSource = WebMessageListenerJS::createWebMessageListenerInjectionJs(
+      jsObjectName, allowedOriginRulesJs);
+
+    std::string groupName = "WebMessageListener-" + jsObjectName;
+
+    auto userScript = std::make_shared<UserScript>(
+      groupName,
+      jsSource,
+      UserScriptInjectionTime::atDocumentStart,
+      true,
+      std::nullopt,
+      ContentWorld::page()
+    );
+
+    if (userContentController) {
+      userContentController->addUserOnlyScript(userScript);
+    }
+  }
+
+  void InAppWebView::createWebMessageChannel(
+    const std::function<void(const std::optional<std::string>&)> callback)
+  {
+    if (!webView || !plugin || !plugin->registrar) {
+      if (callback) callback(std::nullopt);
+      return;
+    }
+
+    std::string channelId = get_uuid();
+    std::string js = WebMessageChannelJS::createWebMessageChannelJs(channelId);
+
+    evaluateJavascript(js, ContentWorld::page(), [this, callback, channelId](const std::string& result)
+      {
+        if (!result.empty() && result != "null") {
+          auto channel = std::make_unique<WebMessageChannel>(
+            plugin->registrar->messenger(), channelId, this);
+          webMessageChannels_[channelId] = std::move(channel);
+          if (callback) callback(channelId);
+        }
+        else {
+          if (callback) callback(std::nullopt);
+        }
+      });
+  }
+
+  WebMessageChannel* InAppWebView::getWebMessageChannel(const std::string& channelId) const
+  {
+    auto it = webMessageChannels_.find(channelId);
+    if (it != webMessageChannels_.end()) {
+      return it->second.get();
+    }
+    return nullptr;
+  }
+
+  void InAppWebView::postWebMessage(const std::string& messageData,
+    const std::string& targetOrigin,
+    int64_t messageType)
+  {
+    if (!webView) return;
+
+    std::string messageDataJs;
+    if (messageType == 1) {
+      messageDataJs = "new Uint8Array([" + messageData + "]).buffer";
+    }
+    else {
+      std::string escaped;
+      escaped.reserve(messageData.size() * 2);
+      for (char c : messageData) {
+        switch (c) {
+        case '\\': escaped += "\\\\"; break;
+        case '"': escaped += "\\\""; break;
+        case '\n': escaped += "\\n"; break;
+        case '\r': escaped += "\\r"; break;
+        case '\t': escaped += "\\t"; break;
+        default: escaped += c; break;
+        }
+      }
+      messageDataJs = "\"" + escaped + "\"";
+    }
+
+    std::string js = WebMessageChannelJS::postWebMessageJs(messageDataJs, targetOrigin, "");
+    evaluateJavascript(js, ContentWorld::page(), nullptr);
+  }
+
+  void InAppWebView::setWebMessageCallback(const std::string& channelId, int portIndex)
+  {
+    if (!webView || channelId.empty()) return;
+
+    std::string js = WebMessageChannelJS::setWebMessageCallbackJs(channelId, portIndex);
+    evaluateJavascript(js, ContentWorld::page(), nullptr);
+  }
+
+  void InAppWebView::postWebMessageOnPort(const std::string& channelId, int portIndex,
+    const std::string& messageData, int64_t messageType)
+  {
+    if (!webView || channelId.empty()) return;
+
+    std::string messageDataJs;
+    if (messageType == 1) {
+      messageDataJs = "new Uint8Array([" + messageData + "]).buffer";
+    }
+    else {
+      std::string escaped;
+      escaped.reserve(messageData.size() * 2);
+      for (char c : messageData) {
+        switch (c) {
+        case '\\': escaped += "\\\\"; break;
+        case '"': escaped += "\\\""; break;
+        case '\n': escaped += "\\n"; break;
+        case '\r': escaped += "\\r"; break;
+        case '\t': escaped += "\\t"; break;
+        default: escaped += c; break;
+        }
+      }
+      messageDataJs = "\"" + escaped + "\"";
+    }
+
+    std::string js = WebMessageChannelJS::postMessageJs(channelId, portIndex, messageDataJs);
+    evaluateJavascript(js, ContentWorld::page(), nullptr);
+  }
+
+  void InAppWebView::closeWebMessagePort(const std::string& channelId, int portIndex)
+  {
+    if (!webView || channelId.empty()) return;
+
+    std::string js = WebMessageChannelJS::closePortJs(channelId, portIndex);
+    evaluateJavascript(js, ContentWorld::page(), nullptr);
+  }
+
+  void InAppWebView::disposeWebMessageChannel(const std::string& channelId)
+  {
+    if (channelId.empty()) return;
+
+    if (webView) {
+      std::string js = WebMessageChannelJS::disposeChannelJs(channelId);
+      evaluateJavascript(js, ContentWorld::page(), nullptr);
+    }
+
+    auto it = webMessageChannels_.find(channelId);
+    if (it != webMessageChannels_.end() && it->second) {
+      it->second->dispose();
+    }
+    webMessageChannels_.erase(channelId);
+  }
+
+  void InAppWebView::addWebNotificationController(const std::string& id, std::shared_ptr<WebNotificationController> controller)
+  {
+    if (id.empty() || !controller) return;
+    webNotificationControllers_[id] = std::move(controller);
+  }
+
+  WebNotificationController* InAppWebView::getWebNotificationController(const std::string& id) const
+  {
+    auto it = webNotificationControllers_.find(id);
+    return it != webNotificationControllers_.end() ? it->second.get() : nullptr;
+  }
+
+  void InAppWebView::eraseWebNotificationController(const std::string& id)
+  {
+    webNotificationControllers_.erase(id);
+  }
+
+  void InAppWebView::disposeAllWebNotificationControllers()
+  {
+    // First pass: invalidate parent pointers to prevent controllers from trying
+    // to erase themselves during dispose (since we're destroying the webview)
+    for (auto& pair : webNotificationControllers_) {
+      if (pair.second) {
+        pair.second->invalidateParentWebView();
+      }
+    }
+    // Second pass: now safe to dispose (won't try to access webview)
+    for (auto& pair : webNotificationControllers_) {
+      if (pair.second) {
+        pair.second->dispose();
+      }
+    }
+    webNotificationControllers_.clear();
+  }
+
+  void InAppWebView::addPrintJobController(const std::string& id, std::shared_ptr<PrintJobController> controller)
+  {
+    if (id.empty() || !controller) return;
+    printJobControllers_[id] = std::move(controller);
+  }
+
+  PrintJobController* InAppWebView::getPrintJobController(const std::string& id) const
+  {
+    auto it = printJobControllers_.find(id);
+    return it != printJobControllers_.end() ? it->second.get() : nullptr;
+  }
+
+  void InAppWebView::erasePrintJobController(const std::string& id)
+  {
+    printJobControllers_.erase(id);
+  }
+
+  void InAppWebView::disposeAllPrintJobControllers()
+  {
+    // First pass: invalidate parent pointers to prevent controllers from trying
+    // to erase themselves during dispose (since we're destroying the webview)
+    for (auto& pair : printJobControllers_) {
+      if (pair.second) {
+        pair.second->invalidateParentWebView();
+      }
+    }
+    // Second pass: now safe to dispose (won't try to access webview)
+    for (auto& pair : printJobControllers_) {
+      if (pair.second) {
+        pair.second->dispose();
+      }
+    }
+    printJobControllers_.clear();
+  }
+
+  void InAppWebView::printCurrentPage(std::shared_ptr<PrintJobSettings> settings,
+    const std::function<void(const std::optional<std::string>&)> completionHandler)
+  {
+    if (!webView || !webViewEnv) {
+      if (completionHandler) {
+        completionHandler(std::nullopt);
+      }
+      return;
+    }
+
+    wil::com_ptr<ICoreWebView2_16> webView16;
+    if (failedAndLog(webView->QueryInterface(IID_PPV_ARGS(&webView16))) || !webView16) {
+      if (completionHandler) {
+        completionHandler(std::nullopt);
+      }
+      return;
+    }
+
+    // Check if showUI is true - use ShowPrintUI instead of Print
+    bool showUI = settings && settings->showUI.value_or(true);
+    
+    if (showUI) {
+      // Use ShowPrintUI to display the print dialog
+      COREWEBVIEW2_PRINT_DIALOG_KIND dialogKind = COREWEBVIEW2_PRINT_DIALOG_KIND_BROWSER;
+      if (settings && settings->printDialogKind.has_value()) {
+        dialogKind = static_cast<COREWEBVIEW2_PRINT_DIALOG_KIND>(settings->printDialogKind.value());
+      }
+      
+      if (failedAndLog(webView16->ShowPrintUI(dialogKind))) {
+        if (completionHandler) {
+          completionHandler(std::nullopt);
+        }
+        return;
+      }
+      
+      // ShowPrintUI is fire-and-forget, return immediately with no job ID
+      if (completionHandler) {
+        completionHandler(std::nullopt);
+      }
+      return;
+    }
+
+    // Generate print job ID if handledByClient is true
+    std::optional<std::string> printJobId = std::nullopt;
+    if (settings && settings->handledByClient.value_or(false)) {
+      printJobId = get_uuid();
+    }
+
+    // Create print settings using PrintJobSettings helper method
+    wil::com_ptr<ICoreWebView2Environment6> environment6;
+    if (failedAndLog(webViewEnv->QueryInterface(IID_PPV_ARGS(&environment6))) || !environment6) {
+      if (completionHandler) {
+        completionHandler(std::nullopt);
+      }
+      return;
+    }
+
+    wil::com_ptr<ICoreWebView2PrintSettings> printSettings;
+    if (settings) {
+      printSettings = settings->createPrintSettings(environment6.get());
+    }
+    else {
+      // Create default print settings if no settings provided
+      if (failedAndLog(environment6->CreatePrintSettings(&printSettings))) {
+        printSettings = nullptr;
+      }
+    }
+
+    if (!printSettings) {
+      if (completionHandler) {
+        completionHandler(std::nullopt);
+      }
+      return;
+    }
+
+    // Create PrintJobController if handledByClient
+    std::shared_ptr<PrintJobController> printJobController = nullptr;
+    if (printJobId.has_value() && printJobManager) {
+      printJobController = printJobManager->createPrintJobController(printJobId.value(), settings);
+      if (printJobController) {
+        addPrintJobController(printJobId.value(), printJobController);
+      }
+    }
+
+    // Capture for the async callback
+    auto printJobControllerCapture = printJobController;
+
+    HRESULT printHr = webView16->Print(printSettings.get(), Callback<ICoreWebView2PrintCompletedHandler>(
+      [this, printJobId, printJobControllerCapture](HRESULT errorCode, COREWEBVIEW2_PRINT_STATUS printStatus) -> HRESULT
+      {
+        bool success = SUCCEEDED(errorCode) && printStatus == COREWEBVIEW2_PRINT_STATUS_SUCCEEDED;
+
+        if (printJobControllerCapture) {
+          // Notify the print job controller of completion
+          std::optional<std::string> error = std::nullopt;
+          if (!success) {
+            if (printStatus == COREWEBVIEW2_PRINT_STATUS_PRINTER_UNAVAILABLE) {
+              error = "Printer unavailable";
+            }
+            else if (errorCode == E_INVALIDARG) {
+              error = "Invalid print settings";
+            }
+            else if (errorCode == E_ABORT) {
+              error = "Print operation aborted - another print job in progress";
+            }
+            else {
+              error = "Print operation failed with status " + std::to_string(static_cast<int>(printStatus));
+            }
+          }
+          printJobControllerCapture->onComplete(success, error);
+        }
+
+        return S_OK;
+      }).Get());
+
+    // Return immediately with the print job ID - don't wait for Print callback
+    // The callback will notify completion via PrintJobController.onComplete
+    if (failedAndLog(printHr)) {
+      if (completionHandler) {
+        completionHandler(std::nullopt);
+      }
+    }
+    else {
+      if (completionHandler) {
+        completionHandler(printJobId);
+      }
+    }
+  }
+
+  void InAppWebView::createPdf(std::shared_ptr<PrintJobSettings> settings,
+    const std::function<void(const std::optional<std::vector<uint8_t>>&)> completionHandler)
+  {
+    if (!webView || !webViewEnv) {
+      if (completionHandler) {
+        completionHandler(std::nullopt);
+      }
+      return;
+    }
+
+    wil::com_ptr<ICoreWebView2_16> webView16;
+    if (failedAndLog(webView->QueryInterface(IID_PPV_ARGS(&webView16))) || !webView16) {
+      if (completionHandler) {
+        completionHandler(std::nullopt);
+      }
+      return;
+    }
+
+    // Create print settings using PrintJobSettings helper method or default
+    wil::com_ptr<ICoreWebView2Environment6> environment6;
+    if (failedAndLog(webViewEnv->QueryInterface(IID_PPV_ARGS(&environment6))) || !environment6) {
+      if (completionHandler) {
+        completionHandler(std::nullopt);
+      }
+      return;
+    }
+
+    wil::com_ptr<ICoreWebView2PrintSettings> printSettings;
+    if (settings) {
+      printSettings = settings->createPrintSettings(environment6.get());
+    }
+    else {
+      // Create default print settings if no settings provided
+      if (failedAndLog(environment6->CreatePrintSettings(&printSettings))) {
+        printSettings = nullptr;
+      }
+    }
+
+    if (!printSettings) {
+      if (completionHandler) {
+        completionHandler(std::nullopt);
+      }
+      return;
+    }
+
+    // Perform the PrintToPdfStream operation
+    auto completionHandlerCapture = completionHandler;
+
+    webView16->PrintToPdfStream(printSettings.get(), Callback<ICoreWebView2PrintToPdfStreamCompletedHandler>(
+      [completionHandlerCapture](HRESULT errorCode, IStream* pdfStream) -> HRESULT
+      {
+        if (FAILED(errorCode) || !pdfStream) {
+          if (completionHandlerCapture) {
+            completionHandlerCapture(std::nullopt);
+          }
+          return S_OK;
+        }
+
+        // Read the PDF data from the stream using utility function
+        auto pdfData = readStreamBytes(pdfStream);
+
+        if (completionHandlerCapture) {
+          completionHandlerCapture(pdfData);
+        }
+
+        return S_OK;
+      }).Get());
+  }
+
   void InAppWebView::takeScreenshot(const std::optional<std::shared_ptr<ScreenshotConfiguration>> screenshotConfiguration, const std::function<void(const std::optional<std::string>)> completionHandler) const
   {
     if (!webView) {
@@ -2219,6 +3300,10 @@ namespace flutter_inappwebview_plugin
         return webView.try_query<ICoreWebView2_25>() != nullptr;
       case string_hash("ICoreWebView2_26"):
         return webView.try_query<ICoreWebView2_26>() != nullptr;
+      case string_hash("ICoreWebView2_27"):
+        return webView.try_query<ICoreWebView2_27>() != nullptr;
+      case string_hash("ICoreWebView2_28"):
+        return webView.try_query<ICoreWebView2_28>() != nullptr;
       default:
         return false;
       }
@@ -2312,6 +3397,8 @@ namespace flutter_inappwebview_plugin
         return webViewEnv.try_query<ICoreWebView2Environment13>() != nullptr;
       case string_hash("ICoreWebView2Environment14"):
         return webViewEnv.try_query<ICoreWebView2Environment14>() != nullptr;
+      case string_hash("ICoreWebView2Environment15"):
+        return webViewEnv.try_query<ICoreWebView2Environment15>() != nullptr;
       default:
         return false;
       }
@@ -2323,6 +3410,179 @@ namespace flutter_inappwebview_plugin
   double InAppWebView::getZoomScale() const
   {
     return zoomScaleFactor_;
+  }
+
+  int64_t InAppWebView::getProgress() const
+  {
+    // Return the progress value tracked natively through navigation events:
+    // NavigationStarting (0), ContentLoading (33), DOMContentLoaded (66), NavigationCompleted (100)
+    return progress_;
+  }
+
+  void InAppWebView::scrollTo(const int64_t& x, const int64_t& y, const bool& animated) const
+  {
+    if (!webView) {
+      return;
+    }
+
+    std::string script = animated
+      ? "window.scrollTo({top: " + std::to_string(y) + ", left: " + std::to_string(x) + ", behavior: 'smooth'});"
+      : "window.scrollTo(" + std::to_string(x) + ", " + std::to_string(y) + ");";
+    evaluateJavascript(script, ContentWorld::page(), nullptr);
+  }
+
+  void InAppWebView::scrollBy(const int64_t& x, const int64_t& y, const bool& animated) const
+  {
+    if (!webView) {
+      return;
+    }
+
+    std::string script = animated
+      ? "window.scrollBy({top: " + std::to_string(y) + ", left: " + std::to_string(x) + ", behavior: 'smooth'});"
+      : "window.scrollBy(" + std::to_string(x) + ", " + std::to_string(y) + ");";
+    evaluateJavascript(script, ContentWorld::page(), nullptr);
+  }
+
+  void InAppWebView::getScrollX(const std::function<void(const std::optional<int64_t>)> completionHandler) const
+  {
+    if (!webView || !completionHandler) {
+      if (completionHandler) completionHandler(std::nullopt);
+      return;
+    }
+
+    evaluateJavascript(
+      "window.scrollX || window.pageXOffset || document.documentElement.scrollLeft || 0",
+      ContentWorld::page(),
+      [completionHandler](const std::string& value) {
+        try {
+          auto scrollX = std::stoll(value);
+          completionHandler(scrollX);
+        }
+        catch (...) {
+          completionHandler(0);
+        }
+      }
+    );
+  }
+
+  void InAppWebView::getScrollY(const std::function<void(const std::optional<int64_t>)> completionHandler) const
+  {
+    if (!webView || !completionHandler) {
+      if (completionHandler) completionHandler(std::nullopt);
+      return;
+    }
+
+    evaluateJavascript(
+      "window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0",
+      ContentWorld::page(),
+      [completionHandler](const std::string& value) {
+        try {
+          auto scrollY = std::stoll(value);
+          completionHandler(scrollY);
+        }
+        catch (...) {
+          completionHandler(0);
+        }
+      }
+    );
+  }
+
+  void InAppWebView::getContentHeight(const std::function<void(const std::optional<int64_t>)> completionHandler) const
+  {
+    if (!webView || !completionHandler) {
+      if (completionHandler) completionHandler(std::nullopt);
+      return;
+    }
+
+    evaluateJavascript(
+      "Math.max(document.body.scrollHeight, document.documentElement.scrollHeight)",
+      ContentWorld::page(),
+      [completionHandler](const std::string& value) {
+        try {
+          auto height = std::stoll(value);
+          completionHandler(height);
+        }
+        catch (...) {
+          completionHandler(0);
+        }
+      }
+    );
+  }
+
+  void InAppWebView::getContentWidth(const std::function<void(const std::optional<int64_t>)> completionHandler) const
+  {
+    if (!webView || !completionHandler) {
+      if (completionHandler) completionHandler(std::nullopt);
+      return;
+    }
+
+    evaluateJavascript(
+      "Math.max(document.body.scrollWidth, document.documentElement.scrollWidth)",
+      ContentWorld::page(),
+      [completionHandler](const std::string& value) {
+        try {
+          auto width = std::stoll(value);
+          completionHandler(width);
+        }
+        catch (...) {
+          completionHandler(0);
+        }
+      }
+    );
+  }
+
+  void InAppWebView::isSecureContext(const std::function<void(const bool)> completionHandler) const
+  {
+    if (!webView || !completionHandler) {
+      if (completionHandler) completionHandler(false);
+      return;
+    }
+
+    evaluateJavascript(
+      "window.isSecureContext",
+      ContentWorld::page(),
+      [completionHandler](const std::string& value) {
+        completionHandler(value == "true");
+      }
+    );
+  }
+
+  void InAppWebView::injectCSSCode(const std::string& source) const
+  {
+    if (!webView) {
+      return;
+    }
+
+    // Escape single quotes and newlines in CSS
+    std::string escaped_source = source;
+    escaped_source = replace_all_copy(escaped_source, "\\", "\\\\");
+    escaped_source = replace_all_copy(escaped_source, "'", "\\'");
+    escaped_source = replace_all_copy(escaped_source, "\n", "\\n");
+    escaped_source = replace_all_copy(escaped_source, "\r", "\\r");
+
+    std::string script =
+      "(function() {"
+      "  var style = document.createElement('style');"
+      "  style.textContent = '" + escaped_source + "';"
+      "  document.head.appendChild(style);"
+      "})();";
+    evaluateJavascript(script, ContentWorld::page(), nullptr);
+  }
+
+  void InAppWebView::injectCSSFileFromUrl(const std::string& urlFile) const
+  {
+    if (!webView) {
+      return;
+    }
+
+    std::string script =
+      "(function() {"
+      "  var link = document.createElement('link');"
+      "  link.rel = 'stylesheet';"
+      "  link.href = '" + urlFile + "';"
+      "  document.head.appendChild(link);"
+      "})();";
+    evaluateJavascript(script, ContentWorld::page(), nullptr);
   }
 
   // flutter_view
@@ -2660,6 +3920,130 @@ namespace flutter_inappwebview_plugin
             return S_OK;
           }
 
+          auto resolveInternalHandler = [this, callHandlerID]()
+            {
+              evaluateJavascript("if (window." + JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + "[" + std::to_string(callHandlerID) + "] != null) { \
+                      window." + JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + "[" + std::to_string(callHandlerID) + "].resolve(null); \
+                      delete window." + JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + "[" + std::to_string(callHandlerID) + "]; \
+                    }", ContentWorld::page(), nullptr);
+            };
+
+          if (handlerName == "onWebMessagePortMessageReceived") {
+            std::string webMessageChannelId = "";
+            int portIndex = 0;
+            std::string messageData = "";
+            int64_t messageType = 0;
+
+            if (!handlerArgs.empty()) {
+              try {
+                auto argsJson = nlohmann::json::parse(handlerArgs);
+                if (argsJson.is_array() && !argsJson.empty()) {
+                  auto firstArg = argsJson[0];
+                  if (firstArg.contains("webMessageChannelId") && firstArg["webMessageChannelId"].is_string()) {
+                    webMessageChannelId = firstArg["webMessageChannelId"].get<std::string>();
+                  }
+                  if (firstArg.contains("index") && firstArg["index"].is_number()) {
+                    portIndex = firstArg["index"].get<int>();
+                  }
+                  if (firstArg.contains("message") && firstArg["message"].is_object()) {
+                    auto messageObj = firstArg["message"];
+                    if (messageObj.contains("type") && messageObj["type"].is_number()) {
+                      messageType = messageObj["type"].get<int64_t>();
+                    }
+                    if (messageObj.contains("data")) {
+                      if (messageType == 1 && messageObj["data"].is_array()) {
+                        std::string bytes;
+                        for (auto& byte : messageObj["data"]) {
+                          if (!bytes.empty()) bytes += ",";
+                          bytes += std::to_string(byte.get<int>());
+                        }
+                        messageData = bytes;
+                      }
+                      else if (messageObj["data"].is_string()) {
+                        messageData = messageObj["data"].get<std::string>();
+                      }
+                      else if (!messageObj["data"].is_null()) {
+                        messageData = messageObj["data"].dump();
+                      }
+                    }
+                  }
+                }
+              }
+              catch (nlohmann::json::parse_error&) {}
+            }
+
+            if (!webMessageChannelId.empty()) {
+              auto channel = getWebMessageChannel(webMessageChannelId);
+              if (channel != nullptr) {
+                channel->onMessage(portIndex, messageData.empty() ? nullptr : &messageData, messageType);
+              }
+            }
+            resolveInternalHandler();
+            return S_OK;
+          }
+
+          if (handlerName == "onWebMessageListenerPostMessageReceived") {
+            std::string jsObjectName = "";
+            std::string messageData = "";
+            int64_t messageType = 0;
+            std::string sourceOriginStr = "";
+            bool isMainFrameMsg = true;
+
+            if (!handlerArgs.empty()) {
+              try {
+                auto argsJson = nlohmann::json::parse(handlerArgs);
+                if (argsJson.is_array() && !argsJson.empty()) {
+                  auto firstArg = argsJson[0];
+                  if (firstArg.contains("jsObjectName") && firstArg["jsObjectName"].is_string()) {
+                    jsObjectName = firstArg["jsObjectName"].get<std::string>();
+                  }
+                  if (firstArg.contains("sourceOrigin") && firstArg["sourceOrigin"].is_string()) {
+                    sourceOriginStr = firstArg["sourceOrigin"].get<std::string>();
+                  }
+                  if (firstArg.contains("isMainFrame") && firstArg["isMainFrame"].is_boolean()) {
+                    isMainFrameMsg = firstArg["isMainFrame"].get<bool>();
+                  }
+                  if (firstArg.contains("message") && firstArg["message"].is_object()) {
+                    auto messageObj = firstArg["message"];
+                    if (messageObj.contains("type") && messageObj["type"].is_number()) {
+                      messageType = messageObj["type"].get<int64_t>();
+                    }
+                    if (messageObj.contains("data")) {
+                      if (messageType == 1 && messageObj["data"].is_array()) {
+                        std::string bytes;
+                        for (auto& byte : messageObj["data"]) {
+                          if (!bytes.empty()) bytes += ",";
+                          bytes += std::to_string(byte.get<int>());
+                        }
+                        messageData = bytes;
+                      }
+                      else if (messageObj["data"].is_string()) {
+                        messageData = messageObj["data"].get<std::string>();
+                      }
+                      else if (!messageObj["data"].is_null()) {
+                        messageData = messageObj["data"].dump();
+                      }
+                    }
+                  }
+                }
+              }
+              catch (nlohmann::json::parse_error&) {}
+            }
+
+            if (!jsObjectName.empty()) {
+              auto it = webMessageListeners_.find(jsObjectName);
+              if (it != webMessageListeners_.end() && it->second) {
+                it->second->onPostMessage(
+                  messageData.empty() ? nullptr : &messageData,
+                  messageType,
+                  sourceOriginStr,
+                  isMainFrameMsg);
+              }
+            }
+            resolveInternalHandler();
+            return S_OK;
+          }
+
           bool isOriginAllowed = false;
           if (settings->javaScriptHandlersOriginAllowList.has_value()) {
             for (auto& allowedOrigin : settings->javaScriptHandlersOriginAllowList.value()) {
@@ -2751,6 +4135,27 @@ namespace flutter_inappwebview_plugin
     }
     if (webViewController) {
       failedLog(webViewController->Close());
+    }
+    for (auto& [id, channel] : webMessageChannels_) {
+      if (channel) {
+        channel->dispose();
+      }
+    }
+    webMessageChannels_.clear();
+    for (auto& [name, listener] : webMessageListeners_) {
+      if (listener) {
+        listener->dispose();
+      }
+    }
+    webMessageListeners_.clear();
+    if (printJobManager) {
+      printJobManager->dispose();
+      printJobManager.reset();
+    }
+    disposeAllWebNotificationControllers();
+    if (findInteractionController) {
+      findInteractionController->dispose();
+      findInteractionController.reset();
     }
     navigationActions_.clear();
     inAppBrowser = nullptr;

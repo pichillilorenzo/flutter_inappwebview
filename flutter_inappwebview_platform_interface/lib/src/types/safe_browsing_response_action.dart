@@ -18,6 +18,7 @@ class SafeBrowsingResponseAction_ {
   static const PROCEED = const SafeBrowsingResponseAction_._internal(1);
 
   ///Display the default interstitial.
-  static const SHOW_INTERSTITIAL =
-      const SafeBrowsingResponseAction_._internal(2);
+  static const SHOW_INTERSTITIAL = const SafeBrowsingResponseAction_._internal(
+    2,
+  );
 }

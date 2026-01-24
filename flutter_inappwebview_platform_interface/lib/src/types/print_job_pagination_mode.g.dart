@@ -11,25 +11,28 @@ class PrintJobPaginationMode {
   final String _value;
   final int? _nativeValue;
   const PrintJobPaginationMode._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory PrintJobPaginationMode._internalMultiPlatform(
-          String value, Function nativeValue) =>
-      PrintJobPaginationMode._internal(value, nativeValue());
+    String value,
+    Function nativeValue,
+  ) => PrintJobPaginationMode._internal(value, nativeValue());
 
   ///
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- macOS WKWebView
-  static final AUTOMATIC =
-      PrintJobPaginationMode._internalMultiPlatform('AUTOMATIC', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.macOS:
-        return 0;
-      default:
-        break;
-    }
-    return null;
-  });
+  static final AUTOMATIC = PrintJobPaginationMode._internalMultiPlatform(
+    'AUTOMATIC',
+    () {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.macOS:
+          return 0;
+        default:
+          break;
+      }
+      return null;
+    },
+  );
 
   ///
   ///
@@ -70,8 +73,9 @@ class PrintJobPaginationMode {
   static PrintJobPaginationMode? fromValue(String? value) {
     if (value != null) {
       try {
-        return PrintJobPaginationMode.values
-            .firstWhere((element) => element.toValue() == value);
+        return PrintJobPaginationMode.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -83,8 +87,9 @@ class PrintJobPaginationMode {
   static PrintJobPaginationMode? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return PrintJobPaginationMode.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return PrintJobPaginationMode.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -100,8 +105,9 @@ class PrintJobPaginationMode {
   static PrintJobPaginationMode? byName(String? name) {
     if (name != null) {
       try {
-        return PrintJobPaginationMode.values
-            .firstWhere((element) => element.name() == name);
+        return PrintJobPaginationMode.values.firstWhere(
+          (element) => element.name() == name,
+        );
       } catch (e) {
         return null;
       }
@@ -119,7 +125,7 @@ class PrintJobPaginationMode {
   /// them will be represented in the returned map.
   static Map<String, PrintJobPaginationMode> asNameMap() =>
       <String, PrintJobPaginationMode>{
-        for (final value in PrintJobPaginationMode.values) value.name(): value
+        for (final value in PrintJobPaginationMode.values) value.name(): value,
       };
 
   ///Gets [String] value.

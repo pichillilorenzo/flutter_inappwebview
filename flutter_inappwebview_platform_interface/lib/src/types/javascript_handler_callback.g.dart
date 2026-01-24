@@ -12,15 +12,18 @@ class JavaScriptHandlerFunctionData {
   bool isMainFrame;
   WebUri origin;
   WebUri requestUrl;
-  JavaScriptHandlerFunctionData(
-      {this.args = const [],
-      required this.isMainFrame,
-      required this.origin,
-      required this.requestUrl});
+  JavaScriptHandlerFunctionData({
+    this.args = const [],
+    required this.isMainFrame,
+    required this.origin,
+    required this.requestUrl,
+  });
 
   ///Gets a possible [JavaScriptHandlerFunctionData] instance from a [Map] value.
-  static JavaScriptHandlerFunctionData? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static JavaScriptHandlerFunctionData? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }

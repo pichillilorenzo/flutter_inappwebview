@@ -30,9 +30,10 @@ class UIEventAttribution_ {
   String purchaser;
 
   @ExchangeableObjectConstructor()
-  UIEventAttribution_(
-      {required this.sourceIdentifier,
-      required this.destinationURL,
-      required this.sourceDescription,
-      required this.purchaser});
+  UIEventAttribution_({
+    required this.sourceIdentifier,
+    required this.destinationURL,
+    required this.sourceDescription,
+    required this.purchaser,
+  });
 }

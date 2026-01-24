@@ -35,13 +35,15 @@ class X509PublicKey {
       } else if (oid == OID.rsaEncryption) {
         List<ASN1Object>? publicKeyAsn1Objects;
         try {
-          publicKeyAsn1Objects =
-              ASN1DERDecoder.decode(data: keyData.toList(growable: true));
+          publicKeyAsn1Objects = ASN1DERDecoder.decode(
+            data: keyData.toList(growable: true),
+          );
         } catch (e) {}
 
         if (publicKeyAsn1Objects != null && publicKeyAsn1Objects.length > 0) {
-          var publicKeyModulus =
-              publicKeyAsn1Objects.first.subAtIndex(0)?.value;
+          var publicKeyModulus = publicKeyAsn1Objects.first
+              .subAtIndex(0)
+              ?.value;
           if (publicKeyModulus != null) {
             return Uint8List.fromList(publicKeyModulus);
           }

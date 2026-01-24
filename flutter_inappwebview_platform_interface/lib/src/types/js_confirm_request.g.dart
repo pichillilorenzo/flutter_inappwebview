@@ -24,17 +24,20 @@ class JsConfirmRequest {
 
   ///The url of the page requesting the dialog.
   WebUri? url;
-  JsConfirmRequest(
-      {@Deprecated('Use isMainFrame instead') this.iosIsMainFrame,
-      this.isMainFrame,
-      this.message,
-      this.url}) {
+  JsConfirmRequest({
+    @Deprecated('Use isMainFrame instead') this.iosIsMainFrame,
+    this.isMainFrame,
+    this.message,
+    this.url,
+  }) {
     isMainFrame = isMainFrame ?? iosIsMainFrame;
   }
 
   ///Gets a possible [JsConfirmRequest] instance from a [Map] value.
-  static JsConfirmRequest? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static JsConfirmRequest? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }

@@ -22,6 +22,7 @@ import 'web_authentication_session/platform_web_authenticate_session.dart';
 import 'web_message/platform_web_message_channel.dart';
 import 'web_message/platform_web_message_listener.dart';
 import 'web_message/platform_web_message_port.dart';
+import 'web_notification/platform_web_notification_controller.dart';
 import 'web_storage/platform_web_storage.dart';
 import 'web_storage/platform_web_storage_manager.dart';
 import 'webview_environment/platform_webview_environment.dart';
@@ -43,7 +44,8 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
   static set instance(InAppWebViewPlatform? instance) {
     if (instance == null) {
       throw AssertionError(
-          'Platform interfaces can only be set to a non-null instance');
+        'Platform interfaces can only be set to a non-null instance',
+      );
     }
 
     PlatformInterface.verify(instance, _token);
@@ -58,7 +60,8 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
     PlatformCookieManagerCreationParams params,
   ) {
     throw UnimplementedError(
-        'createPlatformCookieManager is not implemented on the current platform.');
+      'createPlatformCookieManager is not implemented on the current platform.',
+    );
   }
 
   /// Creates a new empty [PlatformCookieManager] to access static methods.
@@ -67,7 +70,8 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
   /// Look at using [CookieManager] in `flutter_inappwebview` instead.
   PlatformCookieManager createPlatformCookieManagerStatic() {
     throw UnimplementedError(
-        'createPlatformCookieManagerStatic is not implemented on the current platform.');
+      'createPlatformCookieManagerStatic is not implemented on the current platform.',
+    );
   }
 
   /// Creates a new [PlatformInAppWebViewController].
@@ -78,7 +82,8 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
     PlatformInAppWebViewControllerCreationParams params,
   ) {
     throw UnimplementedError(
-        'createPlatformInAppWebViewController is not implemented on the current platform.');
+      'createPlatformInAppWebViewController is not implemented on the current platform.',
+    );
   }
 
   /// Creates a new empty [PlatformInAppWebViewController] to access static methods.
@@ -87,7 +92,8 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
   /// Look at using [InAppWebViewController] in `flutter_inappwebview` instead.
   PlatformInAppWebViewController createPlatformInAppWebViewControllerStatic() {
     throw UnimplementedError(
-        'createPlatformInAppWebViewControllerStatic is not implemented on the current platform.');
+      'createPlatformInAppWebViewControllerStatic is not implemented on the current platform.',
+    );
   }
 
   /// Creates a new [PlatformInAppWebViewWidget].
@@ -98,7 +104,8 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
     PlatformInAppWebViewWidgetCreationParams params,
   ) {
     throw UnimplementedError(
-        'createPlatformInAppWebViewWidget is not implemented on the current platform.');
+      'createPlatformInAppWebViewWidget is not implemented on the current platform.',
+    );
   }
 
   /// Creates a new empty [PlatformInAppWebViewWidget] to access static methods.
@@ -107,7 +114,8 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
   /// Look at using [InAppWebView] in `flutter_inappwebview` instead.
   PlatformInAppWebViewWidget createPlatformInAppWebViewWidgetStatic() {
     throw UnimplementedError(
-        'createPlatformInAppWebViewWidgetStatic is not implemented on the current platform.');
+      'createPlatformInAppWebViewWidgetStatic is not implemented on the current platform.',
+    );
   }
 
   /// Creates a new [PlatformFindInteractionController].
@@ -118,7 +126,8 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
     PlatformFindInteractionControllerCreationParams params,
   ) {
     throw UnimplementedError(
-        'createPlatformFindInteractionController is not implemented on the current platform.');
+      'createPlatformFindInteractionController is not implemented on the current platform.',
+    );
   }
 
   /// Creates a new empty [PlatformFindInteractionController] to access static methods.
@@ -126,9 +135,10 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
   /// This function should only be called by the app-facing package.
   /// Look at using [FindInteractionController] in `flutter_inappwebview` instead.
   PlatformFindInteractionController
-      createPlatformFindInteractionControllerStatic() {
+  createPlatformFindInteractionControllerStatic() {
     throw UnimplementedError(
-        'createPlatformFindInteractionControllerStatic is not implemented on the current platform.');
+      'createPlatformFindInteractionControllerStatic is not implemented on the current platform.',
+    );
   }
 
   /// Creates a new [PlatformPrintJobController].
@@ -139,7 +149,8 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
     PlatformPrintJobControllerCreationParams params,
   ) {
     throw UnimplementedError(
-        'createPlatformPrintJobController is not implemented on the current platform.');
+      'createPlatformPrintJobController is not implemented on the current platform.',
+    );
   }
 
   /// Creates a new empty [PlatformPrintJobController] to access static methods.
@@ -148,7 +159,8 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
   /// Look at using [PrintJobController] in `flutter_inappwebview` instead.
   PlatformPrintJobController createPlatformPrintJobControllerStatic() {
     throw UnimplementedError(
-        'createPlatformPrintJobControllerStatic is not implemented on the current platform.');
+      'createPlatformPrintJobControllerStatic is not implemented on the current platform.',
+    );
   }
 
   /// Creates a new [PlatformPullToRefreshController].
@@ -159,7 +171,8 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
     PlatformPullToRefreshControllerCreationParams params,
   ) {
     throw UnimplementedError(
-        'createPlatformPullToRefreshController is not implemented on the current platform.');
+      'createPlatformPullToRefreshController is not implemented on the current platform.',
+    );
   }
 
   /// Creates a new empty [PlatformPullToRefreshController] to access static methods.
@@ -167,9 +180,10 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
   /// This function should only be called by the app-facing package.
   /// Look at using [PullToRefreshController] in `flutter_inappwebview` instead.
   PlatformPullToRefreshController
-      createPlatformPullToRefreshControllerStatic() {
+  createPlatformPullToRefreshControllerStatic() {
     throw UnimplementedError(
-        'createPlatformPullToRefreshControllerStatic is not implemented on the current platform.');
+      'createPlatformPullToRefreshControllerStatic is not implemented on the current platform.',
+    );
   }
 
   /// Creates a new [PlatformWebAuthenticationSession].
@@ -180,7 +194,8 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
     PlatformWebAuthenticationSessionCreationParams params,
   ) {
     throw UnimplementedError(
-        'createPlatformWebAuthenticationSession is not implemented on the current platform.');
+      'createPlatformWebAuthenticationSession is not implemented on the current platform.',
+    );
   }
 
   /// Creates a new empty [PlatformWebAuthenticationSession] to access static methods.
@@ -188,9 +203,10 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
   /// This function should only be called by the app-facing package.
   /// Look at using [WebAuthenticationSession] in `flutter_inappwebview` instead.
   PlatformWebAuthenticationSession
-      createPlatformWebAuthenticationSessionStatic() {
+  createPlatformWebAuthenticationSessionStatic() {
     throw UnimplementedError(
-        'createPlatformWebAuthenticationSessionStatic is not implemented on the current platform.');
+      'createPlatformWebAuthenticationSessionStatic is not implemented on the current platform.',
+    );
   }
 
   /// Creates a new [PlatformWebMessageChannel].
@@ -201,7 +217,8 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
     PlatformWebMessageChannelCreationParams params,
   ) {
     throw UnimplementedError(
-        'createPlatformWebMessageChannel is not implemented on the current platform.');
+      'createPlatformWebMessageChannel is not implemented on the current platform.',
+    );
   }
 
   /// Creates a new empty [PlatformWebMessageChannel] to access static methods.
@@ -210,7 +227,8 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
   /// Look at using [WebMessageChannel] in `flutter_inappwebview` instead.
   PlatformWebMessageChannel createPlatformWebMessageChannelStatic() {
     throw UnimplementedError(
-        'createPlatformWebMessageChannelStatic is not implemented on the current platform.');
+      'createPlatformWebMessageChannelStatic is not implemented on the current platform.',
+    );
   }
 
   /// Creates a new [PlatformWebMessageListener].
@@ -221,7 +239,8 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
     PlatformWebMessageListenerCreationParams params,
   ) {
     throw UnimplementedError(
-        'createPlatformWebMessageListener is not implemented on the current platform.');
+      'createPlatformWebMessageListener is not implemented on the current platform.',
+    );
   }
 
   /// Creates a new empty [PlatformWebMessageListener] to access static methods.
@@ -230,7 +249,8 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
   /// Look at using [WebMessageListener] in `flutter_inappwebview` instead.
   PlatformWebMessageListener createPlatformWebMessageListenerStatic() {
     throw UnimplementedError(
-        'createPlatformWebMessageListenerStatic is not implemented on the current platform.');
+      'createPlatformWebMessageListenerStatic is not implemented on the current platform.',
+    );
   }
 
   /// Creates a new [PlatformJavaScriptReplyProxy].
@@ -241,7 +261,8 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
     PlatformJavaScriptReplyProxyCreationParams params,
   ) {
     throw UnimplementedError(
-        'createPlatformJavaScriptReplyProxy is not implemented on the current platform.');
+      'createPlatformJavaScriptReplyProxy is not implemented on the current platform.',
+    );
   }
 
   /// Creates a new [PlatformWebMessagePort].
@@ -252,7 +273,8 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
     PlatformWebMessagePortCreationParams params,
   ) {
     throw UnimplementedError(
-        'createPlatformWebMessagePort is not implemented on the current platform.');
+      'createPlatformWebMessagePort is not implemented on the current platform.',
+    );
   }
 
   /// Creates a new [PlatformWebStorage].
@@ -263,7 +285,8 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
     PlatformWebStorageCreationParams params,
   ) {
     throw UnimplementedError(
-        'createPlatformWebStorage is not implemented on the current platform.');
+      'createPlatformWebStorage is not implemented on the current platform.',
+    );
   }
 
   /// Creates a new empty [PlatformWebStorage] to access static methods.
@@ -272,7 +295,8 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
   /// Look at using [WebStorage] in `flutter_inappwebview` instead.
   PlatformWebStorage createPlatformWebStorageStatic() {
     throw UnimplementedError(
-        'createPlatformWebStorageStatic is not implemented on the current platform.');
+      'createPlatformWebStorageStatic is not implemented on the current platform.',
+    );
   }
 
   /// Creates a new [PlatformLocalStorage].
@@ -283,7 +307,8 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
     PlatformLocalStorageCreationParams params,
   ) {
     throw UnimplementedError(
-        'createPlatformLocalStorage is not implemented on the current platform.');
+      'createPlatformLocalStorage is not implemented on the current platform.',
+    );
   }
 
   /// Creates a new empty [PlatformLocalStorage] to access static methods.
@@ -292,7 +317,8 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
   /// Look at using [LocalStorage] in `flutter_inappwebview` instead.
   PlatformLocalStorage createPlatformLocalStorageStatic() {
     throw UnimplementedError(
-        'createPlatformLocalStorageStatic is not implemented on the current platform.');
+      'createPlatformLocalStorageStatic is not implemented on the current platform.',
+    );
   }
 
   /// Creates a new [PlatformSessionStorage].
@@ -303,7 +329,8 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
     PlatformSessionStorageCreationParams params,
   ) {
     throw UnimplementedError(
-        'createPlatformSessionStorage is not implemented on the current platform.');
+      'createPlatformSessionStorage is not implemented on the current platform.',
+    );
   }
 
   /// Creates a new empty [PlatformSessionStorage] to access static methods.
@@ -312,7 +339,8 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
   /// Look at using [PlatformSessionStorage] in `flutter_inappwebview` instead.
   PlatformSessionStorage createPlatformSessionStorageStatic() {
     throw UnimplementedError(
-        'createPlatformSessionStorageStatic is not implemented on the current platform.');
+      'createPlatformSessionStorageStatic is not implemented on the current platform.',
+    );
   }
 
   /// Creates a new [PlatformHeadlessInAppWebView].
@@ -323,7 +351,8 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
     PlatformHeadlessInAppWebViewCreationParams params,
   ) {
     throw UnimplementedError(
-        'createPlatformHeadlessInAppWebView is not implemented on the current platform.');
+      'createPlatformHeadlessInAppWebView is not implemented on the current platform.',
+    );
   }
 
   /// Creates a new empty [PlatformHeadlessInAppWebView] to access static methods.
@@ -332,7 +361,8 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
   /// Look at using [HeadlessInAppWebView] in `flutter_inappwebview` instead.
   PlatformHeadlessInAppWebView createPlatformHeadlessInAppWebViewStatic() {
     throw UnimplementedError(
-        'createPlatformHeadlessInAppWebViewStatic is not implemented on the current platform.');
+      'createPlatformHeadlessInAppWebViewStatic is not implemented on the current platform.',
+    );
   }
 
   /// Creates a new [PlatformWebStorageManager].
@@ -343,7 +373,8 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
     PlatformWebStorageManagerCreationParams params,
   ) {
     throw UnimplementedError(
-        'createPlatformWebStorageManager is not implemented on the current platform.');
+      'createPlatformWebStorageManager is not implemented on the current platform.',
+    );
   }
 
   /// Creates a new empty [PlatformWebStorageManager] to access static methods.
@@ -352,7 +383,8 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
   /// Look at using [WebStorageManager] in `flutter_inappwebview` instead.
   PlatformWebStorageManager createPlatformWebStorageManagerStatic() {
     throw UnimplementedError(
-        'createPlatformWebStorageManagerStatic is not implemented on the current platform.');
+      'createPlatformWebStorageManagerStatic is not implemented on the current platform.',
+    );
   }
 
   /// Creates a new [PlatformHttpAuthCredentialDatabase].
@@ -363,7 +395,8 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
     PlatformHttpAuthCredentialDatabaseCreationParams params,
   ) {
     throw UnimplementedError(
-        'createPlatformHttpAuthCredentialDatabase is not implemented on the current platform.');
+      'createPlatformHttpAuthCredentialDatabase is not implemented on the current platform.',
+    );
   }
 
   /// Creates a new empty [PlatformHttpAuthCredentialDatabase] to access static methods.
@@ -371,9 +404,10 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
   /// This function should only be called by the app-facing package.
   /// Look at using [HttpAuthCredentialDatabase] in `flutter_inappwebview` instead.
   PlatformHttpAuthCredentialDatabase
-      createPlatformHttpAuthCredentialDatabaseStatic() {
+  createPlatformHttpAuthCredentialDatabaseStatic() {
     throw UnimplementedError(
-        'createPlatformHttpAuthCredentialDatabaseStatic is not implemented on the current platform.');
+      'createPlatformHttpAuthCredentialDatabaseStatic is not implemented on the current platform.',
+    );
   }
 
   /// Creates a new [PlatformInAppBrowser].
@@ -384,7 +418,8 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
     PlatformInAppBrowserCreationParams params,
   ) {
     throw UnimplementedError(
-        'createPlatformInAppBrowser is not implemented on the current platform.');
+      'createPlatformInAppBrowser is not implemented on the current platform.',
+    );
   }
 
   /// Creates a new empty [PlatformInAppBrowser] to access static methods.
@@ -393,7 +428,8 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
   /// Look at using [InAppBrowser] in `flutter_inappwebview` instead.
   PlatformInAppBrowser createPlatformInAppBrowserStatic() {
     throw UnimplementedError(
-        'createPlatformInAppBrowserStatic is not implemented on the current platform.');
+      'createPlatformInAppBrowserStatic is not implemented on the current platform.',
+    );
   }
 
   /// Creates a new [PlatformProcessGlobalConfig].
@@ -404,7 +440,8 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
     PlatformProcessGlobalConfigCreationParams params,
   ) {
     throw UnimplementedError(
-        'createPlatformProcessGlobalConfig is not implemented on the current platform.');
+      'createPlatformProcessGlobalConfig is not implemented on the current platform.',
+    );
   }
 
   /// Creates a new empty [PlatformProcessGlobalConfig] to access static methods.
@@ -413,7 +450,8 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
   /// Look at using [ProcessGlobalConfig] in `flutter_inappwebview` instead.
   PlatformProcessGlobalConfig createPlatformProcessGlobalConfigStatic() {
     throw UnimplementedError(
-        'createPlatformProcessGlobalConfigStatic is not implemented on the current platform.');
+      'createPlatformProcessGlobalConfigStatic is not implemented on the current platform.',
+    );
   }
 
   /// Creates a new [PlatformProxyController].
@@ -424,7 +462,8 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
     PlatformProxyControllerCreationParams params,
   ) {
     throw UnimplementedError(
-        'createPlatformProxyController is not implemented on the current platform.');
+      'createPlatformProxyController is not implemented on the current platform.',
+    );
   }
 
   /// Creates a new empty [PlatformProxyController] to access static methods.
@@ -433,7 +472,8 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
   /// Look at using [ProxyController] in `flutter_inappwebview` instead.
   PlatformProxyController createPlatformProxyControllerStatic() {
     throw UnimplementedError(
-        'createPlatformProxyControllerStatic is not implemented on the current platform.');
+      'createPlatformProxyControllerStatic is not implemented on the current platform.',
+    );
   }
 
   /// Creates a new [PlatformServiceWorkerController].
@@ -444,7 +484,8 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
     PlatformServiceWorkerControllerCreationParams params,
   ) {
     throw UnimplementedError(
-        'createPlatformServiceWorkerController is not implemented on the current platform.');
+      'createPlatformServiceWorkerController is not implemented on the current platform.',
+    );
   }
 
   /// Creates a new empty [PlatformServiceWorkerController] to access static methods.
@@ -452,9 +493,10 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
   /// This function should only be called by the app-facing package.
   /// Look at using [ServiceWorkerController] in `flutter_inappwebview` instead.
   PlatformServiceWorkerController
-      createPlatformServiceWorkerControllerStatic() {
+  createPlatformServiceWorkerControllerStatic() {
     throw UnimplementedError(
-        'createPlatformServiceWorkerControllerStatic is not implemented on the current platform.');
+      'createPlatformServiceWorkerControllerStatic is not implemented on the current platform.',
+    );
   }
 
   /// Creates a new [PlatformTracingController].
@@ -465,7 +507,8 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
     PlatformTracingControllerCreationParams params,
   ) {
     throw UnimplementedError(
-        'createPlatformTracingController is not implemented on the current platform.');
+      'createPlatformTracingController is not implemented on the current platform.',
+    );
   }
 
   /// Creates a new empty [PlatformTracingController] to access static methods.
@@ -474,7 +517,8 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
   /// Look at using [TracingController] in `flutter_inappwebview` instead.
   PlatformTracingController createPlatformTracingControllerStatic() {
     throw UnimplementedError(
-        'createPlatformTracingControllerStatic is not implemented on the current platform.');
+      'createPlatformTracingControllerStatic is not implemented on the current platform.',
+    );
   }
 
   /// Creates a new [PlatformAssetsPathHandler].
@@ -485,7 +529,8 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
     PlatformAssetsPathHandlerCreationParams params,
   ) {
     throw UnimplementedError(
-        'createPlatformAssetsPathHandler is not implemented on the current platform.');
+      'createPlatformAssetsPathHandler is not implemented on the current platform.',
+    );
   }
 
   /// Creates a new [PlatformResourcesPathHandler].
@@ -496,7 +541,8 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
     PlatformResourcesPathHandlerCreationParams params,
   ) {
     throw UnimplementedError(
-        'createPlatformResourcesPathHandler is not implemented on the current platform.');
+      'createPlatformResourcesPathHandler is not implemented on the current platform.',
+    );
   }
 
   /// Creates a new [PlatformInternalStoragePathHandler].
@@ -507,7 +553,8 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
     PlatformInternalStoragePathHandlerCreationParams params,
   ) {
     throw UnimplementedError(
-        'createPlatformInternalStoragePathHandler is not implemented on the current platform.');
+      'createPlatformInternalStoragePathHandler is not implemented on the current platform.',
+    );
   }
 
   /// Creates a new [PlatformCustomPathHandler].
@@ -518,7 +565,8 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
     PlatformCustomPathHandlerCreationParams params,
   ) {
     throw UnimplementedError(
-        'createPlatformCustomPathHandler is not implemented on the current platform.');
+      'createPlatformCustomPathHandler is not implemented on the current platform.',
+    );
   }
 
   /// Creates a new [PlatformWebViewFeature].
@@ -529,7 +577,8 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
     PlatformWebViewFeatureCreationParams params,
   ) {
     throw UnimplementedError(
-        'createPlatformWebViewFeature is not implemented on the current platform.');
+      'createPlatformWebViewFeature is not implemented on the current platform.',
+    );
   }
 
   /// Creates a new empty [PlatformWebViewFeature] to access static methods.
@@ -538,7 +587,8 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
   /// Look at using [WebViewFeature] in `flutter_inappwebview` instead.
   PlatformWebViewFeature createPlatformWebViewFeatureStatic() {
     throw UnimplementedError(
-        'createPlatformWebViewFeatureStatic is not implemented on the current platform.');
+      'createPlatformWebViewFeatureStatic is not implemented on the current platform.',
+    );
   }
 
   /// Creates a new empty [PlatformInAppLocalhostServer] to access static methods.
@@ -546,7 +596,8 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
   /// This function should only be called by the app-facing package.
   /// Look at using [DefaultInAppLocalhostServer] in `flutter_inappwebview` instead.
   PlatformInAppLocalhostServer createPlatformInAppLocalhostServer(
-      PlatformInAppLocalhostServerCreationParams params) {
+    PlatformInAppLocalhostServerCreationParams params,
+  ) {
     return DefaultInAppLocalhostServer(params);
   }
 
@@ -558,7 +609,8 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
     PlatformChromeSafariBrowserCreationParams params,
   ) {
     throw UnimplementedError(
-        'createPlatformChromeSafariBrowser is not implemented on the current platform.');
+      'createPlatformChromeSafariBrowser is not implemented on the current platform.',
+    );
   }
 
   /// Creates a new empty [PlatformChromeSafariBrowser] to access static methods.
@@ -567,7 +619,8 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
   /// Look at using [ChromeSafariBrowser] in `flutter_inappwebview` instead.
   PlatformChromeSafariBrowser createPlatformChromeSafariBrowserStatic() {
     throw UnimplementedError(
-        'createPlatformChromeSafariBrowserStatic is not implemented on the current platform.');
+      'createPlatformChromeSafariBrowserStatic is not implemented on the current platform.',
+    );
   }
 
   /// Creates a new [PlatformWebViewEnvironment].
@@ -578,7 +631,8 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
     PlatformWebViewEnvironmentCreationParams params,
   ) {
     throw UnimplementedError(
-        'createPlatformWebViewEnvironment is not implemented on the current platform.');
+      'createPlatformWebViewEnvironment is not implemented on the current platform.',
+    );
   }
 
   /// Creates a new empty [PlatformWebViewEnvironment] to access static methods.
@@ -587,6 +641,30 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
   /// Look at using [WebViewEnvironment] in `flutter_inappwebview` instead.
   PlatformWebViewEnvironment createPlatformWebViewEnvironmentStatic() {
     throw UnimplementedError(
-        'createPlatformWebViewEnvironmentStatic is not implemented on the current platform.');
+      'createPlatformWebViewEnvironmentStatic is not implemented on the current platform.',
+    );
+  }
+
+  /// Creates a new [PlatformWebNotificationController].
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [WebNotificationController] in `flutter_inappwebview` instead.
+  PlatformWebNotificationController createPlatformWebNotificationController(
+    PlatformWebNotificationControllerCreationParams params,
+  ) {
+    throw UnimplementedError(
+      'createPlatformWebNotificationController is not implemented on the current platform.',
+    );
+  }
+
+  /// Creates a new empty [PlatformWebNotificationController] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [WebNotificationController] in `flutter_inappwebview` instead.
+  PlatformWebNotificationController
+  createPlatformWebNotificationControllerStatic() {
+    throw UnimplementedError(
+      'createPlatformWebNotificationControllerStatic is not implemented on the current platform.',
+    );
   }
 }

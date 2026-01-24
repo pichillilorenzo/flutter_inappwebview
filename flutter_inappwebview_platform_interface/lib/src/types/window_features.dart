@@ -31,15 +31,16 @@ class WindowFeatures_ {
   ///A Double value specifying the y-coordinate of the containing window, or `null` if the y-coordinate is not specified.
   double? y;
 
-  WindowFeatures_(
-      {this.allowsResizing,
-      this.height,
-      this.menuBarVisibility,
-      this.statusBarVisibility,
-      this.toolbarsVisibility,
-      this.width,
-      this.x,
-      this.y});
+  WindowFeatures_({
+    this.allowsResizing,
+    this.height,
+    this.menuBarVisibility,
+    this.statusBarVisibility,
+    this.toolbarsVisibility,
+    this.width,
+    this.x,
+    this.y,
+  });
 }
 
 ///An iOS-specific class that specifies optional attributes for the containing window when a new web view is requested.
@@ -71,13 +72,14 @@ class IOSWKWindowFeatures_ {
   ///A Double value specifying the y-coordinate of the containing window, or `null` if the y-coordinate is not specified.
   double? y;
 
-  IOSWKWindowFeatures_(
-      {this.allowsResizing,
-      this.height,
-      this.menuBarVisibility,
-      this.statusBarVisibility,
-      this.toolbarsVisibility,
-      this.width,
-      this.x,
-      this.y});
+  IOSWKWindowFeatures_({
+    this.allowsResizing,
+    this.height,
+    this.menuBarVisibility,
+    this.statusBarVisibility,
+    this.toolbarsVisibility,
+    this.width,
+    this.x,
+    this.y,
+  });
 }

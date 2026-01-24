@@ -42,14 +42,14 @@ class ClientCertResponse {
   ///**Officially Supported Platforms/Implementations**:
   ///- Windows WebView2
   int selectedCertificate;
-  ClientCertResponse(
-      {this.certificatePath = "",
-      this.certificatePassword = "",
-      @Deprecated('Use keyStoreType instead')
-      this.androidKeyStoreType = "PKCS12",
-      this.keyStoreType = "PKCS12",
-      this.selectedCertificate = -1,
-      this.action = ClientCertResponseAction.CANCEL}) {
+  ClientCertResponse({
+    this.certificatePath = "",
+    this.certificatePassword = "",
+    @Deprecated('Use keyStoreType instead') this.androidKeyStoreType = "PKCS12",
+    this.keyStoreType = "PKCS12",
+    this.selectedCertificate = -1,
+    this.action = ClientCertResponseAction.CANCEL,
+  }) {
     if (this.action == ClientCertResponseAction.PROCEED && !Util.isWindows)
       assert(certificatePath.isNotEmpty);
     this.keyStoreType = this.keyStoreType ?? this.androidKeyStoreType;
@@ -57,17 +57,20 @@ class ClientCertResponse {
   }
 
   ///Gets a possible [ClientCertResponse] instance from a [Map] value.
-  static ClientCertResponse? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static ClientCertResponse? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
     final instance = ClientCertResponse();
     instance.action = switch (enumMethod ?? EnumMethod.nativeValue) {
-      EnumMethod.nativeValue =>
-        ClientCertResponseAction.fromNativeValue(map['action']),
+      EnumMethod.nativeValue => ClientCertResponseAction.fromNativeValue(
+        map['action'],
+      ),
       EnumMethod.value => ClientCertResponseAction.fromValue(map['action']),
-      EnumMethod.name => ClientCertResponseAction.byName(map['action'])
+      EnumMethod.name => ClientCertResponseAction.byName(map['action']),
     };
     instance.androidKeyStoreType = map['keyStoreType'];
     instance.certificatePassword = map['certificatePassword'];
@@ -87,7 +90,7 @@ class ClientCertResponse {
       "action": switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => action?.toNativeValue(),
         EnumMethod.value => action?.toValue(),
-        EnumMethod.name => action?.name()
+        EnumMethod.name => action?.name(),
       },
       "certificatePassword": certificatePassword,
       "certificatePath": certificatePath,

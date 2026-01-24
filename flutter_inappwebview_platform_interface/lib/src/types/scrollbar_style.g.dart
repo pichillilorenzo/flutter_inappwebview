@@ -17,15 +17,18 @@ class ScrollBarStyle {
   final int _value;
   final int _nativeValue;
   const ScrollBarStyle._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory ScrollBarStyle._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      ScrollBarStyle._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => ScrollBarStyle._internal(value, nativeValue());
 
   ///The scrollbar style to display the scrollbars inside the padded area, increasing the padding of the view.
   ///The scrollbars will not overlap the content area of the view.
-  static const SCROLLBARS_INSIDE_INSET =
-      ScrollBarStyle._internal(16777216, 16777216);
+  static const SCROLLBARS_INSIDE_INSET = ScrollBarStyle._internal(
+    16777216,
+    16777216,
+  );
 
   ///The scrollbar style to display the scrollbars inside the content area, without increasing the padding.
   ///The scrollbars will be overlaid with translucency on the view's content.
@@ -33,13 +36,17 @@ class ScrollBarStyle {
 
   ///The scrollbar style to display the scrollbars at the edge of the view, increasing the padding of the view.
   ///The scrollbars will only overlap the background, if any.
-  static const SCROLLBARS_OUTSIDE_INSET =
-      ScrollBarStyle._internal(50331648, 50331648);
+  static const SCROLLBARS_OUTSIDE_INSET = ScrollBarStyle._internal(
+    50331648,
+    50331648,
+  );
 
   ///The scrollbar style to display the scrollbars at the edge of the view, without increasing the padding.
   ///The scrollbars will be overlaid with translucency.
-  static const SCROLLBARS_OUTSIDE_OVERLAY =
-      ScrollBarStyle._internal(33554432, 33554432);
+  static const SCROLLBARS_OUTSIDE_OVERLAY = ScrollBarStyle._internal(
+    33554432,
+    33554432,
+  );
 
   ///Set of all values of [ScrollBarStyle].
   static final Set<ScrollBarStyle> values = [
@@ -53,8 +60,9 @@ class ScrollBarStyle {
   static ScrollBarStyle? fromValue(int? value) {
     if (value != null) {
       try {
-        return ScrollBarStyle.values
-            .firstWhere((element) => element.toValue() == value);
+        return ScrollBarStyle.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -66,8 +74,9 @@ class ScrollBarStyle {
   static ScrollBarStyle? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return ScrollBarStyle.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return ScrollBarStyle.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -83,8 +92,9 @@ class ScrollBarStyle {
   static ScrollBarStyle? byName(String? name) {
     if (name != null) {
       try {
-        return ScrollBarStyle.values
-            .firstWhere((element) => element.name() == name);
+        return ScrollBarStyle.values.firstWhere(
+          (element) => element.name() == name,
+        );
       } catch (e) {
         return null;
       }
@@ -101,8 +111,8 @@ class ScrollBarStyle {
   /// same value, or being values of different enum type), at most one of
   /// them will be represented in the returned map.
   static Map<String, ScrollBarStyle> asNameMap() => <String, ScrollBarStyle>{
-        for (final value in ScrollBarStyle.values) value.name(): value
-      };
+    for (final value in ScrollBarStyle.values) value.name(): value,
+  };
 
   ///Gets [int] value.
   int toValue() => _value;
@@ -156,30 +166,39 @@ class AndroidScrollBarStyle {
   final int _value;
   final int _nativeValue;
   const AndroidScrollBarStyle._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory AndroidScrollBarStyle._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      AndroidScrollBarStyle._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => AndroidScrollBarStyle._internal(value, nativeValue());
 
   ///The scrollbar style to display the scrollbars inside the padded area, increasing the padding of the view.
   ///The scrollbars will not overlap the content area of the view.
-  static const SCROLLBARS_INSIDE_INSET =
-      AndroidScrollBarStyle._internal(16777216, 16777216);
+  static const SCROLLBARS_INSIDE_INSET = AndroidScrollBarStyle._internal(
+    16777216,
+    16777216,
+  );
 
   ///The scrollbar style to display the scrollbars inside the content area, without increasing the padding.
   ///The scrollbars will be overlaid with translucency on the view's content.
-  static const SCROLLBARS_INSIDE_OVERLAY =
-      AndroidScrollBarStyle._internal(0, 0);
+  static const SCROLLBARS_INSIDE_OVERLAY = AndroidScrollBarStyle._internal(
+    0,
+    0,
+  );
 
   ///The scrollbar style to display the scrollbars at the edge of the view, increasing the padding of the view.
   ///The scrollbars will only overlap the background, if any.
-  static const SCROLLBARS_OUTSIDE_INSET =
-      AndroidScrollBarStyle._internal(50331648, 50331648);
+  static const SCROLLBARS_OUTSIDE_INSET = AndroidScrollBarStyle._internal(
+    50331648,
+    50331648,
+  );
 
   ///The scrollbar style to display the scrollbars at the edge of the view, without increasing the padding.
   ///The scrollbars will be overlaid with translucency.
-  static const SCROLLBARS_OUTSIDE_OVERLAY =
-      AndroidScrollBarStyle._internal(33554432, 33554432);
+  static const SCROLLBARS_OUTSIDE_OVERLAY = AndroidScrollBarStyle._internal(
+    33554432,
+    33554432,
+  );
 
   ///Set of all values of [AndroidScrollBarStyle].
   static final Set<AndroidScrollBarStyle> values = [
@@ -193,8 +212,9 @@ class AndroidScrollBarStyle {
   static AndroidScrollBarStyle? fromValue(int? value) {
     if (value != null) {
       try {
-        return AndroidScrollBarStyle.values
-            .firstWhere((element) => element.toValue() == value);
+        return AndroidScrollBarStyle.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -206,8 +226,9 @@ class AndroidScrollBarStyle {
   static AndroidScrollBarStyle? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return AndroidScrollBarStyle.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return AndroidScrollBarStyle.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -223,8 +244,9 @@ class AndroidScrollBarStyle {
   static AndroidScrollBarStyle? byName(String? name) {
     if (name != null) {
       try {
-        return AndroidScrollBarStyle.values
-            .firstWhere((element) => element.name() == name);
+        return AndroidScrollBarStyle.values.firstWhere(
+          (element) => element.name() == name,
+        );
       } catch (e) {
         return null;
       }
@@ -242,7 +264,7 @@ class AndroidScrollBarStyle {
   /// them will be represented in the returned map.
   static Map<String, AndroidScrollBarStyle> asNameMap() =>
       <String, AndroidScrollBarStyle>{
-        for (final value in AndroidScrollBarStyle.values) value.name(): value
+        for (final value in AndroidScrollBarStyle.values) value.name(): value,
       };
 
   ///Gets [int] value.

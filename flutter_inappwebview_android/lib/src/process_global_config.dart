@@ -21,7 +21,8 @@ class AndroidProcessGlobalConfigCreationParams
 
   /// Creates a [AndroidProcessGlobalConfigCreationParams] instance based on [PlatformProcessGlobalConfigCreationParams].
   factory AndroidProcessGlobalConfigCreationParams.fromPlatformProcessGlobalConfigCreationParams(
-      PlatformProcessGlobalConfigCreationParams params) {
+    PlatformProcessGlobalConfigCreationParams params,
+  ) {
     return AndroidProcessGlobalConfigCreationParams(params);
   }
 }
@@ -31,14 +32,16 @@ class AndroidProcessGlobalConfig extends PlatformProcessGlobalConfig
     with ChannelController {
   /// Creates a new [AndroidProcessGlobalConfig].
   AndroidProcessGlobalConfig(PlatformProcessGlobalConfigCreationParams params)
-      : super.implementation(
-          params is AndroidProcessGlobalConfigCreationParams
-              ? params
-              : AndroidProcessGlobalConfigCreationParams
-                  .fromPlatformProcessGlobalConfigCreationParams(params),
-        ) {
+    : super.implementation(
+        params is AndroidProcessGlobalConfigCreationParams
+            ? params
+            : AndroidProcessGlobalConfigCreationParams.fromPlatformProcessGlobalConfigCreationParams(
+                params,
+              ),
+      ) {
     channel = const MethodChannel(
-        'com.pichillilorenzo/flutter_inappwebview_processglobalconfig');
+      'com.pichillilorenzo/flutter_inappwebview_processglobalconfig',
+    );
     handler = handleMethod;
     initMethodCallHandler();
   }
@@ -52,14 +55,19 @@ class AndroidProcessGlobalConfig extends PlatformProcessGlobalConfig
 
   static AndroidProcessGlobalConfig _init() {
     _instance = AndroidProcessGlobalConfig(
-        AndroidProcessGlobalConfigCreationParams(
-            const PlatformProcessGlobalConfigCreationParams()));
+      AndroidProcessGlobalConfigCreationParams(
+        const PlatformProcessGlobalConfigCreationParams(),
+      ),
+    );
     return _instance!;
   }
 
   static final AndroidProcessGlobalConfig _staticValue =
-      AndroidProcessGlobalConfig(AndroidProcessGlobalConfigCreationParams(
-          const PlatformProcessGlobalConfigCreationParams()));
+      AndroidProcessGlobalConfig(
+        AndroidProcessGlobalConfigCreationParams(
+          const PlatformProcessGlobalConfigCreationParams(),
+        ),
+      );
 
   /// Provide static access.
   factory AndroidProcessGlobalConfig.static() {

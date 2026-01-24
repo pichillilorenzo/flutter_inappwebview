@@ -17,6 +17,8 @@ class URLProtectionSpaceHttpAuthCredentials_ {
   ///The list of all its http authentication credentials.
   List<URLCredential_>? credentials;
 
-  URLProtectionSpaceHttpAuthCredentials_(
-      {this.protectionSpace, this.credentials});
+  URLProtectionSpaceHttpAuthCredentials_({
+    this.protectionSpace,
+    this.credentials,
+  });
 }

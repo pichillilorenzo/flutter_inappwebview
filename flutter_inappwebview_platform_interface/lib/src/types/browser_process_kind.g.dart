@@ -11,10 +11,11 @@ class BrowserProcessKind {
   final int _value;
   final int _nativeValue;
   const BrowserProcessKind._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory BrowserProcessKind._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      BrowserProcessKind._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => BrowserProcessKind._internal(value, nativeValue());
 
   ///Indicates the browser process kind.
   ///
@@ -90,16 +91,18 @@ class BrowserProcessKind {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Windows WebView2
-  static final SANDBOX_HELPER =
-      BrowserProcessKind._internalMultiPlatform(3, () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.windows:
-        return 3;
-      default:
-        break;
-    }
-    return null;
-  });
+  static final SANDBOX_HELPER = BrowserProcessKind._internalMultiPlatform(
+    3,
+    () {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.windows:
+          return 3;
+        default:
+          break;
+      }
+      return null;
+    },
+  );
 
   ///Indicates the utility process kind.
   ///
@@ -130,8 +133,9 @@ class BrowserProcessKind {
   static BrowserProcessKind? fromValue(int? value) {
     if (value != null) {
       try {
-        return BrowserProcessKind.values
-            .firstWhere((element) => element.toValue() == value);
+        return BrowserProcessKind.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return BrowserProcessKind._internal(value, value);
       }
@@ -143,8 +147,9 @@ class BrowserProcessKind {
   static BrowserProcessKind? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return BrowserProcessKind.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return BrowserProcessKind.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return BrowserProcessKind._internal(value, value);
       }
@@ -160,8 +165,9 @@ class BrowserProcessKind {
   static BrowserProcessKind? byName(String? name) {
     if (name != null) {
       try {
-        return BrowserProcessKind.values
-            .firstWhere((element) => element.name() == name);
+        return BrowserProcessKind.values.firstWhere(
+          (element) => element.name() == name,
+        );
       } catch (e) {
         return null;
       }
@@ -179,7 +185,7 @@ class BrowserProcessKind {
   /// them will be represented in the returned map.
   static Map<String, BrowserProcessKind> asNameMap() =>
       <String, BrowserProcessKind>{
-        for (final value in BrowserProcessKind.values) value.name(): value
+        for (final value in BrowserProcessKind.values) value.name(): value,
       };
 
   ///Gets [int] value.
@@ -217,7 +223,9 @@ class BrowserProcessKind {
 
   BrowserProcessKind operator |(BrowserProcessKind value) =>
       BrowserProcessKind._internal(
-          value.toValue() | _value, value.toNativeValue() | _nativeValue);
+        value.toValue() | _value,
+        value.toNativeValue() | _nativeValue,
+      );
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {

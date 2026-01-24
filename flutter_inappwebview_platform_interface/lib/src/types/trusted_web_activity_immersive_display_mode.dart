@@ -24,13 +24,15 @@ class TrustedWebActivityImmersiveDisplayMode_
   static final _type = "IMMERSIVE_MODE";
 
   @ExchangeableObjectConstructor()
-  TrustedWebActivityImmersiveDisplayMode_(
-      {required this.isSticky,
-      this.displayCutoutMode = LayoutInDisplayCutoutMode_.DEFAULT,
-      this.layoutInDisplayCutoutMode}) {
+  TrustedWebActivityImmersiveDisplayMode_({
+    required this.isSticky,
+    this.displayCutoutMode = LayoutInDisplayCutoutMode_.DEFAULT,
+    this.layoutInDisplayCutoutMode,
+  }) {
     this.displayCutoutMode = this.layoutInDisplayCutoutMode != null
         ? LayoutInDisplayCutoutMode_.fromNativeValue(
-            layoutInDisplayCutoutMode?.toNativeValue())!
+            layoutInDisplayCutoutMode?.toNativeValue(),
+          )!
         : this.displayCutoutMode;
   }
 

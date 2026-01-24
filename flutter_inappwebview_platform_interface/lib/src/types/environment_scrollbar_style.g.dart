@@ -11,25 +11,28 @@ class EnvironmentScrollbarStyle {
   final int _value;
   final int _nativeValue;
   const EnvironmentScrollbarStyle._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory EnvironmentScrollbarStyle._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      EnvironmentScrollbarStyle._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => EnvironmentScrollbarStyle._internal(value, nativeValue());
 
   ///Browser default ScrollBar style.
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Windows WebView2
-  static final DEFAULT =
-      EnvironmentScrollbarStyle._internalMultiPlatform(0, () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.windows:
-        return 0;
-      default:
-        break;
-    }
-    return null;
-  });
+  static final DEFAULT = EnvironmentScrollbarStyle._internalMultiPlatform(
+    0,
+    () {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.windows:
+          return 0;
+        default:
+          break;
+      }
+      return null;
+    },
+  );
 
   ///Window style fluent overlay scroll bar.
   ///Please see [Fluent UI](https://developer.microsoft.com/fluentui#/) for more details on fluent UI.
@@ -38,14 +41,14 @@ class EnvironmentScrollbarStyle {
   ///- Windows WebView2
   static final FLUENT_OVERLAY =
       EnvironmentScrollbarStyle._internalMultiPlatform(1, () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.windows:
-        return 1;
-      default:
-        break;
-    }
-    return null;
-  });
+        switch (defaultTargetPlatform) {
+          case TargetPlatform.windows:
+            return 1;
+          default:
+            break;
+        }
+        return null;
+      });
 
   ///Set of all values of [EnvironmentScrollbarStyle].
   static final Set<EnvironmentScrollbarStyle> values = [
@@ -57,8 +60,9 @@ class EnvironmentScrollbarStyle {
   static EnvironmentScrollbarStyle? fromValue(int? value) {
     if (value != null) {
       try {
-        return EnvironmentScrollbarStyle.values
-            .firstWhere((element) => element.toValue() == value);
+        return EnvironmentScrollbarStyle.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -70,8 +74,9 @@ class EnvironmentScrollbarStyle {
   static EnvironmentScrollbarStyle? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return EnvironmentScrollbarStyle.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return EnvironmentScrollbarStyle.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -87,8 +92,9 @@ class EnvironmentScrollbarStyle {
   static EnvironmentScrollbarStyle? byName(String? name) {
     if (name != null) {
       try {
-        return EnvironmentScrollbarStyle.values
-            .firstWhere((element) => element.name() == name);
+        return EnvironmentScrollbarStyle.values.firstWhere(
+          (element) => element.name() == name,
+        );
       } catch (e) {
         return null;
       }
@@ -107,7 +113,7 @@ class EnvironmentScrollbarStyle {
   static Map<String, EnvironmentScrollbarStyle> asNameMap() =>
       <String, EnvironmentScrollbarStyle>{
         for (final value in EnvironmentScrollbarStyle.values)
-          value.name(): value
+          value.name(): value,
       };
 
   ///Gets [int] value.

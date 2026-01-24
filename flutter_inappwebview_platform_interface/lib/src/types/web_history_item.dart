@@ -29,11 +29,12 @@ class WebHistoryItem_ {
   @SupportedPlatforms(platforms: [WindowsPlatform()])
   int? entryId;
 
-  WebHistoryItem_(
-      {this.originalUrl,
-      this.title,
-      this.url,
-      this.index,
-      this.offset,
-      this.entryId});
+  WebHistoryItem_({
+    this.originalUrl,
+    this.title,
+    this.url,
+    this.index,
+    this.offset,
+    this.entryId,
+  });
 }

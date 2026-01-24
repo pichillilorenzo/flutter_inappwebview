@@ -3,9 +3,7 @@ part of 'main.dart';
 void pauseResume() {
   final shouldSkip = kIsWeb
       ? true
-      : ![
-          TargetPlatform.android,
-        ].contains(defaultTargetPlatform);
+      : ![TargetPlatform.android].contains(defaultTargetPlatform);
 
   skippableTestWidgets('pause/resume', (WidgetTester tester) async {
     final Completer<InAppWebViewController> controllerCompleter =

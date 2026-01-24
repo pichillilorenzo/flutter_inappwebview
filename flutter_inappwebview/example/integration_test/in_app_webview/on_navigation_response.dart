@@ -29,8 +29,9 @@ void onNavigationResponse() {
               pageLoaded.complete();
             },
             onNavigationResponse: (controller, navigationResponse) async {
-              onNavigationResponseCompleter
-                  .complete(navigationResponse.response!.url.toString());
+              onNavigationResponseCompleter.complete(
+                navigationResponse.response!.url.toString(),
+              );
               return NavigationResponseAction.ALLOW;
             },
           ),
@@ -62,8 +63,9 @@ void onNavigationResponse() {
               pageLoaded.complete();
             },
             onNavigationResponse: (controller, navigationResponse) async {
-              onNavigationResponseCompleter
-                  .complete(navigationResponse.response!.url.toString());
+              onNavigationResponseCompleter.complete(
+                navigationResponse.response!.url.toString(),
+              );
               return NavigationResponseAction.CANCEL;
             },
           ),

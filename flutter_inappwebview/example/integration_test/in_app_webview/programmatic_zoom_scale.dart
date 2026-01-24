@@ -12,9 +12,7 @@ void programmaticZoomScale() {
   skippableGroup('programmatic zoom scale', () {
     final shouldSkipTest1 = kIsWeb
         ? true
-        : ![
-            TargetPlatform.android,
-          ].contains(defaultTargetPlatform);
+        : ![TargetPlatform.android].contains(defaultTargetPlatform);
 
     skippableTestWidgets('zoomIn/zoomOut', (WidgetTester tester) async {
       final Completer<InAppWebViewController> controllerCompleter =
@@ -112,7 +110,9 @@ void programmaticZoomScale() {
       await pageLoaded.future;
 
       await expectLater(
-          controller.zoomBy(zoomFactor: 3.0, animated: true), completes);
+        controller.zoomBy(zoomFactor: 3.0, animated: true),
+        completes,
+      );
     });
 
     skippableTestWidgets('getZoomScale', (WidgetTester tester) async {

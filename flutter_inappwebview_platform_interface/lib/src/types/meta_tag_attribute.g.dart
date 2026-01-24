@@ -16,24 +16,20 @@ class MetaTagAttribute {
   MetaTagAttribute({this.name, this.value});
 
   ///Gets a possible [MetaTagAttribute] instance from a [Map] value.
-  static MetaTagAttribute? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static MetaTagAttribute? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
-    final instance = MetaTagAttribute(
-      name: map['name'],
-      value: map['value'],
-    );
+    final instance = MetaTagAttribute(name: map['name'], value: map['value']);
     return instance;
   }
 
   ///Converts instance to a map.
   Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
-    return {
-      "name": name,
-      "value": value,
-    };
+    return {"name": name, "value": value};
   }
 
   ///Converts instance to a map.

@@ -20,25 +20,29 @@ class WindowsHttpAuthCredentialDatabaseCreationParams
 
   /// Creates a [WindowsHttpAuthCredentialDatabaseCreationParams] instance based on [PlatformHttpAuthCredentialDatabaseCreationParams].
   factory WindowsHttpAuthCredentialDatabaseCreationParams.fromPlatformHttpAuthCredentialDatabaseCreationParams(
-      PlatformHttpAuthCredentialDatabaseCreationParams params) {
+    PlatformHttpAuthCredentialDatabaseCreationParams params,
+  ) {
     return WindowsHttpAuthCredentialDatabaseCreationParams(params);
   }
 }
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformHttpAuthCredentialDatabase}
 class WindowsHttpAuthCredentialDatabase
-    extends PlatformHttpAuthCredentialDatabase with ChannelController {
+    extends PlatformHttpAuthCredentialDatabase
+    with ChannelController {
   /// Creates a new [WindowsHttpAuthCredentialDatabase].
   WindowsHttpAuthCredentialDatabase(
-      PlatformHttpAuthCredentialDatabaseCreationParams params)
-      : super.implementation(
-          params is WindowsHttpAuthCredentialDatabaseCreationParams
-              ? params
-              : WindowsHttpAuthCredentialDatabaseCreationParams
-                  .fromPlatformHttpAuthCredentialDatabaseCreationParams(params),
-        ) {
+    PlatformHttpAuthCredentialDatabaseCreationParams params,
+  ) : super.implementation(
+        params is WindowsHttpAuthCredentialDatabaseCreationParams
+            ? params
+            : WindowsHttpAuthCredentialDatabaseCreationParams.fromPlatformHttpAuthCredentialDatabaseCreationParams(
+                params,
+              ),
+      ) {
     channel = const MethodChannel(
-        'com.pichillilorenzo/flutter_inappwebview_credential_database');
+      'com.pichillilorenzo/flutter_inappwebview_credential_database',
+    );
     handler = handleMethod;
     initMethodCallHandler();
   }
@@ -52,8 +56,10 @@ class WindowsHttpAuthCredentialDatabase
 
   static WindowsHttpAuthCredentialDatabase _init() {
     _instance = WindowsHttpAuthCredentialDatabase(
-        WindowsHttpAuthCredentialDatabaseCreationParams(
-            const PlatformHttpAuthCredentialDatabaseCreationParams()));
+      WindowsHttpAuthCredentialDatabaseCreationParams(
+        const PlatformHttpAuthCredentialDatabaseCreationParams(),
+      ),
+    );
     return _instance!;
   }
 
@@ -61,7 +67,7 @@ class WindowsHttpAuthCredentialDatabase
 
   @override
   Future<List<URLProtectionSpaceHttpAuthCredentials>>
-      getAllAuthCredentials() async {
+  getAllAuthCredentials() async {
     Map<String, dynamic> args = <String, dynamic>{};
     List<dynamic> allCredentials =
         await channel?.invokeMethod<List>('getAllAuthCredentials', args) ?? [];
@@ -70,7 +76,8 @@ class WindowsHttpAuthCredentialDatabase
 
     for (Map<dynamic, dynamic> map in allCredentials) {
       var element = URLProtectionSpaceHttpAuthCredentials.fromMap(
-          map.cast<String, dynamic>());
+        map.cast<String, dynamic>(),
+      );
       if (element != null) {
         result.add(element);
       }
@@ -79,8 +86,9 @@ class WindowsHttpAuthCredentialDatabase
   }
 
   @override
-  Future<List<URLCredential>> getHttpAuthCredentials(
-      {required URLProtectionSpace protectionSpace}) async {
+  Future<List<URLCredential>> getHttpAuthCredentials({
+    required URLProtectionSpace protectionSpace,
+  }) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent("host", () => protectionSpace.host);
     args.putIfAbsent("protocol", () => protectionSpace.protocol);
@@ -99,9 +107,10 @@ class WindowsHttpAuthCredentialDatabase
   }
 
   @override
-  Future<void> setHttpAuthCredential(
-      {required URLProtectionSpace protectionSpace,
-      required URLCredential credential}) async {
+  Future<void> setHttpAuthCredential({
+    required URLProtectionSpace protectionSpace,
+    required URLCredential credential,
+  }) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent("host", () => protectionSpace.host);
     args.putIfAbsent("protocol", () => protectionSpace.protocol);
@@ -113,9 +122,10 @@ class WindowsHttpAuthCredentialDatabase
   }
 
   @override
-  Future<void> removeHttpAuthCredential(
-      {required URLProtectionSpace protectionSpace,
-      required URLCredential credential}) async {
+  Future<void> removeHttpAuthCredential({
+    required URLProtectionSpace protectionSpace,
+    required URLCredential credential,
+  }) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent("host", () => protectionSpace.host);
     args.putIfAbsent("protocol", () => protectionSpace.protocol);
@@ -127,8 +137,9 @@ class WindowsHttpAuthCredentialDatabase
   }
 
   @override
-  Future<void> removeHttpAuthCredentials(
-      {required URLProtectionSpace protectionSpace}) async {
+  Future<void> removeHttpAuthCredentials({
+    required URLProtectionSpace protectionSpace,
+  }) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent("host", () => protectionSpace.host);
     args.putIfAbsent("protocol", () => protectionSpace.protocol);

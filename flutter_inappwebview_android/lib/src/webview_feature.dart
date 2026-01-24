@@ -20,7 +20,8 @@ class AndroidWebViewFeatureCreationParams
 
   /// Creates a [AndroidWebViewFeatureCreationParams] instance based on [PlatformWebViewFeatureCreationParams].
   factory AndroidWebViewFeatureCreationParams.fromPlatformWebViewFeatureCreationParams(
-      PlatformWebViewFeatureCreationParams params) {
+    PlatformWebViewFeatureCreationParams params,
+  ) {
     return AndroidWebViewFeatureCreationParams(params);
   }
 }
@@ -30,14 +31,16 @@ class AndroidWebViewFeature extends PlatformWebViewFeature
     with ChannelController {
   /// Creates a new [AndroidWebViewFeature].
   AndroidWebViewFeature(PlatformWebViewFeatureCreationParams params)
-      : super.implementation(
-          params is AndroidWebViewFeatureCreationParams
-              ? params
-              : AndroidWebViewFeatureCreationParams
-                  .fromPlatformWebViewFeatureCreationParams(params),
-        ) {
+    : super.implementation(
+        params is AndroidWebViewFeatureCreationParams
+            ? params
+            : AndroidWebViewFeatureCreationParams.fromPlatformWebViewFeatureCreationParams(
+                params,
+              ),
+      ) {
     channel = const MethodChannel(
-        'com.pichillilorenzo/flutter_inappwebview_webviewfeature');
+      'com.pichillilorenzo/flutter_inappwebview_webviewfeature',
+    );
     handler = handleMethod;
     initMethodCallHandler();
   }
@@ -54,8 +57,11 @@ class AndroidWebViewFeature extends PlatformWebViewFeature
   }
 
   static AndroidWebViewFeature _init() {
-    _instance = AndroidWebViewFeature(AndroidWebViewFeatureCreationParams(
-        const PlatformWebViewFeatureCreationParams()));
+    _instance = AndroidWebViewFeature(
+      AndroidWebViewFeatureCreationParams(
+        const PlatformWebViewFeatureCreationParams(),
+      ),
+    );
     return _instance!;
   }
 
@@ -74,7 +80,9 @@ class AndroidWebViewFeature extends PlatformWebViewFeature
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent("startupFeature", () => startupFeature.toNativeValue());
     return await channel?.invokeMethod<bool>(
-            'isStartupFeatureSupported', args) ??
+          'isStartupFeatureSupported',
+          args,
+        ) ??
         false;
   }
 

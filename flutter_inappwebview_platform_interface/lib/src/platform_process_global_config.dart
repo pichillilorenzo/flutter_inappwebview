@@ -19,9 +19,7 @@ part 'platform_process_global_config.g.dart';
 ///{@endtemplate}
 ///
 ///{@macro flutter_inappwebview_platform_interface.PlatformProcessGlobalConfigCreationParams.supported_platforms}
-@SupportedPlatforms(platforms: [
-  AndroidPlatform(),
-])
+@SupportedPlatforms(platforms: [AndroidPlatform()])
 @immutable
 class PlatformProcessGlobalConfigCreationParams {
   /// Used by the platform implementation to create a new [PlatformProcessGlobalConfig].
@@ -32,7 +30,8 @@ class PlatformProcessGlobalConfigCreationParams {
   ///{@endtemplate}
   bool isClassSupported({TargetPlatform? platform}) =>
       _PlatformProcessGlobalConfigCreationParamsClassSupported.isClassSupported(
-          platform: platform);
+        platform: platform,
+      );
 }
 
 ///{@template flutter_inappwebview_platform_interface.PlatformProcessGlobalConfig}
@@ -58,16 +57,20 @@ class PlatformProcessGlobalConfigCreationParams {
 ///{@endtemplate}
 ///
 ///{@macro flutter_inappwebview_platform_interface.PlatformProcessGlobalConfig.supported_platforms}
-@SupportedPlatforms(platforms: [
-  AndroidPlatform(
+@SupportedPlatforms(
+  platforms: [
+    AndroidPlatform(
       apiName: 'ProcessGlobalConfig',
       apiUrl:
-          'https://developer.android.com/reference/androidx/webkit/ProcessGlobalConfig'),
-])
+          'https://developer.android.com/reference/androidx/webkit/ProcessGlobalConfig',
+    ),
+  ],
+)
 abstract class PlatformProcessGlobalConfig extends PlatformInterface {
   /// Creates a new [PlatformProcessGlobalConfig]
   factory PlatformProcessGlobalConfig(
-      PlatformProcessGlobalConfigCreationParams params) {
+    PlatformProcessGlobalConfigCreationParams params,
+  ) {
     assert(
       InAppWebViewPlatform.instance != null,
       'A platform implementation for `flutter_inappwebview` has not been set. Please '
@@ -105,7 +108,7 @@ abstract class PlatformProcessGlobalConfig extends PlatformInterface {
   /// a class that only contains a factory constructor.
   @protected
   PlatformProcessGlobalConfig.implementation(this.params)
-      : super(token: _token);
+    : super(token: _token);
 
   static final Object _token = Object();
 
@@ -120,15 +123,19 @@ abstract class PlatformProcessGlobalConfig extends PlatformInterface {
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformProcessGlobalConfig.apply.supported_platforms}
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(
         apiName: 'ProcessGlobalConfig.apply',
         apiUrl:
-            'https://developer.android.com/reference/androidx/webkit/ProcessGlobalConfig#apply(androidx.webkit.ProcessGlobalConfig)'),
-  ])
+            'https://developer.android.com/reference/androidx/webkit/ProcessGlobalConfig#apply(androidx.webkit.ProcessGlobalConfig)',
+      ),
+    ],
+  )
   Future<void> apply({required ProcessGlobalConfigSettings settings}) {
     throw UnimplementedError(
-        'apply is not implemented on the current platform');
+      'apply is not implemented on the current platform',
+    );
   }
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformProcessGlobalConfigCreationParams.isClassSupported}
@@ -138,10 +145,13 @@ abstract class PlatformProcessGlobalConfig extends PlatformInterface {
   ///{@template flutter_inappwebview_platform_interface.PlatformProcessGlobalConfig.isMethodSupported}
   ///Check if the given [method] is supported by the [defaultTargetPlatform] or a specific [platform].
   ///{@endtemplate}
-  bool isMethodSupported(PlatformProcessGlobalConfigMethod method,
-          {TargetPlatform? platform}) =>
-      _PlatformProcessGlobalConfigMethodSupported.isMethodSupported(method,
-          platform: platform);
+  bool isMethodSupported(
+    PlatformProcessGlobalConfigMethod method, {
+    TargetPlatform? platform,
+  }) => _PlatformProcessGlobalConfigMethodSupported.isMethodSupported(
+    method,
+    platform: platform,
+  );
 }
 
 ///{@template flutter_inappwebview_platform_interface.ProcessGlobalConfigSettings}
@@ -149,12 +159,15 @@ abstract class PlatformProcessGlobalConfig extends PlatformInterface {
 ///{@endtemplate}
 ///
 ///{@macro flutter_inappwebview_platform_interface.ProcessGlobalConfigSettings.supported_platforms}
-@SupportedPlatforms(platforms: [
-  AndroidPlatform(
+@SupportedPlatforms(
+  platforms: [
+    AndroidPlatform(
       apiName: 'ProcessGlobalConfig.apply',
       apiUrl:
-          'https://developer.android.com/reference/androidx/webkit/ProcessGlobalConfig#apply(androidx.webkit.ProcessGlobalConfig)'),
-])
+          'https://developer.android.com/reference/androidx/webkit/ProcessGlobalConfig#apply(androidx.webkit.ProcessGlobalConfig)',
+    ),
+  ],
+)
 @ExchangeableObject(copyMethod: true)
 class ProcessGlobalConfigSettings_ {
   ///The directory name suffix to be used for the current process.
@@ -178,11 +191,14 @@ class ProcessGlobalConfigSettings_ {
   ///The [PlatformInAppWebViewController.disableWebView] method can be used to ensure that the other processes do not use WebView by accident in this case.
   ///
   ///{@macro flutter_inappwebview_platform_interface.ProcessGlobalConfigSettings.dataDirectorySuffix.supported_platforms}
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(
         note:
-            'Available only if [WebViewFeature.STARTUP_FEATURE_SET_DATA_DIRECTORY_SUFFIX] feature is supported.'),
-  ])
+            'Available only if [WebViewFeature.STARTUP_FEATURE_SET_DATA_DIRECTORY_SUFFIX] feature is supported.',
+      ),
+    ],
+  )
   String? dataDirectorySuffix;
 
   ///Set the base directories that `WebView` will use for the current process.
@@ -204,31 +220,39 @@ class ProcessGlobalConfigSettings_ {
   ///In such a case, the directory in which `WebView` creates missing directories must be readable and writable by the current process.
   ///
   ///{@macro flutter_inappwebview_platform_interface.ProcessGlobalConfigSettings.directoryBasePaths.supported_platforms}
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(
         note:
-            'Available only if [WebViewFeature.STARTUP_FEATURE_SET_DIRECTORY_BASE_PATHS] feature is supported.'),
-  ])
+            'Available only if [WebViewFeature.STARTUP_FEATURE_SET_DIRECTORY_BASE_PATHS] feature is supported.',
+      ),
+    ],
+  )
   ProcessGlobalConfigDirectoryBasePaths_? directoryBasePaths;
 
-  ProcessGlobalConfigSettings_(
-      {this.dataDirectorySuffix, this.directoryBasePaths});
+  ProcessGlobalConfigSettings_({
+    this.dataDirectorySuffix,
+    this.directoryBasePaths,
+  });
 
   ///{@template flutter_inappwebview_platform_interface.ProcessGlobalConfigSettings.isClassSupported}
   ///Check if the current class is supported by the [defaultTargetPlatform] or a specific [platform].
   ///{@endtemplate}
   static bool isClassSupported({TargetPlatform? platform}) =>
       _ProcessGlobalConfigSettingsClassSupported.isClassSupported(
-          platform: platform);
+        platform: platform,
+      );
 
   ///{@template flutter_inappwebview_platform_interface.ProcessGlobalConfigSettings.isPropertySupported}
   ///Check if the current class is supported by the [defaultTargetPlatform] or a specific [platform].
   ///{@endtemplate}
-  static bool isPropertySupported(ProcessGlobalConfigSettingsProperty property,
-          {TargetPlatform? platform}) =>
-      _ProcessGlobalConfigSettingsPropertySupported.isPropertySupported(
-          property,
-          platform: platform);
+  static bool isPropertySupported(
+    ProcessGlobalConfigSettingsProperty property, {
+    TargetPlatform? platform,
+  }) => _ProcessGlobalConfigSettingsPropertySupported.isPropertySupported(
+    property,
+    platform: platform,
+  );
 }
 
 ///Class that represents the settings used to configure the [ProcessGlobalConfigSettings.directoryBasePaths].
@@ -243,7 +267,8 @@ class ProcessGlobalConfigDirectoryBasePaths_ {
   ///The absolute base path for the WebView cache directory.
   String cacheDirectoryBasePath;
 
-  ProcessGlobalConfigDirectoryBasePaths_(
-      {required this.dataDirectoryBasePath,
-      required this.cacheDirectoryBasePath});
+  ProcessGlobalConfigDirectoryBasePaths_({
+    required this.dataDirectoryBasePath,
+    required this.cacheDirectoryBasePath,
+  });
 }

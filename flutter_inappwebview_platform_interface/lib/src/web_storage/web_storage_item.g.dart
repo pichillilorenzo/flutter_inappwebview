@@ -16,24 +16,20 @@ class WebStorageItem {
   WebStorageItem({this.key, this.value});
 
   ///Gets a possible [WebStorageItem] instance from a [Map] value.
-  static WebStorageItem? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static WebStorageItem? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
-    final instance = WebStorageItem(
-      key: map['key'],
-      value: map['value'],
-    );
+    final instance = WebStorageItem(key: map['key'], value: map['value']);
     return instance;
   }
 
   ///Converts instance to a map.
   Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
-    return {
-      "key": key,
-      "value": value,
-    };
+    return {"key": key, "value": value};
   }
 
   ///Converts instance to a map.

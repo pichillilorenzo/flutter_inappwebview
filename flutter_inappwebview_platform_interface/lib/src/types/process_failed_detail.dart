@@ -11,17 +11,13 @@ part 'process_failed_detail.g.dart';
 @ExchangeableObject()
 class ProcessFailedDetail_ {
   ///The kind of process failure that has occurred.
-  @SupportedPlatforms(platforms: [
-    WindowsPlatform(),
-  ])
+  @SupportedPlatforms(platforms: [WindowsPlatform()])
   ProcessFailedKind_ kind;
 
   ///The exit code of the failing process, for telemetry purposes.
   ///
   ///The exit code is always STILL_ACTIVE (259) when [ProcessFailedKind.RENDER_PROCESS_UNRESPONSIVE].
-  @SupportedPlatforms(platforms: [
-    WindowsPlatform(),
-  ])
+  @SupportedPlatforms(platforms: [WindowsPlatform()])
   int? exitCode;
 
   ///Description of the process assigned by the WebView2 Runtime.
@@ -29,15 +25,11 @@ class ProcessFailedDetail_ {
   ///This is a technical English term appropriate for logging or development purposes, and not localized for the end user.
   ///It applies to utility processes (for example, "Audio Service", "Video Capture") and plugin processes (for example, "Flash").
   ///The returned [processDescription] is empty if the WebView2 Runtime did not assign a description to the process.
-  @SupportedPlatforms(platforms: [
-    WindowsPlatform(),
-  ])
+  @SupportedPlatforms(platforms: [WindowsPlatform()])
   String? processDescription;
 
   ///The reason for the process failure.
-  @SupportedPlatforms(platforms: [
-    WindowsPlatform(),
-  ])
+  @SupportedPlatforms(platforms: [WindowsPlatform()])
   ProcessFailedReason_? reason;
 
   ///This property is the full path of the module that caused the crash in cases of Windows Code Integrity failures.
@@ -50,9 +42,7 @@ class ProcessFailedDetail_ {
   ///- It has an invalid or missing signature that does not match the publisher or signer of the file.
   ///- It has been tampered with or corrupted by malware or other software.
   ///- It has been blocked by an administrator or a security policy. This property always will be the empty string if failure is not caused by STATUS_INVALID_IMAGE_HASH.
-  @SupportedPlatforms(platforms: [
-    WindowsPlatform(),
-  ])
+  @SupportedPlatforms(platforms: [WindowsPlatform()])
   String? failureSourceModulePath;
 
   ///The collection of [FrameInfo]s for frames in the WebView that were being rendered by the failed process.
@@ -61,9 +51,7 @@ class ProcessFailedDetail_ {
   ///This is only available when [ProcessFailedKind] is [ProcessFailedKind.FRAME_RENDER_PROCESS_EXITED];
   ///frames is null for all other process failure kinds, including the case in which the failed process was the renderer
   ///for the main frame and subframes within it, for which the failure kind is [ProcessFailedKind.RENDER_PROCESS_EXITED].
-  @SupportedPlatforms(platforms: [
-    WindowsPlatform(),
-  ])
+  @SupportedPlatforms(platforms: [WindowsPlatform()])
   List<FrameInfo_>? frameInfos;
 
   ProcessFailedDetail_({

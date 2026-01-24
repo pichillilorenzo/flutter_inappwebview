@@ -35,17 +35,20 @@ class ChromeSafariBrowserActionButton {
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView:
   ///    - Not available in an Android Trusted Web Activity.
-  ChromeSafariBrowserActionButton(
-      {required this.id,
-      required this.icon,
-      required this.description,
-      @Deprecated("Use onClick instead") this.action,
-      this.onClick,
-      this.shouldTint = false});
+  ChromeSafariBrowserActionButton({
+    required this.id,
+    required this.icon,
+    required this.description,
+    @Deprecated("Use onClick instead") this.action,
+    this.onClick,
+    this.shouldTint = false,
+  });
 
   ///Gets a possible [ChromeSafariBrowserActionButton] instance from a [Map] value.
-  static ChromeSafariBrowserActionButton? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static ChromeSafariBrowserActionButton? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }

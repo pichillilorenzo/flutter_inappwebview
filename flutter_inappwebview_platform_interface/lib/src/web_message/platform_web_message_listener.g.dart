@@ -14,13 +14,20 @@ extension _PlatformWebMessageListenerCreationParamsClassSupported
   ///- Android WebView
   ///- iOS WKWebView
   ///- macOS WKWebView
+  ///- Linux WPE WebKit
+  ///- Windows WebView2
   ///
   ///Use the [PlatformWebMessageListenerCreationParams.isClassSupported] method to check if this class is supported at runtime.
   ///{@endtemplate}
   static bool isClassSupported({TargetPlatform? platform}) {
     return ((kIsWeb && platform != null) || !kIsWeb) &&
-        [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
-            .contains(platform ?? defaultTargetPlatform);
+        [
+          TargetPlatform.android,
+          TargetPlatform.iOS,
+          TargetPlatform.macOS,
+          TargetPlatform.linux,
+          TargetPlatform.windows,
+        ].contains(platform ?? defaultTargetPlatform);
   }
 }
 
@@ -34,6 +41,8 @@ enum PlatformWebMessageListenerCreationParamsProperty {
   ///- Android WebView
   ///- iOS WKWebView
   ///- macOS WKWebView
+  ///- Linux WPE WebKit
+  ///- Windows WebView2
   ///
   ///Use the [PlatformWebMessageListenerCreationParams.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
@@ -47,6 +56,8 @@ enum PlatformWebMessageListenerCreationParamsProperty {
   ///- Android WebView
   ///- iOS WKWebView
   ///- macOS WKWebView
+  ///- Linux WPE WebKit
+  ///- Windows WebView2
   ///
   ///Use the [PlatformWebMessageListenerCreationParams.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
@@ -60,6 +71,8 @@ enum PlatformWebMessageListenerCreationParamsProperty {
   ///- Android WebView ([Official API - WebViewCompat.WebMessageListener.onPostMessage](https://developer.android.com/reference/androidx/webkit/WebViewCompat.WebMessageListener#onPostMessage(android.webkit.WebView,%20androidx.webkit.WebMessageCompat,%20android.net.Uri,%20boolean,%20androidx.webkit.JavaScriptReplyProxy)))
   ///- iOS WKWebView
   ///- macOS WKWebView
+  ///- Linux WPE WebKit
+  ///- Windows WebView2
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [message]: all platforms
@@ -75,21 +88,37 @@ enum PlatformWebMessageListenerCreationParamsProperty {
 extension _PlatformWebMessageListenerCreationParamsPropertySupported
     on PlatformWebMessageListenerCreationParams {
   static bool isPropertySupported(
-      PlatformWebMessageListenerCreationParamsProperty property,
-      {TargetPlatform? platform}) {
+    PlatformWebMessageListenerCreationParamsProperty property, {
+    TargetPlatform? platform,
+  }) {
     switch (property) {
       case PlatformWebMessageListenerCreationParamsProperty.allowedOriginRules:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+              TargetPlatform.linux,
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebMessageListenerCreationParamsProperty.jsObjectName:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+              TargetPlatform.linux,
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebMessageListenerCreationParamsProperty.onPostMessage:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+              TargetPlatform.linux,
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
     }
   }
 }
@@ -102,13 +131,20 @@ extension _PlatformWebMessageListenerClassSupported
   ///- Android WebView
   ///- iOS WKWebView
   ///- macOS WKWebView
+  ///- Linux WPE WebKit
+  ///- Windows WebView2
   ///
   ///Use the [PlatformWebMessageListener.isClassSupported] method to check if this class is supported at runtime.
   ///{@endtemplate}
   static bool isClassSupported({TargetPlatform? platform}) {
     return ((kIsWeb && platform != null) || !kIsWeb) &&
-        [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
-            .contains(platform ?? defaultTargetPlatform);
+        [
+          TargetPlatform.android,
+          TargetPlatform.iOS,
+          TargetPlatform.macOS,
+          TargetPlatform.linux,
+          TargetPlatform.windows,
+        ].contains(platform ?? defaultTargetPlatform);
   }
 }
 
@@ -122,6 +158,8 @@ enum PlatformWebMessageListenerMethod {
   ///- Android WebView
   ///- iOS WKWebView
   ///- macOS WKWebView
+  ///- Linux WPE WebKit
+  ///- Windows WebView2
   ///
   ///Use the [PlatformWebMessageListener.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
@@ -130,13 +168,20 @@ enum PlatformWebMessageListenerMethod {
 
 extension _PlatformWebMessageListenerMethodSupported
     on PlatformWebMessageListener {
-  static bool isMethodSupported(PlatformWebMessageListenerMethod method,
-      {TargetPlatform? platform}) {
+  static bool isMethodSupported(
+    PlatformWebMessageListenerMethod method, {
+    TargetPlatform? platform,
+  }) {
     switch (method) {
       case PlatformWebMessageListenerMethod.dispose:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+              TargetPlatform.linux,
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
     }
   }
 }

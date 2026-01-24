@@ -6,13 +6,17 @@ import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_pla
 ///{@macro flutter_inappwebview_platform_interface.PlatformPullToRefreshController}
 class PullToRefreshController {
   ///{@macro flutter_inappwebview_platform_interface.PlatformPullToRefreshController}
-  PullToRefreshController(
-      {void Function()? onRefresh,
-      @Deprecated("Use settings instead") PullToRefreshOptions? options,
-      PullToRefreshSettings? settings})
-      : this.fromPlatformCreationParams(
-            params: PlatformPullToRefreshControllerCreationParams(
-                onRefresh: onRefresh, options: options, settings: settings));
+  PullToRefreshController({
+    void Function()? onRefresh,
+    @Deprecated("Use settings instead") PullToRefreshOptions? options,
+    PullToRefreshSettings? settings,
+  }) : this.fromPlatformCreationParams(
+         params: PlatformPullToRefreshControllerCreationParams(
+           onRefresh: onRefresh,
+           options: options,
+           settings: settings,
+         ),
+       );
 
   /// Constructs a [PullToRefreshController].
   ///
@@ -95,19 +99,25 @@ class PullToRefreshController {
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformPullToRefreshController.isClassSupported}
   static bool isClassSupported({TargetPlatform? platform}) =>
-      PlatformPullToRefreshController.static()
-          .isClassSupported(platform: platform);
+      PlatformPullToRefreshController.static().isClassSupported(
+        platform: platform,
+      );
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformPullToRefreshController.isPropertySupported}
   static bool isPropertySupported(
-          PlatformPullToRefreshControllerCreationParamsProperty property,
-          {TargetPlatform? platform}) =>
-      PlatformPullToRefreshController.static()
-          .isPropertySupported(property, platform: platform);
+    PlatformPullToRefreshControllerCreationParamsProperty property, {
+    TargetPlatform? platform,
+  }) => PlatformPullToRefreshController.static().isPropertySupported(
+    property,
+    platform: platform,
+  );
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformPullToRefreshController.isMethodSupported}
-  static bool isMethodSupported(PlatformPullToRefreshControllerMethod method,
-          {TargetPlatform? platform}) =>
-      PlatformPullToRefreshController.static()
-          .isMethodSupported(method, platform: platform);
+  static bool isMethodSupported(
+    PlatformPullToRefreshControllerMethod method, {
+    TargetPlatform? platform,
+  }) => PlatformPullToRefreshController.static().isMethodSupported(
+    method,
+    platform: platform,
+  );
 }

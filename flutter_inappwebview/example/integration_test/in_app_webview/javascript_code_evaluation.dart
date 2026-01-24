@@ -43,15 +43,19 @@ void javascriptCodeEvaluation() {
       await tester.pump();
       await pageLoaded.future;
 
-      var result = await controller.evaluateJavascript(source: """
+      var result = await controller.evaluateJavascript(
+        source: """
         [1, true, ["bar", 5], {"foo": "baz"}];
-      """);
+      """,
+      );
       expect(result, isNotNull);
       expect(result[0], 1);
       expect(result[1], true);
       expect(listEquals(result[2] as List<dynamic>?, ["bar", 5]), true);
       expect(
-          mapEquals(result[3]?.cast<String, String>(), {"foo": "baz"}), true);
+        mapEquals(result[3]?.cast<String, String>(), {"foo": "baz"}),
+        true,
+      );
     }, skip: shouldSkipTest1);
 
     final shouldSkipTest2 = kIsWeb
@@ -62,8 +66,9 @@ void javascriptCodeEvaluation() {
             TargetPlatform.macOS,
           ].contains(defaultTargetPlatform);
 
-    skippableTestWidgets('evaluateJavascript with content world',
-        (WidgetTester tester) async {
+    skippableTestWidgets('evaluateJavascript with content world', (
+      WidgetTester tester,
+    ) async {
       final Completer<InAppWebViewController> controllerCompleter =
           Completer<InAppWebViewController>();
       final Completer<void> pageLoaded = Completer<void>();
@@ -88,14 +93,16 @@ void javascriptCodeEvaluation() {
       await pageLoaded.future;
 
       await controller.evaluateJavascript(
-          source: "var foo = 49;",
-          contentWorld: ContentWorld.world(name: "custom-world"));
+        source: "var foo = 49;",
+        contentWorld: ContentWorld.world(name: "custom-world"),
+      );
       var result = await controller.evaluateJavascript(source: "foo");
       expect(result, isNull);
 
       result = await controller.evaluateJavascript(
-          source: "foo",
-          contentWorld: ContentWorld.world(name: "custom-world"));
+        source: "foo",
+        contentWorld: ContentWorld.world(name: "custom-world"),
+      );
       expect(result, 49);
     }, skip: shouldSkipTest2);
 
@@ -146,15 +153,17 @@ void javascriptCodeEvaluation() {
       """;
 
       var result = await controller.callAsyncJavaScript(
-          functionBody: functionBody,
-          arguments: {'x': 49, 'y': 'error message'});
+        functionBody: functionBody,
+        arguments: {'x': 49, 'y': 'error message'},
+      );
       expect(result, isNotNull);
       expect(result!.error, isNull);
       expect(result.value, 49);
 
       result = await controller.callAsyncJavaScript(
-          functionBody: functionBody,
-          arguments: {'x': -49, 'y': 'error message'});
+        functionBody: functionBody,
+        arguments: {'x': -49, 'y': 'error message'},
+      );
       expect(result, isNotNull);
       expect(result!.value, isNull);
       expect(result.error, 'error message');
@@ -168,8 +177,9 @@ void javascriptCodeEvaluation() {
             TargetPlatform.macOS,
           ].contains(defaultTargetPlatform);
 
-    skippableTestWidgets('callAsyncJavaScript with content world',
-        (WidgetTester tester) async {
+    skippableTestWidgets('callAsyncJavaScript with content world', (
+      WidgetTester tester,
+    ) async {
       final Completer<InAppWebViewController> controllerCompleter =
           Completer<InAppWebViewController>();
       final Completer<void> pageLoaded = Completer<void>();
@@ -194,17 +204,20 @@ void javascriptCodeEvaluation() {
       await pageLoaded.future;
 
       await controller.callAsyncJavaScript(
-          functionBody: "window.foo = 49;",
-          contentWorld: ContentWorld.world(name: "custom-world"));
+        functionBody: "window.foo = 49;",
+        contentWorld: ContentWorld.world(name: "custom-world"),
+      );
       var result = await controller.callAsyncJavaScript(
-          functionBody: "return window.foo;");
+        functionBody: "return window.foo;",
+      );
       expect(result, isNotNull);
       expect(result!.error, isNull);
       expect(result.value, isNull);
 
       result = await controller.callAsyncJavaScript(
-          functionBody: "return window.foo;",
-          contentWorld: ContentWorld.world(name: "custom-world"));
+        functionBody: "return window.foo;",
+        contentWorld: ContentWorld.world(name: "custom-world"),
+      );
       expect(result, isNotNull);
       expect(result!.error, isNull);
       expect(result.value, 49);

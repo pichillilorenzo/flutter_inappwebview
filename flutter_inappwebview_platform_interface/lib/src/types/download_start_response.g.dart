@@ -34,22 +34,29 @@ class DownloadStartResponse {
   ///**Officially Supported Platforms/Implementations**:
   ///- Windows WebView2
   String? resultFilePath;
-  DownloadStartResponse(
-      {this.action, required this.handled, this.resultFilePath});
+  DownloadStartResponse({
+    this.action,
+    required this.handled,
+    this.resultFilePath,
+  });
 
   ///Gets a possible [DownloadStartResponse] instance from a [Map] value.
-  static DownloadStartResponse? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static DownloadStartResponse? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
     final instance = DownloadStartResponse(
       action: switch (enumMethod ?? EnumMethod.nativeValue) {
-        EnumMethod.nativeValue =>
-          DownloadStartResponseAction.fromNativeValue(map['action']),
-        EnumMethod.value =>
-          DownloadStartResponseAction.fromValue(map['action']),
-        EnumMethod.name => DownloadStartResponseAction.byName(map['action'])
+        EnumMethod.nativeValue => DownloadStartResponseAction.fromNativeValue(
+          map['action'],
+        ),
+        EnumMethod.value => DownloadStartResponseAction.fromValue(
+          map['action'],
+        ),
+        EnumMethod.name => DownloadStartResponseAction.byName(map['action']),
       },
       handled: map['handled'],
       resultFilePath: map['resultFilePath'],
@@ -63,7 +70,7 @@ class DownloadStartResponse {
       "action": switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => action?.toNativeValue(),
         EnumMethod.value => action?.toValue(),
-        EnumMethod.name => action?.name()
+        EnumMethod.name => action?.name(),
       },
       "handled": handled,
       "resultFilePath": resultFilePath,

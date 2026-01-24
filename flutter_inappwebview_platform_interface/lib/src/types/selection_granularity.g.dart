@@ -11,10 +11,11 @@ class SelectionGranularity {
   final int _value;
   final int _nativeValue;
   const SelectionGranularity._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory SelectionGranularity._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      SelectionGranularity._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => SelectionGranularity._internal(value, nativeValue());
 
   ///Selection endpoints can be placed at any character boundary.
   static const CHARACTER = SelectionGranularity._internal(1, 1);
@@ -32,8 +33,9 @@ class SelectionGranularity {
   static SelectionGranularity? fromValue(int? value) {
     if (value != null) {
       try {
-        return SelectionGranularity.values
-            .firstWhere((element) => element.toValue() == value);
+        return SelectionGranularity.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -45,8 +47,9 @@ class SelectionGranularity {
   static SelectionGranularity? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return SelectionGranularity.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return SelectionGranularity.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -62,8 +65,9 @@ class SelectionGranularity {
   static SelectionGranularity? byName(String? name) {
     if (name != null) {
       try {
-        return SelectionGranularity.values
-            .firstWhere((element) => element.name() == name);
+        return SelectionGranularity.values.firstWhere(
+          (element) => element.name() == name,
+        );
       } catch (e) {
         return null;
       }
@@ -81,7 +85,7 @@ class SelectionGranularity {
   /// them will be represented in the returned map.
   static Map<String, SelectionGranularity> asNameMap() =>
       <String, SelectionGranularity>{
-        for (final value in SelectionGranularity.values) value.name(): value
+        for (final value in SelectionGranularity.values) value.name(): value,
       };
 
   ///Gets [int] value.
@@ -125,10 +129,11 @@ class IOSWKSelectionGranularity {
   final int _value;
   final int _nativeValue;
   const IOSWKSelectionGranularity._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory IOSWKSelectionGranularity._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      IOSWKSelectionGranularity._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => IOSWKSelectionGranularity._internal(value, nativeValue());
 
   ///Selection endpoints can be placed at any character boundary.
   static const CHARACTER = IOSWKSelectionGranularity._internal(1, 1);
@@ -146,8 +151,9 @@ class IOSWKSelectionGranularity {
   static IOSWKSelectionGranularity? fromValue(int? value) {
     if (value != null) {
       try {
-        return IOSWKSelectionGranularity.values
-            .firstWhere((element) => element.toValue() == value);
+        return IOSWKSelectionGranularity.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -159,8 +165,9 @@ class IOSWKSelectionGranularity {
   static IOSWKSelectionGranularity? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return IOSWKSelectionGranularity.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return IOSWKSelectionGranularity.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -176,8 +183,9 @@ class IOSWKSelectionGranularity {
   static IOSWKSelectionGranularity? byName(String? name) {
     if (name != null) {
       try {
-        return IOSWKSelectionGranularity.values
-            .firstWhere((element) => element.name() == name);
+        return IOSWKSelectionGranularity.values.firstWhere(
+          (element) => element.name() == name,
+        );
       } catch (e) {
         return null;
       }
@@ -196,7 +204,7 @@ class IOSWKSelectionGranularity {
   static Map<String, IOSWKSelectionGranularity> asNameMap() =>
       <String, IOSWKSelectionGranularity>{
         for (final value in IOSWKSelectionGranularity.values)
-          value.name(): value
+          value.name(): value,
       };
 
   ///Gets [int] value.

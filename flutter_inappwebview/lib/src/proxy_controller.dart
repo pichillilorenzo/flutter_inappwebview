@@ -7,9 +7,9 @@ import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_pla
 class ProxyController {
   ///{@macro flutter_inappwebview_platform_interface.PlatformProxyController}
   ProxyController()
-      : this.fromPlatformCreationParams(
-          const PlatformProxyControllerCreationParams(),
-        );
+    : this.fromPlatformCreationParams(
+        const PlatformProxyControllerCreationParams(),
+      );
 
   /// Constructs a [ProxyController] from creation params for a specific
   /// platform.
@@ -46,8 +46,11 @@ class ProxyController {
       PlatformProxyController.static().isClassSupported(platform: platform);
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformProxyController.isMethodSupported}
-  static bool isMethodSupported(PlatformProxyControllerMethod method,
-          {TargetPlatform? platform}) =>
-      PlatformProxyController.static()
-          .isMethodSupported(method, platform: platform);
+  static bool isMethodSupported(
+    PlatformProxyControllerMethod method, {
+    TargetPlatform? platform,
+  }) => PlatformProxyController.static().isMethodSupported(
+    method,
+    platform: platform,
+  );
 }

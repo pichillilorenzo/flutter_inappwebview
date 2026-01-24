@@ -29,14 +29,15 @@ class URLResponse_ {
   ///The response’s HTTP status code.
   int? statusCode;
 
-  URLResponse_(
-      {this.url,
-      required this.expectedContentLength,
-      this.mimeType,
-      this.suggestedFilename,
-      this.textEncodingName,
-      this.headers,
-      this.statusCode});
+  URLResponse_({
+    this.url,
+    required this.expectedContentLength,
+    this.mimeType,
+    this.suggestedFilename,
+    this.textEncodingName,
+    this.headers,
+    this.statusCode,
+  });
 }
 
 ///Use [URLResponse] instead.
@@ -64,12 +65,13 @@ class IOSURLResponse_ {
   ///The response’s HTTP status code.
   int? statusCode;
 
-  IOSURLResponse_(
-      {this.url,
-      required this.expectedContentLength,
-      this.mimeType,
-      this.suggestedFilename,
-      this.textEncodingName,
-      this.headers,
-      this.statusCode});
+  IOSURLResponse_({
+    this.url,
+    required this.expectedContentLength,
+    this.mimeType,
+    this.suggestedFilename,
+    this.textEncodingName,
+    this.headers,
+    this.statusCode,
+  });
 }

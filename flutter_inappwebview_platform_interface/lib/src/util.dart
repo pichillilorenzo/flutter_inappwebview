@@ -439,8 +439,12 @@ extension UtilColor on Color {
         .split(",")
         .map((rbgValue) => rbgValue.trim())
         .toList();
-    return Color.fromRGBO(int.parse(rgbaValues[0]), int.parse(rgbaValues[1]),
-        int.parse(rgbaValues[2]), double.parse(rgbaValues[3]));
+    return Color.fromRGBO(
+      int.parse(rgbaValues[0]),
+      int.parse(rgbaValues[1]),
+      int.parse(rgbaValues[2]),
+      double.parse(rgbaValues[3]),
+    );
   }
 
   static Color? fromHlsString(String? hlsString) {
@@ -471,7 +475,11 @@ extension UtilColor on Color {
         .toList();
     var rgbaValues = _hslToRgb(hlsaValues[0], hlsaValues[1], hlsaValues[2]);
     return Color.fromRGBO(
-        rgbaValues[0], rgbaValues[1], rgbaValues[2], hlsaValues[3]);
+      rgbaValues[0],
+      rgbaValues[1],
+      rgbaValues[2],
+      hlsaValues[3],
+    );
   }
 
   static List<int> _hslToRgb(double h, double s, double l) {
@@ -507,7 +515,8 @@ extension UtilColor on Color {
 
 extension HexColor on Color {
   /// Prefixes a hash sign if [leadingHashSign] is set to `true` (default is `true`).
-  String toHex({bool leadingHashSign = true}) => '${leadingHashSign ? '#' : ''}'
+  String toHex({bool leadingHashSign = true}) =>
+      '${leadingHashSign ? '#' : ''}'
       '${alpha.toRadixString(16).padLeft(2, '0')}'
       '${red.toRadixString(16).padLeft(2, '0')}'
       '${green.toRadixString(16).padLeft(2, '0')}'
@@ -537,7 +546,11 @@ extension MapEdgeInsets on EdgeInsets {
       return null;
     }
     return EdgeInsets.fromLTRB(
-        map['left'], map['top'], map['right'], map['bottom']);
+      map['left'],
+      map['top'],
+      map['right'],
+      map['bottom'],
+    );
   }
 
   Map<String, double> toJson() {
@@ -549,13 +562,14 @@ extension MapEdgeInsets on EdgeInsets {
   }
 }
 
-void debugLog(
-    {required DebugLoggingSettings debugLoggingSettings,
-    required String className,
-    required String method,
-    String? name,
-    String? id,
-    dynamic args}) {
+void debugLog({
+  required DebugLoggingSettings debugLoggingSettings,
+  required String className,
+  required String method,
+  String? name,
+  String? id,
+  dynamic args,
+}) {
   if (debugLoggingSettings.enabled) {
     for (var regExp in debugLoggingSettings.excludeFilter) {
       if (regExp.hasMatch(method)) return;
@@ -563,11 +577,11 @@ void debugLog(
     var maxLogMessageLength = debugLoggingSettings.maxLogMessageLength;
     String message =
         "(${Util.isWeb ? 'Web' : defaultTargetPlatform.name}) ${name ?? className}" +
-            (id != null ? ' ID $id' : '') +
-            ' calling "' +
-            method.toString() +
-            '" using ' +
-            args.toString();
+        (id != null ? ' ID $id' : '') +
+        ' calling "' +
+        method.toString() +
+        '" using ' +
+        args.toString();
     if (maxLogMessageLength >= 0 && message.length > maxLogMessageLength) {
       message = message.substring(0, maxLogMessageLength) + '...';
     }
@@ -621,9 +635,13 @@ extension InternalChannelController on ChannelController {
 
   initMethodCallHandler() {
     assert(
-        channel != null, 'Method Channel for ${runtimeType} not initialized!');
-    assert(handler != null,
-        'Method Call Handler for ${runtimeType} not initialized!');
+      channel != null,
+      'Method Channel for ${runtimeType} not initialized!',
+    );
+    assert(
+      handler != null,
+      'Method Call Handler for ${runtimeType} not initialized!',
+    );
 
     channel?.setMethodCallHandler((call) async {
       if (disposed) return null;

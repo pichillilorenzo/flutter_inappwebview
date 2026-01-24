@@ -2,7 +2,7 @@ const kPlatformNameAndroid = "Android WebView";
 const kPlatformNameIOS = "iOS WKWebView";
 const kPlatformNameMacOS = "macOS WKWebView";
 const kPlatformNameWindows = "Windows WebView2";
-const kPlatformNameLinux = "Linux WebKitGTK";
+const kPlatformNameLinux = "Linux WPE WebKit";
 const kPlatformNameWeb = "Web \\<iframe\\>";
 const kPlatformNameValues = [
   kPlatformNameAndroid,

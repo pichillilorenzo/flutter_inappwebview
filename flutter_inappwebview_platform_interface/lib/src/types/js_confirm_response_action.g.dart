@@ -11,10 +11,11 @@ class JsConfirmResponseAction {
   final int _value;
   final int _nativeValue;
   const JsConfirmResponseAction._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory JsConfirmResponseAction._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      JsConfirmResponseAction._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => JsConfirmResponseAction._internal(value, nativeValue());
 
   ///Confirm that the user hit cancel button.
   static const CANCEL = JsConfirmResponseAction._internal(1, 1);
@@ -32,8 +33,9 @@ class JsConfirmResponseAction {
   static JsConfirmResponseAction? fromValue(int? value) {
     if (value != null) {
       try {
-        return JsConfirmResponseAction.values
-            .firstWhere((element) => element.toValue() == value);
+        return JsConfirmResponseAction.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -45,8 +47,9 @@ class JsConfirmResponseAction {
   static JsConfirmResponseAction? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return JsConfirmResponseAction.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return JsConfirmResponseAction.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -62,8 +65,9 @@ class JsConfirmResponseAction {
   static JsConfirmResponseAction? byName(String? name) {
     if (name != null) {
       try {
-        return JsConfirmResponseAction.values
-            .firstWhere((element) => element.name() == name);
+        return JsConfirmResponseAction.values.firstWhere(
+          (element) => element.name() == name,
+        );
       } catch (e) {
         return null;
       }
@@ -81,7 +85,7 @@ class JsConfirmResponseAction {
   /// them will be represented in the returned map.
   static Map<String, JsConfirmResponseAction> asNameMap() =>
       <String, JsConfirmResponseAction>{
-        for (final value in JsConfirmResponseAction.values) value.name(): value
+        for (final value in JsConfirmResponseAction.values) value.name(): value,
       };
 
   ///Gets [int] value.

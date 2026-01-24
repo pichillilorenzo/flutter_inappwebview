@@ -14,13 +14,14 @@ void convertToInAppWebView() {
     final Completer<void> pageLoaded = Completer<void>();
 
     var headlessWebView = new HeadlessInAppWebView(
-        initialUrlRequest: URLRequest(url: TEST_CROSS_PLATFORM_URL_1),
-        onWebViewCreated: (controller) {
-          controllerCompleter.complete(controller);
-        },
-        onLoadStop: (controller, url) async {
-          pageLoaded.complete();
-        });
+      initialUrlRequest: URLRequest(url: TEST_CROSS_PLATFORM_URL_1),
+      onWebViewCreated: (controller) {
+        controllerCompleter.complete(controller);
+      },
+      onLoadStop: (controller, url) async {
+        pageLoaded.complete();
+      },
+    );
 
     await headlessWebView.run();
     expect(headlessWebView.isRunning(), true);
@@ -60,11 +61,14 @@ void convertToInAppWebView() {
 
     expect(headlessWebView.isRunning(), false);
 
-    expect((await widgetController.getUrl())?.toString(),
-        TEST_CROSS_PLATFORM_URL_1.toString());
+    expect(
+      (await widgetController.getUrl())?.toString(),
+      TEST_CROSS_PLATFORM_URL_1.toString(),
+    );
 
     await widgetController.loadUrl(
-        urlRequest: URLRequest(url: TEST_CROSS_PLATFORM_URL_2));
+      urlRequest: URLRequest(url: TEST_CROSS_PLATFORM_URL_2),
+    );
     expect(await loadedUrl.future, TEST_CROSS_PLATFORM_URL_2.toString());
   }, skip: shouldSkip);
 }

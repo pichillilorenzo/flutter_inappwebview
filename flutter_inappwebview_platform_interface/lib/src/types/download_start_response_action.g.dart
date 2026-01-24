@@ -11,25 +11,31 @@ class DownloadStartResponseAction {
   final int _value;
   final int _nativeValue;
   const DownloadStartResponseAction._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory DownloadStartResponseAction._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      DownloadStartResponseAction._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => DownloadStartResponseAction._internal(value, nativeValue());
 
   ///Cancel the download.
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Windows WebView2
-  static final CANCEL =
-      DownloadStartResponseAction._internalMultiPlatform(0, () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.windows:
-        return 0;
-      default:
-        break;
-    }
-    return null;
-  });
+  ///- Linux WPE WebKit
+  static final CANCEL = DownloadStartResponseAction._internalMultiPlatform(
+    0,
+    () {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.windows:
+          return 0;
+        case TargetPlatform.linux:
+          return 0;
+        default:
+          break;
+      }
+      return null;
+    },
+  );
 
   ///Set of all values of [DownloadStartResponseAction].
   static final Set<DownloadStartResponseAction> values = [
@@ -40,8 +46,9 @@ class DownloadStartResponseAction {
   static DownloadStartResponseAction? fromValue(int? value) {
     if (value != null) {
       try {
-        return DownloadStartResponseAction.values
-            .firstWhere((element) => element.toValue() == value);
+        return DownloadStartResponseAction.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -53,8 +60,9 @@ class DownloadStartResponseAction {
   static DownloadStartResponseAction? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return DownloadStartResponseAction.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return DownloadStartResponseAction.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -70,8 +78,9 @@ class DownloadStartResponseAction {
   static DownloadStartResponseAction? byName(String? name) {
     if (name != null) {
       try {
-        return DownloadStartResponseAction.values
-            .firstWhere((element) => element.name() == name);
+        return DownloadStartResponseAction.values.firstWhere(
+          (element) => element.name() == name,
+        );
       } catch (e) {
         return null;
       }
@@ -90,7 +99,7 @@ class DownloadStartResponseAction {
   static Map<String, DownloadStartResponseAction> asNameMap() =>
       <String, DownloadStartResponseAction>{
         for (final value in DownloadStartResponseAction.values)
-          value.name(): value
+          value.name(): value,
       };
 
   ///Gets [int] value.

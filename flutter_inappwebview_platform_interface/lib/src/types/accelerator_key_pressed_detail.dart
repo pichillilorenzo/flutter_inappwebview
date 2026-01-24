@@ -14,6 +14,9 @@ class AcceleratorKeyPressedDetail_ {
   int? virtualKey;
 
   @ExchangeableObjectConstructor()
-  AcceleratorKeyPressedDetail_(
-      {this.keyEventKind, this.physicalKeyStatus, this.virtualKey});
+  AcceleratorKeyPressedDetail_({
+    this.keyEventKind,
+    this.physicalKeyStatus,
+    this.virtualKey,
+  });
 }

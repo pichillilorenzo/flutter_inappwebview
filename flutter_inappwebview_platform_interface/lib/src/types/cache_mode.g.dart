@@ -11,7 +11,7 @@ class CacheMode {
   final int _value;
   final int _nativeValue;
   const CacheMode._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory CacheMode._internalMultiPlatform(int value, Function nativeValue) =>
       CacheMode._internal(value, nativeValue());
 
@@ -40,8 +40,9 @@ class CacheMode {
   static CacheMode? fromValue(int? value) {
     if (value != null) {
       try {
-        return CacheMode.values
-            .firstWhere((element) => element.toValue() == value);
+        return CacheMode.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -53,8 +54,9 @@ class CacheMode {
   static CacheMode? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return CacheMode.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return CacheMode.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -87,8 +89,8 @@ class CacheMode {
   /// same value, or being values of different enum type), at most one of
   /// them will be represented in the returned map.
   static Map<String, CacheMode> asNameMap() => <String, CacheMode>{
-        for (final value in CacheMode.values) value.name(): value
-      };
+    for (final value in CacheMode.values) value.name(): value,
+  };
 
   ///Gets [int] value.
   int toValue() => _value;
@@ -135,10 +137,11 @@ class AndroidCacheMode {
   final int _value;
   final int _nativeValue;
   const AndroidCacheMode._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory AndroidCacheMode._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      AndroidCacheMode._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => AndroidCacheMode._internal(value, nativeValue());
 
   ///Use cached resources when they are available, even if they have expired. Otherwise load resources from the network.
   static const LOAD_CACHE_ELSE_NETWORK = AndroidCacheMode._internal(1, 1);
@@ -165,8 +168,9 @@ class AndroidCacheMode {
   static AndroidCacheMode? fromValue(int? value) {
     if (value != null) {
       try {
-        return AndroidCacheMode.values
-            .firstWhere((element) => element.toValue() == value);
+        return AndroidCacheMode.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -178,8 +182,9 @@ class AndroidCacheMode {
   static AndroidCacheMode? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return AndroidCacheMode.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return AndroidCacheMode.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -195,8 +200,9 @@ class AndroidCacheMode {
   static AndroidCacheMode? byName(String? name) {
     if (name != null) {
       try {
-        return AndroidCacheMode.values
-            .firstWhere((element) => element.name() == name);
+        return AndroidCacheMode.values.firstWhere(
+          (element) => element.name() == name,
+        );
       } catch (e) {
         return null;
       }
@@ -214,7 +220,7 @@ class AndroidCacheMode {
   /// them will be represented in the returned map.
   static Map<String, AndroidCacheMode> asNameMap() =>
       <String, AndroidCacheMode>{
-        for (final value in AndroidCacheMode.values) value.name(): value
+        for (final value in AndroidCacheMode.values) value.name(): value,
       };
 
   ///Gets [int] value.

@@ -20,11 +20,12 @@ class InAppWebViewRect_ {
   double height;
 
   @ExchangeableObjectConstructor()
-  InAppWebViewRect_(
-      {required this.x,
-      required this.y,
-      required this.width,
-      required this.height}) {
+  InAppWebViewRect_({
+    required this.x,
+    required this.y,
+    required this.width,
+    required this.height,
+  }) {
     assert(this.x >= 0 && this.y >= 0 && this.width >= 0 && this.height >= 0);
   }
 }

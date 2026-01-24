@@ -18,29 +18,38 @@ part 'platform_web_message_listener.g.dart';
 ///{@endtemplate}
 ///
 ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageListenerCreationParams.supported_platforms}
-@SupportedPlatforms(platforms: [
-  AndroidPlatform(),
-  IOSPlatform(),
-  MacOSPlatform(),
-])
+@SupportedPlatforms(
+  platforms: [
+    AndroidPlatform(),
+    IOSPlatform(),
+    MacOSPlatform(),
+    LinuxPlatform(),
+    WindowsPlatform(),
+  ],
+)
 @immutable
 class PlatformWebMessageListenerCreationParams {
   /// Used by the platform implementation to create a new [PlatformWebMessageListener].
-  const PlatformWebMessageListenerCreationParams(
-      {required this.jsObjectName,
-      this.allowedOriginRules,
-      this.onPostMessage});
+  const PlatformWebMessageListenerCreationParams({
+    required this.jsObjectName,
+    this.allowedOriginRules,
+    this.onPostMessage,
+  });
 
   ///{@template flutter_inappwebview_platform_interface.PlatformWebMessageListenerCreationParams.jsObjectName}
   ///The name for the injected JavaScript object.
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageListenerCreationParams.jsObjectName.supported_platforms}
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(),
-    IOSPlatform(),
-    MacOSPlatform(),
-  ])
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(),
+      IOSPlatform(),
+      MacOSPlatform(),
+      LinuxPlatform(),
+      WindowsPlatform(),
+    ],
+  )
   final String jsObjectName;
 
   ///{@template flutter_inappwebview_platform_interface.PlatformWebMessageListenerCreationParams.allowedOriginRules}
@@ -48,11 +57,15 @@ class PlatformWebMessageListenerCreationParams {
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageListenerCreationParams.allowedOriginRules.supported_platforms}
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(),
-    IOSPlatform(),
-    MacOSPlatform(),
-  ])
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(),
+      IOSPlatform(),
+      MacOSPlatform(),
+      LinuxPlatform(),
+      WindowsPlatform(),
+    ],
+  )
   final Set<String>? allowedOriginRules;
 
   ///{@template flutter_inappwebview_platform_interface.PlatformWebMessageListenerCreationParams.onPostMessage}
@@ -67,14 +80,19 @@ class PlatformWebMessageListenerCreationParams {
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageListenerCreationParams.onPostMessage.supported_platforms}
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(
         apiName: 'WebViewCompat.WebMessageListener.onPostMessage',
         apiUrl:
-            'https://developer.android.com/reference/androidx/webkit/WebViewCompat.WebMessageListener#onPostMessage(android.webkit.WebView,%20androidx.webkit.WebMessageCompat,%20android.net.Uri,%20boolean,%20androidx.webkit.JavaScriptReplyProxy)'),
-    IOSPlatform(),
-    MacOSPlatform(),
-  ])
+            'https://developer.android.com/reference/androidx/webkit/WebViewCompat.WebMessageListener#onPostMessage(android.webkit.WebView,%20androidx.webkit.WebMessageCompat,%20android.net.Uri,%20boolean,%20androidx.webkit.JavaScriptReplyProxy)',
+      ),
+      IOSPlatform(),
+      MacOSPlatform(),
+      LinuxPlatform(),
+      WindowsPlatform(),
+    ],
+  )
   final OnPostMessageCallback? onPostMessage;
 
   ///{@template flutter_inappwebview_platform_interface.PlatformWebMessageListenerCreationParams.isClassSupported}
@@ -82,16 +100,20 @@ class PlatformWebMessageListenerCreationParams {
   ///{@endtemplate}
   bool isClassSupported({TargetPlatform? platform}) =>
       _PlatformWebMessageListenerCreationParamsClassSupported.isClassSupported(
-          platform: platform);
+        platform: platform,
+      );
 
   ///{@template flutter_inappwebview_platform_interface.PlatformWebMessageListenerCreationParams.isPropertySupported}
   ///Check if the given [property] is supported by the [defaultTargetPlatform] or a specific [platform].
   ///{@endtemplate}
   bool isPropertySupported(
-          PlatformWebMessageListenerCreationParamsProperty property,
-          {TargetPlatform? platform}) =>
-      _PlatformWebMessageListenerCreationParamsPropertySupported
-          .isPropertySupported(property, platform: platform);
+    PlatformWebMessageListenerCreationParamsProperty property, {
+    TargetPlatform? platform,
+  }) =>
+      _PlatformWebMessageListenerCreationParamsPropertySupported.isPropertySupported(
+        property,
+        platform: platform,
+      );
 
   @override
   String toString() {
@@ -104,16 +126,21 @@ class PlatformWebMessageListenerCreationParams {
 ///{@endtemplate}
 ///
 ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageListener.supported_platforms}
-@SupportedPlatforms(platforms: [
-  AndroidPlatform(),
-  IOSPlatform(),
-  MacOSPlatform(),
-])
+@SupportedPlatforms(
+  platforms: [
+    AndroidPlatform(),
+    IOSPlatform(),
+    MacOSPlatform(),
+    LinuxPlatform(),
+    WindowsPlatform(),
+  ],
+)
 abstract class PlatformWebMessageListener extends PlatformInterface
     implements Disposable {
   /// Creates a new [PlatformWebMessageListener]
   factory PlatformWebMessageListener(
-      PlatformWebMessageListenerCreationParams params) {
+    PlatformWebMessageListenerCreationParams params,
+  ) {
     assert(
       InAppWebViewPlatform.instance != null,
       'A platform implementation for `flutter_inappwebview` has not been set. Please '
@@ -121,8 +148,9 @@ abstract class PlatformWebMessageListener extends PlatformInterface
       '`InAppWebViewPlatform.instance` before use. For unit testing, '
       '`InAppWebViewPlatform.instance` can be set with your own test implementation.',
     );
-    final PlatformWebMessageListener webMessageListener =
-        InAppWebViewPlatform.instance!.createPlatformWebMessageListener(params);
+    final PlatformWebMessageListener webMessageListener = InAppWebViewPlatform
+        .instance!
+        .createPlatformWebMessageListener(params);
     PlatformInterface.verify(webMessageListener, _token);
     return webMessageListener;
   }
@@ -171,12 +199,14 @@ abstract class PlatformWebMessageListener extends PlatformInterface
 
   Map<String, dynamic> toMap() {
     throw UnimplementedError(
-        'toMap is not implemented on the current platform.');
+      'toMap is not implemented on the current platform.',
+    );
   }
 
   Map<String, dynamic> toJson() {
     throw UnimplementedError(
-        'toJson is not implemented on the current platform.');
+      'toJson is not implemented on the current platform.',
+    );
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformWebMessageListener.dispose}
@@ -184,37 +214,46 @@ abstract class PlatformWebMessageListener extends PlatformInterface
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageListener.dispose.supported_platforms}
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(),
-    IOSPlatform(),
-    MacOSPlatform(),
-  ])
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(),
+      IOSPlatform(),
+      MacOSPlatform(),
+      LinuxPlatform(),
+      WindowsPlatform(),
+    ],
+  )
   @override
   void dispose() {
     throw UnimplementedError(
-        'dispose is not implemented on the current platform.');
+      'dispose is not implemented on the current platform.',
+    );
   }
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageListenerCreationParams.isClassSupported}
   bool isClassSupported({TargetPlatform? platform}) =>
       _PlatformWebMessageListenerClassSupported.isClassSupported(
-          platform: platform);
+        platform: platform,
+      );
 
   ///{@template flutter_inappwebview_platform_interface.PlatformWebMessageListener.isPropertySupported}
   ///Check if the given [property] is supported by the [defaultTargetPlatform] or a specific [platform].
   ///{@endtemplate}
   bool isPropertySupported(
-          PlatformWebMessageListenerCreationParamsProperty property,
-          {TargetPlatform? platform}) =>
-      params.isPropertySupported(property, platform: platform);
+    PlatformWebMessageListenerCreationParamsProperty property, {
+    TargetPlatform? platform,
+  }) => params.isPropertySupported(property, platform: platform);
 
   ///{@template flutter_inappwebview_platform_interface.PlatformWebMessageListener.isMethodSupported}
   ///Check if the given [method] is supported by the [defaultTargetPlatform] or a specific [platform].
   ///{@endtemplate}
-  bool isMethodSupported(PlatformWebMessageListenerMethod method,
-          {TargetPlatform? platform}) =>
-      _PlatformWebMessageListenerMethodSupported.isMethodSupported(method,
-          platform: platform);
+  bool isMethodSupported(
+    PlatformWebMessageListenerMethod method, {
+    TargetPlatform? platform,
+  }) => _PlatformWebMessageListenerMethodSupported.isMethodSupported(
+    method,
+    platform: platform,
+  );
 
   @override
   String toString() {
@@ -229,8 +268,9 @@ abstract class PlatformWebMessageListener extends PlatformInterface
 @immutable
 class PlatformJavaScriptReplyProxyCreationParams {
   /// Used by the platform implementation to create a new [PlatformJavaScriptReplyProxy].
-  const PlatformJavaScriptReplyProxyCreationParams(
-      {required this.webMessageListener});
+  const PlatformJavaScriptReplyProxyCreationParams({
+    required this.webMessageListener,
+  });
 
   final PlatformWebMessageListener webMessageListener;
 }
@@ -242,10 +282,22 @@ class PlatformJavaScriptReplyProxyCreationParams {
 ///
 ///There is a 1:1 relationship between this object and the JavaScript object in a frame.
 ///{@endtemplate}
+///
+///{@macro flutter_inappwebview_platform_interface.PlatformJavaScriptReplyProxy.supported_platforms}
+@SupportedPlatforms(
+  platforms: [
+    AndroidPlatform(),
+    IOSPlatform(),
+    MacOSPlatform(),
+    LinuxPlatform(),
+    WindowsPlatform(),
+  ],
+)
 abstract class PlatformJavaScriptReplyProxy extends PlatformInterface {
   /// Creates a new [PlatformWebMessageListener]
   factory PlatformJavaScriptReplyProxy(
-      PlatformJavaScriptReplyProxyCreationParams params) {
+    PlatformJavaScriptReplyProxyCreationParams params,
+  ) {
     assert(
       InAppWebViewPlatform.instance != null,
       'A platform implementation for `flutter_inappwebview` has not been set. Please '
@@ -254,8 +306,9 @@ abstract class PlatformJavaScriptReplyProxy extends PlatformInterface {
       '`InAppWebViewPlatform.instance` can be set with your own test implementation.',
     );
     final PlatformJavaScriptReplyProxy javaScriptReplyProxy =
-        InAppWebViewPlatform.instance!
-            .createPlatformJavaScriptReplyProxy(params);
+        InAppWebViewPlatform.instance!.createPlatformJavaScriptReplyProxy(
+          params,
+        );
     PlatformInterface.verify(javaScriptReplyProxy, _token);
     return javaScriptReplyProxy;
   }
@@ -266,7 +319,7 @@ abstract class PlatformJavaScriptReplyProxy extends PlatformInterface {
   /// a class that only contains a factory constructor.
   @protected
   PlatformJavaScriptReplyProxy.implementation(this.params)
-      : super(token: _token);
+    : super(token: _token);
 
   static final Object _token = Object();
 
@@ -280,9 +333,21 @@ abstract class PlatformJavaScriptReplyProxy extends PlatformInterface {
   ///
   ///**Official Android API**: https://developer.android.com/reference/androidx/webkit/JavaScriptReplyProxy#postMessage(java.lang.String)
   ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformJavaScriptReplyProxy.postMessage.supported_platforms}
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(),
+      IOSPlatform(),
+      MacOSPlatform(),
+      LinuxPlatform(),
+      WindowsPlatform(),
+    ],
+  )
   Future<void> postMessage(WebMessage message) {
     throw UnimplementedError(
-        'postMessage is not implemented on the current platform.');
+      'postMessage is not implemented on the current platform.',
+    );
   }
 
   @override

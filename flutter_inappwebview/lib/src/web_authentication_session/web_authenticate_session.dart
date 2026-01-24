@@ -7,8 +7,9 @@ import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_pla
 class WebAuthenticationSession {
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebAuthenticationSession}
   WebAuthenticationSession()
-      : this.fromPlatformCreationParams(
-            params: PlatformWebAuthenticationSessionCreationParams());
+    : this.fromPlatformCreationParams(
+        params: PlatformWebAuthenticationSessionCreationParams(),
+      );
 
   /// Constructs a [WebAuthenticationSession].
   ///
@@ -42,17 +43,20 @@ class WebAuthenticationSession {
       platform.onComplete;
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebAuthenticationSession.create}
-  static Future<WebAuthenticationSession> create(
-      {required WebUri url,
-      String? callbackURLScheme,
-      WebAuthenticationSessionCompletionHandler onComplete,
-      WebAuthenticationSessionSettings? initialSettings}) async {
+  static Future<WebAuthenticationSession> create({
+    required WebUri url,
+    String? callbackURLScheme,
+    WebAuthenticationSessionCompletionHandler onComplete,
+    WebAuthenticationSessionSettings? initialSettings,
+  }) async {
     return WebAuthenticationSession.fromPlatform(
-        platform: await PlatformWebAuthenticationSession.static().create(
-            url: url,
-            callbackURLScheme: callbackURLScheme,
-            onComplete: onComplete,
-            initialSettings: initialSettings));
+      platform: await PlatformWebAuthenticationSession.static().create(
+        url: url,
+        callbackURLScheme: callbackURLScheme,
+        onComplete: onComplete,
+        initialSettings: initialSettings,
+      ),
+    );
   }
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebAuthenticationSession.canStart}
@@ -75,23 +79,30 @@ class WebAuthenticationSession {
   ///Check if the current class is supported by the [defaultTargetPlatform] or a specific [platform].
   ///{@endtemplate}
   static bool isClassSupported({TargetPlatform? platform}) =>
-      PlatformWebAuthenticationSession.static()
-          .isClassSupported(platform: platform);
+      PlatformWebAuthenticationSession.static().isClassSupported(
+        platform: platform,
+      );
 
   ///{@template flutter_inappwebview.WebAuthenticationSession.isPropertySupported}
   ///Check if the given [property] is supported by the [defaultTargetPlatform] or a specific [platform].
   ///The property should be one of the [PlatformWebAuthenticationSessionProperty] or [PlatformWebAuthenticationSessionCreationParamsProperty] values.
   ///{@endtemplate}
-  static bool isPropertySupported(dynamic property,
-          {TargetPlatform? platform}) =>
-      PlatformWebAuthenticationSession.static()
-          .isPropertySupported(property, platform: platform);
+  static bool isPropertySupported(
+    dynamic property, {
+    TargetPlatform? platform,
+  }) => PlatformWebAuthenticationSession.static().isPropertySupported(
+    property,
+    platform: platform,
+  );
 
   ///{@template flutter_inappwebview.WebAuthenticationSession.isMethodSupported}
   ///Check if the given [method] is supported by the [defaultTargetPlatform] or a specific [platform].
   ///{@endtemplate}
-  static bool isMethodSupported(PlatformWebAuthenticationSessionMethod method,
-          {TargetPlatform? platform}) =>
-      PlatformWebAuthenticationSession.static()
-          .isMethodSupported(method, platform: platform);
+  static bool isMethodSupported(
+    PlatformWebAuthenticationSessionMethod method, {
+    TargetPlatform? platform,
+  }) => PlatformWebAuthenticationSession.static().isMethodSupported(
+    method,
+    platform: platform,
+  );
 }

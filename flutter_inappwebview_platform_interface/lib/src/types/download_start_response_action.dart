@@ -13,6 +13,8 @@ class DownloadStartResponseAction_ {
   const DownloadStartResponseAction_._internal(this._value);
 
   ///Cancel the download.
-  @EnumSupportedPlatforms(platforms: [EnumWindowsPlatform(value: 0)])
+  @EnumSupportedPlatforms(
+    platforms: [EnumWindowsPlatform(value: 0), EnumLinuxPlatform(value: 0)],
+  )
   static const CANCEL = const DownloadStartResponseAction_._internal(0);
 }

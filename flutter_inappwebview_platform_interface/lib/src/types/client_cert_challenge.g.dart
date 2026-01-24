@@ -47,35 +47,39 @@ class ClientCertChallenge extends URLAuthenticationChallenge {
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView 21+ ([Official API - ClientCertRequest.getPrincipals](https://developer.android.com/reference/android/webkit/ClientCertRequest#getPrincipals()))
   List<String>? principals;
-  ClientCertChallenge(
-      {this.allowedCertificateAuthorities,
-      @Deprecated('Use keyTypes instead') this.androidKeyTypes,
-      @Deprecated('Use principals instead') this.androidPrincipals,
-      this.isProxy,
-      this.keyTypes,
-      this.mutuallyTrustedCertificates,
-      this.principals,
-      required URLProtectionSpace protectionSpace})
-      : super(protectionSpace: protectionSpace) {
+  ClientCertChallenge({
+    this.allowedCertificateAuthorities,
+    @Deprecated('Use keyTypes instead') this.androidKeyTypes,
+    @Deprecated('Use principals instead') this.androidPrincipals,
+    this.isProxy,
+    this.keyTypes,
+    this.mutuallyTrustedCertificates,
+    this.principals,
+    required URLProtectionSpace protectionSpace,
+  }) : super(protectionSpace: protectionSpace) {
     keyTypes = keyTypes ?? androidKeyTypes;
     principals = principals ?? androidPrincipals;
   }
 
   ///Gets a possible [ClientCertChallenge] instance from a [Map] value.
-  static ClientCertChallenge? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static ClientCertChallenge? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
     final instance = ClientCertChallenge(
       protectionSpace: URLProtectionSpace.fromMap(
-          map['protectionSpace']?.cast<String, dynamic>(),
-          enumMethod: enumMethod)!,
+        map['protectionSpace']?.cast<String, dynamic>(),
+        enumMethod: enumMethod,
+      )!,
       allowedCertificateAuthorities:
           map['allowedCertificateAuthorities'] != null
-              ? List<String>.from(
-                  map['allowedCertificateAuthorities']!.cast<String>())
-              : null,
+          ? List<String>.from(
+              map['allowedCertificateAuthorities']!.cast<String>(),
+            )
+          : null,
       androidKeyTypes: map['keyTypes'] != null
           ? List<String>.from(map['keyTypes']!.cast<String>())
           : null,
@@ -87,9 +91,14 @@ class ClientCertChallenge extends URLAuthenticationChallenge {
           ? List<String>.from(map['keyTypes']!.cast<String>())
           : null,
       mutuallyTrustedCertificates: map['mutuallyTrustedCertificates'] != null
-          ? List<SslCertificate>.from(map['mutuallyTrustedCertificates'].map(
-              (e) => SslCertificate.fromMap(e?.cast<String, dynamic>(),
-                  enumMethod: enumMethod)!))
+          ? List<SslCertificate>.from(
+              map['mutuallyTrustedCertificates'].map(
+                (e) => SslCertificate.fromMap(
+                  e?.cast<String, dynamic>(),
+                  enumMethod: enumMethod,
+                )!,
+              ),
+            )
           : null,
       principals: map['principals'] != null
           ? List<String>.from(map['principals']!.cast<String>())

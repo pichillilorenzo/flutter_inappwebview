@@ -18,8 +18,10 @@ extension _PlatformWebAuthenticationSessionCreationParamsClassSupported
   ///{@endtemplate}
   static bool isClassSupported({TargetPlatform? platform}) {
     return ((kIsWeb && platform != null) || !kIsWeb) &&
-        [TargetPlatform.iOS, TargetPlatform.macOS]
-            .contains(platform ?? defaultTargetPlatform);
+        [
+          TargetPlatform.iOS,
+          TargetPlatform.macOS,
+        ].contains(platform ?? defaultTargetPlatform);
   }
 }
 
@@ -35,8 +37,10 @@ extension _PlatformWebAuthenticationSessionClassSupported
   ///{@endtemplate}
   static bool isClassSupported({TargetPlatform? platform}) {
     return ((kIsWeb && platform != null) || !kIsWeb) &&
-        [TargetPlatform.iOS, TargetPlatform.macOS]
-            .contains(platform ?? defaultTargetPlatform);
+        [
+          TargetPlatform.iOS,
+          TargetPlatform.macOS,
+        ].contains(platform ?? defaultTargetPlatform);
   }
 }
 
@@ -110,29 +114,40 @@ enum PlatformWebAuthenticationSessionProperty {
 extension _PlatformWebAuthenticationSessionPropertySupported
     on PlatformWebAuthenticationSession {
   static bool isPropertySupported(
-      PlatformWebAuthenticationSessionProperty property,
-      {TargetPlatform? platform}) {
+    PlatformWebAuthenticationSessionProperty property, {
+    TargetPlatform? platform,
+  }) {
     switch (property) {
       case PlatformWebAuthenticationSessionProperty.callbackURLScheme:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebAuthenticationSessionProperty.id:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebAuthenticationSessionProperty.initialSettings:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebAuthenticationSessionProperty.onComplete:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebAuthenticationSessionProperty.url:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
     }
   }
 }
@@ -220,33 +235,47 @@ enum PlatformWebAuthenticationSessionMethod {
 
 extension _PlatformWebAuthenticationSessionMethodSupported
     on PlatformWebAuthenticationSession {
-  static bool isMethodSupported(PlatformWebAuthenticationSessionMethod method,
-      {TargetPlatform? platform}) {
+  static bool isMethodSupported(
+    PlatformWebAuthenticationSessionMethod method, {
+    TargetPlatform? platform,
+  }) {
     switch (method) {
       case PlatformWebAuthenticationSessionMethod.canStart:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebAuthenticationSessionMethod.cancel:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebAuthenticationSessionMethod.create:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebAuthenticationSessionMethod.dispose:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebAuthenticationSessionMethod.isAvailable:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebAuthenticationSessionMethod.start:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
     }
   }
 }

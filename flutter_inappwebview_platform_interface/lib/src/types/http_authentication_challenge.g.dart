@@ -39,42 +39,48 @@ class HttpAuthenticationChallenge extends URLAuthenticationChallenge {
   ///If the proposed credential’s hasPassword method returns false, then the credential provides a default user name,
   ///and the client must prompt the user for a corresponding password.
   URLCredential? proposedCredential;
-  HttpAuthenticationChallenge(
-      {this.error,
-      this.failureResponse,
-      @Deprecated('Use error instead') this.iosError,
-      @Deprecated('Use failureResponse instead') this.iosFailureResponse,
-      required this.previousFailureCount,
-      this.proposedCredential,
-      required URLProtectionSpace protectionSpace})
-      : super(protectionSpace: protectionSpace) {
+  HttpAuthenticationChallenge({
+    this.error,
+    this.failureResponse,
+    @Deprecated('Use error instead') this.iosError,
+    @Deprecated('Use failureResponse instead') this.iosFailureResponse,
+    required this.previousFailureCount,
+    this.proposedCredential,
+    required URLProtectionSpace protectionSpace,
+  }) : super(protectionSpace: protectionSpace) {
     error = error ?? iosError;
     failureResponse =
         failureResponse ?? URLResponse.fromMap(iosFailureResponse?.toMap());
   }
 
   ///Gets a possible [HttpAuthenticationChallenge] instance from a [Map] value.
-  static HttpAuthenticationChallenge? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static HttpAuthenticationChallenge? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
     final instance = HttpAuthenticationChallenge(
       protectionSpace: URLProtectionSpace.fromMap(
-          map['protectionSpace']?.cast<String, dynamic>(),
-          enumMethod: enumMethod)!,
+        map['protectionSpace']?.cast<String, dynamic>(),
+        enumMethod: enumMethod,
+      )!,
       error: map['error'],
       failureResponse: URLResponse.fromMap(
-          map['failureResponse']?.cast<String, dynamic>(),
-          enumMethod: enumMethod),
+        map['failureResponse']?.cast<String, dynamic>(),
+        enumMethod: enumMethod,
+      ),
       iosError: map['error'],
       iosFailureResponse: IOSURLResponse.fromMap(
-          map['failureResponse']?.cast<String, dynamic>(),
-          enumMethod: enumMethod),
+        map['failureResponse']?.cast<String, dynamic>(),
+        enumMethod: enumMethod,
+      ),
       previousFailureCount: map['previousFailureCount'],
       proposedCredential: URLCredential.fromMap(
-          map['proposedCredential']?.cast<String, dynamic>(),
-          enumMethod: enumMethod),
+        map['proposedCredential']?.cast<String, dynamic>(),
+        enumMethod: enumMethod,
+      ),
     );
     return instance;
   }

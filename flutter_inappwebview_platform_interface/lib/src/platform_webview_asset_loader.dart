@@ -82,12 +82,14 @@ abstract class PlatformPathHandler {
 
   Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     throw UnimplementedError(
-        'toMap is not implemented on the current platform');
+      'toMap is not implemented on the current platform',
+    );
   }
 
   Map<String, dynamic> toJson() {
     throw UnimplementedError(
-        'toJson is not implemented on the current platform');
+      'toJson is not implemented on the current platform',
+    );
   }
 }
 
@@ -105,7 +107,8 @@ abstract class PlatformPathHandlerEvents {
   ///{@endtemplate}
   Future<WebResourceResponse?> handle(String path) {
     throw UnimplementedError(
-        'handle is not implemented on the current platform');
+      'handle is not implemented on the current platform',
+    );
   }
 }
 
@@ -125,7 +128,8 @@ class PlatformAssetsPathHandlerCreationParams
 
   /// Creates a [PlatformAssetsPathHandlerCreationParams] instance based on [PlatformPathHandlerCreationParams].
   factory PlatformAssetsPathHandlerCreationParams.fromPlatformPathHandlerCreationParams(
-      PlatformPathHandlerCreationParams params) {
+    PlatformPathHandlerCreationParams params,
+  ) {
     return PlatformAssetsPathHandlerCreationParams(params);
   }
 }
@@ -149,7 +153,8 @@ abstract class PlatformAssetsPathHandler extends PlatformInterface
     implements PlatformPathHandler {
   /// Creates a new [PlatformAssetsPathHandler]
   factory PlatformAssetsPathHandler(
-      PlatformAssetsPathHandlerCreationParams params) {
+    PlatformAssetsPathHandlerCreationParams params,
+  ) {
     assert(
       InAppWebViewPlatform.instance != null,
       'A platform implementation for `flutter_inappwebview` has not been set. Please '
@@ -157,8 +162,9 @@ abstract class PlatformAssetsPathHandler extends PlatformInterface
       '`InAppWebViewPlatform.instance` before use. For unit testing, '
       '`InAppWebViewPlatform.instance` can be set with your own test implementation.',
     );
-    final PlatformAssetsPathHandler assetsPathHandler =
-        InAppWebViewPlatform.instance!.createPlatformAssetsPathHandler(params);
+    final PlatformAssetsPathHandler assetsPathHandler = InAppWebViewPlatform
+        .instance!
+        .createPlatformAssetsPathHandler(params);
     PlatformInterface.verify(assetsPathHandler, _token);
     return assetsPathHandler;
   }
@@ -198,7 +204,8 @@ class PlatformResourcesPathHandlerCreationParams
 
   /// Creates a [PlatformResourcesPathHandlerCreationParams] instance based on [PlatformPathHandlerCreationParams].
   factory PlatformResourcesPathHandlerCreationParams.fromPlatformPathHandlerCreationParams(
-      PlatformPathHandlerCreationParams params) {
+    PlatformPathHandlerCreationParams params,
+  ) {
     return PlatformResourcesPathHandlerCreationParams(params);
   }
 }
@@ -222,7 +229,8 @@ abstract class PlatformResourcesPathHandler extends PlatformInterface
     implements PlatformPathHandler {
   /// Creates a new [PlatformResourcesPathHandler]
   factory PlatformResourcesPathHandler(
-      PlatformResourcesPathHandlerCreationParams params) {
+    PlatformResourcesPathHandlerCreationParams params,
+  ) {
     assert(
       InAppWebViewPlatform.instance != null,
       'A platform implementation for `flutter_inappwebview` has not been set. Please '
@@ -231,8 +239,9 @@ abstract class PlatformResourcesPathHandler extends PlatformInterface
       '`InAppWebViewPlatform.instance` can be set with your own test implementation.',
     );
     final PlatformResourcesPathHandler resourcesPathHandler =
-        InAppWebViewPlatform.instance!
-            .createPlatformResourcesPathHandler(params);
+        InAppWebViewPlatform.instance!.createPlatformResourcesPathHandler(
+          params,
+        );
     PlatformInterface.verify(resourcesPathHandler, _token);
     return resourcesPathHandler;
   }
@@ -243,7 +252,7 @@ abstract class PlatformResourcesPathHandler extends PlatformInterface
   /// a class that only contains a factory constructor.
   @protected
   PlatformResourcesPathHandler.implementation(this.params)
-      : super(token: _token);
+    : super(token: _token);
 
   static final Object _token = Object();
 
@@ -266,18 +275,21 @@ class PlatformInternalStoragePathHandlerCreationParams
     extends PlatformPathHandlerCreationParams {
   /// Used by the platform implementation to create a new [PlatformInternalStoragePathHandler].
   PlatformInternalStoragePathHandlerCreationParams(
-      // This parameter prevents breaking changes later.
-      // ignore: avoid_unused_constructor_parameters
-      PlatformPathHandlerCreationParams params,
-      {required this.directory})
-      : super(path: params.path);
+    // This parameter prevents breaking changes later.
+    // ignore: avoid_unused_constructor_parameters
+    PlatformPathHandlerCreationParams params, {
+    required this.directory,
+  }) : super(path: params.path);
 
   /// Creates a [PlatformInternalStoragePathHandlerCreationParams] instance based on [PlatformPathHandlerCreationParams].
   factory PlatformInternalStoragePathHandlerCreationParams.fromPlatformPathHandlerCreationParams(
-      PlatformPathHandlerCreationParams params,
-      {required String directory}) {
-    return PlatformInternalStoragePathHandlerCreationParams(params,
-        directory: directory);
+    PlatformPathHandlerCreationParams params, {
+    required String directory,
+  }) {
+    return PlatformInternalStoragePathHandlerCreationParams(
+      params,
+      directory: directory,
+    );
   }
 
   final String directory;
@@ -307,7 +319,8 @@ abstract class PlatformInternalStoragePathHandler extends PlatformInterface
     implements PlatformPathHandler {
   /// Creates a new [PlatformResourcesPathHandler]
   factory PlatformInternalStoragePathHandler(
-      PlatformInternalStoragePathHandlerCreationParams params) {
+    PlatformInternalStoragePathHandlerCreationParams params,
+  ) {
     assert(
       InAppWebViewPlatform.instance != null,
       'A platform implementation for `flutter_inappwebview` has not been set. Please '
@@ -316,8 +329,9 @@ abstract class PlatformInternalStoragePathHandler extends PlatformInterface
       '`InAppWebViewPlatform.instance` can be set with your own test implementation.',
     );
     final PlatformInternalStoragePathHandler internalStoragePathHandler =
-        InAppWebViewPlatform.instance!
-            .createPlatformInternalStoragePathHandler(params);
+        InAppWebViewPlatform.instance!.createPlatformInternalStoragePathHandler(
+          params,
+        );
     PlatformInterface.verify(internalStoragePathHandler, _token);
     return internalStoragePathHandler;
   }
@@ -328,7 +342,7 @@ abstract class PlatformInternalStoragePathHandler extends PlatformInterface
   /// a class that only contains a factory constructor.
   @protected
   PlatformInternalStoragePathHandler.implementation(this.params)
-      : super(token: _token);
+    : super(token: _token);
 
   static final Object _token = Object();
 
@@ -360,7 +374,8 @@ class PlatformCustomPathHandlerCreationParams
 
   /// Creates a [PlatformCustomPathHandlerCreationParams] instance based on [PlatformPathHandlerCreationParams].
   factory PlatformCustomPathHandlerCreationParams.fromPlatformPathHandlerCreationParams(
-      PlatformPathHandlerCreationParams params) {
+    PlatformPathHandlerCreationParams params,
+  ) {
     return PlatformCustomPathHandlerCreationParams(params);
   }
 }
@@ -382,7 +397,8 @@ abstract class PlatformCustomPathHandler extends PlatformInterface
     implements PlatformPathHandler {
   /// Creates a new [PlatformCustomPathHandler]
   factory PlatformCustomPathHandler(
-      PlatformCustomPathHandlerCreationParams params) {
+    PlatformCustomPathHandlerCreationParams params,
+  ) {
     assert(
       InAppWebViewPlatform.instance != null,
       'A platform implementation for `flutter_inappwebview` has not been set. Please '
@@ -390,8 +406,9 @@ abstract class PlatformCustomPathHandler extends PlatformInterface
       '`InAppWebViewPlatform.instance` before use. For unit testing, '
       '`InAppWebViewPlatform.instance` can be set with your own test implementation.',
     );
-    final PlatformCustomPathHandler customPathHandler =
-        InAppWebViewPlatform.instance!.createPlatformCustomPathHandler(params);
+    final PlatformCustomPathHandler customPathHandler = InAppWebViewPlatform
+        .instance!
+        .createPlatformCustomPathHandler(params);
     PlatformInterface.verify(customPathHandler, _token);
     return customPathHandler;
   }

@@ -33,8 +33,9 @@ void onPermissionRequest() {
           onPermissionRequest: (controller, permissionRequest) async {
             onPermissionRequestCompleter.complete(permissionRequest.resources);
             return PermissionResponse(
-                resources: permissionRequest.resources,
-                action: PermissionResponseAction.GRANT);
+              resources: permissionRequest.resources,
+              action: PermissionResponseAction.GRANT,
+            );
           },
         ),
       ),
@@ -43,7 +44,8 @@ void onPermissionRequest() {
     final InAppWebViewController controller = await controllerCompleter.future;
     await pageLoaded.future;
     await controller.evaluateJavascript(
-        source: "document.querySelector('#camera').click();");
+      source: "document.querySelector('#camera').click();",
+    );
     await tester.pump();
     final List<PermissionResourceType> resources =
         await onPermissionRequestCompleter.future;
@@ -59,15 +61,16 @@ void onPermissionRequest() {
   // TODO: this test is not working
   final shouldSkip2 = true;
 
-  skippableTestWidgets('onPermissionRequestCanceled',
-      (WidgetTester tester) async {
+  skippableTestWidgets('onPermissionRequestCanceled', (
+    WidgetTester tester,
+  ) async {
     final Completer<InAppWebViewController> controllerCompleter =
         Completer<InAppWebViewController>();
     final Completer<void> pageLoaded = Completer<void>();
     final Completer<List<PermissionResourceType>> onPermissionRequestCompleter =
         Completer<List<PermissionResourceType>>();
     final Completer<List<PermissionResourceType>>
-        onPermissionRequestCancelCompleter =
+    onPermissionRequestCancelCompleter =
         Completer<List<PermissionResourceType>>();
 
     await tester.pumpWidget(
@@ -88,12 +91,14 @@ void onPermissionRequest() {
             onPermissionRequestCompleter.complete(permissionRequest.resources);
             await Future.delayed(Duration(seconds: 5));
             return PermissionResponse(
-                resources: permissionRequest.resources,
-                action: PermissionResponseAction.GRANT);
+              resources: permissionRequest.resources,
+              action: PermissionResponseAction.GRANT,
+            );
           },
           onPermissionRequestCanceled: (controller, permissionRequest) {
-            onPermissionRequestCancelCompleter
-                .complete(permissionRequest.resources);
+            onPermissionRequestCancelCompleter.complete(
+              permissionRequest.resources,
+            );
           },
         ),
       ),
@@ -102,7 +107,8 @@ void onPermissionRequest() {
     final InAppWebViewController controller = await controllerCompleter.future;
     await pageLoaded.future;
     await controller.evaluateJavascript(
-        source: "document.querySelector('#camera').click();");
+      source: "document.querySelector('#camera').click();",
+    );
     await tester.pump();
 
     final List<PermissionResourceType> resources =

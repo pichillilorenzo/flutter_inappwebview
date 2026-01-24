@@ -55,16 +55,18 @@ class UserScript {
 
   ///The script’s source code.
   String source;
-  UserScript(
-      {this.groupName,
-      required this.source,
-      required this.injectionTime,
-      @Deprecated("Use forMainFrameOnly instead") this.iosForMainFrameOnly,
-      this.forMainFrameOnly = true,
-      Set<String>? allowedOriginRules,
-      ContentWorld? contentWorld}) {
-    this.allowedOriginRules =
-        allowedOriginRules != null ? allowedOriginRules : Set.from(["*"]);
+  UserScript({
+    this.groupName,
+    required this.source,
+    required this.injectionTime,
+    @Deprecated("Use forMainFrameOnly instead") this.iosForMainFrameOnly,
+    this.forMainFrameOnly = true,
+    Set<String>? allowedOriginRules,
+    ContentWorld? contentWorld,
+  }) {
+    this.allowedOriginRules = allowedOriginRules != null
+        ? allowedOriginRules
+        : Set.from(["*"]);
     this.contentWorld = contentWorld ?? ContentWorld.PAGE;
     this.forMainFrameOnly = this.iosForMainFrameOnly != null
         ? this.iosForMainFrameOnly!
@@ -72,31 +74,37 @@ class UserScript {
   }
 
   ///Gets a possible [UserScript] instance from a [Map] value.
-  static UserScript? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static UserScript? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
     final instance = UserScript(
       groupName: map['groupName'],
       injectionTime: switch (enumMethod ?? EnumMethod.nativeValue) {
-        EnumMethod.nativeValue =>
-          UserScriptInjectionTime.fromNativeValue(map['injectionTime']),
-        EnumMethod.value =>
-          UserScriptInjectionTime.fromValue(map['injectionTime']),
-        EnumMethod.name => UserScriptInjectionTime.byName(map['injectionTime'])
+        EnumMethod.nativeValue => UserScriptInjectionTime.fromNativeValue(
+          map['injectionTime'],
+        ),
+        EnumMethod.value => UserScriptInjectionTime.fromValue(
+          map['injectionTime'],
+        ),
+        EnumMethod.name => UserScriptInjectionTime.byName(map['injectionTime']),
       }!,
       iosForMainFrameOnly: map['forMainFrameOnly'],
       source: map['source'],
     );
     if (map['allowedOriginRules'] != null) {
-      instance.allowedOriginRules =
-          Set<String>.from(map['allowedOriginRules']!.cast<String>());
+      instance.allowedOriginRules = Set<String>.from(
+        map['allowedOriginRules']!.cast<String>(),
+      );
     }
     if (map['contentWorld'] != null) {
       instance.contentWorld = ContentWorld.fromMap(
-          map['contentWorld']?.cast<String, dynamic>(),
-          enumMethod: enumMethod)!;
+        map['contentWorld']?.cast<String, dynamic>(),
+        enumMethod: enumMethod,
+      )!;
     }
     if (map['forMainFrameOnly'] != null) {
       instance.forMainFrameOnly = map['forMainFrameOnly'];
@@ -114,7 +122,7 @@ class UserScript {
       "injectionTime": switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => injectionTime.toNativeValue(),
         EnumMethod.value => injectionTime.toValue(),
-        EnumMethod.name => injectionTime.name()
+        EnumMethod.name => injectionTime.name(),
       },
       "source": source,
     };

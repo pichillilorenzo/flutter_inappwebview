@@ -11,10 +11,11 @@ class MediaPlaybackState {
   final int _value;
   final int _nativeValue;
   const MediaPlaybackState._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory MediaPlaybackState._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      MediaPlaybackState._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => MediaPlaybackState._internal(value, nativeValue());
 
   ///There is no media to play back.
   static const NONE = MediaPlaybackState._internal(0, 0);
@@ -40,8 +41,9 @@ class MediaPlaybackState {
   static MediaPlaybackState? fromValue(int? value) {
     if (value != null) {
       try {
-        return MediaPlaybackState.values
-            .firstWhere((element) => element.toValue() == value);
+        return MediaPlaybackState.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -53,8 +55,9 @@ class MediaPlaybackState {
   static MediaPlaybackState? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return MediaPlaybackState.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return MediaPlaybackState.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -70,8 +73,9 @@ class MediaPlaybackState {
   static MediaPlaybackState? byName(String? name) {
     if (name != null) {
       try {
-        return MediaPlaybackState.values
-            .firstWhere((element) => element.name() == name);
+        return MediaPlaybackState.values.firstWhere(
+          (element) => element.name() == name,
+        );
       } catch (e) {
         return null;
       }
@@ -89,7 +93,7 @@ class MediaPlaybackState {
   /// them will be represented in the returned map.
   static Map<String, MediaPlaybackState> asNameMap() =>
       <String, MediaPlaybackState>{
-        for (final value in MediaPlaybackState.values) value.name(): value
+        for (final value in MediaPlaybackState.values) value.name(): value,
       };
 
   ///Gets [int] value.

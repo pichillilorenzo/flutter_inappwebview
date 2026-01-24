@@ -15,8 +15,10 @@ class AjaxRequestHeaders_ {
   AjaxRequestHeaders_(this._headers);
 
   ///Gets a possible [AjaxRequestHeaders] instance from a [Map] value.
-  static AjaxRequestHeaders_? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static AjaxRequestHeaders_? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }

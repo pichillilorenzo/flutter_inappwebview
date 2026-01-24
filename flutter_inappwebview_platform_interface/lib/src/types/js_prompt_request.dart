@@ -26,10 +26,11 @@ class JsPromptRequest_ {
   @SupportedPlatforms(platforms: [IOSPlatform(), MacOSPlatform()])
   bool? isMainFrame;
 
-  JsPromptRequest_(
-      {this.url,
-      this.message,
-      this.defaultValue,
-      @Deprecated("Use isMainFrame instead") this.iosIsMainFrame,
-      this.isMainFrame});
+  JsPromptRequest_({
+    this.url,
+    this.message,
+    this.defaultValue,
+    @Deprecated("Use isMainFrame instead") this.iosIsMainFrame,
+    this.isMainFrame,
+  });
 }

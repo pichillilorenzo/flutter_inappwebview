@@ -34,11 +34,12 @@ class WebResourceResponse_ {
   ///**NOTE**: available on Android 21+. For Android < 21 it won't be used.
   String? reasonPhrase;
 
-  WebResourceResponse_(
-      {this.contentType = "",
-      this.contentEncoding = "utf-8",
-      this.data,
-      this.headers,
-      this.statusCode,
-      this.reasonPhrase});
+  WebResourceResponse_({
+    this.contentType = "",
+    this.contentEncoding = "utf-8",
+    this.data,
+    this.headers,
+    this.statusCode,
+    this.reasonPhrase,
+  });
 }

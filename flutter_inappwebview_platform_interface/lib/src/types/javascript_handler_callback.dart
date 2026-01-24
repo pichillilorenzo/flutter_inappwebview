@@ -29,9 +29,10 @@ class JavaScriptHandlerFunctionData_ {
   bool isMainFrame;
   WebUri requestUrl;
 
-  JavaScriptHandlerFunctionData_(
-      {this.args = const [],
-      required this.origin,
-      required this.isMainFrame,
-      required this.requestUrl});
+  JavaScriptHandlerFunctionData_({
+    this.args = const [],
+    required this.origin,
+    required this.isMainFrame,
+    required this.requestUrl,
+  });
 }

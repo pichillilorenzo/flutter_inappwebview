@@ -14,24 +14,15 @@ part 'proxy_relay_hop.g.dart';
 @ExchangeableObject()
 class ProxyRelayHop_ {
   ///A URL or host endpoint identifying the relay server accessible using HTTP/3.
-  @SupportedPlatforms(platforms: [
-    IOSPlatform(),
-    MacOSPlatform(),
-  ])
+  @SupportedPlatforms(platforms: [IOSPlatform(), MacOSPlatform()])
   String? http3RelayEndpoint;
 
   ///A URL or host endpoint identifying the relay server accessible using HTTP/2.
-  @SupportedPlatforms(platforms: [
-    IOSPlatform(),
-    MacOSPlatform(),
-  ])
+  @SupportedPlatforms(platforms: [IOSPlatform(), MacOSPlatform()])
   String? http2RelayEndpoint;
 
   ///A dictionary of additional HTTP headers to send as part of CONNECT requests to the relay.
-  @SupportedPlatforms(platforms: [
-    IOSPlatform(),
-    MacOSPlatform(),
-  ])
+  @SupportedPlatforms(platforms: [IOSPlatform(), MacOSPlatform()])
   Map<String, String>? additionalHTTPHeaders;
 
   @ExchangeableObjectConstructor()
@@ -40,7 +31,9 @@ class ProxyRelayHop_ {
     this.http2RelayEndpoint,
     this.additionalHTTPHeaders,
   }) {
-    assert(http3RelayEndpoint != null || http2RelayEndpoint != null,
-        "At least one of http3RelayEndpoint or http2RelayEndpoint must be non-null");
+    assert(
+      http3RelayEndpoint != null || http2RelayEndpoint != null,
+      "At least one of http3RelayEndpoint or http2RelayEndpoint must be non-null",
+    );
   }
 }

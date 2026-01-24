@@ -21,7 +21,8 @@ class AndroidProxyControllerCreationParams
 
   /// Creates a [AndroidProxyControllerCreationParams] instance based on [PlatformProxyControllerCreationParams].
   factory AndroidProxyControllerCreationParams.fromPlatformProxyControllerCreationParams(
-      PlatformProxyControllerCreationParams params) {
+    PlatformProxyControllerCreationParams params,
+  ) {
     return AndroidProxyControllerCreationParams(params);
   }
 }
@@ -31,14 +32,16 @@ class AndroidProxyController extends PlatformProxyController
     with ChannelController {
   /// Creates a new [AndroidProxyController].
   AndroidProxyController(PlatformProxyControllerCreationParams params)
-      : super.implementation(
-          params is AndroidProxyControllerCreationParams
-              ? params
-              : AndroidProxyControllerCreationParams
-                  .fromPlatformProxyControllerCreationParams(params),
-        ) {
+    : super.implementation(
+        params is AndroidProxyControllerCreationParams
+            ? params
+            : AndroidProxyControllerCreationParams.fromPlatformProxyControllerCreationParams(
+                params,
+              ),
+      ) {
     channel = const MethodChannel(
-        'com.pichillilorenzo/flutter_inappwebview_proxycontroller');
+      'com.pichillilorenzo/flutter_inappwebview_proxycontroller',
+    );
     handler = handleMethod;
     initMethodCallHandler();
   }
@@ -51,14 +54,19 @@ class AndroidProxyController extends PlatformProxyController
   }
 
   static AndroidProxyController _init() {
-    _instance = AndroidProxyController(AndroidProxyControllerCreationParams(
-        const PlatformProxyControllerCreationParams()));
+    _instance = AndroidProxyController(
+      AndroidProxyControllerCreationParams(
+        const PlatformProxyControllerCreationParams(),
+      ),
+    );
     return _instance!;
   }
 
   static final AndroidProxyController _staticValue = AndroidProxyController(
-      AndroidProxyControllerCreationParams(
-          const PlatformProxyControllerCreationParams()));
+    AndroidProxyControllerCreationParams(
+      const PlatformProxyControllerCreationParams(),
+    ),
+  );
 
   /// Provide static access.
   factory AndroidProxyController.static() {

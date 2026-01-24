@@ -19,6 +19,8 @@ class RenderProcessGoneDetail_ {
   /// any individual `WebView` requested using [].
   RendererPriority_? rendererPriorityAtExit;
 
-  RenderProcessGoneDetail_(
-      {required this.didCrash, this.rendererPriorityAtExit});
+  RenderProcessGoneDetail_({
+    required this.didCrash,
+    this.rendererPriorityAtExit,
+  });
 }

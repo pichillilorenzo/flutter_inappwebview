@@ -17,8 +17,9 @@ void getTitle() {
         </body>
         </html>
       ''';
-  final String getTitleTestBase64 =
-      base64Encode(const Utf8Encoder().convert(getTitleTest));
+  final String getTitleTestBase64 = base64Encode(
+    const Utf8Encoder().convert(getTitleTest),
+  );
 
   var url = !kIsWeb
       ? WebUri('data:text/html;charset=utf-8;base64,$getTitleTestBase64')

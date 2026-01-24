@@ -22,11 +22,13 @@ class WebMessage_ {
 
   @ExchangeableObjectConstructor()
   WebMessage_({this.data, this.type = WebMessageType_.STRING, this.ports}) {
-    assert(((this.data == null || this.data is String) &&
-            this.type == WebMessageType_.STRING) ||
-        (this.data != null &&
-            this.data is Uint8List &&
-            this.type == WebMessageType_.ARRAY_BUFFER));
+    assert(
+      ((this.data == null || this.data is String) &&
+              this.type == WebMessageType_.STRING) ||
+          (this.data != null &&
+              this.data is Uint8List &&
+              this.type == WebMessageType_.ARRAY_BUFFER),
+    );
   }
 }
 

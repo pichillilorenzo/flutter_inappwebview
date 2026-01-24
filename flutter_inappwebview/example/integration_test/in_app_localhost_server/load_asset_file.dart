@@ -17,7 +17,8 @@ void loadAssetFile(InAppLocalhostServer localhostServer) {
 
     var headlessWebView = new HeadlessInAppWebView(
       initialUrlRequest: URLRequest(
-          url: WebUri('http://localhost:8080/test_assets/index.html')),
+        url: WebUri('http://localhost:8080/test_assets/index.html'),
+      ),
       onWebViewCreated: (controller) {
         controllerCompleter.complete(controller);
       },
@@ -32,7 +33,8 @@ void loadAssetFile(InAppLocalhostServer localhostServer) {
           child: InAppWebView(
             key: GlobalKey(),
             initialUrlRequest: URLRequest(
-                url: WebUri('http://localhost:8080/test_assets/index.html')),
+              url: WebUri('http://localhost:8080/test_assets/index.html'),
+            ),
             onWebViewCreated: (controller) {
               controllerCompleter.complete(controller);
             },

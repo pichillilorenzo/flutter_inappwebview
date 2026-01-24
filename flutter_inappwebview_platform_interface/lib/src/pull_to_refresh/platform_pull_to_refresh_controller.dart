@@ -23,28 +23,22 @@ part 'platform_pull_to_refresh_controller.g.dart';
 ///{@endtemplate}
 ///
 ///{@macro flutter_inappwebview_platform_interface.PlatformPullToRefreshControllerCreationParams.supported_platforms}
-@SupportedPlatforms(platforms: [
-  AndroidPlatform(),
-  IOSPlatform(),
-])
+@SupportedPlatforms(platforms: [AndroidPlatform(), IOSPlatform()])
 class PlatformPullToRefreshControllerCreationParams {
   /// Used by the platform implementation to create a new [PlatformPullToRefreshController].
-  PlatformPullToRefreshControllerCreationParams(
-      {@Deprecated("Use settings instead") PullToRefreshOptions? options,
-      PullToRefreshSettings? settings,
-      this.onRefresh})
-      : this.options = options ?? PullToRefreshOptions(),
-        this.settings = settings ?? PullToRefreshSettings();
+  PlatformPullToRefreshControllerCreationParams({
+    @Deprecated("Use settings instead") PullToRefreshOptions? options,
+    PullToRefreshSettings? settings,
+    this.onRefresh,
+  }) : this.options = options ?? PullToRefreshOptions(),
+       this.settings = settings ?? PullToRefreshSettings();
 
   ///{@template flutter_inappwebview_platform_interface.PlatformPullToRefreshControllerCreationParams.options}
   /// Use [settings] instead.
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformPullToRefreshControllerCreationParams.options.supported_platforms}
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(),
-    IOSPlatform(),
-  ])
+  @SupportedPlatforms(platforms: [AndroidPlatform(), IOSPlatform()])
   @Deprecated("Use settings instead")
   late PullToRefreshOptions options;
 
@@ -53,10 +47,7 @@ class PlatformPullToRefreshControllerCreationParams {
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformPullToRefreshControllerCreationParams.settings.supported_platforms}
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(),
-    IOSPlatform(),
-  ])
+  @SupportedPlatforms(platforms: [AndroidPlatform(), IOSPlatform()])
   late PullToRefreshSettings settings;
 
   ///{@template flutter_inappwebview_platform_interface.PlatformPullToRefreshControllerCreationParams.onRefresh}
@@ -64,27 +55,28 @@ class PlatformPullToRefreshControllerCreationParams {
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformPullToRefreshControllerCreationParams.onRefresh.supported_platforms}
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(),
-    IOSPlatform(),
-  ])
+  @SupportedPlatforms(platforms: [AndroidPlatform(), IOSPlatform()])
   final void Function()? onRefresh;
 
   ///{@template flutter_inappwebview_platform_interface.PlatformPullToRefreshControllerCreationParams.isClassSupported}
   ///Check if the current class is supported by the [defaultTargetPlatform] or a specific [platform].
   ///{@endtemplate}
   bool isClassSupported({TargetPlatform? platform}) =>
-      _PlatformPullToRefreshControllerCreationParamsClassSupported
-          .isClassSupported(platform: platform);
+      _PlatformPullToRefreshControllerCreationParamsClassSupported.isClassSupported(
+        platform: platform,
+      );
 
   ///{@template flutter_inappwebview_platform_interface.PlatformPullToRefreshControllerCreationParams.isPropertySupported}
   ///Check if the given [property] is supported by the [defaultTargetPlatform] or a specific [platform].
   ///{@endtemplate}
   bool isPropertySupported(
-          PlatformPullToRefreshControllerCreationParamsProperty property,
-          {TargetPlatform? platform}) =>
-      _PlatformPullToRefreshControllerCreationParamsPropertySupported
-          .isPropertySupported(property, platform: platform);
+    PlatformPullToRefreshControllerCreationParamsProperty property, {
+    TargetPlatform? platform,
+  }) =>
+      _PlatformPullToRefreshControllerCreationParamsPropertySupported.isPropertySupported(
+        property,
+        platform: platform,
+      );
 }
 
 ///{@template flutter_inappwebview_platform_interface.PlatformPullToRefreshController}
@@ -96,12 +88,15 @@ class PlatformPullToRefreshControllerCreationParams {
 ///{@endtemplate}
 ///
 ///{@macro flutter_inappwebview_platform_interface.PlatformPullToRefreshController.supported_platforms}
-@SupportedPlatforms(platforms: [
-  AndroidPlatform(
+@SupportedPlatforms(
+  platforms: [
+    AndroidPlatform(
       note:
-          '**NOTE**: to be able to use the "pull-to-refresh" feature, [InAppWebViewSettings.useHybridComposition] must be `true`.'),
-  IOSPlatform(),
-])
+          '**NOTE**: to be able to use the "pull-to-refresh" feature, [InAppWebViewSettings.useHybridComposition] must be `true`.',
+    ),
+    IOSPlatform(),
+  ],
+)
 abstract class PlatformPullToRefreshController extends PlatformInterface
     implements Disposable {
   ///Debug settings.
@@ -109,7 +104,8 @@ abstract class PlatformPullToRefreshController extends PlatformInterface
 
   /// Creates a new [PlatformPullToRefreshController]
   factory PlatformPullToRefreshController(
-      PlatformPullToRefreshControllerCreationParams params) {
+    PlatformPullToRefreshControllerCreationParams params,
+  ) {
     assert(
       InAppWebViewPlatform.instance != null,
       'A platform implementation for `flutter_inappwebview` has not been set. Please '
@@ -118,8 +114,9 @@ abstract class PlatformPullToRefreshController extends PlatformInterface
       '`InAppWebViewPlatform.instance` can be set with your own test implementation.',
     );
     final PlatformPullToRefreshController webViewControllerDelegate =
-        InAppWebViewPlatform.instance!
-            .createPlatformPullToRefreshController(params);
+        InAppWebViewPlatform.instance!.createPlatformPullToRefreshController(
+          params,
+        );
     PlatformInterface.verify(webViewControllerDelegate, _token);
     return webViewControllerDelegate;
   }
@@ -146,7 +143,7 @@ abstract class PlatformPullToRefreshController extends PlatformInterface
   /// a class that only contains a factory constructor.
   @protected
   PlatformPullToRefreshController.implementation(this.params)
-      : super(token: _token);
+    : super(token: _token);
 
   static final Object _token = Object();
 
@@ -174,19 +171,24 @@ abstract class PlatformPullToRefreshController extends PlatformInterface
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformPullToRefreshController.setEnabled.supported_platforms}
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(
         apiName: 'SwipeRefreshLayout.setEnabled',
         apiUrl:
-            'https://developer.android.com/reference/androidx/swiperefreshlayout/widget/SwipeRefreshLayout#setEnabled(boolean)'),
-    IOSPlatform(
+            'https://developer.android.com/reference/androidx/swiperefreshlayout/widget/SwipeRefreshLayout#setEnabled(boolean)',
+      ),
+      IOSPlatform(
         apiName: 'UIScrollView.refreshControl',
         apiUrl:
-            'https://developer.apple.com/documentation/uikit/uiscrollview/2127691-refreshcontrol'),
-  ])
+            'https://developer.apple.com/documentation/uikit/uiscrollview/2127691-refreshcontrol',
+      ),
+    ],
+  )
   Future<void> setEnabled(bool enabled) {
     throw UnimplementedError(
-        'setEnabled is not implemented on the current platform');
+      'setEnabled is not implemented on the current platform',
+    );
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformPullToRefreshController.isEnabled}
@@ -194,19 +196,24 @@ abstract class PlatformPullToRefreshController extends PlatformInterface
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformPullToRefreshController.isEnabled.supported_platforms}
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(
         apiName: 'View.isEnabled',
         apiUrl:
-            'https://developer.android.com/reference/android/view/View#isEnabled()'),
-    IOSPlatform(
+            'https://developer.android.com/reference/android/view/View#isEnabled()',
+      ),
+      IOSPlatform(
         apiName: 'UIScrollView.refreshControl',
         apiUrl:
-            'https://developer.apple.com/documentation/uikit/uiscrollview/2127691-refreshcontrol'),
-  ])
+            'https://developer.apple.com/documentation/uikit/uiscrollview/2127691-refreshcontrol',
+      ),
+    ],
+  )
   Future<bool> isEnabled() {
     throw UnimplementedError(
-        'isEnabled is not implemented on the current platform');
+      'isEnabled is not implemented on the current platform',
+    );
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformPullToRefreshController.beginRefreshing}
@@ -218,19 +225,24 @@ abstract class PlatformPullToRefreshController extends PlatformInterface
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformPullToRefreshController.beginRefreshing.supported_platforms}
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(
         apiName: 'SwipeRefreshLayout.setRefreshing',
         apiUrl:
-            'https://developer.android.com/reference/androidx/swiperefreshlayout/widget/SwipeRefreshLayout#setRefreshing(boolean)'),
-    IOSPlatform(
+            'https://developer.android.com/reference/androidx/swiperefreshlayout/widget/SwipeRefreshLayout#setRefreshing(boolean)',
+      ),
+      IOSPlatform(
         apiName: 'UIRefreshControl.beginRefreshing',
         apiUrl:
-            'https://developer.apple.com/documentation/uikit/uirefreshcontrol/1624842-beginrefreshing'),
-  ])
+            'https://developer.apple.com/documentation/uikit/uirefreshcontrol/1624842-beginrefreshing',
+      ),
+    ],
+  )
   Future<void> beginRefreshing() {
     throw UnimplementedError(
-        'beginRefreshing is not implemented on the current platform');
+      'beginRefreshing is not implemented on the current platform',
+    );
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformPullToRefreshController.endRefreshing}
@@ -243,19 +255,24 @@ abstract class PlatformPullToRefreshController extends PlatformInterface
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformPullToRefreshController.endRefreshing.supported_platforms}
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(
         apiName: 'SwipeRefreshLayout.setRefreshing',
         apiUrl:
-            'https://developer.android.com/reference/androidx/swiperefreshlayout/widget/SwipeRefreshLayout#setRefreshing(boolean)'),
-    IOSPlatform(
+            'https://developer.android.com/reference/androidx/swiperefreshlayout/widget/SwipeRefreshLayout#setRefreshing(boolean)',
+      ),
+      IOSPlatform(
         apiName: 'UIRefreshControl.endRefreshing',
         apiUrl:
-            'https://developer.apple.com/documentation/uikit/uirefreshcontrol/1624846-endrefreshing'),
-  ])
+            'https://developer.apple.com/documentation/uikit/uirefreshcontrol/1624846-endrefreshing',
+      ),
+    ],
+  )
   Future<void> endRefreshing() {
     throw UnimplementedError(
-        'endRefreshing is not implemented on the current platform');
+      'endRefreshing is not implemented on the current platform',
+    );
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformPullToRefreshController.isRefreshing}
@@ -263,19 +280,24 @@ abstract class PlatformPullToRefreshController extends PlatformInterface
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformPullToRefreshController.isRefreshing.supported_platforms}
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(
         apiName: 'SwipeRefreshLayout.isRefreshing',
         apiUrl:
-            'https://developer.android.com/reference/androidx/swiperefreshlayout/widget/SwipeRefreshLayout#isRefreshing()'),
-    IOSPlatform(
+            'https://developer.android.com/reference/androidx/swiperefreshlayout/widget/SwipeRefreshLayout#isRefreshing()',
+      ),
+      IOSPlatform(
         apiName: 'UIRefreshControl.isRefreshing',
         apiUrl:
-            'https://developer.apple.com/documentation/uikit/uirefreshcontrol/1624844-isrefreshing'),
-  ])
+            'https://developer.apple.com/documentation/uikit/uirefreshcontrol/1624844-isrefreshing',
+      ),
+    ],
+  )
   Future<bool> isRefreshing() {
     throw UnimplementedError(
-        'isRefreshing is not implemented on the current platform');
+      'isRefreshing is not implemented on the current platform',
+    );
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformPullToRefreshController.setColor}
@@ -283,19 +305,24 @@ abstract class PlatformPullToRefreshController extends PlatformInterface
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformPullToRefreshController.setColor.supported_platforms}
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(
         apiName: 'SwipeRefreshLayout.setColorSchemeColors',
         apiUrl:
-            'https://developer.android.com/reference/androidx/swiperefreshlayout/widget/SwipeRefreshLayout#setColorSchemeColors(int...)'),
-    IOSPlatform(
+            'https://developer.android.com/reference/androidx/swiperefreshlayout/widget/SwipeRefreshLayout#setColorSchemeColors(int...)',
+      ),
+      IOSPlatform(
         apiName: 'UIRefreshControl.tintColor',
         apiUrl:
-            'https://developer.apple.com/documentation/uikit/uirefreshcontrol/1624847-tintcolor'),
-  ])
+            'https://developer.apple.com/documentation/uikit/uirefreshcontrol/1624847-tintcolor',
+      ),
+    ],
+  )
   Future<void> setColor(Color color) {
     throw UnimplementedError(
-        'setColor is not implemented on the current platform');
+      'setColor is not implemented on the current platform',
+    );
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformPullToRefreshController.setBackgroundColor}
@@ -303,19 +330,24 @@ abstract class PlatformPullToRefreshController extends PlatformInterface
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformPullToRefreshController.setBackgroundColor.supported_platforms}
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(
         apiName: 'SwipeRefreshLayout.setProgressBackgroundColorSchemeColor',
         apiUrl:
-            'https://developer.android.com/reference/androidx/swiperefreshlayout/widget/SwipeRefreshLayout#setProgressBackgroundColorSchemeColor(int)'),
-    IOSPlatform(
+            'https://developer.android.com/reference/androidx/swiperefreshlayout/widget/SwipeRefreshLayout#setProgressBackgroundColorSchemeColor(int)',
+      ),
+      IOSPlatform(
         apiName: 'UIView.backgroundColor',
         apiUrl:
-            'https://developer.apple.com/documentation/uikit/uiview/1622591-backgroundcolor'),
-  ])
+            'https://developer.apple.com/documentation/uikit/uiview/1622591-backgroundcolor',
+      ),
+    ],
+  )
   Future<void> setBackgroundColor(Color color) {
     throw UnimplementedError(
-        'setBackgroundColor is not implemented on the current platform');
+      'setBackgroundColor is not implemented on the current platform',
+    );
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformPullToRefreshController.setDistanceToTriggerSync}
@@ -323,15 +355,19 @@ abstract class PlatformPullToRefreshController extends PlatformInterface
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformPullToRefreshController.setDistanceToTriggerSync.supported_platforms}
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(
         apiName: 'SwipeRefreshLayout.setDistanceToTriggerSync',
         apiUrl:
-            'https://developer.android.com/reference/androidx/swiperefreshlayout/widget/SwipeRefreshLayout#setDistanceToTriggerSync(int)'),
-  ])
+            'https://developer.android.com/reference/androidx/swiperefreshlayout/widget/SwipeRefreshLayout#setDistanceToTriggerSync(int)',
+      ),
+    ],
+  )
   Future<void> setDistanceToTriggerSync(int distanceToTriggerSync) {
     throw UnimplementedError(
-        'setDistanceToTriggerSync is not implemented on the current platform');
+      'setDistanceToTriggerSync is not implemented on the current platform',
+    );
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformPullToRefreshController.setSlingshotDistance}
@@ -339,15 +375,19 @@ abstract class PlatformPullToRefreshController extends PlatformInterface
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformPullToRefreshController.setSlingshotDistance.supported_platforms}
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(
         apiName: 'SwipeRefreshLayout.setSlingshotDistance',
         apiUrl:
-            'https://developer.android.com/reference/androidx/swiperefreshlayout/widget/SwipeRefreshLayout#setSlingshotDistance(int)'),
-  ])
+            'https://developer.android.com/reference/androidx/swiperefreshlayout/widget/SwipeRefreshLayout#setSlingshotDistance(int)',
+      ),
+    ],
+  )
   Future<void> setSlingshotDistance(int slingshotDistance) {
     throw UnimplementedError(
-        'setSlingshotDistance is not implemented on the current platform');
+      'setSlingshotDistance is not implemented on the current platform',
+    );
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformPullToRefreshController.getDefaultSlingshotDistance}
@@ -355,15 +395,19 @@ abstract class PlatformPullToRefreshController extends PlatformInterface
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformPullToRefreshController.getDefaultSlingshotDistance.supported_platforms}
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(
         apiName: 'SwipeRefreshLayout.DEFAULT_SLINGSHOT_DISTANCE',
         apiUrl:
-            'https://developer.android.com/reference/androidx/swiperefreshlayout/widget/SwipeRefreshLayout#DEFAULT_SLINGSHOT_DISTANCE()'),
-  ])
+            'https://developer.android.com/reference/androidx/swiperefreshlayout/widget/SwipeRefreshLayout#DEFAULT_SLINGSHOT_DISTANCE()',
+      ),
+    ],
+  )
   Future<int> getDefaultSlingshotDistance() {
     throw UnimplementedError(
-        'getDefaultSlingshotDistance is not implemented on the current platform');
+      'getDefaultSlingshotDistance is not implemented on the current platform',
+    );
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformPullToRefreshController.setSize}
@@ -371,16 +415,20 @@ abstract class PlatformPullToRefreshController extends PlatformInterface
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformPullToRefreshController.setSize.supported_platforms}
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(
         apiName: 'SwipeRefreshLayout.setSize',
         apiUrl:
-            'https://developer.android.com/reference/androidx/swiperefreshlayout/widget/SwipeRefreshLayout#setSize(int)'),
-  ])
+            'https://developer.android.com/reference/androidx/swiperefreshlayout/widget/SwipeRefreshLayout#setSize(int)',
+      ),
+    ],
+  )
   @Deprecated("Use setIndicatorSize instead")
   Future<void> setSize(AndroidPullToRefreshSize size) {
     throw UnimplementedError(
-        'setSize is not implemented on the current platform');
+      'setSize is not implemented on the current platform',
+    );
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformPullToRefreshController.setIndicatorSize}
@@ -388,15 +436,19 @@ abstract class PlatformPullToRefreshController extends PlatformInterface
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformPullToRefreshController.setIndicatorSize.supported_platforms}
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(
         apiName: 'SwipeRefreshLayout.setSize',
         apiUrl:
-            'https://developer.android.com/reference/androidx/swiperefreshlayout/widget/SwipeRefreshLayout#setSize(int)'),
-  ])
+            'https://developer.android.com/reference/androidx/swiperefreshlayout/widget/SwipeRefreshLayout#setSize(int)',
+      ),
+    ],
+  )
   Future<void> setIndicatorSize(PullToRefreshSize size) {
     throw UnimplementedError(
-        'setIndicatorSize is not implemented on the current platform');
+      'setIndicatorSize is not implemented on the current platform',
+    );
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformPullToRefreshController.setAttributedTitle}
@@ -404,16 +456,20 @@ abstract class PlatformPullToRefreshController extends PlatformInterface
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformPullToRefreshController.setAttributedTitle.supported_platforms}
-  @SupportedPlatforms(platforms: [
-    IOSPlatform(
+  @SupportedPlatforms(
+    platforms: [
+      IOSPlatform(
         apiName: 'UIRefreshControl.attributedTitle',
         apiUrl:
-            'https://developer.apple.com/documentation/uikit/uirefreshcontrol/1624845-attributedtitle'),
-  ])
+            'https://developer.apple.com/documentation/uikit/uirefreshcontrol/1624845-attributedtitle',
+      ),
+    ],
+  )
   @Deprecated("Use setStyledTitle instead")
   Future<void> setAttributedTitle(IOSNSAttributedString attributedTitle) {
     throw UnimplementedError(
-        'setAttributedTitle is not implemented on the current platform');
+      'setAttributedTitle is not implemented on the current platform',
+    );
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformPullToRefreshController.setStyledTitle}
@@ -421,15 +477,19 @@ abstract class PlatformPullToRefreshController extends PlatformInterface
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformPullToRefreshController.setStyledTitle.supported_platforms}
-  @SupportedPlatforms(platforms: [
-    IOSPlatform(
+  @SupportedPlatforms(
+    platforms: [
+      IOSPlatform(
         apiName: 'UIRefreshControl.attributedTitle',
         apiUrl:
-            'https://developer.apple.com/documentation/uikit/uirefreshcontrol/1624845-attributedtitle'),
-  ])
+            'https://developer.apple.com/documentation/uikit/uirefreshcontrol/1624845-attributedtitle',
+      ),
+    ],
+  )
   Future<void> setStyledTitle(AttributedString attributedTitle) {
     throw UnimplementedError(
-        'setStyledTitle is not implemented on the current platform');
+      'setStyledTitle is not implemented on the current platform',
+    );
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformPullToRefreshController.dispose}
@@ -437,34 +497,36 @@ abstract class PlatformPullToRefreshController extends PlatformInterface
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformPullToRefreshController.dispose.supported_platforms}
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(),
-    IOSPlatform(),
-  ])
+  @SupportedPlatforms(platforms: [AndroidPlatform(), IOSPlatform()])
   @override
   void dispose({bool isKeepAlive = false}) {
     throw UnimplementedError(
-        'dispose is not implemented on the current platform');
+      'dispose is not implemented on the current platform',
+    );
   }
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformPullToRefreshControllerCreationParams.isClassSupported}
   bool isClassSupported({TargetPlatform? platform}) =>
       _PlatformPullToRefreshControllerClassSupported.isClassSupported(
-          platform: platform);
+        platform: platform,
+      );
 
   ///{@template flutter_inappwebview_platform_interface.PlatformPullToRefreshController.isPropertySupported}
   ///Check if the given [property] is supported by the [defaultTargetPlatform] or a specific [platform].
   ///{@endtemplate}
   bool isPropertySupported(
-          PlatformPullToRefreshControllerCreationParamsProperty property,
-          {TargetPlatform? platform}) =>
-      params.isPropertySupported(property, platform: platform);
+    PlatformPullToRefreshControllerCreationParamsProperty property, {
+    TargetPlatform? platform,
+  }) => params.isPropertySupported(property, platform: platform);
 
   ///{@template flutter_inappwebview_platform_interface.PlatformPullToRefreshController.isMethodSupported}
   ///Check if the given [method] is supported by the [defaultTargetPlatform] or a specific [platform].
   ///{@endtemplate}
-  bool isMethodSupported(PlatformPullToRefreshControllerMethod method,
-          {TargetPlatform? platform}) =>
-      _PlatformPullToRefreshControllerMethodSupported.isMethodSupported(method,
-          platform: platform);
+  bool isMethodSupported(
+    PlatformPullToRefreshControllerMethod method, {
+    TargetPlatform? platform,
+  }) => _PlatformPullToRefreshControllerMethodSupported.isMethodSupported(
+    method,
+    platform: platform,
+  );
 }

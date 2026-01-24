@@ -7,8 +7,10 @@ import 'enum_method.dart';
 
 part 'url_credential.g.dart';
 
-List<X509Certificate>? _certificatesDeserializer(dynamic value,
-    {EnumMethod? enumMethod}) {
+List<X509Certificate>? _certificatesDeserializer(
+  dynamic value, {
+  EnumMethod? enumMethod,
+}) {
   List<X509Certificate>? certificates;
   if (value != null) {
     certificates = <X509Certificate>[];
@@ -52,11 +54,12 @@ class URLCredential_ {
   @SupportedPlatforms(platforms: [IOSPlatform(), MacOSPlatform()])
   URLCredentialPersistence_? persistence;
 
-  URLCredential_(
-      {this.username,
-      this.password,
-      @Deprecated("Use certificates instead") this.iosPersistence,
-      this.persistence,
-      @Deprecated("Use persistence instead") this.iosCertificates,
-      this.certificates});
+  URLCredential_({
+    this.username,
+    this.password,
+    @Deprecated("Use certificates instead") this.iosPersistence,
+    this.persistence,
+    @Deprecated("Use persistence instead") this.iosCertificates,
+    this.certificates,
+  });
 }

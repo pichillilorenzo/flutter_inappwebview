@@ -21,7 +21,8 @@ void onWindowBlur() {
           initialUrlRequest: URLRequest(url: url),
           onLoadStop: (controller, url) async {
             await controller.evaluateJavascript(
-                source: 'window.dispatchEvent(new Event("blur"));');
+              source: 'window.dispatchEvent(new Event("blur"));',
+            );
           },
           onWindowBlur: (controller) {
             onWindowBlurCompleter.complete();

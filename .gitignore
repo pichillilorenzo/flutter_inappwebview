@@ -32,3 +32,5 @@ build/
 flutter_driver_tests.log
 tool/chromedriver
 tool/chromedriver.*
+
+plans/

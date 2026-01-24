@@ -62,25 +62,29 @@ class PullToRefreshSettings {
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView
   ///- iOS WKWebView
-  PullToRefreshSettings(
-      {this.attributedTitle,
-      this.backgroundColor,
-      this.color,
-      this.distanceToTriggerSync,
-      this.enabled = true,
-      this.size,
-      this.slingshotDistance});
+  PullToRefreshSettings({
+    this.attributedTitle,
+    this.backgroundColor,
+    this.color,
+    this.distanceToTriggerSync,
+    this.enabled = true,
+    this.size,
+    this.slingshotDistance,
+  });
 
   ///Gets a possible [PullToRefreshSettings] instance from a [Map] value.
-  static PullToRefreshSettings? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static PullToRefreshSettings? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
     final instance = PullToRefreshSettings(
       attributedTitle: AttributedString.fromMap(
-          map['attributedTitle']?.cast<String, dynamic>(),
-          enumMethod: enumMethod),
+        map['attributedTitle']?.cast<String, dynamic>(),
+        enumMethod: enumMethod,
+      ),
       backgroundColor: map['backgroundColor'] != null
           ? UtilColor.fromStringRepresentation(map['backgroundColor'])
           : null,
@@ -89,10 +93,11 @@ class PullToRefreshSettings {
           : null,
       distanceToTriggerSync: map['distanceToTriggerSync'],
       size: switch (enumMethod ?? EnumMethod.nativeValue) {
-        EnumMethod.nativeValue =>
-          PullToRefreshSize.fromNativeValue(map['size']),
+        EnumMethod.nativeValue => PullToRefreshSize.fromNativeValue(
+          map['size'],
+        ),
         EnumMethod.value => PullToRefreshSize.fromValue(map['size']),
-        EnumMethod.name => PullToRefreshSize.byName(map['size'])
+        EnumMethod.name => PullToRefreshSize.byName(map['size']),
       },
       slingshotDistance: map['slingshotDistance'],
     );
@@ -101,10 +106,13 @@ class PullToRefreshSettings {
   }
 
   ///Check if the given [property] is supported by the [defaultTargetPlatform] or a specific [platform].
-  static bool isPropertySupported(PullToRefreshSettingsProperty property,
-          {TargetPlatform? platform}) =>
-      _PullToRefreshSettingsPropertySupported.isPropertySupported(property,
-          platform: platform);
+  static bool isPropertySupported(
+    PullToRefreshSettingsProperty property, {
+    TargetPlatform? platform,
+  }) => _PullToRefreshSettingsPropertySupported.isPropertySupported(
+    property,
+    platform: platform,
+  );
 
   ///Converts instance to a map.
   Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
@@ -117,7 +125,7 @@ class PullToRefreshSettings {
       "size": switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => size?.toNativeValue(),
         EnumMethod.value => size?.toValue(),
-        EnumMethod.name => size?.name()
+        EnumMethod.name => size?.name(),
       },
       "slingshotDistance": slingshotDistance,
     };
@@ -227,36 +235,47 @@ enum PullToRefreshSettingsProperty {
 }
 
 extension _PullToRefreshSettingsPropertySupported on PullToRefreshSettings {
-  static bool isPropertySupported(PullToRefreshSettingsProperty property,
-      {TargetPlatform? platform}) {
+  static bool isPropertySupported(
+    PullToRefreshSettingsProperty property, {
+    TargetPlatform? platform,
+  }) {
     switch (property) {
       case PullToRefreshSettingsProperty.attributedTitle:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
       case PullToRefreshSettingsProperty.backgroundColor:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android, TargetPlatform.iOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+              TargetPlatform.iOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case PullToRefreshSettingsProperty.color:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android, TargetPlatform.iOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+              TargetPlatform.iOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case PullToRefreshSettingsProperty.distanceToTriggerSync:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
       case PullToRefreshSettingsProperty.enabled:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android, TargetPlatform.iOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+              TargetPlatform.iOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case PullToRefreshSettingsProperty.size:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
       case PullToRefreshSettingsProperty.slingshotDistance:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
     }
   }
 }

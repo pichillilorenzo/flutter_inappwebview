@@ -11,18 +11,23 @@ import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_pla
 class AndroidPullToRefreshControllerCreationParams
     extends PlatformPullToRefreshControllerCreationParams {
   /// Creates a new [AndroidPullToRefreshControllerCreationParams] instance.
-  AndroidPullToRefreshControllerCreationParams(
-      {super.onRefresh, super.options, super.settings});
+  AndroidPullToRefreshControllerCreationParams({
+    super.onRefresh,
+    super.options,
+    super.settings,
+  });
 
   /// Creates a [AndroidPullToRefreshControllerCreationParams] instance based on [PlatformPullToRefreshControllerCreationParams].
   factory AndroidPullToRefreshControllerCreationParams.fromPlatformPullToRefreshControllerCreationParams(
-      // Recommended placeholder to prevent being broken by platform interface.
-      // ignore: avoid_unused_constructor_parameters
-      PlatformPullToRefreshControllerCreationParams params) {
+    // Recommended placeholder to prevent being broken by platform interface.
+    // ignore: avoid_unused_constructor_parameters
+    PlatformPullToRefreshControllerCreationParams params,
+  ) {
     return AndroidPullToRefreshControllerCreationParams(
-        onRefresh: params.onRefresh,
-        options: params.options,
-        settings: params.settings);
+      onRefresh: params.onRefresh,
+      options: params.options,
+      settings: params.settings,
+    );
   }
 }
 
@@ -31,17 +36,19 @@ class AndroidPullToRefreshController extends PlatformPullToRefreshController
     with ChannelController {
   /// Constructs a [AndroidPullToRefreshController].
   AndroidPullToRefreshController(
-      PlatformPullToRefreshControllerCreationParams params)
-      : super.implementation(
-          params is AndroidPullToRefreshControllerCreationParams
-              ? params
-              : AndroidPullToRefreshControllerCreationParams
-                  .fromPlatformPullToRefreshControllerCreationParams(params),
-        );
+    PlatformPullToRefreshControllerCreationParams params,
+  ) : super.implementation(
+        params is AndroidPullToRefreshControllerCreationParams
+            ? params
+            : AndroidPullToRefreshControllerCreationParams.fromPlatformPullToRefreshControllerCreationParams(
+                params,
+              ),
+      );
 
   static final AndroidPullToRefreshController _staticValue =
       AndroidPullToRefreshController(
-          AndroidPullToRefreshControllerCreationParams());
+        AndroidPullToRefreshControllerCreationParams(),
+      );
 
   /// Provide static access.
   factory AndroidPullToRefreshController.static() {
@@ -50,11 +57,12 @@ class AndroidPullToRefreshController extends PlatformPullToRefreshController
 
   _debugLog(String method, dynamic args) {
     debugLog(
-        className: this.runtimeType.toString(),
-        debugLoggingSettings:
-            PlatformPullToRefreshController.debugLoggingSettings,
-        method: method,
-        args: args);
+      className: this.runtimeType.toString(),
+      debugLoggingSettings:
+          PlatformPullToRefreshController.debugLoggingSettings,
+      method: method,
+      args: args,
+    );
   }
 
   Future<dynamic> _handleMethod(MethodCall call) async {
@@ -137,7 +145,9 @@ class AndroidPullToRefreshController extends PlatformPullToRefreshController
   Future<int> getDefaultSlingshotDistance() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await channel?.invokeMethod<int>(
-            'getDefaultSlingshotDistance', args) ??
+          'getDefaultSlingshotDistance',
+          args,
+        ) ??
         0;
   }
 
@@ -165,7 +175,8 @@ class AndroidPullToRefreshController extends PlatformPullToRefreshController
 extension InternalPullToRefreshController on AndroidPullToRefreshController {
   void init(dynamic id) {
     channel = MethodChannel(
-        'com.pichillilorenzo/flutter_inappwebview_pull_to_refresh_$id');
+      'com.pichillilorenzo/flutter_inappwebview_pull_to_refresh_$id',
+    );
     handler = _handleMethod;
     initMethodCallHandler();
   }

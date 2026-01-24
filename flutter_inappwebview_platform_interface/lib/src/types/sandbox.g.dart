@@ -11,7 +11,7 @@ class Sandbox {
   final String? _value;
   final String? _nativeValue;
   const Sandbox._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory Sandbox._internalMultiPlatform(String? value, Function nativeValue) =>
       Sandbox._internal(value, nativeValue());
 
@@ -19,8 +19,10 @@ class Sandbox {
   static const ALLOW_ALL = const [_ALL];
 
   ///Allows for downloads to occur with a gesture from the user.
-  static const ALLOW_DOWNLOADS =
-      Sandbox._internal('allow-downloads', 'allow-downloads');
+  static const ALLOW_DOWNLOADS = Sandbox._internal(
+    'allow-downloads',
+    'allow-downloads',
+  );
 
   ///Allows the resource to submit forms. If this keyword is not used, form submission is blocked.
   static const ALLOW_FORMS = Sandbox._internal('allow-forms', 'allow-forms');
@@ -32,12 +34,16 @@ class Sandbox {
   static const ALLOW_NONE = const [_NONE];
 
   ///Lets the resource lock the screen orientation.
-  static const ALLOW_ORIENTATION_LOCK =
-      Sandbox._internal('allow-orientation-lock', 'allow-orientation-lock');
+  static const ALLOW_ORIENTATION_LOCK = Sandbox._internal(
+    'allow-orientation-lock',
+    'allow-orientation-lock',
+  );
 
   ///Lets the resource use the Pointer Lock API.
-  static const ALLOW_POINTER_LOCK =
-      Sandbox._internal('allow-pointer-lock', 'allow-pointer-lock');
+  static const ALLOW_POINTER_LOCK = Sandbox._internal(
+    'allow-pointer-lock',
+    'allow-pointer-lock',
+  );
 
   ///Allows popups (such as `window.open()`, `target="_blank"`, or `showModalDialog()`).
   ///If this keyword is not used, the popup will silently fail to open.
@@ -46,29 +52,40 @@ class Sandbox {
   ///Lets the sandboxed document open new windows without those windows inheriting the sandboxing.
   ///For example, this can safely sandbox an advertisement without forcing the same restrictions upon the page the ad links to.
   static const ALLOW_POPUPS_TO_ESCAPE_SANDBOX = Sandbox._internal(
-      'allow-popups-to-escape-sandbox', 'allow-popups-to-escape-sandbox');
+    'allow-popups-to-escape-sandbox',
+    'allow-popups-to-escape-sandbox',
+  );
 
   ///Lets the resource start a presentation session.
-  static const ALLOW_PRESENTATION =
-      Sandbox._internal('allow-presentation', 'allow-presentation');
+  static const ALLOW_PRESENTATION = Sandbox._internal(
+    'allow-presentation',
+    'allow-presentation',
+  );
 
   ///If this token is not used, the resource is treated as being from a special origin that always fails the
   ///same-origin policy (potentially preventing access to data storage/cookies and some JavaScript APIs).
-  static const ALLOW_SAME_ORIGIN =
-      Sandbox._internal('allow-same-origin', 'allow-same-origin');
+  static const ALLOW_SAME_ORIGIN = Sandbox._internal(
+    'allow-same-origin',
+    'allow-same-origin',
+  );
 
   ///Lets the resource run scripts (but not create popup windows).
-  static const ALLOW_SCRIPTS =
-      Sandbox._internal('allow-scripts', 'allow-scripts');
+  static const ALLOW_SCRIPTS = Sandbox._internal(
+    'allow-scripts',
+    'allow-scripts',
+  );
 
   ///Lets the resource navigate the top-level browsing context (the one named `_top`).
-  static const ALLOW_TOP_NAVIGATION =
-      Sandbox._internal('allow-top-navigation', 'allow-top-navigation');
+  static const ALLOW_TOP_NAVIGATION = Sandbox._internal(
+    'allow-top-navigation',
+    'allow-top-navigation',
+  );
 
   ///Lets the resource navigate the top-level browsing context, but only if initiated by a user gesture.
   static const ALLOW_TOP_NAVIGATION_BY_USER_ACTIVATION = Sandbox._internal(
-      'allow-top-navigation-by-user-activation',
-      'allow-top-navigation-by-user-activation');
+    'allow-top-navigation-by-user-activation',
+    'allow-top-navigation-by-user-activation',
+  );
   static const _ALL = Sandbox._internal(null, null);
   static const _NONE = Sandbox._internal('', '');
 
@@ -113,8 +130,8 @@ class Sandbox {
   /// same value, or being values of different enum type), at most one of
   /// them will be represented in the returned map.
   static Map<String, Sandbox> asNameMap() => <String, Sandbox>{
-        for (final value in Sandbox.values) value.name(): value
-      };
+    for (final value in Sandbox.values) value.name(): value,
+  };
 
   ///Gets a possible [Sandbox] instance from a native value.
   static Sandbox? fromNativeValue(String? value) {
@@ -124,8 +141,9 @@ class Sandbox {
       return Sandbox._NONE;
     }
     try {
-      return Sandbox.values
-          .firstWhere((element) => element.toNativeValue() == value);
+      return Sandbox.values.firstWhere(
+        (element) => element.toNativeValue() == value,
+      );
     } catch (e) {
       return null;
     }

@@ -36,8 +36,10 @@ class AndroidResource {
   AndroidResource({this.defPackage, this.defType, required this.name});
 
   ///Gets a possible [AndroidResource] instance from a [Map] value.
-  static AndroidResource? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static AndroidResource? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
@@ -55,7 +57,10 @@ class AndroidResource {
 
   static AndroidResource layout({required String name, String? defPackage}) {
     return AndroidResource(
-        name: name, defType: "layout", defPackage: defPackage);
+      name: name,
+      defType: "layout",
+      defPackage: defPackage,
+    );
   }
 
   static AndroidResource id({required String name, String? defPackage}) {
@@ -64,16 +69,15 @@ class AndroidResource {
 
   static AndroidResource drawable({required String name, String? defPackage}) {
     return AndroidResource(
-        name: name, defType: "drawable", defPackage: defPackage);
+      name: name,
+      defType: "drawable",
+      defPackage: defPackage,
+    );
   }
 
   ///Converts instance to a map.
   Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
-    return {
-      "defPackage": defPackage,
-      "defType": defType,
-      "name": name,
-    };
+    return {"defPackage": defPackage, "defType": defType, "name": name};
   }
 
   ///Converts instance to a map.

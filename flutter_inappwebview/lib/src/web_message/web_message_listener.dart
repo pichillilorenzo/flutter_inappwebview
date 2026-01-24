@@ -4,15 +4,17 @@ import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_pla
 ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageListener}
 class WebMessageListener {
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageListener}
-  WebMessageListener(
-      {required String jsObjectName,
-      Set<String>? allowedOriginRules,
-      OnPostMessageCallback? onPostMessage})
-      : this.fromPlatformCreationParams(
-            params: PlatformWebMessageListenerCreationParams(
-                jsObjectName: jsObjectName,
-                allowedOriginRules: allowedOriginRules,
-                onPostMessage: onPostMessage));
+  WebMessageListener({
+    required String jsObjectName,
+    Set<String>? allowedOriginRules,
+    OnPostMessageCallback? onPostMessage,
+  }) : this.fromPlatformCreationParams(
+         params: PlatformWebMessageListenerCreationParams(
+           jsObjectName: jsObjectName,
+           allowedOriginRules: allowedOriginRules,
+           onPostMessage: onPostMessage,
+         ),
+       );
 
   /// Constructs a [WebMessageListener].
   ///
@@ -31,7 +33,8 @@ class WebMessageListener {
   /// Provide static access.
   static WebMessageListener static() {
     return WebMessageListener.fromPlatform(
-        platform: PlatformWebMessageListener.static());
+      platform: PlatformWebMessageListener.static(),
+    );
   }
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageListenerCreationParams.isClassSupported}
@@ -40,16 +43,21 @@ class WebMessageListener {
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageListener.isPropertySupported}
   static bool isPropertySupported(
-          PlatformWebMessageListenerCreationParamsProperty property,
-          {TargetPlatform? platform}) =>
-      PlatformWebMessageListener.static()
-          .isPropertySupported(property, platform: platform);
+    PlatformWebMessageListenerCreationParamsProperty property, {
+    TargetPlatform? platform,
+  }) => PlatformWebMessageListener.static().isPropertySupported(
+    property,
+    platform: platform,
+  );
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageListener.isMethodSupported}
-  static bool isMethodSupported(PlatformWebMessageListenerMethod method,
-          {TargetPlatform? platform}) =>
-      PlatformWebMessageListener.static()
-          .isMethodSupported(method, platform: platform);
+  static bool isMethodSupported(
+    PlatformWebMessageListenerMethod method, {
+    TargetPlatform? platform,
+  }) => PlatformWebMessageListener.static().isMethodSupported(
+    method,
+    platform: platform,
+  );
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageListener.jsObjectName}
   String get jsObjectName => platform.jsObjectName;
@@ -75,9 +83,11 @@ class WebMessageListener {
 class JavaScriptReplyProxy {
   ///{@macro flutter_inappwebview_platform_interface.PlatformJavaScriptReplyProxy}
   JavaScriptReplyProxy({required PlatformWebMessageListener webMessageListener})
-      : this.fromPlatformCreationParams(
-            params: PlatformJavaScriptReplyProxyCreationParams(
-                webMessageListener: webMessageListener));
+    : this.fromPlatformCreationParams(
+        params: PlatformJavaScriptReplyProxyCreationParams(
+          webMessageListener: webMessageListener,
+        ),
+      );
 
   /// Constructs a [JavaScriptReplyProxy].
   ///

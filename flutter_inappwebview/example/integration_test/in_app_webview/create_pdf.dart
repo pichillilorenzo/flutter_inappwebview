@@ -33,7 +33,8 @@ void createPdf() {
     await pageLoaded.future;
 
     var pdfConfiguration = PDFConfiguration(
-        rect: InAppWebViewRect(width: 100, height: 100, x: 50, y: 50));
+      rect: InAppWebViewRect(width: 100, height: 100, x: 50, y: 50),
+    );
     var pdf = await controller.createPdf(pdfConfiguration: pdfConfiguration);
     expect(pdf, isNotNull);
   }, skip: shouldSkip);

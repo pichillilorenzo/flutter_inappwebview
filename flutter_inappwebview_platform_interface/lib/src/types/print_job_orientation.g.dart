@@ -11,10 +11,11 @@ class PrintJobOrientation {
   final int _value;
   final int _nativeValue;
   const PrintJobOrientation._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory PrintJobOrientation._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      PrintJobOrientation._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => PrintJobOrientation._internal(value, nativeValue());
 
   ///Pages are printed in landscape orientation.
   ///
@@ -22,6 +23,7 @@ class PrintJobOrientation {
   ///- Android WebView
   ///- iOS WKWebView
   ///- macOS WKWebView
+  ///- Windows WebView2
   static final LANDSCAPE = PrintJobOrientation._internalMultiPlatform(1, () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -29,6 +31,8 @@ class PrintJobOrientation {
       case TargetPlatform.iOS:
         return 1;
       case TargetPlatform.macOS:
+        return 1;
+      case TargetPlatform.windows:
         return 1;
       default:
         break;
@@ -42,6 +46,7 @@ class PrintJobOrientation {
   ///- Android WebView
   ///- iOS WKWebView
   ///- macOS WKWebView
+  ///- Windows WebView2
   static final PORTRAIT = PrintJobOrientation._internalMultiPlatform(0, () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -49,6 +54,8 @@ class PrintJobOrientation {
       case TargetPlatform.iOS:
         return 0;
       case TargetPlatform.macOS:
+        return 0;
+      case TargetPlatform.windows:
         return 0;
       default:
         break;
@@ -66,8 +73,9 @@ class PrintJobOrientation {
   static PrintJobOrientation? fromValue(int? value) {
     if (value != null) {
       try {
-        return PrintJobOrientation.values
-            .firstWhere((element) => element.toValue() == value);
+        return PrintJobOrientation.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -79,8 +87,9 @@ class PrintJobOrientation {
   static PrintJobOrientation? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return PrintJobOrientation.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return PrintJobOrientation.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -96,8 +105,9 @@ class PrintJobOrientation {
   static PrintJobOrientation? byName(String? name) {
     if (name != null) {
       try {
-        return PrintJobOrientation.values
-            .firstWhere((element) => element.name() == name);
+        return PrintJobOrientation.values.firstWhere(
+          (element) => element.name() == name,
+        );
       } catch (e) {
         return null;
       }
@@ -115,7 +125,7 @@ class PrintJobOrientation {
   /// them will be represented in the returned map.
   static Map<String, PrintJobOrientation> asNameMap() =>
       <String, PrintJobOrientation>{
-        for (final value in PrintJobOrientation.values) value.name(): value
+        for (final value in PrintJobOrientation.values) value.name(): value,
       };
 
   ///Gets [int] value.

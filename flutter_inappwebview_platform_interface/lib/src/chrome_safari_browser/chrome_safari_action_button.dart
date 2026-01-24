@@ -10,9 +10,11 @@ import '../types/enum_method.dart';
 part 'chrome_safari_action_button.g.dart';
 
 ///Class that represents a custom action button for a [PlatformChromeSafariBrowser] instance.
-@SupportedPlatforms(platforms: [
-  AndroidPlatform(note: 'Not available in an Android Trusted Web Activity.'),
-])
+@SupportedPlatforms(
+  platforms: [
+    AndroidPlatform(note: 'Not available in an Android Trusted Web Activity.'),
+  ],
+)
 @ExchangeableObject()
 class ChromeSafariBrowserActionButton_ {
   ///The action button id. It should be different from the [ChromeSafariBrowserMenuItem.id].
@@ -35,11 +37,12 @@ class ChromeSafariBrowserActionButton_ {
   void Function(WebUri? url, String title)? onClick;
 
   @ExchangeableObjectConstructor()
-  ChromeSafariBrowserActionButton_(
-      {required this.id,
-      required this.icon,
-      required this.description,
-      @Deprecated("Use onClick instead") this.action,
-      this.onClick,
-      this.shouldTint = false});
+  ChromeSafariBrowserActionButton_({
+    required this.id,
+    required this.icon,
+    required this.description,
+    @Deprecated("Use onClick instead") this.action,
+    this.onClick,
+    this.shouldTint = false,
+  });
 }

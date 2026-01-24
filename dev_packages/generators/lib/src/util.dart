@@ -6,8 +6,10 @@ import 'package:collection/collection.dart';
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 import 'package:source_gen/source_gen.dart';
 
+const _annotationsPackage = 'flutter_inappwebview_internal_annotations';
+
 final _coreCheckerObjectMethod =
-    const TypeChecker.fromRuntime(ExchangeableObjectMethod);
+    TypeChecker.typeNamedLiterally('ExchangeableObjectMethod', inPackage: _annotationsPackage);
 
 abstract class Util {
   static bool typeIsNullable(DartType type) {
@@ -103,10 +105,10 @@ abstract class Util {
   }
 
   static String? getParameterSupportedDocs(
-      TypeChecker checker, List<ParameterElement> parameters,
+      TypeChecker checker, List<FormalParameterElement> parameters,
       [Map<String, List<DartObject>>? workaroundPlatforms]) {
     final nonDeprecatedParameters =
-        parameters.where((p) => !p.hasDeprecated).toList();
+        parameters.where((p) => !p.metadata.hasDeprecated).toList();
     if (nonDeprecatedParameters.isEmpty) {
       return null;
     }

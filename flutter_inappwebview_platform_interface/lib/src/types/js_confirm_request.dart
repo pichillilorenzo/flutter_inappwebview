@@ -23,9 +23,10 @@ class JsConfirmRequest_ {
   @SupportedPlatforms(platforms: [IOSPlatform(), MacOSPlatform()])
   bool? isMainFrame;
 
-  JsConfirmRequest_(
-      {this.url,
-      this.message,
-      @Deprecated("Use isMainFrame instead") this.iosIsMainFrame,
-      this.isMainFrame});
+  JsConfirmRequest_({
+    this.url,
+    this.message,
+    @Deprecated("Use isMainFrame instead") this.iosIsMainFrame,
+    this.isMainFrame,
+  });
 }

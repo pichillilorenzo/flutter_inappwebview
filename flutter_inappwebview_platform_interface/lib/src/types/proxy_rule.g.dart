@@ -43,6 +43,8 @@ class ProxyRule {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView
+  ///- Linux WPE WebKit ([Official API - webkit_network_proxy_settings_add_proxy_for_scheme](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.NetworkProxySettings.add_proxy_for_scheme.html)):
+  ///    - Linux accepts scheme filters: '*', 'http', 'https', 'socks', 'socks4', 'socks5' (case-insensitive). '*' is treated as the default proxy.
   ProxySchemeFilter? schemeFilter;
 
   ///Represents the proxy URL.
@@ -51,6 +53,7 @@ class ProxyRule {
   ///- Android WebView
   ///- iOS WKWebView
   ///- macOS WKWebView
+  ///- Linux WPE WebKit
   String url;
 
   ///Sets a username to use as authentication for a proxy configuration.
@@ -59,18 +62,21 @@ class ProxyRule {
   ///- iOS WKWebView
   ///- macOS WKWebView
   String? username;
-  ProxyRule(
-      {this.allowFailover,
-      this.excludedDomains,
-      this.matchDomains,
-      this.password,
-      this.schemeFilter,
-      required this.url,
-      this.username});
+  ProxyRule({
+    this.allowFailover,
+    this.excludedDomains,
+    this.matchDomains,
+    this.password,
+    this.schemeFilter,
+    required this.url,
+    this.username,
+  });
 
   ///Gets a possible [ProxyRule] instance from a [Map] value.
-  static ProxyRule? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static ProxyRule? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
@@ -84,10 +90,11 @@ class ProxyRule {
           : null,
       password: map['password'],
       schemeFilter: switch (enumMethod ?? EnumMethod.nativeValue) {
-        EnumMethod.nativeValue =>
-          ProxySchemeFilter.fromNativeValue(map['schemeFilter']),
+        EnumMethod.nativeValue => ProxySchemeFilter.fromNativeValue(
+          map['schemeFilter'],
+        ),
         EnumMethod.value => ProxySchemeFilter.fromValue(map['schemeFilter']),
-        EnumMethod.name => ProxySchemeFilter.byName(map['schemeFilter'])
+        EnumMethod.name => ProxySchemeFilter.byName(map['schemeFilter']),
       },
       url: map['url'],
       username: map['username'],
@@ -105,7 +112,7 @@ class ProxyRule {
       "schemeFilter": switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => schemeFilter?.toNativeValue(),
         EnumMethod.value => schemeFilter?.toValue(),
-        EnumMethod.name => schemeFilter?.name()
+        EnumMethod.name => schemeFilter?.name(),
       },
       "url": url,
       "username": username,

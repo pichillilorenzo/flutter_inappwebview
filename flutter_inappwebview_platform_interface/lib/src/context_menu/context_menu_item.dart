@@ -29,12 +29,13 @@ class ContextMenuItem_ {
   Function()? action;
 
   @ExchangeableObjectConstructor()
-  ContextMenuItem_(
-      {this.id,
-      @Deprecated("Use id instead") this.androidId,
-      @Deprecated("Use id instead") this.iosId,
-      required this.title,
-      this.action}) {
+  ContextMenuItem_({
+    this.id,
+    @Deprecated("Use id instead") this.androidId,
+    @Deprecated("Use id instead") this.iosId,
+    required this.title,
+    this.action,
+  }) {
     if (Util.isAndroid) {
       // ignore: deprecated_member_use_from_same_package
       this.id = this.id ?? this.androidId;

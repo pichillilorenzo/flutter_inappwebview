@@ -32,12 +32,15 @@ class WebAuthenticationSessionSettings {
   ///**Officially Supported Platforms/Implementations**:
   ///- iOS WKWebView 13.0+
   ///- macOS WKWebView 10.15+
-  WebAuthenticationSessionSettings(
-      {this.prefersEphemeralWebBrowserSession = false});
+  WebAuthenticationSessionSettings({
+    this.prefersEphemeralWebBrowserSession = false,
+  });
 
   ///Gets a possible [WebAuthenticationSessionSettings] instance from a [Map] value.
-  static WebAuthenticationSessionSettings? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static WebAuthenticationSessionSettings? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
@@ -49,11 +52,12 @@ class WebAuthenticationSessionSettings {
 
   ///Check if the given [property] is supported by the [defaultTargetPlatform] or a specific [platform].
   static bool isPropertySupported(
-          WebAuthenticationSessionSettingsProperty property,
-          {TargetPlatform? platform}) =>
-      _WebAuthenticationSessionSettingsPropertySupported.isPropertySupported(
-          property,
-          platform: platform);
+    WebAuthenticationSessionSettingsProperty property, {
+    TargetPlatform? platform,
+  }) => _WebAuthenticationSessionSettingsPropertySupported.isPropertySupported(
+    property,
+    platform: platform,
+  );
 
   ///Converts instance to a map.
   Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
@@ -101,14 +105,17 @@ enum WebAuthenticationSessionSettingsProperty {
 extension _WebAuthenticationSessionSettingsPropertySupported
     on WebAuthenticationSessionSettings {
   static bool isPropertySupported(
-      WebAuthenticationSessionSettingsProperty property,
-      {TargetPlatform? platform}) {
+    WebAuthenticationSessionSettingsProperty property, {
+    TargetPlatform? platform,
+  }) {
     switch (property) {
       case WebAuthenticationSessionSettingsProperty
-            .prefersEphemeralWebBrowserSession:
+          .prefersEphemeralWebBrowserSession:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
     }
   }
 }

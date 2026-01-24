@@ -10,8 +10,9 @@ abstract mixin class PlatformUtilListener {
 ///Platform native utilities
 class PlatformUtil {
   static PlatformUtil? _instance;
-  static const MethodChannel _channel =
-      MethodChannel('com.pichillilorenzo/flutter_inappwebview_platformutil');
+  static const MethodChannel _channel = MethodChannel(
+    'com.pichillilorenzo/flutter_inappwebview_platformutil',
+  );
 
   static final ObserverList<PlatformUtilListener> _listeners =
       ObserverList<PlatformUtilListener>();

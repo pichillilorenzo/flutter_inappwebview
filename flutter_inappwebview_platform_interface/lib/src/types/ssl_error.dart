@@ -23,9 +23,10 @@ class SslError_ {
   ///The message associated to the [code].
   String? message;
 
-  SslError_(
-      {@Deprecated('Use code instead') this.androidError,
-      @Deprecated('Use code instead') this.iosError,
-      this.code,
-      this.message}) {}
+  SslError_({
+    @Deprecated('Use code instead') this.androidError,
+    @Deprecated('Use code instead') this.iosError,
+    this.code,
+    this.message,
+  }) {}
 }

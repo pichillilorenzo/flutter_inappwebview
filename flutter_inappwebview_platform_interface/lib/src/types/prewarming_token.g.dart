@@ -13,22 +13,20 @@ class PrewarmingToken {
   PrewarmingToken({required this.id});
 
   ///Gets a possible [PrewarmingToken] instance from a [Map] value.
-  static PrewarmingToken? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static PrewarmingToken? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
-    final instance = PrewarmingToken(
-      id: map['id'],
-    );
+    final instance = PrewarmingToken(id: map['id']);
     return instance;
   }
 
   ///Converts instance to a map.
   Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
-    return {
-      "id": id,
-    };
+    return {"id": id};
   }
 
   ///Converts instance to a map.

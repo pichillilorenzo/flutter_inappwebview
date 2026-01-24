@@ -5,13 +5,17 @@ import 'web_message_port.dart';
 ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageChannel}
 class WebMessageChannel {
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageChannel}
-  WebMessageChannel(
-      {required String id,
-      required WebMessagePort port1,
-      required WebMessagePort port2})
-      : this.fromPlatformCreationParams(
-            params: PlatformWebMessageChannelCreationParams(
-                id: id, port1: port1.platform, port2: port2.platform));
+  WebMessageChannel({
+    required String id,
+    required WebMessagePort port1,
+    required WebMessagePort port2,
+  }) : this.fromPlatformCreationParams(
+         params: PlatformWebMessageChannelCreationParams(
+           id: id,
+           port1: port1.platform,
+           port2: port2.platform,
+         ),
+       );
 
   /// Constructs a [WebMessageChannel].
   ///
@@ -30,7 +34,8 @@ class WebMessageChannel {
   /// Provide static access.
   static WebMessageChannel static() {
     return WebMessageChannel.fromPlatform(
-        platform: PlatformWebMessageChannel.static());
+      platform: PlatformWebMessageChannel.static(),
+    );
   }
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageChannelCreationParams.isClassSupported}
@@ -39,20 +44,25 @@ class WebMessageChannel {
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageChannel.isPropertySupported}
   static bool isPropertySupported(
-          PlatformWebMessageChannelCreationParamsProperty property,
-          {TargetPlatform? platform}) =>
-      PlatformWebMessageChannel.static()
-          .isPropertySupported(property, platform: platform);
+    PlatformWebMessageChannelCreationParamsProperty property, {
+    TargetPlatform? platform,
+  }) => PlatformWebMessageChannel.static().isPropertySupported(
+    property,
+    platform: platform,
+  );
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageChannel.isMethodSupported}
-  static bool isMethodSupported(PlatformWebMessageChannelMethod method,
-          {TargetPlatform? platform}) =>
-      PlatformWebMessageChannel.static()
-          .isMethodSupported(method, platform: platform);
+  static bool isMethodSupported(
+    PlatformWebMessageChannelMethod method, {
+    TargetPlatform? platform,
+  }) => PlatformWebMessageChannel.static().isMethodSupported(
+    method,
+    platform: platform,
+  );
 
   static WebMessageChannel? fromMap(Map<String, dynamic>? map) {
-    PlatformWebMessageChannel? platform =
-        PlatformWebMessageChannel.static().fromMap(map);
+    PlatformWebMessageChannel? platform = PlatformWebMessageChannel.static()
+        .fromMap(map);
     if (platform == null) {
       return null;
     }

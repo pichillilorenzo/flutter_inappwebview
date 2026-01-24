@@ -11,15 +11,20 @@ class AttributedStringTextEffectStyle {
   final String _value;
   final String _nativeValue;
   const AttributedStringTextEffectStyle._internal(
-      this._value, this._nativeValue);
-// ignore: unused_element
+    this._value,
+    this._nativeValue,
+  );
+  // ignore: unused_element
   factory AttributedStringTextEffectStyle._internalMultiPlatform(
-          String value, Function nativeValue) =>
-      AttributedStringTextEffectStyle._internal(value, nativeValue());
+    String value,
+    Function nativeValue,
+  ) => AttributedStringTextEffectStyle._internal(value, nativeValue());
 
   ///A graphical text effect that gives glyphs the appearance of letterpress printing, which involves pressing the type into the paper.
   static const LETTERPRESS_STYLE = AttributedStringTextEffectStyle._internal(
-      'letterpressStyle', 'letterpressStyle');
+    'letterpressStyle',
+    'letterpressStyle',
+  );
 
   ///Set of all values of [AttributedStringTextEffectStyle].
   static final Set<AttributedStringTextEffectStyle> values = [
@@ -30,8 +35,9 @@ class AttributedStringTextEffectStyle {
   static AttributedStringTextEffectStyle? fromValue(String? value) {
     if (value != null) {
       try {
-        return AttributedStringTextEffectStyle.values
-            .firstWhere((element) => element.toValue() == value);
+        return AttributedStringTextEffectStyle.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -43,8 +49,9 @@ class AttributedStringTextEffectStyle {
   static AttributedStringTextEffectStyle? fromNativeValue(String? value) {
     if (value != null) {
       try {
-        return AttributedStringTextEffectStyle.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return AttributedStringTextEffectStyle.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -60,8 +67,9 @@ class AttributedStringTextEffectStyle {
   static AttributedStringTextEffectStyle? byName(String? name) {
     if (name != null) {
       try {
-        return AttributedStringTextEffectStyle.values
-            .firstWhere((element) => element.name() == name);
+        return AttributedStringTextEffectStyle.values.firstWhere(
+          (element) => element.name() == name,
+        );
       } catch (e) {
         return null;
       }
@@ -80,7 +88,7 @@ class AttributedStringTextEffectStyle {
   static Map<String, AttributedStringTextEffectStyle> asNameMap() =>
       <String, AttributedStringTextEffectStyle>{
         for (final value in AttributedStringTextEffectStyle.values)
-          value.name(): value
+          value.name(): value,
       };
 
   ///Gets [String] value.
@@ -122,16 +130,21 @@ class IOSNSAttributedStringTextEffectStyle {
   final String _value;
   final String _nativeValue;
   const IOSNSAttributedStringTextEffectStyle._internal(
-      this._value, this._nativeValue);
-// ignore: unused_element
+    this._value,
+    this._nativeValue,
+  );
+  // ignore: unused_element
   factory IOSNSAttributedStringTextEffectStyle._internalMultiPlatform(
-          String value, Function nativeValue) =>
-      IOSNSAttributedStringTextEffectStyle._internal(value, nativeValue());
+    String value,
+    Function nativeValue,
+  ) => IOSNSAttributedStringTextEffectStyle._internal(value, nativeValue());
 
   ///A graphical text effect that gives glyphs the appearance of letterpress printing, which involves pressing the type into the paper.
   static const LETTERPRESS_STYLE =
       IOSNSAttributedStringTextEffectStyle._internal(
-          'letterpressStyle', 'letterpressStyle');
+        'letterpressStyle',
+        'letterpressStyle',
+      );
 
   ///Set of all values of [IOSNSAttributedStringTextEffectStyle].
   static final Set<IOSNSAttributedStringTextEffectStyle> values = [
@@ -142,8 +155,9 @@ class IOSNSAttributedStringTextEffectStyle {
   static IOSNSAttributedStringTextEffectStyle? fromValue(String? value) {
     if (value != null) {
       try {
-        return IOSNSAttributedStringTextEffectStyle.values
-            .firstWhere((element) => element.toValue() == value);
+        return IOSNSAttributedStringTextEffectStyle.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -155,8 +169,9 @@ class IOSNSAttributedStringTextEffectStyle {
   static IOSNSAttributedStringTextEffectStyle? fromNativeValue(String? value) {
     if (value != null) {
       try {
-        return IOSNSAttributedStringTextEffectStyle.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return IOSNSAttributedStringTextEffectStyle.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -172,8 +187,9 @@ class IOSNSAttributedStringTextEffectStyle {
   static IOSNSAttributedStringTextEffectStyle? byName(String? name) {
     if (name != null) {
       try {
-        return IOSNSAttributedStringTextEffectStyle.values
-            .firstWhere((element) => element.name() == name);
+        return IOSNSAttributedStringTextEffectStyle.values.firstWhere(
+          (element) => element.name() == name,
+        );
       } catch (e) {
         return null;
       }
@@ -192,7 +208,7 @@ class IOSNSAttributedStringTextEffectStyle {
   static Map<String, IOSNSAttributedStringTextEffectStyle> asNameMap() =>
       <String, IOSNSAttributedStringTextEffectStyle>{
         for (final value in IOSNSAttributedStringTextEffectStyle.values)
-          value.name(): value
+          value.name(): value,
       };
 
   ///Gets [String] value.

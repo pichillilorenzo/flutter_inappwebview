@@ -5,41 +5,62 @@ void supported() {
     skippableTestWidgets('basic', (WidgetTester tester) async {
       expect(InAppBrowser.isClassSupported(), true);
       expect(
-          InAppBrowser.isPropertySupported(
-              PlatformInAppBrowserProperty.windowId),
-          true);
+        InAppBrowser.isPropertySupported(PlatformInAppBrowserProperty.windowId),
+        true,
+      );
       expect(
-          InAppBrowser.isMethodSupported(
-              PlatformInAppBrowserMethod.openUrlRequest),
-          true);
-      expect(InAppBrowser.isMethodSupported(PlatformInAppBrowserMethod.close),
-          true);
-      expect(InAppBrowser.isMethodSupported(PlatformInAppBrowserMethod.hide),
-          true);
-      expect(InAppBrowser.isMethodSupported(PlatformInAppBrowserMethod.show),
-          true);
+        InAppBrowser.isMethodSupported(
+          PlatformInAppBrowserMethod.openUrlRequest,
+        ),
+        true,
+      );
       expect(
-          InAppBrowser.isEventMethodSupported(
-              PlatformInAppBrowserEventsMethod.onWebContentProcessDidTerminate),
-          [TargetPlatform.iOS, TargetPlatform.macOS, TargetPlatform.windows]
-              .contains(defaultTargetPlatform));
+        InAppBrowser.isMethodSupported(PlatformInAppBrowserMethod.close),
+        true,
+      );
       expect(
-          InAppBrowser.isEventMethodSupported(
-              PlatformInAppBrowserEventsMethod.onAcceleratorKeyPressed),
-          defaultTargetPlatform == TargetPlatform.windows);
+        InAppBrowser.isMethodSupported(PlatformInAppBrowserMethod.hide),
+        true,
+      );
+      expect(
+        InAppBrowser.isMethodSupported(PlatformInAppBrowserMethod.show),
+        true,
+      );
+      expect(
+        InAppBrowser.isEventMethodSupported(
+          PlatformInAppBrowserEventsMethod.onWebContentProcessDidTerminate,
+        ),
+        [
+          TargetPlatform.iOS,
+          TargetPlatform.macOS,
+          TargetPlatform.windows,
+        ].contains(defaultTargetPlatform),
+      );
+      expect(
+        InAppBrowser.isEventMethodSupported(
+          PlatformInAppBrowserEventsMethod.onAcceleratorKeyPressed,
+        ),
+        defaultTargetPlatform == TargetPlatform.windows,
+      );
 
       expect(
-          InAppBrowserSettings.isPropertySupported(
-              InAppBrowserSettingsProperty.toolbarBottomTintColor),
-          defaultTargetPlatform == TargetPlatform.iOS);
+        InAppBrowserSettings.isPropertySupported(
+          InAppBrowserSettingsProperty.toolbarBottomTintColor,
+        ),
+        defaultTargetPlatform == TargetPlatform.iOS,
+      );
       expect(
-          InAppBrowserSettings.isPropertySupported(
-              InAppBrowserSettingsProperty.hidden),
-          true);
+        InAppBrowserSettings.isPropertySupported(
+          InAppBrowserSettingsProperty.hidden,
+        ),
+        true,
+      );
       expect(
-          InAppBrowserSettings.isPropertySupported(
-              InAppBrowserSettingsProperty.closeOnCannotGoBack),
-          defaultTargetPlatform == TargetPlatform.android);
+        InAppBrowserSettings.isPropertySupported(
+          InAppBrowserSettingsProperty.closeOnCannotGoBack,
+        ),
+        defaultTargetPlatform == TargetPlatform.android,
+      );
     }, skip: false);
   }, skip: false);
 }

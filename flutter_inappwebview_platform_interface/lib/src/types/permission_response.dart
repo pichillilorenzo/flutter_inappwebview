@@ -18,9 +18,10 @@ class PermissionResponse_ {
   ///Indicate the [PermissionResponseAction] to take in response of a permission request.
   PermissionResponseAction_? action;
 
-  PermissionResponse_(
-      {this.resources = const [],
-      this.action = PermissionResponseAction_.DENY});
+  PermissionResponse_({
+    this.resources = const [],
+    this.action = PermissionResponseAction_.DENY,
+  });
 }
 
 ///Class that represents the response used by the [PlatformWebViewCreationParams.androidOnPermissionRequest] event.
@@ -34,7 +35,8 @@ class PermissionRequestResponse_ {
   ///Indicate the [PermissionRequestResponseAction] to take in response of a permission request.
   PermissionRequestResponseAction_? action;
 
-  PermissionRequestResponse_(
-      {this.resources = const [],
-      this.action = PermissionRequestResponseAction_.DENY});
+  PermissionRequestResponse_({
+    this.resources = const [],
+    this.action = PermissionRequestResponseAction_.DENY,
+  });
 }

@@ -1,10 +1,12 @@
 #include "../in_app_browser/in_app_browser.h"
+#include "../print_job/print_job_settings.h"
 #include "../types/base_callback_result.h"
 #include "../types/content_world.h"
 #include "../utils/flutter.h"
 #include "../utils/log.h"
 #include "../utils/strconv.h"
 #include "../utils/string.h"
+#include "../utils/uuid.h"
 #include "in_app_webview.h"
 #include "webview_channel_delegate.h"
 
@@ -106,6 +108,46 @@ namespace flutter_inappwebview_plugin
       };
   }
 
+  WebViewChannelDelegate::LaunchingExternalUriSchemeCallback::LaunchingExternalUriSchemeCallback()
+  {
+    decodeResult = [](const flutter::EncodableValue* value)
+      {
+        return value == nullptr || value->IsNull() ? std::optional<std::shared_ptr<LaunchingExternalUriSchemeResponse>>{} : std::make_shared<LaunchingExternalUriSchemeResponse>(std::get<flutter::EncodableMap>(*value));
+      };
+  }
+
+  WebViewChannelDelegate::NotificationReceivedCallback::NotificationReceivedCallback()
+  {
+    decodeResult = [](const flutter::EncodableValue* value)
+      {
+        return value == nullptr || value->IsNull() ? std::optional<std::shared_ptr<NotificationReceivedResponse>>{} : std::make_shared<NotificationReceivedResponse>(std::get<flutter::EncodableMap>(*value));
+      };
+  }
+
+  WebViewChannelDelegate::SaveAsUIShowingCallback::SaveAsUIShowingCallback()
+  {
+    decodeResult = [](const flutter::EncodableValue* value)
+      {
+        return value == nullptr || value->IsNull() ? std::optional<std::shared_ptr<SaveAsUIShowingResponse>>{} : std::make_shared<SaveAsUIShowingResponse>(std::get<flutter::EncodableMap>(*value));
+      };
+  }
+
+  WebViewChannelDelegate::SaveFileSecurityCheckStartingCallback::SaveFileSecurityCheckStartingCallback()
+  {
+    decodeResult = [](const flutter::EncodableValue* value)
+      {
+        return value == nullptr || value->IsNull() ? std::optional<std::shared_ptr<SaveFileSecurityCheckStartingResponse>>{} : std::make_shared<SaveFileSecurityCheckStartingResponse>(std::get<flutter::EncodableMap>(*value));
+      };
+  }
+
+  WebViewChannelDelegate::ScreenCaptureStartingCallback::ScreenCaptureStartingCallback()
+  {
+    decodeResult = [](const flutter::EncodableValue* value)
+      {
+        return value == nullptr || value->IsNull() ? std::optional<std::shared_ptr<ScreenCaptureStartingResponse>>{} : std::make_shared<ScreenCaptureStartingResponse>(std::get<flutter::EncodableMap>(*value));
+      };
+  }
+
   void WebViewChannelDelegate::HandleMethodCall(const flutter::MethodCall<flutter::EncodableValue>& method_call,
     std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result)
   {
@@ -121,7 +163,7 @@ namespace flutter_inappwebview_plugin
       result->Success(make_fl_value(webView->getUrl()));
     }
     else if (string_equals(methodName, "getTitle")) {
-      result->Success(make_fl_value(webView->getUrl()));
+      result->Success(make_fl_value(webView->getTitle()));
     }
     else if (string_equals(methodName, "loadUrl")) {
       auto urlRequest = std::make_unique<URLRequest>(get_fl_map_value<flutter::EncodableMap>(arguments, "urlRequest"));
@@ -227,6 +269,58 @@ namespace flutter_inappwebview_plugin
       webView->removeAllUserScripts();
       result->Success(true);
     }
+    else if (string_equals(methodName, "addWebMessageListener")) {
+      auto listenerValue = get_fl_map_value<flutter::EncodableMap>(arguments, "webMessageListener");
+      auto listenerId = get_fl_map_value<std::string>(listenerValue, "id");
+      auto jsObjectName = get_fl_map_value<std::string>(listenerValue, "jsObjectName");
+      auto allowedOriginRules = get_fl_map_value<std::vector<std::string>>(
+        listenerValue, "allowedOriginRules", std::vector<std::string>{});
+      if (!jsObjectName.empty() && !listenerId.empty()) {
+        webView->addWebMessageListener(jsObjectName, allowedOriginRules, listenerId);
+      }
+      result->Success(true);
+    }
+    else if (string_equals(methodName, "createWebMessageChannel")) {
+      auto result_ = std::shared_ptr<flutter::MethodResult<flutter::EncodableValue>>(std::move(result));
+      webView->createWebMessageChannel([result_ = std::move(result_)](const std::optional<std::string>& channelId)
+        {
+          if (channelId.has_value()) {
+            flutter::EncodableMap map = {
+              {make_fl_value("id"), make_fl_value(channelId.value())}
+            };
+            result_->Success(make_fl_value(map));
+          }
+          else {
+            result_->Success(make_fl_value());
+          }
+        });
+    }
+    else if (string_equals(methodName, "postWebMessage")) {
+      auto messageValue = get_fl_map_value<flutter::EncodableMap>(arguments, "message");
+      auto targetOrigin = get_fl_map_value<std::string>(arguments, "targetOrigin", "*");
+      std::string messageData = "";
+      int64_t messageType = 0;
+
+      if (fl_map_contains_not_null(messageValue, "type")) {
+        messageType = messageValue.at(make_fl_value("type")).LongValue();
+      }
+      if (fl_map_contains_not_null(messageValue, "data")) {
+        const auto& dataValue = messageValue.at(make_fl_value("data"));
+        if (std::holds_alternative<std::string>(dataValue)) {
+          messageData = std::get<std::string>(dataValue);
+        } else if (std::holds_alternative<std::vector<uint8_t>>(dataValue)) {
+          const auto& bytes = std::get<std::vector<uint8_t>>(dataValue);
+          for (size_t i = 0; i < bytes.size(); i++) {
+            if (i > 0) messageData += ",";
+            messageData += std::to_string(bytes[i]);
+          }
+          messageType = 1;
+        }
+      }
+
+      webView->postWebMessage(messageData, targetOrigin, messageType);
+      result->Success(true);
+    }
     else if (string_equals(methodName, "takeScreenshot")) {
       auto result_ = std::shared_ptr<flutter::MethodResult<flutter::EncodableValue>>(std::move(result));
       auto screenshotConfigurationMap = get_optional_fl_map_value<flutter::EncodableMap>(arguments, "screenshotConfiguration");
@@ -315,6 +409,133 @@ namespace flutter_inappwebview_plugin
     else if (string_equals(methodName, "getZoomScale")) {
       result->Success(webView->getZoomScale());
     }
+    else if (string_equals(methodName, "getProgress")) {
+      result->Success(webView->getProgress());
+    }
+    else if (string_equals(methodName, "getOriginalUrl")) {
+      // WebView2 does not distinguish between original and current URL
+      result->Success(make_fl_value(webView->getUrl()));
+    }
+    else if (string_equals(methodName, "getFrameId")) {
+      result->Success(make_fl_value(webView->getFrameId()));
+    }
+    else if (string_equals(methodName, "getMemoryUsageTargetLevel")) {
+      result->Success(make_fl_value(webView->getMemoryUsageTargetLevel()));
+    }
+    else if (string_equals(methodName, "setMemoryUsageTargetLevel")) {
+      auto level = get_fl_map_value<int64_t>(arguments, "level");
+      webView->setMemoryUsageTargetLevel(level);
+      result->Success(true);
+    }
+    else if (string_equals(methodName, "getFavicon")) {
+      auto result_ = std::shared_ptr<flutter::MethodResult<flutter::EncodableValue>>(std::move(result));
+      auto url = get_fl_map_value<std::string>(arguments, "url");
+      std::optional<std::string> targetUrl = url.empty() ? std::optional<std::string>{} : std::optional<std::string>{ url };
+      auto faviconImageFormat = FaviconImageFormatFromInteger(get_optional_fl_map_value<int64_t>(arguments, "faviconImageFormat"));
+      webView->getFavicon(targetUrl, faviconImageFormat, [result_ = std::move(result_)](const std::optional<std::vector<uint8_t>> data)
+        {
+          result_->Success(make_fl_value(data));
+        });
+    }
+    else if (string_equals(methodName, "showSaveAsUI")) {
+      auto result_ = std::shared_ptr<flutter::MethodResult<flutter::EncodableValue>>(std::move(result));
+      webView->showSaveAsUI([result_ = std::move(result_)](const std::optional<int64_t> value)
+        {
+          result_->Success(make_fl_value(value));
+        });
+    }
+    else if (string_equals(methodName, "scrollTo")) {
+      auto x = get_fl_map_value<int>(arguments, "x");
+      auto y = get_fl_map_value<int>(arguments, "y");
+      auto animated = get_fl_map_value<bool>(arguments, "animated", false);
+      webView->scrollTo(x, y, animated);
+      result->Success(true);
+    }
+    else if (string_equals(methodName, "scrollBy")) {
+      auto x = get_fl_map_value<int>(arguments, "x");
+      auto y = get_fl_map_value<int>(arguments, "y");
+      auto animated = get_fl_map_value<bool>(arguments, "animated", false);
+      webView->scrollBy(x, y, animated);
+      result->Success(true);
+    }
+    else if (string_equals(methodName, "getScrollX")) {
+      auto result_ = std::shared_ptr<flutter::MethodResult<flutter::EncodableValue>>(std::move(result));
+      webView->getScrollX([result_ = std::move(result_)](const std::optional<int64_t> value)
+        {
+          result_->Success(make_fl_value(value));
+        });
+    }
+    else if (string_equals(methodName, "getScrollY")) {
+      auto result_ = std::shared_ptr<flutter::MethodResult<flutter::EncodableValue>>(std::move(result));
+      webView->getScrollY([result_ = std::move(result_)](const std::optional<int64_t> value)
+        {
+          result_->Success(make_fl_value(value));
+        });
+    }
+    else if (string_equals(methodName, "getContentHeight")) {
+      auto result_ = std::shared_ptr<flutter::MethodResult<flutter::EncodableValue>>(std::move(result));
+      webView->getContentHeight([result_ = std::move(result_)](const std::optional<int64_t> value)
+        {
+          result_->Success(make_fl_value(value));
+        });
+    }
+    else if (string_equals(methodName, "getContentWidth")) {
+      auto result_ = std::shared_ptr<flutter::MethodResult<flutter::EncodableValue>>(std::move(result));
+      webView->getContentWidth([result_ = std::move(result_)](const std::optional<int64_t> value)
+        {
+          result_->Success(make_fl_value(value));
+        });
+    }
+    else if (string_equals(methodName, "isSecureContext")) {
+      auto result_ = std::shared_ptr<flutter::MethodResult<flutter::EncodableValue>>(std::move(result));
+      webView->isSecureContext([result_ = std::move(result_)](const bool value)
+        {
+          result_->Success(value);
+        });
+    }
+    else if (string_equals(methodName, "injectCSSCode")) {
+      auto source = get_fl_map_value<std::string>(arguments, "source");
+      webView->injectCSSCode(source);
+      result->Success(true);
+    }
+    else if (string_equals(methodName, "injectCSSFileFromUrl")) {
+      auto urlFile = get_fl_map_value<std::string>(arguments, "urlFile");
+      webView->injectCSSFileFromUrl(urlFile);
+      result->Success(true);
+    }
+    else if (string_equals(methodName, "printCurrentPage")) {
+      auto result_ = std::shared_ptr<flutter::MethodResult<flutter::EncodableValue>>(std::move(result));
+      auto settingsMap = get_optional_fl_map_value<flutter::EncodableMap>(arguments, "settings");
+      std::shared_ptr<PrintJobSettings> settings = settingsMap.has_value() 
+        ? std::make_shared<PrintJobSettings>(settingsMap.value()) 
+        : nullptr;
+      webView->printCurrentPage(settings, [result_ = std::move(result_)](const std::optional<std::string>& printJobId)
+        {
+          result_->Success(make_fl_value(printJobId));
+        });
+    }
+    else if (string_equals(methodName, "createPdf")) {
+      auto result_ = std::shared_ptr<flutter::MethodResult<flutter::EncodableValue>>(std::move(result));
+      
+      // Parse settings from pdfConfiguration if provided
+      std::shared_ptr<PrintJobSettings> settings = nullptr;
+      if (fl_map_contains_not_null(arguments, "pdfConfiguration")) {
+        auto pdfConfig = get_fl_map_value<flutter::EncodableMap>(arguments, "pdfConfiguration");
+        if (fl_map_contains_not_null(pdfConfig, "settings")) {
+          auto settingsMap = get_fl_map_value<flutter::EncodableMap>(pdfConfig, "settings");
+          settings = std::make_shared<PrintJobSettings>(settingsMap);
+        }
+      }
+      
+      webView->createPdf(settings, [result_ = std::move(result_)](const std::optional<std::vector<uint8_t>>& pdfData)
+        {
+          if (pdfData.has_value()) {
+            result_->Success(flutter::EncodableValue(pdfData.value()));
+          } else {
+            result_->Success(flutter::EncodableValue());
+          }
+        });
+    }
     // for inAppBrowser
     else if (webView->inAppBrowser && string_equals(methodName, "show")) {
       webView->inAppBrowser->show();
@@ -355,6 +576,30 @@ namespace flutter_inappwebview_plugin
       {"url", make_fl_value(url)},
       });
     channel->InvokeMethod("onLoadStop", std::move(arguments));
+  }
+
+  void WebViewChannelDelegate::onContentLoading(const std::optional<std::string>& url) const
+  {
+    if (!channel) {
+      return;
+    }
+
+    auto arguments = std::make_unique<flutter::EncodableValue>(flutter::EncodableMap{
+      {"url", make_fl_value(url)},
+      });
+    channel->InvokeMethod("onContentLoading", std::move(arguments));
+  }
+
+  void WebViewChannelDelegate::onDOMContentLoaded(const std::optional<std::string>& url) const
+  {
+    if (!channel) {
+      return;
+    }
+
+    auto arguments = std::make_unique<flutter::EncodableValue>(flutter::EncodableMap{
+      {"url", make_fl_value(url)},
+      });
+    channel->InvokeMethod("onDOMContentLoaded", std::move(arguments));
   }
 
   void WebViewChannelDelegate::shouldOverrideUrlLoading(std::shared_ptr<NavigationAction> navigationAction, std::unique_ptr<ShouldOverrideUrlLoadingCallback> callback) const
@@ -574,7 +819,7 @@ namespace flutter_inappwebview_plugin
     }
 
     auto arguments = std::make_unique<flutter::EncodableValue>(detail->toEncodableMap());
-    channel->InvokeMethod("onDevToolsProtocolEventReceived", std::move(arguments));
+    channel->InvokeMethod("onRenderProcessGone", std::move(arguments));
   }
 
   void WebViewChannelDelegate::onRenderProcessUnresponsive(const std::optional<std::string>& url) const
@@ -640,6 +885,91 @@ namespace flutter_inappwebview_plugin
       {"newScale", make_fl_value(newScale)},
       });
     channel->InvokeMethod("onZoomScaleChanged", std::move(arguments));
+  }
+
+  void WebViewChannelDelegate::onEnterFullscreen() const
+  {
+    if (!channel) {
+      return;
+    }
+
+    auto arguments = std::make_unique<flutter::EncodableValue>(flutter::EncodableMap{});
+    channel->InvokeMethod("onEnterFullscreen", std::move(arguments));
+  }
+
+  void WebViewChannelDelegate::onExitFullscreen() const
+  {
+    if (!channel) {
+      return;
+    }
+
+    auto arguments = std::make_unique<flutter::EncodableValue>(flutter::EncodableMap{});
+    channel->InvokeMethod("onExitFullscreen", std::move(arguments));
+  }
+
+  void WebViewChannelDelegate::onFaviconChanged(std::shared_ptr<FaviconChangedRequest> request) const
+  {
+    if (!channel) {
+      return;
+    }
+
+    auto arguments = std::make_unique<flutter::EncodableValue>(request->toEncodableMap());
+    channel->InvokeMethod("onFaviconChanged", std::move(arguments));
+  }
+
+  void WebViewChannelDelegate::onLaunchingExternalUriScheme(std::shared_ptr<LaunchingExternalUriSchemeRequest> request, std::unique_ptr<LaunchingExternalUriSchemeCallback> callback) const
+  {
+    if (!channel) {
+      callback->defaultBehaviour(std::nullopt);
+      return;
+    }
+
+    auto arguments = std::make_unique<flutter::EncodableValue>(request->toEncodableMap());
+    channel->InvokeMethod("onLaunchingExternalUriScheme", std::move(arguments), std::move(callback));
+  }
+
+  void WebViewChannelDelegate::onNotificationReceived(std::shared_ptr<NotificationReceivedRequest> request, std::unique_ptr<NotificationReceivedCallback> callback) const
+  {
+    if (!channel) {
+      callback->defaultBehaviour(std::nullopt);
+      return;
+    }
+
+    auto arguments = std::make_unique<flutter::EncodableValue>(request->toEncodableMap());
+    channel->InvokeMethod("onNotificationReceived", std::move(arguments), std::move(callback));
+  }
+
+  void WebViewChannelDelegate::onSaveAsUIShowing(std::shared_ptr<SaveAsUIShowingRequest> request, std::unique_ptr<SaveAsUIShowingCallback> callback) const
+  {
+    if (!channel) {
+      callback->defaultBehaviour(std::nullopt);
+      return;
+    }
+
+    auto arguments = std::make_unique<flutter::EncodableValue>(request->toEncodableMap());
+    channel->InvokeMethod("onSaveAsUIShowing", std::move(arguments), std::move(callback));
+  }
+
+  void WebViewChannelDelegate::onSaveFileSecurityCheckStarting(std::shared_ptr<SaveFileSecurityCheckStartingRequest> request, std::unique_ptr<SaveFileSecurityCheckStartingCallback> callback) const
+  {
+    if (!channel) {
+      callback->defaultBehaviour(std::nullopt);
+      return;
+    }
+
+    auto arguments = std::make_unique<flutter::EncodableValue>(request->toEncodableMap());
+    channel->InvokeMethod("onSaveFileSecurityCheckStarting", std::move(arguments), std::move(callback));
+  }
+
+  void WebViewChannelDelegate::onScreenCaptureStarting(std::shared_ptr<ScreenCaptureStartingRequest> request, std::unique_ptr<ScreenCaptureStartingCallback> callback) const
+  {
+    if (!channel) {
+      callback->defaultBehaviour(std::nullopt);
+      return;
+    }
+
+    auto arguments = std::make_unique<flutter::EncodableValue>(request->toEncodableMap());
+    channel->InvokeMethod("onScreenCaptureStarting", std::move(arguments), std::move(callback));
   }
 
   WebViewChannelDelegate::~WebViewChannelDelegate()

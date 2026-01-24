@@ -55,8 +55,9 @@ class AndroidLayoutInDisplayCutoutMode_ {
   ///Content renders into the cutout area in both portrait and landscape modes.
   ///
   ///**NOTE**: available on Android 28+.
-  static const SHORT_EDGES =
-      const AndroidLayoutInDisplayCutoutMode_._internal(1);
+  static const SHORT_EDGES = const AndroidLayoutInDisplayCutoutMode_._internal(
+    1,
+  );
 
   ///Content never renders into the cutout area.
   ///

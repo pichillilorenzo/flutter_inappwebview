@@ -11,10 +11,11 @@ class JsBeforeUnloadResponseAction {
   final int _value;
   final int _nativeValue;
   const JsBeforeUnloadResponseAction._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory JsBeforeUnloadResponseAction._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      JsBeforeUnloadResponseAction._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => JsBeforeUnloadResponseAction._internal(value, nativeValue());
 
   ///Confirm that the user hit cancel button.
   static const CANCEL = JsBeforeUnloadResponseAction._internal(1, 1);
@@ -32,8 +33,9 @@ class JsBeforeUnloadResponseAction {
   static JsBeforeUnloadResponseAction? fromValue(int? value) {
     if (value != null) {
       try {
-        return JsBeforeUnloadResponseAction.values
-            .firstWhere((element) => element.toValue() == value);
+        return JsBeforeUnloadResponseAction.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -45,8 +47,9 @@ class JsBeforeUnloadResponseAction {
   static JsBeforeUnloadResponseAction? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return JsBeforeUnloadResponseAction.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return JsBeforeUnloadResponseAction.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -62,8 +65,9 @@ class JsBeforeUnloadResponseAction {
   static JsBeforeUnloadResponseAction? byName(String? name) {
     if (name != null) {
       try {
-        return JsBeforeUnloadResponseAction.values
-            .firstWhere((element) => element.name() == name);
+        return JsBeforeUnloadResponseAction.values.firstWhere(
+          (element) => element.name() == name,
+        );
       } catch (e) {
         return null;
       }
@@ -82,7 +86,7 @@ class JsBeforeUnloadResponseAction {
   static Map<String, JsBeforeUnloadResponseAction> asNameMap() =>
       <String, JsBeforeUnloadResponseAction>{
         for (final value in JsBeforeUnloadResponseAction.values)
-          value.name(): value
+          value.name(): value,
       };
 
   ///Gets [int] value.

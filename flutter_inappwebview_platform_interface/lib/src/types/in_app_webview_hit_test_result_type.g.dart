@@ -11,10 +11,11 @@ class InAppWebViewHitTestResultType {
   final int _value;
   final int _nativeValue;
   const InAppWebViewHitTestResultType._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory InAppWebViewHitTestResultType._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      InAppWebViewHitTestResultType._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => InAppWebViewHitTestResultType._internal(value, nativeValue());
 
   ///[InAppWebViewHitTestResult] for hitting an edit text area.
   static const EDIT_TEXT_TYPE = InAppWebViewHitTestResultType._internal(9, 9);
@@ -35,8 +36,10 @@ class InAppWebViewHitTestResultType {
   static const SRC_ANCHOR_TYPE = InAppWebViewHitTestResultType._internal(7, 7);
 
   ///[InAppWebViewHitTestResult] for hitting a HTML::a tag with src=http + HTML::img.
-  static const SRC_IMAGE_ANCHOR_TYPE =
-      InAppWebViewHitTestResultType._internal(8, 8);
+  static const SRC_IMAGE_ANCHOR_TYPE = InAppWebViewHitTestResultType._internal(
+    8,
+    8,
+  );
 
   ///Default [InAppWebViewHitTestResult], where the target is unknown.
   static const UNKNOWN_TYPE = InAppWebViewHitTestResultType._internal(0, 0);
@@ -57,8 +60,9 @@ class InAppWebViewHitTestResultType {
   static InAppWebViewHitTestResultType? fromValue(int? value) {
     if (value != null) {
       try {
-        return InAppWebViewHitTestResultType.values
-            .firstWhere((element) => element.toValue() == value);
+        return InAppWebViewHitTestResultType.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -70,8 +74,9 @@ class InAppWebViewHitTestResultType {
   static InAppWebViewHitTestResultType? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return InAppWebViewHitTestResultType.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return InAppWebViewHitTestResultType.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -87,8 +92,9 @@ class InAppWebViewHitTestResultType {
   static InAppWebViewHitTestResultType? byName(String? name) {
     if (name != null) {
       try {
-        return InAppWebViewHitTestResultType.values
-            .firstWhere((element) => element.name() == name);
+        return InAppWebViewHitTestResultType.values.firstWhere(
+          (element) => element.name() == name,
+        );
       } catch (e) {
         return null;
       }
@@ -107,7 +113,7 @@ class InAppWebViewHitTestResultType {
   static Map<String, InAppWebViewHitTestResultType> asNameMap() =>
       <String, InAppWebViewHitTestResultType>{
         for (final value in InAppWebViewHitTestResultType.values)
-          value.name(): value
+          value.name(): value,
       };
 
   ///Gets [int] value.

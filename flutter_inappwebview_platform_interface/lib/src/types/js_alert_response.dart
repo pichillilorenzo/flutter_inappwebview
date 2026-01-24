@@ -21,9 +21,10 @@ class JsAlertResponse_ {
   ///Action used to confirm that the user hit confirm button.
   JsAlertResponseAction_? action;
 
-  JsAlertResponse_(
-      {this.message = "",
-      this.handledByClient = false,
-      this.confirmButtonTitle = "",
-      this.action = JsAlertResponseAction_.CONFIRM});
+  JsAlertResponse_({
+    this.message = "",
+    this.handledByClient = false,
+    this.confirmButtonTitle = "",
+    this.action = JsAlertResponseAction_.CONFIRM,
+  });
 }

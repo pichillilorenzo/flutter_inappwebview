@@ -11,39 +11,82 @@ class URLProtectionSpaceAuthenticationMethod {
   final String _value;
   final String _nativeValue;
   const URLProtectionSpaceAuthenticationMethod._internal(
-      this._value, this._nativeValue);
-// ignore: unused_element
+    this._value,
+    this._nativeValue,
+  );
+  // ignore: unused_element
   factory URLProtectionSpaceAuthenticationMethod._internalMultiPlatform(
-          String value, Function nativeValue) =>
-      URLProtectionSpaceAuthenticationMethod._internal(value, nativeValue());
+    String value,
+    Function nativeValue,
+  ) => URLProtectionSpaceAuthenticationMethod._internal(value, nativeValue());
 
   ///Use client certificate authentication for this protection space.
   static const NSURL_AUTHENTICATION_METHOD_CLIENT_CERTIFICATE =
       URLProtectionSpaceAuthenticationMethod._internal(
-          'NSURLAuthenticationMethodClientCertificate',
-          'NSURLAuthenticationMethodClientCertificate');
+        'NSURLAuthenticationMethodClientCertificate',
+        'NSURLAuthenticationMethodClientCertificate',
+      );
+
+  ///Use the default authentication method for a protocol.
+  static const NSURL_AUTHENTICATION_METHOD_DEFAULT =
+      URLProtectionSpaceAuthenticationMethod._internal(
+        'NSURLAuthenticationMethodDefault',
+        'NSURLAuthenticationMethodDefault',
+      );
+
+  ///Use HTML form authentication for this protection space.
+  static const NSURL_AUTHENTICATION_METHOD_HTML_FORM =
+      URLProtectionSpaceAuthenticationMethod._internal(
+        'NSURLAuthenticationMethodHTMLForm',
+        'NSURLAuthenticationMethodHTMLForm',
+      );
+
+  ///Use HTTP basic authentication for this protection space.
+  static const NSURL_AUTHENTICATION_METHOD_HTTP_BASIC =
+      URLProtectionSpaceAuthenticationMethod._internal(
+        'NSURLAuthenticationMethodHTTPBasic',
+        'NSURLAuthenticationMethodHTTPBasic',
+      );
+
+  ///Use HTTP digest authentication for this protection space.
+  static const NSURL_AUTHENTICATION_METHOD_HTTP_DIGEST =
+      URLProtectionSpaceAuthenticationMethod._internal(
+        'NSURLAuthenticationMethodHTTPDigest',
+        'NSURLAuthenticationMethodHTTPDigest',
+      );
 
   ///Negotiate whether to use Kerberos or NTLM authentication for this protection space.
   static const NSURL_AUTHENTICATION_METHOD_NEGOTIATE =
       URLProtectionSpaceAuthenticationMethod._internal(
-          'NSURLAuthenticationMethodNegotiate',
-          'NSURLAuthenticationMethodNegotiate');
+        'NSURLAuthenticationMethodNegotiate',
+        'NSURLAuthenticationMethodNegotiate',
+      );
 
   ///Use NTLM authentication for this protection space.
   static const NSURL_AUTHENTICATION_METHOD_NTLM =
       URLProtectionSpaceAuthenticationMethod._internal(
-          'NSURLAuthenticationMethodNTLM', 'NSURLAuthenticationMethodNTLM');
+        'NSURLAuthenticationMethodNTLM',
+        'NSURLAuthenticationMethodNTLM',
+      );
 
   ///Perform server trust authentication (certificate validation) for this protection space.
   static const NSURL_AUTHENTICATION_METHOD_SERVER_TRUST =
       URLProtectionSpaceAuthenticationMethod._internal(
-          'NSURLAuthenticationMethodServerTrust',
-          'NSURLAuthenticationMethodServerTrust');
+        'NSURLAuthenticationMethodServerTrust',
+        'NSURLAuthenticationMethodServerTrust',
+      );
 
   ///Set of all values of [URLProtectionSpaceAuthenticationMethod].
   static final Set<URLProtectionSpaceAuthenticationMethod> values = [
     URLProtectionSpaceAuthenticationMethod
         .NSURL_AUTHENTICATION_METHOD_CLIENT_CERTIFICATE,
+    URLProtectionSpaceAuthenticationMethod.NSURL_AUTHENTICATION_METHOD_DEFAULT,
+    URLProtectionSpaceAuthenticationMethod
+        .NSURL_AUTHENTICATION_METHOD_HTML_FORM,
+    URLProtectionSpaceAuthenticationMethod
+        .NSURL_AUTHENTICATION_METHOD_HTTP_BASIC,
+    URLProtectionSpaceAuthenticationMethod
+        .NSURL_AUTHENTICATION_METHOD_HTTP_DIGEST,
     URLProtectionSpaceAuthenticationMethod
         .NSURL_AUTHENTICATION_METHOD_NEGOTIATE,
     URLProtectionSpaceAuthenticationMethod.NSURL_AUTHENTICATION_METHOD_NTLM,
@@ -55,8 +98,9 @@ class URLProtectionSpaceAuthenticationMethod {
   static URLProtectionSpaceAuthenticationMethod? fromValue(String? value) {
     if (value != null) {
       try {
-        return URLProtectionSpaceAuthenticationMethod.values
-            .firstWhere((element) => element.toValue() == value);
+        return URLProtectionSpaceAuthenticationMethod.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -66,11 +110,13 @@ class URLProtectionSpaceAuthenticationMethod {
 
   ///Gets a possible [URLProtectionSpaceAuthenticationMethod] instance from a native value.
   static URLProtectionSpaceAuthenticationMethod? fromNativeValue(
-      String? value) {
+    String? value,
+  ) {
     if (value != null) {
       try {
-        return URLProtectionSpaceAuthenticationMethod.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return URLProtectionSpaceAuthenticationMethod.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -86,8 +132,9 @@ class URLProtectionSpaceAuthenticationMethod {
   static URLProtectionSpaceAuthenticationMethod? byName(String? name) {
     if (name != null) {
       try {
-        return URLProtectionSpaceAuthenticationMethod.values
-            .firstWhere((element) => element.name() == name);
+        return URLProtectionSpaceAuthenticationMethod.values.firstWhere(
+          (element) => element.name() == name,
+        );
       } catch (e) {
         return null;
       }
@@ -106,7 +153,7 @@ class URLProtectionSpaceAuthenticationMethod {
   static Map<String, URLProtectionSpaceAuthenticationMethod> asNameMap() =>
       <String, URLProtectionSpaceAuthenticationMethod>{
         for (final value in URLProtectionSpaceAuthenticationMethod.values)
-          value.name(): value
+          value.name(): value,
       };
 
   ///Gets [String] value.
@@ -120,6 +167,14 @@ class URLProtectionSpaceAuthenticationMethod {
     switch (_value) {
       case 'NSURLAuthenticationMethodClientCertificate':
         return 'NSURL_AUTHENTICATION_METHOD_CLIENT_CERTIFICATE';
+      case 'NSURLAuthenticationMethodDefault':
+        return 'NSURL_AUTHENTICATION_METHOD_DEFAULT';
+      case 'NSURLAuthenticationMethodHTMLForm':
+        return 'NSURL_AUTHENTICATION_METHOD_HTML_FORM';
+      case 'NSURLAuthenticationMethodHTTPBasic':
+        return 'NSURL_AUTHENTICATION_METHOD_HTTP_BASIC';
+      case 'NSURLAuthenticationMethodHTTPDigest':
+        return 'NSURL_AUTHENTICATION_METHOD_HTTP_DIGEST';
       case 'NSURLAuthenticationMethodNegotiate':
         return 'NSURL_AUTHENTICATION_METHOD_NEGOTIATE';
       case 'NSURLAuthenticationMethodNTLM':
@@ -154,40 +209,86 @@ class IOSNSURLProtectionSpaceAuthenticationMethod {
   final String _value;
   final String _nativeValue;
   const IOSNSURLProtectionSpaceAuthenticationMethod._internal(
-      this._value, this._nativeValue);
-// ignore: unused_element
+    this._value,
+    this._nativeValue,
+  );
+  // ignore: unused_element
   factory IOSNSURLProtectionSpaceAuthenticationMethod._internalMultiPlatform(
-          String value, Function nativeValue) =>
-      IOSNSURLProtectionSpaceAuthenticationMethod._internal(
-          value, nativeValue());
+    String value,
+    Function nativeValue,
+  ) => IOSNSURLProtectionSpaceAuthenticationMethod._internal(
+    value,
+    nativeValue(),
+  );
 
   ///Use client certificate authentication for this protection space.
   static const NSURL_AUTHENTICATION_METHOD_CLIENT_CERTIFICATE =
       IOSNSURLProtectionSpaceAuthenticationMethod._internal(
-          'NSURLAuthenticationMethodClientCertificate',
-          'NSURLAuthenticationMethodClientCertificate');
+        'NSURLAuthenticationMethodClientCertificate',
+        'NSURLAuthenticationMethodClientCertificate',
+      );
+
+  ///Use the default authentication method for a protocol.
+  static const NSURL_AUTHENTICATION_METHOD_DEFAULT =
+      IOSNSURLProtectionSpaceAuthenticationMethod._internal(
+        'NSURLAuthenticationMethodDefault',
+        'NSURLAuthenticationMethodDefault',
+      );
+
+  ///Use HTML form authentication for this protection space.
+  static const NSURL_AUTHENTICATION_METHOD_HTML_FORM =
+      IOSNSURLProtectionSpaceAuthenticationMethod._internal(
+        'NSURLAuthenticationMethodHTMLForm',
+        'NSURLAuthenticationMethodHTMLForm',
+      );
+
+  ///Use HTTP basic authentication for this protection space.
+  static const NSURL_AUTHENTICATION_METHOD_HTTP_BASIC =
+      IOSNSURLProtectionSpaceAuthenticationMethod._internal(
+        'NSURLAuthenticationMethodHTTPBasic',
+        'NSURLAuthenticationMethodHTTPBasic',
+      );
+
+  ///Use HTTP digest authentication for this protection space.
+  static const NSURL_AUTHENTICATION_METHOD_HTTP_DIGEST =
+      IOSNSURLProtectionSpaceAuthenticationMethod._internal(
+        'NSURLAuthenticationMethodHTTPDigest',
+        'NSURLAuthenticationMethodHTTPDigest',
+      );
 
   ///Negotiate whether to use Kerberos or NTLM authentication for this protection space.
   static const NSURL_AUTHENTICATION_METHOD_NEGOTIATE =
       IOSNSURLProtectionSpaceAuthenticationMethod._internal(
-          'NSURLAuthenticationMethodNegotiate',
-          'NSURLAuthenticationMethodNegotiate');
+        'NSURLAuthenticationMethodNegotiate',
+        'NSURLAuthenticationMethodNegotiate',
+      );
 
   ///Use NTLM authentication for this protection space.
   static const NSURL_AUTHENTICATION_METHOD_NTLM =
       IOSNSURLProtectionSpaceAuthenticationMethod._internal(
-          'NSURLAuthenticationMethodNTLM', 'NSURLAuthenticationMethodNTLM');
+        'NSURLAuthenticationMethodNTLM',
+        'NSURLAuthenticationMethodNTLM',
+      );
 
   ///Perform server trust authentication (certificate validation) for this protection space.
   static const NSURL_AUTHENTICATION_METHOD_SERVER_TRUST =
       IOSNSURLProtectionSpaceAuthenticationMethod._internal(
-          'NSURLAuthenticationMethodServerTrust',
-          'NSURLAuthenticationMethodServerTrust');
+        'NSURLAuthenticationMethodServerTrust',
+        'NSURLAuthenticationMethodServerTrust',
+      );
 
   ///Set of all values of [IOSNSURLProtectionSpaceAuthenticationMethod].
   static final Set<IOSNSURLProtectionSpaceAuthenticationMethod> values = [
     IOSNSURLProtectionSpaceAuthenticationMethod
         .NSURL_AUTHENTICATION_METHOD_CLIENT_CERTIFICATE,
+    IOSNSURLProtectionSpaceAuthenticationMethod
+        .NSURL_AUTHENTICATION_METHOD_DEFAULT,
+    IOSNSURLProtectionSpaceAuthenticationMethod
+        .NSURL_AUTHENTICATION_METHOD_HTML_FORM,
+    IOSNSURLProtectionSpaceAuthenticationMethod
+        .NSURL_AUTHENTICATION_METHOD_HTTP_BASIC,
+    IOSNSURLProtectionSpaceAuthenticationMethod
+        .NSURL_AUTHENTICATION_METHOD_HTTP_DIGEST,
     IOSNSURLProtectionSpaceAuthenticationMethod
         .NSURL_AUTHENTICATION_METHOD_NEGOTIATE,
     IOSNSURLProtectionSpaceAuthenticationMethod
@@ -200,8 +301,9 @@ class IOSNSURLProtectionSpaceAuthenticationMethod {
   static IOSNSURLProtectionSpaceAuthenticationMethod? fromValue(String? value) {
     if (value != null) {
       try {
-        return IOSNSURLProtectionSpaceAuthenticationMethod.values
-            .firstWhere((element) => element.toValue() == value);
+        return IOSNSURLProtectionSpaceAuthenticationMethod.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -211,11 +313,13 @@ class IOSNSURLProtectionSpaceAuthenticationMethod {
 
   ///Gets a possible [IOSNSURLProtectionSpaceAuthenticationMethod] instance from a native value.
   static IOSNSURLProtectionSpaceAuthenticationMethod? fromNativeValue(
-      String? value) {
+    String? value,
+  ) {
     if (value != null) {
       try {
-        return IOSNSURLProtectionSpaceAuthenticationMethod.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return IOSNSURLProtectionSpaceAuthenticationMethod.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -231,8 +335,9 @@ class IOSNSURLProtectionSpaceAuthenticationMethod {
   static IOSNSURLProtectionSpaceAuthenticationMethod? byName(String? name) {
     if (name != null) {
       try {
-        return IOSNSURLProtectionSpaceAuthenticationMethod.values
-            .firstWhere((element) => element.name() == name);
+        return IOSNSURLProtectionSpaceAuthenticationMethod.values.firstWhere(
+          (element) => element.name() == name,
+        );
       } catch (e) {
         return null;
       }
@@ -251,7 +356,7 @@ class IOSNSURLProtectionSpaceAuthenticationMethod {
   static Map<String, IOSNSURLProtectionSpaceAuthenticationMethod> asNameMap() =>
       <String, IOSNSURLProtectionSpaceAuthenticationMethod>{
         for (final value in IOSNSURLProtectionSpaceAuthenticationMethod.values)
-          value.name(): value
+          value.name(): value,
       };
 
   ///Gets [String] value.
@@ -265,6 +370,14 @@ class IOSNSURLProtectionSpaceAuthenticationMethod {
     switch (_value) {
       case 'NSURLAuthenticationMethodClientCertificate':
         return 'NSURL_AUTHENTICATION_METHOD_CLIENT_CERTIFICATE';
+      case 'NSURLAuthenticationMethodDefault':
+        return 'NSURL_AUTHENTICATION_METHOD_DEFAULT';
+      case 'NSURLAuthenticationMethodHTMLForm':
+        return 'NSURL_AUTHENTICATION_METHOD_HTML_FORM';
+      case 'NSURLAuthenticationMethodHTTPBasic':
+        return 'NSURL_AUTHENTICATION_METHOD_HTTP_BASIC';
+      case 'NSURLAuthenticationMethodHTTPDigest':
+        return 'NSURL_AUTHENTICATION_METHOD_HTTP_DIGEST';
       case 'NSURLAuthenticationMethodNegotiate':
         return 'NSURL_AUTHENTICATION_METHOD_NEGOTIATE';
       case 'NSURLAuthenticationMethodNTLM':

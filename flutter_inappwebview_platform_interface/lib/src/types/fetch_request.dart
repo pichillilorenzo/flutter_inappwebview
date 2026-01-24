@@ -11,20 +11,28 @@ import 'referrer_policy.dart';
 
 part 'fetch_request.g.dart';
 
-FetchRequestCredential? _fetchRequestCredentialDeserializer(dynamic value,
-    {EnumMethod? enumMethod}) {
+FetchRequestCredential? _fetchRequestCredentialDeserializer(
+  dynamic value, {
+  EnumMethod? enumMethod,
+}) {
   Map<String, dynamic>? credentialMap = value?.cast<String, dynamic>();
   FetchRequestCredential? credentials;
   if (credentialMap != null) {
     if (credentialMap["type"] == "default") {
-      credentials = FetchRequestCredentialDefault.fromMap(credentialMap,
-          enumMethod: enumMethod);
+      credentials = FetchRequestCredentialDefault.fromMap(
+        credentialMap,
+        enumMethod: enumMethod,
+      );
     } else if (credentialMap["type"] == "federated") {
-      credentials = FetchRequestFederatedCredential.fromMap(credentialMap,
-          enumMethod: enumMethod);
+      credentials = FetchRequestFederatedCredential.fromMap(
+        credentialMap,
+        enumMethod: enumMethod,
+      );
     } else if (credentialMap["type"] == "password") {
-      credentials = FetchRequestPasswordCredential.fromMap(credentialMap,
-          enumMethod: enumMethod);
+      credentials = FetchRequestPasswordCredential.fromMap(
+        credentialMap,
+        enumMethod: enumMethod,
+      );
     }
   }
   return credentials;
@@ -73,18 +81,19 @@ class FetchRequest_ {
   ///Indicates the [FetchRequestAction] that can be used to control the request.
   FetchRequestAction_? action;
 
-  FetchRequest_(
-      {this.url,
-      this.method,
-      this.headers,
-      this.body,
-      this.mode,
-      this.credentials,
-      this.cache,
-      this.redirect,
-      this.referrer,
-      this.referrerPolicy,
-      this.integrity,
-      this.keepalive,
-      this.action = FetchRequestAction_.PROCEED});
+  FetchRequest_({
+    this.url,
+    this.method,
+    this.headers,
+    this.body,
+    this.mode,
+    this.credentials,
+    this.cache,
+    this.redirect,
+    this.referrer,
+    this.referrerPolicy,
+    this.integrity,
+    this.keepalive,
+    this.action = FetchRequestAction_.PROCEED,
+  });
 }

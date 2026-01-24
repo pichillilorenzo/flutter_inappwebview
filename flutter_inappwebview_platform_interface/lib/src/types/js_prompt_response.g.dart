@@ -28,29 +28,31 @@ class JsPromptResponse {
 
   ///Value of the prompt dialog.
   String? value;
-  JsPromptResponse(
-      {this.action = JsPromptResponseAction.CANCEL,
-      this.cancelButtonTitle = "",
-      this.confirmButtonTitle = "",
-      this.defaultValue = "",
-      this.handledByClient = false,
-      this.message = "",
-      this.value});
+  JsPromptResponse({
+    this.action = JsPromptResponseAction.CANCEL,
+    this.cancelButtonTitle = "",
+    this.confirmButtonTitle = "",
+    this.defaultValue = "",
+    this.handledByClient = false,
+    this.message = "",
+    this.value,
+  });
 
   ///Gets a possible [JsPromptResponse] instance from a [Map] value.
-  static JsPromptResponse? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static JsPromptResponse? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
-    final instance = JsPromptResponse(
-      value: map['value'],
-    );
+    final instance = JsPromptResponse(value: map['value']);
     instance.action = switch (enumMethod ?? EnumMethod.nativeValue) {
-      EnumMethod.nativeValue =>
-        JsPromptResponseAction.fromNativeValue(map['action']),
+      EnumMethod.nativeValue => JsPromptResponseAction.fromNativeValue(
+        map['action'],
+      ),
       EnumMethod.value => JsPromptResponseAction.fromValue(map['action']),
-      EnumMethod.name => JsPromptResponseAction.byName(map['action'])
+      EnumMethod.name => JsPromptResponseAction.byName(map['action']),
     };
     if (map['cancelButtonTitle'] != null) {
       instance.cancelButtonTitle = map['cancelButtonTitle'];
@@ -76,7 +78,7 @@ class JsPromptResponse {
       "action": switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => action?.toNativeValue(),
         EnumMethod.value => action?.toValue(),
-        EnumMethod.name => action?.name()
+        EnumMethod.name => action?.name(),
       },
       "cancelButtonTitle": cancelButtonTitle,
       "confirmButtonTitle": confirmButtonTitle,

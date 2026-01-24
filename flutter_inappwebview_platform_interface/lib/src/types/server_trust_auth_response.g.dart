@@ -13,18 +13,22 @@ class ServerTrustAuthResponse {
   ServerTrustAuthResponse({this.action = ServerTrustAuthResponseAction.CANCEL});
 
   ///Gets a possible [ServerTrustAuthResponse] instance from a [Map] value.
-  static ServerTrustAuthResponse? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static ServerTrustAuthResponse? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
     final instance = ServerTrustAuthResponse();
     instance.action = switch (enumMethod ?? EnumMethod.nativeValue) {
-      EnumMethod.nativeValue =>
-        ServerTrustAuthResponseAction.fromNativeValue(map['action']),
-      EnumMethod.value =>
-        ServerTrustAuthResponseAction.fromValue(map['action']),
-      EnumMethod.name => ServerTrustAuthResponseAction.byName(map['action'])
+      EnumMethod.nativeValue => ServerTrustAuthResponseAction.fromNativeValue(
+        map['action'],
+      ),
+      EnumMethod.value => ServerTrustAuthResponseAction.fromValue(
+        map['action'],
+      ),
+      EnumMethod.name => ServerTrustAuthResponseAction.byName(map['action']),
     };
     return instance;
   }
@@ -35,7 +39,7 @@ class ServerTrustAuthResponse {
       "action": switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => action?.toNativeValue(),
         EnumMethod.value => action?.toValue(),
-        EnumMethod.name => action?.name()
+        EnumMethod.name => action?.name(),
       },
     };
   }

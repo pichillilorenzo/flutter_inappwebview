@@ -34,23 +34,28 @@ class ChromeSafariBrowserMenuItem {
   ///- Android WebView:
   ///    - Not available in an Android Trusted Web Activity.
   ///- iOS WKWebView
-  ChromeSafariBrowserMenuItem(
-      {required this.id,
-      required this.label,
-      this.image,
-      @Deprecated("Use onClick instead") this.action,
-      this.onClick});
+  ChromeSafariBrowserMenuItem({
+    required this.id,
+    required this.label,
+    this.image,
+    @Deprecated("Use onClick instead") this.action,
+    this.onClick,
+  });
 
   ///Gets a possible [ChromeSafariBrowserMenuItem] instance from a [Map] value.
-  static ChromeSafariBrowserMenuItem? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static ChromeSafariBrowserMenuItem? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
     final instance = ChromeSafariBrowserMenuItem(
       id: map['id'],
-      image: UIImage.fromMap(map['image']?.cast<String, dynamic>(),
-          enumMethod: enumMethod),
+      image: UIImage.fromMap(
+        map['image']?.cast<String, dynamic>(),
+        enumMethod: enumMethod,
+      ),
       label: map['label'],
     );
     return instance;

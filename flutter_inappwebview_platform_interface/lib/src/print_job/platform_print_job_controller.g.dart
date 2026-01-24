@@ -14,13 +14,18 @@ extension _PlatformPrintJobControllerCreationParamsClassSupported
   ///- Android WebView
   ///- iOS WKWebView
   ///- macOS WKWebView
+  ///- Windows WebView2
   ///
   ///Use the [PlatformPrintJobControllerCreationParams.isClassSupported] method to check if this class is supported at runtime.
   ///{@endtemplate}
   static bool isClassSupported({TargetPlatform? platform}) {
     return ((kIsWeb && platform != null) || !kIsWeb) &&
-        [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
-            .contains(platform ?? defaultTargetPlatform);
+        [
+          TargetPlatform.android,
+          TargetPlatform.iOS,
+          TargetPlatform.macOS,
+          TargetPlatform.windows,
+        ].contains(platform ?? defaultTargetPlatform);
   }
 }
 
@@ -34,6 +39,7 @@ enum PlatformPrintJobControllerCreationParamsProperty {
   ///- Android WebView
   ///- iOS WKWebView
   ///- macOS WKWebView
+  ///- Windows WebView2
   ///
   ///Use the [PlatformPrintJobControllerCreationParams.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
@@ -43,13 +49,18 @@ enum PlatformPrintJobControllerCreationParamsProperty {
 extension _PlatformPrintJobControllerCreationParamsPropertySupported
     on PlatformPrintJobControllerCreationParams {
   static bool isPropertySupported(
-      PlatformPrintJobControllerCreationParamsProperty property,
-      {TargetPlatform? platform}) {
+    PlatformPrintJobControllerCreationParamsProperty property, {
+    TargetPlatform? platform,
+  }) {
     switch (property) {
       case PlatformPrintJobControllerCreationParamsProperty.id:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
     }
   }
 }
@@ -62,13 +73,18 @@ extension _PlatformPrintJobControllerClassSupported
   ///- Android WebView
   ///- iOS WKWebView
   ///- macOS WKWebView
+  ///- Windows WebView2
   ///
   ///Use the [PlatformPrintJobController.isClassSupported] method to check if this class is supported at runtime.
   ///{@endtemplate}
   static bool isClassSupported({TargetPlatform? platform}) {
     return ((kIsWeb && platform != null) || !kIsWeb) &&
-        [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
-            .contains(platform ?? defaultTargetPlatform);
+        [
+          TargetPlatform.android,
+          TargetPlatform.iOS,
+          TargetPlatform.macOS,
+          TargetPlatform.windows,
+        ].contains(platform ?? defaultTargetPlatform);
   }
 }
 
@@ -83,6 +99,7 @@ enum PlatformPrintJobControllerProperty {
   ///    - `completed` is always `true` and `error` is always `null`.
   ///- iOS WKWebView ([Official API - UIPrintInteractionController.CompletionHandler](https://developer.apple.com/documentation/uikit/uiprintinteractioncontroller/completionhandler))
   ///- macOS WKWebView ([Official API - NSPrintOperation.runModal](https://developer.apple.com/documentation/appkit/nsprintoperation/1532065-runmodal))
+  ///- Windows WebView2
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [completed]: all platforms
@@ -95,13 +112,19 @@ enum PlatformPrintJobControllerProperty {
 
 extension _PlatformPrintJobControllerPropertySupported
     on PlatformPrintJobController {
-  static bool isPropertySupported(PlatformPrintJobControllerProperty property,
-      {TargetPlatform? platform}) {
+  static bool isPropertySupported(
+    PlatformPrintJobControllerProperty property, {
+    TargetPlatform? platform,
+  }) {
     switch (property) {
       case PlatformPrintJobControllerProperty.onComplete:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
     }
   }
 }
@@ -141,6 +164,7 @@ enum PlatformPrintJobControllerMethod {
   ///- Android WebView
   ///- iOS WKWebView
   ///- macOS WKWebView
+  ///- Windows WebView2
   ///
   ///Use the [PlatformPrintJobController.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
@@ -154,6 +178,7 @@ enum PlatformPrintJobControllerMethod {
   ///- Android WebView ([Official API - PrintJob.getInfo](https://developer.android.com/reference/android/print/PrintJob#getInfo()))
   ///- iOS WKWebView
   ///- macOS WKWebView
+  ///- Windows WebView2
   ///
   ///Use the [PlatformPrintJobController.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
@@ -173,28 +198,40 @@ enum PlatformPrintJobControllerMethod {
 
 extension _PlatformPrintJobControllerMethodSupported
     on PlatformPrintJobController {
-  static bool isMethodSupported(PlatformPrintJobControllerMethod method,
-      {TargetPlatform? platform}) {
+  static bool isMethodSupported(
+    PlatformPrintJobControllerMethod method, {
+    TargetPlatform? platform,
+  }) {
     switch (method) {
       case PlatformPrintJobControllerMethod.cancel:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformPrintJobControllerMethod.dismiss:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
       case PlatformPrintJobControllerMethod.dispose:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformPrintJobControllerMethod.getInfo:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformPrintJobControllerMethod.restart:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
     }
   }
 }

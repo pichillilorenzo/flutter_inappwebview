@@ -4,10 +4,10 @@
 # customers of the plugin.
 cmake_minimum_required(VERSION 3.14)
 
-set(WIL_VERSION "1.0.231216.1")
-set(WEBVIEW_VERSION "1.0.2849.39")
-set(NLOHMANN_JSON_VERSION "3.11.2")
-set(CPP_WINRT_VERSION "2.0.240405.15")
+set(WIL_VERSION "1.0.250325.1")
+set(WEBVIEW_VERSION "1.0.3650.58")
+set(NLOHMANN_JSON_VERSION "3.12.0")
+set(CPP_WINRT_VERSION "2.0.250303.1")
 
 message(VERBOSE "CMake system version is ${CMAKE_SYSTEM_VERSION} (using SDK ${CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION})")
 
@@ -133,6 +133,33 @@ list(APPEND PLUGIN_SOURCES
   "types/download_start_request.h"
   "types/download_start_response.cpp"
   "types/download_start_response.h"
+  "types/favicon_changed_request.cpp"
+  "types/favicon_changed_request.h"
+  "types/favicon_image_format.h"
+  "types/launching_external_uri_scheme_request.cpp"
+  "types/launching_external_uri_scheme_request.h"
+  "types/launching_external_uri_scheme_response.cpp"
+  "types/launching_external_uri_scheme_response.h"
+  "types/text_direction_kind.h"
+  "types/notification_received_request.cpp"
+  "types/notification_received_request.h"
+  "types/notification_received_response.cpp"
+  "types/notification_received_response.h"
+  "types/save_as_kind.h"
+  "types/save_as_ui_showing_request.cpp"
+  "types/save_as_ui_showing_request.h"
+  "types/save_as_ui_showing_response.cpp"
+  "types/save_as_ui_showing_response.h"
+  "types/save_file_security_check_starting_request.cpp"
+  "types/save_file_security_check_starting_request.h"
+  "types/save_file_security_check_starting_response.cpp"
+  "types/save_file_security_check_starting_response.h"
+  "types/screen_capture_starting_request.cpp"
+  "types/screen_capture_starting_request.h"
+  "types/screen_capture_starting_response.cpp"
+  "types/screen_capture_starting_response.h"
+  "types/web_notification.cpp"
+  "types/web_notification.h"
   "types/browser_process_exited_detail.cpp"
   "types/browser_process_exited_detail.h"
   "types/browser_process_info.cpp"
@@ -158,6 +185,32 @@ list(APPEND PLUGIN_SOURCES
   "custom_platform_view/util/swizzle.h"
   "plugin_scripts_js/plugin_scripts_util.h"
   "plugin_scripts_js/javascript_bridge_js.h"
+  "plugin_scripts_js/web_message_channel_js.h"
+  "plugin_scripts_js/web_message_listener_js.h"
+  "find_interaction/find_interaction_channel_delegate.cpp"
+  "find_interaction/find_interaction_channel_delegate.h"
+  "find_interaction/find_interaction_controller.cpp"
+  "find_interaction/find_interaction_controller.h"
+  "web_notification/web_notification_channel_delegate.cpp"
+  "web_notification/web_notification_channel_delegate.h"
+  "web_notification/web_notification_controller.cpp"
+  "web_notification/web_notification_controller.h"
+  "print_job/print_job_channel_delegate.cpp"
+  "print_job/print_job_channel_delegate.h"
+  "print_job/print_job_controller.cpp"
+  "print_job/print_job_controller.h"
+  "print_job/print_job_info.cpp"
+  "print_job/print_job_info.h"
+  "print_job/print_job_manager.cpp"
+  "print_job/print_job_manager.h"
+  "print_job/print_job_settings.cpp"
+  "print_job/print_job_settings.h"
+  "web_message/web_message_channel.cpp"
+  "web_message/web_message_channel.h"
+  "web_message/web_message_listener.cpp"
+  "web_message/web_message_listener.h"
+  "web_message/web_message_listener_channel_delegate.cpp"
+  "web_message/web_message_listener_channel_delegate.h"
   "webview_environment/webview_environment_settings.cpp"
   "webview_environment/webview_environment_settings.h"
   "webview_environment/webview_environment.cpp"
@@ -299,9 +352,15 @@ add_executable(${TEST_RUNNER}
   ${PLUGIN_SOURCES}
 )
 apply_standard_settings(${TEST_RUNNER})
+target_compile_options(${TEST_RUNNER} PRIVATE /bigobj)
+target_compile_options(${TEST_RUNNER} PRIVATE /WX-)
 target_include_directories(${TEST_RUNNER} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 target_link_libraries(${TEST_RUNNER} PRIVATE flutter_wrapper_plugin)
 target_link_libraries(${TEST_RUNNER} PRIVATE gtest_main gmock)
+add_dependencies(${TEST_RUNNER} ${PROJECT_NAME}_DEPS)
+target_link_libraries(${TEST_RUNNER} PRIVATE ${CMAKE_BINARY_DIR}/packages/Microsoft.Web.WebView2/build/native/Microsoft.Web.WebView2.targets)
+target_link_libraries(${TEST_RUNNER} PRIVATE ${CMAKE_BINARY_DIR}/packages/Microsoft.Windows.ImplementationLibrary/build/native/Microsoft.Windows.ImplementationLibrary.targets)
+target_link_libraries(${TEST_RUNNER} PRIVATE ${CMAKE_BINARY_DIR}/packages/nlohmann.json/build/native/nlohmann.json.targets)
 # flutter_wrapper_plugin has link dependencies on the Flutter DLL.
 add_custom_command(TARGET ${TEST_RUNNER} POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E copy_if_different

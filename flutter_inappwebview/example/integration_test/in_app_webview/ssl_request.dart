@@ -19,7 +19,8 @@ void sslRequest() {
         child: InAppWebView(
           key: GlobalKey(),
           initialUrlRequest: URLRequest(
-              url: WebUri("https://${environment["NODE_SERVER_IP"]}:4433/")),
+            url: WebUri("https://${environment["NODE_SERVER_IP"]}:4433/"),
+          ),
           onWebViewCreated: (controller) {
             controllerCompleter.complete(controller);
           },
@@ -28,14 +29,16 @@ void sslRequest() {
           },
           onReceivedServerTrustAuthRequest: (controller, challenge) async {
             return new ServerTrustAuthResponse(
-                action: ServerTrustAuthResponseAction.PROCEED);
+              action: ServerTrustAuthResponseAction.PROCEED,
+            );
           },
           onReceivedClientCertRequest: (controller, challenge) async {
             return new ClientCertResponse(
-                certificatePath: "test_assets/certificate.pfx",
-                certificatePassword: "",
-                keyStoreType: "PKCS12",
-                action: ClientCertResponseAction.PROCEED);
+              certificatePath: "test_assets/certificate.pfx",
+              certificatePassword: "",
+              keyStoreType: "PKCS12",
+              action: ClientCertResponseAction.PROCEED,
+            );
           },
         ),
       ),
@@ -44,7 +47,8 @@ void sslRequest() {
     await pageLoaded.future;
 
     final String h1Content = await controller.evaluateJavascript(
-        source: "document.body.querySelector('h1').textContent");
+      source: "document.body.querySelector('h1').textContent",
+    );
     expect(h1Content, "Authorized");
   }, skip: shouldSkip);
 }

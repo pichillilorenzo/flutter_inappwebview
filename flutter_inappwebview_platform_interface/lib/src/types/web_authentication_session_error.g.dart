@@ -11,10 +11,11 @@ class WebAuthenticationSessionError {
   final int _value;
   final int _nativeValue;
   const WebAuthenticationSessionError._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory WebAuthenticationSessionError._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      WebAuthenticationSessionError._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => WebAuthenticationSessionError._internal(value, nativeValue());
 
   ///The login has been canceled.
   static const CANCELED_LOGIN = WebAuthenticationSessionError._internal(1, 1);
@@ -38,8 +39,9 @@ class WebAuthenticationSessionError {
   static WebAuthenticationSessionError? fromValue(int? value) {
     if (value != null) {
       try {
-        return WebAuthenticationSessionError.values
-            .firstWhere((element) => element.toValue() == value);
+        return WebAuthenticationSessionError.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -51,8 +53,9 @@ class WebAuthenticationSessionError {
   static WebAuthenticationSessionError? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return WebAuthenticationSessionError.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return WebAuthenticationSessionError.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -68,8 +71,9 @@ class WebAuthenticationSessionError {
   static WebAuthenticationSessionError? byName(String? name) {
     if (name != null) {
       try {
-        return WebAuthenticationSessionError.values
-            .firstWhere((element) => element.name() == name);
+        return WebAuthenticationSessionError.values.firstWhere(
+          (element) => element.name() == name,
+        );
       } catch (e) {
         return null;
       }
@@ -88,7 +92,7 @@ class WebAuthenticationSessionError {
   static Map<String, WebAuthenticationSessionError> asNameMap() =>
       <String, WebAuthenticationSessionError>{
         for (final value in WebAuthenticationSessionError.values)
-          value.name(): value
+          value.name(): value,
       };
 
   ///Gets [int] value.

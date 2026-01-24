@@ -43,7 +43,8 @@ void loadUrl() {
     expect(await firstUrlLoad.future, initialUrl.toString());
 
     await controller.loadUrl(
-        urlRequest: URLRequest(url: TEST_CROSS_PLATFORM_URL_1));
+      urlRequest: URLRequest(url: TEST_CROSS_PLATFORM_URL_1),
+    );
     expect(await loadedUrl.future, TEST_CROSS_PLATFORM_URL_1.toString());
   }, skip: shouldSkip1);
 
@@ -86,13 +87,15 @@ void loadUrl() {
 
     final htmlCode = "<h1>Hello</h1>";
     await controller.loadSimulatedRequest(
-        urlRequest: URLRequest(url: TEST_CROSS_PLATFORM_URL_1),
-        data: Uint8List.fromList(utf8.encode(htmlCode)));
+      urlRequest: URLRequest(url: TEST_CROSS_PLATFORM_URL_1),
+      data: Uint8List.fromList(utf8.encode(htmlCode)),
+    );
     expect(await loadedUrl.future, TEST_CROSS_PLATFORM_URL_1.toString());
     expect(
-        (await controller.evaluateJavascript(source: "document.body.innerHTML"))
-            .toString()
-            .trim(),
-        htmlCode);
+      (await controller.evaluateJavascript(
+        source: "document.body.innerHTML",
+      )).toString().trim(),
+      htmlCode,
+    );
   }, skip: shouldSkip2);
 }

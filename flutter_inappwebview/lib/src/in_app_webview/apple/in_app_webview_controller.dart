@@ -11,8 +11,9 @@ import '../in_app_webview_controller.dart';
 class IOSInAppWebViewController {
   PlatformInAppWebViewController? _controller;
 
-  IOSInAppWebViewController(
-      {required PlatformInAppWebViewController controller}) {
+  IOSInAppWebViewController({
+    required PlatformInAppWebViewController controller,
+  }) {
     this._controller = controller;
   }
 
@@ -24,14 +25,16 @@ class IOSInAppWebViewController {
 
   ///Use [InAppWebViewController.createPdf] instead.
   @Deprecated("Use InAppWebViewController.createPdf instead")
-  Future<Uint8List?> createPdf(
-      {@Deprecated("Use pdfConfiguration instead")
-      // ignore: deprecated_member_use_from_same_package
-      IOSWKPDFConfiguration? iosWKPdfConfiguration,
-      PDFConfiguration? pdfConfiguration}) async {
+  Future<Uint8List?> createPdf({
+    @Deprecated("Use pdfConfiguration instead")
+    // ignore: deprecated_member_use_from_same_package
+    IOSWKPDFConfiguration? iosWKPdfConfiguration,
+    PDFConfiguration? pdfConfiguration,
+  }) async {
     return await _controller?.createPdf(
-        iosWKPdfConfiguration: iosWKPdfConfiguration,
-        pdfConfiguration: pdfConfiguration);
+      iosWKPdfConfiguration: iosWKPdfConfiguration,
+      pdfConfiguration: pdfConfiguration,
+    );
   }
 
   ///Use [InAppWebViewController.createWebArchiveData] instead.

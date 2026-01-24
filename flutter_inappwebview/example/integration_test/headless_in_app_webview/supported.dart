@@ -5,22 +5,29 @@ void supported() {
     skippableTestWidgets('basic', (WidgetTester tester) async {
       expect(HeadlessInAppWebView.isClassSupported(), true);
       expect(
-          HeadlessInAppWebView.isPropertySupported(
-              PlatformHeadlessInAppWebViewCreationParamsProperty.initialSize),
-          true);
+        HeadlessInAppWebView.isPropertySupported(
+          PlatformHeadlessInAppWebViewCreationParamsProperty.initialSize,
+        ),
+        true,
+      );
       expect(
-          HeadlessInAppWebView.isPropertySupported(
-              PlatformHeadlessInAppWebViewCreationParamsProperty
-                  .webViewEnvironment),
-          defaultTargetPlatform == TargetPlatform.windows);
+        HeadlessInAppWebView.isPropertySupported(
+          PlatformHeadlessInAppWebViewCreationParamsProperty.webViewEnvironment,
+        ),
+        defaultTargetPlatform == TargetPlatform.windows,
+      );
       expect(
-          HeadlessInAppWebView.isMethodSupported(
-              PlatformHeadlessInAppWebViewMethod.run),
-          true);
+        HeadlessInAppWebView.isMethodSupported(
+          PlatformHeadlessInAppWebViewMethod.run,
+        ),
+        true,
+      );
       expect(
-          HeadlessInAppWebView.isMethodSupported(
-              PlatformHeadlessInAppWebViewMethod.dispose),
-          true);
+        HeadlessInAppWebView.isMethodSupported(
+          PlatformHeadlessInAppWebViewMethod.dispose,
+        ),
+        true,
+      );
     }, skip: false);
   }, skip: false);
 }

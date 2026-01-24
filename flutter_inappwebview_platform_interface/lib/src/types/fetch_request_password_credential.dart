@@ -21,7 +21,11 @@ class FetchRequestPasswordCredential_ extends FetchRequestCredential_ {
   ///URL pointing to an image for an icon. This image is intended for display in a credential chooser. The URL must be accessible without authentication.
   WebUri? iconURL;
 
-  FetchRequestPasswordCredential_(
-      {type, this.id, this.name, this.password, this.iconURL})
-      : super(type: type);
+  FetchRequestPasswordCredential_({
+    type,
+    this.id,
+    this.name,
+    this.password,
+    this.iconURL,
+  }) : super(type: type);
 }

@@ -41,38 +41,46 @@ void injectJavascriptFile() {
       await pageLoaded.future;
 
       await controller.injectJavascriptFileFromUrl(
-          urlFile: WebUri('https://www.notawebsite..com/jquery-3.3.1.min.js'),
-          scriptHtmlTagAttributes: ScriptHtmlTagAttributes(
-            id: 'jquery-error',
-            onError: () {
-              jQueryLoadError.complete();
-            },
-          ));
+        urlFile: WebUri('https://www.notawebsite..com/jquery-3.3.1.min.js'),
+        scriptHtmlTagAttributes: ScriptHtmlTagAttributes(
+          id: 'jquery-error',
+          onError: () {
+            jQueryLoadError.complete();
+          },
+        ),
+      );
       await jQueryLoadError.future;
       expect(
-          await controller.evaluateJavascript(
-              source: "document.body.querySelector('#jquery-error') == null;"),
-          false);
+        await controller.evaluateJavascript(
+          source: "document.body.querySelector('#jquery-error') == null;",
+        ),
+        false,
+      );
       expect(
-          await controller.evaluateJavascript(source: "window.jQuery == null;"),
-          true);
+        await controller.evaluateJavascript(source: "window.jQuery == null;"),
+        true,
+      );
 
       await controller.injectJavascriptFileFromUrl(
-          urlFile: WebUri('https://code.jquery.com/jquery-3.3.1.min.js'),
-          scriptHtmlTagAttributes: ScriptHtmlTagAttributes(
-            id: 'jquery',
-            onLoad: () {
-              jQueryLoaded.complete();
-            },
-          ));
+        urlFile: WebUri('https://code.jquery.com/jquery-3.3.1.min.js'),
+        scriptHtmlTagAttributes: ScriptHtmlTagAttributes(
+          id: 'jquery',
+          onLoad: () {
+            jQueryLoaded.complete();
+          },
+        ),
+      );
       await jQueryLoaded.future;
       expect(
-          await controller.evaluateJavascript(
-              source: "document.body.querySelector('#jquery') == null;"),
-          false);
+        await controller.evaluateJavascript(
+          source: "document.body.querySelector('#jquery') == null;",
+        ),
+        false,
+      );
       expect(
-          await controller.evaluateJavascript(source: "window.jQuery == null;"),
-          false);
+        await controller.evaluateJavascript(source: "window.jQuery == null;"),
+        false,
+      );
     });
 
     skippableTestWidgets('from asset', (WidgetTester tester) async {
@@ -102,10 +110,12 @@ void injectJavascriptFile() {
       await pageLoaded.future;
 
       await controller.injectJavascriptFileFromAsset(
-          assetFilePath: 'test_assets/js/jquery-3.3.1.min.js');
+        assetFilePath: 'test_assets/js/jquery-3.3.1.min.js',
+      );
       expect(
-          await controller.evaluateJavascript(source: "window.jQuery == null;"),
-          false);
+        await controller.evaluateJavascript(source: "window.jQuery == null;"),
+        false,
+      );
     });
   }, skip: shouldSkip);
 }

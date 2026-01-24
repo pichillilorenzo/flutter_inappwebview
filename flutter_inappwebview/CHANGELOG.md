@@ -1,5 +1,6 @@
 ## 6.2.0-beta.3
 
+- Added Linux support
 - Updated dependencies to the latest versions for all platform implementations:
   - `flutter_inappwebview_platform_interface`: `^1.4.0-beta.2` -> `^1.4.0-beta.3`
   - `flutter_inappwebview_android`: `^1.2.0-beta.2` -> `^1.2.0-beta.3`
@@ -7,18 +8,24 @@
   - `flutter_inappwebview_macos`: `^1.2.0-beta.2` -> `^1.2.0-beta.3`
   - `flutter_inappwebview_web`: `^1.2.0-beta.2` -> `^1.2.0-beta.3`
   - `flutter_inappwebview_windows`: `^0.7.0-beta.2` -> `^0.7.0-beta.3`
+  - `flutter_inappwebview_linux`: `^0.1.0-beta.1`
+- Added `InAppWebViewController.getFavicon` wrapper with `faviconImageFormat` support.
 - Fixed "When useShouldInterceptAjaxRequest is true, some ajax requests doesn't work" [#2197](https://github.com/pichillilorenzo/flutter_inappwebview/issues/2197)
 - Mapped `isClassSupported`, `isPropertySupported`, `isMethodSupported` platform interface static methods to the corresponding plugin classes such as `InAppWebViewController`, `InAppWebView`, `InAppBrowser`, etc., in order to check if a class, property, or method is supported by the platform at runtime
 - Updated code generator
+- Minimum Dart SDK `^3.8.0`
+- Minimum Flutter SDK `>=3.32.0`
 
 #### Platform Interface
 - Updated `flutter_inappwebview_internal_annotations` dependency from `^1.2.0` to `^1.3.0`
 - Added `isClassSupported`, `isPropertySupported`, `isMethodSupported` static methods for all main classes, such as `PlatformInAppWebViewController`, `InAppWebViewSettings`, `PlatformInAppBrowser`, etc., in order to check if a class, property, or method is supported by the platform at runtime
 - Added `isSupported` method to all custom enum classes
-- Added `saveState`, `restoreState` methods to `PlatformInAppWebViewController` class
-- Added `useOnAjaxReadyStateChange`, `useOnAjaxProgress`, `useOnShowFileChooser` properties to `InAppWebViewSettings`
-- Added `onShowFileChooser` WebView events
+- Added `saveState`, `restoreState`, `requestEnterFullscreen`, `requestExitFullscreen`, `setVisible`, `setTargetRefreshRate`, `getTargetRefreshRate`, `requestPointerLock`, `requestPointerUnlock`, `getScreenScale`, `setScreenScale`, `isVisible`, `getFrameId`, `getFavicon`, `showSaveAsUI`, `getMemoryUsageTargetLevel`, `setMemoryUsageTargetLevel` methods to `PlatformInAppWebViewController` class
+- Added `useOnAjaxReadyStateChange`, `useOnAjaxProgress`, `useOnShowFileChooser`, `corsAllowlist`, `itpEnabled`, `darkMode`, `disableAnimations`, `fontAntialias`, `fontHintingStyle`, `fontSubpixelLayout`, `fontDPI`, `cursorBlinkTime`, `doubleClickDistance`, `doubleClickTime`, `dragThreshold`, `keyRepeatDelay`, `keyRepeatInterval`, `disableWebSecurity`, `enableWebRTC`, `webRTCUdpPortsRange`, `javaScriptCanAccessClipboard`, `allowModalDialogs`, `enableMedia`, `enableEncryptedMedia`, `enableMediaCapabilities`, `enableMockCaptureDevices`, `mediaContentTypesRequiringHardwareSupport`, `enableJavaScriptMarkup`, `enable2DCanvasAcceleration`, `allowTopNavigationToDataUrls` properties to `InAppWebViewSettings`
+- Added `onShowFileChooser`, `onContentLoading`, `onDOMContentLoaded`,  `onLaunchingExternalUriScheme`, `onFaviconChanged`, `onNotificationReceived`, `onSaveAsUIShowing`, `onSaveFileSecurityCheckStarting`, `onScreenCaptureStarting` WebView events
+- Added `PlatformWebNotificationController` class
 - Update code documentation
+- Deprecated `onReceivedIcon` in favor of `onFaviconChanged`
 
 #### Android Platform
 - Merged "Fixed recursive calling toMap in AndroidInternalStoragePathHandler" [#2452](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2452) (thanks to [roberthofstra](https://github.com/roberthofstra))
@@ -36,6 +43,12 @@
 - Merged "Fix gesture recognition delay prevention for latest Flutter versions" [#2538](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2538) (thanks to [muccy-timeware](https://github.com/muccy-timeware))
 
 ### Windows
+- Updated Microsoft.Web.WebView2 SDK version from `1.0.2849.39` to `1.0.3650.58`
+- Implemented `getFrameId`, `getFavicon`, `showSaveAsUI`, `getMemoryUsageTargetLevel`, `setMemoryUsageTargetLevel` InAppWebViewController method
+- Added support for `onEnterFullscreen`, `onExitFullscreen`, `onContentLoading`, `onDOMContentLoaded`,  `onLaunchingExternalUriScheme`, `onFaviconChanged`, `onNotificationReceived`, `onSaveAsUIShowing`, `onSaveFileSecurityCheckStarting`, `onScreenCaptureStarting` WebView events.
+- Added native FindInteractionController implementation using WebView2 `ICoreWebView2Find`.
+- Implemented `setFindOptions` FindInteractionController method
+- Implemented `PlatformWebNotificationController` feature
 - Merged "windows: fix WebViewEnvironment dispose crash" [#2433](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2433) (thanks to [GooRingX](https://github.com/GooRingX))
 - Merged "fix #2484, Remove not-empty assert for Cookie.value" [#2486](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2486) (thanks to [laishere](https://github.com/laishere))
 - Merged "Prevent Unpredictable Close On Windows" [#2543](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2543) (thanks to [momadvisor](https://github.com/momadvisor))
@@ -47,6 +60,9 @@
 - Implemented `setJavaScriptBridgeName`, `getJavaScriptBridgeName`, `getDefaultUserAgent` InAppWebViewController static methods
 - Implemented `javaScriptHandlersOriginAllowList`, `javaScriptBridgeEnabled`, `javaScriptBridgeOriginAllowList`, `hasJavaScriptHandler`, `addUserScript`, `addUserScripts`, `removeUserScript` of `InAppWebViewSettings`
 - Merged "fix #2484, Remove not-empty assert for Cookie.value" [#2486](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2486) (thanks to [laishere](https://github.com/laishere))
+
+### Linux
+- Initial implementation
 
 ## 6.2.0-beta.2
 

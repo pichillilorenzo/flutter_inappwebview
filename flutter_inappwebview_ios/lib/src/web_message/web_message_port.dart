@@ -16,9 +16,10 @@ class IOSWebMessagePortCreationParams
 
   /// Creates a [IOSWebMessagePortCreationParams] instance based on [PlatformWebMessagePortCreationParams].
   factory IOSWebMessagePortCreationParams.fromPlatformWebMessagePortCreationParams(
-      // Recommended placeholder to prevent being broken by platform interface.
-      // ignore: avoid_unused_constructor_parameters
-      PlatformWebMessagePortCreationParams params) {
+    // Recommended placeholder to prevent being broken by platform interface.
+    // ignore: avoid_unused_constructor_parameters
+    PlatformWebMessagePortCreationParams params,
+  ) {
     return IOSWebMessagePortCreationParams(index: params.index);
   }
 
@@ -35,19 +36,22 @@ class IOSWebMessagePort extends PlatformWebMessagePort {
 
   /// Constructs a [IOSWebMessagePort].
   IOSWebMessagePort(PlatformWebMessagePortCreationParams params)
-      : super.implementation(
-          params is IOSWebMessagePortCreationParams
-              ? params
-              : IOSWebMessagePortCreationParams
-                  .fromPlatformWebMessagePortCreationParams(params),
-        );
+    : super.implementation(
+        params is IOSWebMessagePortCreationParams
+            ? params
+            : IOSWebMessagePortCreationParams.fromPlatformWebMessagePortCreationParams(
+                params,
+              ),
+      );
 
   @override
   Future<void> setWebMessageCallback(WebMessageCallback? onMessage) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('index', () => params.index);
-    await _webMessageChannel.internalChannel
-        ?.invokeMethod('setWebMessageCallback', args);
+    await _webMessageChannel.internalChannel?.invokeMethod(
+      'setWebMessageCallback',
+      args,
+    );
     this._onMessage = onMessage;
   }
 
@@ -70,7 +74,7 @@ class IOSWebMessagePort extends PlatformWebMessagePort {
   Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
       "index": params.index,
-      "webMessageChannelId": this._webMessageChannel.params.id
+      "webMessageChannelId": this._webMessageChannel.params.id,
     };
   }
 

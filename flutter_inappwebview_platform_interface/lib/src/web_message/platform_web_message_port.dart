@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 import '../inappwebview_platform.dart';
@@ -44,6 +45,17 @@ class PlatformWebMessagePortCreationParams {
 ///
 ///It is possible to transfer both ports of a channel to JavaScript, for example for communication between subframes.
 ///{@endtemplate}
+///
+///{@macro flutter_inappwebview_platform_interface.PlatformWebMessagePort.supported_platforms}
+@SupportedPlatforms(
+  platforms: [
+    AndroidPlatform(),
+    IOSPlatform(),
+    MacOSPlatform(),
+    LinuxPlatform(note: 'Implemented via JavaScript MessageChannel API.'),
+    WindowsPlatform(note: 'Implemented via JavaScript MessageChannel API.'),
+  ],
+)
 abstract class PlatformWebMessagePort extends PlatformInterface
     implements IWebMessagePort {
   /// Creates a new [PlatformWebMessagePort]
@@ -55,8 +67,8 @@ abstract class PlatformWebMessagePort extends PlatformInterface
       '`InAppWebViewPlatform.instance` before use. For unit testing, '
       '`InAppWebViewPlatform.instance` can be set with your own test implementation.',
     );
-    final PlatformWebMessagePort webMessagePort =
-        InAppWebViewPlatform.instance!.createPlatformWebMessagePort(params);
+    final PlatformWebMessagePort webMessagePort = InAppWebViewPlatform.instance!
+        .createPlatformWebMessagePort(params);
     PlatformInterface.verify(webMessagePort, _token);
     return webMessagePort;
   }
@@ -83,34 +95,72 @@ abstract class IWebMessagePort {
   ///{@template flutter_inappwebview_platform_interface.PlatformWebMessagePort.setWebMessageCallback}
   ///Sets a callback to receive message events on the main thread.
   ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessagePort.setWebMessageCallback.supported_platforms}
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(),
+      IOSPlatform(),
+      MacOSPlatform(),
+      LinuxPlatform(note: 'Implemented via JavaScript MessageChannel API.'),
+      WindowsPlatform(note: 'Implemented via JavaScript MessageChannel API.'),
+    ],
+  )
   Future<void> setWebMessageCallback(WebMessageCallback? onMessage) {
     throw UnimplementedError(
-        'setWebMessageCallback is not implemented on the current platform');
+      'setWebMessageCallback is not implemented on the current platform',
+    );
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformWebMessagePort.postMessage}
   ///Post a WebMessage to the entangled port.
   ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessagePort.postMessage.supported_platforms}
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(),
+      IOSPlatform(),
+      MacOSPlatform(),
+      LinuxPlatform(note: 'Implemented via JavaScript MessageChannel API.'),
+      WindowsPlatform(note: 'Implemented via JavaScript MessageChannel API.'),
+    ],
+  )
   Future<void> postMessage(WebMessage message) {
     throw UnimplementedError(
-        'postMessage is not implemented on the current platform');
+      'postMessage is not implemented on the current platform',
+    );
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformWebMessagePort.close}
   ///Close the message port and free any resources associated with it.
   ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessagePort.close.supported_platforms}
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(),
+      IOSPlatform(),
+      MacOSPlatform(),
+      LinuxPlatform(note: 'Implemented via JavaScript MessageChannel API.'),
+      WindowsPlatform(note: 'Implemented via JavaScript MessageChannel API.'),
+    ],
+  )
   Future<void> close() {
     throw UnimplementedError(
-        'close is not implemented on the current platform');
+      'close is not implemented on the current platform',
+    );
   }
 
   Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     throw UnimplementedError(
-        'toMap is not implemented on the current platform');
+      'toMap is not implemented on the current platform',
+    );
   }
 
   Map<String, dynamic> toJson() {
     throw UnimplementedError(
-        'toJson is not implemented on the current platform');
+      'toJson is not implemented on the current platform',
+    );
   }
 }

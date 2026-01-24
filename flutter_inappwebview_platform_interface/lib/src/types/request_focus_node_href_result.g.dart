@@ -19,8 +19,10 @@ class RequestFocusNodeHrefResult {
   RequestFocusNodeHrefResult({this.src, this.title, this.url});
 
   ///Gets a possible [RequestFocusNodeHrefResult] instance from a [Map] value.
-  static RequestFocusNodeHrefResult? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static RequestFocusNodeHrefResult? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
@@ -34,11 +36,7 @@ class RequestFocusNodeHrefResult {
 
   ///Converts instance to a map.
   Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
-    return {
-      "src": src,
-      "title": title,
-      "url": url?.toString(),
-    };
+    return {"src": src, "title": title, "url": url?.toString()};
   }
 
   ///Converts instance to a map.

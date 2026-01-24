@@ -1,6 +1,8 @@
 import 'dart:io' show Platform;
+
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview_example/utils/support_checker.dart';
 
 /// Utility class for platform detection and information.
@@ -56,17 +58,15 @@ class PlatformUtils {
   /// Note: This is a placeholder. In production, you might use
   /// package_info_plus or similar to get actual version info.
   static String getFlutterVersion() {
-    // In a real app, you'd get this from package_info_plus or similar
-    return 'Flutter SDK';
+    return FlutterVersion.version != null
+        ? FlutterVersion.version! + ' (' + (FlutterVersion.channel ?? '') + ')'
+        : 'Flutter SDK';
   }
 
   /// Gets the Dart SDK version.
   static String getDartVersion() {
-    // Platform.version gives us something like "2.19.0 (stable)"
-    if (!kIsWeb) {
-      return Platform.version.split(' ').first;
-    }
-    return 'Dart SDK';
+    return FlutterVersion.dartVersion ??
+        (!kIsWeb ? Platform.version : 'Dart SDK');
   }
 
   /// Returns true if running on web platform.

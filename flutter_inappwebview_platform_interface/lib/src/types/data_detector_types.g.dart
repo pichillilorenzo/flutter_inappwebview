@@ -11,10 +11,11 @@ class DataDetectorTypes {
   final String _value;
   final String _nativeValue;
   const DataDetectorTypes._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory DataDetectorTypes._internalMultiPlatform(
-          String value, Function nativeValue) =>
-      DataDetectorTypes._internal(value, nativeValue());
+    String value,
+    Function nativeValue,
+  ) => DataDetectorTypes._internal(value, nativeValue());
 
   ///Addresses are detected and turned into links.
   static const ADDRESS = DataDetectorTypes._internal('ADDRESS', 'ADDRESS');
@@ -23,34 +24,46 @@ class DataDetectorTypes {
   static const ALL = DataDetectorTypes._internal('ALL', 'ALL');
 
   ///Dates and times that are in the future are detected and turned into links.
-  static const CALENDAR_EVENT =
-      DataDetectorTypes._internal('CALENDAR_EVENT', 'CALENDAR_EVENT');
+  static const CALENDAR_EVENT = DataDetectorTypes._internal(
+    'CALENDAR_EVENT',
+    'CALENDAR_EVENT',
+  );
 
   ///Flight numbers are detected and turned into links.
-  static const FLIGHT_NUMBER =
-      DataDetectorTypes._internal('FLIGHT_NUMBER', 'FLIGHT_NUMBER');
+  static const FLIGHT_NUMBER = DataDetectorTypes._internal(
+    'FLIGHT_NUMBER',
+    'FLIGHT_NUMBER',
+  );
 
   ///URLs in text are detected and turned into links.
   static const LINK = DataDetectorTypes._internal('LINK', 'LINK');
 
   ///Lookup suggestions are detected and turned into links.
-  static const LOOKUP_SUGGESTION =
-      DataDetectorTypes._internal('LOOKUP_SUGGESTION', 'LOOKUP_SUGGESTION');
+  static const LOOKUP_SUGGESTION = DataDetectorTypes._internal(
+    'LOOKUP_SUGGESTION',
+    'LOOKUP_SUGGESTION',
+  );
 
   ///No detection is performed.
   static const NONE = DataDetectorTypes._internal('NONE', 'NONE');
 
   ///Phone numbers are detected and turned into links.
-  static const PHONE_NUMBER =
-      DataDetectorTypes._internal('PHONE_NUMBER', 'PHONE_NUMBER');
+  static const PHONE_NUMBER = DataDetectorTypes._internal(
+    'PHONE_NUMBER',
+    'PHONE_NUMBER',
+  );
 
   ///Spotlight suggestions are detected and turned into links.
   static const SPOTLIGHT_SUGGESTION = DataDetectorTypes._internal(
-      'SPOTLIGHT_SUGGESTION', 'SPOTLIGHT_SUGGESTION');
+    'SPOTLIGHT_SUGGESTION',
+    'SPOTLIGHT_SUGGESTION',
+  );
 
   ///Tracking numbers are detected and turned into links.
-  static const TRACKING_NUMBER =
-      DataDetectorTypes._internal('TRACKING_NUMBER', 'TRACKING_NUMBER');
+  static const TRACKING_NUMBER = DataDetectorTypes._internal(
+    'TRACKING_NUMBER',
+    'TRACKING_NUMBER',
+  );
 
   ///Set of all values of [DataDetectorTypes].
   static final Set<DataDetectorTypes> values = [
@@ -70,8 +83,9 @@ class DataDetectorTypes {
   static DataDetectorTypes? fromValue(String? value) {
     if (value != null) {
       try {
-        return DataDetectorTypes.values
-            .firstWhere((element) => element.toValue() == value);
+        return DataDetectorTypes.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -83,8 +97,9 @@ class DataDetectorTypes {
   static DataDetectorTypes? fromNativeValue(String? value) {
     if (value != null) {
       try {
-        return DataDetectorTypes.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return DataDetectorTypes.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -100,8 +115,9 @@ class DataDetectorTypes {
   static DataDetectorTypes? byName(String? name) {
     if (name != null) {
       try {
-        return DataDetectorTypes.values
-            .firstWhere((element) => element.name() == name);
+        return DataDetectorTypes.values.firstWhere(
+          (element) => element.name() == name,
+        );
       } catch (e) {
         return null;
       }
@@ -119,7 +135,7 @@ class DataDetectorTypes {
   /// them will be represented in the returned map.
   static Map<String, DataDetectorTypes> asNameMap() =>
       <String, DataDetectorTypes>{
-        for (final value in DataDetectorTypes.values) value.name(): value
+        for (final value in DataDetectorTypes.values) value.name(): value,
       };
 
   ///Gets [String] value.
@@ -182,10 +198,11 @@ class IOSWKDataDetectorTypes {
   final String _value;
   final String _nativeValue;
   const IOSWKDataDetectorTypes._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory IOSWKDataDetectorTypes._internalMultiPlatform(
-          String value, Function nativeValue) =>
-      IOSWKDataDetectorTypes._internal(value, nativeValue());
+    String value,
+    Function nativeValue,
+  ) => IOSWKDataDetectorTypes._internal(value, nativeValue());
 
   ///Addresses are detected and turned into links.
   static const ADDRESS = IOSWKDataDetectorTypes._internal('ADDRESS', 'ADDRESS');
@@ -194,34 +211,46 @@ class IOSWKDataDetectorTypes {
   static const ALL = IOSWKDataDetectorTypes._internal('ALL', 'ALL');
 
   ///Dates and times that are in the future are detected and turned into links.
-  static const CALENDAR_EVENT =
-      IOSWKDataDetectorTypes._internal('CALENDAR_EVENT', 'CALENDAR_EVENT');
+  static const CALENDAR_EVENT = IOSWKDataDetectorTypes._internal(
+    'CALENDAR_EVENT',
+    'CALENDAR_EVENT',
+  );
 
   ///Flight numbers are detected and turned into links.
-  static const FLIGHT_NUMBER =
-      IOSWKDataDetectorTypes._internal('FLIGHT_NUMBER', 'FLIGHT_NUMBER');
+  static const FLIGHT_NUMBER = IOSWKDataDetectorTypes._internal(
+    'FLIGHT_NUMBER',
+    'FLIGHT_NUMBER',
+  );
 
   ///URLs in text are detected and turned into links.
   static const LINK = IOSWKDataDetectorTypes._internal('LINK', 'LINK');
 
   ///Lookup suggestions are detected and turned into links.
   static const LOOKUP_SUGGESTION = IOSWKDataDetectorTypes._internal(
-      'LOOKUP_SUGGESTION', 'LOOKUP_SUGGESTION');
+    'LOOKUP_SUGGESTION',
+    'LOOKUP_SUGGESTION',
+  );
 
   ///No detection is performed.
   static const NONE = IOSWKDataDetectorTypes._internal('NONE', 'NONE');
 
   ///Phone numbers are detected and turned into links.
-  static const PHONE_NUMBER =
-      IOSWKDataDetectorTypes._internal('PHONE_NUMBER', 'PHONE_NUMBER');
+  static const PHONE_NUMBER = IOSWKDataDetectorTypes._internal(
+    'PHONE_NUMBER',
+    'PHONE_NUMBER',
+  );
 
   ///Spotlight suggestions are detected and turned into links.
   static const SPOTLIGHT_SUGGESTION = IOSWKDataDetectorTypes._internal(
-      'SPOTLIGHT_SUGGESTION', 'SPOTLIGHT_SUGGESTION');
+    'SPOTLIGHT_SUGGESTION',
+    'SPOTLIGHT_SUGGESTION',
+  );
 
   ///Tracking numbers are detected and turned into links.
-  static const TRACKING_NUMBER =
-      IOSWKDataDetectorTypes._internal('TRACKING_NUMBER', 'TRACKING_NUMBER');
+  static const TRACKING_NUMBER = IOSWKDataDetectorTypes._internal(
+    'TRACKING_NUMBER',
+    'TRACKING_NUMBER',
+  );
 
   ///Set of all values of [IOSWKDataDetectorTypes].
   static final Set<IOSWKDataDetectorTypes> values = [
@@ -241,8 +270,9 @@ class IOSWKDataDetectorTypes {
   static IOSWKDataDetectorTypes? fromValue(String? value) {
     if (value != null) {
       try {
-        return IOSWKDataDetectorTypes.values
-            .firstWhere((element) => element.toValue() == value);
+        return IOSWKDataDetectorTypes.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -254,8 +284,9 @@ class IOSWKDataDetectorTypes {
   static IOSWKDataDetectorTypes? fromNativeValue(String? value) {
     if (value != null) {
       try {
-        return IOSWKDataDetectorTypes.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return IOSWKDataDetectorTypes.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -271,8 +302,9 @@ class IOSWKDataDetectorTypes {
   static IOSWKDataDetectorTypes? byName(String? name) {
     if (name != null) {
       try {
-        return IOSWKDataDetectorTypes.values
-            .firstWhere((element) => element.name() == name);
+        return IOSWKDataDetectorTypes.values.firstWhere(
+          (element) => element.name() == name,
+        );
       } catch (e) {
         return null;
       }
@@ -290,7 +322,7 @@ class IOSWKDataDetectorTypes {
   /// them will be represented in the returned map.
   static Map<String, IOSWKDataDetectorTypes> asNameMap() =>
       <String, IOSWKDataDetectorTypes>{
-        for (final value in IOSWKDataDetectorTypes.values) value.name(): value
+        for (final value in IOSWKDataDetectorTypes.values) value.name(): value,
       };
 
   ///Gets [String] value.

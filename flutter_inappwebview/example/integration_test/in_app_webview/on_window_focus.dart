@@ -21,7 +21,8 @@ void onWindowFocus() {
           initialUrlRequest: URLRequest(url: url),
           onLoadStop: (controller, url) async {
             await controller.evaluateJavascript(
-                source: 'window.dispatchEvent(new Event("focus"));');
+              source: 'window.dispatchEvent(new Event("focus"));',
+            );
           },
           onWindowFocus: (controller) {
             onWindowFocusCompleter.complete();

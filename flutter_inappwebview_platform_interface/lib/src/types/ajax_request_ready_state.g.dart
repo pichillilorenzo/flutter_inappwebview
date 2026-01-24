@@ -11,10 +11,11 @@ class AjaxRequestReadyState {
   final int _value;
   final int _nativeValue;
   const AjaxRequestReadyState._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory AjaxRequestReadyState._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      AjaxRequestReadyState._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => AjaxRequestReadyState._internal(value, nativeValue());
 
   ///The operation is complete.
   static const DONE = AjaxRequestReadyState._internal(4, 4);
@@ -44,8 +45,9 @@ class AjaxRequestReadyState {
   static AjaxRequestReadyState? fromValue(int? value) {
     if (value != null) {
       try {
-        return AjaxRequestReadyState.values
-            .firstWhere((element) => element.toValue() == value);
+        return AjaxRequestReadyState.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -57,8 +59,9 @@ class AjaxRequestReadyState {
   static AjaxRequestReadyState? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return AjaxRequestReadyState.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return AjaxRequestReadyState.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -74,8 +77,9 @@ class AjaxRequestReadyState {
   static AjaxRequestReadyState? byName(String? name) {
     if (name != null) {
       try {
-        return AjaxRequestReadyState.values
-            .firstWhere((element) => element.name() == name);
+        return AjaxRequestReadyState.values.firstWhere(
+          (element) => element.name() == name,
+        );
       } catch (e) {
         return null;
       }
@@ -93,7 +97,7 @@ class AjaxRequestReadyState {
   /// them will be represented in the returned map.
   static Map<String, AjaxRequestReadyState> asNameMap() =>
       <String, AjaxRequestReadyState>{
-        for (final value in AjaxRequestReadyState.values) value.name(): value
+        for (final value in AjaxRequestReadyState.values) value.name(): value,
       };
 
   ///Gets [int] value.

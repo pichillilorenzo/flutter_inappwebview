@@ -22,7 +22,9 @@ void interceptFetchRequest() {
           textDirection: TextDirection.ltr,
           child: InAppWebView(
             key: GlobalKey(),
-            initialData: InAppWebViewInitialData(data: """
+            initialData: InAppWebViewInitialData(
+              data:
+                  """
 <!doctype html>
 <html lang="en">
     <head>
@@ -54,16 +56,17 @@ void interceptFetchRequest() {
         </script>
     </body>
 </html>
-                    """),
+                    """,
+            ),
             onWebViewCreated: (controller) {
               controllerCompleter.complete(controller);
 
               controller.addJavaScriptHandler(
-                  handlerName: "fetchPost",
-                  callback: (args) {
-                    fetchPostCompleter
-                        .complete(args[0] as Map<String, dynamic>);
-                  });
+                handlerName: "fetchPost",
+                callback: (args) {
+                  fetchPostCompleter.complete(args[0] as Map<String, dynamic>);
+                },
+              );
             },
             shouldInterceptFetchRequest: (controller, fetchRequest) async {
               assert(fetchRequest.body == "firstname=Foo&lastname=Bar");
@@ -80,9 +83,12 @@ void interceptFetchRequest() {
       var fetchPostCompleterValue = await fetchPostCompleter.future;
 
       expect(
-          mapEquals(fetchPostCompleterValue,
-              {'firstname': 'Foo2', 'lastname': 'Bar2'}),
-          true);
+        mapEquals(fetchPostCompleterValue, {
+          'firstname': 'Foo2',
+          'lastname': 'Bar2',
+        }),
+        true,
+      );
     });
 
     skippableTestWidgets('send json data', (WidgetTester tester) async {
@@ -97,7 +103,9 @@ void interceptFetchRequest() {
           textDirection: TextDirection.ltr,
           child: InAppWebView(
             key: GlobalKey(),
-            initialData: InAppWebViewInitialData(data: """
+            initialData: InAppWebViewInitialData(
+              data:
+                  """
 <!doctype html>
 <html lang="en">
     <head>
@@ -133,21 +141,24 @@ void interceptFetchRequest() {
         </script>
     </body>
 </html>
-                    """),
+                    """,
+            ),
             onWebViewCreated: (controller) {
               controllerCompleter.complete(controller);
 
               controller.addJavaScriptHandler(
-                  handlerName: "fetchPost",
-                  callback: (args) {
-                    fetchPostCompleter
-                        .complete(args[0] as Map<String, dynamic>);
-                  });
+                handlerName: "fetchPost",
+                callback: (args) {
+                  fetchPostCompleter.complete(args[0] as Map<String, dynamic>);
+                },
+              );
             },
             shouldInterceptFetchRequest: (controller, fetchRequest) async {
               String body = fetchRequest.body;
-              assert(body.contains('"firstname":"Foo"') &&
-                  body.contains('"lastname":"Bar"'));
+              assert(
+                body.contains('"firstname":"Foo"') &&
+                    body.contains('"lastname":"Bar"'),
+              );
 
               fetchRequest.body = '{"firstname": "Foo2", "lastname": "Bar2"}';
               shouldInterceptFetchPostRequestCompleter.complete();
@@ -161,13 +172,17 @@ void interceptFetchRequest() {
       var fetchPostCompleterValue = await fetchPostCompleter.future;
 
       expect(
-          mapEquals(fetchPostCompleterValue,
-              {'firstname': 'Foo2', 'lastname': 'Bar2'}),
-          true);
+        mapEquals(fetchPostCompleterValue, {
+          'firstname': 'Foo2',
+          'lastname': 'Bar2',
+        }),
+        true,
+      );
     });
 
-    skippableTestWidgets('send URLSearchParams data',
-        (WidgetTester tester) async {
+    skippableTestWidgets('send URLSearchParams data', (
+      WidgetTester tester,
+    ) async {
       final Completer<InAppWebViewController> controllerCompleter =
           Completer<InAppWebViewController>();
       final Completer<Map<String, dynamic>> fetchPostCompleter =
@@ -179,7 +194,9 @@ void interceptFetchRequest() {
           textDirection: TextDirection.ltr,
           child: InAppWebView(
             key: GlobalKey(),
-            initialData: InAppWebViewInitialData(data: """
+            initialData: InAppWebViewInitialData(
+              data:
+                  """
 <!doctype html>
 <html lang="en">
     <head>
@@ -213,16 +230,17 @@ void interceptFetchRequest() {
         </script>
     </body>
 </html>
-                    """),
+                    """,
+            ),
             onWebViewCreated: (controller) {
               controllerCompleter.complete(controller);
 
               controller.addJavaScriptHandler(
-                  handlerName: "fetchPost",
-                  callback: (args) {
-                    fetchPostCompleter
-                        .complete(args[0] as Map<String, dynamic>);
-                  });
+                handlerName: "fetchPost",
+                callback: (args) {
+                  fetchPostCompleter.complete(args[0] as Map<String, dynamic>);
+                },
+              );
             },
             shouldInterceptFetchRequest: (controller, fetchRequest) async {
               assert(fetchRequest.body == "firstname=Foo&lastname=Bar");
@@ -239,9 +257,12 @@ void interceptFetchRequest() {
       var fetchPostCompleterValue = await fetchPostCompleter.future;
 
       expect(
-          mapEquals(fetchPostCompleterValue,
-              {'firstname': 'Foo2', 'lastname': 'Bar2'}),
-          true);
+        mapEquals(fetchPostCompleterValue, {
+          'firstname': 'Foo2',
+          'lastname': 'Bar2',
+        }),
+        true,
+      );
     });
 
     skippableTestWidgets('send FormData', (WidgetTester tester) async {
@@ -256,7 +277,9 @@ void interceptFetchRequest() {
           textDirection: TextDirection.ltr,
           child: InAppWebView(
             key: GlobalKey(),
-            initialData: InAppWebViewInitialData(data: """
+            initialData: InAppWebViewInitialData(
+              data:
+                  """
 <!doctype html>
 <html lang="en">
     <head>
@@ -288,16 +311,17 @@ void interceptFetchRequest() {
         </script>
     </body>
 </html>
-                    """),
+                    """,
+            ),
             onWebViewCreated: (controller) {
               controllerCompleter.complete(controller);
 
               controller.addJavaScriptHandler(
-                  handlerName: "fetchPost",
-                  callback: (args) {
-                    fetchPostCompleter
-                        .complete(args[0] as Map<String, dynamic>);
-                  });
+                handlerName: "fetchPost",
+                callback: (args) {
+                  fetchPostCompleter.complete(args[0] as Map<String, dynamic>);
+                },
+              );
             },
             shouldInterceptFetchRequest: (controller, fetchRequest) async {
               assert(fetchRequest.body != null);
@@ -306,9 +330,11 @@ void interceptFetchRequest() {
               var bodyString = String.fromCharCodes(body);
               assert(bodyString.indexOf("WebKitFormBoundary") >= 0);
 
-              fetchRequest.body = utf8.encode(bodyString
-                  .replaceFirst("Foo", "Foo2")
-                  .replaceFirst("Bar", "Bar2"));
+              fetchRequest.body = utf8.encode(
+                bodyString
+                    .replaceFirst("Foo", "Foo2")
+                    .replaceFirst("Bar", "Bar2"),
+              );
               shouldInterceptFetchPostRequestCompleter.complete();
               return fetchRequest;
             },
@@ -320,9 +346,12 @@ void interceptFetchRequest() {
       var fetchPostCompleterValue = await fetchPostCompleter.future;
 
       expect(
-          mapEquals(fetchPostCompleterValue,
-              {'firstname': 'Foo2', 'lastname': 'Bar2'}),
-          true);
+        mapEquals(fetchPostCompleterValue, {
+          'firstname': 'Foo2',
+          'lastname': 'Bar2',
+        }),
+        true,
+      );
     });
   }, skip: shouldSkip);
 }

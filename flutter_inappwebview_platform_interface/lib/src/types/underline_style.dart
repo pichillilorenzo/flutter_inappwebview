@@ -68,8 +68,9 @@ class IOSNSUnderlineStyle_ {
   static const PATTERN_DASH_DOT = const IOSNSUnderlineStyle_._internal(768);
 
   ///Draw a line of alternating dashes and two dots.
-  static const PATTERN_DASH_DOT_DOT =
-      const IOSNSUnderlineStyle_._internal(1024);
+  static const PATTERN_DASH_DOT_DOT = const IOSNSUnderlineStyle_._internal(
+    1024,
+  );
 
   ///Draw the line only beneath or through words, not whitespace.
   static const BY_WORD = const IOSNSUnderlineStyle_._internal(32768);

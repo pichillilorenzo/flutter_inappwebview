@@ -5,8 +5,9 @@ import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_pla
 class PrintJobController {
   ///{@macro flutter_inappwebview_platform_interface.PlatformPrintJobController}
   PrintJobController({required String id})
-      : this.fromPlatformCreationParams(
-            params: PlatformPrintJobControllerCreationParams(id: id));
+    : this.fromPlatformCreationParams(
+        params: PlatformPrintJobControllerCreationParams(id: id),
+      );
 
   /// Constructs a [PrintJobController].
   ///
@@ -53,14 +54,20 @@ class PrintJobController {
       PlatformPrintJobController.static().isClassSupported(platform: platform);
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformPrintJobController.isPropertySupported}
-  static bool isPropertySupported(dynamic property,
-          {TargetPlatform? platform}) =>
-      PlatformPrintJobController.static()
-          .isPropertySupported(property, platform: platform);
+  static bool isPropertySupported(
+    dynamic property, {
+    TargetPlatform? platform,
+  }) => PlatformPrintJobController.static().isPropertySupported(
+    property,
+    platform: platform,
+  );
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformPrintJobController.isMethodSupported}
-  static bool isMethodSupported(PlatformPrintJobControllerMethod method,
-          {TargetPlatform? platform}) =>
-      PlatformPrintJobController.static()
-          .isMethodSupported(method, platform: platform);
+  static bool isMethodSupported(
+    PlatformPrintJobControllerMethod method, {
+    TargetPlatform? platform,
+  }) => PlatformPrintJobController.static().isMethodSupported(
+    method,
+    platform: platform,
+  );
 }

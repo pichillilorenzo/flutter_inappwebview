@@ -7,9 +7,9 @@ import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_pla
 class HttpAuthCredentialDatabase {
   ///{@macro flutter_inappwebview_platform_interface.PlatformHttpAuthCredentialDatabase}
   HttpAuthCredentialDatabase()
-      : this.fromPlatformCreationParams(
-          const PlatformHttpAuthCredentialDatabaseCreationParams(),
-        );
+    : this.fromPlatformCreationParams(
+        const PlatformHttpAuthCredentialDatabaseCreationParams(),
+      );
 
   /// Constructs a [HttpAuthCredentialDatabase] from creation params for a specific
   /// platform.
@@ -39,40 +39,48 @@ class HttpAuthCredentialDatabase {
       platform.getAllAuthCredentials();
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformHttpAuthCredentialDatabase.getHttpAuthCredentials}
-  Future<List<URLCredential>> getHttpAuthCredentials(
-          {required URLProtectionSpace protectionSpace}) =>
-      platform.getHttpAuthCredentials(protectionSpace: protectionSpace);
+  Future<List<URLCredential>> getHttpAuthCredentials({
+    required URLProtectionSpace protectionSpace,
+  }) => platform.getHttpAuthCredentials(protectionSpace: protectionSpace);
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformHttpAuthCredentialDatabase.setHttpAuthCredential}
-  Future<void> setHttpAuthCredential(
-          {required URLProtectionSpace protectionSpace,
-          required URLCredential credential}) =>
-      platform.setHttpAuthCredential(
-          protectionSpace: protectionSpace, credential: credential);
+  Future<void> setHttpAuthCredential({
+    required URLProtectionSpace protectionSpace,
+    required URLCredential credential,
+  }) => platform.setHttpAuthCredential(
+    protectionSpace: protectionSpace,
+    credential: credential,
+  );
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformHttpAuthCredentialDatabase.removeHttpAuthCredential}
-  Future<void> removeHttpAuthCredential(
-          {required URLProtectionSpace protectionSpace,
-          required URLCredential credential}) =>
-      platform.removeHttpAuthCredential(
-          protectionSpace: protectionSpace, credential: credential);
+  Future<void> removeHttpAuthCredential({
+    required URLProtectionSpace protectionSpace,
+    required URLCredential credential,
+  }) => platform.removeHttpAuthCredential(
+    protectionSpace: protectionSpace,
+    credential: credential,
+  );
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformHttpAuthCredentialDatabase.removeHttpAuthCredentials}
-  Future<void> removeHttpAuthCredentials(
-          {required URLProtectionSpace protectionSpace}) =>
-      platform.removeHttpAuthCredentials(protectionSpace: protectionSpace);
+  Future<void> removeHttpAuthCredentials({
+    required URLProtectionSpace protectionSpace,
+  }) => platform.removeHttpAuthCredentials(protectionSpace: protectionSpace);
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformHttpAuthCredentialDatabase.clearAllAuthCredentials}
   Future<void> clearAllAuthCredentials() => platform.clearAllAuthCredentials();
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformHttpAuthCredentialDatabaseCreationParams.isClassSupported}
   static bool isClassSupported({TargetPlatform? platform}) =>
-      PlatformHttpAuthCredentialDatabase.static()
-          .isClassSupported(platform: platform);
+      PlatformHttpAuthCredentialDatabase.static().isClassSupported(
+        platform: platform,
+      );
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformHttpAuthCredentialDatabase.isMethodSupported}
-  static bool isMethodSupported(PlatformHttpAuthCredentialDatabaseMethod method,
-          {TargetPlatform? platform}) =>
-      PlatformHttpAuthCredentialDatabase.static()
-          .isMethodSupported(method, platform: platform);
+  static bool isMethodSupported(
+    PlatformHttpAuthCredentialDatabaseMethod method, {
+    TargetPlatform? platform,
+  }) => PlatformHttpAuthCredentialDatabase.static().isMethodSupported(
+    method,
+    platform: platform,
+  );
 }

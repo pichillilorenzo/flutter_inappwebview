@@ -17,13 +17,16 @@ class ClientCertChallenge_ extends URLAuthenticationChallenge_ {
   List<String>? androidPrincipals;
 
   ///The acceptable certificate issuers for the certificate matching the private key.
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(
         apiName: "ClientCertRequest.getPrincipals",
         apiUrl:
             "https://developer.android.com/reference/android/webkit/ClientCertRequest#getPrincipals()",
-        available: "21")
-  ])
+        available: "21",
+      ),
+    ],
+  )
   List<String>? principals;
 
   ///Use [keyTypes] instead.
@@ -31,13 +34,16 @@ class ClientCertChallenge_ extends URLAuthenticationChallenge_ {
   List<String>? androidKeyTypes;
 
   ///Returns the acceptable types of asymmetric keys.
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(
         apiName: "ClientCertRequest.getKeyTypes",
         apiUrl:
             "https://developer.android.com/reference/android/webkit/ClientCertRequest#getKeyTypes()",
-        available: "21")
-  ])
+        available: "21",
+      ),
+    ],
+  )
   List<String>? keyTypes;
 
   ///The collection contains Base64 encoding of DER encoded distinguished names

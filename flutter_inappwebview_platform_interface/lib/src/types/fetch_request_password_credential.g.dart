@@ -19,13 +19,19 @@ class FetchRequestPasswordCredential extends FetchRequestCredential {
 
   ///The password of the credential.
   String? password;
-  FetchRequestPasswordCredential(
-      {this.iconURL, this.id, this.name, this.password, String? type})
-      : super(type: type);
+  FetchRequestPasswordCredential({
+    this.iconURL,
+    this.id,
+    this.name,
+    this.password,
+    String? type,
+  }) : super(type: type);
 
   ///Gets a possible [FetchRequestPasswordCredential] instance from a [Map] value.
-  static FetchRequestPasswordCredential? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static FetchRequestPasswordCredential? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }

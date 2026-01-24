@@ -41,30 +41,40 @@ class ContextMenu {
   ///- Android WebView:
   ///    - To make it work properly on Android, JavaScript should be enabled!
   ///- iOS WKWebView
-  ContextMenu(
-      {this.menuItems = const [],
-      this.onCreateContextMenu,
-      this.onHideContextMenu,
-      @Deprecated("Use settings instead") this.options,
-      this.settings,
-      this.onContextMenuActionItemClicked});
+  ContextMenu({
+    this.menuItems = const [],
+    this.onCreateContextMenu,
+    this.onHideContextMenu,
+    @Deprecated("Use settings instead") this.options,
+    this.settings,
+    this.onContextMenuActionItemClicked,
+  });
 
   ///Gets a possible [ContextMenu] instance from a [Map] value.
-  static ContextMenu? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static ContextMenu? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
     final instance = ContextMenu(
-      menuItems: List<ContextMenuItem>.from(map['menuItems'].map((e) =>
-          ContextMenuItem.fromMap(e?.cast<String, dynamic>(),
-              enumMethod: enumMethod)!)),
+      menuItems: List<ContextMenuItem>.from(
+        map['menuItems'].map(
+          (e) => ContextMenuItem.fromMap(
+            e?.cast<String, dynamic>(),
+            enumMethod: enumMethod,
+          )!,
+        ),
+      ),
       options: ContextMenuOptions.fromMap(
-          map['settings']?.cast<String, dynamic>(),
-          enumMethod: enumMethod),
+        map['settings']?.cast<String, dynamic>(),
+        enumMethod: enumMethod,
+      ),
       settings: ContextMenuSettings.fromMap(
-          map['settings']?.cast<String, dynamic>(),
-          enumMethod: enumMethod),
+        map['settings']?.cast<String, dynamic>(),
+        enumMethod: enumMethod,
+      ),
     );
     return instance;
   }
@@ -74,15 +84,16 @@ class ContextMenu {
     return {
       "settings":
           (settings as ContextMenuSettings?)?.toMap(enumMethod: enumMethod) ??
-              (options as ContextMenuOptions?)?.toMap(enumMethod: enumMethod)
+          (options as ContextMenuOptions?)?.toMap(enumMethod: enumMethod),
     };
   }
 
   ///Converts instance to a map.
   Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
-      "menuItems":
-          menuItems.map((e) => e.toMap(enumMethod: enumMethod)).toList(),
+      "menuItems": menuItems
+          .map((e) => e.toMap(enumMethod: enumMethod))
+          .toList(),
       "settings": settings?.toMap(enumMethod: enumMethod),
       ..._toMapMergeWith(enumMethod: enumMethod),
     };

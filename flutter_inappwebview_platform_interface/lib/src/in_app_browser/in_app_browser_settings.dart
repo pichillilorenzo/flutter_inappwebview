@@ -30,9 +30,10 @@ class InAppBrowserClassSettings {
   ///WebView settings.
   late InAppWebViewSettings webViewSettings;
 
-  InAppBrowserClassSettings(
-      {InAppBrowserSettings? browserSettings,
-      InAppWebViewSettings? webViewSettings}) {
+  InAppBrowserClassSettings({
+    InAppBrowserSettings? browserSettings,
+    InAppWebViewSettings? webViewSettings,
+  }) {
     this.browserSettings = browserSettings ?? InAppBrowserSettings();
     this.webViewSettings = webViewSettings ?? InAppWebViewSettings();
   }
@@ -54,17 +55,20 @@ class InAppBrowserClassSettings {
     return toMap().toString();
   }
 
-  factory InAppBrowserClassSettings.fromMap(Map<String, dynamic> options,
-      {InAppBrowserClassSettings? instance, EnumMethod? enumMethod}) {
+  factory InAppBrowserClassSettings.fromMap(
+    Map<String, dynamic> options, {
+    InAppBrowserClassSettings? instance,
+    EnumMethod? enumMethod,
+  }) {
     if (instance == null) {
       instance = InAppBrowserClassSettings();
     }
     instance.browserSettings =
         InAppBrowserSettings.fromMap(options, enumMethod: enumMethod) ??
-            InAppBrowserSettings();
+        InAppBrowserSettings();
     instance.webViewSettings =
         InAppWebViewSettings.fromMap(options, enumMethod: enumMethod) ??
-            InAppWebViewSettings();
+        InAppWebViewSettings();
     return instance;
   }
 
@@ -100,47 +104,86 @@ class BrowserOptions {
 ///This class represents all [InAppBrowser] settings available.
 ///{@endtemplate}
 @ExchangeableObject(copyMethod: true)
-@SupportedPlatforms(platforms: [
-  AndroidPlatform(),
-  IOSPlatform(),
-  MacOSPlatform(),
-  WindowsPlatform()
-])
+@SupportedPlatforms(
+  platforms: [
+    AndroidPlatform(),
+    IOSPlatform(),
+    MacOSPlatform(),
+    WindowsPlatform(),
+    LinuxPlatform(
+      apiName: 'GtkWindow',
+      apiUrl: 'https://docs.gtk.org/gtk3/class.Window.html',
+    ),
+  ],
+)
 class InAppBrowserSettings_
     implements BrowserOptions, AndroidOptions, IosOptions {
   ///Set to `true` to create the browser and load the page, but not show it. Omit or set to `false` to have the browser open and load normally.
   ///The default value is `false`.
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(),
-    IOSPlatform(),
-    MacOSPlatform(),
-    WindowsPlatform()
-  ])
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(),
+      IOSPlatform(),
+      MacOSPlatform(),
+      WindowsPlatform(),
+      LinuxPlatform(),
+    ],
+  )
   bool? hidden;
 
   ///Set to `true` to hide the toolbar at the top of the WebView. The default value is `false`.
   @SupportedPlatforms(
-      platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()])
+    platforms: [
+      AndroidPlatform(),
+      IOSPlatform(),
+      MacOSPlatform(),
+      LinuxPlatform(),
+    ],
+  )
   bool? hideToolbarTop;
 
   ///Set the custom background color of the toolbar at the top.
   @SupportedPlatforms(
-      platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()])
+    platforms: [
+      AndroidPlatform(),
+      IOSPlatform(),
+      MacOSPlatform(),
+      LinuxPlatform(),
+    ],
+  )
   Color_? toolbarTopBackgroundColor;
 
   ///Set to `true` to hide the url bar on the toolbar at the top. The default value is `false`.
   @SupportedPlatforms(
-      platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()])
+    platforms: [
+      AndroidPlatform(),
+      IOSPlatform(),
+      MacOSPlatform(),
+      LinuxPlatform(),
+    ],
+  )
   bool? hideUrlBar;
 
   ///Set to `true` to hide the progress bar when the WebView is loading a page. The default value is `false`.
   @SupportedPlatforms(
-      platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()])
+    platforms: [
+      AndroidPlatform(),
+      IOSPlatform(),
+      MacOSPlatform(),
+      LinuxPlatform(),
+    ],
+  )
   bool? hideProgressBar;
 
   ///Set to `true` to hide the default menu items. The default value is `false`.
   @SupportedPlatforms(
-      platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()])
+    platforms: [
+      AndroidPlatform(),
+      IOSPlatform(),
+      MacOSPlatform(),
+      LinuxPlatform(),
+    ],
+  )
   bool? hideDefaultMenuItems;
 
   ///Set to `true` if you want the title should be displayed. The default value is `false`.
@@ -149,7 +192,13 @@ class InAppBrowserSettings_
 
   ///Set the action bar's title.
   @SupportedPlatforms(
-      platforms: [AndroidPlatform(), MacOSPlatform(), WindowsPlatform()])
+    platforms: [
+      AndroidPlatform(),
+      MacOSPlatform(),
+      WindowsPlatform(),
+      LinuxPlatform(),
+    ],
+  )
   String? toolbarTopFixedTitle;
 
   ///Set to `false` to not close the InAppBrowser when the user click on the Android back button and the WebView cannot go back to the history. The default value is `true`.
@@ -218,12 +267,16 @@ class InAppBrowserSettings_
 
   ///How the browser window should be added to the main window.
   ///The default value is [WindowType.WINDOW].
-  @SupportedPlatforms(platforms: [MacOSPlatform(), WindowsPlatform()])
+  @SupportedPlatforms(
+    platforms: [MacOSPlatform(), WindowsPlatform(), LinuxPlatform()],
+  )
   WindowType_? windowType;
 
   ///The window’s alpha value.
   ///The default value is `1.0`.
-  @SupportedPlatforms(platforms: [MacOSPlatform(), WindowsPlatform()])
+  @SupportedPlatforms(
+    platforms: [MacOSPlatform(), WindowsPlatform(), LinuxPlatform()],
+  )
   double? windowAlphaValue;
 
   ///Flags that describe the window’s current style, such as if it’s resizable or in full-screen mode.
@@ -236,38 +289,41 @@ class InAppBrowserSettings_
 
   ///Sets the origin and size of the window’s frame rectangle according to a given frame rectangle,
   ///thereby setting its position and size onscreen.
-  @SupportedPlatforms(platforms: [MacOSPlatform(), WindowsPlatform()])
+  @SupportedPlatforms(
+    platforms: [MacOSPlatform(), WindowsPlatform(), LinuxPlatform()],
+  )
   InAppWebViewRect_? windowFrame;
 
-  InAppBrowserSettings_(
-      {this.hidden = false,
-      this.hideToolbarTop = false,
-      this.toolbarTopBackgroundColor,
-      this.hideUrlBar = false,
-      this.hideProgressBar = false,
-      this.hideDefaultMenuItems = false,
-      this.toolbarTopTranslucent = true,
-      this.toolbarTopTintColor,
-      this.hideToolbarBottom = false,
-      this.toolbarBottomBackgroundColor,
-      this.toolbarBottomTintColor,
-      this.toolbarBottomTranslucent = true,
-      this.closeButtonCaption,
-      this.closeButtonColor,
-      this.hideCloseButton = false,
-      this.menuButtonColor,
-      this.presentationStyle = ModalPresentationStyle_.FULL_SCREEN,
-      this.transitionStyle = ModalTransitionStyle_.COVER_VERTICAL,
-      this.hideTitleBar = false,
-      this.toolbarTopFixedTitle,
-      this.closeOnCannotGoBack = true,
-      this.allowGoBackWithBackButton = true,
-      this.shouldCloseOnBackButtonPressed = false,
-      this.windowType,
-      this.windowAlphaValue = 1.0,
-      this.windowStyleMask,
-      this.windowTitlebarSeparatorStyle,
-      this.windowFrame});
+  InAppBrowserSettings_({
+    this.hidden = false,
+    this.hideToolbarTop = false,
+    this.toolbarTopBackgroundColor,
+    this.hideUrlBar = false,
+    this.hideProgressBar = false,
+    this.hideDefaultMenuItems = false,
+    this.toolbarTopTranslucent = true,
+    this.toolbarTopTintColor,
+    this.hideToolbarBottom = false,
+    this.toolbarBottomBackgroundColor,
+    this.toolbarBottomTintColor,
+    this.toolbarBottomTranslucent = true,
+    this.closeButtonCaption,
+    this.closeButtonColor,
+    this.hideCloseButton = false,
+    this.menuButtonColor,
+    this.presentationStyle = ModalPresentationStyle_.FULL_SCREEN,
+    this.transitionStyle = ModalTransitionStyle_.COVER_VERTICAL,
+    this.hideTitleBar = false,
+    this.toolbarTopFixedTitle,
+    this.closeOnCannotGoBack = true,
+    this.allowGoBackWithBackButton = true,
+    this.shouldCloseOnBackButtonPressed = false,
+    this.windowType,
+    this.windowAlphaValue = 1.0,
+    this.windowStyleMask,
+    this.windowTitlebarSeparatorStyle,
+    this.windowFrame,
+  });
 
   @override
   @ExchangeableObjectMethod(ignore: true)
@@ -288,10 +344,13 @@ class InAppBrowserSettings_
   }
 
   ///Check if the given [property] is supported by the [defaultTargetPlatform] or a specific [platform].
-  static bool isPropertySupported(InAppBrowserSettingsProperty property,
-          {TargetPlatform? platform}) =>
-      _InAppBrowserSettingsPropertySupported.isPropertySupported(property,
-          platform: platform);
+  static bool isPropertySupported(
+    InAppBrowserSettingsProperty property, {
+    TargetPlatform? platform,
+  }) => _InAppBrowserSettingsPropertySupported.isPropertySupported(
+    property,
+    platform: platform,
+  );
 }
 
 ///Class that represents the options that can be used for an [InAppBrowser] WebView.
@@ -310,11 +369,12 @@ class InAppBrowserClassOptions {
   ///WebView options.
   late InAppWebViewGroupOptions inAppWebViewGroupOptions;
 
-  InAppBrowserClassOptions(
-      {InAppBrowserOptions? crossPlatform,
-      AndroidInAppBrowserOptions? android,
-      IOSInAppBrowserOptions? ios,
-      InAppWebViewGroupOptions? inAppWebViewGroupOptions}) {
+  InAppBrowserClassOptions({
+    InAppBrowserOptions? crossPlatform,
+    AndroidInAppBrowserOptions? android,
+    IOSInAppBrowserOptions? ios,
+    InAppWebViewGroupOptions? inAppWebViewGroupOptions,
+  }) {
     this.crossPlatform = crossPlatform ?? InAppBrowserOptions();
     this.android = android ?? AndroidInAppBrowserOptions();
     this.ios = ios ?? IOSInAppBrowserOptions();
@@ -347,20 +407,24 @@ class InAppBrowserClassOptions {
     return toMap().toString();
   }
 
-  static InAppBrowserClassOptions fromMap(Map<String, dynamic> options,
-      {EnumMethod? enumMethod}) {
+  static InAppBrowserClassOptions fromMap(
+    Map<String, dynamic> options, {
+    EnumMethod? enumMethod,
+  }) {
     InAppBrowserClassOptions inAppBrowserClassOptions =
         InAppBrowserClassOptions();
 
-    inAppBrowserClassOptions.crossPlatform =
-        InAppBrowserOptions.fromMap(options);
+    inAppBrowserClassOptions.crossPlatform = InAppBrowserOptions.fromMap(
+      options,
+    );
     inAppBrowserClassOptions.inAppWebViewGroupOptions =
         InAppWebViewGroupOptions();
     inAppBrowserClassOptions.inAppWebViewGroupOptions.crossPlatform =
         InAppWebViewOptions.fromMap(options);
     if (Util.isAndroid) {
-      inAppBrowserClassOptions.android =
-          AndroidInAppBrowserOptions.fromMap(options);
+      inAppBrowserClassOptions.android = AndroidInAppBrowserOptions.fromMap(
+        options,
+      );
       inAppBrowserClassOptions.inAppWebViewGroupOptions.android =
           AndroidInAppWebViewOptions.fromMap(options);
     } else if (Util.isIOS) {
@@ -398,12 +462,13 @@ class InAppBrowserOptions
   ///Set to `true` to hide the progress bar when the WebView is loading a page. The default value is `false`.
   bool hideProgressBar;
 
-  InAppBrowserOptions(
-      {this.hidden = false,
-      this.hideToolbarTop = false,
-      this.toolbarTopBackgroundColor,
-      this.hideUrlBar = false,
-      this.hideProgressBar = false});
+  InAppBrowserOptions({
+    this.hidden = false,
+    this.hideToolbarTop = false,
+    this.toolbarTopBackgroundColor,
+    this.hideUrlBar = false,
+    this.hideProgressBar = false,
+  });
 
   @override
   Map<String, dynamic> toMap() {
@@ -412,7 +477,7 @@ class InAppBrowserOptions
       "hideToolbarTop": hideToolbarTop,
       "toolbarTopBackgroundColor": toolbarTopBackgroundColor?.toHex(),
       "hideUrlBar": hideUrlBar,
-      "hideProgressBar": hideProgressBar
+      "hideProgressBar": hideProgressBar,
     };
   }
 
@@ -420,8 +485,9 @@ class InAppBrowserOptions
     var instance = InAppBrowserOptions();
     instance.hidden = map["hidden"];
     instance.hideToolbarTop = map["hideToolbarTop"];
-    instance.toolbarTopBackgroundColor =
-        UtilColor.fromHex(map["toolbarTopBackgroundColor"]);
+    instance.toolbarTopBackgroundColor = UtilColor.fromHex(
+      map["toolbarTopBackgroundColor"],
+    );
     instance.hideUrlBar = map["hideUrlBar"];
     instance.hideProgressBar = map["hideProgressBar"];
     return instance;

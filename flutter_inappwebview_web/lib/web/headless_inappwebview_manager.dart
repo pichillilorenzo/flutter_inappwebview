@@ -26,8 +26,8 @@ class HeadlessInAppWebViewManager extends ChannelController {
     switch (call.method) {
       case "run":
         String id = call.arguments["id"];
-        Map<String, dynamic> params =
-            call.arguments["params"].cast<String, dynamic>();
+        Map<String, dynamic> params = call.arguments["params"]
+            .cast<String, dynamic>();
         run(id, params);
         break;
       default:
@@ -39,7 +39,10 @@ class HeadlessInAppWebViewManager extends ChannelController {
   void run(String id, Map<String, dynamic> params) {
     var webView = InAppWebViewWebElement(viewId: id, messenger: _messenger);
     var headlessWebView = HeadlessInAppWebViewWebElement(
-        id: id, messenger: _messenger, webView: webView);
+      id: id,
+      messenger: _messenger,
+      webView: webView,
+    );
     InAppWebViewManager.webViews.putIfAbsent(id, () => webView);
     HeadlessInAppWebViewManager.webViews.putIfAbsent(id, () => headlessWebView);
     prepare(webView, params);
@@ -56,18 +59,20 @@ class HeadlessInAppWebViewManager extends ChannelController {
       webView.iframeContainer.style.height =
           initialSize["height"].toString() + 'px';
     }
-    Map<String, dynamic> initialSettings =
-        params["initialSettings"].cast<String, dynamic>();
+    Map<String, dynamic> initialSettings = params["initialSettings"]
+        .cast<String, dynamic>();
     if (initialSettings.isEmpty) {
       webView.initialSettings = InAppWebViewSettings();
     } else {
       webView.initialSettings = InAppWebViewSettings.fromMap(initialSettings);
     }
     webView.initialUrlRequest = URLRequest.fromMap(
-        params["initialUrlRequest"]?.cast<String, dynamic>());
+      params["initialUrlRequest"]?.cast<String, dynamic>(),
+    );
     webView.initialFile = params["initialFile"];
     webView.initialData = InAppWebViewInitialData.fromMap(
-        params["initialData"]?.cast<String, dynamic>());
+      params["initialData"]?.cast<String, dynamic>(),
+    );
     webView.initialUserScripts = params["initialUserScripts"];
     document.body?.append(webView.iframeContainer);
     webView.prepare();

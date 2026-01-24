@@ -21,20 +21,23 @@ class TrustedWebActivityImmersiveDisplayMode
   ///Use [displayCutoutMode] instead.
   @Deprecated('Use displayCutoutMode instead')
   AndroidLayoutInDisplayCutoutMode? layoutInDisplayCutoutMode;
-  TrustedWebActivityImmersiveDisplayMode(
-      {required this.isSticky,
-      this.displayCutoutMode = LayoutInDisplayCutoutMode.DEFAULT,
-      this.layoutInDisplayCutoutMode}) {
+  TrustedWebActivityImmersiveDisplayMode({
+    required this.isSticky,
+    this.displayCutoutMode = LayoutInDisplayCutoutMode.DEFAULT,
+    this.layoutInDisplayCutoutMode,
+  }) {
     this.displayCutoutMode = this.layoutInDisplayCutoutMode != null
         ? LayoutInDisplayCutoutMode.fromNativeValue(
-            layoutInDisplayCutoutMode?.toNativeValue())!
+            layoutInDisplayCutoutMode?.toNativeValue(),
+          )!
         : this.displayCutoutMode;
   }
 
   ///Gets a possible [TrustedWebActivityImmersiveDisplayMode] instance from a [Map] value.
   static TrustedWebActivityImmersiveDisplayMode? fromMap(
-      Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
@@ -43,22 +46,28 @@ class TrustedWebActivityImmersiveDisplayMode
       layoutInDisplayCutoutMode: switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue =>
           AndroidLayoutInDisplayCutoutMode.fromNativeValue(
-              map['displayCutoutMode']),
-        EnumMethod.value =>
-          AndroidLayoutInDisplayCutoutMode.fromValue(map['displayCutoutMode']),
-        EnumMethod.name =>
-          AndroidLayoutInDisplayCutoutMode.byName(map['displayCutoutMode'])
+            map['displayCutoutMode'],
+          ),
+        EnumMethod.value => AndroidLayoutInDisplayCutoutMode.fromValue(
+          map['displayCutoutMode'],
+        ),
+        EnumMethod.name => AndroidLayoutInDisplayCutoutMode.byName(
+          map['displayCutoutMode'],
+        ),
       },
     );
     if (map['displayCutoutMode'] != null) {
-      instance.displayCutoutMode =
-          switch (enumMethod ?? EnumMethod.nativeValue) {
-        EnumMethod.nativeValue =>
-          LayoutInDisplayCutoutMode.fromNativeValue(map['displayCutoutMode']),
-        EnumMethod.value =>
-          LayoutInDisplayCutoutMode.fromValue(map['displayCutoutMode']),
-        EnumMethod.name =>
-          LayoutInDisplayCutoutMode.byName(map['displayCutoutMode'])
+      instance.displayCutoutMode = switch (enumMethod ??
+          EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => LayoutInDisplayCutoutMode.fromNativeValue(
+          map['displayCutoutMode'],
+        ),
+        EnumMethod.value => LayoutInDisplayCutoutMode.fromValue(
+          map['displayCutoutMode'],
+        ),
+        EnumMethod.name => LayoutInDisplayCutoutMode.byName(
+          map['displayCutoutMode'],
+        ),
       }!;
     }
     return instance;
@@ -75,7 +84,7 @@ class TrustedWebActivityImmersiveDisplayMode
       "displayCutoutMode": switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => displayCutoutMode.toNativeValue(),
         EnumMethod.value => displayCutoutMode.toValue(),
-        EnumMethod.name => displayCutoutMode.name()
+        EnumMethod.name => displayCutoutMode.name(),
       },
       "isSticky": isSticky,
       ..._toMapMergeWith(enumMethod: enumMethod),

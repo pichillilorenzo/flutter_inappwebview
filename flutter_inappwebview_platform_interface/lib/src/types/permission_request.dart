@@ -24,6 +24,9 @@ class PermissionRequest_ {
   ///The frame that initiates the request in the web view.
   FrameInfo_? frame;
 
-  PermissionRequest_(
-      {required this.origin, this.resources = const [], this.frame});
+  PermissionRequest_({
+    required this.origin,
+    this.resources = const [],
+    this.frame,
+  });
 }

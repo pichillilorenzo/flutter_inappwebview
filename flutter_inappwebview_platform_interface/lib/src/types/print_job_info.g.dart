@@ -120,34 +120,38 @@ class PrintJobInfo {
   ///- iOS
   ///- MacOS
   PrintJobState? state;
-  PrintJobInfo(
-      {this.attributes,
-      this.canSpawnSeparateThread,
-      this.copies,
-      this.creationTime,
-      this.currentPage,
-      this.firstPage,
-      this.isCopyingOperation,
-      this.label,
-      this.lastPage,
-      this.numberOfPages,
-      this.pageOrder,
-      this.preferredRenderingQuality,
-      this.printer,
-      this.showsPrintPanel,
-      this.showsProgressPanel,
-      this.state});
+  PrintJobInfo({
+    this.attributes,
+    this.canSpawnSeparateThread,
+    this.copies,
+    this.creationTime,
+    this.currentPage,
+    this.firstPage,
+    this.isCopyingOperation,
+    this.label,
+    this.lastPage,
+    this.numberOfPages,
+    this.pageOrder,
+    this.preferredRenderingQuality,
+    this.printer,
+    this.showsPrintPanel,
+    this.showsProgressPanel,
+    this.state,
+  });
 
   ///Gets a possible [PrintJobInfo] instance from a [Map] value.
-  static PrintJobInfo? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static PrintJobInfo? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
     final instance = PrintJobInfo(
       attributes: PrintJobAttributes.fromMap(
-          map['attributes']?.cast<String, dynamic>(),
-          enumMethod: enumMethod),
+        map['attributes']?.cast<String, dynamic>(),
+        enumMethod: enumMethod,
+      ),
       canSpawnSeparateThread: map['canSpawnSeparateThread'],
       copies: map['copies'],
       creationTime: map['creationTime'],
@@ -158,27 +162,33 @@ class PrintJobInfo {
       lastPage: map['lastPage'],
       numberOfPages: map['numberOfPages'],
       pageOrder: switch (enumMethod ?? EnumMethod.nativeValue) {
-        EnumMethod.nativeValue =>
-          PrintJobPageOrder.fromNativeValue(map['pageOrder']),
+        EnumMethod.nativeValue => PrintJobPageOrder.fromNativeValue(
+          map['pageOrder'],
+        ),
         EnumMethod.value => PrintJobPageOrder.fromValue(map['pageOrder']),
-        EnumMethod.name => PrintJobPageOrder.byName(map['pageOrder'])
+        EnumMethod.name => PrintJobPageOrder.byName(map['pageOrder']),
       },
       preferredRenderingQuality: switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => PrintJobRenderingQuality.fromNativeValue(
-            map['preferredRenderingQuality']),
-        EnumMethod.value =>
-          PrintJobRenderingQuality.fromValue(map['preferredRenderingQuality']),
-        EnumMethod.name =>
-          PrintJobRenderingQuality.byName(map['preferredRenderingQuality'])
+          map['preferredRenderingQuality'],
+        ),
+        EnumMethod.value => PrintJobRenderingQuality.fromValue(
+          map['preferredRenderingQuality'],
+        ),
+        EnumMethod.name => PrintJobRenderingQuality.byName(
+          map['preferredRenderingQuality'],
+        ),
       },
-      printer: Printer.fromMap(map['printer']?.cast<String, dynamic>(),
-          enumMethod: enumMethod),
+      printer: Printer.fromMap(
+        map['printer']?.cast<String, dynamic>(),
+        enumMethod: enumMethod,
+      ),
       showsPrintPanel: map['showsPrintPanel'],
       showsProgressPanel: map['showsProgressPanel'],
       state: switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => PrintJobState.fromNativeValue(map['state']),
         EnumMethod.value => PrintJobState.fromValue(map['state']),
-        EnumMethod.name => PrintJobState.byName(map['state'])
+        EnumMethod.name => PrintJobState.byName(map['state']),
       },
     );
     return instance;
@@ -200,13 +210,13 @@ class PrintJobInfo {
       "pageOrder": switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => pageOrder?.toNativeValue(),
         EnumMethod.value => pageOrder?.toValue(),
-        EnumMethod.name => pageOrder?.name()
+        EnumMethod.name => pageOrder?.name(),
       },
-      "preferredRenderingQuality": switch (
-          enumMethod ?? EnumMethod.nativeValue) {
+      "preferredRenderingQuality": switch (enumMethod ??
+          EnumMethod.nativeValue) {
         EnumMethod.nativeValue => preferredRenderingQuality?.toNativeValue(),
         EnumMethod.value => preferredRenderingQuality?.toValue(),
-        EnumMethod.name => preferredRenderingQuality?.name()
+        EnumMethod.name => preferredRenderingQuality?.name(),
       },
       "printer": printer?.toMap(enumMethod: enumMethod),
       "showsPrintPanel": showsPrintPanel,
@@ -214,7 +224,7 @@ class PrintJobInfo {
       "state": switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => state?.toNativeValue(),
         EnumMethod.value => state?.toValue(),
-        EnumMethod.name => state?.name()
+        EnumMethod.name => state?.name(),
       },
     };
   }

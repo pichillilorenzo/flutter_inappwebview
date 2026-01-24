@@ -15,9 +15,10 @@ class IOSPrintJobControllerCreationParams
 
   /// Creates a [IOSPrintJobControllerCreationParams] instance based on [PlatformPrintJobControllerCreationParams].
   factory IOSPrintJobControllerCreationParams.fromPlatformPrintJobControllerCreationParams(
-      // Recommended placeholder to prevent being broken by platform interface.
-      // ignore: avoid_unused_constructor_parameters
-      PlatformPrintJobControllerCreationParams params) {
+    // Recommended placeholder to prevent being broken by platform interface.
+    // ignore: avoid_unused_constructor_parameters
+    PlatformPrintJobControllerCreationParams params,
+  ) {
     return IOSPrintJobControllerCreationParams(id: params.id);
   }
 }
@@ -27,20 +28,23 @@ class IOSPrintJobController extends PlatformPrintJobController
     with ChannelController {
   /// Constructs a [IOSPrintJobController].
   IOSPrintJobController(PlatformPrintJobControllerCreationParams params)
-      : super.implementation(
-          params is IOSPrintJobControllerCreationParams
-              ? params
-              : IOSPrintJobControllerCreationParams
-                  .fromPlatformPrintJobControllerCreationParams(params),
-        ) {
+    : super.implementation(
+        params is IOSPrintJobControllerCreationParams
+            ? params
+            : IOSPrintJobControllerCreationParams.fromPlatformPrintJobControllerCreationParams(
+                params,
+              ),
+      ) {
     channel = MethodChannel(
-        'com.pichillilorenzo/flutter_inappwebview_printjobcontroller_${params.id}');
+      'com.pichillilorenzo/flutter_inappwebview_printjobcontroller_${params.id}',
+    );
     handler = _handleMethod;
     initMethodCallHandler();
   }
 
-  static final IOSPrintJobController _staticValue =
-      IOSPrintJobController(IOSPrintJobControllerCreationParams(id: ''));
+  static final IOSPrintJobController _staticValue = IOSPrintJobController(
+    IOSPrintJobControllerCreationParams(id: ''),
+  );
 
   /// Provide static access.
   factory IOSPrintJobController.static() {
@@ -71,8 +75,10 @@ class IOSPrintJobController extends PlatformPrintJobController
   @override
   Future<PrintJobInfo?> getInfo() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    Map<String, dynamic>? infoMap =
-        (await channel?.invokeMethod('getInfo', args))?.cast<String, dynamic>();
+    Map<String, dynamic>? infoMap = (await channel?.invokeMethod(
+      'getInfo',
+      args,
+    ))?.cast<String, dynamic>();
     return PrintJobInfo.fromMap(infoMap);
   }
 

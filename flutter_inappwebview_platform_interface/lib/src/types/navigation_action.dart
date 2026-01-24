@@ -32,17 +32,21 @@ class NavigationAction_ {
   ///For security reasons in certain situations this method may return `false` even though
   ///the sequence of events which caused the request to be created was initiated by a user
   ///gesture.
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(
         available: "21",
         apiName: "WebResourceRequest.hasGesture",
         apiUrl:
             "https://developer.android.com/reference/android/webkit/WebResourceRequest#hasGesture()",
-        note: "On Android < 21, this is always `false`"),
-    WindowsPlatform(
+        note: "On Android < 21, this is always `false`",
+      ),
+      WindowsPlatform(
         note:
-            "Available only if the request is associated to the [PlatformWebViewCreationParams.onCreateWindow] event")
-  ])
+            "Available only if the request is associated to the [PlatformWebViewCreationParams.onCreateWindow] event",
+      ),
+    ],
+  )
   bool? hasGesture;
 
   ///Use [isRedirect] instead.
@@ -53,14 +57,17 @@ class NavigationAction_ {
   ///
   ///**NOTE**: If the request is associated to the [PlatformWebViewCreationParams.onCreateWindow] event, this is always `false`.
   ///Also, on Android < 21, this is always `false`.
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(
         available: "21",
         apiName: "WebResourceRequest.isRedirect",
         apiUrl:
-            "https://developer.android.com/reference/android/webkit/WebResourceRequest#isRedirect()"),
-    WindowsPlatform()
-  ])
+            "https://developer.android.com/reference/android/webkit/WebResourceRequest#isRedirect()",
+      ),
+      WindowsPlatform(),
+    ],
+  )
   bool? isRedirect;
 
   ///Use [navigationType] instead.
@@ -68,17 +75,21 @@ class NavigationAction_ {
   IOSWKNavigationType_? iosWKNavigationType;
 
   ///The type of action triggering the navigation.
-  @SupportedPlatforms(platforms: [
-    IOSPlatform(
+  @SupportedPlatforms(
+    platforms: [
+      IOSPlatform(
         apiName: "WKNavigationAction.navigationType",
         apiUrl:
-            "https://developer.apple.com/documentation/webkit/wknavigationaction/1401914-navigationtype"),
-    MacOSPlatform(
+            "https://developer.apple.com/documentation/webkit/wknavigationaction/1401914-navigationtype",
+      ),
+      MacOSPlatform(
         apiName: "WKNavigationAction.navigationType",
         apiUrl:
-            "https://developer.apple.com/documentation/webkit/wknavigationaction/1401914-navigationtype"),
-    WindowsPlatform()
-  ])
+            "https://developer.apple.com/documentation/webkit/wknavigationaction/1401914-navigationtype",
+      ),
+      WindowsPlatform(),
+    ],
+  )
   NavigationType_? navigationType;
 
   ///Use [sourceFrame] instead.
@@ -86,16 +97,20 @@ class NavigationAction_ {
   IOSWKFrameInfo_? iosSourceFrame;
 
   ///The frame that requested the navigation.
-  @SupportedPlatforms(platforms: [
-    IOSPlatform(
+  @SupportedPlatforms(
+    platforms: [
+      IOSPlatform(
         apiName: "WKNavigationAction.sourceFrame",
         apiUrl:
-            "https://developer.apple.com/documentation/webkit/wknavigationaction/1401926-sourceframe"),
-    MacOSPlatform(
+            "https://developer.apple.com/documentation/webkit/wknavigationaction/1401926-sourceframe",
+      ),
+      MacOSPlatform(
         apiName: "WKNavigationAction.sourceFrame",
         apiUrl:
-            "https://developer.apple.com/documentation/webkit/wknavigationaction/1401926-sourceframe")
-  ])
+            "https://developer.apple.com/documentation/webkit/wknavigationaction/1401926-sourceframe",
+      ),
+    ],
+  )
   FrameInfo_? sourceFrame;
 
   ///Use [targetFrame] instead.
@@ -103,45 +118,54 @@ class NavigationAction_ {
   IOSWKFrameInfo_? iosTargetFrame;
 
   ///The frame in which to display the new content.
-  @SupportedPlatforms(platforms: [
-    IOSPlatform(
+  @SupportedPlatforms(
+    platforms: [
+      IOSPlatform(
         apiName: "WKNavigationAction.targetFrame",
         apiUrl:
-            "https://developer.apple.com/documentation/webkit/wknavigationaction/1401918-targetframe"),
-    MacOSPlatform(
+            "https://developer.apple.com/documentation/webkit/wknavigationaction/1401918-targetframe",
+      ),
+      MacOSPlatform(
         apiName: "WKNavigationAction.targetFrame",
         apiUrl:
-            "https://developer.apple.com/documentation/webkit/wknavigationaction/1401918-targetframe")
-  ])
+            "https://developer.apple.com/documentation/webkit/wknavigationaction/1401918-targetframe",
+      ),
+    ],
+  )
   FrameInfo_? targetFrame;
 
   ///A value indicating whether the web content used a download attribute to indicate that this should be downloaded.
-  @SupportedPlatforms(platforms: [
-    IOSPlatform(
+  @SupportedPlatforms(
+    platforms: [
+      IOSPlatform(
         available: "14.5",
         apiName: "WKNavigationAction.shouldPerformDownload",
         apiUrl:
-            "https://developer.apple.com/documentation/webkit/wknavigationaction/3727357-shouldperformdownload"),
-    MacOSPlatform(
+            "https://developer.apple.com/documentation/webkit/wknavigationaction/3727357-shouldperformdownload",
+      ),
+      MacOSPlatform(
         available: "11.3",
         apiName: "WKNavigationAction.shouldPerformDownload",
         apiUrl:
-            "https://developer.apple.com/documentation/webkit/wknavigationaction/3727357-shouldperformdownload")
-  ])
+            "https://developer.apple.com/documentation/webkit/wknavigationaction/3727357-shouldperformdownload",
+      ),
+    ],
+  )
   bool? shouldPerformDownload;
 
-  NavigationAction_(
-      {required this.request,
-      required this.isForMainFrame,
-      @Deprecated('Use hasGesture instead') this.androidHasGesture,
-      this.hasGesture,
-      @Deprecated('Use isRedirect instead') this.androidIsRedirect,
-      this.isRedirect,
-      @Deprecated("Use navigationType instead") this.iosWKNavigationType,
-      this.navigationType,
-      @Deprecated("Use sourceFrame instead") this.iosSourceFrame,
-      this.sourceFrame,
-      @Deprecated("Use targetFrame instead") this.iosTargetFrame,
-      this.targetFrame,
-      this.shouldPerformDownload});
+  NavigationAction_({
+    required this.request,
+    required this.isForMainFrame,
+    @Deprecated('Use hasGesture instead') this.androidHasGesture,
+    this.hasGesture,
+    @Deprecated('Use isRedirect instead') this.androidIsRedirect,
+    this.isRedirect,
+    @Deprecated("Use navigationType instead") this.iosWKNavigationType,
+    this.navigationType,
+    @Deprecated("Use sourceFrame instead") this.iosSourceFrame,
+    this.sourceFrame,
+    @Deprecated("Use targetFrame instead") this.iosTargetFrame,
+    this.targetFrame,
+    this.shouldPerformDownload,
+  });
 }

@@ -34,23 +34,28 @@ class ProxyRelayHop {
   ///- iOS WKWebView
   ///- macOS WKWebView
   String? http3RelayEndpoint;
-  ProxyRelayHop(
-      {this.http3RelayEndpoint,
-      this.http2RelayEndpoint,
-      this.additionalHTTPHeaders}) {
-    assert(http3RelayEndpoint != null || http2RelayEndpoint != null,
-        "At least one of http3RelayEndpoint or http2RelayEndpoint must be non-null");
+  ProxyRelayHop({
+    this.http3RelayEndpoint,
+    this.http2RelayEndpoint,
+    this.additionalHTTPHeaders,
+  }) {
+    assert(
+      http3RelayEndpoint != null || http2RelayEndpoint != null,
+      "At least one of http3RelayEndpoint or http2RelayEndpoint must be non-null",
+    );
   }
 
   ///Gets a possible [ProxyRelayHop] instance from a [Map] value.
-  static ProxyRelayHop? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static ProxyRelayHop? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
     final instance = ProxyRelayHop(
-      additionalHTTPHeaders:
-          map['additionalHTTPHeaders']?.cast<String, String>(),
+      additionalHTTPHeaders: map['additionalHTTPHeaders']
+          ?.cast<String, String>(),
       http2RelayEndpoint: map['http2RelayEndpoint'],
       http3RelayEndpoint: map['http3RelayEndpoint'],
     );

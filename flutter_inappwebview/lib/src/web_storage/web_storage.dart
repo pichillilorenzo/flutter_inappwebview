@@ -6,12 +6,15 @@ import '../in_app_webview/in_app_webview_controller.dart';
 ///{@macro flutter_inappwebview_platform_interface.PlatformWebStorage}
 class WebStorage {
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebStorage}
-  WebStorage(
-      {required PlatformLocalStorage localStorage,
-      required PlatformSessionStorage sessionStorage})
-      : this.fromPlatformCreationParams(
-            params: PlatformWebStorageCreationParams(
-                localStorage: localStorage, sessionStorage: sessionStorage));
+  WebStorage({
+    required PlatformLocalStorage localStorage,
+    required PlatformSessionStorage sessionStorage,
+  }) : this.fromPlatformCreationParams(
+         params: PlatformWebStorageCreationParams(
+           localStorage: localStorage,
+           sessionStorage: sessionStorage,
+         ),
+       );
 
   /// Constructs a [WebStorage].
   ///
@@ -32,14 +35,19 @@ class WebStorage {
       PlatformWebStorage.static().isClassSupported(platform: platform);
 
   ///Check if the given [property] is supported by the [defaultTargetPlatform] or a specific [platform].
-  static bool isPropertySupported(dynamic property,
-          {TargetPlatform? platform}) =>
-      PlatformWebStorage.static()
-          .isPropertySupported(property, platform: platform);
+  static bool isPropertySupported(
+    dynamic property, {
+    TargetPlatform? platform,
+  }) => PlatformWebStorage.static().isPropertySupported(
+    property,
+    platform: platform,
+  );
 
   ///Check if the given [method] is supported by the [defaultTargetPlatform] or a specific [platform].
-  static bool isMethodSupported(PlatformWebStorageMethod method,
-          {TargetPlatform? platform}) =>
+  static bool isMethodSupported(
+    PlatformWebStorageMethod method, {
+    TargetPlatform? platform,
+  }) =>
       PlatformWebStorage.static().isMethodSupported(method, platform: platform);
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebStorage.localStorage}
@@ -99,11 +107,14 @@ abstract class Storage implements PlatformStorage {
 class LocalStorage extends Storage {
   ///{@macro flutter_inappwebview_platform_interface.PlatformLocalStorage}
   LocalStorage({required InAppWebViewController? controller})
-      : this.fromPlatformCreationParams(
-            params: PlatformLocalStorageCreationParams(
-                PlatformStorageCreationParams(
-                    controller: controller?.platform,
-                    webStorageType: WebStorageType.LOCAL_STORAGE)));
+    : this.fromPlatformCreationParams(
+        params: PlatformLocalStorageCreationParams(
+          PlatformStorageCreationParams(
+            controller: controller?.platform,
+            webStorageType: WebStorageType.LOCAL_STORAGE,
+          ),
+        ),
+      );
 
   /// Constructs a [LocalStorage].
   ///
@@ -115,7 +126,7 @@ class LocalStorage extends Storage {
 
   /// Constructs a [LocalStorage] from a specific platform implementation.
   LocalStorage.fromPlatform({required this.platform})
-      : super.fromPlatform(platform: platform);
+    : super.fromPlatform(platform: platform);
 
   /// Implementation of [PlatformLocalStorage] for the current platform.
   final PlatformLocalStorage platform;
@@ -126,27 +137,35 @@ class LocalStorage extends Storage {
 
   ///Check if the given [property] is supported by the [defaultTargetPlatform] or a specific [platform].
   static bool isPropertySupported(
-          PlatformStorageCreationParamsProperty property,
-          {TargetPlatform? platform}) =>
-      PlatformLocalStorage.static()
-          .isPropertySupported(property, platform: platform);
+    PlatformStorageCreationParamsProperty property, {
+    TargetPlatform? platform,
+  }) => PlatformLocalStorage.static().isPropertySupported(
+    property,
+    platform: platform,
+  );
 
   ///Check if the given [method] is supported by the [defaultTargetPlatform] or a specific [platform].
-  static bool isMethodSupported(PlatformLocalStorageMethod method,
-          {TargetPlatform? platform}) =>
-      PlatformLocalStorage.static()
-          .isMethodSupported(method, platform: platform);
+  static bool isMethodSupported(
+    PlatformLocalStorageMethod method, {
+    TargetPlatform? platform,
+  }) => PlatformLocalStorage.static().isMethodSupported(
+    method,
+    platform: platform,
+  );
 }
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformSessionStorage}
 class SessionStorage extends Storage {
   ///{@macro flutter_inappwebview_platform_interface.PlatformSessionStorage}
   SessionStorage({required InAppWebViewController? controller})
-      : this.fromPlatformCreationParams(
-            params: PlatformSessionStorageCreationParams(
-                PlatformStorageCreationParams(
-                    controller: controller?.platform,
-                    webStorageType: WebStorageType.SESSION_STORAGE)));
+    : this.fromPlatformCreationParams(
+        params: PlatformSessionStorageCreationParams(
+          PlatformStorageCreationParams(
+            controller: controller?.platform,
+            webStorageType: WebStorageType.SESSION_STORAGE,
+          ),
+        ),
+      );
 
   /// Constructs a [SessionStorage].
   ///
@@ -158,7 +177,7 @@ class SessionStorage extends Storage {
 
   /// Constructs a [SessionStorage] from a specific platform implementation.
   SessionStorage.fromPlatform({required this.platform})
-      : super.fromPlatform(platform: platform);
+    : super.fromPlatform(platform: platform);
 
   /// Implementation of [PlatformSessionStorage] for the current platform.
   final PlatformSessionStorage platform;
@@ -169,14 +188,19 @@ class SessionStorage extends Storage {
 
   ///Check if the given [property] is supported by the [defaultTargetPlatform] or a specific [platform].
   static bool isPropertySupported(
-          PlatformStorageCreationParamsProperty property,
-          {TargetPlatform? platform}) =>
-      PlatformSessionStorage.static()
-          .isPropertySupported(property, platform: platform);
+    PlatformStorageCreationParamsProperty property, {
+    TargetPlatform? platform,
+  }) => PlatformSessionStorage.static().isPropertySupported(
+    property,
+    platform: platform,
+  );
 
   ///Check if the given [method] is supported by the [defaultTargetPlatform] or a specific [platform].
-  static bool isMethodSupported(PlatformSessionStorageMethod method,
-          {TargetPlatform? platform}) =>
-      PlatformSessionStorage.static()
-          .isMethodSupported(method, platform: platform);
+  static bool isMethodSupported(
+    PlatformSessionStorageMethod method, {
+    TargetPlatform? platform,
+  }) => PlatformSessionStorage.static().isMethodSupported(
+    method,
+    platform: platform,
+  );
 }

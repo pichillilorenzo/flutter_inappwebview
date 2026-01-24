@@ -38,8 +38,10 @@ void stopLoading() {
 
     if (defaultTargetPlatform == TargetPlatform.android) {
       await pageLoaded.future;
-      expect(await controller.evaluateJavascript(source: "document.body"),
-          isNullOrEmpty);
+      expect(
+        await controller.evaluateJavascript(source: "document.body"),
+        isNullOrEmpty,
+      );
     } else if (defaultTargetPlatform == TargetPlatform.iOS) {
       expect(pageLoaded.future, doesNotComplete);
     }

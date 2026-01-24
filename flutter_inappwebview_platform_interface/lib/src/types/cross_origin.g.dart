@@ -13,17 +13,20 @@ class CrossOrigin {
   final String _value;
   final String _nativeValue;
   const CrossOrigin._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory CrossOrigin._internalMultiPlatform(
-          String value, Function nativeValue) =>
-      CrossOrigin._internal(value, nativeValue());
+    String value,
+    Function nativeValue,
+  ) => CrossOrigin._internal(value, nativeValue());
 
   ///CORS requests for this element will have the credentials flag set to 'same-origin'.
   static const ANONYMOUS = CrossOrigin._internal('anonymous', 'anonymous');
 
   ///CORS requests for this element will have the credentials flag set to 'include'.
-  static const USE_CREDENTIALS =
-      CrossOrigin._internal('use-credentials', 'use-credentials');
+  static const USE_CREDENTIALS = CrossOrigin._internal(
+    'use-credentials',
+    'use-credentials',
+  );
 
   ///Set of all values of [CrossOrigin].
   static final Set<CrossOrigin> values = [
@@ -35,8 +38,9 @@ class CrossOrigin {
   static CrossOrigin? fromValue(String? value) {
     if (value != null) {
       try {
-        return CrossOrigin.values
-            .firstWhere((element) => element.toValue() == value);
+        return CrossOrigin.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -48,8 +52,9 @@ class CrossOrigin {
   static CrossOrigin? fromNativeValue(String? value) {
     if (value != null) {
       try {
-        return CrossOrigin.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return CrossOrigin.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -65,8 +70,9 @@ class CrossOrigin {
   static CrossOrigin? byName(String? name) {
     if (name != null) {
       try {
-        return CrossOrigin.values
-            .firstWhere((element) => element.name() == name);
+        return CrossOrigin.values.firstWhere(
+          (element) => element.name() == name,
+        );
       } catch (e) {
         return null;
       }
@@ -83,8 +89,8 @@ class CrossOrigin {
   /// same value, or being values of different enum type), at most one of
   /// them will be represented in the returned map.
   static Map<String, CrossOrigin> asNameMap() => <String, CrossOrigin>{
-        for (final value in CrossOrigin.values) value.name(): value
-      };
+    for (final value in CrossOrigin.values) value.name(): value,
+  };
 
   ///Gets [String] value.
   String toValue() => _value;

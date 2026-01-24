@@ -21,12 +21,16 @@ class InAppWebViewFlutterPlugin {
   /// Constructs a new instance of [InAppWebViewFlutterPlugin].
   InAppWebViewFlutterPlugin(Registrar registrar) {
     ui_web.platformViewRegistry.registerViewFactory(
-        'com.pichillilorenzo/flutter_inappwebview', (int viewId) {
-      var webView =
-          InAppWebViewWebElement(viewId: viewId, messenger: registrar);
-      InAppWebViewManager.webViews.putIfAbsent(viewId, () => webView);
-      return webView.iframeContainer;
-    });
+      'com.pichillilorenzo/flutter_inappwebview',
+      (int viewId) {
+        var webView = InAppWebViewWebElement(
+          viewId: viewId,
+          messenger: registrar,
+        );
+        InAppWebViewManager.webViews.putIfAbsent(viewId, () => webView);
+        return webView.iframeContainer;
+      },
+    );
   }
 
   static void registerWith(Registrar registrar) {
@@ -43,15 +47,20 @@ class InAppWebViewFlutterPlugin {
       if (!Object_isFrozen(flutterInAppWebView!).toDart) {
         flutterInAppWebView!.nativeAsyncCommunication =
             ((JSString method, JSAny viewId, [JSArray? args]) {
-          return _dartNativeAsyncCommunication(
-                  method.toDart, viewId, args?.toDart)
-              .then((value) => value?.toJS)
-              .toJS;
-        }).toJS;
-        flutterInAppWebView!.nativeSyncCommunication = ((JSString method,
-                JSAny viewId, [JSArray? args]) =>
-            _dartNativeSyncCommunication(method.toDart, viewId, args?.toDart)
-                ?.toJS).toJS;
+              return _dartNativeAsyncCommunication(
+                method.toDart,
+                viewId,
+                args?.toDart,
+              ).then((value) => value?.toJS).toJS;
+            }).toJS;
+        flutterInAppWebView!.nativeSyncCommunication =
+            ((JSString method, JSAny viewId, [JSArray? args]) =>
+                    _dartNativeSyncCommunication(
+                      method.toDart,
+                      viewId,
+                      args?.toDart,
+                    )?.toJS)
+                .toJS;
         Object_freeze(flutterInAppWebView!);
       }
     } else {
@@ -62,8 +71,11 @@ class InAppWebViewFlutterPlugin {
   }
 }
 
-Future<String?> _dartNativeAsyncCommunication(String method, dynamic viewId,
-    [List? args]) async {
+Future<String?> _dartNativeAsyncCommunication(
+  String method,
+  dynamic viewId, [
+  List? args,
+]) async {
   if (InAppWebViewManager.webViews.containsKey(viewId)) {
     var webViewHtmlElement =
         InAppWebViewManager.webViews[viewId] as InAppWebViewWebElement;
@@ -75,7 +87,10 @@ Future<String?> _dartNativeAsyncCommunication(String method, dynamic viewId,
           String? target = args[1];
           String? windowFeatures = args[2];
           result = await webViewHtmlElement.onCreateWindow(
-              url, target, windowFeatures);
+            url,
+            target,
+            windowFeatures,
+          );
           break;
         case 'onCallJsHandler':
           String handlerName = args![0];
@@ -96,8 +111,11 @@ Future<String?> _dartNativeAsyncCommunication(String method, dynamic viewId,
   return null;
 }
 
-String? _dartNativeSyncCommunication(String method, dynamic viewId,
-    [List? args]) {
+String? _dartNativeSyncCommunication(
+  String method,
+  dynamic viewId, [
+  List? args,
+]) {
   if (InAppWebViewManager.webViews.containsKey(viewId)) {
     var webViewHtmlElement =
         InAppWebViewManager.webViews[viewId] as InAppWebViewWebElement;
@@ -164,8 +182,9 @@ String? _dartNativeSyncCommunication(String method, dynamic viewId,
           webViewHtmlElement.onCloseWindow();
           break;
         case 'getUserOnlyScriptsAt':
-          final injectionTime =
-              UserScriptInjectionTime.fromNativeValue(args![0]);
+          final injectionTime = UserScriptInjectionTime.fromNativeValue(
+            args![0],
+          );
           result = webViewHtmlElement.userContentController
               .getUserOnlyScriptsAt(injectionTime!);
           break;

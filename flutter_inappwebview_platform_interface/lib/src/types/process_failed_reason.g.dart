@@ -11,100 +11,113 @@ class ProcessFailedReason {
   final String _value;
   final int? _nativeValue;
   const ProcessFailedReason._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory ProcessFailedReason._internalMultiPlatform(
-          String value, Function nativeValue) =>
-      ProcessFailedReason._internal(value, nativeValue());
+    String value,
+    Function nativeValue,
+  ) => ProcessFailedReason._internal(value, nativeValue());
 
   ///The process crashed.
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Windows WebView2 ([Official API - COREWEBVIEW2_PROCESS_FAILED_REASON_CRASHED](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_process_failed_reason))
-  static final CRASHED =
-      ProcessFailedReason._internalMultiPlatform('CRASHED', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.windows:
-        return 3;
-      default:
-        break;
-    }
-    return null;
-  });
+  static final CRASHED = ProcessFailedReason._internalMultiPlatform(
+    'CRASHED',
+    () {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.windows:
+          return 3;
+        default:
+          break;
+      }
+      return null;
+    },
+  );
 
   ///The process failed to launch.
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Windows WebView2 ([Official API - COREWEBVIEW2_PROCESS_FAILED_REASON_LAUNCH_FAILED](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_process_failed_reason))
-  static final LAUNCH_FAILED =
-      ProcessFailedReason._internalMultiPlatform('LAUNCH_FAILED', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.windows:
-        return 4;
-      default:
-        break;
-    }
-    return null;
-  });
+  static final LAUNCH_FAILED = ProcessFailedReason._internalMultiPlatform(
+    'LAUNCH_FAILED',
+    () {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.windows:
+          return 4;
+        default:
+          break;
+      }
+      return null;
+    },
+  );
 
   ///The process terminated due to running out of memory.
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Windows WebView2 ([Official API - COREWEBVIEW2_PROCESS_FAILED_REASON_OUT_OF_MEMORY](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_process_failed_reason))
-  static final OUT_OF_MEMORY =
-      ProcessFailedReason._internalMultiPlatform('OUT_OF_MEMORY', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.windows:
-        return 5;
-      default:
-        break;
-    }
-    return null;
-  });
+  static final OUT_OF_MEMORY = ProcessFailedReason._internalMultiPlatform(
+    'OUT_OF_MEMORY',
+    () {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.windows:
+          return 5;
+        default:
+          break;
+      }
+      return null;
+    },
+  );
 
   ///The process was terminated. For example, from Task Manager.
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Windows WebView2 ([Official API - COREWEBVIEW2_PROCESS_FAILED_REASON_TERMINATED](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_process_failed_reason))
-  static final TERMINATED =
-      ProcessFailedReason._internalMultiPlatform('TERMINATED', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.windows:
-        return 2;
-      default:
-        break;
-    }
-    return null;
-  });
+  static final TERMINATED = ProcessFailedReason._internalMultiPlatform(
+    'TERMINATED',
+    () {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.windows:
+          return 2;
+        default:
+          break;
+      }
+      return null;
+    },
+  );
 
   ///An unexpected process failure occurred.
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Windows WebView2 ([Official API - COREWEBVIEW2_PROCESS_FAILED_REASON_UNEXPECTED](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_process_failed_reason))
-  static final UNEXPECTED =
-      ProcessFailedReason._internalMultiPlatform('UNEXPECTED', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.windows:
-        return 0;
-      default:
-        break;
-    }
-    return null;
-  });
+  static final UNEXPECTED = ProcessFailedReason._internalMultiPlatform(
+    'UNEXPECTED',
+    () {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.windows:
+          return 0;
+        default:
+          break;
+      }
+      return null;
+    },
+  );
 
   ///The process became unresponsive. This only applies to the main frame's render process.
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Windows WebView2 ([Official API - COREWEBVIEW2_PROCESS_FAILED_REASON_UNRESPONSIVE](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_process_failed_reason))
-  static final UNRESPONSIVE =
-      ProcessFailedReason._internalMultiPlatform('UNRESPONSIVE', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.windows:
-        return 1;
-      default:
-        break;
-    }
-    return null;
-  });
+  static final UNRESPONSIVE = ProcessFailedReason._internalMultiPlatform(
+    'UNRESPONSIVE',
+    () {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.windows:
+          return 1;
+        default:
+          break;
+      }
+      return null;
+    },
+  );
 
   ///Set of all values of [ProcessFailedReason].
   static final Set<ProcessFailedReason> values = [
@@ -120,8 +133,9 @@ class ProcessFailedReason {
   static ProcessFailedReason? fromValue(String? value) {
     if (value != null) {
       try {
-        return ProcessFailedReason.values
-            .firstWhere((element) => element.toValue() == value);
+        return ProcessFailedReason.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -133,8 +147,9 @@ class ProcessFailedReason {
   static ProcessFailedReason? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return ProcessFailedReason.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return ProcessFailedReason.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -150,8 +165,9 @@ class ProcessFailedReason {
   static ProcessFailedReason? byName(String? name) {
     if (name != null) {
       try {
-        return ProcessFailedReason.values
-            .firstWhere((element) => element.name() == name);
+        return ProcessFailedReason.values.firstWhere(
+          (element) => element.name() == name,
+        );
       } catch (e) {
         return null;
       }
@@ -169,7 +185,7 @@ class ProcessFailedReason {
   /// them will be represented in the returned map.
   static Map<String, ProcessFailedReason> asNameMap() =>
       <String, ProcessFailedReason>{
-        for (final value in ProcessFailedReason.values) value.name(): value
+        for (final value in ProcessFailedReason.values) value.name(): value,
       };
 
   ///Gets [String] value.

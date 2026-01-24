@@ -19,8 +19,9 @@ class CustomSchemeResponse_ {
   ///Content-Encoding of the data, such as `utf-8`.
   String contentEncoding;
 
-  CustomSchemeResponse_(
-      {required this.data,
-      required this.contentType,
-      this.contentEncoding = 'utf-8'});
+  CustomSchemeResponse_({
+    required this.data,
+    required this.contentType,
+    this.contentEncoding = 'utf-8',
+  });
 }

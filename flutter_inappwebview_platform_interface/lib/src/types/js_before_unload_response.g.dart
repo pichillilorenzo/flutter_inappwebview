@@ -22,25 +22,29 @@ class JsBeforeUnloadResponse {
 
   ///Message to be displayed in the window.
   String message;
-  JsBeforeUnloadResponse(
-      {this.action = JsBeforeUnloadResponseAction.CONFIRM,
-      this.cancelButtonTitle = "",
-      this.confirmButtonTitle = "",
-      this.handledByClient = false,
-      this.message = ""});
+  JsBeforeUnloadResponse({
+    this.action = JsBeforeUnloadResponseAction.CONFIRM,
+    this.cancelButtonTitle = "",
+    this.confirmButtonTitle = "",
+    this.handledByClient = false,
+    this.message = "",
+  });
 
   ///Gets a possible [JsBeforeUnloadResponse] instance from a [Map] value.
-  static JsBeforeUnloadResponse? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static JsBeforeUnloadResponse? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
     final instance = JsBeforeUnloadResponse();
     instance.action = switch (enumMethod ?? EnumMethod.nativeValue) {
-      EnumMethod.nativeValue =>
-        JsBeforeUnloadResponseAction.fromNativeValue(map['action']),
+      EnumMethod.nativeValue => JsBeforeUnloadResponseAction.fromNativeValue(
+        map['action'],
+      ),
       EnumMethod.value => JsBeforeUnloadResponseAction.fromValue(map['action']),
-      EnumMethod.name => JsBeforeUnloadResponseAction.byName(map['action'])
+      EnumMethod.name => JsBeforeUnloadResponseAction.byName(map['action']),
     };
     if (map['cancelButtonTitle'] != null) {
       instance.cancelButtonTitle = map['cancelButtonTitle'];
@@ -63,7 +67,7 @@ class JsBeforeUnloadResponse {
       "action": switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => action?.toNativeValue(),
         EnumMethod.value => action?.toValue(),
-        EnumMethod.name => action?.name()
+        EnumMethod.name => action?.name(),
       },
       "cancelButtonTitle": cancelButtonTitle,
       "confirmButtonTitle": confirmButtonTitle,

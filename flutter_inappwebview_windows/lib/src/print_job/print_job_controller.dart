@@ -15,9 +15,10 @@ class WindowsPrintJobControllerCreationParams
 
   /// Creates a [WindowsPrintJobControllerCreationParams] instance based on [PlatformPrintJobControllerCreationParams].
   factory WindowsPrintJobControllerCreationParams.fromPlatformPrintJobControllerCreationParams(
-      // Recommended placeholder to prevent being broken by platform interface.
-      // ignore: avoid_unused_constructor_parameters
-      PlatformPrintJobControllerCreationParams params) {
+    // Recommended placeholder to prevent being broken by platform interface.
+    // ignore: avoid_unused_constructor_parameters
+    PlatformPrintJobControllerCreationParams params,
+  ) {
     return WindowsPrintJobControllerCreationParams(id: params.id);
   }
 }
@@ -27,14 +28,16 @@ class WindowsPrintJobController extends PlatformPrintJobController
     with ChannelController {
   /// Constructs a [WindowsPrintJobController].
   WindowsPrintJobController(PlatformPrintJobControllerCreationParams params)
-      : super.implementation(
-          params is WindowsPrintJobControllerCreationParams
-              ? params
-              : WindowsPrintJobControllerCreationParams
-                  .fromPlatformPrintJobControllerCreationParams(params),
-        ) {
+    : super.implementation(
+        params is WindowsPrintJobControllerCreationParams
+            ? params
+            : WindowsPrintJobControllerCreationParams.fromPlatformPrintJobControllerCreationParams(
+                params,
+              ),
+      ) {
     channel = MethodChannel(
-        'com.pichillilorenzo/flutter_inappwebview_printjobcontroller_${params.id}');
+      'com.pichillilorenzo/flutter_inappwebview_printjobcontroller_${params.id}',
+    );
     handler = _handleMethod;
     initMethodCallHandler();
   }
@@ -56,8 +59,10 @@ class WindowsPrintJobController extends PlatformPrintJobController
   @override
   Future<PrintJobInfo?> getInfo() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    Map<String, dynamic>? infoMap =
-        (await channel?.invokeMethod('getInfo', args))?.cast<String, dynamic>();
+    Map<String, dynamic>? infoMap = (await channel?.invokeMethod(
+      'getInfo',
+      args,
+    ))?.cast<String, dynamic>();
     return PrintJobInfo.fromMap(infoMap);
   }
 

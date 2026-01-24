@@ -16,9 +16,10 @@ class AndroidWebMessagePortCreationParams
 
   /// Creates a [AndroidWebMessagePortCreationParams] instance based on [PlatformWebMessagePortCreationParams].
   factory AndroidWebMessagePortCreationParams.fromPlatformWebMessagePortCreationParams(
-      // Recommended placeholder to prevent being broken by platform interface.
-      // ignore: avoid_unused_constructor_parameters
-      PlatformWebMessagePortCreationParams params) {
+    // Recommended placeholder to prevent being broken by platform interface.
+    // ignore: avoid_unused_constructor_parameters
+    PlatformWebMessagePortCreationParams params,
+  ) {
     return AndroidWebMessagePortCreationParams(index: params.index);
   }
 
@@ -35,19 +36,22 @@ class AndroidWebMessagePort extends PlatformWebMessagePort {
 
   /// Constructs a [AndroidWebMessagePort].
   AndroidWebMessagePort(PlatformWebMessagePortCreationParams params)
-      : super.implementation(
-          params is AndroidWebMessagePortCreationParams
-              ? params
-              : AndroidWebMessagePortCreationParams
-                  .fromPlatformWebMessagePortCreationParams(params),
-        );
+    : super.implementation(
+        params is AndroidWebMessagePortCreationParams
+            ? params
+            : AndroidWebMessagePortCreationParams.fromPlatformWebMessagePortCreationParams(
+                params,
+              ),
+      );
 
   @override
   Future<void> setWebMessageCallback(WebMessageCallback? onMessage) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('index', () => params.index);
-    await _webMessageChannel.internalChannel
-        ?.invokeMethod('setWebMessageCallback', args);
+    await _webMessageChannel.internalChannel?.invokeMethod(
+      'setWebMessageCallback',
+      args,
+    );
     this._onMessage = onMessage;
   }
 
@@ -70,7 +74,7 @@ class AndroidWebMessagePort extends PlatformWebMessagePort {
   Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
       "index": params.index,
-      "webMessageChannelId": this._webMessageChannel.params.id
+      "webMessageChannelId": this._webMessageChannel.params.id,
     };
   }
 

@@ -12,13 +12,14 @@ class InAppLocalhostServer {
     bool shared = false,
     Future<bool> Function(HttpRequest request)? onData,
   }) : this.fromPlatformCreationParams(
-          PlatformInAppLocalhostServerCreationParams(
-              port: port,
-              directoryIndex: directoryIndex,
-              documentRoot: documentRoot,
-              shared: shared,
-              onData: onData),
-        );
+         PlatformInAppLocalhostServerCreationParams(
+           port: port,
+           directoryIndex: directoryIndex,
+           documentRoot: documentRoot,
+           shared: shared,
+           onData: onData,
+         ),
+       );
 
   /// Constructs a [InAppLocalhostServer] from creation params for a specific
   /// platform.

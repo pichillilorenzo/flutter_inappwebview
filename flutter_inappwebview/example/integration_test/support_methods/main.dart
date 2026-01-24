@@ -31,7 +31,8 @@ void main() {
     skippableTest('WebMessageListener support methods are callable', () {
       expect(
         () => WebMessageListener.isClassSupported(
-            platform: defaultTargetPlatform),
+          platform: defaultTargetPlatform,
+        ),
         returnsNormally,
       );
       expect(
@@ -53,7 +54,8 @@ void main() {
     skippableTest('WebViewEnvironment support methods are callable', () {
       expect(
         () => WebViewEnvironment.isClassSupported(
-            platform: defaultTargetPlatform),
+          platform: defaultTargetPlatform,
+        ),
         returnsNormally,
       );
       expect(
@@ -75,7 +77,8 @@ void main() {
     skippableTest('HeadlessInAppWebView support methods are callable', () {
       expect(
         () => HeadlessInAppWebView.isClassSupported(
-            platform: defaultTargetPlatform),
+          platform: defaultTargetPlatform,
+        ),
         returnsNormally,
       );
       expect(
@@ -182,7 +185,8 @@ void main() {
     skippableTest('PullToRefreshController support methods are callable', () {
       expect(
         () => PullToRefreshController.isClassSupported(
-            platform: defaultTargetPlatform),
+          platform: defaultTargetPlatform,
+        ),
         returnsNormally,
       );
       expect(
@@ -228,7 +232,8 @@ void main() {
     skippableTest('InAppWebViewController support methods are callable', () {
       expect(
         () => InAppWebViewController.isClassSupported(
-            platform: defaultTargetPlatform),
+          platform: defaultTargetPlatform,
+        ),
         returnsNormally,
       );
       expect(
@@ -271,7 +276,8 @@ void main() {
     skippableTest('ChromeSafariBrowser support methods are callable', () {
       expect(
         () => ChromeSafariBrowser.isClassSupported(
-            platform: defaultTargetPlatform),
+          platform: defaultTargetPlatform,
+        ),
         returnsNormally,
       );
       expect(
@@ -286,7 +292,8 @@ void main() {
     skippableTest('WebAuthenticationSession support methods are callable', () {
       expect(
         () => WebAuthenticationSession.isClassSupported(
-            platform: defaultTargetPlatform),
+          platform: defaultTargetPlatform,
+        ),
         returnsNormally,
       );
       expect(
@@ -329,7 +336,8 @@ void main() {
     skippableTest('ProcessGlobalConfig support methods are callable', () {
       expect(
         () => ProcessGlobalConfig.isClassSupported(
-            platform: defaultTargetPlatform),
+          platform: defaultTargetPlatform,
+        ),
         returnsNormally,
       );
       expect(
@@ -344,7 +352,8 @@ void main() {
     skippableTest('ServiceWorkerController support methods are callable', () {
       expect(
         () => ServiceWorkerController.isClassSupported(
-            platform: defaultTargetPlatform),
+          platform: defaultTargetPlatform,
+        ),
         returnsNormally,
       );
       expect(
@@ -373,7 +382,8 @@ void main() {
     skippableTest('PrintJobController support methods are callable', () {
       expect(
         () => PrintJobController.isClassSupported(
-            platform: defaultTargetPlatform),
+          platform: defaultTargetPlatform,
+        ),
         returnsNormally,
       );
       expect(
@@ -417,7 +427,8 @@ void main() {
     skippableTest('FindInteractionController support methods are callable', () {
       expect(
         () => FindInteractionController.isClassSupported(
-            platform: defaultTargetPlatform),
+          platform: defaultTargetPlatform,
+        ),
         returnsNormally,
       );
       expect(
@@ -436,20 +447,23 @@ void main() {
       );
     });
 
-    skippableTest('HttpAuthCredentialDatabase support methods are callable',
-        () {
-      expect(
-        () => HttpAuthCredentialDatabase.isClassSupported(
-            platform: defaultTargetPlatform),
-        returnsNormally,
-      );
-      expect(
-        () => HttpAuthCredentialDatabase.isMethodSupported(
-          PlatformHttpAuthCredentialDatabaseMethod.values.first,
-          platform: defaultTargetPlatform,
-        ),
-        returnsNormally,
-      );
-    });
+    skippableTest(
+      'HttpAuthCredentialDatabase support methods are callable',
+      () {
+        expect(
+          () => HttpAuthCredentialDatabase.isClassSupported(
+            platform: defaultTargetPlatform,
+          ),
+          returnsNormally,
+        );
+        expect(
+          () => HttpAuthCredentialDatabase.isMethodSupported(
+            PlatformHttpAuthCredentialDatabaseMethod.values.first,
+            platform: defaultTargetPlatform,
+          ),
+          returnsNormally,
+        );
+      },
+    );
   });
 }

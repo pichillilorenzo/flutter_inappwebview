@@ -11,20 +11,26 @@ class AcceleratorKeyPressedDetail {
   int? keyEventKind;
   PhysicalKeyStatus? physicalKeyStatus;
   int? virtualKey;
-  AcceleratorKeyPressedDetail(
-      {this.keyEventKind, this.physicalKeyStatus, this.virtualKey});
+  AcceleratorKeyPressedDetail({
+    this.keyEventKind,
+    this.physicalKeyStatus,
+    this.virtualKey,
+  });
 
   ///Gets a possible [AcceleratorKeyPressedDetail] instance from a [Map] value.
-  static AcceleratorKeyPressedDetail? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static AcceleratorKeyPressedDetail? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
     final instance = AcceleratorKeyPressedDetail(
       keyEventKind: map['keyEventKind'],
       physicalKeyStatus: PhysicalKeyStatus.fromMap(
-          map['physicalKeyStatus']?.cast<String, dynamic>(),
-          enumMethod: enumMethod),
+        map['physicalKeyStatus']?.cast<String, dynamic>(),
+        enumMethod: enumMethod,
+      ),
       virtualKey: map['virtualKey'],
     );
     return instance;

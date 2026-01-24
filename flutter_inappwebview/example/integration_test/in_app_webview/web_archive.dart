@@ -90,7 +90,9 @@ void webArchive() {
       expect(path, endsWith(fileName));
 
       path = await controller.saveWebArchive(
-          filePath: supportDir.path, autoname: true);
+        filePath: supportDir.path,
+        autoname: true,
+      );
       expect(path, isNotNull);
     });
   }, skip: shouldSkip);

@@ -11,10 +11,11 @@ class PdfToolbarItems {
   final int _value;
   final int _nativeValue;
   const PdfToolbarItems._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory PdfToolbarItems._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      PdfToolbarItems._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => PdfToolbarItems._internal(value, nativeValue());
 
   ///The bookmarks button.
   static const BOOKMARKS = PdfToolbarItems._internal(256, 256);
@@ -80,8 +81,9 @@ class PdfToolbarItems {
   static PdfToolbarItems? fromValue(int? value) {
     if (value != null) {
       try {
-        return PdfToolbarItems.values
-            .firstWhere((element) => element.toValue() == value);
+        return PdfToolbarItems.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return PdfToolbarItems._internal(value, value);
       }
@@ -93,8 +95,9 @@ class PdfToolbarItems {
   static PdfToolbarItems? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return PdfToolbarItems.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return PdfToolbarItems.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return PdfToolbarItems._internal(value, value);
       }
@@ -110,8 +113,9 @@ class PdfToolbarItems {
   static PdfToolbarItems? byName(String? name) {
     if (name != null) {
       try {
-        return PdfToolbarItems.values
-            .firstWhere((element) => element.name() == name);
+        return PdfToolbarItems.values.firstWhere(
+          (element) => element.name() == name,
+        );
       } catch (e) {
         return null;
       }
@@ -128,8 +132,8 @@ class PdfToolbarItems {
   /// same value, or being values of different enum type), at most one of
   /// them will be represented in the returned map.
   static Map<String, PdfToolbarItems> asNameMap() => <String, PdfToolbarItems>{
-        for (final value in PdfToolbarItems.values) value.name(): value
-      };
+    for (final value in PdfToolbarItems.values) value.name(): value,
+  };
 
   ///Gets [int] value.
   int toValue() => _value;
@@ -180,7 +184,9 @@ class PdfToolbarItems {
 
   PdfToolbarItems operator |(PdfToolbarItems value) =>
       PdfToolbarItems._internal(
-          value.toValue() | _value, value.toNativeValue() | _nativeValue);
+        value.toValue() | _value,
+        value.toNativeValue() | _nativeValue,
+      );
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {

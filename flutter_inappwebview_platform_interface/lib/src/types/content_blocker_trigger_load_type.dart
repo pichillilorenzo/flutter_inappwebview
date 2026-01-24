@@ -12,10 +12,12 @@ class ContentBlockerTriggerLoadType_ {
   const ContentBlockerTriggerLoadType_._internal(this._value);
 
   ///FIRST_PARTY is triggered only if the resource has the same scheme, domain, and port as the main page resource.
-  static const FIRST_PARTY =
-      const ContentBlockerTriggerLoadType_._internal('first-party');
+  static const FIRST_PARTY = const ContentBlockerTriggerLoadType_._internal(
+    'first-party',
+  );
 
   ///THIRD_PARTY is triggered if the resource is not from the same domain as the main page resource.
-  static const THIRD_PARTY =
-      const ContentBlockerTriggerLoadType_._internal('third-party');
+  static const THIRD_PARTY = const ContentBlockerTriggerLoadType_._internal(
+    'third-party',
+  );
 }

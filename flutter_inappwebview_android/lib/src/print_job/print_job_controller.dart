@@ -15,9 +15,10 @@ class AndroidPrintJobControllerCreationParams
 
   /// Creates a [AndroidPrintJobControllerCreationParams] instance based on [PlatformPrintJobControllerCreationParams].
   factory AndroidPrintJobControllerCreationParams.fromPlatformPrintJobControllerCreationParams(
-      // Recommended placeholder to prevent being broken by platform interface.
-      // ignore: avoid_unused_constructor_parameters
-      PlatformPrintJobControllerCreationParams params) {
+    // Recommended placeholder to prevent being broken by platform interface.
+    // ignore: avoid_unused_constructor_parameters
+    PlatformPrintJobControllerCreationParams params,
+  ) {
     return AndroidPrintJobControllerCreationParams(id: params.id);
   }
 }
@@ -27,21 +28,24 @@ class AndroidPrintJobController extends PlatformPrintJobController
     with ChannelController {
   /// Constructs a [AndroidPrintJobController].
   AndroidPrintJobController(PlatformPrintJobControllerCreationParams params)
-      : super.implementation(
-          params is AndroidPrintJobControllerCreationParams
-              ? params
-              : AndroidPrintJobControllerCreationParams
-                  .fromPlatformPrintJobControllerCreationParams(params),
-        ) {
+    : super.implementation(
+        params is AndroidPrintJobControllerCreationParams
+            ? params
+            : AndroidPrintJobControllerCreationParams.fromPlatformPrintJobControllerCreationParams(
+                params,
+              ),
+      ) {
     channel = MethodChannel(
-        'com.pichillilorenzo/flutter_inappwebview_printjobcontroller_${params.id}');
+      'com.pichillilorenzo/flutter_inappwebview_printjobcontroller_${params.id}',
+    );
     handler = _handleMethod;
     initMethodCallHandler();
   }
 
   static final AndroidPrintJobController _staticValue =
       AndroidPrintJobController(
-          AndroidPrintJobControllerCreationParams(id: ''));
+        AndroidPrintJobControllerCreationParams(id: ''),
+      );
 
   /// Provide static access.
   factory AndroidPrintJobController.static() {
@@ -75,8 +79,10 @@ class AndroidPrintJobController extends PlatformPrintJobController
   @override
   Future<PrintJobInfo?> getInfo() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    Map<String, dynamic>? infoMap =
-        (await channel?.invokeMethod('getInfo', args))?.cast<String, dynamic>();
+    Map<String, dynamic>? infoMap = (await channel?.invokeMethod(
+      'getInfo',
+      args,
+    ))?.cast<String, dynamic>();
     return PrintJobInfo.fromMap(infoMap);
   }
 

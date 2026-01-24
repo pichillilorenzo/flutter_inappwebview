@@ -18,9 +18,7 @@ part 'platform_service_worker_controller.g.dart';
 ///{@endtemplate}
 ///
 ///{@macro flutter_inappwebview_platform_interface.PlatformServiceWorkerControllerCreationParams.supported_platforms}
-@SupportedPlatforms(platforms: [
-  AndroidPlatform(),
-])
+@SupportedPlatforms(platforms: [AndroidPlatform()])
 @immutable
 class PlatformServiceWorkerControllerCreationParams {
   /// Used by the platform implementation to create a new [PlatformServiceWorkerController].
@@ -30,8 +28,9 @@ class PlatformServiceWorkerControllerCreationParams {
   ///Check if the current class is supported by the [defaultTargetPlatform] or a specific [platform].
   ///{@endtemplate}
   bool isClassSupported({TargetPlatform? platform}) =>
-      _PlatformServiceWorkerControllerCreationParamsClassSupported
-          .isClassSupported(platform: platform);
+      _PlatformServiceWorkerControllerCreationParamsClassSupported.isClassSupported(
+        platform: platform,
+      );
 }
 
 ///{@template flutter_inappwebview_platform_interface.PlatformServiceWorkerController}
@@ -39,17 +38,20 @@ class PlatformServiceWorkerControllerCreationParams {
 ///{@endtemplate}
 ///
 ///{@macro flutter_inappwebview_platform_interface.PlatformServiceWorkerControllerCreationParams.supported_platforms}
-@SupportedPlatforms(platforms: [
-  AndroidPlatform(
-    apiName: 'ServiceWorkerControllerCompat',
-    apiUrl:
-        'https://developer.android.com/reference/androidx/webkit/ServiceWorkerControllerCompat',
-  ),
-])
+@SupportedPlatforms(
+  platforms: [
+    AndroidPlatform(
+      apiName: 'ServiceWorkerControllerCompat',
+      apiUrl:
+          'https://developer.android.com/reference/androidx/webkit/ServiceWorkerControllerCompat',
+    ),
+  ],
+)
 abstract class PlatformServiceWorkerController extends PlatformInterface {
   /// Creates a new [PlatformServiceWorkerController]
   factory PlatformServiceWorkerController(
-      PlatformServiceWorkerControllerCreationParams params) {
+    PlatformServiceWorkerControllerCreationParams params,
+  ) {
     assert(
       InAppWebViewPlatform.instance != null,
       'A platform implementation for `flutter_inappwebview` has not been set. Please '
@@ -58,8 +60,9 @@ abstract class PlatformServiceWorkerController extends PlatformInterface {
       '`WebViewPlatform.instance` can be set with your own test implementation.',
     );
     final PlatformServiceWorkerController serviceWorkerController =
-        InAppWebViewPlatform.instance!
-            .createPlatformServiceWorkerController(params);
+        InAppWebViewPlatform.instance!.createPlatformServiceWorkerController(
+          params,
+        );
     PlatformInterface.verify(serviceWorkerController, _token);
     return serviceWorkerController;
   }
@@ -87,7 +90,7 @@ abstract class PlatformServiceWorkerController extends PlatformInterface {
   /// a class that only contains a factory constructor.
   @protected
   PlatformServiceWorkerController.implementation(this.params)
-      : super(token: _token);
+    : super(token: _token);
 
   static final Object _token = Object();
 
@@ -105,16 +108,19 @@ abstract class PlatformServiceWorkerController extends PlatformInterface {
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformServiceWorkerController.setServiceWorkerClient.supported_platforms}
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(
-      apiName: 'ServiceWorkerControllerCompat.setServiceWorkerClient',
-      apiUrl:
-          'https://developer.android.com/reference/androidx/webkit/ServiceWorkerControllerCompat#setServiceWorkerClient(androidx.webkit.ServiceWorkerClientCompat)',
-    ),
-  ])
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(
+        apiName: 'ServiceWorkerControllerCompat.setServiceWorkerClient',
+        apiUrl:
+            'https://developer.android.com/reference/androidx/webkit/ServiceWorkerControllerCompat#setServiceWorkerClient(androidx.webkit.ServiceWorkerClientCompat)',
+      ),
+    ],
+  )
   Future<void> setServiceWorkerClient(ServiceWorkerClient? value) {
     throw UnimplementedError(
-        'setServiceWorkerClient is not implemented on the current platform');
+      'setServiceWorkerClient is not implemented on the current platform',
+    );
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformServiceWorkerController.getAllowContentAccess}
@@ -123,16 +129,19 @@ abstract class PlatformServiceWorkerController extends PlatformInterface {
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformServiceWorkerController.getAllowContentAccess.supported_platforms}
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(
-      apiName: 'ServiceWorkerWebSettingsCompat.getAllowContentAccess',
-      apiUrl:
-          'https://developer.android.com/reference/androidx/webkit/ServiceWorkerWebSettingsCompat#getAllowContentAccess()',
-    ),
-  ])
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(
+        apiName: 'ServiceWorkerWebSettingsCompat.getAllowContentAccess',
+        apiUrl:
+            'https://developer.android.com/reference/androidx/webkit/ServiceWorkerWebSettingsCompat#getAllowContentAccess()',
+      ),
+    ],
+  )
   Future<bool> getAllowContentAccess() {
     throw UnimplementedError(
-        'getAllowContentAccess is not implemented on the current platform');
+      'getAllowContentAccess is not implemented on the current platform',
+    );
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformServiceWorkerController.getAllowFileAccess}
@@ -141,16 +150,19 @@ abstract class PlatformServiceWorkerController extends PlatformInterface {
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformServiceWorkerController.getAllowFileAccess.supported_platforms}
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(
-      apiName: 'ServiceWorkerWebSettingsCompat.getAllowFileAccess',
-      apiUrl:
-          'https://developer.android.com/reference/androidx/webkit/ServiceWorkerWebSettingsCompat#getAllowFileAccess()',
-    ),
-  ])
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(
+        apiName: 'ServiceWorkerWebSettingsCompat.getAllowFileAccess',
+        apiUrl:
+            'https://developer.android.com/reference/androidx/webkit/ServiceWorkerWebSettingsCompat#getAllowFileAccess()',
+      ),
+    ],
+  )
   Future<bool> getAllowFileAccess() {
     throw UnimplementedError(
-        'getAllowFileAccess is not implemented on the current platform');
+      'getAllowFileAccess is not implemented on the current platform',
+    );
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformServiceWorkerController.getBlockNetworkLoads}
@@ -159,16 +171,19 @@ abstract class PlatformServiceWorkerController extends PlatformInterface {
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformServiceWorkerController.getBlockNetworkLoads.supported_platforms}
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(
-      apiName: 'ServiceWorkerWebSettingsCompat.getBlockNetworkLoads',
-      apiUrl:
-          'https://developer.android.com/reference/androidx/webkit/ServiceWorkerWebSettingsCompat#getBlockNetworkLoads()',
-    ),
-  ])
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(
+        apiName: 'ServiceWorkerWebSettingsCompat.getBlockNetworkLoads',
+        apiUrl:
+            'https://developer.android.com/reference/androidx/webkit/ServiceWorkerWebSettingsCompat#getBlockNetworkLoads()',
+      ),
+    ],
+  )
   Future<bool> getBlockNetworkLoads() {
     throw UnimplementedError(
-        'getBlockNetworkLoads is not implemented on the current platform');
+      'getBlockNetworkLoads is not implemented on the current platform',
+    );
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformServiceWorkerController.getCacheMode}
@@ -177,16 +192,19 @@ abstract class PlatformServiceWorkerController extends PlatformInterface {
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformServiceWorkerController.getCacheMode.supported_platforms}
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(
-      apiName: 'ServiceWorkerWebSettingsCompat.getCacheMode',
-      apiUrl:
-          'https://developer.android.com/reference/androidx/webkit/ServiceWorkerWebSettingsCompat#getCacheMode()',
-    ),
-  ])
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(
+        apiName: 'ServiceWorkerWebSettingsCompat.getCacheMode',
+        apiUrl:
+            'https://developer.android.com/reference/androidx/webkit/ServiceWorkerWebSettingsCompat#getCacheMode()',
+      ),
+    ],
+  )
   Future<CacheMode?> getCacheMode() {
     throw UnimplementedError(
-        'getCacheMode is not implemented on the current platform');
+      'getCacheMode is not implemented on the current platform',
+    );
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformServiceWorkerController.setAllowContentAccess}
@@ -195,16 +213,19 @@ abstract class PlatformServiceWorkerController extends PlatformInterface {
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformServiceWorkerController.setAllowContentAccess.supported_platforms}
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(
-      apiName: 'ServiceWorkerWebSettingsCompat.setAllowContentAccess',
-      apiUrl:
-          'https://developer.android.com/reference/androidx/webkit/ServiceWorkerWebSettingsCompat#setAllowContentAccess(boolean)',
-    ),
-  ])
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(
+        apiName: 'ServiceWorkerWebSettingsCompat.setAllowContentAccess',
+        apiUrl:
+            'https://developer.android.com/reference/androidx/webkit/ServiceWorkerWebSettingsCompat#setAllowContentAccess(boolean)',
+      ),
+    ],
+  )
   Future<void> setAllowContentAccess(bool allow) {
     throw UnimplementedError(
-        'setAllowContentAccess is not implemented on the current platform');
+      'setAllowContentAccess is not implemented on the current platform',
+    );
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformServiceWorkerController.setAllowFileAccess}
@@ -213,16 +234,19 @@ abstract class PlatformServiceWorkerController extends PlatformInterface {
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformServiceWorkerController.setAllowFileAccess.supported_platforms}
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(
-      apiName: 'ServiceWorkerWebSettingsCompat.setAllowFileAccess',
-      apiUrl:
-          'https://developer.android.com/reference/androidx/webkit/ServiceWorkerWebSettingsCompat#setAllowFileAccess(boolean)',
-    ),
-  ])
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(
+        apiName: 'ServiceWorkerWebSettingsCompat.setAllowFileAccess',
+        apiUrl:
+            'https://developer.android.com/reference/androidx/webkit/ServiceWorkerWebSettingsCompat#setAllowFileAccess(boolean)',
+      ),
+    ],
+  )
   Future<void> setAllowFileAccess(bool allow) {
     throw UnimplementedError(
-        'setAllowFileAccess is not implemented on the current platform');
+      'setAllowFileAccess is not implemented on the current platform',
+    );
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformServiceWorkerController.setBlockNetworkLoads}
@@ -231,16 +255,19 @@ abstract class PlatformServiceWorkerController extends PlatformInterface {
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformServiceWorkerController.setBlockNetworkLoads.supported_platforms}
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(
-      apiName: 'ServiceWorkerWebSettingsCompat.setBlockNetworkLoads',
-      apiUrl:
-          'https://developer.android.com/reference/androidx/webkit/ServiceWorkerWebSettingsCompat#setBlockNetworkLoads(boolean)',
-    ),
-  ])
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(
+        apiName: 'ServiceWorkerWebSettingsCompat.setBlockNetworkLoads',
+        apiUrl:
+            'https://developer.android.com/reference/androidx/webkit/ServiceWorkerWebSettingsCompat#setBlockNetworkLoads(boolean)',
+      ),
+    ],
+  )
   Future<void> setBlockNetworkLoads(bool flag) {
     throw UnimplementedError(
-        'setBlockNetworkLoads is not implemented on the current platform');
+      'setBlockNetworkLoads is not implemented on the current platform',
+    );
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformServiceWorkerController.setCacheMode}
@@ -249,16 +276,19 @@ abstract class PlatformServiceWorkerController extends PlatformInterface {
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformServiceWorkerController.setCacheMode.supported_platforms}
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(
-      apiName: 'ServiceWorkerWebSettingsCompat.setCacheMode',
-      apiUrl:
-          'https://developer.android.com/reference/androidx/webkit/ServiceWorkerWebSettingsCompat#setCacheMode(int)',
-    ),
-  ])
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(
+        apiName: 'ServiceWorkerWebSettingsCompat.setCacheMode',
+        apiUrl:
+            'https://developer.android.com/reference/androidx/webkit/ServiceWorkerWebSettingsCompat#setCacheMode(int)',
+      ),
+    ],
+  )
   Future<void> setCacheMode(CacheMode mode) {
     throw UnimplementedError(
-        'setCacheMode is not implemented on the current platform');
+      'setCacheMode is not implemented on the current platform',
+    );
   }
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformServiceWorkerControllerCreationParams.isClassSupported}
@@ -268,10 +298,13 @@ abstract class PlatformServiceWorkerController extends PlatformInterface {
   ///{@template flutter_inappwebview_platform_interface.PlatformServiceWorkerController.isMethodSupported}
   ///Check if the given [method] is supported by the [defaultTargetPlatform] or a specific [platform].
   ///{@endtemplate}
-  bool isMethodSupported(PlatformServiceWorkerControllerMethod method,
-          {TargetPlatform? platform}) =>
-      _PlatformServiceWorkerControllerMethodSupported.isMethodSupported(method,
-          platform: platform);
+  bool isMethodSupported(
+    PlatformServiceWorkerControllerMethod method, {
+    TargetPlatform? platform,
+  }) => _PlatformServiceWorkerControllerMethodSupported.isMethodSupported(
+    method,
+    platform: platform,
+  );
 }
 
 ///{@template flutter_inappwebview_platform_interface.ServiceWorkerClient}
@@ -279,13 +312,15 @@ abstract class PlatformServiceWorkerController extends PlatformInterface {
 ///{@endtemplate}
 ///
 ///{@macro flutter_inappwebview_platform_interface.ServiceWorkerClient.supported_platforms}
-@SupportedPlatforms(platforms: [
-  AndroidPlatform(
-    apiName: 'ServiceWorkerClientCompat',
-    apiUrl:
-        'https://developer.android.com/reference/androidx/webkit/ServiceWorkerClientCompat',
-  ),
-])
+@SupportedPlatforms(
+  platforms: [
+    AndroidPlatform(
+      apiName: 'ServiceWorkerClientCompat',
+      apiUrl:
+          'https://developer.android.com/reference/androidx/webkit/ServiceWorkerClientCompat',
+    ),
+  ],
+)
 class ServiceWorkerClient {
   ///{@template flutter_inappwebview_platform_interface.ServiceWorkerClient.shouldInterceptRequest}
   ///Notify the host application of a resource request and allow the application to return the data.
@@ -299,15 +334,17 @@ class ServiceWorkerClient {
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.ServiceWorkerClient.shouldInterceptRequest.supported_platforms}
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(
-      apiName: 'ServiceWorkerClientCompat.shouldInterceptRequest',
-      apiUrl:
-          'https://developer.android.com/reference/androidx/webkit/ServiceWorkerClientCompat#shouldInterceptRequest(android.webkit.WebResourceRequest)',
-    ),
-  ])
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(
+        apiName: 'ServiceWorkerClientCompat.shouldInterceptRequest',
+        apiUrl:
+            'https://developer.android.com/reference/androidx/webkit/ServiceWorkerClientCompat#shouldInterceptRequest(android.webkit.WebResourceRequest)',
+      ),
+    ],
+  )
   final Future<WebResourceResponse?> Function(WebResourceRequest request)?
-      shouldInterceptRequest;
+  shouldInterceptRequest;
 
   ServiceWorkerClient({this.shouldInterceptRequest});
 
@@ -315,14 +352,18 @@ class ServiceWorkerClient {
   ///Check if the current class is supported by the [defaultTargetPlatform] or a specific [platform].
   ///{@endtemplate}
   static bool isClassSupported({TargetPlatform? platform}) =>
-      _PlatformServiceWorkerControllerCreationParamsClassSupported
-          .isClassSupported(platform: platform);
+      _PlatformServiceWorkerControllerCreationParamsClassSupported.isClassSupported(
+        platform: platform,
+      );
 
   ///{@template flutter_inappwebview_platform_interface.ServiceWorkerClient.isPropertySupported}
   ///Check if the given [method] is supported by the [defaultTargetPlatform] or a specific [platform].
   ///{@endtemplate}
-  static bool isPropertySupported(ServiceWorkerClientProperty property,
-          {TargetPlatform? platform}) =>
-      _ServiceWorkerClientPropertySupported.isPropertySupported(property,
-          platform: platform);
+  static bool isPropertySupported(
+    ServiceWorkerClientProperty property, {
+    TargetPlatform? platform,
+  }) => _ServiceWorkerClientPropertySupported.isPropertySupported(
+    property,
+    platform: platform,
+  );
 }

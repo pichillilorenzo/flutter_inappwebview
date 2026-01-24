@@ -44,18 +44,21 @@ class InAppBrowserMenuItem {
   ///- Android WebView
   ///- iOS WKWebView
   ///- macOS WKWebView
-  InAppBrowserMenuItem(
-      {this.icon,
-      this.iconColor,
-      required this.id,
-      this.onClick,
-      this.order,
-      this.showAsAction = false,
-      required this.title});
+  InAppBrowserMenuItem({
+    this.icon,
+    this.iconColor,
+    required this.id,
+    this.onClick,
+    this.order,
+    this.showAsAction = false,
+    required this.title,
+  });
 
   ///Gets a possible [InAppBrowserMenuItem] instance from a [Map] value.
-  static InAppBrowserMenuItem? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static InAppBrowserMenuItem? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }

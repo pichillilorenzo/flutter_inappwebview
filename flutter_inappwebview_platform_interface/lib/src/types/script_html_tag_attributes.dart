@@ -71,21 +71,24 @@ class ScriptHtmlTagAttributes_ {
   Function? onError;
 
   @ExchangeableObjectConstructor()
-  ScriptHtmlTagAttributes_(
-      {this.type = "text/javascript",
-      this.id,
-      this.async,
-      this.defer,
-      this.crossOrigin,
-      this.integrity,
-      this.noModule,
-      this.nonce,
-      this.referrerPolicy,
-      this.onLoad,
-      this.onError}) {
+  ScriptHtmlTagAttributes_({
+    this.type = "text/javascript",
+    this.id,
+    this.async,
+    this.defer,
+    this.crossOrigin,
+    this.integrity,
+    this.noModule,
+    this.nonce,
+    this.referrerPolicy,
+    this.onLoad,
+    this.onError,
+  }) {
     if (this.onLoad != null || this.onError != null) {
-      assert(this.id != null,
-          'onLoad and onError callbacks require the id property to be set.');
+      assert(
+        this.id != null,
+        'onLoad and onError callbacks require the id property to be set.',
+      );
     }
   }
 }

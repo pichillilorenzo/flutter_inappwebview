@@ -14,13 +14,22 @@ extension _PlatformWebMessageChannelCreationParamsClassSupported
   ///- Android WebView
   ///- iOS WKWebView
   ///- macOS WKWebView
+  ///- Linux WPE WebKit:
+  ///    - Implemented via JavaScript MessageChannel API.
+  ///- Windows WebView2:
+  ///    - Implemented via JavaScript MessageChannel API.
   ///
   ///Use the [PlatformWebMessageChannelCreationParams.isClassSupported] method to check if this class is supported at runtime.
   ///{@endtemplate}
   static bool isClassSupported({TargetPlatform? platform}) {
     return ((kIsWeb && platform != null) || !kIsWeb) &&
-        [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
-            .contains(platform ?? defaultTargetPlatform);
+        [
+          TargetPlatform.android,
+          TargetPlatform.iOS,
+          TargetPlatform.macOS,
+          TargetPlatform.linux,
+          TargetPlatform.windows,
+        ].contains(platform ?? defaultTargetPlatform);
   }
 }
 
@@ -34,6 +43,10 @@ enum PlatformWebMessageChannelCreationParamsProperty {
   ///- Android WebView
   ///- iOS WKWebView
   ///- macOS WKWebView
+  ///- Linux WPE WebKit:
+  ///    - Implemented via JavaScript MessageChannel API.
+  ///- Windows WebView2:
+  ///    - Implemented via JavaScript MessageChannel API.
   ///
   ///Use the [PlatformWebMessageChannelCreationParams.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
@@ -47,6 +60,10 @@ enum PlatformWebMessageChannelCreationParamsProperty {
   ///- Android WebView
   ///- iOS WKWebView
   ///- macOS WKWebView
+  ///- Linux WPE WebKit:
+  ///    - Implemented via JavaScript MessageChannel API.
+  ///- Windows WebView2:
+  ///    - Implemented via JavaScript MessageChannel API.
   ///
   ///Use the [PlatformWebMessageChannelCreationParams.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
@@ -60,6 +77,10 @@ enum PlatformWebMessageChannelCreationParamsProperty {
   ///- Android WebView
   ///- iOS WKWebView
   ///- macOS WKWebView
+  ///- Linux WPE WebKit:
+  ///    - Implemented via JavaScript MessageChannel API.
+  ///- Windows WebView2:
+  ///    - Implemented via JavaScript MessageChannel API.
   ///
   ///Use the [PlatformWebMessageChannelCreationParams.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
@@ -69,21 +90,37 @@ enum PlatformWebMessageChannelCreationParamsProperty {
 extension _PlatformWebMessageChannelCreationParamsPropertySupported
     on PlatformWebMessageChannelCreationParams {
   static bool isPropertySupported(
-      PlatformWebMessageChannelCreationParamsProperty property,
-      {TargetPlatform? platform}) {
+    PlatformWebMessageChannelCreationParamsProperty property, {
+    TargetPlatform? platform,
+  }) {
     switch (property) {
       case PlatformWebMessageChannelCreationParamsProperty.id:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+              TargetPlatform.linux,
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebMessageChannelCreationParamsProperty.port1:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+              TargetPlatform.linux,
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebMessageChannelCreationParamsProperty.port2:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+              TargetPlatform.linux,
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
     }
   }
 }
@@ -96,13 +133,22 @@ extension _PlatformWebMessageChannelClassSupported
   ///- Android WebView
   ///- iOS WKWebView
   ///- macOS WKWebView
+  ///- Linux WPE WebKit:
+  ///    - Implemented via JavaScript MessageChannel API.
+  ///- Windows WebView2:
+  ///    - Implemented via JavaScript MessageChannel API.
   ///
   ///Use the [PlatformWebMessageChannel.isClassSupported] method to check if this class is supported at runtime.
   ///{@endtemplate}
   static bool isClassSupported({TargetPlatform? platform}) {
     return ((kIsWeb && platform != null) || !kIsWeb) &&
-        [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
-            .contains(platform ?? defaultTargetPlatform);
+        [
+          TargetPlatform.android,
+          TargetPlatform.iOS,
+          TargetPlatform.macOS,
+          TargetPlatform.linux,
+          TargetPlatform.windows,
+        ].contains(platform ?? defaultTargetPlatform);
   }
 }
 
@@ -116,6 +162,10 @@ enum PlatformWebMessageChannelMethod {
   ///- Android WebView
   ///- iOS WKWebView
   ///- macOS WKWebView
+  ///- Linux WPE WebKit:
+  ///    - Implemented via JavaScript MessageChannel API.
+  ///- Windows WebView2:
+  ///    - Implemented via JavaScript MessageChannel API.
   ///
   ///Use the [PlatformWebMessageChannel.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
@@ -124,13 +174,20 @@ enum PlatformWebMessageChannelMethod {
 
 extension _PlatformWebMessageChannelMethodSupported
     on PlatformWebMessageChannel {
-  static bool isMethodSupported(PlatformWebMessageChannelMethod method,
-      {TargetPlatform? platform}) {
+  static bool isMethodSupported(
+    PlatformWebMessageChannelMethod method, {
+    TargetPlatform? platform,
+  }) {
     switch (method) {
       case PlatformWebMessageChannelMethod.dispose:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+              TargetPlatform.linux,
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
     }
   }
 }

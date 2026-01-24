@@ -63,13 +63,14 @@ class ScreenshotConfiguration {
   ///- iOS WKWebView
   ///- macOS WKWebView
   double? snapshotWidth;
-  ScreenshotConfiguration(
-      {this.rect,
-      this.snapshotWidth,
-      this.compressFormat = CompressFormat.PNG,
-      this.quality = 100,
-      @Deprecated("Use afterScreenUpdates instead") this.iosAfterScreenUpdates,
-      this.afterScreenUpdates = true}) {
+  ScreenshotConfiguration({
+    this.rect,
+    this.snapshotWidth,
+    this.compressFormat = CompressFormat.PNG,
+    this.quality = 100,
+    @Deprecated("Use afterScreenUpdates instead") this.iosAfterScreenUpdates,
+    this.afterScreenUpdates = true,
+  }) {
     assert(this.quality >= 0);
     this.afterScreenUpdates = this.iosAfterScreenUpdates != null
         ? this.iosAfterScreenUpdates!
@@ -77,15 +78,19 @@ class ScreenshotConfiguration {
   }
 
   ///Gets a possible [ScreenshotConfiguration] instance from a [Map] value.
-  static ScreenshotConfiguration? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static ScreenshotConfiguration? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
     final instance = ScreenshotConfiguration(
       iosAfterScreenUpdates: map['afterScreenUpdates'],
-      rect: InAppWebViewRect.fromMap(map['rect']?.cast<String, dynamic>(),
-          enumMethod: enumMethod),
+      rect: InAppWebViewRect.fromMap(
+        map['rect']?.cast<String, dynamic>(),
+        enumMethod: enumMethod,
+      ),
       snapshotWidth: map['snapshotWidth'],
     );
     if (map['afterScreenUpdates'] != null) {
@@ -93,10 +98,11 @@ class ScreenshotConfiguration {
     }
     if (map['compressFormat'] != null) {
       instance.compressFormat = switch (enumMethod ?? EnumMethod.nativeValue) {
-        EnumMethod.nativeValue =>
-          CompressFormat.fromNativeValue(map['compressFormat']),
+        EnumMethod.nativeValue => CompressFormat.fromNativeValue(
+          map['compressFormat'],
+        ),
         EnumMethod.value => CompressFormat.fromValue(map['compressFormat']),
-        EnumMethod.name => CompressFormat.byName(map['compressFormat'])
+        EnumMethod.name => CompressFormat.byName(map['compressFormat']),
       }!;
     }
     if (map['quality'] != null) {
@@ -112,7 +118,7 @@ class ScreenshotConfiguration {
       "compressFormat": switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => compressFormat.toNativeValue(),
         EnumMethod.value => compressFormat.toValue(),
-        EnumMethod.name => compressFormat.name()
+        EnumMethod.name => compressFormat.name(),
       },
       "quality": quality,
       "rect": rect?.toMap(enumMethod: enumMethod),

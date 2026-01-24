@@ -37,11 +37,13 @@ void takeScreenshot() {
     await tester.pump();
 
     var screenshotConfiguration = ScreenshotConfiguration(
-        compressFormat: CompressFormat.JPEG,
-        quality: 20,
-        rect: InAppWebViewRect(width: 100, height: 100, x: 50, y: 50));
+      compressFormat: CompressFormat.JPEG,
+      quality: 20,
+      rect: InAppWebViewRect(width: 100, height: 100, x: 50, y: 50),
+    );
     var screenshot = await controller.takeScreenshot(
-        screenshotConfiguration: screenshotConfiguration);
+      screenshotConfiguration: screenshotConfiguration,
+    );
     expect(screenshot, isNotNull);
   }, skip: shouldSkip);
 }

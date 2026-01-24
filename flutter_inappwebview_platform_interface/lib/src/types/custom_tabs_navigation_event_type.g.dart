@@ -11,70 +11,79 @@ class CustomTabsNavigationEventType {
   final int _value;
   final int? _nativeValue;
   const CustomTabsNavigationEventType._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory CustomTabsNavigationEventType._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      CustomTabsNavigationEventType._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => CustomTabsNavigationEventType._internal(value, nativeValue());
 
   ///Sent when loading was aborted by a user action before it finishes like clicking on a link or refreshing the page.
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView
-  static final ABORTED =
-      CustomTabsNavigationEventType._internalMultiPlatform(4, () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.android:
-        return 4;
-      default:
-        break;
-    }
-    return null;
-  });
+  static final ABORTED = CustomTabsNavigationEventType._internalMultiPlatform(
+    4,
+    () {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.android:
+          return 4;
+        default:
+          break;
+      }
+      return null;
+    },
+  );
 
   ///Sent when the tab couldn't finish loading due to a failure.
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView
-  static final FAILED =
-      CustomTabsNavigationEventType._internalMultiPlatform(3, () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.android:
-        return 3;
-      default:
-        break;
-    }
-    return null;
-  });
+  static final FAILED = CustomTabsNavigationEventType._internalMultiPlatform(
+    3,
+    () {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.android:
+          return 3;
+        default:
+          break;
+      }
+      return null;
+    },
+  );
 
   ///Sent when the tab has finished loading a page.
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView
-  static final FINISHED =
-      CustomTabsNavigationEventType._internalMultiPlatform(2, () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.android:
-        return 2;
-      default:
-        break;
-    }
-    return null;
-  });
+  static final FINISHED = CustomTabsNavigationEventType._internalMultiPlatform(
+    2,
+    () {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.android:
+          return 2;
+        default:
+          break;
+      }
+      return null;
+    },
+  );
 
   ///Sent when the tab has started loading a page.
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView
-  static final STARTED =
-      CustomTabsNavigationEventType._internalMultiPlatform(1, () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.android:
-        return 1;
-      default:
-        break;
-    }
-    return null;
-  });
+  static final STARTED = CustomTabsNavigationEventType._internalMultiPlatform(
+    1,
+    () {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.android:
+          return 1;
+        default:
+          break;
+      }
+      return null;
+    },
+  );
 
   ///Sent when the tab becomes hidden.
   ///
@@ -82,29 +91,31 @@ class CustomTabsNavigationEventType {
   ///- Android WebView
   static final TAB_HIDDEN =
       CustomTabsNavigationEventType._internalMultiPlatform(6, () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.android:
-        return 6;
-      default:
-        break;
-    }
-    return null;
-  });
+        switch (defaultTargetPlatform) {
+          case TargetPlatform.android:
+            return 6;
+          default:
+            break;
+        }
+        return null;
+      });
 
   ///Sent when the tab becomes visible.
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView
-  static final TAB_SHOWN =
-      CustomTabsNavigationEventType._internalMultiPlatform(5, () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.android:
-        return 5;
-      default:
-        break;
-    }
-    return null;
-  });
+  static final TAB_SHOWN = CustomTabsNavigationEventType._internalMultiPlatform(
+    5,
+    () {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.android:
+          return 5;
+        default:
+          break;
+      }
+      return null;
+    },
+  );
 
   ///Set of all values of [CustomTabsNavigationEventType].
   static final Set<CustomTabsNavigationEventType> values = [
@@ -120,8 +131,9 @@ class CustomTabsNavigationEventType {
   static CustomTabsNavigationEventType? fromValue(int? value) {
     if (value != null) {
       try {
-        return CustomTabsNavigationEventType.values
-            .firstWhere((element) => element.toValue() == value);
+        return CustomTabsNavigationEventType.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -133,8 +145,9 @@ class CustomTabsNavigationEventType {
   static CustomTabsNavigationEventType? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return CustomTabsNavigationEventType.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return CustomTabsNavigationEventType.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -150,8 +163,9 @@ class CustomTabsNavigationEventType {
   static CustomTabsNavigationEventType? byName(String? name) {
     if (name != null) {
       try {
-        return CustomTabsNavigationEventType.values
-            .firstWhere((element) => element.name() == name);
+        return CustomTabsNavigationEventType.values.firstWhere(
+          (element) => element.name() == name,
+        );
       } catch (e) {
         return null;
       }
@@ -170,7 +184,7 @@ class CustomTabsNavigationEventType {
   static Map<String, CustomTabsNavigationEventType> asNameMap() =>
       <String, CustomTabsNavigationEventType>{
         for (final value in CustomTabsNavigationEventType.values)
-          value.name(): value
+          value.name(): value,
       };
 
   ///Gets [int] value.

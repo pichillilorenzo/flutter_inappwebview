@@ -11,10 +11,11 @@ class AjaxRequestAction {
   final int _value;
   final int _nativeValue;
   const AjaxRequestAction._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory AjaxRequestAction._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      AjaxRequestAction._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => AjaxRequestAction._internal(value, nativeValue());
 
   ///Aborts the current [AjaxRequest].
   static const ABORT = AjaxRequestAction._internal(0, 0);
@@ -32,8 +33,9 @@ class AjaxRequestAction {
   static AjaxRequestAction? fromValue(int? value) {
     if (value != null) {
       try {
-        return AjaxRequestAction.values
-            .firstWhere((element) => element.toValue() == value);
+        return AjaxRequestAction.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -45,8 +47,9 @@ class AjaxRequestAction {
   static AjaxRequestAction? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return AjaxRequestAction.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return AjaxRequestAction.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -62,8 +65,9 @@ class AjaxRequestAction {
   static AjaxRequestAction? byName(String? name) {
     if (name != null) {
       try {
-        return AjaxRequestAction.values
-            .firstWhere((element) => element.name() == name);
+        return AjaxRequestAction.values.firstWhere(
+          (element) => element.name() == name,
+        );
       } catch (e) {
         return null;
       }
@@ -81,7 +85,7 @@ class AjaxRequestAction {
   /// them will be represented in the returned map.
   static Map<String, AjaxRequestAction> asNameMap() =>
       <String, AjaxRequestAction>{
-        for (final value in AjaxRequestAction.values) value.name(): value
+        for (final value in AjaxRequestAction.values) value.name(): value,
       };
 
   ///Gets [int] value.

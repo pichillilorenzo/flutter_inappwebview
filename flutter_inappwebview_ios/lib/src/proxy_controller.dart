@@ -21,7 +21,8 @@ class IOSProxyControllerCreationParams
 
   /// Creates a [IOSProxyControllerCreationParams] instance based on [PlatformProxyControllerCreationParams].
   factory IOSProxyControllerCreationParams.fromPlatformProxyControllerCreationParams(
-      PlatformProxyControllerCreationParams params) {
+    PlatformProxyControllerCreationParams params,
+  ) {
     return IOSProxyControllerCreationParams(params);
   }
 }
@@ -31,14 +32,16 @@ class IOSProxyController extends PlatformProxyController
     with ChannelController {
   /// Creates a new [IOSProxyController].
   IOSProxyController(PlatformProxyControllerCreationParams params)
-      : super.implementation(
-          params is IOSProxyControllerCreationParams
-              ? params
-              : IOSProxyControllerCreationParams
-                  .fromPlatformProxyControllerCreationParams(params),
-        ) {
+    : super.implementation(
+        params is IOSProxyControllerCreationParams
+            ? params
+            : IOSProxyControllerCreationParams.fromPlatformProxyControllerCreationParams(
+                params,
+              ),
+      ) {
     channel = const MethodChannel(
-        'com.pichillilorenzo/flutter_inappwebview_proxycontroller');
+      'com.pichillilorenzo/flutter_inappwebview_proxycontroller',
+    );
     handler = handleMethod;
     initMethodCallHandler();
   }
@@ -51,14 +54,19 @@ class IOSProxyController extends PlatformProxyController
   }
 
   static IOSProxyController _init() {
-    _instance = IOSProxyController(IOSProxyControllerCreationParams(
-        const PlatformProxyControllerCreationParams()));
+    _instance = IOSProxyController(
+      IOSProxyControllerCreationParams(
+        const PlatformProxyControllerCreationParams(),
+      ),
+    );
     return _instance!;
   }
 
   static final IOSProxyController _staticValue = IOSProxyController(
-      IOSProxyControllerCreationParams(
-          const PlatformProxyControllerCreationParams()));
+    IOSProxyControllerCreationParams(
+      const PlatformProxyControllerCreationParams(),
+    ),
+  );
 
   /// Provide static access.
   factory IOSProxyController.static() {

@@ -20,16 +20,21 @@ import 'headless_in_app_webview.dart';
 class WebPlatformInAppWebViewControllerCreationParams
     extends PlatformInAppWebViewControllerCreationParams {
   /// Creates a new [WebPlatformInAppWebViewControllerCreationParams] instance.
-  const WebPlatformInAppWebViewControllerCreationParams(
-      {required super.id, super.webviewParams});
+  const WebPlatformInAppWebViewControllerCreationParams({
+    required super.id,
+    super.webviewParams,
+  });
 
   /// Creates a [WebPlatformInAppWebViewControllerCreationParams] instance based on [PlatformInAppWebViewControllerCreationParams].
   factory WebPlatformInAppWebViewControllerCreationParams.fromPlatformInAppWebViewControllerCreationParams(
-      // Recommended placeholder to prevent being broken by platform interface.
-      // ignore: avoid_unused_constructor_parameters
-      PlatformInAppWebViewControllerCreationParams params) {
+    // Recommended placeholder to prevent being broken by platform interface.
+    // ignore: avoid_unused_constructor_parameters
+    PlatformInAppWebViewControllerCreationParams params,
+  ) {
     return WebPlatformInAppWebViewControllerCreationParams(
-        id: params.id, webviewParams: params.webviewParams);
+      id: params.id,
+      webviewParams: params.webviewParams,
+    );
   }
 }
 
@@ -44,7 +49,7 @@ class WebPlatformInAppWebViewController extends PlatformInAppWebViewController
 
   Map<UserScriptInjectionTime, List<UserScript>> _userScripts = {
     UserScriptInjectionTime.AT_DOCUMENT_START: <UserScript>[],
-    UserScriptInjectionTime.AT_DOCUMENT_END: <UserScript>[]
+    UserScriptInjectionTime.AT_DOCUMENT_END: <UserScript>[],
   };
   Map<String, Function> _javaScriptHandlersMap = HashMap<String, Function>();
   Map<String, ScriptHtmlTagAttributes> _injectedScriptsFromURL = {};
@@ -55,12 +60,14 @@ class WebPlatformInAppWebViewController extends PlatformInAppWebViewController
   late WebPlatformWebStorage webStorage;
 
   WebPlatformInAppWebViewController(
-      PlatformInAppWebViewControllerCreationParams params)
-      : super.implementation(
-            params is WebPlatformInAppWebViewControllerCreationParams
-                ? params
-                : WebPlatformInAppWebViewControllerCreationParams
-                    .fromPlatformInAppWebViewControllerCreationParams(params)) {
+    PlatformInAppWebViewControllerCreationParams params,
+  ) : super.implementation(
+        params is WebPlatformInAppWebViewControllerCreationParams
+            ? params
+            : WebPlatformInAppWebViewControllerCreationParams.fromPlatformInAppWebViewControllerCreationParams(
+                params,
+              ),
+      ) {
     channel = MethodChannel('com.pichillilorenzo/flutter_inappwebview_$id');
     handler = handleMethod;
     initMethodCallHandler();
@@ -70,7 +77,8 @@ class WebPlatformInAppWebViewController extends PlatformInAppWebViewController
 
   static final WebPlatformInAppWebViewController _staticValue =
       WebPlatformInAppWebViewController(
-          WebPlatformInAppWebViewControllerCreationParams(id: null));
+        WebPlatformInAppWebViewControllerCreationParams(id: null),
+      );
 
   factory WebPlatformInAppWebViewController.static() {
     return _staticValue;
@@ -80,21 +88,25 @@ class WebPlatformInAppWebViewController extends PlatformInAppWebViewController
     _controllerFromPlatform =
         params.webviewParams?.controllerFromPlatform?.call(this) ?? this;
 
-    webStorage = WebPlatformWebStorage(WebPlatformWebStorageCreationParams(
+    webStorage = WebPlatformWebStorage(
+      WebPlatformWebStorageCreationParams(
         localStorage: WebPlatformLocalStorage.defaultStorage(controller: this),
-        sessionStorage:
-            WebPlatformSessionStorage.defaultStorage(controller: this)));
+        sessionStorage: WebPlatformSessionStorage.defaultStorage(
+          controller: this,
+        ),
+      ),
+    );
   }
 
   _debugLog(String method, dynamic args) {
     debugLog(
-        className: this.runtimeType.toString(),
-        name: "WebView",
-        id: getViewId().toString(),
-        debugLoggingSettings:
-            PlatformInAppWebViewController.debugLoggingSettings,
-        method: method,
-        args: args);
+      className: this.runtimeType.toString(),
+      name: "WebView",
+      id: getViewId().toString(),
+      debugLoggingSettings: PlatformInAppWebViewController.debugLoggingSettings,
+      method: method,
+      args: args,
+    );
   }
 
   Future<dynamic> _handleMethod(MethodCall call) async {
@@ -122,11 +134,13 @@ class WebPlatformInAppWebViewController extends PlatformInAppWebViewController
       case "onConsoleMessage":
         if ((webviewParams != null &&
             webviewParams!.onConsoleMessage != null)) {
-          Map<String, dynamic> arguments =
-              call.arguments.cast<String, dynamic>();
+          Map<String, dynamic> arguments = call.arguments
+              .cast<String, dynamic>();
           ConsoleMessage consoleMessage = ConsoleMessage.fromMap(arguments)!;
           webviewParams!.onConsoleMessage!(
-              _controllerFromPlatform, consoleMessage);
+            _controllerFromPlatform,
+            consoleMessage,
+          );
         }
         break;
       case "onScrollChanged":
@@ -138,13 +152,16 @@ class WebPlatformInAppWebViewController extends PlatformInAppWebViewController
         break;
       case "onCreateWindow":
         if ((webviewParams != null && webviewParams!.onCreateWindow != null)) {
-          Map<String, dynamic> arguments =
-              call.arguments.cast<String, dynamic>();
-          CreateWindowAction createWindowAction =
-              CreateWindowAction.fromMap(arguments)!;
+          Map<String, dynamic> arguments = call.arguments
+              .cast<String, dynamic>();
+          CreateWindowAction createWindowAction = CreateWindowAction.fromMap(
+            arguments,
+          )!;
 
           return await webviewParams!.onCreateWindow!(
-              _controllerFromPlatform, createWindowAction);
+            _controllerFromPlatform,
+            createWindowAction,
+          );
         }
         break;
       case "onCloseWindow":
@@ -168,11 +185,17 @@ class WebPlatformInAppWebViewController extends PlatformInAppWebViewController
 
           if (webviewParams!.onZoomScaleChanged != null)
             webviewParams!.onZoomScaleChanged!(
-                _controllerFromPlatform, oldScale, newScale);
+              _controllerFromPlatform,
+              oldScale,
+              newScale,
+            );
           else {
             // ignore: deprecated_member_use_from_same_package
             webviewParams!.androidOnScaleChanged!(
-                _controllerFromPlatform, oldScale, newScale);
+              _controllerFromPlatform,
+              oldScale,
+              newScale,
+            );
           }
         }
         break;
@@ -183,7 +206,10 @@ class WebPlatformInAppWebViewController extends PlatformInAppWebViewController
           bool? isReload = call.arguments["isReload"];
           WebUri? uri = url != null ? WebUri(url) : null;
           webviewParams!.onUpdateVisitedHistory!(
-              _controllerFromPlatform, uri, isReload);
+            _controllerFromPlatform,
+            uri,
+            isReload,
+          );
         }
         break;
       case "onEnterFullscreen":
@@ -212,7 +238,10 @@ class WebPlatformInAppWebViewController extends PlatformInAppWebViewController
 
           if (webviewParams!.onPrintRequest != null)
             return await webviewParams!.onPrintRequest!(
-                _controllerFromPlatform, uri, null);
+              _controllerFromPlatform,
+              uri,
+              null,
+            );
           else {
             // ignore: deprecated_member_use_from_same_package
             webviewParams!.onPrint!(_controllerFromPlatform, uri);
@@ -236,12 +265,13 @@ class WebPlatformInAppWebViewController extends PlatformInAppWebViewController
         break;
       case "onCallJsHandler":
         String handlerName = call.arguments["handlerName"];
-        Map<String, dynamic> handlerDataMap =
-            call.arguments["data"].cast<String, dynamic>();
+        Map<String, dynamic> handlerDataMap = call.arguments["data"]
+            .cast<String, dynamic>();
         // decode args to json
         handlerDataMap["args"] = jsonDecode(handlerDataMap["args"]);
-        final handlerData =
-            JavaScriptHandlerFunctionData.fromMap(handlerDataMap)!;
+        final handlerData = JavaScriptHandlerFunctionData.fromMap(
+          handlerDataMap,
+        )!;
 
         _debugLog(handlerName, handlerData);
 
@@ -251,19 +281,23 @@ class WebPlatformInAppWebViewController extends PlatformInAppWebViewController
             var jsHandlerResult = null;
             if (_javaScriptHandlersMap[handlerName]
                 is JavaScriptHandlerCallback) {
-              jsHandlerResult = await (_javaScriptHandlersMap[handlerName]
-                  as JavaScriptHandlerCallback)(handlerData.args);
+              jsHandlerResult =
+                  await (_javaScriptHandlersMap[handlerName]
+                      as JavaScriptHandlerCallback)(handlerData.args);
             } else if (_javaScriptHandlersMap[handlerName]
                 is JavaScriptHandlerFunction) {
-              jsHandlerResult = await (_javaScriptHandlersMap[handlerName]
-                  as JavaScriptHandlerFunction)(handlerData);
+              jsHandlerResult =
+                  await (_javaScriptHandlersMap[handlerName]
+                      as JavaScriptHandlerFunction)(handlerData);
             } else {
               jsHandlerResult = await _javaScriptHandlersMap[handlerName]!();
             }
             return jsonEncode(jsHandlerResult);
           } catch (error, stacktrace) {
-            developer.log(error.toString() + '\n' + stacktrace.toString(),
-                name: 'JavaScript Handler "$handlerName"');
+            developer.log(
+              error.toString() + '\n' + stacktrace.toString(),
+              name: 'JavaScript Handler "$handlerName"',
+            );
             throw Exception(error.toString().replaceFirst('Exception: ', ''));
           }
         }
@@ -294,7 +328,8 @@ class WebPlatformInAppWebViewController extends PlatformInAppWebViewController
     InAppWebViewSettings? settings = await getSettings();
     if (settings != null && settings.javaScriptEnabled == true) {
       html = await evaluateJavascript(
-          source: "window.document.getElementsByTagName('html')[0].outerHTML;");
+        source: "window.document.getElementsByTagName('html')[0].outerHTML;",
+      );
       if (html != null && html.isNotEmpty) return html;
     }
 
@@ -340,7 +375,9 @@ class WebPlatformInAppWebViewController extends PlatformInAppWebViewController
 
     InAppWebViewSettings? settings = await getSettings();
     if (settings != null && settings.javaScriptEnabled == true) {
-      List<Map<dynamic, dynamic>> links = (await evaluateJavascript(source: """
+      List<Map<dynamic, dynamic>> links =
+          (await evaluateJavascript(
+            source: """
 (function() {
   var linkNodes = document.head.getElementsByTagName("link");
   var links = [];
@@ -366,7 +403,9 @@ class WebPlatformInAppWebViewController extends PlatformInAppWebViewController
   }
   return links;
 })();
-"""))?.cast<Map<dynamic, dynamic>>() ?? [];
+""",
+          ))?.cast<Map<dynamic, dynamic>>() ??
+          [];
       for (var link in links) {
         if (link["rel"] == "manifest") {
           manifestUrl = link["href"];
@@ -374,15 +413,24 @@ class WebPlatformInAppWebViewController extends PlatformInAppWebViewController
             if (manifestUrl.startsWith("/")) {
               manifestUrl = manifestUrl.substring(1);
             }
-            manifestUrl = ((assetPathBase == null)
+            manifestUrl =
+                ((assetPathBase == null)
                     ? webviewUrl.scheme + "://" + webviewUrl.host + "/"
                     : assetPathBase) +
                 manifestUrl;
           }
           continue;
         }
-        favicons.addAll(_createFavicons(webviewUrl, assetPathBase, link["href"],
-            link["rel"], link["sizes"], false));
+        favicons.addAll(
+          _createFavicons(
+            webviewUrl,
+            assetPathBase,
+            link["href"],
+            link["rel"],
+            link["sizes"],
+            false,
+          ),
+        );
       }
     }
 
@@ -393,8 +441,14 @@ class WebPlatformInAppWebViewController extends PlatformInAppWebViewController
     return url.startsWith("http://") || url.startsWith("https://");
   }
 
-  List<Favicon> _createFavicons(WebUri url, String? assetPathBase,
-      String urlIcon, String? rel, String? sizes, bool isManifest) {
+  List<Favicon> _createFavicons(
+    WebUri url,
+    String? assetPathBase,
+    String urlIcon,
+    String? rel,
+    String? sizes,
+    bool isManifest,
+  ) {
     List<Favicon> favicons = [];
 
     List<String> urlSplit = urlIcon.split("/");
@@ -402,7 +456,8 @@ class WebPlatformInAppWebViewController extends PlatformInAppWebViewController
       if (urlIcon.startsWith("/")) {
         urlIcon = urlIcon.substring(1);
       }
-      urlIcon = ((assetPathBase == null)
+      urlIcon =
+          ((assetPathBase == null)
               ? url.scheme + "://" + url.host + "/"
               : assetPathBase) +
           urlIcon;
@@ -410,9 +465,9 @@ class WebPlatformInAppWebViewController extends PlatformInAppWebViewController
     if (isManifest) {
       rel = (sizes != null)
           ? urlSplit[urlSplit.length - 1]
-              .replaceFirst("-" + sizes, "")
-              .split(" ")[0]
-              .split(".")[0]
+                .replaceFirst("-" + sizes, "")
+                .split(" ")[0]
+                .split(".")[0]
           : null;
     }
     if (sizes != null && sizes.isNotEmpty && sizes != "any") {
@@ -420,42 +475,51 @@ class WebPlatformInAppWebViewController extends PlatformInAppWebViewController
       for (String size in sizesSplit) {
         int width = int.parse(size.split("x")[0]);
         int height = int.parse(size.split("x")[1]);
-        favicons.add(Favicon(
-            url: WebUri(urlIcon), rel: rel, width: width, height: height));
+        favicons.add(
+          Favicon(url: WebUri(urlIcon), rel: rel, width: width, height: height),
+        );
       }
     } else {
       favicons.add(
-          Favicon(url: WebUri(urlIcon), rel: rel, width: null, height: null));
+        Favicon(url: WebUri(urlIcon), rel: rel, width: null, height: null),
+      );
     }
 
     return favicons;
   }
 
   @override
-  Future<void> loadUrl(
-      {required URLRequest urlRequest,
-      @Deprecated('Use allowingReadAccessTo instead')
-      Uri? iosAllowingReadAccessTo,
-      WebUri? allowingReadAccessTo}) async {
+  Future<void> loadUrl({
+    required URLRequest urlRequest,
+    @Deprecated('Use allowingReadAccessTo instead')
+    Uri? iosAllowingReadAccessTo,
+    WebUri? allowingReadAccessTo,
+  }) async {
     assert(urlRequest.url != null && urlRequest.url.toString().isNotEmpty);
     assert(
-        allowingReadAccessTo == null || allowingReadAccessTo.isScheme("file"));
-    assert(iosAllowingReadAccessTo == null ||
-        iosAllowingReadAccessTo.isScheme("file"));
+      allowingReadAccessTo == null || allowingReadAccessTo.isScheme("file"),
+    );
+    assert(
+      iosAllowingReadAccessTo == null ||
+          iosAllowingReadAccessTo.isScheme("file"),
+    );
 
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('urlRequest', () => urlRequest.toMap());
     args.putIfAbsent(
-        'allowingReadAccessTo',
-        () =>
-            allowingReadAccessTo?.toString() ??
-            iosAllowingReadAccessTo?.toString());
+      'allowingReadAccessTo',
+      () =>
+          allowingReadAccessTo?.toString() ??
+          iosAllowingReadAccessTo?.toString(),
+    );
     await channel?.invokeMethod('loadUrl', args);
   }
 
   @override
-  Future<void> postUrl(
-      {required WebUri url, required Uint8List postData}) async {
+  Future<void> postUrl({
+    required WebUri url,
+    required Uint8List postData,
+  }) async {
     assert(url.toString().isNotEmpty);
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('url', () => url.toString());
@@ -464,20 +528,24 @@ class WebPlatformInAppWebViewController extends PlatformInAppWebViewController
   }
 
   @override
-  Future<void> loadData(
-      {required String data,
-      String mimeType = "text/html",
-      String encoding = "utf8",
-      WebUri? baseUrl,
-      @Deprecated('Use historyUrl instead') Uri? androidHistoryUrl,
-      WebUri? historyUrl,
-      @Deprecated('Use allowingReadAccessTo instead')
-      Uri? iosAllowingReadAccessTo,
-      WebUri? allowingReadAccessTo}) async {
+  Future<void> loadData({
+    required String data,
+    String mimeType = "text/html",
+    String encoding = "utf8",
+    WebUri? baseUrl,
+    @Deprecated('Use historyUrl instead') Uri? androidHistoryUrl,
+    WebUri? historyUrl,
+    @Deprecated('Use allowingReadAccessTo instead')
+    Uri? iosAllowingReadAccessTo,
+    WebUri? allowingReadAccessTo,
+  }) async {
     assert(
-        allowingReadAccessTo == null || allowingReadAccessTo.isScheme("file"));
-    assert(iosAllowingReadAccessTo == null ||
-        iosAllowingReadAccessTo.isScheme("file"));
+      allowingReadAccessTo == null || allowingReadAccessTo.isScheme("file"),
+    );
+    assert(
+      iosAllowingReadAccessTo == null ||
+          iosAllowingReadAccessTo.isScheme("file"),
+    );
 
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('data', () => data);
@@ -485,16 +553,18 @@ class WebPlatformInAppWebViewController extends PlatformInAppWebViewController
     args.putIfAbsent('encoding', () => encoding);
     args.putIfAbsent('baseUrl', () => baseUrl?.toString() ?? "about:blank");
     args.putIfAbsent(
-        'historyUrl',
-        () =>
-            historyUrl?.toString() ??
-            androidHistoryUrl?.toString() ??
-            "about:blank");
+      'historyUrl',
+      () =>
+          historyUrl?.toString() ??
+          androidHistoryUrl?.toString() ??
+          "about:blank",
+    );
     args.putIfAbsent(
-        'allowingReadAccessTo',
-        () =>
-            allowingReadAccessTo?.toString() ??
-            iosAllowingReadAccessTo?.toString());
+      'allowingReadAccessTo',
+      () =>
+          allowingReadAccessTo?.toString() ??
+          iosAllowingReadAccessTo?.toString(),
+    );
     await channel?.invokeMethod('loadData', args);
   }
 
@@ -544,8 +614,10 @@ class WebPlatformInAppWebViewController extends PlatformInAppWebViewController
   }
 
   @override
-  Future<dynamic> evaluateJavascript(
-      {required String source, ContentWorld? contentWorld}) async {
+  Future<dynamic> evaluateJavascript({
+    required String source,
+    ContentWorld? contentWorld,
+  }) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('source', () => source);
     args.putIfAbsent('contentWorld', () => contentWorld?.toMap());
@@ -561,9 +633,10 @@ class WebPlatformInAppWebViewController extends PlatformInAppWebViewController
   }
 
   @override
-  Future<void> injectJavascriptFileFromUrl(
-      {required WebUri urlFile,
-      ScriptHtmlTagAttributes? scriptHtmlTagAttributes}) async {
+  Future<void> injectJavascriptFileFromUrl({
+    required WebUri urlFile,
+    ScriptHtmlTagAttributes? scriptHtmlTagAttributes,
+  }) async {
     assert(urlFile.toString().isNotEmpty);
     var id = scriptHtmlTagAttributes?.id;
     if (scriptHtmlTagAttributes != null && id != null) {
@@ -572,13 +645,16 @@ class WebPlatformInAppWebViewController extends PlatformInAppWebViewController
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('urlFile', () => urlFile.toString());
     args.putIfAbsent(
-        'scriptHtmlTagAttributes', () => scriptHtmlTagAttributes?.toMap());
+      'scriptHtmlTagAttributes',
+      () => scriptHtmlTagAttributes?.toMap(),
+    );
     await channel?.invokeMethod('injectJavascriptFileFromUrl', args);
   }
 
   @override
-  Future<dynamic> injectJavascriptFileFromAsset(
-      {required String assetFilePath}) async {
+  Future<dynamic> injectJavascriptFileFromAsset({
+    required String assetFilePath,
+  }) async {
     String source = await rootBundle.loadString(assetFilePath);
     return await evaluateJavascript(source: source);
   }
@@ -591,14 +667,17 @@ class WebPlatformInAppWebViewController extends PlatformInAppWebViewController
   }
 
   @override
-  Future<void> injectCSSFileFromUrl(
-      {required WebUri urlFile,
-      CSSLinkHtmlTagAttributes? cssLinkHtmlTagAttributes}) async {
+  Future<void> injectCSSFileFromUrl({
+    required WebUri urlFile,
+    CSSLinkHtmlTagAttributes? cssLinkHtmlTagAttributes,
+  }) async {
     assert(urlFile.toString().isNotEmpty);
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('urlFile', () => urlFile.toString());
     args.putIfAbsent(
-        'cssLinkHtmlTagAttributes', () => cssLinkHtmlTagAttributes?.toMap());
+      'cssLinkHtmlTagAttributes',
+      () => cssLinkHtmlTagAttributes?.toMap(),
+    );
     await channel?.invokeMethod('injectCSSFileFromUrl', args);
   }
 
@@ -642,8 +721,10 @@ class WebPlatformInAppWebViewController extends PlatformInAppWebViewController
   Future<InAppWebViewSettings?> getSettings() async {
     Map<String, dynamic> args = <String, dynamic>{};
 
-    Map<dynamic, dynamic>? settings =
-        await channel?.invokeMethod('getSettings', args);
+    Map<dynamic, dynamic>? settings = await channel?.invokeMethod(
+      'getSettings',
+      args,
+    );
     if (settings != null) {
       settings = settings.cast<String, dynamic>();
       return InAppWebViewSettings.fromMap(settings as Map<String, dynamic>);
@@ -665,8 +746,11 @@ class WebPlatformInAppWebViewController extends PlatformInAppWebViewController
   }
 
   @override
-  Future<void> scrollTo(
-      {required int x, required int y, bool animated = false}) async {
+  Future<void> scrollTo({
+    required int x,
+    required int y,
+    bool animated = false,
+  }) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('x', () => x);
     args.putIfAbsent('y', () => y);
@@ -675,8 +759,11 @@ class WebPlatformInAppWebViewController extends PlatformInAppWebViewController
   }
 
   @override
-  Future<void> scrollBy(
-      {required int x, required int y, bool animated = false}) async {
+  Future<void> scrollBy({
+    required int x,
+    required int y,
+    bool animated = false,
+  }) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('x', () => x);
     args.putIfAbsent('y', () => y);
@@ -685,8 +772,9 @@ class WebPlatformInAppWebViewController extends PlatformInAppWebViewController
   }
 
   @override
-  Future<PlatformPrintJobController?> printCurrentPage(
-      {PrintJobSettings? settings}) async {
+  Future<PlatformPrintJobController?> printCurrentPage({
+    PrintJobSettings? settings,
+  }) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent("settings", () => settings?.toMap());
     await channel?.invokeMethod<String?>('printCurrentPage', args);
@@ -700,7 +788,8 @@ class WebPlatformInAppWebViewController extends PlatformInAppWebViewController
     if (height == null || height == 0) {
       // try to use javascript
       var scrollHeight = await evaluateJavascript(
-          source: "document.documentElement.scrollHeight;");
+        source: "document.documentElement.scrollHeight;",
+      );
       if (scrollHeight != null && scrollHeight is num) {
         height = scrollHeight.toInt();
       }
@@ -715,7 +804,8 @@ class WebPlatformInAppWebViewController extends PlatformInAppWebViewController
     if (width == null || width == 0) {
       // try to use javascript
       var scrollHeight = await evaluateJavascript(
-          source: "document.documentElement.scrollWidth;");
+        source: "document.documentElement.scrollWidth;",
+      );
       if (scrollHeight != null && scrollHeight is num) {
         width = scrollHeight.toInt();
       }
@@ -740,8 +830,8 @@ class WebPlatformInAppWebViewController extends PlatformInAppWebViewController
   Future<List<MetaTag>> getMetaTags() async {
     List<MetaTag> metaTags = [];
 
-    List<Map<dynamic, dynamic>>? metaTagList =
-        (await evaluateJavascript(source: """
+    List<Map<dynamic, dynamic>>? metaTagList = (await evaluateJavascript(
+      source: """
 (function() {
   var metaTags = [];
   var metaTagNodes = document.head.getElementsByTagName('meta');
@@ -775,7 +865,8 @@ class WebPlatformInAppWebViewController extends PlatformInAppWebViewController
   }
   return metaTags;
 })();
-    """))?.cast<Map<dynamic, dynamic>>();
+    """,
+    ))?.cast<Map<dynamic, dynamic>>();
 
     if (metaTagList == null) {
       return metaTags;
@@ -785,12 +876,21 @@ class WebPlatformInAppWebViewController extends PlatformInAppWebViewController
       var attrs = <MetaTagAttribute>[];
 
       for (var metaTagAttr in metaTag["attrs"]) {
-        attrs.add(MetaTagAttribute(
-            name: metaTagAttr["name"], value: metaTagAttr["value"]));
+        attrs.add(
+          MetaTagAttribute(
+            name: metaTagAttr["name"],
+            value: metaTagAttr["value"],
+          ),
+        );
       }
 
-      metaTags.add(MetaTag(
-          name: metaTag["name"], content: metaTag["content"], attrs: attrs));
+      metaTags.add(
+        MetaTag(
+          name: metaTag["name"],
+          content: metaTag["content"],
+          attrs: attrs,
+        ),
+      );
     }
 
     return metaTags;
@@ -803,7 +903,8 @@ class WebPlatformInAppWebViewController extends PlatformInAppWebViewController
     try {
       Map<String, dynamic> args = <String, dynamic>{};
       themeColor = UtilColor.fromStringRepresentation(
-          await channel?.invokeMethod('getMetaThemeColor', args));
+        await channel?.invokeMethod('getMetaThemeColor', args),
+      );
       return themeColor;
     } catch (e) {
       // not implemented
@@ -866,10 +967,14 @@ class WebPlatformInAppWebViewController extends PlatformInAppWebViewController
   }
 
   @override
-  void addJavaScriptHandler(
-      {required String handlerName, required Function callback}) {
-    assert(!kJavaScriptHandlerForbiddenNames.contains(handlerName),
-        '"$handlerName" is a forbidden name!');
+  void addJavaScriptHandler({
+    required String handlerName,
+    required Function callback,
+  }) {
+    assert(
+      !kJavaScriptHandlerForbiddenNames.contains(handlerName),
+      '"$handlerName" is a forbidden name!',
+    );
     this._javaScriptHandlersMap[handlerName] = (callback);
   }
 
@@ -920,15 +1025,17 @@ class WebPlatformInAppWebViewController extends PlatformInAppWebViewController
   @override
   Future<void> removeUserScriptsByGroupName({required String groupName}) async {
     final List<UserScript> userScriptsAtDocumentStart = List.from(
-        _userScripts[UserScriptInjectionTime.AT_DOCUMENT_START] ?? []);
+      _userScripts[UserScriptInjectionTime.AT_DOCUMENT_START] ?? [],
+    );
     for (final userScript in userScriptsAtDocumentStart) {
       if (userScript.groupName == groupName) {
         _userScripts[userScript.injectionTime]?.remove(userScript);
       }
     }
 
-    final List<UserScript> userScriptsAtDocumentEnd =
-        List.from(_userScripts[UserScriptInjectionTime.AT_DOCUMENT_END] ?? []);
+    final List<UserScript> userScriptsAtDocumentEnd = List.from(
+      _userScripts[UserScriptInjectionTime.AT_DOCUMENT_END] ?? [],
+    );
     for (final userScript in userScriptsAtDocumentEnd) {
       if (userScript.groupName == groupName) {
         _userScripts[userScript.injectionTime]?.remove(userScript);
@@ -941,8 +1048,9 @@ class WebPlatformInAppWebViewController extends PlatformInAppWebViewController
   }
 
   @override
-  Future<void> removeUserScripts(
-      {required List<UserScript> userScripts}) async {
+  Future<void> removeUserScripts({
+    required List<UserScript> userScripts,
+  }) async {
     for (final userScript in userScripts) {
       await removeUserScript(userScript: userScript);
     }
@@ -965,8 +1073,10 @@ class WebPlatformInAppWebViewController extends PlatformInAppWebViewController
 
   @override
   Future<void> setJavaScriptBridgeName(String bridgeName) async {
-    assert(RegExp(r'^[a-zA-Z_]\w*$').hasMatch(bridgeName),
-        'bridgeName must be a non-empty string with only alphanumeric and underscore characters. It can\'t start with a number.');
+    assert(
+      RegExp(r'^[a-zA-Z_]\w*$').hasMatch(bridgeName),
+      'bridgeName must be a non-empty string with only alphanumeric and underscore characters. It can\'t start with a number.',
+    );
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('bridgeName', () => bridgeName);
     await _staticChannel.invokeMethod('setJavaScriptBridgeName', args);
@@ -976,7 +1086,9 @@ class WebPlatformInAppWebViewController extends PlatformInAppWebViewController
   Future<String> getJavaScriptBridgeName() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await _staticChannel.invokeMethod<String>(
-            'getJavaScriptBridgeName', args) ??
+          'getJavaScriptBridgeName',
+          args,
+        ) ??
         '';
   }
 
@@ -984,17 +1096,21 @@ class WebPlatformInAppWebViewController extends PlatformInAppWebViewController
   Future<String> getDefaultUserAgent() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await _staticChannel.invokeMethod<String>(
-            'getDefaultUserAgent', args) ??
+          'getDefaultUserAgent',
+          args,
+        ) ??
         '';
   }
 
   @override
   Future<String> get tRexRunnerHtml async => await rootBundle.loadString(
-      'packages/flutter_inappwebview/assets/t_rex_runner/t-rex.html');
+    'packages/flutter_inappwebview/assets/t_rex_runner/t-rex.html',
+  );
 
   @override
   Future<String> get tRexRunnerCss async => await rootBundle.loadString(
-      'packages/flutter_inappwebview/assets/t_rex_runner/t-rex.css');
+    'packages/flutter_inappwebview/assets/t_rex_runner/t-rex.css',
+  );
 
   @override
   Future<String?> getIFrameId() async {

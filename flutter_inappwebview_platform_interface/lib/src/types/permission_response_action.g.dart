@@ -11,10 +11,11 @@ class PermissionResponseAction {
   final int _value;
   final int _nativeValue;
   const PermissionResponseAction._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory PermissionResponseAction._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      PermissionResponseAction._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => PermissionResponseAction._internal(value, nativeValue());
 
   ///Denies the request.
   static const DENY = PermissionResponseAction._internal(0, 0);
@@ -36,8 +37,9 @@ class PermissionResponseAction {
   static PermissionResponseAction? fromValue(int? value) {
     if (value != null) {
       try {
-        return PermissionResponseAction.values
-            .firstWhere((element) => element.toValue() == value);
+        return PermissionResponseAction.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -49,8 +51,9 @@ class PermissionResponseAction {
   static PermissionResponseAction? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return PermissionResponseAction.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return PermissionResponseAction.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -66,8 +69,9 @@ class PermissionResponseAction {
   static PermissionResponseAction? byName(String? name) {
     if (name != null) {
       try {
-        return PermissionResponseAction.values
-            .firstWhere((element) => element.name() == name);
+        return PermissionResponseAction.values.firstWhere(
+          (element) => element.name() == name,
+        );
       } catch (e) {
         return null;
       }
@@ -85,7 +89,8 @@ class PermissionResponseAction {
   /// them will be represented in the returned map.
   static Map<String, PermissionResponseAction> asNameMap() =>
       <String, PermissionResponseAction>{
-        for (final value in PermissionResponseAction.values) value.name(): value
+        for (final value in PermissionResponseAction.values)
+          value.name(): value,
       };
 
   ///Gets [int] value.
@@ -131,11 +136,14 @@ class PermissionRequestResponseAction {
   final int _value;
   final int _nativeValue;
   const PermissionRequestResponseAction._internal(
-      this._value, this._nativeValue);
-// ignore: unused_element
+    this._value,
+    this._nativeValue,
+  );
+  // ignore: unused_element
   factory PermissionRequestResponseAction._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      PermissionRequestResponseAction._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => PermissionRequestResponseAction._internal(value, nativeValue());
 
   ///Denies the request.
   static const DENY = PermissionRequestResponseAction._internal(0, 0);
@@ -153,8 +161,9 @@ class PermissionRequestResponseAction {
   static PermissionRequestResponseAction? fromValue(int? value) {
     if (value != null) {
       try {
-        return PermissionRequestResponseAction.values
-            .firstWhere((element) => element.toValue() == value);
+        return PermissionRequestResponseAction.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -166,8 +175,9 @@ class PermissionRequestResponseAction {
   static PermissionRequestResponseAction? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return PermissionRequestResponseAction.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return PermissionRequestResponseAction.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -183,8 +193,9 @@ class PermissionRequestResponseAction {
   static PermissionRequestResponseAction? byName(String? name) {
     if (name != null) {
       try {
-        return PermissionRequestResponseAction.values
-            .firstWhere((element) => element.name() == name);
+        return PermissionRequestResponseAction.values.firstWhere(
+          (element) => element.name() == name,
+        );
       } catch (e) {
         return null;
       }
@@ -203,7 +214,7 @@ class PermissionRequestResponseAction {
   static Map<String, PermissionRequestResponseAction> asNameMap() =>
       <String, PermissionRequestResponseAction>{
         for (final value in PermissionRequestResponseAction.values)
-          value.name(): value
+          value.name(): value,
       };
 
   ///Gets [int] value.

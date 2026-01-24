@@ -25,17 +25,20 @@ class PhysicalKeyStatus {
 
   ///Indicates that the key was held down.
   bool wasKeyDown;
-  PhysicalKeyStatus(
-      {required this.isExtendedKey,
-      required this.isKeyReleased,
-      required this.isMenuKeyDown,
-      required this.repeatCount,
-      required this.scanCode,
-      required this.wasKeyDown});
+  PhysicalKeyStatus({
+    required this.isExtendedKey,
+    required this.isKeyReleased,
+    required this.isMenuKeyDown,
+    required this.repeatCount,
+    required this.scanCode,
+    required this.wasKeyDown,
+  });
 
   ///Gets a possible [PhysicalKeyStatus] instance from a [Map] value.
-  static PhysicalKeyStatus? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static PhysicalKeyStatus? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }

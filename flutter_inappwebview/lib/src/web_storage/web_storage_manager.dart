@@ -10,9 +10,9 @@ import 'ios/web_storage_manager.dart';
 class WebStorageManager {
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebStorageManager}
   WebStorageManager()
-      : this.fromPlatformCreationParams(
-          const PlatformWebStorageManagerCreationParams(),
-        );
+    : this.fromPlatformCreationParams(
+        const PlatformWebStorageManagerCreationParams(),
+      );
 
   /// Constructs a [WebStorageManager] from creation params for a specific
   /// platform.
@@ -34,10 +34,13 @@ class WebStorageManager {
       PlatformWebStorageManager.static().isClassSupported(platform: platform);
 
   ///Check if the given [method] is supported by the [defaultTargetPlatform] or a specific [platform].
-  static bool isMethodSupported(PlatformWebStorageManagerMethod method,
-          {TargetPlatform? platform}) =>
-      PlatformWebStorageManager.static()
-          .isMethodSupported(method, platform: platform);
+  static bool isMethodSupported(
+    PlatformWebStorageManagerMethod method, {
+    TargetPlatform? platform,
+  }) => PlatformWebStorageManager.static().isMethodSupported(
+    method,
+    platform: platform,
+  );
 
   ///Use [WebStorageManager] instead.
   @Deprecated("Use WebStorageManager instead")
@@ -74,18 +77,19 @@ class WebStorageManager {
       platform.getUsageForOrigin(origin: origin);
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebStorageManager.fetchDataRecords}
-  Future<List<WebsiteDataRecord>> fetchDataRecords(
-          {required Set<WebsiteDataType> dataTypes}) =>
-      platform.fetchDataRecords(dataTypes: dataTypes);
+  Future<List<WebsiteDataRecord>> fetchDataRecords({
+    required Set<WebsiteDataType> dataTypes,
+  }) => platform.fetchDataRecords(dataTypes: dataTypes);
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebStorageManager.removeDataFor}
-  Future<void> removeDataFor(
-          {required Set<WebsiteDataType> dataTypes,
-          required List<WebsiteDataRecord> dataRecords}) =>
-      platform.removeDataFor(dataTypes: dataTypes, dataRecords: dataRecords);
+  Future<void> removeDataFor({
+    required Set<WebsiteDataType> dataTypes,
+    required List<WebsiteDataRecord> dataRecords,
+  }) => platform.removeDataFor(dataTypes: dataTypes, dataRecords: dataRecords);
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebStorageManager.removeDataModifiedSince}
-  Future<void> removeDataModifiedSince(
-          {required Set<WebsiteDataType> dataTypes, required DateTime date}) =>
-      platform.removeDataModifiedSince(dataTypes: dataTypes, date: date);
+  Future<void> removeDataModifiedSince({
+    required Set<WebsiteDataType> dataTypes,
+    required DateTime date,
+  }) => platform.removeDataModifiedSince(dataTypes: dataTypes, date: date);
 }

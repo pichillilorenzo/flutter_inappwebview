@@ -25,7 +25,8 @@ class DefaultInAppLocalhostServerCreationParams
 
   /// Creates a [DefaultInAppLocalhostServerCreationParams] instance based on [PlatformInAppLocalhostServerCreationParams].
   factory DefaultInAppLocalhostServerCreationParams.fromPlatformInAppLocalhostServerCreationParams(
-      PlatformInAppLocalhostServerCreationParams params) {
+    PlatformInAppLocalhostServerCreationParams params,
+  ) {
     return DefaultInAppLocalhostServerCreationParams(params);
   }
 }
@@ -42,12 +43,13 @@ class DefaultInAppLocalhostServer extends PlatformInAppLocalhostServer {
 
   /// Creates a new [DefaultInAppLocalhostServer].
   DefaultInAppLocalhostServer(PlatformInAppLocalhostServerCreationParams params)
-      : super.implementation(
-          params is DefaultInAppLocalhostServerCreationParams
-              ? params
-              : DefaultInAppLocalhostServerCreationParams
-                  .fromPlatformInAppLocalhostServerCreationParams(params),
-        ) {
+    : super.implementation(
+        params is DefaultInAppLocalhostServerCreationParams
+            ? params
+            : DefaultInAppLocalhostServerCreationParams.fromPlatformInAppLocalhostServerCreationParams(
+                params,
+              ),
+      ) {
     this._port = params.port;
     this._directoryIndex = params.directoryIndex;
     this._documentRoot = (params.documentRoot.endsWith('/'))
@@ -81,67 +83,72 @@ class DefaultInAppLocalhostServer extends PlatformInAppLocalhostServer {
 
     final completer = Completer();
 
-    runZonedGuarded(() {
-      HttpServer.bind('127.0.0.1', _port, shared: _shared).then((server) {
-        if (kDebugMode) {
-          print('Server running on http://localhost:' + _port.toString());
-        }
-
-        this._server = server;
-
-        server.listen((HttpRequest request) async {
-          if (await _customOnData?.call(request) ?? false) {
-            // if _customOnData returns true,
-            // it means that the request has been handled
-            return;
+    runZonedGuarded(
+      () {
+        HttpServer.bind('127.0.0.1', _port, shared: _shared).then((server) {
+          if (kDebugMode) {
+            print('Server running on http://localhost:' + _port.toString());
           }
 
-          Uint8List body = Uint8List(0);
+          this._server = server;
 
-          var path = request.requestedUri.path;
-          path = (path.startsWith('/')) ? path.substring(1) : path;
-          path += (path.endsWith('/')) ? _directoryIndex : '';
-          if (path == '') {
-            // if the path still empty, try to load the index file
-            path = _directoryIndex;
-          }
-          path = _documentRoot + path;
-
-          try {
-            body = (await rootBundle.load(Uri.decodeFull(path)))
-                .buffer
-                .asUint8List();
-          } catch (e) {
-            if (kDebugMode) {
-              print(Uri.decodeFull(path));
-              print(e.toString());
+          server.listen((HttpRequest request) async {
+            if (await _customOnData?.call(request) ?? false) {
+              // if _customOnData returns true,
+              // it means that the request has been handled
+              return;
             }
+
+            Uint8List body = Uint8List(0);
+
+            var path = request.requestedUri.path;
+            path = (path.startsWith('/')) ? path.substring(1) : path;
+            path += (path.endsWith('/')) ? _directoryIndex : '';
+            if (path == '') {
+              // if the path still empty, try to load the index file
+              path = _directoryIndex;
+            }
+            path = _documentRoot + path;
+
+            try {
+              body = (await rootBundle.load(
+                Uri.decodeFull(path),
+              )).buffer.asUint8List();
+            } catch (e) {
+              if (kDebugMode) {
+                print(Uri.decodeFull(path));
+                print(e.toString());
+              }
+              request.response.close();
+              return;
+            }
+
+            var contentType = ContentType('text', 'html', charset: 'utf-8');
+            if (!request.requestedUri.path.endsWith('/') &&
+                request.requestedUri.pathSegments.isNotEmpty) {
+              final mimeType = MimeTypeResolver.lookup(
+                request.requestedUri.path,
+              );
+              if (mimeType != null) {
+                contentType = _getContentTypeFromMimeType(mimeType);
+              }
+            }
+
+            request.response.headers.contentType = contentType;
+            print(request.response.headers);
+            request.response.add(body);
             request.response.close();
-            return;
-          }
+          });
 
-          var contentType = ContentType('text', 'html', charset: 'utf-8');
-          if (!request.requestedUri.path.endsWith('/') &&
-              request.requestedUri.pathSegments.isNotEmpty) {
-            final mimeType = MimeTypeResolver.lookup(request.requestedUri.path);
-            if (mimeType != null) {
-              contentType = _getContentTypeFromMimeType(mimeType);
-            }
-          }
-
-          request.response.headers.contentType = contentType;
-          print(request.response.headers);
-          request.response.add(body);
-          request.response.close();
+          completer.complete();
         });
-
-        completer.complete();
-      });
-    }, (e, stackTrace) {
-      if (kDebugMode) {
-        print('Error: $e $stackTrace');
-      }
-    });
+      },
+      (e, stackTrace) {
+        if (kDebugMode) {
+          print('Error: $e $stackTrace');
+        }
+      },
+    );
 
     return completer.future;
   }

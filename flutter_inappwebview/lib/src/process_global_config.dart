@@ -6,9 +6,9 @@ import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_pla
 class ProcessGlobalConfig {
   ///{@macro flutter_inappwebview_platform_interface.PlatformProcessGlobalConfig}
   ProcessGlobalConfig()
-      : this.fromPlatformCreationParams(
-          const PlatformProcessGlobalConfigCreationParams(),
-        );
+    : this.fromPlatformCreationParams(
+        const PlatformProcessGlobalConfigCreationParams(),
+      );
 
   /// Constructs a [ProcessGlobalConfig] from creation params for a specific
   /// platform.
@@ -42,8 +42,11 @@ class ProcessGlobalConfig {
       PlatformProcessGlobalConfig.static().isClassSupported(platform: platform);
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformProcessGlobalConfig.isMethodSupported}
-  static bool isMethodSupported(PlatformProcessGlobalConfigMethod method,
-          {TargetPlatform? platform}) =>
-      PlatformProcessGlobalConfig.static()
-          .isMethodSupported(method, platform: platform);
+  static bool isMethodSupported(
+    PlatformProcessGlobalConfigMethod method, {
+    TargetPlatform? platform,
+  }) => PlatformProcessGlobalConfig.static().isMethodSupported(
+    method,
+    platform: platform,
+  );
 }

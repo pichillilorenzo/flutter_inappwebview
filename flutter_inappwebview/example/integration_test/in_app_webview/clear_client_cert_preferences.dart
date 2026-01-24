@@ -3,12 +3,12 @@ part of 'main.dart';
 void clearClientCertPreferences() {
   final shouldSkip = kIsWeb
       ? true
-      : ![
-          TargetPlatform.android,
-        ].contains(defaultTargetPlatform);
+      : ![TargetPlatform.android].contains(defaultTargetPlatform);
 
   skippableTest('clearClientCertPreferences', () async {
     await expectLater(
-        InAppWebViewController.clearClientCertPreferences(), completes);
+      InAppWebViewController.clearClientCertPreferences(),
+      completes,
+    );
   }, skip: shouldSkip);
 }

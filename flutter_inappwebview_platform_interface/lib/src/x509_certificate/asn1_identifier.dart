@@ -13,8 +13,9 @@ class ASN1IdentifierClass {
   static ASN1IdentifierClass? fromValue(int? value) {
     if (value != null) {
       try {
-        return ASN1IdentifierClass.values
-            .firstWhere((element) => element.toValue() == value);
+        return ASN1IdentifierClass.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -90,8 +91,9 @@ class ASN1IdentifierTagNumber {
   static ASN1IdentifierTagNumber? fromValue(int? value) {
     if (value != null) {
       try {
-        return ASN1IdentifierTagNumber.values
-            .firstWhere((element) => element.toValue() == value);
+        return ASN1IdentifierTagNumber.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -107,10 +109,12 @@ class ASN1IdentifierTagNumber {
   static const BIT_STRING = const ASN1IdentifierTagNumber._internal(0x03);
   static const OCTET_STRING = const ASN1IdentifierTagNumber._internal(0x04);
   static const NULL = const ASN1IdentifierTagNumber._internal(0x05);
-  static const OBJECT_IDENTIFIER =
-      const ASN1IdentifierTagNumber._internal(0x06);
-  static const OBJECT_DESCRIPTOR =
-      const ASN1IdentifierTagNumber._internal(0x07);
+  static const OBJECT_IDENTIFIER = const ASN1IdentifierTagNumber._internal(
+    0x06,
+  );
+  static const OBJECT_DESCRIPTOR = const ASN1IdentifierTagNumber._internal(
+    0x07,
+  );
   static const EXTERNAL = const ASN1IdentifierTagNumber._internal(0x08);
   static const READ = const ASN1IdentifierTagNumber._internal(0x09);
   static const ENUMERATED = const ASN1IdentifierTagNumber._internal(0x0A);
@@ -227,7 +231,7 @@ class ASN1Identifier {
     for (var tc in [
       ASN1IdentifierClass.APPLICATION,
       ASN1IdentifierClass.CONTEXT_SPECIFIC,
-      ASN1IdentifierClass.PRIVATE
+      ASN1IdentifierClass.PRIVATE,
     ]) {
       if ((rawValue & tc.toValue()) == tc.toValue()) {
         return tc;

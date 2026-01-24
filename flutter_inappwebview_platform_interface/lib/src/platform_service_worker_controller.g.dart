@@ -155,45 +155,56 @@ enum PlatformServiceWorkerControllerMethod {
 
 extension _PlatformServiceWorkerControllerMethodSupported
     on PlatformServiceWorkerController {
-  static bool isMethodSupported(PlatformServiceWorkerControllerMethod method,
-      {TargetPlatform? platform}) {
+  static bool isMethodSupported(
+    PlatformServiceWorkerControllerMethod method, {
+    TargetPlatform? platform,
+  }) {
     switch (method) {
       case PlatformServiceWorkerControllerMethod.getAllowContentAccess:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformServiceWorkerControllerMethod.getAllowFileAccess:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformServiceWorkerControllerMethod.getBlockNetworkLoads:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformServiceWorkerControllerMethod.getCacheMode:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformServiceWorkerControllerMethod.setAllowContentAccess:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformServiceWorkerControllerMethod.setAllowFileAccess:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformServiceWorkerControllerMethod.setBlockNetworkLoads:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformServiceWorkerControllerMethod.setCacheMode:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformServiceWorkerControllerMethod.setServiceWorkerClient:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
     }
   }
 }
@@ -230,13 +241,16 @@ enum ServiceWorkerClientProperty {
 }
 
 extension _ServiceWorkerClientPropertySupported on ServiceWorkerClient {
-  static bool isPropertySupported(ServiceWorkerClientProperty property,
-      {TargetPlatform? platform}) {
+  static bool isPropertySupported(
+    ServiceWorkerClientProperty property, {
+    TargetPlatform? platform,
+  }) {
     switch (property) {
       case ServiceWorkerClientProperty.shouldInterceptRequest:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
     }
   }
 }

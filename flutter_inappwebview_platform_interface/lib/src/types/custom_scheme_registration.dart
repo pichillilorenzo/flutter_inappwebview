@@ -23,9 +23,10 @@ class CustomSchemeRegistration_ {
   ///Specifically, if you have a URI of the following form you should set the HasAuthorityComponent value as listed.
   bool? hasAuthorityComponent;
 
-  CustomSchemeRegistration_(
-      {required this.scheme,
-      this.allowedOrigins,
-      this.treatAsSecure,
-      this.hasAuthorityComponent});
+  CustomSchemeRegistration_({
+    required this.scheme,
+    this.allowedOrigins,
+    this.treatAsSecure,
+    this.hasAuthorityComponent,
+  });
 }

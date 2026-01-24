@@ -28,18 +28,21 @@ class URLResponse {
 
   ///The URL for the response.
   WebUri? url;
-  URLResponse(
-      {required this.expectedContentLength,
-      this.headers,
-      this.mimeType,
-      this.statusCode,
-      this.suggestedFilename,
-      this.textEncodingName,
-      this.url});
+  URLResponse({
+    required this.expectedContentLength,
+    this.headers,
+    this.mimeType,
+    this.statusCode,
+    this.suggestedFilename,
+    this.textEncodingName,
+    this.url,
+  });
 
   ///Gets a possible [URLResponse] instance from a [Map] value.
-  static URLResponse? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static URLResponse? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
@@ -102,18 +105,21 @@ class IOSURLResponse {
 
   ///The URL for the response.
   Uri? url;
-  IOSURLResponse(
-      {required this.expectedContentLength,
-      this.headers,
-      this.mimeType,
-      this.statusCode,
-      this.suggestedFilename,
-      this.textEncodingName,
-      this.url});
+  IOSURLResponse({
+    required this.expectedContentLength,
+    this.headers,
+    this.mimeType,
+    this.statusCode,
+    this.suggestedFilename,
+    this.textEncodingName,
+    this.url,
+  });
 
   ///Gets a possible [IOSURLResponse] instance from a [Map] value.
-  static IOSURLResponse? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static IOSURLResponse? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }

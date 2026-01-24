@@ -17,24 +17,31 @@ class RenderProcessGoneDetail {
   /// Returns the renderer priority that was set at the time that the renderer exited. This may be greater than the priority that
   /// any individual `WebView` requested using [].
   RendererPriority? rendererPriorityAtExit;
-  RenderProcessGoneDetail(
-      {required this.didCrash, this.rendererPriorityAtExit});
+  RenderProcessGoneDetail({
+    required this.didCrash,
+    this.rendererPriorityAtExit,
+  });
 
   ///Gets a possible [RenderProcessGoneDetail] instance from a [Map] value.
-  static RenderProcessGoneDetail? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static RenderProcessGoneDetail? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
     final instance = RenderProcessGoneDetail(
       didCrash: map['didCrash'],
       rendererPriorityAtExit: switch (enumMethod ?? EnumMethod.nativeValue) {
-        EnumMethod.nativeValue =>
-          RendererPriority.fromNativeValue(map['rendererPriorityAtExit']),
-        EnumMethod.value =>
-          RendererPriority.fromValue(map['rendererPriorityAtExit']),
-        EnumMethod.name =>
-          RendererPriority.byName(map['rendererPriorityAtExit'])
+        EnumMethod.nativeValue => RendererPriority.fromNativeValue(
+          map['rendererPriorityAtExit'],
+        ),
+        EnumMethod.value => RendererPriority.fromValue(
+          map['rendererPriorityAtExit'],
+        ),
+        EnumMethod.name => RendererPriority.byName(
+          map['rendererPriorityAtExit'],
+        ),
       },
     );
     return instance;
@@ -47,7 +54,7 @@ class RenderProcessGoneDetail {
       "rendererPriorityAtExit": switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => rendererPriorityAtExit?.toNativeValue(),
         EnumMethod.value => rendererPriorityAtExit?.toValue(),
-        EnumMethod.name => rendererPriorityAtExit?.name()
+        EnumMethod.name => rendererPriorityAtExit?.name(),
       },
     };
   }

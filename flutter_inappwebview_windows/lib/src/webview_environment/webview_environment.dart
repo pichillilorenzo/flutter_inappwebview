@@ -14,9 +14,10 @@ class WindowsWebViewEnvironmentCreationParams
 
   /// Creates a [WindowsInAppWebViewControllerCreationParams] instance based on [PlatformInAppWebViewControllerCreationParams].
   factory WindowsWebViewEnvironmentCreationParams.fromPlatformWebViewEnvironmentCreationParams(
-      // Recommended placeholder to prevent being broken by platform interface.
-      // ignore: avoid_unused_constructor_parameters
-      PlatformWebViewEnvironmentCreationParams params) {
+    // Recommended placeholder to prevent being broken by platform interface.
+    // ignore: avoid_unused_constructor_parameters
+    PlatformWebViewEnvironmentCreationParams params,
+  ) {
     return WindowsWebViewEnvironmentCreationParams(settings: params.settings);
   }
 }
@@ -27,17 +28,21 @@ class WindowsWebViewEnvironmentCreationParams
 ///- Windows
 class WindowsWebViewEnvironment extends PlatformWebViewEnvironment
     with ChannelController {
-  static final MethodChannel _staticChannel =
-      MethodChannel('com.pichillilorenzo/flutter_webview_environment');
+  static final MethodChannel _staticChannel = MethodChannel(
+    'com.pichillilorenzo/flutter_webview_environment',
+  );
 
   @override
   final String id = IdGenerator.generate();
 
   WindowsWebViewEnvironment(PlatformWebViewEnvironmentCreationParams params)
-      : super.implementation(params is WindowsWebViewEnvironmentCreationParams
+    : super.implementation(
+        params is WindowsWebViewEnvironmentCreationParams
             ? params
-            : WindowsWebViewEnvironmentCreationParams
-                .fromPlatformWebViewEnvironmentCreationParams(params));
+            : WindowsWebViewEnvironmentCreationParams.fromPlatformWebViewEnvironmentCreationParams(
+                params,
+              ),
+      );
 
   static final WindowsWebViewEnvironment _staticValue =
       WindowsWebViewEnvironment(WindowsWebViewEnvironmentCreationParams());
@@ -48,11 +53,12 @@ class WindowsWebViewEnvironment extends PlatformWebViewEnvironment
 
   _debugLog(String method, dynamic args) {
     debugLog(
-        className: this.runtimeType.toString(),
-        id: id,
-        debugLoggingSettings: PlatformWebViewEnvironment.debugLoggingSettings,
-        method: method,
-        args: args);
+      className: this.runtimeType.toString(),
+      id: id,
+      debugLoggingSettings: PlatformWebViewEnvironment.debugLoggingSettings,
+      method: method,
+      args: args,
+    );
   }
 
   Future<dynamic> _handleMethod(MethodCall call) async {
@@ -68,16 +74,16 @@ class WindowsWebViewEnvironment extends PlatformWebViewEnvironment
         break;
       case 'onBrowserProcessExited':
         if (onBrowserProcessExited != null) {
-          Map<String, dynamic> arguments =
-              call.arguments.cast<String, dynamic>();
+          Map<String, dynamic> arguments = call.arguments
+              .cast<String, dynamic>();
           final detail = BrowserProcessExitedDetail.fromMap(arguments)!;
           onBrowserProcessExited?.call(detail);
         }
         break;
       case 'onProcessInfosChanged':
         if (onProcessInfosChanged != null) {
-          Map<String, dynamic> arguments =
-              call.arguments.cast<String, dynamic>();
+          Map<String, dynamic> arguments = call.arguments
+              .cast<String, dynamic>();
           final detail = BrowserProcessInfosChangedDetail.fromMap(arguments)!;
           onProcessInfosChanged?.call(detail);
         }
@@ -98,8 +104,10 @@ class WindowsWebViewEnvironment extends PlatformWebViewEnvironment
   @override
   Future<List<BrowserProcessInfo>> getProcessInfos() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    final result =
-        await channel?.invokeMethod<List<dynamic>>('getProcessInfos', args);
+    final result = await channel?.invokeMethod<List<dynamic>>(
+      'getProcessInfos',
+      args,
+    );
     return result
             ?.map((e) => BrowserProcessInfo.fromMap(e.cast<String, dynamic>()))
             .whereType<BrowserProcessInfo>()
@@ -111,14 +119,18 @@ class WindowsWebViewEnvironment extends PlatformWebViewEnvironment
   Future<String?> getFailureReportFolderPath() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await channel?.invokeMethod<String>(
-        'getFailureReportFolderPath', args);
+      'getFailureReportFolderPath',
+      args,
+    );
   }
 
   @override
-  Future<WindowsWebViewEnvironment> create(
-      {WebViewEnvironmentSettings? settings}) async {
+  Future<WindowsWebViewEnvironment> create({
+    WebViewEnvironmentSettings? settings,
+  }) async {
     final env = WindowsWebViewEnvironment(
-        WindowsWebViewEnvironmentCreationParams(settings: settings));
+      WindowsWebViewEnvironmentCreationParams(settings: settings),
+    );
 
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('id', () => env.id);
@@ -126,7 +138,8 @@ class WindowsWebViewEnvironment extends PlatformWebViewEnvironment
     await _staticChannel.invokeMethod('create', args);
 
     env.channel = MethodChannel(
-        'com.pichillilorenzo/flutter_webview_environment_${env.id}');
+      'com.pichillilorenzo/flutter_webview_environment_${env.id}',
+    );
     env.handler = env.handleMethod;
     env.initMethodCallHandler();
     return env;
@@ -137,17 +150,23 @@ class WindowsWebViewEnvironment extends PlatformWebViewEnvironment
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('browserExecutableFolder', () => browserExecutableFolder);
     return await _staticChannel.invokeMethod<String>(
-        'getAvailableVersion', args);
+      'getAvailableVersion',
+      args,
+    );
   }
 
   @override
-  Future<int?> compareBrowserVersions(
-      {required String version1, required String version2}) async {
+  Future<int?> compareBrowserVersions({
+    required String version1,
+    required String version2,
+  }) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('version1', () => version1);
     args.putIfAbsent('version2', () => version2);
     return await _staticChannel.invokeMethod<int>(
-        'compareBrowserVersions', args);
+      'compareBrowserVersions',
+      args,
+    );
   }
 
   @override

@@ -33,12 +33,14 @@ void pauseResumeTimers() {
     final InAppWebViewController controller = await controllerCompleter.future;
     await pageLoaded.future;
 
-    await controller.evaluateJavascript(source: """
+    await controller.evaluateJavascript(
+      source: """
       var count = 0;
       setInterval(function() {
         count = count + 10;
       }, 20);
-      """);
+      """,
+    );
 
     await controller.pauseTimers();
     await Future.delayed(Duration(seconds: 2));
@@ -46,6 +48,8 @@ void pauseResumeTimers() {
     expect(await controller.evaluateJavascript(source: "count;"), lessThan(50));
     await Future.delayed(Duration(seconds: 4));
     expect(
-        await controller.evaluateJavascript(source: "count;"), greaterThan(50));
+      await controller.evaluateJavascript(source: "count;"),
+      greaterThan(50),
+    );
   }, skip: shouldSkip);
 }

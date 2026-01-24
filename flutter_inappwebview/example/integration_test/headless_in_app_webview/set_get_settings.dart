@@ -34,7 +34,8 @@ void setGetSettings() {
     expect(settings!.javaScriptEnabled, false);
 
     await controller.setSettings(
-        settings: InAppWebViewSettings(javaScriptEnabled: true));
+      settings: InAppWebViewSettings(javaScriptEnabled: true),
+    );
 
     settings = await controller.getSettings();
     expect(settings, isNotNull);

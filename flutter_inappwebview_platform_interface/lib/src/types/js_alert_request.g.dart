@@ -24,17 +24,20 @@ class JsAlertRequest {
 
   ///The url of the page requesting the dialog.
   WebUri? url;
-  JsAlertRequest(
-      {@Deprecated('Use isMainFrame instead') this.iosIsMainFrame,
-      this.isMainFrame,
-      this.message,
-      this.url}) {
+  JsAlertRequest({
+    @Deprecated('Use isMainFrame instead') this.iosIsMainFrame,
+    this.isMainFrame,
+    this.message,
+    this.url,
+  }) {
     isMainFrame = isMainFrame ?? iosIsMainFrame;
   }
 
   ///Gets a possible [JsAlertRequest] instance from a [Map] value.
-  static JsAlertRequest? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static JsAlertRequest? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }

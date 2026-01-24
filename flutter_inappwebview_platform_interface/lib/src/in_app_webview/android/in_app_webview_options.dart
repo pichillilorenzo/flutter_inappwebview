@@ -317,8 +317,8 @@ class AndroidInAppWebViewOptions
       "defaultFixedFontSize": defaultFixedFontSize,
       "defaultFontSize": defaultFontSize,
       "defaultTextEncodingName": defaultTextEncodingName,
-      "disabledActionModeMenuItems":
-          disabledActionModeMenuItems?.toNativeValue(),
+      "disabledActionModeMenuItems": disabledActionModeMenuItems
+          ?.toNativeValue(),
       "fantasyFontFamily": fantasyFontFamily,
       "fixedFontFamily": fixedFontFamily,
       "forceDark": forceDark?.toNativeValue(),
@@ -367,8 +367,9 @@ class AndroidInAppWebViewOptions
     instance.domStorageEnabled = map["domStorageEnabled"];
     instance.useWideViewPort = map["useWideViewPort"];
     instance.safeBrowsingEnabled = map["safeBrowsingEnabled"];
-    instance.mixedContentMode =
-        AndroidMixedContentMode.fromNativeValue(map["mixedContentMode"]);
+    instance.mixedContentMode = AndroidMixedContentMode.fromNativeValue(
+      map["mixedContentMode"],
+    );
     instance.allowContentAccess = map["allowContentAccess"];
     instance.allowFileAccess = map["allowFileAccess"];
     instance.appCachePath = map["appCachePath"];
@@ -381,13 +382,15 @@ class AndroidInAppWebViewOptions
     instance.defaultTextEncodingName = map["defaultTextEncodingName"];
     instance.disabledActionModeMenuItems =
         AndroidActionModeMenuItem.fromNativeValue(
-            map["disabledActionModeMenuItems"]);
+          map["disabledActionModeMenuItems"],
+        );
     instance.fantasyFontFamily = map["fantasyFontFamily"];
     instance.fixedFontFamily = map["fixedFontFamily"];
     instance.forceDark = AndroidForceDark.fromNativeValue(map["forceDark"]);
     instance.geolocationEnabled = map["geolocationEnabled"];
-    instance.layoutAlgorithm =
-        AndroidLayoutAlgorithm.fromNativeValue(map["layoutAlgorithm"]);
+    instance.layoutAlgorithm = AndroidLayoutAlgorithm.fromNativeValue(
+      map["layoutAlgorithm"],
+    );
     instance.loadWithOverviewMode = map["loadWithOverviewMode"];
     instance.loadsImagesAutomatically = map["loadsImagesAutomatically"];
     instance.minimumLogicalFontSize = map["minimumLogicalFontSize"];
@@ -406,29 +409,37 @@ class AndroidInAppWebViewOptions
     instance.useHybridComposition = map["useHybridComposition"];
     instance.useShouldInterceptRequest = map["useShouldInterceptRequest"];
     instance.useOnRenderProcessGone = map["useOnRenderProcessGone"];
-    instance.overScrollMode =
-        AndroidOverScrollMode.fromNativeValue(map["overScrollMode"]);
+    instance.overScrollMode = AndroidOverScrollMode.fromNativeValue(
+      map["overScrollMode"],
+    );
     instance.networkAvailable = map["networkAvailable"];
-    instance.scrollBarStyle =
-        AndroidScrollBarStyle.fromNativeValue(map["scrollBarStyle"]);
+    instance.scrollBarStyle = AndroidScrollBarStyle.fromNativeValue(
+      map["scrollBarStyle"],
+    );
     instance.verticalScrollbarPosition =
         AndroidVerticalScrollbarPosition.fromNativeValue(
-            map["verticalScrollbarPosition"]);
+          map["verticalScrollbarPosition"],
+        );
     instance.scrollBarDefaultDelayBeforeFade =
         map["scrollBarDefaultDelayBeforeFade"];
     instance.scrollbarFadingEnabled = map["scrollbarFadingEnabled"];
     instance.scrollBarFadeDuration = map["scrollBarFadeDuration"];
     instance.rendererPriorityPolicy = RendererPriorityPolicy.fromMap(
-        map["rendererPriorityPolicy"]?.cast<String, dynamic>());
+      map["rendererPriorityPolicy"]?.cast<String, dynamic>(),
+    );
     instance.disableDefaultErrorPage = map["disableDefaultErrorPage"];
-    instance.verticalScrollbarThumbColor =
-        UtilColor.fromHex(map["verticalScrollbarThumbColor"]);
-    instance.verticalScrollbarTrackColor =
-        UtilColor.fromHex(map["verticalScrollbarTrackColor"]);
-    instance.horizontalScrollbarThumbColor =
-        UtilColor.fromHex(map["horizontalScrollbarThumbColor"]);
-    instance.horizontalScrollbarTrackColor =
-        UtilColor.fromHex(map["horizontalScrollbarTrackColor"]);
+    instance.verticalScrollbarThumbColor = UtilColor.fromHex(
+      map["verticalScrollbarThumbColor"],
+    );
+    instance.verticalScrollbarTrackColor = UtilColor.fromHex(
+      map["verticalScrollbarTrackColor"],
+    );
+    instance.horizontalScrollbarThumbColor = UtilColor.fromHex(
+      map["horizontalScrollbarThumbColor"],
+    );
+    instance.horizontalScrollbarTrackColor = UtilColor.fromHex(
+      map["horizontalScrollbarTrackColor"],
+    );
     return instance;
   }
 

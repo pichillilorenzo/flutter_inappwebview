@@ -19,9 +19,7 @@ class TrustedWebActivityDefaultDisplayMode
 
   ///Converts instance to a map.
   Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
-    return {
-      ..._toMapMergeWith(enumMethod: enumMethod),
-    };
+    return {..._toMapMergeWith(enumMethod: enumMethod)};
   }
 
   ///Converts instance to a map.

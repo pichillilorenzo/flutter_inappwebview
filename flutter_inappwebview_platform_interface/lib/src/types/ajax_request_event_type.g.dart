@@ -11,10 +11,11 @@ class AjaxRequestEventType {
   final String _value;
   final String _nativeValue;
   const AjaxRequestEventType._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory AjaxRequestEventType._internalMultiPlatform(
-          String value, Function nativeValue) =>
-      AjaxRequestEventType._internal(value, nativeValue());
+    String value,
+    Function nativeValue,
+  ) => AjaxRequestEventType._internal(value, nativeValue());
 
   ///The ABORT event is fired when a request has been aborted.
   static const ABORT = AjaxRequestEventType._internal('abort', 'abort');
@@ -30,12 +31,16 @@ class AjaxRequestEventType {
   static const LOADEND = AjaxRequestEventType._internal('loadend', 'loadend');
 
   ///The LOADSTART event is fired when a request has started to load data.
-  static const LOADSTART =
-      AjaxRequestEventType._internal('loadstart', 'loadstart');
+  static const LOADSTART = AjaxRequestEventType._internal(
+    'loadstart',
+    'loadstart',
+  );
 
   ///The PROGRESS event is fired periodically when a request receives more data.
-  static const PROGRESS =
-      AjaxRequestEventType._internal('progress', 'progress');
+  static const PROGRESS = AjaxRequestEventType._internal(
+    'progress',
+    'progress',
+  );
 
   ///The TIMEOUT event is fired when progression is terminated due to preset time expiring.
   static const TIMEOUT = AjaxRequestEventType._internal('timeout', 'timeout');
@@ -55,8 +60,9 @@ class AjaxRequestEventType {
   static AjaxRequestEventType? fromValue(String? value) {
     if (value != null) {
       try {
-        return AjaxRequestEventType.values
-            .firstWhere((element) => element.toValue() == value);
+        return AjaxRequestEventType.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -68,8 +74,9 @@ class AjaxRequestEventType {
   static AjaxRequestEventType? fromNativeValue(String? value) {
     if (value != null) {
       try {
-        return AjaxRequestEventType.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return AjaxRequestEventType.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -85,8 +92,9 @@ class AjaxRequestEventType {
   static AjaxRequestEventType? byName(String? name) {
     if (name != null) {
       try {
-        return AjaxRequestEventType.values
-            .firstWhere((element) => element.name() == name);
+        return AjaxRequestEventType.values.firstWhere(
+          (element) => element.name() == name,
+        );
       } catch (e) {
         return null;
       }
@@ -104,7 +112,7 @@ class AjaxRequestEventType {
   /// them will be represented in the returned map.
   static Map<String, AjaxRequestEventType> asNameMap() =>
       <String, AjaxRequestEventType>{
-        for (final value in AjaxRequestEventType.values) value.name(): value
+        for (final value in AjaxRequestEventType.values) value.name(): value,
       };
 
   ///Gets [String] value.

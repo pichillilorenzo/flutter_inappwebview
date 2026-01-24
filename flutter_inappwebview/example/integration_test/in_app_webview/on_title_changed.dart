@@ -44,7 +44,8 @@ void onTitleChanged() {
     await tester.pump();
     await pageLoaded.future;
     await controller.evaluateJavascript(
-        source: "document.title = 'title test';");
+      source: "document.title = 'title test';",
+    );
     await expectLater(onTitleChangedCompleter.future, completes);
   }, skip: shouldSkip);
 }

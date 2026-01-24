@@ -31,19 +31,22 @@ class WindowFeatures {
 
   ///A Double value specifying the y-coordinate of the containing window, or `null` if the y-coordinate is not specified.
   double? y;
-  WindowFeatures(
-      {this.allowsResizing,
-      this.height,
-      this.menuBarVisibility,
-      this.statusBarVisibility,
-      this.toolbarsVisibility,
-      this.width,
-      this.x,
-      this.y});
+  WindowFeatures({
+    this.allowsResizing,
+    this.height,
+    this.menuBarVisibility,
+    this.statusBarVisibility,
+    this.toolbarsVisibility,
+    this.width,
+    this.x,
+    this.y,
+  });
 
   ///Gets a possible [WindowFeatures] instance from a [Map] value.
-  static WindowFeatures? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static WindowFeatures? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
@@ -112,19 +115,22 @@ class IOSWKWindowFeatures {
 
   ///A Double value specifying the y-coordinate of the containing window, or `null` if the y-coordinate is not specified.
   double? y;
-  IOSWKWindowFeatures(
-      {this.allowsResizing,
-      this.height,
-      this.menuBarVisibility,
-      this.statusBarVisibility,
-      this.toolbarsVisibility,
-      this.width,
-      this.x,
-      this.y});
+  IOSWKWindowFeatures({
+    this.allowsResizing,
+    this.height,
+    this.menuBarVisibility,
+    this.statusBarVisibility,
+    this.toolbarsVisibility,
+    this.width,
+    this.x,
+    this.y,
+  });
 
   ///Gets a possible [IOSWKWindowFeatures] instance from a [Map] value.
-  static IOSWKWindowFeatures? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static IOSWKWindowFeatures? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }

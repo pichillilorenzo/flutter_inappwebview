@@ -3,9 +3,7 @@ part of 'main.dart';
 void pageDownUp() {
   final shouldSkip = kIsWeb
       ? true
-      : ![
-          TargetPlatform.android,
-        ].contains(defaultTargetPlatform);
+      : ![TargetPlatform.android].contains(defaultTargetPlatform);
 
   skippableTestWidgets('pageDown/pageUp', (WidgetTester tester) async {
     final Completer<InAppWebViewController> controllerCompleter =

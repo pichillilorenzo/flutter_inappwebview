@@ -32,94 +32,107 @@ class CreateWindowAction extends NavigationAction {
 
   ///The window id. Used by `WebView` to create a new WebView.
   int windowId;
-  CreateWindowAction(
-      {@Deprecated('Use isDialog instead') this.androidIsDialog,
-      @Deprecated('Use windowFeatures instead') this.iosWindowFeatures,
-      this.isDialog,
-      this.windowFeatures,
-      required this.windowId,
-      required URLRequest request,
-      required bool isForMainFrame,
-      @Deprecated('Use hasGesture instead') bool? androidHasGesture,
-      bool? hasGesture,
-      @Deprecated('Use isRedirect instead') bool? androidIsRedirect,
-      bool? isRedirect,
-      @Deprecated('Use navigationType instead')
-      IOSWKNavigationType? iosWKNavigationType,
-      NavigationType? navigationType,
-      @Deprecated('Use sourceFrame instead') IOSWKFrameInfo? iosSourceFrame,
-      FrameInfo? sourceFrame,
-      @Deprecated('Use targetFrame instead') IOSWKFrameInfo? iosTargetFrame,
-      FrameInfo? targetFrame,
-      bool? shouldPerformDownload})
-      : super(
-            request: request,
-            isForMainFrame: isForMainFrame,
-            androidHasGesture: androidHasGesture,
-            hasGesture: hasGesture,
-            androidIsRedirect: androidIsRedirect,
-            isRedirect: isRedirect,
-            iosWKNavigationType: iosWKNavigationType,
-            navigationType: navigationType,
-            iosSourceFrame: iosSourceFrame,
-            sourceFrame: sourceFrame,
-            iosTargetFrame: iosTargetFrame,
-            targetFrame: targetFrame,
-            shouldPerformDownload: shouldPerformDownload) {
+  CreateWindowAction({
+    @Deprecated('Use isDialog instead') this.androidIsDialog,
+    @Deprecated('Use windowFeatures instead') this.iosWindowFeatures,
+    this.isDialog,
+    this.windowFeatures,
+    required this.windowId,
+    required URLRequest request,
+    required bool isForMainFrame,
+    @Deprecated('Use hasGesture instead') bool? androidHasGesture,
+    bool? hasGesture,
+    @Deprecated('Use isRedirect instead') bool? androidIsRedirect,
+    bool? isRedirect,
+    @Deprecated('Use navigationType instead')
+    IOSWKNavigationType? iosWKNavigationType,
+    NavigationType? navigationType,
+    @Deprecated('Use sourceFrame instead') IOSWKFrameInfo? iosSourceFrame,
+    FrameInfo? sourceFrame,
+    @Deprecated('Use targetFrame instead') IOSWKFrameInfo? iosTargetFrame,
+    FrameInfo? targetFrame,
+    bool? shouldPerformDownload,
+  }) : super(
+         request: request,
+         isForMainFrame: isForMainFrame,
+         androidHasGesture: androidHasGesture,
+         hasGesture: hasGesture,
+         androidIsRedirect: androidIsRedirect,
+         isRedirect: isRedirect,
+         iosWKNavigationType: iosWKNavigationType,
+         navigationType: navigationType,
+         iosSourceFrame: iosSourceFrame,
+         sourceFrame: sourceFrame,
+         iosTargetFrame: iosTargetFrame,
+         targetFrame: targetFrame,
+         shouldPerformDownload: shouldPerformDownload,
+       ) {
     isDialog = isDialog ?? androidIsDialog;
     windowFeatures =
         windowFeatures ?? WindowFeatures.fromMap(iosWindowFeatures?.toMap());
   }
 
   ///Gets a possible [CreateWindowAction] instance from a [Map] value.
-  static CreateWindowAction? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static CreateWindowAction? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
     final instance = CreateWindowAction(
-      request: URLRequest.fromMap(map['request']?.cast<String, dynamic>(),
-          enumMethod: enumMethod)!,
+      request: URLRequest.fromMap(
+        map['request']?.cast<String, dynamic>(),
+        enumMethod: enumMethod,
+      )!,
       isForMainFrame: map['isForMainFrame'],
       androidIsDialog: map['isDialog'],
       iosWindowFeatures: IOSWKWindowFeatures.fromMap(
-          map['windowFeatures']?.cast<String, dynamic>(),
-          enumMethod: enumMethod),
+        map['windowFeatures']?.cast<String, dynamic>(),
+        enumMethod: enumMethod,
+      ),
       isDialog: map['isDialog'],
       windowFeatures: WindowFeatures.fromMap(
-          map['windowFeatures']?.cast<String, dynamic>(),
-          enumMethod: enumMethod),
+        map['windowFeatures']?.cast<String, dynamic>(),
+        enumMethod: enumMethod,
+      ),
       windowId: map['windowId'],
     );
     instance.androidHasGesture = map['hasGesture'];
     instance.hasGesture = map['hasGesture'];
     instance.androidIsRedirect = map['isRedirect'];
     instance.isRedirect = map['isRedirect'];
-    instance.iosWKNavigationType =
-        switch (enumMethod ?? EnumMethod.nativeValue) {
-      EnumMethod.nativeValue =>
-        IOSWKNavigationType.fromNativeValue(map['navigationType']),
+    instance.iosWKNavigationType = switch (enumMethod ??
+        EnumMethod.nativeValue) {
+      EnumMethod.nativeValue => IOSWKNavigationType.fromNativeValue(
+        map['navigationType'],
+      ),
       EnumMethod.value => IOSWKNavigationType.fromValue(map['navigationType']),
-      EnumMethod.name => IOSWKNavigationType.byName(map['navigationType'])
+      EnumMethod.name => IOSWKNavigationType.byName(map['navigationType']),
     };
     instance.navigationType = switch (enumMethod ?? EnumMethod.nativeValue) {
-      EnumMethod.nativeValue =>
-        NavigationType.fromNativeValue(map['navigationType']),
+      EnumMethod.nativeValue => NavigationType.fromNativeValue(
+        map['navigationType'],
+      ),
       EnumMethod.value => NavigationType.fromValue(map['navigationType']),
-      EnumMethod.name => NavigationType.byName(map['navigationType'])
+      EnumMethod.name => NavigationType.byName(map['navigationType']),
     };
     instance.iosSourceFrame = IOSWKFrameInfo.fromMap(
-        map['sourceFrame']?.cast<String, dynamic>(),
-        enumMethod: enumMethod);
+      map['sourceFrame']?.cast<String, dynamic>(),
+      enumMethod: enumMethod,
+    );
     instance.sourceFrame = FrameInfo.fromMap(
-        map['sourceFrame']?.cast<String, dynamic>(),
-        enumMethod: enumMethod);
+      map['sourceFrame']?.cast<String, dynamic>(),
+      enumMethod: enumMethod,
+    );
     instance.iosTargetFrame = IOSWKFrameInfo.fromMap(
-        map['targetFrame']?.cast<String, dynamic>(),
-        enumMethod: enumMethod);
+      map['targetFrame']?.cast<String, dynamic>(),
+      enumMethod: enumMethod,
+    );
     instance.targetFrame = FrameInfo.fromMap(
-        map['targetFrame']?.cast<String, dynamic>(),
-        enumMethod: enumMethod);
+      map['targetFrame']?.cast<String, dynamic>(),
+      enumMethod: enumMethod,
+    );
     instance.shouldPerformDownload = map['shouldPerformDownload'];
     return instance;
   }
@@ -134,7 +147,7 @@ class CreateWindowAction extends NavigationAction {
       "navigationType": switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => navigationType?.toNativeValue(),
         EnumMethod.value => navigationType?.toValue(),
-        EnumMethod.name => navigationType?.name()
+        EnumMethod.name => navigationType?.name(),
       },
       "sourceFrame": sourceFrame?.toMap(enumMethod: enumMethod),
       "targetFrame": targetFrame?.toMap(enumMethod: enumMethod),

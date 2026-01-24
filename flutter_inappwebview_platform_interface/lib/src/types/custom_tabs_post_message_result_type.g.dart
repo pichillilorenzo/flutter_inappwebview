@@ -11,11 +11,14 @@ class CustomTabsPostMessageResultType {
   final int _value;
   final int? _nativeValue;
   const CustomTabsPostMessageResultType._internal(
-      this._value, this._nativeValue);
-// ignore: unused_element
+    this._value,
+    this._nativeValue,
+  );
+  // ignore: unused_element
   factory CustomTabsPostMessageResultType._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      CustomTabsPostMessageResultType._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => CustomTabsPostMessageResultType._internal(value, nativeValue());
 
   ///Indicates that the postMessage request was not allowed due to a bad argument
   ///or requesting at a disallowed time like when in background.
@@ -24,14 +27,14 @@ class CustomTabsPostMessageResultType {
   ///- Android WebView
   static final FAILURE_DISALLOWED =
       CustomTabsPostMessageResultType._internalMultiPlatform(-1, () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.android:
-        return -1;
-      default:
-        break;
-    }
-    return null;
-  });
+        switch (defaultTargetPlatform) {
+          case TargetPlatform.android:
+            return -1;
+          default:
+            break;
+        }
+        return null;
+      });
 
   ///Indicates that the postMessage request has failed due to an internal error on the browser message channel.
   ///
@@ -39,14 +42,14 @@ class CustomTabsPostMessageResultType {
   ///- Android WebView
   static final FAILURE_MESSAGING_ERROR =
       CustomTabsPostMessageResultType._internalMultiPlatform(-3, () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.android:
-        return -3;
-      default:
-        break;
-    }
-    return null;
-  });
+        switch (defaultTargetPlatform) {
+          case TargetPlatform.android:
+            return -3;
+          default:
+            break;
+        }
+        return null;
+      });
 
   ///Indicates that the postMessage request has failed due to a `RemoteException`.
   ///
@@ -54,29 +57,31 @@ class CustomTabsPostMessageResultType {
   ///- Android WebView
   static final FAILURE_REMOTE_ERROR =
       CustomTabsPostMessageResultType._internalMultiPlatform(-2, () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.android:
-        return -2;
-      default:
-        break;
-    }
-    return null;
-  });
+        switch (defaultTargetPlatform) {
+          case TargetPlatform.android:
+            return -2;
+          default:
+            break;
+        }
+        return null;
+      });
 
   ///Indicates that the postMessage request was accepted.
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView
-  static final SUCCESS =
-      CustomTabsPostMessageResultType._internalMultiPlatform(0, () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.android:
-        return 0;
-      default:
-        break;
-    }
-    return null;
-  });
+  static final SUCCESS = CustomTabsPostMessageResultType._internalMultiPlatform(
+    0,
+    () {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.android:
+          return 0;
+        default:
+          break;
+      }
+      return null;
+    },
+  );
 
   ///Set of all values of [CustomTabsPostMessageResultType].
   static final Set<CustomTabsPostMessageResultType> values = [
@@ -90,8 +95,9 @@ class CustomTabsPostMessageResultType {
   static CustomTabsPostMessageResultType? fromValue(int? value) {
     if (value != null) {
       try {
-        return CustomTabsPostMessageResultType.values
-            .firstWhere((element) => element.toValue() == value);
+        return CustomTabsPostMessageResultType.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -103,8 +109,9 @@ class CustomTabsPostMessageResultType {
   static CustomTabsPostMessageResultType? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return CustomTabsPostMessageResultType.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return CustomTabsPostMessageResultType.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -120,8 +127,9 @@ class CustomTabsPostMessageResultType {
   static CustomTabsPostMessageResultType? byName(String? name) {
     if (name != null) {
       try {
-        return CustomTabsPostMessageResultType.values
-            .firstWhere((element) => element.name() == name);
+        return CustomTabsPostMessageResultType.values.firstWhere(
+          (element) => element.name() == name,
+        );
       } catch (e) {
         return null;
       }
@@ -140,7 +148,7 @@ class CustomTabsPostMessageResultType {
   static Map<String, CustomTabsPostMessageResultType> asNameMap() =>
       <String, CustomTabsPostMessageResultType>{
         for (final value in CustomTabsPostMessageResultType.values)
-          value.name(): value
+          value.name(): value,
       };
 
   ///Gets [int] value.

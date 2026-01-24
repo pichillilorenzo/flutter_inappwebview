@@ -11,18 +11,24 @@ class ContentBlockerTriggerResourceType_ {
   final String _value;
   const ContentBlockerTriggerResourceType_._internal(this._value);
 
-  static const DOCUMENT =
-      const ContentBlockerTriggerResourceType_._internal('document');
-  static const IMAGE =
-      const ContentBlockerTriggerResourceType_._internal('image');
-  static const STYLE_SHEET =
-      const ContentBlockerTriggerResourceType_._internal('style-sheet');
-  static const SCRIPT =
-      const ContentBlockerTriggerResourceType_._internal('script');
-  static const FONT =
-      const ContentBlockerTriggerResourceType_._internal('font');
-  static const MEDIA =
-      const ContentBlockerTriggerResourceType_._internal('media');
+  static const DOCUMENT = const ContentBlockerTriggerResourceType_._internal(
+    'document',
+  );
+  static const IMAGE = const ContentBlockerTriggerResourceType_._internal(
+    'image',
+  );
+  static const STYLE_SHEET = const ContentBlockerTriggerResourceType_._internal(
+    'style-sheet',
+  );
+  static const SCRIPT = const ContentBlockerTriggerResourceType_._internal(
+    'script',
+  );
+  static const FONT = const ContentBlockerTriggerResourceType_._internal(
+    'font',
+  );
+  static const MEDIA = const ContentBlockerTriggerResourceType_._internal(
+    'media',
+  );
   static const SVG_DOCUMENT =
       const ContentBlockerTriggerResourceType_._internal('svg-document');
 

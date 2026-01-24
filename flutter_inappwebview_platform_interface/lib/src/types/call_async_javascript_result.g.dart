@@ -16,8 +16,10 @@ class CallAsyncJavaScriptResult {
   CallAsyncJavaScriptResult({this.error, this.value});
 
   ///Gets a possible [CallAsyncJavaScriptResult] instance from a [Map] value.
-  static CallAsyncJavaScriptResult? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static CallAsyncJavaScriptResult? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
@@ -30,10 +32,7 @@ class CallAsyncJavaScriptResult {
 
   ///Converts instance to a map.
   Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
-    return {
-      "error": error,
-      "value": value,
-    };
+    return {"error": error, "value": value};
   }
 
   ///Converts instance to a map.

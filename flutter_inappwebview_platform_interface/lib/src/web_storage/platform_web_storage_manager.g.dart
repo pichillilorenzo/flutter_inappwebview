@@ -13,14 +13,19 @@ extension _PlatformWebStorageManagerCreationParamsClassSupported
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView
   ///- iOS WKWebView 9.0+
+  ///- Linux WPE WebKit
   ///- macOS WKWebView
   ///
   ///Use the [PlatformWebStorageManagerCreationParams.isClassSupported] method to check if this class is supported at runtime.
   ///{@endtemplate}
   static bool isClassSupported({TargetPlatform? platform}) {
     return ((kIsWeb && platform != null) || !kIsWeb) &&
-        [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
-            .contains(platform ?? defaultTargetPlatform);
+        [
+          TargetPlatform.android,
+          TargetPlatform.iOS,
+          TargetPlatform.linux,
+          TargetPlatform.macOS,
+        ].contains(platform ?? defaultTargetPlatform);
   }
 }
 
@@ -31,14 +36,19 @@ extension _PlatformWebStorageManagerClassSupported
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView ([Official API - WebStorage](https://developer.android.com/reference/android/webkit/WebStorage.html))
   ///- iOS WKWebView 9.0+ ([Official API - WKWebsiteDataStore](https://developer.apple.com/documentation/webkit/wkwebsitedatastore))
+  ///- Linux WPE WebKit ([Official API - WebKitWebsiteDataManager](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/class.WebsiteDataManager.html))
   ///- macOS WKWebView ([Official API - WKWebsiteDataStore](https://developer.apple.com/documentation/webkit/wkwebsitedatastore))
   ///
   ///Use the [PlatformWebStorageManager.isClassSupported] method to check if this class is supported at runtime.
   ///{@endtemplate}
   static bool isClassSupported({TargetPlatform? platform}) {
     return ((kIsWeb && platform != null) || !kIsWeb) &&
-        [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
-            .contains(platform ?? defaultTargetPlatform);
+        [
+          TargetPlatform.android,
+          TargetPlatform.iOS,
+          TargetPlatform.linux,
+          TargetPlatform.macOS,
+        ].contains(platform ?? defaultTargetPlatform);
   }
 }
 
@@ -75,6 +85,7 @@ enum PlatformWebStorageManagerMethod {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- iOS WKWebView 9.0+ ([Official API - WKWebsiteDataStore.fetchDataRecords](https://developer.apple.com/documentation/webkit/wkwebsitedatastore/1532932-fetchdatarecords))
+  ///- Linux WPE WebKit ([Official API - webkit_website_data_manager_fetch](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebsiteDataManager.fetch.html))
   ///- macOS WKWebView ([Official API - WKWebsiteDataStore.fetchDataRecords](https://developer.apple.com/documentation/webkit/wkwebsitedatastore/1532932-fetchdatarecords))
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
@@ -129,6 +140,7 @@ enum PlatformWebStorageManagerMethod {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- iOS WKWebView 9.0+ ([Official API - WKWebsiteDataStore.removeData](https://developer.apple.com/documentation/webkit/wkwebsitedatastore/1532936-removedata))
+  ///- Linux WPE WebKit ([Official API - webkit_website_data_manager_remove](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebsiteDataManager.remove.html))
   ///- macOS WKWebView ([Official API - WKWebsiteDataStore.removeData](https://developer.apple.com/documentation/webkit/wkwebsitedatastore/1532936-removedata))
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
@@ -145,6 +157,7 @@ enum PlatformWebStorageManagerMethod {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- iOS WKWebView 9.0+ ([Official API - WKWebsiteDataStore.removeData](https://developer.apple.com/documentation/webkit/wkwebsitedatastore/1532938-removedata))
+  ///- Linux WPE WebKit ([Official API - webkit_website_data_manager_clear](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebsiteDataManager.clear.html))
   ///- macOS WKWebView ([Official API - WKWebsiteDataStore.removeData](https://developer.apple.com/documentation/webkit/wkwebsitedatastore/1532938-removedata))
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
@@ -158,41 +171,57 @@ enum PlatformWebStorageManagerMethod {
 
 extension _PlatformWebStorageManagerMethodSupported
     on PlatformWebStorageManager {
-  static bool isMethodSupported(PlatformWebStorageManagerMethod method,
-      {TargetPlatform? platform}) {
+  static bool isMethodSupported(
+    PlatformWebStorageManagerMethod method, {
+    TargetPlatform? platform,
+  }) {
     switch (method) {
       case PlatformWebStorageManagerMethod.deleteAllData:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebStorageManagerMethod.deleteOrigin:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebStorageManagerMethod.fetchDataRecords:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.iOS,
+              TargetPlatform.linux,
+              TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebStorageManagerMethod.getOrigins:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebStorageManagerMethod.getQuotaForOrigin:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebStorageManagerMethod.getUsageForOrigin:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebStorageManagerMethod.removeDataFor:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.iOS,
+              TargetPlatform.linux,
+              TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebStorageManagerMethod.removeDataModifiedSince:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.iOS,
+              TargetPlatform.linux,
+              TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
     }
   }
 }

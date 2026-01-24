@@ -11,19 +11,26 @@ class ScrollViewContentInsetAdjustmentBehavior {
   final int _value;
   final int _nativeValue;
   const ScrollViewContentInsetAdjustmentBehavior._internal(
-      this._value, this._nativeValue);
-// ignore: unused_element
+    this._value,
+    this._nativeValue,
+  );
+  // ignore: unused_element
   factory ScrollViewContentInsetAdjustmentBehavior._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      ScrollViewContentInsetAdjustmentBehavior._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => ScrollViewContentInsetAdjustmentBehavior._internal(value, nativeValue());
 
   ///Always include the safe area insets in the content adjustment.
-  static const ALWAYS =
-      ScrollViewContentInsetAdjustmentBehavior._internal(3, 3);
+  static const ALWAYS = ScrollViewContentInsetAdjustmentBehavior._internal(
+    3,
+    3,
+  );
 
   ///Automatically adjust the scroll view insets.
-  static const AUTOMATIC =
-      ScrollViewContentInsetAdjustmentBehavior._internal(0, 0);
+  static const AUTOMATIC = ScrollViewContentInsetAdjustmentBehavior._internal(
+    0,
+    0,
+  );
 
   ///Do not adjust the scroll view insets.
   static const NEVER = ScrollViewContentInsetAdjustmentBehavior._internal(2, 2);
@@ -44,8 +51,9 @@ class ScrollViewContentInsetAdjustmentBehavior {
   static ScrollViewContentInsetAdjustmentBehavior? fromValue(int? value) {
     if (value != null) {
       try {
-        return ScrollViewContentInsetAdjustmentBehavior.values
-            .firstWhere((element) => element.toValue() == value);
+        return ScrollViewContentInsetAdjustmentBehavior.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -57,8 +65,9 @@ class ScrollViewContentInsetAdjustmentBehavior {
   static ScrollViewContentInsetAdjustmentBehavior? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return ScrollViewContentInsetAdjustmentBehavior.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return ScrollViewContentInsetAdjustmentBehavior.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -74,8 +83,9 @@ class ScrollViewContentInsetAdjustmentBehavior {
   static ScrollViewContentInsetAdjustmentBehavior? byName(String? name) {
     if (name != null) {
       try {
-        return ScrollViewContentInsetAdjustmentBehavior.values
-            .firstWhere((element) => element.name() == name);
+        return ScrollViewContentInsetAdjustmentBehavior.values.firstWhere(
+          (element) => element.name() == name,
+        );
       } catch (e) {
         return null;
       }
@@ -94,7 +104,7 @@ class ScrollViewContentInsetAdjustmentBehavior {
   static Map<String, ScrollViewContentInsetAdjustmentBehavior> asNameMap() =>
       <String, ScrollViewContentInsetAdjustmentBehavior>{
         for (final value in ScrollViewContentInsetAdjustmentBehavior.values)
-          value.name(): value
+          value.name(): value,
       };
 
   ///Gets [int] value.
@@ -145,24 +155,33 @@ class IOSUIScrollViewContentInsetAdjustmentBehavior {
   final int _value;
   final int _nativeValue;
   const IOSUIScrollViewContentInsetAdjustmentBehavior._internal(
-      this._value, this._nativeValue);
-// ignore: unused_element
+    this._value,
+    this._nativeValue,
+  );
+  // ignore: unused_element
   factory IOSUIScrollViewContentInsetAdjustmentBehavior._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      IOSUIScrollViewContentInsetAdjustmentBehavior._internal(
-          value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => IOSUIScrollViewContentInsetAdjustmentBehavior._internal(
+    value,
+    nativeValue(),
+  );
 
   ///Always include the safe area insets in the content adjustment.
-  static const ALWAYS =
-      IOSUIScrollViewContentInsetAdjustmentBehavior._internal(3, 3);
+  static const ALWAYS = IOSUIScrollViewContentInsetAdjustmentBehavior._internal(
+    3,
+    3,
+  );
 
   ///Automatically adjust the scroll view insets.
   static const AUTOMATIC =
       IOSUIScrollViewContentInsetAdjustmentBehavior._internal(0, 0);
 
   ///Do not adjust the scroll view insets.
-  static const NEVER =
-      IOSUIScrollViewContentInsetAdjustmentBehavior._internal(2, 2);
+  static const NEVER = IOSUIScrollViewContentInsetAdjustmentBehavior._internal(
+    2,
+    2,
+  );
 
   ///Adjust the insets only in the scrollable directions.
   static const SCROLLABLE_AXES =
@@ -180,8 +199,9 @@ class IOSUIScrollViewContentInsetAdjustmentBehavior {
   static IOSUIScrollViewContentInsetAdjustmentBehavior? fromValue(int? value) {
     if (value != null) {
       try {
-        return IOSUIScrollViewContentInsetAdjustmentBehavior.values
-            .firstWhere((element) => element.toValue() == value);
+        return IOSUIScrollViewContentInsetAdjustmentBehavior.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -191,11 +211,13 @@ class IOSUIScrollViewContentInsetAdjustmentBehavior {
 
   ///Gets a possible [IOSUIScrollViewContentInsetAdjustmentBehavior] instance from a native value.
   static IOSUIScrollViewContentInsetAdjustmentBehavior? fromNativeValue(
-      int? value) {
+    int? value,
+  ) {
     if (value != null) {
       try {
-        return IOSUIScrollViewContentInsetAdjustmentBehavior.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return IOSUIScrollViewContentInsetAdjustmentBehavior.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -211,8 +233,9 @@ class IOSUIScrollViewContentInsetAdjustmentBehavior {
   static IOSUIScrollViewContentInsetAdjustmentBehavior? byName(String? name) {
     if (name != null) {
       try {
-        return IOSUIScrollViewContentInsetAdjustmentBehavior.values
-            .firstWhere((element) => element.name() == name);
+        return IOSUIScrollViewContentInsetAdjustmentBehavior.values.firstWhere(
+          (element) => element.name() == name,
+        );
       } catch (e) {
         return null;
       }
@@ -229,11 +252,10 @@ class IOSUIScrollViewContentInsetAdjustmentBehavior {
   /// same value, or being values of different enum type), at most one of
   /// them will be represented in the returned map.
   static Map<String, IOSUIScrollViewContentInsetAdjustmentBehavior>
-      asNameMap() => <String, IOSUIScrollViewContentInsetAdjustmentBehavior>{
-            for (final value
-                in IOSUIScrollViewContentInsetAdjustmentBehavior.values)
-              value.name(): value
-          };
+  asNameMap() => <String, IOSUIScrollViewContentInsetAdjustmentBehavior>{
+    for (final value in IOSUIScrollViewContentInsetAdjustmentBehavior.values)
+      value.name(): value,
+  };
 
   ///Gets [int] value.
   int toValue() => _value;

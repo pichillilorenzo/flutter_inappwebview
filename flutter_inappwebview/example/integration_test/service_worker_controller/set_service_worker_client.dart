@@ -3,18 +3,19 @@ part of 'main.dart';
 void setServiceWorkerClient() {
   final shouldSkip = kIsWeb
       ? true
-      : ![
-          TargetPlatform.android,
-        ].contains(defaultTargetPlatform);
+      : ![TargetPlatform.android].contains(defaultTargetPlatform);
 
-  skippableTestWidgets('setServiceWorkerClient to null',
-      (WidgetTester tester) async {
+  skippableTestWidgets('setServiceWorkerClient to null', (
+    WidgetTester tester,
+  ) async {
     final Completer<String> pageLoaded = Completer<String>();
 
     var swAvailable = await WebViewFeature.isFeatureSupported(
-        WebViewFeature.SERVICE_WORKER_BASIC_USAGE);
+      WebViewFeature.SERVICE_WORKER_BASIC_USAGE,
+    );
     var swInterceptAvailable = await WebViewFeature.isFeatureSupported(
-        WebViewFeature.SERVICE_WORKER_SHOULD_INTERCEPT_REQUEST);
+      WebViewFeature.SERVICE_WORKER_SHOULD_INTERCEPT_REQUEST,
+    );
 
     if (swAvailable && swInterceptAvailable) {
       ServiceWorkerController serviceWorkerController =

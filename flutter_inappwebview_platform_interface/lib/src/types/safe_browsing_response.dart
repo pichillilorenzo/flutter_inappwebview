@@ -17,7 +17,8 @@ class SafeBrowsingResponse_ {
   ///Indicate the [SafeBrowsingResponseAction] to take when hitting a malicious URL.
   SafeBrowsingResponseAction_? action;
 
-  SafeBrowsingResponse_(
-      {this.report = true,
-      this.action = SafeBrowsingResponseAction_.SHOW_INTERSTITIAL});
+  SafeBrowsingResponse_({
+    this.report = true,
+    this.action = SafeBrowsingResponseAction_.SHOW_INTERSTITIAL,
+  });
 }

@@ -15,9 +15,11 @@ part 'chrome_safari_browser_secondary_toolbar.g.dart';
 ///
 ///RemoteViews has limited to support to Android layouts.
 ///Check the [RemoteViews Official API](https://developer.android.com/reference/android/widget/RemoteViews.html) for more details.
-@SupportedPlatforms(platforms: [
-  AndroidPlatform(note: 'Not available in an Android Trusted Web Activity.')
-])
+@SupportedPlatforms(
+  platforms: [
+    AndroidPlatform(note: 'Not available in an Android Trusted Web Activity.'),
+  ],
+)
 @ExchangeableObject()
 class ChromeSafariBrowserSecondaryToolbar_ {
   ///The android layout resource.
@@ -26,14 +28,18 @@ class ChromeSafariBrowserSecondaryToolbar_ {
   ///The IDs of clickable views. The `onClick` event of these views will be handled by custom tabs.
   List<ChromeSafariBrowserSecondaryToolbarClickableID_> clickableIDs;
 
-  ChromeSafariBrowserSecondaryToolbar_(
-      {required this.layout, this.clickableIDs = const []});
+  ChromeSafariBrowserSecondaryToolbar_({
+    required this.layout,
+    this.clickableIDs = const [],
+  });
 }
 
 ///Class that represents a clickable ID item of the secondary toolbar for a [PlatformChromeSafariBrowser] instance.
-@SupportedPlatforms(platforms: [
-  AndroidPlatform(note: 'Not available in an Android Trusted Web Activity.')
-])
+@SupportedPlatforms(
+  platforms: [
+    AndroidPlatform(note: 'Not available in an Android Trusted Web Activity.'),
+  ],
+)
 @ExchangeableObject()
 class ChromeSafariBrowserSecondaryToolbarClickableID_ {
   ///The android id resource
@@ -42,6 +48,8 @@ class ChromeSafariBrowserSecondaryToolbarClickableID_ {
   ///Callback function to be invoked when the item is clicked
   void Function(WebUri? url)? onClick;
 
-  ChromeSafariBrowserSecondaryToolbarClickableID_(
-      {required this.id, this.onClick});
+  ChromeSafariBrowserSecondaryToolbarClickableID_({
+    required this.id,
+    this.onClick,
+  });
 }

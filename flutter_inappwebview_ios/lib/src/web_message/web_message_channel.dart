@@ -12,16 +12,23 @@ import 'web_message_port.dart';
 class IOSWebMessageChannelCreationParams
     extends PlatformWebMessageChannelCreationParams {
   /// Creates a new [IOSWebMessageChannelCreationParams] instance.
-  const IOSWebMessageChannelCreationParams(
-      {required super.id, required super.port1, required super.port2});
+  const IOSWebMessageChannelCreationParams({
+    required super.id,
+    required super.port1,
+    required super.port2,
+  });
 
   /// Creates a [IOSWebMessageChannelCreationParams] instance based on [PlatformWebMessageChannelCreationParams].
   factory IOSWebMessageChannelCreationParams.fromPlatformWebMessageChannelCreationParams(
-      // Recommended placeholder to prevent being broken by platform interface.
-      // ignore: avoid_unused_constructor_parameters
-      PlatformWebMessageChannelCreationParams params) {
+    // Recommended placeholder to prevent being broken by platform interface.
+    // ignore: avoid_unused_constructor_parameters
+    PlatformWebMessageChannelCreationParams params,
+  ) {
     return IOSWebMessageChannelCreationParams(
-        id: params.id, port1: params.port1, port2: params.port2);
+      id: params.id,
+      port1: params.port1,
+      port2: params.port2,
+    );
   }
 
   @override
@@ -35,23 +42,27 @@ class IOSWebMessageChannel extends PlatformWebMessageChannel
     with ChannelController {
   /// Constructs a [IOSWebMessageChannel].
   IOSWebMessageChannel(PlatformWebMessageChannelCreationParams params)
-      : super.implementation(
-          params is IOSWebMessageChannelCreationParams
-              ? params
-              : IOSWebMessageChannelCreationParams
-                  .fromPlatformWebMessageChannelCreationParams(params),
-        ) {
+    : super.implementation(
+        params is IOSWebMessageChannelCreationParams
+            ? params
+            : IOSWebMessageChannelCreationParams.fromPlatformWebMessageChannelCreationParams(
+                params,
+              ),
+      ) {
     channel = MethodChannel(
-        'com.pichillilorenzo/flutter_inappwebview_web_message_channel_${params.id}');
+      'com.pichillilorenzo/flutter_inappwebview_web_message_channel_${params.id}',
+    );
     handler = _handleMethod;
     initMethodCallHandler();
   }
 
   static final IOSWebMessageChannel _staticValue = IOSWebMessageChannel(
-      IOSWebMessageChannelCreationParams(
-          id: '',
-          port1: IOSWebMessagePort(IOSWebMessagePortCreationParams(index: 0)),
-          port2: IOSWebMessagePort(IOSWebMessagePortCreationParams(index: 1))));
+    IOSWebMessageChannelCreationParams(
+      id: '',
+      port1: IOSWebMessagePort(IOSWebMessagePortCreationParams(index: 0)),
+      port2: IOSWebMessagePort(IOSWebMessagePortCreationParams(index: 1)),
+    ),
+  );
 
   /// Provide static access.
   factory IOSWebMessageChannel.static() {
@@ -67,11 +78,12 @@ class IOSWebMessageChannel extends PlatformWebMessageChannel
       return null;
     }
     var webMessageChannel = IOSWebMessageChannel(
-        IOSWebMessageChannelCreationParams(
-            id: map["id"],
-            port1: IOSWebMessagePort(IOSWebMessagePortCreationParams(index: 0)),
-            port2:
-                IOSWebMessagePort(IOSWebMessagePortCreationParams(index: 1))));
+      IOSWebMessageChannelCreationParams(
+        id: map["id"],
+        port1: IOSWebMessagePort(IOSWebMessagePortCreationParams(index: 0)),
+        port2: IOSWebMessagePort(IOSWebMessagePortCreationParams(index: 1)),
+      ),
+    );
     webMessageChannel._iosPort1.webMessageChannel = webMessageChannel;
     webMessageChannel._iosPort2.webMessageChannel = webMessageChannel;
     return webMessageChannel;
@@ -85,7 +97,8 @@ class IOSWebMessageChannel extends PlatformWebMessageChannel
         if (port.onMessage != null) {
           WebMessage? message = call.arguments["message"] != null
               ? WebMessage.fromMap(
-                  call.arguments["message"].cast<String, dynamic>())
+                  call.arguments["message"].cast<String, dynamic>(),
+                )
               : null;
           port.onMessage!(message);
         }

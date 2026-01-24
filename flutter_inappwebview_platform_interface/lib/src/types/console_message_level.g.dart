@@ -11,10 +11,11 @@ class ConsoleMessageLevel {
   final int _value;
   final int _nativeValue;
   const ConsoleMessageLevel._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory ConsoleMessageLevel._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      ConsoleMessageLevel._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => ConsoleMessageLevel._internal(value, nativeValue());
 
   ///Console DEBUG level
   static const DEBUG = ConsoleMessageLevel._internal(4, 4);
@@ -44,8 +45,9 @@ class ConsoleMessageLevel {
   static ConsoleMessageLevel? fromValue(int? value) {
     if (value != null) {
       try {
-        return ConsoleMessageLevel.values
-            .firstWhere((element) => element.toValue() == value);
+        return ConsoleMessageLevel.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -57,8 +59,9 @@ class ConsoleMessageLevel {
   static ConsoleMessageLevel? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return ConsoleMessageLevel.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return ConsoleMessageLevel.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -74,8 +77,9 @@ class ConsoleMessageLevel {
   static ConsoleMessageLevel? byName(String? name) {
     if (name != null) {
       try {
-        return ConsoleMessageLevel.values
-            .firstWhere((element) => element.name() == name);
+        return ConsoleMessageLevel.values.firstWhere(
+          (element) => element.name() == name,
+        );
       } catch (e) {
         return null;
       }
@@ -93,7 +97,7 @@ class ConsoleMessageLevel {
   /// them will be represented in the returned map.
   static Map<String, ConsoleMessageLevel> asNameMap() =>
       <String, ConsoleMessageLevel>{
-        for (final value in ConsoleMessageLevel.values) value.name(): value
+        for (final value in ConsoleMessageLevel.values) value.name(): value,
       };
 
   ///Gets [int] value.

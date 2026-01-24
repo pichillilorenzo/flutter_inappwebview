@@ -22,18 +22,20 @@ class FetchRequestFederatedCredential extends FetchRequestCredential {
 
   ///Credential's federated identity provider.
   String? provider;
-  FetchRequestFederatedCredential(
-      {this.iconURL,
-      this.id,
-      this.name,
-      this.protocol,
-      this.provider,
-      String? type})
-      : super(type: type);
+  FetchRequestFederatedCredential({
+    this.iconURL,
+    this.id,
+    this.name,
+    this.protocol,
+    this.provider,
+    String? type,
+  }) : super(type: type);
 
   ///Gets a possible [FetchRequestFederatedCredential] instance from a [Map] value.
-  static FetchRequestFederatedCredential? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static FetchRequestFederatedCredential? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }

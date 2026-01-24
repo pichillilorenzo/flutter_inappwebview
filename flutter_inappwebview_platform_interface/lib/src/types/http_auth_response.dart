@@ -21,9 +21,10 @@ class HttpAuthResponse_ {
   ///Indicate the [HttpAuthResponseAction] to take in response of the authentication challenge.
   HttpAuthResponseAction_? action;
 
-  HttpAuthResponse_(
-      {this.username = "",
-      this.password = "",
-      this.permanentPersistence = false,
-      this.action = HttpAuthResponseAction_.CANCEL});
+  HttpAuthResponse_({
+    this.username = "",
+    this.password = "",
+    this.permanentPersistence = false,
+    this.action = HttpAuthResponseAction_.CANCEL,
+  });
 }

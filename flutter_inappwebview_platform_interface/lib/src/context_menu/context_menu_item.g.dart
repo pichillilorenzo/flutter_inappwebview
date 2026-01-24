@@ -26,12 +26,13 @@ class ContextMenuItem {
 
   ///Menu item title.
   String title;
-  ContextMenuItem(
-      {this.id,
-      @Deprecated("Use id instead") this.androidId,
-      @Deprecated("Use id instead") this.iosId,
-      required this.title,
-      this.action}) {
+  ContextMenuItem({
+    this.id,
+    @Deprecated("Use id instead") this.androidId,
+    @Deprecated("Use id instead") this.iosId,
+    required this.title,
+    this.action,
+  }) {
     if (Util.isAndroid) {
       this.id = this.id ?? this.androidId;
       assert(this.id is int);
@@ -42,8 +43,10 @@ class ContextMenuItem {
   }
 
   ///Gets a possible [ContextMenuItem] instance from a [Map] value.
-  static ContextMenuItem? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static ContextMenuItem? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }

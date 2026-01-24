@@ -16,12 +16,17 @@ class SecurityOrigin {
 
   ///The security origin's protocol.
   String protocol;
-  SecurityOrigin(
-      {required this.host, required this.port, required this.protocol});
+  SecurityOrigin({
+    required this.host,
+    required this.port,
+    required this.protocol,
+  });
 
   ///Gets a possible [SecurityOrigin] instance from a [Map] value.
-  static SecurityOrigin? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static SecurityOrigin? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
@@ -35,11 +40,7 @@ class SecurityOrigin {
 
   ///Converts instance to a map.
   Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
-    return {
-      "host": host,
-      "port": port,
-      "protocol": protocol,
-    };
+    return {"host": host, "port": port, "protocol": protocol};
   }
 
   ///Converts instance to a map.
@@ -68,12 +69,17 @@ class IOSWKSecurityOrigin {
 
   ///The security origin's protocol.
   String protocol;
-  IOSWKSecurityOrigin(
-      {required this.host, required this.port, required this.protocol});
+  IOSWKSecurityOrigin({
+    required this.host,
+    required this.port,
+    required this.protocol,
+  });
 
   ///Gets a possible [IOSWKSecurityOrigin] instance from a [Map] value.
-  static IOSWKSecurityOrigin? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static IOSWKSecurityOrigin? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
@@ -87,11 +93,7 @@ class IOSWKSecurityOrigin {
 
   ///Converts instance to a map.
   Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
-    return {
-      "host": host,
-      "port": port,
-      "protocol": protocol,
-    };
+    return {"host": host, "port": port, "protocol": protocol};
   }
 
   ///Converts instance to a map.

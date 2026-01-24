@@ -11,10 +11,11 @@ class FocusDirection {
   final String _value;
   final int? _nativeValue;
   const FocusDirection._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory FocusDirection._internalMultiPlatform(
-          String value, Function nativeValue) =>
-      FocusDirection._internal(value, nativeValue());
+    String value,
+    Function nativeValue,
+  ) => FocusDirection._internal(value, nativeValue());
 
   ///Move focus down.
   ///
@@ -84,8 +85,9 @@ class FocusDirection {
   static FocusDirection? fromValue(String? value) {
     if (value != null) {
       try {
-        return FocusDirection.values
-            .firstWhere((element) => element.toValue() == value);
+        return FocusDirection.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -97,8 +99,9 @@ class FocusDirection {
   static FocusDirection? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return FocusDirection.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return FocusDirection.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -114,8 +117,9 @@ class FocusDirection {
   static FocusDirection? byName(String? name) {
     if (name != null) {
       try {
-        return FocusDirection.values
-            .firstWhere((element) => element.name() == name);
+        return FocusDirection.values.firstWhere(
+          (element) => element.name() == name,
+        );
       } catch (e) {
         return null;
       }
@@ -132,8 +136,8 @@ class FocusDirection {
   /// same value, or being values of different enum type), at most one of
   /// them will be represented in the returned map.
   static Map<String, FocusDirection> asNameMap() => <String, FocusDirection>{
-        for (final value in FocusDirection.values) value.name(): value
-      };
+    for (final value in FocusDirection.values) value.name(): value,
+  };
 
   ///Gets [String] value.
   String toValue() => _value;

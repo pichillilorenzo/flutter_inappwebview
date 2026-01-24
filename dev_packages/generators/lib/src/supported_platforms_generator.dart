@@ -2,16 +2,18 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:source_gen/source_gen.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/dart/constant/value.dart';
-import 'package:build/src/builder/build_step.dart';
+import 'package:build/build.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 
 import 'model_visitor.dart';
 import 'util.dart';
 
-final _coreCheckerDeprecated = const TypeChecker.fromRuntime(Deprecated);
+const _annotationsPackage = 'flutter_inappwebview_internal_annotations';
+
+final _coreCheckerDeprecated = TypeChecker.typeNamedLiterally('Deprecated', inSdk: true);
 final _coreCheckerSupportedPlatforms =
-    const TypeChecker.fromRuntime(SupportedPlatforms);
+    TypeChecker.typeNamedLiterally('SupportedPlatforms', inPackage: _annotationsPackage);
 
 class SupportedPlatformsGenerator
     extends GeneratorForAnnotation<SupportedPlatforms> {
@@ -77,8 +79,8 @@ class SupportedPlatformsGenerator
 
     final classBuffer = StringBuffer();
 
-    final packageName = element.source!.uri.pathSegments[0];
-    var className = visitor.constructor.returnType.element.name;
+    final packageName = element.library?.uri.pathSegments.first ?? 'unknown';
+    var className = visitor.constructor.returnType.element.name ?? '';
     if (className.endsWith('_')) {
       className = className.substring(0, className.length - 1);
     }
@@ -97,7 +99,7 @@ class SupportedPlatformsGenerator
         classBuffer.writeln('///Use the [$className.$isClassSupportedFunctionName] method to check if this class is supported at runtime.');
         classBuffer.writeln('///{@endtemplate}');
       }
-      if (visitor.constructor.returnType.element.hasDeprecated) {
+      if (visitor.constructor.returnType.element.metadata.hasDeprecated) {
         classBuffer.writeln(
             "@Deprecated('${_coreCheckerDeprecated.firstAnnotationOfExact(visitor.constructor.returnType.element)?.getField("message")?.toStringValue()}')");
       }
@@ -155,7 +157,7 @@ class SupportedPlatformsGenerator
               .firstAnnotationOfExact(field)
               ?.getField('parameterPlatforms')
               ?.toMapValue()?.map((key, value) => MapEntry(key!.toStringValue()!, value!.toListValue()!));
-          final parameters = fieldFunction.parameters.where((e) => ![...ignoreParameterNames, ...customIgnoreParameterNames].any((r) => r.hasMatch(e.name))).toList();
+          final parameters = fieldFunction.formalParameters.where((e) => ![...ignoreParameterNames, ...customIgnoreParameterNames].any((r) => r.hasMatch(e.name ?? ''))).toList();
           parameterSupportedDocs = Util.getParameterSupportedDocs(
               _coreCheckerSupportedPlatforms, parameters, parameterPlatforms);
         }
@@ -179,9 +181,9 @@ class SupportedPlatformsGenerator
           classBuffer.writeln('///Use the [$className.$isPropertySupportedFunctionName] method to check if this property is supported at runtime.');
           classBuffer.writeln('///{@endtemplate}');
         }
-        if (field.hasDeprecated || field.getter?.hasDeprecated == true) {
+        if (field.metadata.hasDeprecated || field.getter?.metadata.hasDeprecated == true) {
           classBuffer.writeln(
-              "@Deprecated('${_coreCheckerDeprecated.firstAnnotationOfExact(field.hasDeprecated ? field : field.getter!)?.getField("message")?.toStringValue()}')");
+              "@Deprecated('${_coreCheckerDeprecated.firstAnnotationOfExact(field.metadata.hasDeprecated ? field : field.getter!)?.getField("message")?.toStringValue()}')");
         }
         classBuffer.writeln("$fieldName,");
       }
@@ -246,7 +248,7 @@ class SupportedPlatformsGenerator
             .firstAnnotationOfExact(method)
             ?.getField('ignoreParameterNames')
             ?.toListValue()?.map((e) => RegExp(e.toStringValue()!)).toList() ?? [];
-        final parameters = method.parameters.where((e) => ![...ignoreParameterNames, ...customIgnoreParameterNames].any((r) => r.hasMatch(e.name))).toList();
+        final parameters = method.formalParameters.where((e) => ![...ignoreParameterNames, ...customIgnoreParameterNames].any((r) => r.hasMatch(e.name ?? ''))).toList();
         final parameterSupportedDocs = Util.getParameterSupportedDocs(
             _coreCheckerSupportedPlatforms, parameters);
         if (methodSupportedDocs != null || parameterSupportedDocs != null) {
@@ -265,7 +267,7 @@ class SupportedPlatformsGenerator
           classBuffer.writeln('///Use the [$className.$isMethodSupportedFunctionName] method to check if this method is supported at runtime.');
           classBuffer.writeln('///{@endtemplate}');
         }
-        if (method.hasDeprecated) {
+        if (method.metadata.hasDeprecated) {
           classBuffer.writeln(
               "@Deprecated('${_coreCheckerDeprecated.firstAnnotationOfExact(method)?.getField("message")?.toStringValue()}')");
         }

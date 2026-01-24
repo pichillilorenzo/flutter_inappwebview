@@ -29,22 +29,30 @@ class BrowserProcessInfo {
   BrowserProcessInfo({this.frameInfos, required this.kind, this.processId});
 
   ///Gets a possible [BrowserProcessInfo] instance from a [Map] value.
-  static BrowserProcessInfo? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static BrowserProcessInfo? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
     final instance = BrowserProcessInfo(
       frameInfos: map['frameInfos'] != null
-          ? List<FrameInfo>.from(map['frameInfos'].map((e) => FrameInfo.fromMap(
-              e?.cast<String, dynamic>(),
-              enumMethod: enumMethod)!))
+          ? List<FrameInfo>.from(
+              map['frameInfos'].map(
+                (e) => FrameInfo.fromMap(
+                  e?.cast<String, dynamic>(),
+                  enumMethod: enumMethod,
+                )!,
+              ),
+            )
           : null,
       kind: switch (enumMethod ?? EnumMethod.nativeValue) {
-        EnumMethod.nativeValue =>
-          BrowserProcessKind.fromNativeValue(map['kind']),
+        EnumMethod.nativeValue => BrowserProcessKind.fromNativeValue(
+          map['kind'],
+        ),
         EnumMethod.value => BrowserProcessKind.fromValue(map['kind']),
-        EnumMethod.name => BrowserProcessKind.byName(map['kind'])
+        EnumMethod.name => BrowserProcessKind.byName(map['kind']),
       }!,
       processId: map['processId'],
     );
@@ -54,12 +62,13 @@ class BrowserProcessInfo {
   ///Converts instance to a map.
   Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
-      "frameInfos":
-          frameInfos?.map((e) => e.toMap(enumMethod: enumMethod)).toList(),
+      "frameInfos": frameInfos
+          ?.map((e) => e.toMap(enumMethod: enumMethod))
+          .toList(),
       "kind": switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => kind.toNativeValue(),
         EnumMethod.value => kind.toValue(),
-        EnumMethod.name => kind.name()
+        EnumMethod.name => kind.name(),
       },
       "processId": processId,
     };

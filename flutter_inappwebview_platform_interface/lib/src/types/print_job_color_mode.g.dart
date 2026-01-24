@@ -11,22 +11,43 @@ class PrintJobColorMode {
   final int _value;
   final dynamic _nativeValue;
   const PrintJobColorMode._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory PrintJobColorMode._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      PrintJobColorMode._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => PrintJobColorMode._internal(value, nativeValue());
 
   ///Color color scheme, for example many colors are used.
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView
   ///- macOS WKWebView
+  ///- Windows WebView2
   static final COLOR = PrintJobColorMode._internalMultiPlatform(2, () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
-        return 1;
+        return 2;
       case TargetPlatform.macOS:
         return 'RGB';
+      case TargetPlatform.windows:
+        return 1;
+      default:
+        break;
+    }
+    return null;
+  });
+
+  ///Monochrome color scheme, for example one color is used.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android WebView
+  ///- Windows WebView2
+  static final DEFAULT = PrintJobColorMode._internalMultiPlatform(0, () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+        return 0;
+      case TargetPlatform.windows:
+        return 0;
       default:
         break;
     }
@@ -38,12 +59,15 @@ class PrintJobColorMode {
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView
   ///- macOS WKWebView
+  ///- Windows WebView2
   static final MONOCHROME = PrintJobColorMode._internalMultiPlatform(1, () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return 1;
       case TargetPlatform.macOS:
         return 'Gray';
+      case TargetPlatform.windows:
+        return 2;
       default:
         break;
     }
@@ -53,6 +77,7 @@ class PrintJobColorMode {
   ///Set of all values of [PrintJobColorMode].
   static final Set<PrintJobColorMode> values = [
     PrintJobColorMode.COLOR,
+    PrintJobColorMode.DEFAULT,
     PrintJobColorMode.MONOCHROME,
   ].toSet();
 
@@ -60,8 +85,9 @@ class PrintJobColorMode {
   static PrintJobColorMode? fromValue(int? value) {
     if (value != null) {
       try {
-        return PrintJobColorMode.values
-            .firstWhere((element) => element.toValue() == value);
+        return PrintJobColorMode.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -73,8 +99,9 @@ class PrintJobColorMode {
   static PrintJobColorMode? fromNativeValue(dynamic value) {
     if (value != null) {
       try {
-        return PrintJobColorMode.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return PrintJobColorMode.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -90,8 +117,9 @@ class PrintJobColorMode {
   static PrintJobColorMode? byName(String? name) {
     if (name != null) {
       try {
-        return PrintJobColorMode.values
-            .firstWhere((element) => element.name() == name);
+        return PrintJobColorMode.values.firstWhere(
+          (element) => element.name() == name,
+        );
       } catch (e) {
         return null;
       }
@@ -109,7 +137,7 @@ class PrintJobColorMode {
   /// them will be represented in the returned map.
   static Map<String, PrintJobColorMode> asNameMap() =>
       <String, PrintJobColorMode>{
-        for (final value in PrintJobColorMode.values) value.name(): value
+        for (final value in PrintJobColorMode.values) value.name(): value,
       };
 
   ///Gets [int] value.
@@ -123,6 +151,8 @@ class PrintJobColorMode {
     switch (_value) {
       case 2:
         return 'COLOR';
+      case 0:
+        return 'DEFAULT';
       case 1:
         return 'MONOCHROME';
     }

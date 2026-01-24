@@ -11,10 +11,11 @@ class EnvironmentReleaseChannels {
   final int _value;
   final int _nativeValue;
   const EnvironmentReleaseChannels._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory EnvironmentReleaseChannels._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      EnvironmentReleaseChannels._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => EnvironmentReleaseChannels._internal(value, nativeValue());
 
   ///The Beta release channel that is released every 4 weeks, a week before the stable release.
   ///
@@ -34,16 +35,18 @@ class EnvironmentReleaseChannels {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Windows WebView2
-  static final CANARY =
-      EnvironmentReleaseChannels._internalMultiPlatform(8, () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.windows:
-        return 8;
-      default:
-        break;
-    }
-    return null;
-  });
+  static final CANARY = EnvironmentReleaseChannels._internalMultiPlatform(
+    8,
+    () {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.windows:
+          return 8;
+        default:
+          break;
+      }
+      return null;
+    },
+  );
 
   ///The Dev release channel that is released weekly.
   ///
@@ -77,16 +80,18 @@ class EnvironmentReleaseChannels {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Windows WebView2
-  static final STABLE =
-      EnvironmentReleaseChannels._internalMultiPlatform(1, () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.windows:
-        return 1;
-      default:
-        break;
-    }
-    return null;
-  });
+  static final STABLE = EnvironmentReleaseChannels._internalMultiPlatform(
+    1,
+    () {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.windows:
+          return 1;
+        default:
+          break;
+      }
+      return null;
+    },
+  );
 
   ///Set of all values of [EnvironmentReleaseChannels].
   static final Set<EnvironmentReleaseChannels> values = [
@@ -101,8 +106,9 @@ class EnvironmentReleaseChannels {
   static EnvironmentReleaseChannels? fromValue(int? value) {
     if (value != null) {
       try {
-        return EnvironmentReleaseChannels.values
-            .firstWhere((element) => element.toValue() == value);
+        return EnvironmentReleaseChannels.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return EnvironmentReleaseChannels._internal(value, value);
       }
@@ -114,8 +120,9 @@ class EnvironmentReleaseChannels {
   static EnvironmentReleaseChannels? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return EnvironmentReleaseChannels.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return EnvironmentReleaseChannels.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return EnvironmentReleaseChannels._internal(value, value);
       }
@@ -131,8 +138,9 @@ class EnvironmentReleaseChannels {
   static EnvironmentReleaseChannels? byName(String? name) {
     if (name != null) {
       try {
-        return EnvironmentReleaseChannels.values
-            .firstWhere((element) => element.name() == name);
+        return EnvironmentReleaseChannels.values.firstWhere(
+          (element) => element.name() == name,
+        );
       } catch (e) {
         return null;
       }
@@ -151,7 +159,7 @@ class EnvironmentReleaseChannels {
   static Map<String, EnvironmentReleaseChannels> asNameMap() =>
       <String, EnvironmentReleaseChannels>{
         for (final value in EnvironmentReleaseChannels.values)
-          value.name(): value
+          value.name(): value,
       };
 
   ///Gets [int] value.
@@ -185,7 +193,9 @@ class EnvironmentReleaseChannels {
 
   EnvironmentReleaseChannels operator |(EnvironmentReleaseChannels value) =>
       EnvironmentReleaseChannels._internal(
-          value.toValue() | _value, value.toNativeValue() | _nativeValue);
+        value.toValue() | _value,
+        value.toNativeValue() | _nativeValue,
+      );
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {

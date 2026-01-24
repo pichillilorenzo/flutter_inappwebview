@@ -14,24 +14,25 @@ class URLAuthenticationChallenge {
   URLAuthenticationChallenge({required this.protectionSpace});
 
   ///Gets a possible [URLAuthenticationChallenge] instance from a [Map] value.
-  static URLAuthenticationChallenge? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static URLAuthenticationChallenge? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
     final instance = URLAuthenticationChallenge(
       protectionSpace: URLProtectionSpace.fromMap(
-          map['protectionSpace']?.cast<String, dynamic>(),
-          enumMethod: enumMethod)!,
+        map['protectionSpace']?.cast<String, dynamic>(),
+        enumMethod: enumMethod,
+      )!,
     );
     return instance;
   }
 
   ///Converts instance to a map.
   Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
-    return {
-      "protectionSpace": protectionSpace.toMap(enumMethod: enumMethod),
-    };
+    return {"protectionSpace": protectionSpace.toMap(enumMethod: enumMethod)};
   }
 
   ///Converts instance to a map.

@@ -11,7 +11,8 @@ void clearCache() {
 
   skippableTestWidgets('clearAllCache', (WidgetTester tester) async {
     await expectLater(
-        InAppWebViewController.clearAllCache(includeDiskFiles: true),
-        completes);
+      InAppWebViewController.clearAllCache(includeDiskFiles: true),
+      completes,
+    );
   }, skip: shouldSkip);
 }

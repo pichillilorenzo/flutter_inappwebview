@@ -20,7 +20,8 @@ class MacOSProxyControllerCreationParams
 
   /// Creates a [MacOSProxyControllerCreationParams] instance based on [PlatformProxyControllerCreationParams].
   factory MacOSProxyControllerCreationParams.fromPlatformProxyControllerCreationParams(
-      PlatformProxyControllerCreationParams params) {
+    PlatformProxyControllerCreationParams params,
+  ) {
     return MacOSProxyControllerCreationParams(params);
   }
 }
@@ -30,14 +31,16 @@ class MacOSProxyController extends PlatformProxyController
     with ChannelController {
   /// Creates a new [MacOSProxyController].
   MacOSProxyController(PlatformProxyControllerCreationParams params)
-      : super.implementation(
-          params is MacOSProxyControllerCreationParams
-              ? params
-              : MacOSProxyControllerCreationParams
-                  .fromPlatformProxyControllerCreationParams(params),
-        ) {
+    : super.implementation(
+        params is MacOSProxyControllerCreationParams
+            ? params
+            : MacOSProxyControllerCreationParams.fromPlatformProxyControllerCreationParams(
+                params,
+              ),
+      ) {
     channel = const MethodChannel(
-        'com.pichillilorenzo/flutter_inappwebview_proxycontroller');
+      'com.pichillilorenzo/flutter_inappwebview_proxycontroller',
+    );
     handler = handleMethod;
     initMethodCallHandler();
   }
@@ -50,14 +53,19 @@ class MacOSProxyController extends PlatformProxyController
   }
 
   static MacOSProxyController _init() {
-    _instance = MacOSProxyController(MacOSProxyControllerCreationParams(
-        const PlatformProxyControllerCreationParams()));
+    _instance = MacOSProxyController(
+      MacOSProxyControllerCreationParams(
+        const PlatformProxyControllerCreationParams(),
+      ),
+    );
     return _instance!;
   }
 
   static final MacOSProxyController _staticValue = MacOSProxyController(
-      MacOSProxyControllerCreationParams(
-          const PlatformProxyControllerCreationParams()));
+    MacOSProxyControllerCreationParams(
+      const PlatformProxyControllerCreationParams(),
+    ),
+  );
 
   /// Provide static access.
   factory MacOSProxyController.static() {

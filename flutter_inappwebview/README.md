@@ -5,7 +5,7 @@
 ![InAppWebView-logo](https://user-images.githubusercontent.com/5956938/195422744-bdcfed16-73f0-4bc9-94ab-ecf10771a1c4.png)
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-95-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-100-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 [![flutter_inappwebview version](https://img.shields.io/pub/v/flutter_inappwebview?include_prereleases)](https://pub.dartlang.org/packages/flutter_inappwebview)
@@ -52,8 +52,8 @@ Send a submission request to the [Submit App](https://inappwebview.dev/submit-ap
 
 ## Requirements
 
-- Dart sdk: "^3.5.0"
-- Flutter: ">=3.24.0"
+- Dart sdk: "^3.8.0"
+- Flutter: ">=3.32.0"
 - Android: `minSdkVersion >= 19`, `compileSdk >= 34`, [AGP](https://developer.android.com/build/releases/gradle-plugin) version `>= 7.3.0` (use [Android Studio - Android Gradle plugin Upgrade Assistant](https://developer.android.com/build/agp-upgrade-assistant) for help), support for `androidx` (see [AndroidX Migration](https://flutter.dev/docs/development/androidx-migration) to migrate an existing app)
 - iOS 12.0+: `--ios-language swift`, Xcode version `>= 15.0`
 - MacOS 10.14+: Xcode version `>= 15.0`
@@ -205,6 +205,13 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://fuzzybinary.com"><img src="https://avatars.githubusercontent.com/u/249982?v=4?s=100" width="100px;" alt="Jeff Ward"/><br /><sub><b>Jeff Ward</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=fuzzybinary" title="Tests">⚠️</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://hero.io"><img src="https://avatars.githubusercontent.com/u/33483071?v=4?s=100" width="100px;" alt="Yelzhan Yerkebulan"/><br /><sub><b>Yelzhan Yerkebulan</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=yerkejs" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/GooRingX"><img src="https://avatars.githubusercontent.com/u/167741400?v=4?s=100" width="100px;" alt="GooRingX"/><br /><sub><b>GooRingX</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=GooRingX" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/roberthofstra"><img src="https://avatars.githubusercontent.com/u/1643242?v=4?s=100" width="100px;" alt="Robodoh"/><br /><sub><b>Robodoh</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=roberthofstra" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/imoyakin"><img src="https://avatars.githubusercontent.com/u/7473806?v=4?s=100" width="100px;" alt="imoyakin"/><br /><sub><b>imoyakin</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=imoyakin" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/laishere"><img src="https://avatars.githubusercontent.com/u/23557738?v=4?s=100" width="100px;" alt="laishere"/><br /><sub><b>laishere</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=laishere" title="Code">💻</a></td>
+    </tr>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/muccy-timeware"><img src="https://avatars.githubusercontent.com/u/74927063?v=4?s=100" width="100px;" alt="Marco Muccinelli"/><br /><sub><b>Marco Muccinelli</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=muccy-timeware" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/momadvisor"><img src="https://avatars.githubusercontent.com/u/77181890?v=4?s=100" width="100px;" alt="momadvisor"/><br /><sub><b>momadvisor</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=momadvisor" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>

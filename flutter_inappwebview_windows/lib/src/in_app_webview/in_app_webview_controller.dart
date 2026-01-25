@@ -235,7 +235,8 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
         }
         break;
       case "onContentLoading":
-        if ((webviewParams != null && webviewParams!.onContentLoading != null) ||
+        if ((webviewParams != null &&
+                webviewParams!.onContentLoading != null) ||
             _inAppBrowserEventHandler != null) {
           String? url = call.arguments["url"];
           WebUri? uri = url != null ? WebUri(url) : null;
@@ -821,7 +822,8 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
         }
         break;
       case "onFaviconChanged":
-        if ((webviewParams != null && webviewParams!.onFaviconChanged != null) ||
+        if ((webviewParams != null &&
+                webviewParams!.onFaviconChanged != null) ||
             _inAppBrowserEventHandler != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
@@ -1711,18 +1713,20 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
         }
         break;
       case "onNotificationReceived":
-        if ((webviewParams != null && webviewParams!.onNotificationReceived != null) ||
+        if ((webviewParams != null &&
+                webviewParams!.onNotificationReceived != null) ||
             _inAppBrowserEventHandler != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
-          
+
           // Extract data from native
-          final String notificationControllerId = arguments['notificationControllerId'];
+          final String notificationControllerId =
+              arguments['notificationControllerId'];
           final String? senderOriginString = arguments['senderOrigin'];
           final notification = WebNotification.fromMap(
             arguments['notification']?.cast<String, dynamic>(),
           )!;
-          
+
           // Create the notification controller
           final notificationController = WindowsWebNotificationController(
             WindowsWebNotificationControllerCreationParams(
@@ -1730,14 +1734,17 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
               notification: notification,
             ),
           );
-          
+
           // Create the request with senderOrigin and controller
           final request = NotificationReceivedRequest(
-            senderOrigin: senderOriginString != null ? WebUri(senderOriginString) : null,
+            senderOrigin: senderOriginString != null
+                ? WebUri(senderOriginString)
+                : null,
             notificationController: notificationController,
           );
 
-          if (webviewParams != null && webviewParams!.onNotificationReceived != null)
+          if (webviewParams != null &&
+              webviewParams!.onNotificationReceived != null)
             return (await webviewParams!.onNotificationReceived!(
               _controllerFromPlatform,
               request,
@@ -1748,7 +1755,8 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
         }
         break;
       case "onSaveAsUIShowing":
-        if ((webviewParams != null && webviewParams!.onSaveAsUIShowing != null) ||
+        if ((webviewParams != null &&
+                webviewParams!.onSaveAsUIShowing != null) ||
             _inAppBrowserEventHandler != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
@@ -1786,13 +1794,15 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
         }
         break;
       case "onScreenCaptureStarting":
-        if ((webviewParams != null && webviewParams!.onScreenCaptureStarting != null) ||
+        if ((webviewParams != null &&
+                webviewParams!.onScreenCaptureStarting != null) ||
             _inAppBrowserEventHandler != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
           final request = ScreenCaptureStartingRequest.fromMap(arguments)!;
 
-          if (webviewParams != null && webviewParams!.onScreenCaptureStarting != null)
+          if (webviewParams != null &&
+              webviewParams!.onScreenCaptureStarting != null)
             return (await webviewParams!.onScreenCaptureStarting!(
               _controllerFromPlatform,
               request,
@@ -2087,8 +2097,10 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
   @override
   Future<MemoryUsageTargetLevel?> getMemoryUsageTargetLevel() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    final nativeValue =
-        await channel?.invokeMethod<int?>('getMemoryUsageTargetLevel', args);
+    final nativeValue = await channel?.invokeMethod<int?>(
+      'getMemoryUsageTargetLevel',
+      args,
+    );
     return MemoryUsageTargetLevel.fromNativeValue(nativeValue);
   }
 

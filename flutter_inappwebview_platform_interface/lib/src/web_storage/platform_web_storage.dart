@@ -29,7 +29,7 @@ part 'platform_web_storage.g.dart';
     MacOSPlatform(),
     WebPlatform(),
     WindowsPlatform(),
-    LinuxPlatform()
+    LinuxPlatform(),
   ],
 )
 @immutable
@@ -102,7 +102,7 @@ class PlatformWebStorageCreationParams {
     MacOSPlatform(),
     WebPlatform(),
     WindowsPlatform(),
-    LinuxPlatform()
+    LinuxPlatform(),
   ],
 )
 abstract class PlatformWebStorage extends PlatformInterface
@@ -250,7 +250,7 @@ abstract class PlatformWebStorage extends PlatformInterface
     MacOSPlatform(),
     WebPlatform(),
     WindowsPlatform(),
-    LinuxPlatform()
+    LinuxPlatform(),
   ],
 )
 @immutable
@@ -323,7 +323,7 @@ class PlatformStorageCreationParams {
     MacOSPlatform(),
     WebPlatform(),
     WindowsPlatform(),
-    LinuxPlatform()
+    LinuxPlatform(),
   ],
 )
 abstract mixin class PlatformStorage implements Disposable {
@@ -337,7 +337,7 @@ abstract mixin class PlatformStorage implements Disposable {
       MacOSPlatform(),
       WebPlatform(),
       WindowsPlatform(),
-      LinuxPlatform()
+      LinuxPlatform(),
     ],
   )
   PlatformInAppWebViewController? get controller;
@@ -352,7 +352,7 @@ abstract mixin class PlatformStorage implements Disposable {
       MacOSPlatform(),
       WebPlatform(),
       WindowsPlatform(),
-      LinuxPlatform()
+      LinuxPlatform(),
     ],
   )
   WebStorageType get webStorageType {
@@ -544,7 +544,7 @@ abstract mixin class PlatformStorage implements Disposable {
     MacOSPlatform(),
     WebPlatform(),
     WindowsPlatform(),
-    LinuxPlatform()
+    LinuxPlatform(),
   ],
 )
 class PlatformLocalStorageCreationParams extends PlatformStorageCreationParams {
@@ -586,7 +586,7 @@ class PlatformLocalStorageCreationParams extends PlatformStorageCreationParams {
     MacOSPlatform(),
     WebPlatform(),
     WindowsPlatform(),
-    LinuxPlatform()
+    LinuxPlatform(),
   ],
 )
 abstract class PlatformLocalStorage extends PlatformInterface
@@ -778,7 +778,7 @@ abstract class PlatformLocalStorage extends PlatformInterface
     MacOSPlatform(),
     WebPlatform(),
     WindowsPlatform(),
-    LinuxPlatform()
+    LinuxPlatform(),
   ],
 )
 class PlatformSessionStorageCreationParams
@@ -821,7 +821,7 @@ class PlatformSessionStorageCreationParams
     MacOSPlatform(),
     WebPlatform(),
     WindowsPlatform(),
-    LinuxPlatform()
+    LinuxPlatform(),
   ],
 )
 abstract class PlatformSessionStorage extends PlatformInterface

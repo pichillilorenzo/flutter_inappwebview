@@ -19,7 +19,12 @@ part 'platform_print_job_controller.g.dart';
 ///
 ///{@macro flutter_inappwebview_platform_interface.PlatformPrintJobControllerCreationParams.supported_platforms}
 @SupportedPlatforms(
-  platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform(), WindowsPlatform()],
+  platforms: [
+    AndroidPlatform(),
+    IOSPlatform(),
+    MacOSPlatform(),
+    WindowsPlatform(),
+  ],
 )
 @immutable
 class PlatformPrintJobControllerCreationParams {
@@ -32,7 +37,12 @@ class PlatformPrintJobControllerCreationParams {
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformPrintJobControllerCreationParams.id.supported_platforms}
   @SupportedPlatforms(
-    platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform(), WindowsPlatform()],
+    platforms: [
+      AndroidPlatform(),
+      IOSPlatform(),
+      MacOSPlatform(),
+      WindowsPlatform(),
+    ],
   )
   final String id;
 
@@ -67,7 +77,12 @@ typedef PrintJobCompletionHandler =
 ///
 ///{@macro flutter_inappwebview_platform_interface.PlatformPrintJobController.supported_platforms}
 @SupportedPlatforms(
-  platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform(), WindowsPlatform()],
+  platforms: [
+    AndroidPlatform(),
+    IOSPlatform(),
+    MacOSPlatform(),
+    WindowsPlatform(),
+  ],
 )
 abstract class PlatformPrintJobController extends PlatformInterface
     implements Disposable {
@@ -241,7 +256,12 @@ abstract class PlatformPrintJobController extends PlatformInterface
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformPrintJobController.dispose.supported_platforms}
   @SupportedPlatforms(
-    platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform(), WindowsPlatform()],
+    platforms: [
+      AndroidPlatform(),
+      IOSPlatform(),
+      MacOSPlatform(),
+      WindowsPlatform(),
+    ],
   )
   @override
   void dispose() {

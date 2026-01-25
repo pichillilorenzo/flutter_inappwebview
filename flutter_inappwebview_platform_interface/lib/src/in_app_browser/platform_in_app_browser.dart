@@ -2402,7 +2402,7 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
     ],
   )
   FutureOr<SaveFileSecurityCheckStartingResponse?>?
-      onSaveFileSecurityCheckStarting(
+  onSaveFileSecurityCheckStarting(
     SaveFileSecurityCheckStartingRequest request,
   ) {
     return null;

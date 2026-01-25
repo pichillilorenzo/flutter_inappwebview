@@ -8,7 +8,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.0.1'
+        classpath 'com.android.tools.build:gradle:8.13.1'
     }
 }
 
@@ -26,7 +26,12 @@ android {
     if (project.android.hasProperty("namespace")) {
         namespace 'com.pichillilorenzo.flutter_inappwebview_android'
     }
-    compileSdk 34
+    compileSdk = flutter.compileSdkVersion
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
 
     defaultConfig {
         minSdkVersion 19
@@ -41,17 +46,17 @@ android {
     buildTypes {
         debug {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
         release {
             minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
     dependencies {
-        implementation 'androidx.webkit:webkit:1.12.0'
-        implementation 'androidx.browser:browser:1.8.0'
-        implementation 'androidx.appcompat:appcompat:1.6.1'
-        implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
+        implementation 'androidx.webkit:webkit:1.14.0'
+        implementation 'androidx.browser:browser:1.9.0'
+        implementation 'androidx.appcompat:appcompat:1.7.1'
+        implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.2.0'
     }
 }

@@ -18,9 +18,7 @@ part 'platform_web_notification_controller.g.dart';
 ///{@endtemplate}
 ///
 ///{@macro flutter_inappwebview_platform_interface.PlatformWebNotificationControllerCreationParams.supported_platforms}
-@SupportedPlatforms(
-  platforms: [WindowsPlatform()],
-)
+@SupportedPlatforms(platforms: [WindowsPlatform()])
 @immutable
 class PlatformWebNotificationControllerCreationParams {
   /// Used by the platform implementation to create a new [PlatformWebNotificationController].
@@ -34,9 +32,7 @@ class PlatformWebNotificationControllerCreationParams {
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebNotificationControllerCreationParams.id.supported_platforms}
-  @SupportedPlatforms(
-    platforms: [WindowsPlatform()],
-  )
+  @SupportedPlatforms(platforms: [WindowsPlatform()])
   final String id;
 
   ///{@template flutter_inappwebview_platform_interface.PlatformWebNotificationControllerCreationParams.notification}
@@ -44,9 +40,7 @@ class PlatformWebNotificationControllerCreationParams {
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebNotificationControllerCreationParams.notification.supported_platforms}
-  @SupportedPlatforms(
-    platforms: [WindowsPlatform()],
-  )
+  @SupportedPlatforms(platforms: [WindowsPlatform()])
   final WebNotification notification;
 
   ///{@template flutter_inappwebview_platform_interface.PlatformWebNotificationControllerCreationParams.isClassSupported}
@@ -81,9 +75,7 @@ typedef WebNotificationCloseHandler = Future<void> Function()?;
 ///{@endtemplate}
 ///
 ///{@macro flutter_inappwebview_platform_interface.PlatformWebNotificationController.supported_platforms}
-@SupportedPlatforms(
-  platforms: [WindowsPlatform()],
-)
+@SupportedPlatforms(platforms: [WindowsPlatform()])
 abstract class PlatformWebNotificationController extends PlatformInterface
     implements Disposable {
   /// Creates a new [PlatformWebNotificationController]
@@ -98,8 +90,9 @@ abstract class PlatformWebNotificationController extends PlatformInterface
       '`InAppWebViewPlatform.instance` can be set with your own test implementation.',
     );
     final PlatformWebNotificationController webNotificationController =
-        InAppWebViewPlatform.instance!
-            .createPlatformWebNotificationController(params);
+        InAppWebViewPlatform.instance!.createPlatformWebNotificationController(
+          params,
+        );
     PlatformInterface.verify(webNotificationController, _token);
     return webNotificationController;
   }
@@ -126,7 +119,7 @@ abstract class PlatformWebNotificationController extends PlatformInterface
   /// a class that only contains a factory constructor.
   @protected
   PlatformWebNotificationController.implementation(this.params)
-      : super(token: _token);
+    : super(token: _token);
 
   static final Object _token = Object();
 
@@ -245,9 +238,7 @@ abstract class PlatformWebNotificationController extends PlatformInterface
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebNotificationController.dispose.supported_platforms}
-  @SupportedPlatforms(
-    platforms: [WindowsPlatform()],
-  )
+  @SupportedPlatforms(platforms: [WindowsPlatform()])
   @override
   void dispose() {
     throw UnimplementedError(
@@ -265,11 +256,11 @@ abstract class PlatformWebNotificationController extends PlatformInterface
   ///{@endtemplate}
   bool isPropertySupported(dynamic property, {TargetPlatform? platform}) =>
       property is PlatformWebNotificationControllerCreationParamsProperty
-          ? params.isPropertySupported(property, platform: platform)
-          : _PlatformWebNotificationControllerPropertySupported.isPropertySupported(
-              property,
-              platform: platform,
-            );
+      ? params.isPropertySupported(property, platform: platform)
+      : _PlatformWebNotificationControllerPropertySupported.isPropertySupported(
+          property,
+          platform: platform,
+        );
 
   ///{@template flutter_inappwebview_platform_interface.PlatformWebNotificationController.isMethodSupported}
   ///Check if the given [method] is supported by the [defaultTargetPlatform] or a specific [platform].
@@ -277,9 +268,8 @@ abstract class PlatformWebNotificationController extends PlatformInterface
   bool isMethodSupported(
     PlatformWebNotificationControllerMethod method, {
     TargetPlatform? platform,
-  }) =>
-      _PlatformWebNotificationControllerMethodSupported.isMethodSupported(
-        method,
-        platform: platform,
-      );
+  }) => _PlatformWebNotificationControllerMethodSupported.isMethodSupported(
+    method,
+    platform: platform,
+  );
 }

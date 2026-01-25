@@ -1,7 +1,6 @@
 package com.pichillilorenzo.flutter_inappwebview_android.webview.in_app_webview;
 
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.net.http.SslError;
@@ -69,7 +68,7 @@ public class InAppWebViewClientCompat extends WebViewClientCompat {
     this.inAppBrowserDelegate = inAppBrowserDelegate;
   }
 
-  @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+  @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
   @Override
   public boolean shouldOverrideUrlLoading(@NonNull WebView view, @NonNull WebResourceRequest request) {
     InAppWebView webView = (InAppWebView) view;

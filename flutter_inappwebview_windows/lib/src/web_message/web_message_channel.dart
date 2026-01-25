@@ -60,8 +60,12 @@ class WindowsWebMessageChannel extends PlatformWebMessageChannel
   static final WindowsWebMessageChannel _staticValue = WindowsWebMessageChannel(
     WindowsWebMessageChannelCreationParams(
       id: '',
-      port1: WindowsWebMessagePort(WindowsWebMessagePortCreationParams(index: 0)),
-      port2: WindowsWebMessagePort(WindowsWebMessagePortCreationParams(index: 1)),
+      port1: WindowsWebMessagePort(
+        WindowsWebMessagePortCreationParams(index: 0),
+      ),
+      port2: WindowsWebMessagePort(
+        WindowsWebMessagePortCreationParams(index: 1),
+      ),
     ),
   );
 
@@ -81,8 +85,12 @@ class WindowsWebMessageChannel extends PlatformWebMessageChannel
     var webMessageChannel = WindowsWebMessageChannel(
       WindowsWebMessageChannelCreationParams(
         id: map["id"],
-        port1: WindowsWebMessagePort(WindowsWebMessagePortCreationParams(index: 0)),
-        port2: WindowsWebMessagePort(WindowsWebMessagePortCreationParams(index: 1)),
+        port1: WindowsWebMessagePort(
+          WindowsWebMessagePortCreationParams(index: 0),
+        ),
+        port2: WindowsWebMessagePort(
+          WindowsWebMessagePortCreationParams(index: 1),
+        ),
       ),
     );
     webMessageChannel._windowsPort1.webMessageChannel = webMessageChannel;

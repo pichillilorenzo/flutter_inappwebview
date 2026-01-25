@@ -43,8 +43,8 @@ class WindowsFindInteractionController extends PlatformFindInteractionController
 
   static final WindowsFindInteractionController _staticValue =
       WindowsFindInteractionController(
-    const WindowsFindInteractionControllerCreationParams(),
-  );
+        const WindowsFindInteractionControllerCreationParams(),
+      );
 
   /// Provide static access.
   factory WindowsFindInteractionController.static() {

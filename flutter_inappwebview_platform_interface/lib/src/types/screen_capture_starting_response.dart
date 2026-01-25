@@ -13,8 +13,5 @@ class ScreenCaptureStartingResponse_ {
   ///Whether the event has been handled.
   bool? handled;
 
-  ScreenCaptureStartingResponse_({
-    this.cancel,
-    this.handled,
-  });
+  ScreenCaptureStartingResponse_({this.cancel, this.handled});
 }

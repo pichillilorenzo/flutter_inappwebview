@@ -17,9 +17,5 @@ class ScreenCaptureStartingRequest_ {
   ///Whether the event has been handled.
   bool? handled;
 
-  ScreenCaptureStartingRequest_({
-    this.frame,
-    this.cancel,
-    this.handled,
-  });
+  ScreenCaptureStartingRequest_({this.frame, this.cancel, this.handled});
 }

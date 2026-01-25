@@ -80,10 +80,7 @@ class InAppWebViewController {
   Future<Uint8List?> getFavicon({
     required WebUri url,
     FaviconImageFormat faviconImageFormat = FaviconImageFormat.PNG,
-  }) => platform.getFavicon(
-    url: url,
-    faviconImageFormat: faviconImageFormat,
-  );
+  }) => platform.getFavicon(url: url, faviconImageFormat: faviconImageFormat);
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.showSaveAsUI}
   ///

@@ -4,13 +4,15 @@ import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_pla
 ///{@macro flutter_inappwebview_platform_interface.PlatformWebNotificationController}
 class WebNotificationController {
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebNotificationController}
-  WebNotificationController({required String id, required WebNotification notification})
-    : this.fromPlatformCreationParams(
-        params: PlatformWebNotificationControllerCreationParams(
-          id: id,
-          notification: notification,
-        ),
-      );
+  WebNotificationController({
+    required String id,
+    required WebNotification notification,
+  }) : this.fromPlatformCreationParams(
+         params: PlatformWebNotificationControllerCreationParams(
+           id: id,
+           notification: notification,
+         ),
+       );
 
   /// Constructs a [WebNotificationController].
   ///
@@ -53,7 +55,9 @@ class WebNotificationController {
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebNotificationControllerCreationParams.isClassSupported}
   static bool isClassSupported({TargetPlatform? platform}) =>
-      PlatformWebNotificationController.static().isClassSupported(platform: platform);
+      PlatformWebNotificationController.static().isClassSupported(
+        platform: platform,
+      );
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebNotificationController.isPropertySupported}
   static bool isPropertySupported(

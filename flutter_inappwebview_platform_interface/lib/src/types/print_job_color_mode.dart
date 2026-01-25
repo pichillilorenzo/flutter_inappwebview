@@ -16,10 +16,7 @@ class PrintJobColorMode_ {
 
   ///Monochrome color scheme, for example one color is used.
   @EnumSupportedPlatforms(
-    platforms: [
-      EnumAndroidPlatform(value: 0),
-      EnumWindowsPlatform(value: 0),
-    ],
+    platforms: [EnumAndroidPlatform(value: 0), EnumWindowsPlatform(value: 0)],
   )
   static const DEFAULT = const PrintJobColorMode_._internal(0);
 

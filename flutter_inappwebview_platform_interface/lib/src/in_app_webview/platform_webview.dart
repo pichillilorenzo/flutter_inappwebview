@@ -182,7 +182,7 @@ class PlatformWebViewCreationParams<T> {
       WindowsPlatform(
         apiName: 'ICoreWebView2.add_ContentLoading',
         apiUrl:
-        'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#add_contentloading',
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#add_contentloading',
       ),
     ],
   )
@@ -1310,7 +1310,7 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
       WindowsPlatform(
         apiName: 'ICoreWebView2.add_ContainsFullScreenElementChanged',
         apiUrl:
-        'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#add_containsfullscreenelementchanged',
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#add_containsfullscreenelementchanged',
       ),
       LinuxPlatform(
         apiName: 'WebKitWebView::enter-fullscreen',
@@ -1351,7 +1351,7 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
       WindowsPlatform(
         apiName: 'ICoreWebView2.add_ContainsFullScreenElementChanged',
         apiUrl:
-        'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#add_containsfullscreenelementchanged',
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#add_containsfullscreenelementchanged',
       ),
       LinuxPlatform(
         apiName: 'WebKitWebView::leave-fullscreen',
@@ -1931,7 +1931,10 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
       ),
     ],
   )
-  final void Function(T controller, FaviconChangedRequest faviconChangedRequest)?
+  final void Function(
+    T controller,
+    FaviconChangedRequest faviconChangedRequest,
+  )?
   onFaviconChanged;
 
   ///{@template flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.androidOnReceivedTouchIconUrl}

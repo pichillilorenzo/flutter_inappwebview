@@ -24,6 +24,11 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.menu.MenuBuilder;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.pichillilorenzo.flutter_inappwebview_android.R;
 import com.pichillilorenzo.flutter_inappwebview_android.Util;
@@ -61,6 +66,8 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
   public PullToRefreshLayout pullToRefreshLayout;
   @Nullable
   public ActionBar actionBar;
+  @Nullable
+  public Toolbar toolbar;
   @Nullable
   public Menu menu;
   @Nullable
@@ -107,6 +114,19 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
     windowId = b.getInt("windowId");
 
     setContentView(R.layout.activity_web_view);
+
+    WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+    toolbar = findViewById(R.id.toolbar);
+    setSupportActionBar(toolbar);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+      getWindow().setStatusBarColor(Color.TRANSPARENT);
+    }
+
+    ViewCompat.setOnApplyWindowInsetsListener(toolbar, (v, insets) -> {
+      Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.statusBars());
+      v.setPadding(v.getPaddingLeft(), systemBars.top, v.getPaddingRight(), v.getPaddingBottom());
+      return insets;
+    });
 
     Map<String, Object> pullToRefreshInitialSettings = (Map<String, Object>) b.getSerializable("pullToRefreshInitialSettings");
     MethodChannel pullToRefreshLayoutChannel = new MethodChannel(manager.plugin.messenger, PullToRefreshLayout.METHOD_CHANNEL_NAME_PREFIX + id);

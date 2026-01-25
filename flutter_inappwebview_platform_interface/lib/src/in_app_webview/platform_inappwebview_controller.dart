@@ -312,9 +312,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
       ),
     ],
   )
-  Future<void> setMemoryUsageTargetLevel(
-    MemoryUsageTargetLevel level,
-  ) {
+  Future<void> setMemoryUsageTargetLevel(MemoryUsageTargetLevel level) {
     throw UnimplementedError(
       '${PlatformInAppWebViewControllerMethod.setMemoryUsageTargetLevel.name} is not implemented on the current platform',
     );

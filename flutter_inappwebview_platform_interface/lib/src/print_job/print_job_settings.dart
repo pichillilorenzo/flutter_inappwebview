@@ -23,7 +23,12 @@ part 'print_job_settings.g.dart';
 ///Class that represents the settings of a [PlatformPrintJobController].
 @ExchangeableObject(copyMethod: true)
 @SupportedPlatforms(
-  platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform(), WindowsPlatform()],
+  platforms: [
+    AndroidPlatform(),
+    IOSPlatform(),
+    MacOSPlatform(),
+    WindowsPlatform(),
+  ],
 )
 class PrintJobSettings_ {
   ///Set this to `true` to handle the [PlatformPrintJobController].
@@ -58,7 +63,12 @@ class PrintJobSettings_ {
 
   ///The orientation of the printed content, portrait or landscape.
   @SupportedPlatforms(
-    platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform(), WindowsPlatform()],
+    platforms: [
+      AndroidPlatform(),
+      IOSPlatform(),
+      MacOSPlatform(),
+      WindowsPlatform(),
+    ],
   )
   PrintJobOrientation_? orientation;
 
@@ -73,7 +83,9 @@ class PrintJobSettings_ {
   ///The margins for each printed page.
   ///Margins define the white space around the content where the left margin defines
   ///the amount of white space on the left of the content and so on.
-  @SupportedPlatforms(platforms: [IOSPlatform(), MacOSPlatform(), WindowsPlatform()])
+  @SupportedPlatforms(
+    platforms: [IOSPlatform(), MacOSPlatform(), WindowsPlatform()],
+  )
   EdgeInsets? margins;
 
   ///The media size.
@@ -81,7 +93,9 @@ class PrintJobSettings_ {
   PrintJobMediaSize_? mediaSize;
 
   ///The color mode.
-  @SupportedPlatforms(platforms: [AndroidPlatform(), MacOSPlatform(), WindowsPlatform()])
+  @SupportedPlatforms(
+    platforms: [AndroidPlatform(), MacOSPlatform(), WindowsPlatform()],
+  )
   PrintJobColorMode_? colorMode;
 
   ///The duplex mode to use for the print job.

@@ -36,11 +36,12 @@ class WindowsWebNotificationController extends PlatformWebNotificationController
   WindowsWebNotificationController(
     PlatformWebNotificationControllerCreationParams params,
   ) : super.implementation(
-          params is WindowsWebNotificationControllerCreationParams
-              ? params
-              : WindowsWebNotificationControllerCreationParams
-                  .fromPlatformWebNotificationControllerCreationParams(params),
-        ) {
+        params is WindowsWebNotificationControllerCreationParams
+            ? params
+            : WindowsWebNotificationControllerCreationParams.fromPlatformWebNotificationControllerCreationParams(
+                params,
+              ),
+      ) {
     channel = MethodChannel(
       'com.pichillilorenzo/flutter_inappwebview_webnotificationcontroller_${params.id}',
     );
@@ -50,11 +51,11 @@ class WindowsWebNotificationController extends PlatformWebNotificationController
 
   static final WindowsWebNotificationController _staticValue =
       WindowsWebNotificationController(
-    WindowsWebNotificationControllerCreationParams(
-      id: '',
-      notification: WebNotification(),
-    ),
-  );
+        WindowsWebNotificationControllerCreationParams(
+          id: '',
+          notification: WebNotification(),
+        ),
+      );
 
   /// Provide static access.
   factory WindowsWebNotificationController.static() {

@@ -250,8 +250,7 @@ export 'save_file_security_check_starting_request.dart'
     show SaveFileSecurityCheckStartingRequest;
 export 'save_file_security_check_starting_response.dart'
     show SaveFileSecurityCheckStartingResponse;
-export 'screen_capture_starting_request.dart'
-    show ScreenCaptureStartingRequest;
+export 'screen_capture_starting_request.dart' show ScreenCaptureStartingRequest;
 export 'screen_capture_starting_response.dart'
     show ScreenCaptureStartingResponse;
 export 'web_notification.dart' show WebNotification;

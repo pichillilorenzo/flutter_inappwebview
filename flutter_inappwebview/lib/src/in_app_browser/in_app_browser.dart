@@ -651,7 +651,7 @@ class InAppBrowser implements PlatformInAppBrowserEvents {
 
   @override
   FutureOr<SaveFileSecurityCheckStartingResponse?>?
-      onSaveFileSecurityCheckStarting(
+  onSaveFileSecurityCheckStarting(
     SaveFileSecurityCheckStartingRequest request,
   ) {
     return null;

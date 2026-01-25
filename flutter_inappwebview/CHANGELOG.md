@@ -28,15 +28,23 @@
 - Deprecated `onReceivedIcon` in favor of `onFaviconChanged`
 
 #### Android Platform
+- Updated native dependencies:
+  - implementation from `'androidx.webkit:webkit:1.12.0'` to `'androidx.webkit:webkit:1.14.0'`
+  - implementation from `'androidx.browser:browser:1.8.0'` to `'androidx.browser:browser:1.9.0'`
+  - implementation from `'androidx.appcompat:appcompat:1.6.1'` to `'androidx.appcompat:appcompat:1.7.1'`
+  - implementation from `'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'` to `'androidx.swiperefreshlayout:swiperefreshlayout:1.2.0'`
+- Updated android native `compileOptions` to `JavaVersion.VERSION_17`
 - Implemented `saveState`, `restoreState` InAppWebViewController methods
 - Implemented `onShowFileChooser` WebView event
+- Updated InAppBrowser toolbar top
 - Merged "Android: implemented PlatformPrintJobController.onComplete" [#2216](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2216) (thanks to [Doflatango](https://github.com/Doflatango))
 - Fixed "When useShouldInterceptAjaxRequest is true, some ajax requests doesn't work" [#2197](https://github.com/pichillilorenzo/flutter_inappwebview/issues/2197)
 - Merged "Fixed recursive calling toMap in AndroidInternalStoragePathHandler" [#2452](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2452) (thanks to [roberthofstra](https://github.com/roberthofstra))
 - Fixed recursive `toMap` call for `AndroidInternalStoragePathHandler` [#2451](https://github.com/pichillilorenzo/flutter_inappwebview/issues/2451)
 - Fixed "Error when updating webview settings Android in v6.2.0-beta.2" [#2449](https://github.com/pichillilorenzo/flutter_inappwebview/issues/2449)
+- Fixed "[Android] Upgrade to AGP 9" [#2765](https://github.com/pichillilorenzo/flutter_inappwebview/issues/2765)
+- Fixed "update android apg version to 8.9.1 or higer" [#2761](https://github.com/pichillilorenzo/flutter_inappwebview/issues/2761)
 - Merged "fix #2484, Remove not-empty assert for Cookie.value" [#2486](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2486) (thanks to [laishere](https://github.com/laishere))
-
 
 #### macOS and iOS Platforms
 - Implemented `saveState`, `restoreState` InAppWebViewController methods

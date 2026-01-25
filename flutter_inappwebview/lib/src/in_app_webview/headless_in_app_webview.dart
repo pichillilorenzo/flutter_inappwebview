@@ -640,10 +640,10 @@ class HeadlessInAppWebView {
            onExitFullscreen: onExitFullscreen != null
                ? (controller) => onExitFullscreen.call(controller)
                : null,
-             onContentLoading: onContentLoading != null
+           onContentLoading: onContentLoading != null
                ? (controller, url) => onContentLoading.call(controller, url)
                : null,
-             onDOMContentLoaded: onDOMContentLoaded != null
+           onDOMContentLoaded: onDOMContentLoaded != null
                ? (controller, url) => onDOMContentLoaded.call(controller, url)
                : null,
            onPageCommitVisible: onPageCommitVisible != null
@@ -757,9 +757,9 @@ class HeadlessInAppWebView {
            onReceivedIcon: onReceivedIcon != null
                ? (controller, icon) => onReceivedIcon.call(controller, icon)
                : null,
-             onFaviconChanged: onFaviconChanged != null
+           onFaviconChanged: onFaviconChanged != null
                ? (controller, request) =>
-                 onFaviconChanged.call(controller, request)
+                     onFaviconChanged.call(controller, request)
                : null,
            androidOnReceivedTouchIconUrl: androidOnReceivedTouchIconUrl != null
                ? (controller, url, precomposed) => androidOnReceivedTouchIconUrl
@@ -857,22 +857,22 @@ class HeadlessInAppWebView {
                ? (controller, detail) =>
                      onProcessFailed.call(controller, detail)
                : null,
-               onNotificationReceived: onNotificationReceived != null
+           onNotificationReceived: onNotificationReceived != null
                ? (controller, request) =>
-                 onNotificationReceived.call(controller, request)
+                     onNotificationReceived.call(controller, request)
                : null,
-               onSaveAsUIShowing: onSaveAsUIShowing != null
+           onSaveAsUIShowing: onSaveAsUIShowing != null
                ? (controller, request) =>
-                 onSaveAsUIShowing.call(controller, request)
+                     onSaveAsUIShowing.call(controller, request)
                : null,
-               onSaveFileSecurityCheckStarting:
+           onSaveFileSecurityCheckStarting:
                onSaveFileSecurityCheckStarting != null
                ? (controller, request) =>
-                 onSaveFileSecurityCheckStarting.call(controller, request)
+                     onSaveFileSecurityCheckStarting.call(controller, request)
                : null,
-               onScreenCaptureStarting: onScreenCaptureStarting != null
+           onScreenCaptureStarting: onScreenCaptureStarting != null
                ? (controller, request) =>
-                 onScreenCaptureStarting.call(controller, request)
+                     onScreenCaptureStarting.call(controller, request)
                : null,
            onAcceleratorKeyPressed: onAcceleratorKeyPressed != null
                ? (controller, detail) =>

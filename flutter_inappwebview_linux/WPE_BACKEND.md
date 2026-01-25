@@ -42,22 +42,10 @@ The build system automatically selects the backend:
 ## Installation Options
 
 You can either:
-1. **Use pre-built packages** from your distribution (if available)
-2. **Build from source** using official tarball releases (recommended for latest features)
+1. **Use pre-built packages** from your distribution (if available): https://wpewebkit.org/about/get-wpe.html
+2. **Build from source** using official tarball releases (recommended for latest features): https://wpewebkit.org/release/
 
-### Option 1: Install from Distribution Packages
-
-Some distributions provide WPE WebKit packages:
-
-- **Debian/Ubuntu**: `sudo apt install libwpewebkit-1.0-dev libwpebackend-fdo-1.0-dev`
-- **Arch Linux**: `sudo pacman -S wpewebkit`
-- **Fedora**: Available via COPR
-
-> **Note:** Distribution packages may be outdated. For the latest features and security fixes, building from source is recommended.
-
-> **Note on Snaps and Flatpaks:** Installing WPE WebKit via Snap (`wpe-webkit-mir-kiosk`) or Flatpak (`org.wpewebkit.WPEWebKit`) provides a standalone browser application. **These do not provide the development headers and libraries required to build this plugin.** You must install the `dev` packages via `apt` or build from source.
-
-### Option 2: Build from Source (Recommended)
+### Option 2: Build from Source
 
 #### Prerequisites
 
@@ -149,10 +137,10 @@ WPE WebKit has many optional features that are **enabled by default**. If you do
 
 | CMake Flag | Default | Dependencies (Debian/Ubuntu) | Description |
 |------------|---------|------------------------------|-------------|
+| `ENABLE_WPE_PLATFORM` | OFF | See platform flags below | WPE 2.0 platform abstraction (**required for this plugin**, ⚠️ see note) |
+| `ENABLE_WPE_PLATFORM_HEADLESS` | OFF | See platform flags below | Headless platform (**required for this plugin**, ⚠️ see note) |
 | `ENABLE_ENCRYPTED_MEDIA` | OFF | Thunder/OCDM | Encrypted Media Extensions (EME/DRM) |
-| `ENABLE_WPE_PLATFORM` | OFF | See platform flags below | WPE 2.0 platform abstraction (⚠️ see note) |
 | `ENABLE_WPE_PLATFORM_DRM` | OFF | `libinput-dev libudev-dev libdrm-dev libgbm-dev` | DRM/KMS platform (requires `USE_GBM`) |
-| `ENABLE_WPE_PLATFORM_HEADLESS` | **ON** | — | Headless platform (**required for this plugin**) |
 | `ENABLE_WPE_PLATFORM_WAYLAND` | OFF | `libwayland-dev wayland-protocols` | Wayland platform |
 | `ENABLE_WPE_QT_API` | OFF | Qt5/Qt6 development packages | Qt/QML API bindings |
 | `USE_QT6` | OFF | `qt6-base-dev qt6-declarative-dev` | Use Qt6 instead of Qt5 (requires `ENABLE_WPE_PLATFORM`) |
@@ -173,7 +161,9 @@ cmake -B build -G Ninja \
   -DUSE_AVIF=OFF \
   -DENABLE_SPEECH_SYNTHESIS=OFF \
   -DENABLE_DOCUMENTATION=OFF \
-  -DENABLE_INTROSPECTION=OFF \
+  -DENABLE_INTROSPECTION=OFF  \
+  -DENABLE_WPE_PLATFORM=ON \
+  -DENABLE_WPE_PLATFORM_HEADLESS=ON \
   # ... other options
 ```
 
@@ -200,7 +190,9 @@ cmake -B build -G Ninja \
   -DENABLE_WEBDRIVER=OFF \
   -DENABLE_GAMEPAD=OFF \
   -DUSE_GSTREAMER_WEBRTC=OFF \
-  -DENABLE_MINIBROWSER=OFF
+  -DENABLE_MINIBROWSER=OFF \
+  -DENABLE_WPE_PLATFORM=ON \
+  -DENABLE_WPE_PLATFORM_HEADLESS=ON
 ```
 
 ##### Feature-Complete Build (WPE 2.0 with All Features)
@@ -233,7 +225,9 @@ cmake -B build -G Ninja \
   -DUSE_LIBDRM=ON \
   -DUSE_LIBBACKTRACE=ON \
   -DUSE_FLITE=ON \
-  -DUSE_GSTREAMER_WEBRTC=ON
+  -DUSE_GSTREAMER_WEBRTC=ON \
+  -DENABLE_WPE_PLATFORM=ON \
+  -DENABLE_WPE_PLATFORM_HEADLESS=ON
 ```
 
 > **Note:** This requires all optional dependencies to be installed (see "Installing All Optional Dependencies" above).
@@ -313,28 +307,6 @@ sudo apt-get install -y libwayland-dev wayland-protocols
 | `libsystemd or libelogind are needed for ENABLE_JOURNALD_LOG` | Install `libsystemd-dev` OR add `-DENABLE_JOURNALD_LOG=OFF` |
 | `GBM is required for USE_GBM` | Install `libgbm-dev` OR add `-DUSE_GBM=OFF` (disables GPU process) |
 | `libdrm is required for USE_LIBDRM` | Install `libdrm-dev` OR add `-DUSE_LIBDRM=OFF` |
-
-#### Download Official Tarballs
-
-Download the official release tarballs from [wpewebkit.org](https://wpewebkit.org/about/get-wpe.html).
-
-##### Stable Releases (Recommended for Production)
-
-| Component | Version | Download |
-|-----------|---------|----------|
-| libwpe | 1.16.3 | https://wpewebkit.org/releases/libwpe-1.16.3.tar.xz |
-| WPEBackend-fdo | 1.16.1 | https://wpewebkit.org/releases/wpebackend-fdo-1.16.1.tar.xz |
-| WPE WebKit | 2.50.4 | https://wpewebkit.org/releases/wpewebkit-2.50.4.tar.xz |
-
-##### Unstable Releases (Development/Preview)
-
-| Component | Version | Download |
-|-----------|---------|----------|
-| libwpe | 1.15.2 | https://wpewebkit.org/releases/libwpe-1.15.2.tar.xz |
-| WPEBackend-fdo | 1.15.90 | https://wpewebkit.org/releases/wpebackend-fdo-1.15.90.tar.xz |
-| WPE WebKit | 2.51.4 | https://wpewebkit.org/releases/wpewebkit-2.51.4.tar.xz |
-
-> **Note:** Check [wpewebkit.org/release/](https://wpewebkit.org/release/) for the latest versions.
 
 #### Build Instructions
 
@@ -416,7 +388,7 @@ cd ..
 # === 4. Update library cache ===
 sudo ldconfig
 
-# === 5. Create the default backend symlink ===
+# === 5. Create the default backend symlink (OPTIONAL - only for legacy fallback) ===
 # WPE looks for libWPEBackend-default.so
 ARCH=$(uname -m)
 if [ -f "$WPE_PREFIX/lib/${ARCH}-linux-gnu/libWPEBackend-fdo-1.0.so.1" ]; then
@@ -439,6 +411,7 @@ fi
 ```bash
 # Check pkg-config can find the libraries
 pkg-config --modversion wpe-webkit-2.0
+# (OPTIONAL - only for legacy fallback)
 pkg-config --modversion wpebackend-fdo-1.0
 pkg-config --modversion wpe-1.0
 ```
@@ -513,14 +486,6 @@ The following files are automatically copied to your app's `lib/` directory:
 - `libWPEBackend-fdo-1.0.so.*` - FDO backend library
 - `libWPEBackend-default.so` - Symlink to FDO backend
 
-## Runtime Environment Variables
-
-| Variable | Description |
-|----------|-------------|
-| `FLUTTER_INAPPWEBVIEW_LINUX_DEBUG=1` | Enable debug logging |
-| `FLUTTER_INAPPWEBVIEW_LINUX_WPE_INSPECTOR=1` | Enable remote web inspector |
-| `FLUTTER_INAPPWEBVIEW_LINUX_WPE_INSPECTOR_PORT=9222` | Web inspector port |
-
 ## Architecture
 
 ```
@@ -554,32 +519,6 @@ InAppWebView (C++)
     │         ▼
     └──► Flutter Texture ◄──── SHM Buffer / DMA-BUF
 ```
-
-### Frame Export Flow
-
-1. WPE WebKit renders a frame using GPU
-2. `wpebackend-fdo` exports the frame as a SHM buffer or DMA-BUF
-3. The export callback receives the buffer data
-4. Buffer is converted to RGBA and uploaded to Flutter texture
-5. Flutter composites the webview texture into the scene
-
-### Input Handling
-
-Input events are forwarded to WPE's backend:
-
-- Pointer events → `wpe_view_backend_dispatch_pointer_event()`
-- Keyboard events → `wpe_view_backend_dispatch_keyboard_event()`  
-- Axis (scroll) events → `wpe_view_backend_dispatch_axis_event()`
-
-Keyboard modifiers (Ctrl, Shift, Alt, Meta) and shortcuts (Ctrl+A, Ctrl+C, Ctrl+V, etc.) are properly mapped to X11 keysyms.
-
-### Cursor Handling
-
-The plugin detects cursor changes via:
-- WebKit's `mouse-target-changed` signal for links, editable content, etc.
-- JavaScript injection for CSS `cursor` property detection
-
-Cursor types are mapped to Flutter's cursor system: pointer, text, grab, resize, forbidden, etc.
 
 ## Troubleshooting
 
@@ -619,19 +558,6 @@ sudo ln -sf /usr/local/lib/$(uname -m)-linux-gnu/libWPEBackend-fdo-1.0.so.1 \
 
 Or for the bundled app, ensure the symlink exists in the `lib/` directory.
 
-### Blank webview
-
-Enable debug logging:
-
-```bash
-FLUTTER_INAPPWEBVIEW_LINUX_DEBUG=1 ./your_app
-```
-
-Check for errors related to:
-- EGL context creation
-- SHM buffer allocation
-- WebKit rendering
-
 ### Build errors for WPE WebKit
 
 If you encounter missing dependency errors during `cmake`:
@@ -659,19 +585,6 @@ If libraries aren't being bundled, check:
 
 1. CMake output for "Will bundle" messages
 2. Library paths are correct in pkg-config
-
-### App crashes on startup
-
-Run with debug logging and check for:
-
-```bash
-FLUTTER_INAPPWEBVIEW_LINUX_DEBUG=1 ./your_app 2>&1 | head -50
-```
-
-Common issues:
-- Missing library symlinks in `lib/`
-- Mismatched library versions
-- Missing `libWPEBackend-default.so`
 
 ## Resources
 

@@ -62,11 +62,11 @@ class WindowsWebMessageListener extends PlatformWebMessageListener
 
   static final WindowsWebMessageListener _staticValue =
       WindowsWebMessageListener(
-    WindowsWebMessageListenerCreationParams(
-      jsObjectName: '',
-      allowedOriginRules: Set.from(["*"]),
-    ),
-  );
+        WindowsWebMessageListenerCreationParams(
+          jsObjectName: '',
+          allowedOriginRules: Set.from(["*"]),
+        ),
+      );
 
   /// Provide static access.
   factory WindowsWebMessageListener.static() {

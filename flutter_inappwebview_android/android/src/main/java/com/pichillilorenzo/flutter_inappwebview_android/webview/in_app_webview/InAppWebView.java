@@ -1019,7 +1019,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     if (newSettingsMap.get("fixedFontFamily") != null && !customSettings.fixedFontFamily.equals(newCustomSettings.fixedFontFamily))
       settings.setFixedFontFamily(newCustomSettings.fixedFontFamily);
 
-    if (newSettingsMap.get("forceDark") != null && !customSettings.forceDark.equals(newCustomSettings.forceDark)) {
+    if (newSettingsMap.get("forceDark") != null && !Util.objEquals(customSettings.forceDark, newCustomSettings.forceDark)) {
       if (WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK))
         WebSettingsCompat.setForceDark(settings, newCustomSettings.forceDark);
       else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
@@ -1027,7 +1027,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     }
 
     if (newSettingsMap.get("forceDarkStrategy") != null &&
-            !customSettings.forceDarkStrategy.equals(newCustomSettings.forceDarkStrategy) &&
+            !Util.objEquals(customSettings.forceDarkStrategy, newCustomSettings.forceDarkStrategy) &&
             WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK_STRATEGY)) {
       try {
         // for some reason the setForceDarkStrategy method could throw a ClassCastException

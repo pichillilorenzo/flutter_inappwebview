@@ -11,7 +11,7 @@ part of 'referrer_policy.dart';
 ///when fetching a resource `<link>` or a `<script>` (or resources fetched by the `<script>`).
 class ReferrerPolicy {
   final String _value;
-  final String _nativeValue;
+  final String? _nativeValue;
   const ReferrerPolicy._internal(this._value, this._nativeValue);
   // ignore: unused_element
   factory ReferrerPolicy._internalMultiPlatform(
@@ -141,8 +141,8 @@ class ReferrerPolicy {
   ///Gets [String] value.
   String toValue() => _value;
 
-  ///Gets [String] native value.
-  String toNativeValue() => _nativeValue;
+  ///Gets [String] native value if supported by the current platform, otherwise `null`.
+  String? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -175,7 +175,7 @@ class ReferrerPolicy {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override

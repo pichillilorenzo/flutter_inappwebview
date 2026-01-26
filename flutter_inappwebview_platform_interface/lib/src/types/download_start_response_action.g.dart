@@ -9,7 +9,7 @@ part of 'download_start_response_action.dart';
 ///Class representing the action of a [DownloadStartResponse].
 class DownloadStartResponseAction {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const DownloadStartResponseAction._internal(this._value, this._nativeValue);
   // ignore: unused_element
   factory DownloadStartResponseAction._internalMultiPlatform(
@@ -105,8 +105,8 @@ class DownloadStartResponseAction {
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -125,7 +125,7 @@ class DownloadStartResponseAction {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return toNativeValue() != null;
+    return _nativeValue != null;
   }
 
   @override

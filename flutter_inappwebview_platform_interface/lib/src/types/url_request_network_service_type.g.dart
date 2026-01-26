@@ -9,7 +9,7 @@ part of 'url_request_network_service_type.dart';
 ///Class that represents the constants that specify how a request uses network resources.
 class URLRequestNetworkServiceType {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const URLRequestNetworkServiceType._internal(this._value, this._nativeValue);
   // ignore: unused_element
   factory URLRequestNetworkServiceType._internalMultiPlatform(
@@ -123,8 +123,8 @@ class URLRequestNetworkServiceType {
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -157,7 +157,7 @@ class URLRequestNetworkServiceType {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override
@@ -171,7 +171,7 @@ class URLRequestNetworkServiceType {
 @Deprecated('Use URLRequestNetworkServiceType instead')
 class IOSURLRequestNetworkServiceType {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const IOSURLRequestNetworkServiceType._internal(
     this._value,
     this._nativeValue,
@@ -294,8 +294,8 @@ class IOSURLRequestNetworkServiceType {
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -328,7 +328,7 @@ class IOSURLRequestNetworkServiceType {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override

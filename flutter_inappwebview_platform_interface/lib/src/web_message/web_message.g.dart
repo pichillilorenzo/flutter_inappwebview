@@ -9,7 +9,7 @@ part of 'web_message.dart';
 ///The type corresponding to the [WebMessage].
 class WebMessageType {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const WebMessageType._internal(this._value, this._nativeValue);
   // ignore: unused_element
   factory WebMessageType._internalMultiPlatform(
@@ -92,8 +92,8 @@ class WebMessageType {
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -114,7 +114,7 @@ class WebMessageType {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override

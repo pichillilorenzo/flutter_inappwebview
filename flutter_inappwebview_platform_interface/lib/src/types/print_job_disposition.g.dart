@@ -9,7 +9,7 @@ part of 'print_job_disposition.dart';
 ///Class representing the constants that specify values for the print job disposition of a [PlatformPrintJobController].
 class PrintJobDisposition {
   final String _value;
-  final String _nativeValue;
+  final String? _nativeValue;
   const PrintJobDisposition._internal(this._value, this._nativeValue);
   // ignore: unused_element
   factory PrintJobDisposition._internalMultiPlatform(
@@ -149,8 +149,8 @@ class PrintJobDisposition {
   ///Gets [String] value.
   String toValue() => _value;
 
-  ///Gets [String] native value.
-  String toNativeValue() => _nativeValue;
+  ///Gets [String] native value if supported by the current platform, otherwise `null`.
+  String? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -175,7 +175,7 @@ class PrintJobDisposition {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return toNativeValue() != null;
+    return _nativeValue != null;
   }
 
   @override

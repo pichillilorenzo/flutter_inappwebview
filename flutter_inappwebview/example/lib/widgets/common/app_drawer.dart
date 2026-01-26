@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_inappwebview_example/models/navigation_section.dart';
 import 'package:flutter_inappwebview_example/utils/responsive_utils.dart';
+import 'package:pointer_interceptor/pointer_interceptor.dart';
 
 class AppDrawer extends StatelessWidget {
   AppDrawer({super.key, List<NavigationSection>? sections})
@@ -12,10 +13,12 @@ class AppDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isMobile = context.isMobile;
-    return Drawer(
-      child: ListView(
-        padding: EdgeInsets.zero,
-        children: _buildChildren(context, isMobile),
+    return PointerInterceptor(
+      child: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: _buildChildren(context, isMobile),
+        ),
       ),
     );
   }

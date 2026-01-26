@@ -9,7 +9,7 @@ part of 'url_credential_persistence.dart';
 ///Class that represents the constants that specify how long the credential will be kept.
 class URLCredentialPersistence {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const URLCredentialPersistence._internal(this._value, this._nativeValue);
   // ignore: unused_element
   factory URLCredentialPersistence._internalMultiPlatform(
@@ -101,8 +101,8 @@ class URLCredentialPersistence {
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -127,7 +127,7 @@ class URLCredentialPersistence {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override
@@ -141,7 +141,7 @@ class URLCredentialPersistence {
 @Deprecated('Use URLCredentialPersistence instead')
 class IOSURLCredentialPersistence {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const IOSURLCredentialPersistence._internal(this._value, this._nativeValue);
   // ignore: unused_element
   factory IOSURLCredentialPersistence._internalMultiPlatform(
@@ -233,8 +233,8 @@ class IOSURLCredentialPersistence {
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -259,7 +259,7 @@ class IOSURLCredentialPersistence {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override

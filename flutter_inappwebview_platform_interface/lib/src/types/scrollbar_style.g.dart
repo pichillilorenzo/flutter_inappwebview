@@ -15,7 +15,7 @@ part of 'scrollbar_style.dart';
 ///then you can use [ScrollBarStyle.SCROLLBARS_OUTSIDE_OVERLAY] or [ScrollBarStyle.SCROLLBARS_OUTSIDE_INSET].
 class ScrollBarStyle {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const ScrollBarStyle._internal(this._value, this._nativeValue);
   // ignore: unused_element
   factory ScrollBarStyle._internalMultiPlatform(
@@ -117,8 +117,8 @@ class ScrollBarStyle {
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -143,7 +143,7 @@ class ScrollBarStyle {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override
@@ -164,7 +164,7 @@ class ScrollBarStyle {
 @Deprecated('Use ScrollBarStyle instead')
 class AndroidScrollBarStyle {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const AndroidScrollBarStyle._internal(this._value, this._nativeValue);
   // ignore: unused_element
   factory AndroidScrollBarStyle._internalMultiPlatform(
@@ -270,8 +270,8 @@ class AndroidScrollBarStyle {
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -296,7 +296,7 @@ class AndroidScrollBarStyle {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override

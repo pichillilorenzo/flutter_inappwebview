@@ -9,7 +9,7 @@ part of 'web_resource_context.dart';
 ///Constants that describe the web resource request contexts.
 class WebResourceContext {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const WebResourceContext._internal(this._value, this._nativeValue);
   // ignore: unused_element
   factory WebResourceContext._internalMultiPlatform(
@@ -151,8 +151,8 @@ class WebResourceContext {
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -203,7 +203,7 @@ class WebResourceContext {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override

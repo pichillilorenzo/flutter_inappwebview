@@ -9,7 +9,7 @@ part of 'scrollview_deceleration_rate.dart';
 ///Class that represents a floating-point value that determines the rate of deceleration after the user lifts their finger.
 class ScrollViewDecelerationRate {
   final String _value;
-  final String _nativeValue;
+  final String? _nativeValue;
   const ScrollViewDecelerationRate._internal(this._value, this._nativeValue);
   // ignore: unused_element
   factory ScrollViewDecelerationRate._internalMultiPlatform(
@@ -95,8 +95,8 @@ class ScrollViewDecelerationRate {
   ///Gets [String] value.
   String toValue() => _value;
 
-  ///Gets [String] native value.
-  String toNativeValue() => _nativeValue;
+  ///Gets [String] native value if supported by the current platform, otherwise `null`.
+  String? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -117,7 +117,7 @@ class ScrollViewDecelerationRate {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override
@@ -131,7 +131,7 @@ class ScrollViewDecelerationRate {
 @Deprecated('Use ScrollViewDecelerationRate instead')
 class IOSUIScrollViewDecelerationRate {
   final String _value;
-  final String _nativeValue;
+  final String? _nativeValue;
   const IOSUIScrollViewDecelerationRate._internal(
     this._value,
     this._nativeValue,
@@ -220,8 +220,8 @@ class IOSUIScrollViewDecelerationRate {
   ///Gets [String] value.
   String toValue() => _value;
 
-  ///Gets [String] native value.
-  String toNativeValue() => _nativeValue;
+  ///Gets [String] native value if supported by the current platform, otherwise `null`.
+  String? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -242,7 +242,7 @@ class IOSUIScrollViewDecelerationRate {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override

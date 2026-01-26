@@ -3190,7 +3190,10 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
   }) async {
     if (!autoname) {
       assert(
-        filePath.endsWith("." + WebArchiveFormat.WEBARCHIVE.toNativeValue()),
+        WebArchiveFormat.WEBARCHIVE.isSupported() &&
+            filePath.endsWith(
+              "." + WebArchiveFormat.WEBARCHIVE.toNativeValue()!,
+            ),
       );
     }
 

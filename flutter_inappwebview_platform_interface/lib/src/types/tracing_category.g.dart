@@ -9,7 +9,7 @@ part of 'tracing_category.dart';
 ///Constants that describe the results summary the find panel UI includes.
 class TracingCategory {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const TracingCategory._internal(this._value, this._nativeValue);
   // ignore: unused_element
   factory TracingCategory._internalMultiPlatform(
@@ -125,8 +125,8 @@ class TracingCategory {
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -159,7 +159,7 @@ class TracingCategory {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override

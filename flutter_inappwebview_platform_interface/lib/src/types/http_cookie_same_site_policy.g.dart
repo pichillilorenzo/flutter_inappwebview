@@ -9,7 +9,7 @@ part of 'http_cookie_same_site_policy.dart';
 ///Class that represents the same site policy of a cookie. Used by the [Cookie] class.
 class HTTPCookieSameSitePolicy {
   final String _value;
-  final String _nativeValue;
+  final String? _nativeValue;
   const HTTPCookieSameSitePolicy._internal(this._value, this._nativeValue);
   // ignore: unused_element
   factory HTTPCookieSameSitePolicy._internalMultiPlatform(
@@ -104,8 +104,8 @@ class HTTPCookieSameSitePolicy {
   ///Gets [String] value.
   String toValue() => _value;
 
-  ///Gets [String] native value.
-  String toNativeValue() => _nativeValue;
+  ///Gets [String] native value if supported by the current platform, otherwise `null`.
+  String? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -128,7 +128,7 @@ class HTTPCookieSameSitePolicy {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override

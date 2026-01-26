@@ -9,7 +9,7 @@ part of 'scrollview_content_inset_adjustment_behavior.dart';
 ///Class used to configure how safe area insets are added to the adjusted content inset.
 class ScrollViewContentInsetAdjustmentBehavior {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const ScrollViewContentInsetAdjustmentBehavior._internal(
     this._value,
     this._nativeValue,
@@ -110,8 +110,8 @@ class ScrollViewContentInsetAdjustmentBehavior {
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -136,7 +136,7 @@ class ScrollViewContentInsetAdjustmentBehavior {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override
@@ -153,7 +153,7 @@ class ScrollViewContentInsetAdjustmentBehavior {
 @Deprecated('Use ScrollViewContentInsetAdjustmentBehavior instead')
 class IOSUIScrollViewContentInsetAdjustmentBehavior {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const IOSUIScrollViewContentInsetAdjustmentBehavior._internal(
     this._value,
     this._nativeValue,
@@ -260,8 +260,8 @@ class IOSUIScrollViewContentInsetAdjustmentBehavior {
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -286,7 +286,7 @@ class IOSUIScrollViewContentInsetAdjustmentBehavior {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override

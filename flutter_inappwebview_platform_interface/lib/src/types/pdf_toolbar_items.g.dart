@@ -9,7 +9,7 @@ part of 'pdf_toolbar_items.dart';
 ///Class used to customize the PDF toolbar items.
 class PdfToolbarItems {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const PdfToolbarItems._internal(this._value, this._nativeValue);
   // ignore: unused_element
   factory PdfToolbarItems._internalMultiPlatform(
@@ -99,7 +99,7 @@ class PdfToolbarItems {
           (element) => element.toNativeValue() == value,
         );
       } catch (e) {
-        return PdfToolbarItems._internal(value, value);
+        return null;
       }
     }
     return null;
@@ -138,8 +138,8 @@ class PdfToolbarItems {
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -185,12 +185,14 @@ class PdfToolbarItems {
   PdfToolbarItems operator |(PdfToolbarItems value) =>
       PdfToolbarItems._internal(
         value.toValue() | _value,
-        value.toNativeValue() | _nativeValue,
+        value.toNativeValue() != null && _nativeValue != null
+            ? value.toNativeValue()! | _nativeValue!
+            : null,
       );
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override

@@ -9,7 +9,7 @@ part of 'force_dark.dart';
 ///Class used to indicate the force dark mode.
 class ForceDark {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const ForceDark._internal(this._value, this._nativeValue);
   // ignore: unused_element
   factory ForceDark._internalMultiPlatform(int value, Function nativeValue) =>
@@ -91,8 +91,8 @@ class ForceDark {
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -115,7 +115,7 @@ class ForceDark {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override
@@ -132,7 +132,7 @@ class ForceDark {
 @Deprecated('Use ForceDark instead')
 class AndroidForceDark {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const AndroidForceDark._internal(this._value, this._nativeValue);
   // ignore: unused_element
   factory AndroidForceDark._internalMultiPlatform(
@@ -219,8 +219,8 @@ class AndroidForceDark {
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -243,7 +243,7 @@ class AndroidForceDark {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override

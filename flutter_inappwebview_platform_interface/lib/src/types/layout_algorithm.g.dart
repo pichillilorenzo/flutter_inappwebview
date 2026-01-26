@@ -9,7 +9,7 @@ part of 'layout_algorithm.dart';
 ///Class used to set the underlying layout algorithm.
 class LayoutAlgorithm {
   final String _value;
-  final String _nativeValue;
+  final String? _nativeValue;
   const LayoutAlgorithm._internal(this._value, this._nativeValue);
   // ignore: unused_element
   factory LayoutAlgorithm._internalMultiPlatform(
@@ -103,8 +103,8 @@ class LayoutAlgorithm {
   ///Gets [String] value.
   String toValue() => _value;
 
-  ///Gets [String] native value.
-  String toNativeValue() => _nativeValue;
+  ///Gets [String] native value if supported by the current platform, otherwise `null`.
+  String? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -127,7 +127,7 @@ class LayoutAlgorithm {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override
@@ -141,7 +141,7 @@ class LayoutAlgorithm {
 @Deprecated('Use LayoutAlgorithm instead')
 class AndroidLayoutAlgorithm {
   final String _value;
-  final String _nativeValue;
+  final String? _nativeValue;
   const AndroidLayoutAlgorithm._internal(this._value, this._nativeValue);
   // ignore: unused_element
   factory AndroidLayoutAlgorithm._internalMultiPlatform(
@@ -236,8 +236,8 @@ class AndroidLayoutAlgorithm {
   ///Gets [String] value.
   String toValue() => _value;
 
-  ///Gets [String] native value.
-  String toNativeValue() => _nativeValue;
+  ///Gets [String] native value if supported by the current platform, otherwise `null`.
+  String? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -260,7 +260,7 @@ class AndroidLayoutAlgorithm {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override

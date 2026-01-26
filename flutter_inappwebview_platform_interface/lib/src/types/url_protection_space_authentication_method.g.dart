@@ -9,7 +9,7 @@ part of 'url_protection_space_authentication_method.dart';
 ///Class that represents the constants describing known values of the [URLProtectionSpace.authenticationMethod] property.
 class URLProtectionSpaceAuthenticationMethod {
   final String _value;
-  final String _nativeValue;
+  final String? _nativeValue;
   const URLProtectionSpaceAuthenticationMethod._internal(
     this._value,
     this._nativeValue,
@@ -159,8 +159,8 @@ class URLProtectionSpaceAuthenticationMethod {
   ///Gets [String] value.
   String toValue() => _value;
 
-  ///Gets [String] native value.
-  String toNativeValue() => _nativeValue;
+  ///Gets [String] native value if supported by the current platform, otherwise `null`.
+  String? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -193,7 +193,7 @@ class URLProtectionSpaceAuthenticationMethod {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override
@@ -207,7 +207,7 @@ class URLProtectionSpaceAuthenticationMethod {
 @Deprecated('Use URLProtectionSpaceAuthenticationMethod instead')
 class IOSNSURLProtectionSpaceAuthenticationMethod {
   final String _value;
-  final String _nativeValue;
+  final String? _nativeValue;
   const IOSNSURLProtectionSpaceAuthenticationMethod._internal(
     this._value,
     this._nativeValue,
@@ -362,8 +362,8 @@ class IOSNSURLProtectionSpaceAuthenticationMethod {
   ///Gets [String] value.
   String toValue() => _value;
 
-  ///Gets [String] native value.
-  String toNativeValue() => _nativeValue;
+  ///Gets [String] native value if supported by the current platform, otherwise `null`.
+  String? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -396,7 +396,7 @@ class IOSNSURLProtectionSpaceAuthenticationMethod {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override

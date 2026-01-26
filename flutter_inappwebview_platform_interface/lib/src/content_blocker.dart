@@ -153,27 +153,51 @@ class ContentBlockerTrigger {
   Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     List<String> resourceTypeStringList = [];
     resourceType.forEach((type) {
-      resourceTypeStringList.add(switch (enumMethod ?? EnumMethod.nativeValue) {
-        EnumMethod.nativeValue => type.toNativeValue(),
-        EnumMethod.value => type.toValue(),
-        EnumMethod.name => type.name(),
-      });
+      switch (enumMethod ?? EnumMethod.nativeValue) {
+        case EnumMethod.nativeValue:
+          if (type.isSupported()) {
+            resourceTypeStringList.add(type.toNativeValue()!);
+          }
+          break;
+        case EnumMethod.value:
+          resourceTypeStringList.add(type.toValue());
+          break;
+        case EnumMethod.name:
+          resourceTypeStringList.add(type.name());
+          break;
+      }
     });
     List<String> loadTypeStringList = [];
     loadType.forEach((type) {
-      loadTypeStringList.add(switch (enumMethod ?? EnumMethod.nativeValue) {
-        EnumMethod.nativeValue => type.toNativeValue(),
-        EnumMethod.value => type.toValue(),
-        EnumMethod.name => type.name(),
-      });
+      switch (enumMethod ?? EnumMethod.nativeValue) {
+        case EnumMethod.nativeValue:
+          if (type.isSupported()) {
+            loadTypeStringList.add(type.toNativeValue()!);
+          }
+          break;
+        case EnumMethod.value:
+          loadTypeStringList.add(type.toValue());
+          break;
+        case EnumMethod.name:
+          loadTypeStringList.add(type.name());
+          break;
+      }
     });
     List<String> loadContextStringList = [];
     loadContext.forEach((type) {
-      loadContextStringList.add(switch (enumMethod ?? EnumMethod.nativeValue) {
-        EnumMethod.nativeValue => type.toNativeValue(),
-        EnumMethod.value => type.toValue(),
-        EnumMethod.name => type.name(),
-      });
+      switch (enumMethod ?? EnumMethod.nativeValue) {
+        case EnumMethod.nativeValue:
+          if (type.isSupported()) {
+            loadContextStringList.add(type.toNativeValue()!);
+          }
+          break;
+        case EnumMethod.value:
+          loadContextStringList.add(type.toValue());
+          break;
+        case EnumMethod.name:
+          loadContextStringList.add(type.name());
+          break;
+      }
     });
 
     Map<String, dynamic> map = {

@@ -9,7 +9,7 @@ part of 'dismiss_button_style.dart';
 ///Class used to set the custom style for the dismiss button.
 class DismissButtonStyle {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const DismissButtonStyle._internal(this._value, this._nativeValue);
   // ignore: unused_element
   factory DismissButtonStyle._internalMultiPlatform(
@@ -95,8 +95,8 @@ class DismissButtonStyle {
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -119,7 +119,7 @@ class DismissButtonStyle {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override
@@ -136,7 +136,7 @@ class DismissButtonStyle {
 @Deprecated('Use DismissButtonStyle instead')
 class IOSSafariDismissButtonStyle {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const IOSSafariDismissButtonStyle._internal(this._value, this._nativeValue);
   // ignore: unused_element
   factory IOSSafariDismissButtonStyle._internalMultiPlatform(
@@ -223,8 +223,8 @@ class IOSSafariDismissButtonStyle {
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -247,7 +247,7 @@ class IOSSafariDismissButtonStyle {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override

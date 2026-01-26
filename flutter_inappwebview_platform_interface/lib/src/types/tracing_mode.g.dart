@@ -9,7 +9,7 @@ part of 'tracing_mode.dart';
 ///Constants that describe the results summary the find panel UI includes.
 class TracingMode {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const TracingMode._internal(this._value, this._nativeValue);
   // ignore: unused_element
   factory TracingMode._internalMultiPlatform(int value, Function nativeValue) =>
@@ -94,8 +94,8 @@ class TracingMode {
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -116,7 +116,7 @@ class TracingMode {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override

@@ -9,7 +9,7 @@ part of 'platform_webview_feature.dart';
 ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewFeature}
 class WebViewFeature {
   final String _value;
-  final String _nativeValue;
+  final String? _nativeValue;
   const WebViewFeature._internal(this._value, this._nativeValue);
   // ignore: unused_element
   factory WebViewFeature._internalMultiPlatform(
@@ -455,8 +455,8 @@ class WebViewFeature {
   ///Gets [String] value.
   String toValue() => _value;
 
-  ///Gets [String] native value.
-  String toNativeValue() => _nativeValue;
+  ///Gets [String] native value if supported by the current platform, otherwise `null`.
+  String? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -575,7 +575,7 @@ class WebViewFeature {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override
@@ -589,7 +589,7 @@ class WebViewFeature {
 @Deprecated('Use WebViewFeature instead')
 class AndroidWebViewFeature {
   final String _value;
-  final String _nativeValue;
+  final String? _nativeValue;
   const AndroidWebViewFeature._internal(this._value, this._nativeValue);
   // ignore: unused_element
   factory AndroidWebViewFeature._internalMultiPlatform(
@@ -1007,8 +1007,8 @@ class AndroidWebViewFeature {
   ///Gets [String] value.
   String toValue() => _value;
 
-  ///Gets [String] native value.
-  String toNativeValue() => _nativeValue;
+  ///Gets [String] native value if supported by the current platform, otherwise `null`.
+  String? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -1117,7 +1117,7 @@ class AndroidWebViewFeature {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override

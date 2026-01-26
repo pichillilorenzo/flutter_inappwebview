@@ -9,7 +9,7 @@ part of 'environment_release_channels.dart';
 ///The WebView2 release channels searched for during [PlatformWebViewEnvironment] creation.
 class EnvironmentReleaseChannels {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const EnvironmentReleaseChannels._internal(this._value, this._nativeValue);
   // ignore: unused_element
   factory EnvironmentReleaseChannels._internalMultiPlatform(
@@ -124,7 +124,7 @@ class EnvironmentReleaseChannels {
           (element) => element.toNativeValue() == value,
         );
       } catch (e) {
-        return EnvironmentReleaseChannels._internal(value, value);
+        return null;
       }
     }
     return null;
@@ -165,8 +165,8 @@ class EnvironmentReleaseChannels {
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -194,12 +194,14 @@ class EnvironmentReleaseChannels {
   EnvironmentReleaseChannels operator |(EnvironmentReleaseChannels value) =>
       EnvironmentReleaseChannels._internal(
         value.toValue() | _value,
-        value.toNativeValue() | _nativeValue,
+        value.toNativeValue() != null && _nativeValue != null
+            ? value.toNativeValue()! | _nativeValue!
+            : null,
       );
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return toNativeValue() != null;
+    return _nativeValue != null;
   }
 
   @override

@@ -9,7 +9,7 @@ part of 'print_job_dialog_kind.dart';
 ///Class representing the print dialog kind used by a [PlatformPrintJobController].
 class PrintJobDialogKind {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const PrintJobDialogKind._internal(this._value, this._nativeValue);
   // ignore: unused_element
   factory PrintJobDialogKind._internalMultiPlatform(
@@ -91,8 +91,8 @@ class PrintJobDialogKind {
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -113,7 +113,7 @@ class PrintJobDialogKind {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override

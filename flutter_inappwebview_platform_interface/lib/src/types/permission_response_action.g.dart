@@ -9,7 +9,7 @@ part of 'permission_response_action.dart';
 ///Class used by [PermissionResponse] class.
 class PermissionResponseAction {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const PermissionResponseAction._internal(this._value, this._nativeValue);
   // ignore: unused_element
   factory PermissionResponseAction._internalMultiPlatform(
@@ -96,8 +96,8 @@ class PermissionResponseAction {
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -120,7 +120,7 @@ class PermissionResponseAction {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override
@@ -134,7 +134,7 @@ class PermissionResponseAction {
 @Deprecated('Use PermissionResponseAction instead')
 class PermissionRequestResponseAction {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const PermissionRequestResponseAction._internal(
     this._value,
     this._nativeValue,
@@ -220,8 +220,8 @@ class PermissionRequestResponseAction {
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -242,7 +242,7 @@ class PermissionRequestResponseAction {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override

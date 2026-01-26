@@ -9,7 +9,7 @@ part of 'print_job_output_type.dart';
 ///Class representing the kind of printable content of a [PlatformPrintJobController].
 class PrintJobOutputType {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const PrintJobOutputType._internal(this._value, this._nativeValue);
   // ignore: unused_element
   factory PrintJobOutputType._internalMultiPlatform(
@@ -109,8 +109,8 @@ class PrintJobOutputType {
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -135,7 +135,7 @@ class PrintJobOutputType {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override

@@ -2886,7 +2886,10 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
     bool autoname = false,
   }) async {
     if (!autoname) {
-      assert(filePath.endsWith("." + WebArchiveFormat.MHT.toNativeValue()));
+      assert(
+        WebArchiveFormat.MHT.isSupported() &&
+            filePath.endsWith("." + WebArchiveFormat.MHT.toNativeValue()!),
+      );
     }
 
     Map<String, dynamic> args = <String, dynamic>{};

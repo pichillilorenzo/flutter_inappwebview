@@ -9,7 +9,7 @@ part of 'data_detector_types.dart';
 ///Class used to specify a `dataDetectoryTypes` value that adds interactivity to web content that matches the value.
 class DataDetectorTypes {
   final String _value;
-  final String _nativeValue;
+  final String? _nativeValue;
   const DataDetectorTypes._internal(this._value, this._nativeValue);
   // ignore: unused_element
   factory DataDetectorTypes._internalMultiPlatform(
@@ -141,8 +141,8 @@ class DataDetectorTypes {
   ///Gets [String] value.
   String toValue() => _value;
 
-  ///Gets [String] native value.
-  String toNativeValue() => _nativeValue;
+  ///Gets [String] native value if supported by the current platform, otherwise `null`.
+  String? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -179,7 +179,7 @@ class DataDetectorTypes {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override
@@ -196,7 +196,7 @@ class DataDetectorTypes {
 @Deprecated('Use DataDetectorTypes instead')
 class IOSWKDataDetectorTypes {
   final String _value;
-  final String _nativeValue;
+  final String? _nativeValue;
   const IOSWKDataDetectorTypes._internal(this._value, this._nativeValue);
   // ignore: unused_element
   factory IOSWKDataDetectorTypes._internalMultiPlatform(
@@ -328,8 +328,8 @@ class IOSWKDataDetectorTypes {
   ///Gets [String] value.
   String toValue() => _value;
 
-  ///Gets [String] native value.
-  String toNativeValue() => _nativeValue;
+  ///Gets [String] native value if supported by the current platform, otherwise `null`.
+  String? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -366,7 +366,7 @@ class IOSWKDataDetectorTypes {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override

@@ -9,7 +9,7 @@ part of 'window_type.dart';
 ///Class that represents how a browser window should be added to the main window.
 class WindowType {
   final String _value;
-  final String _nativeValue;
+  final String? _nativeValue;
   const WindowType._internal(this._value, this._nativeValue);
   // ignore: unused_element
   factory WindowType._internalMultiPlatform(
@@ -133,8 +133,8 @@ class WindowType {
   ///Gets [String] value.
   String toValue() => _value;
 
-  ///Gets [String] native value.
-  String toNativeValue() => _nativeValue;
+  ///Gets [String] native value if supported by the current platform, otherwise `null`.
+  String? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -157,7 +157,7 @@ class WindowType {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return toNativeValue() != null;
+    return _nativeValue != null;
   }
 
   @override

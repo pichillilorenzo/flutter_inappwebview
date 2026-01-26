@@ -9,7 +9,7 @@ part of 'website_data_type.dart';
 ///Class that represents a website data type.
 class WebsiteDataType {
   final String _value;
-  final String _nativeValue;
+  final String? _nativeValue;
   const WebsiteDataType._internal(this._value, this._nativeValue);
   // ignore: unused_element
   factory WebsiteDataType._internalMultiPlatform(
@@ -172,8 +172,8 @@ class WebsiteDataType {
   ///Gets [String] value.
   String toValue() => _value;
 
-  ///Gets [String] native value.
-  String toNativeValue() => _nativeValue;
+  ///Gets [String] native value if supported by the current platform, otherwise `null`.
+  String? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -212,7 +212,7 @@ class WebsiteDataType {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override
@@ -229,7 +229,7 @@ class WebsiteDataType {
 @Deprecated('Use WebsiteDataType instead')
 class IOSWKWebsiteDataType {
   final String _value;
-  final String _nativeValue;
+  final String? _nativeValue;
   const IOSWKWebsiteDataType._internal(this._value, this._nativeValue);
   // ignore: unused_element
   factory IOSWKWebsiteDataType._internalMultiPlatform(
@@ -395,8 +395,8 @@ class IOSWKWebsiteDataType {
   ///Gets [String] value.
   String toValue() => _value;
 
-  ///Gets [String] native value.
-  String toNativeValue() => _nativeValue;
+  ///Gets [String] native value if supported by the current platform, otherwise `null`.
+  String? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -435,7 +435,7 @@ class IOSWKWebsiteDataType {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override

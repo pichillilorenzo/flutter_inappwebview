@@ -9,7 +9,7 @@ part of 'url_protection_space_proxy_type.dart';
 ///Class that represents the supported proxy types.
 class URLProtectionSpaceProxyType {
   final String _value;
-  final String _nativeValue;
+  final String? _nativeValue;
   const URLProtectionSpaceProxyType._internal(this._value, this._nativeValue);
   // ignore: unused_element
   factory URLProtectionSpaceProxyType._internalMultiPlatform(
@@ -116,8 +116,8 @@ class URLProtectionSpaceProxyType {
   ///Gets [String] value.
   String toValue() => _value;
 
-  ///Gets [String] native value.
-  String toNativeValue() => _nativeValue;
+  ///Gets [String] native value if supported by the current platform, otherwise `null`.
+  String? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -142,7 +142,7 @@ class URLProtectionSpaceProxyType {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override
@@ -156,7 +156,7 @@ class URLProtectionSpaceProxyType {
 @Deprecated('Use URLProtectionSpaceProxyType instead')
 class IOSNSURLProtectionSpaceProxyType {
   final String _value;
-  final String _nativeValue;
+  final String? _nativeValue;
   const IOSNSURLProtectionSpaceProxyType._internal(
     this._value,
     this._nativeValue,
@@ -266,8 +266,8 @@ class IOSNSURLProtectionSpaceProxyType {
   ///Gets [String] value.
   String toValue() => _value;
 
-  ///Gets [String] native value.
-  String toNativeValue() => _nativeValue;
+  ///Gets [String] native value if supported by the current platform, otherwise `null`.
+  String? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -292,7 +292,7 @@ class IOSNSURLProtectionSpaceProxyType {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override

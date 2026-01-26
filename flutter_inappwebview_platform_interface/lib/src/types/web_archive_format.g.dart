@@ -9,7 +9,7 @@ part of 'web_archive_format.dart';
 ///Class that represents the known Web Archive formats used when saving a web page.
 class WebArchiveFormat {
   final String _value;
-  final String _nativeValue;
+  final String? _nativeValue;
   const WebArchiveFormat._internal(this._value, this._nativeValue);
   // ignore: unused_element
   factory WebArchiveFormat._internalMultiPlatform(
@@ -94,8 +94,8 @@ class WebArchiveFormat {
   ///Gets [String] value.
   String toValue() => _value;
 
-  ///Gets [String] native value.
-  String toNativeValue() => _nativeValue;
+  ///Gets [String] native value if supported by the current platform, otherwise `null`.
+  String? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -116,7 +116,7 @@ class WebArchiveFormat {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override

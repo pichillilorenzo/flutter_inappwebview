@@ -9,7 +9,7 @@ part of 'url_request_attribution.dart';
 ///Class that represents the constants used to indicate the entities that can make a network request.
 class URLRequestAttribution {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const URLRequestAttribution._internal(this._value, this._nativeValue);
   // ignore: unused_element
   factory URLRequestAttribution._internalMultiPlatform(
@@ -97,8 +97,8 @@ class URLRequestAttribution {
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -119,7 +119,7 @@ class URLRequestAttribution {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override

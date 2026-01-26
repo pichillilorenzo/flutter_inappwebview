@@ -9,7 +9,7 @@ part of 'attributed_string_text_effect_style.dart';
 ///Class that represents the supported proxy types.
 class AttributedStringTextEffectStyle {
   final String _value;
-  final String _nativeValue;
+  final String? _nativeValue;
   const AttributedStringTextEffectStyle._internal(
     this._value,
     this._nativeValue,
@@ -94,8 +94,8 @@ class AttributedStringTextEffectStyle {
   ///Gets [String] value.
   String toValue() => _value;
 
-  ///Gets [String] native value.
-  String toNativeValue() => _nativeValue;
+  ///Gets [String] native value if supported by the current platform, otherwise `null`.
+  String? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -114,7 +114,7 @@ class AttributedStringTextEffectStyle {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override
@@ -128,7 +128,7 @@ class AttributedStringTextEffectStyle {
 @Deprecated('Use AttributedStringTextEffectStyle instead')
 class IOSNSAttributedStringTextEffectStyle {
   final String _value;
-  final String _nativeValue;
+  final String? _nativeValue;
   const IOSNSAttributedStringTextEffectStyle._internal(
     this._value,
     this._nativeValue,
@@ -214,8 +214,8 @@ class IOSNSAttributedStringTextEffectStyle {
   ///Gets [String] value.
   String toValue() => _value;
 
-  ///Gets [String] native value.
-  String toNativeValue() => _nativeValue;
+  ///Gets [String] native value if supported by the current platform, otherwise `null`.
+  String? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -234,7 +234,7 @@ class IOSNSAttributedStringTextEffectStyle {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override

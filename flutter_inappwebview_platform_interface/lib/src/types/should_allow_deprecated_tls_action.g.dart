@@ -10,7 +10,7 @@ part of 'should_allow_deprecated_tls_action.dart';
 ///It represents the policy to pass back to the decision handler.
 class ShouldAllowDeprecatedTLSAction {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const ShouldAllowDeprecatedTLSAction._internal(
     this._value,
     this._nativeValue,
@@ -96,8 +96,8 @@ class ShouldAllowDeprecatedTLSAction {
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -118,7 +118,7 @@ class ShouldAllowDeprecatedTLSAction {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override
@@ -133,7 +133,7 @@ class ShouldAllowDeprecatedTLSAction {
 @Deprecated('Use ShouldAllowDeprecatedTLSAction instead')
 class IOSShouldAllowDeprecatedTLSAction {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const IOSShouldAllowDeprecatedTLSAction._internal(
     this._value,
     this._nativeValue,
@@ -219,8 +219,8 @@ class IOSShouldAllowDeprecatedTLSAction {
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -241,7 +241,7 @@ class IOSShouldAllowDeprecatedTLSAction {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override

@@ -9,7 +9,7 @@ part of 'modal_presentation_style.dart';
 ///Class used to specify the modal presentation style when presenting a view controller.
 class ModalPresentationStyle {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const ModalPresentationStyle._internal(this._value, this._nativeValue);
   // ignore: unused_element
   factory ModalPresentationStyle._internalMultiPlatform(
@@ -125,8 +125,8 @@ class ModalPresentationStyle {
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -163,7 +163,7 @@ class ModalPresentationStyle {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override
@@ -177,7 +177,7 @@ class ModalPresentationStyle {
 @Deprecated('Use ModalPresentationStyle instead')
 class IOSUIModalPresentationStyle {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const IOSUIModalPresentationStyle._internal(this._value, this._nativeValue);
   // ignore: unused_element
   factory IOSUIModalPresentationStyle._internalMultiPlatform(
@@ -297,8 +297,8 @@ class IOSUIModalPresentationStyle {
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -335,7 +335,7 @@ class IOSUIModalPresentationStyle {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override

@@ -9,7 +9,7 @@ part of 'pull_to_refresh_size.dart';
 ///Class representing the size of the refresh indicator.
 class PullToRefreshSize {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const PullToRefreshSize._internal(this._value, this._nativeValue);
   // ignore: unused_element
   factory PullToRefreshSize._internalMultiPlatform(
@@ -91,8 +91,8 @@ class PullToRefreshSize {
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -113,7 +113,7 @@ class PullToRefreshSize {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override
@@ -127,7 +127,7 @@ class PullToRefreshSize {
 @Deprecated('Use PullToRefreshSize instead')
 class AndroidPullToRefreshSize {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const AndroidPullToRefreshSize._internal(this._value, this._nativeValue);
   // ignore: unused_element
   factory AndroidPullToRefreshSize._internalMultiPlatform(
@@ -210,8 +210,8 @@ class AndroidPullToRefreshSize {
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -232,7 +232,7 @@ class AndroidPullToRefreshSize {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override

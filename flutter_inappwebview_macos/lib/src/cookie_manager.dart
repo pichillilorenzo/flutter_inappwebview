@@ -151,8 +151,8 @@ class MacOSCookieManager extends PlatformCookieManager with ChannelController {
 
     if (isSecure != null && isSecure) cookieValue += "; Secure";
 
-    if (sameSite != null)
-      cookieValue += "; SameSite=" + sameSite.toNativeValue();
+    if (sameSite != null && sameSite.isSupported())
+      cookieValue += "; SameSite=" + sameSite.toNativeValue()!;
 
     cookieValue += ";";
 

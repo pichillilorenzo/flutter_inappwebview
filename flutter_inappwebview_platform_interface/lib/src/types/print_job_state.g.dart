@@ -260,7 +260,7 @@ class PrintJobState {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return toNativeValue() != null;
+    return _nativeValue != null;
   }
 
   @override

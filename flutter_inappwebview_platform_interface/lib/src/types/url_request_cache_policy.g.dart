@@ -9,7 +9,7 @@ part of 'url_request_cache_policy.dart';
 ///Class that represents the constants used to specify interaction with the cached responses.
 class URLRequestCachePolicy {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const URLRequestCachePolicy._internal(this._value, this._nativeValue);
   // ignore: unused_element
   factory URLRequestCachePolicy._internalMultiPlatform(
@@ -133,8 +133,8 @@ class URLRequestCachePolicy {
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -163,7 +163,7 @@ class URLRequestCachePolicy {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override
@@ -177,7 +177,7 @@ class URLRequestCachePolicy {
 @Deprecated('Use URLRequestCachePolicy instead')
 class IOSURLRequestCachePolicy {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const IOSURLRequestCachePolicy._internal(this._value, this._nativeValue);
   // ignore: unused_element
   factory IOSURLRequestCachePolicy._internalMultiPlatform(
@@ -300,8 +300,8 @@ class IOSURLRequestCachePolicy {
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -330,7 +330,7 @@ class IOSURLRequestCachePolicy {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override

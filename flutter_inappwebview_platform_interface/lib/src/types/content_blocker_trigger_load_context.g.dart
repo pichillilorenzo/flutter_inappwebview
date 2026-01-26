@@ -9,7 +9,7 @@ part of 'content_blocker_trigger_load_context.dart';
 ///Class that represents the kind of load context that can be used with a [ContentBlockerTrigger].
 class ContentBlockerTriggerLoadContext {
   final String _value;
-  final String _nativeValue;
+  final String? _nativeValue;
   const ContentBlockerTriggerLoadContext._internal(
     this._value,
     this._nativeValue,
@@ -101,8 +101,8 @@ class ContentBlockerTriggerLoadContext {
   ///Gets [String] value.
   String toValue() => _value;
 
-  ///Gets [String] native value.
-  String toNativeValue() => _nativeValue;
+  ///Gets [String] native value if supported by the current platform, otherwise `null`.
+  String? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -123,7 +123,7 @@ class ContentBlockerTriggerLoadContext {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override

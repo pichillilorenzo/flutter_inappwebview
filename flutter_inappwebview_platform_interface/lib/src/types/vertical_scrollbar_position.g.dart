@@ -9,7 +9,7 @@ part of 'vertical_scrollbar_position.dart';
 ///Class used to configure the position of the vertical scroll bar.
 class VerticalScrollbarPosition {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const VerticalScrollbarPosition._internal(this._value, this._nativeValue);
   // ignore: unused_element
   factory VerticalScrollbarPosition._internalMultiPlatform(
@@ -105,8 +105,8 @@ class VerticalScrollbarPosition {
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -129,7 +129,7 @@ class VerticalScrollbarPosition {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override
@@ -143,7 +143,7 @@ class VerticalScrollbarPosition {
 @Deprecated('Use VerticalScrollbarPosition instead')
 class AndroidVerticalScrollbarPosition {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const AndroidVerticalScrollbarPosition._internal(
     this._value,
     this._nativeValue,
@@ -236,8 +236,8 @@ class AndroidVerticalScrollbarPosition {
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -260,7 +260,7 @@ class AndroidVerticalScrollbarPosition {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override

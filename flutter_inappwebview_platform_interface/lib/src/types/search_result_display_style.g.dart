@@ -9,7 +9,7 @@ part of 'search_result_display_style.dart';
 ///Constants that describe the results summary the find panel UI includes.
 class SearchResultDisplayStyle {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const SearchResultDisplayStyle._internal(this._value, this._nativeValue);
   // ignore: unused_element
   factory SearchResultDisplayStyle._internalMultiPlatform(
@@ -96,8 +96,8 @@ class SearchResultDisplayStyle {
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -120,7 +120,7 @@ class SearchResultDisplayStyle {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override

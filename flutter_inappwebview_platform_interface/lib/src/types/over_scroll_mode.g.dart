@@ -10,7 +10,7 @@ part of 'over_scroll_mode.dart';
 ///Setting the over-scroll mode of a WebView will have an effect only if the `WebView` is capable of scrolling.
 class OverScrollMode {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const OverScrollMode._internal(this._value, this._nativeValue);
   // ignore: unused_element
   factory OverScrollMode._internalMultiPlatform(
@@ -95,8 +95,8 @@ class OverScrollMode {
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -119,7 +119,7 @@ class OverScrollMode {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override
@@ -134,7 +134,7 @@ class OverScrollMode {
 @Deprecated('Use OverScrollMode instead')
 class AndroidOverScrollMode {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const AndroidOverScrollMode._internal(this._value, this._nativeValue);
   // ignore: unused_element
   factory AndroidOverScrollMode._internalMultiPlatform(
@@ -223,8 +223,8 @@ class AndroidOverScrollMode {
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -247,7 +247,7 @@ class AndroidOverScrollMode {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override

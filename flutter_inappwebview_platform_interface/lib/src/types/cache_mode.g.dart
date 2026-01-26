@@ -9,7 +9,7 @@ part of 'cache_mode.dart';
 ///Class used to override the way the cache is used.
 class CacheMode {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const CacheMode._internal(this._value, this._nativeValue);
   // ignore: unused_element
   factory CacheMode._internalMultiPlatform(int value, Function nativeValue) =>
@@ -95,8 +95,8 @@ class CacheMode {
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -121,7 +121,7 @@ class CacheMode {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override
@@ -135,7 +135,7 @@ class CacheMode {
 @Deprecated('Use CacheMode instead')
 class AndroidCacheMode {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const AndroidCacheMode._internal(this._value, this._nativeValue);
   // ignore: unused_element
   factory AndroidCacheMode._internalMultiPlatform(
@@ -226,8 +226,8 @@ class AndroidCacheMode {
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -252,7 +252,7 @@ class AndroidCacheMode {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override

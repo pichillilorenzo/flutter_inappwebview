@@ -9,7 +9,7 @@ part of 'web_authentication_session_error.dart';
 ///Class that represents the error code for a web authentication session error.
 class WebAuthenticationSessionError {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const WebAuthenticationSessionError._internal(this._value, this._nativeValue);
   // ignore: unused_element
   factory WebAuthenticationSessionError._internalMultiPlatform(
@@ -98,8 +98,8 @@ class WebAuthenticationSessionError {
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -122,7 +122,7 @@ class WebAuthenticationSessionError {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override

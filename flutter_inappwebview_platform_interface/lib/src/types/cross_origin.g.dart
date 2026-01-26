@@ -11,7 +11,7 @@ part of 'cross_origin.dart';
 ///when fetching a resource `<link>` or a `<script>` (or resources fetched by the `<script>`).
 class CrossOrigin {
   final String _value;
-  final String _nativeValue;
+  final String? _nativeValue;
   const CrossOrigin._internal(this._value, this._nativeValue);
   // ignore: unused_element
   factory CrossOrigin._internalMultiPlatform(
@@ -95,8 +95,8 @@ class CrossOrigin {
   ///Gets [String] value.
   String toValue() => _value;
 
-  ///Gets [String] native value.
-  String toNativeValue() => _nativeValue;
+  ///Gets [String] native value if supported by the current platform, otherwise `null`.
+  String? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -117,7 +117,7 @@ class CrossOrigin {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override

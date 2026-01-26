@@ -9,7 +9,7 @@ part of 'user_preferred_content_mode.dart';
 ///Class that represents the content mode to prefer when loading and rendering a webpage.
 class UserPreferredContentMode {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const UserPreferredContentMode._internal(this._value, this._nativeValue);
   // ignore: unused_element
   factory UserPreferredContentMode._internalMultiPlatform(
@@ -96,8 +96,8 @@ class UserPreferredContentMode {
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -120,7 +120,7 @@ class UserPreferredContentMode {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override

@@ -9,7 +9,7 @@ part of 'content_blocker_action_type.dart';
 ///Class that represents the kind of action that can be used with a [ContentBlockerTrigger].
 class ContentBlockerActionType {
   final String _value;
-  final String _nativeValue;
+  final String? _nativeValue;
   const ContentBlockerActionType._internal(this._value, this._nativeValue);
   // ignore: unused_element
   factory ContentBlockerActionType._internalMultiPlatform(
@@ -219,8 +219,8 @@ class ContentBlockerActionType {
   ///Gets [String] value.
   String toValue() => _value;
 
-  ///Gets [String] native value.
-  String toNativeValue() => _nativeValue;
+  ///Gets [String] native value if supported by the current platform, otherwise `null`.
+  String? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -247,7 +247,7 @@ class ContentBlockerActionType {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return toNativeValue() != null;
+    return _nativeValue != null;
   }
 
   @override

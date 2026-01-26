@@ -271,7 +271,9 @@ class IOSInAppWebViewOptions
   Map<String, dynamic> toMap() {
     List<String> dataDetectorTypesList = [];
     dataDetectorTypes.forEach((dataDetectorType) {
-      dataDetectorTypesList.add(dataDetectorType.toNativeValue());
+      if (dataDetectorType.isSupported()) {
+        dataDetectorTypesList.add(dataDetectorType.toNativeValue()!);
+      }
     });
 
     return {

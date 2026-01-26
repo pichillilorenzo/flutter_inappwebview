@@ -9,7 +9,7 @@ part of 'media_capture_state.dart';
 ///Class that describes whether a media device, like a camera or microphone, is currently capturing audio or video.
 class MediaCaptureState {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const MediaCaptureState._internal(this._value, this._nativeValue);
   // ignore: unused_element
   factory MediaCaptureState._internalMultiPlatform(
@@ -95,8 +95,8 @@ class MediaCaptureState {
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -119,7 +119,7 @@ class MediaCaptureState {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override

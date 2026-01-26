@@ -244,7 +244,7 @@ class NavigationType {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return toNativeValue() != null;
+    return _nativeValue != null;
   }
 
   @override
@@ -258,7 +258,7 @@ class NavigationType {
 @Deprecated('Use NavigationType instead')
 class IOSWKNavigationType {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const IOSWKNavigationType._internal(this._value, this._nativeValue);
   // ignore: unused_element
   factory IOSWKNavigationType._internalMultiPlatform(
@@ -356,8 +356,8 @@ class IOSWKNavigationType {
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -386,7 +386,7 @@ class IOSWKNavigationType {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override

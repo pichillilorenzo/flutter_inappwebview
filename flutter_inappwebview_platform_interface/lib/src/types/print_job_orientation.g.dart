@@ -9,7 +9,7 @@ part of 'print_job_orientation.dart';
 ///Class representing the orientation of a [PlatformPrintJobController].
 class PrintJobOrientation {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const PrintJobOrientation._internal(this._value, this._nativeValue);
   // ignore: unused_element
   factory PrintJobOrientation._internalMultiPlatform(
@@ -131,8 +131,8 @@ class PrintJobOrientation {
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -153,7 +153,7 @@ class PrintJobOrientation {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return toNativeValue() != null;
+    return _nativeValue != null;
   }
 
   @override

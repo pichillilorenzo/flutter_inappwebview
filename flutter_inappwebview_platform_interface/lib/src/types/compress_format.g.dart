@@ -9,7 +9,7 @@ part of 'compress_format.dart';
 ///Class that represents the known formats a bitmap can be compressed into.
 class CompressFormat {
   final String _value;
-  final String _nativeValue;
+  final String? _nativeValue;
   const CompressFormat._internal(this._value, this._nativeValue);
   // ignore: unused_element
   factory CompressFormat._internalMultiPlatform(
@@ -140,8 +140,8 @@ class CompressFormat {
   ///Gets [String] value.
   String toValue() => _value;
 
-  ///Gets [String] native value.
-  String toNativeValue() => _nativeValue;
+  ///Gets [String] native value if supported by the current platform, otherwise `null`.
+  String? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -168,7 +168,7 @@ class CompressFormat {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return toNativeValue() != null;
+    return _nativeValue != null;
   }
 
   @override

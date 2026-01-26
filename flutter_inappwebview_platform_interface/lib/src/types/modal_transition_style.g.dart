@@ -9,7 +9,7 @@ part of 'modal_transition_style.dart';
 ///Class used to specify the transition style when presenting a view controller.
 class ModalTransitionStyle {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const ModalTransitionStyle._internal(this._value, this._nativeValue);
   // ignore: unused_element
   factory ModalTransitionStyle._internalMultiPlatform(
@@ -105,8 +105,8 @@ class ModalTransitionStyle {
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -131,7 +131,7 @@ class ModalTransitionStyle {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override
@@ -145,7 +145,7 @@ class ModalTransitionStyle {
 @Deprecated('Use ModalTransitionStyle instead')
 class IOSUIModalTransitionStyle {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const IOSUIModalTransitionStyle._internal(this._value, this._nativeValue);
   // ignore: unused_element
   factory IOSUIModalTransitionStyle._internalMultiPlatform(
@@ -242,8 +242,8 @@ class IOSUIModalTransitionStyle {
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -268,7 +268,7 @@ class IOSUIModalTransitionStyle {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override

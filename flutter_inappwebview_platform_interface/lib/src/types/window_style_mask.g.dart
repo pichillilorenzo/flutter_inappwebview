@@ -219,7 +219,7 @@ class WindowStyleMask {
           (element) => element.toNativeValue() == value,
         );
       } catch (e) {
-        return WindowStyleMask._internal(value, value);
+        return null;
       }
     }
     return null;
@@ -301,12 +301,12 @@ class WindowStyleMask {
         value.toValue() | _value,
         value.toNativeValue() != null && _nativeValue != null
             ? value.toNativeValue()! | _nativeValue!
-            : _nativeValue,
+            : null,
       );
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return toNativeValue() != null;
+    return _nativeValue != null;
   }
 
   @override

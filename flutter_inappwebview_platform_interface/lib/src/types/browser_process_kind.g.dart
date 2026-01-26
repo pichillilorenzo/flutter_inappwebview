@@ -9,7 +9,7 @@ part of 'browser_process_kind.dart';
 ///Indicates the process type used in the [BrowserProcessInfo] interface.
 class BrowserProcessKind {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const BrowserProcessKind._internal(this._value, this._nativeValue);
   // ignore: unused_element
   factory BrowserProcessKind._internalMultiPlatform(
@@ -151,7 +151,7 @@ class BrowserProcessKind {
           (element) => element.toNativeValue() == value,
         );
       } catch (e) {
-        return BrowserProcessKind._internal(value, value);
+        return null;
       }
     }
     return null;
@@ -191,8 +191,8 @@ class BrowserProcessKind {
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -224,12 +224,14 @@ class BrowserProcessKind {
   BrowserProcessKind operator |(BrowserProcessKind value) =>
       BrowserProcessKind._internal(
         value.toValue() | _value,
-        value.toNativeValue() | _nativeValue,
+        value.toNativeValue() != null && _nativeValue != null
+            ? value.toNativeValue()! | _nativeValue!
+            : null,
       );
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return toNativeValue() != null;
+    return _nativeValue != null;
   }
 
   @override

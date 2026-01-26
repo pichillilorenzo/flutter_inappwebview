@@ -9,7 +9,7 @@ part of 'action_mode_menu_item.dart';
 ///Class used to disable the action mode menu items.
 class ActionModeMenuItem {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const ActionModeMenuItem._internal(this._value, this._nativeValue);
   // ignore: unused_element
   factory ActionModeMenuItem._internalMultiPlatform(
@@ -59,7 +59,7 @@ class ActionModeMenuItem {
           (element) => element.toNativeValue() == value,
         );
       } catch (e) {
-        return ActionModeMenuItem._internal(value, value);
+        return null;
       }
     }
     return null;
@@ -99,8 +99,8 @@ class ActionModeMenuItem {
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -126,12 +126,14 @@ class ActionModeMenuItem {
   ActionModeMenuItem operator |(ActionModeMenuItem value) =>
       ActionModeMenuItem._internal(
         value.toValue() | _value,
-        value.toNativeValue() | _nativeValue,
+        value.toNativeValue() != null && _nativeValue != null
+            ? value.toNativeValue()! | _nativeValue!
+            : null,
       );
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override
@@ -148,7 +150,7 @@ class ActionModeMenuItem {
 @Deprecated('Use ActionModeMenuItem instead')
 class AndroidActionModeMenuItem {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const AndroidActionModeMenuItem._internal(this._value, this._nativeValue);
   // ignore: unused_element
   factory AndroidActionModeMenuItem._internalMultiPlatform(
@@ -201,7 +203,7 @@ class AndroidActionModeMenuItem {
           (element) => element.toNativeValue() == value,
         );
       } catch (e) {
-        return AndroidActionModeMenuItem._internal(value, value);
+        return null;
       }
     }
     return null;
@@ -242,8 +244,8 @@ class AndroidActionModeMenuItem {
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -269,12 +271,14 @@ class AndroidActionModeMenuItem {
   AndroidActionModeMenuItem operator |(AndroidActionModeMenuItem value) =>
       AndroidActionModeMenuItem._internal(
         value.toValue() | _value,
-        value.toNativeValue() | _nativeValue,
+        value.toNativeValue() != null && _nativeValue != null
+            ? value.toNativeValue()! | _nativeValue!
+            : null,
       );
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override

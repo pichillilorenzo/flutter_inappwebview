@@ -406,7 +406,7 @@ class SslErrorType {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return toNativeValue() != null;
+    return _nativeValue != null;
   }
 
   @override
@@ -421,7 +421,7 @@ class SslErrorType {
 @Deprecated('Use SslErrorType instead')
 class AndroidSslError {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const AndroidSslError._internal(this._value, this._nativeValue);
   // ignore: unused_element
   factory AndroidSslError._internalMultiPlatform(
@@ -518,8 +518,8 @@ class AndroidSslError {
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -548,7 +548,7 @@ class AndroidSslError {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override
@@ -563,7 +563,7 @@ class AndroidSslError {
 @Deprecated('Use SslErrorType instead')
 class IOSSslError {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const IOSSslError._internal(this._value, this._nativeValue);
   // ignore: unused_element
   factory IOSSslError._internalMultiPlatform(int value, Function nativeValue) =>
@@ -658,8 +658,8 @@ class IOSSslError {
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -688,7 +688,7 @@ class IOSSslError {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override

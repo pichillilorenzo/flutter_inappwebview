@@ -9,7 +9,7 @@ part of 'media_playback_state.dart';
 ///Class that describes whether an audio or video presentation is playing, paused, or suspended.
 class MediaPlaybackState {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const MediaPlaybackState._internal(this._value, this._nativeValue);
   // ignore: unused_element
   factory MediaPlaybackState._internalMultiPlatform(
@@ -99,8 +99,8 @@ class MediaPlaybackState {
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -125,7 +125,7 @@ class MediaPlaybackState {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override

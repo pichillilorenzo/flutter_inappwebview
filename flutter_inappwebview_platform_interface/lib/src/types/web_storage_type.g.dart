@@ -10,7 +10,7 @@ part of 'web_storage_type.dart';
 ///Used by the [PlatformStorage] class.
 class WebStorageType {
   final String _value;
-  final String _nativeValue;
+  final String? _nativeValue;
   const WebStorageType._internal(this._value, this._nativeValue);
   // ignore: unused_element
   factory WebStorageType._internalMultiPlatform(
@@ -98,8 +98,8 @@ class WebStorageType {
   ///Gets [String] value.
   String toValue() => _value;
 
-  ///Gets [String] native value.
-  String toNativeValue() => _nativeValue;
+  ///Gets [String] native value if supported by the current platform, otherwise `null`.
+  String? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -120,7 +120,7 @@ class WebStorageType {
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {
-    return true;
+    return _nativeValue != null;
   }
 
   @override

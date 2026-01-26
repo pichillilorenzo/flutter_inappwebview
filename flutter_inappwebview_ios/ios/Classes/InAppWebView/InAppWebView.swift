@@ -1558,6 +1558,12 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         if let applePayAPIEnabled = settings?.applePayAPIEnabled, applePayAPIEnabled {
             return
         }
+        // PATCHED: frame nil check for iPad onCreateWindow crash
+        if frame == nil {
+            print("[InAppWebView Patch] Skipping evaluateJavaScript - frame is nil")
+            completionHandler?(.failure(NSError(domain: "InAppWebViewPatch", code: -1, userInfo: [NSLocalizedDescriptionKey: "Frame is nil"])))
+            return
+        }
         super.evaluateJavaScript(javaScript, in: frame, in: contentWorld, completionHandler: completionHandler)
     }
     

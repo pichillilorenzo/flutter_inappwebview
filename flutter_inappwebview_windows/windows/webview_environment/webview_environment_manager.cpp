@@ -20,7 +20,8 @@ namespace flutter_inappwebview_plugin
 
     RegisterClass(&windowClass_);
 
-    hwnd_ = CreateWindowEx(0, windowClass_.lpszClassName, L"", 0, 0,
+    const DWORD windowStyle = WS_CHILD | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
+    hwnd_ = CreateWindowEx(0, windowClass_.lpszClassName, L"", windowStyle, 0,
       0, 0, 0,
       plugin->registrar->GetView()->GetNativeWindow(),
       nullptr,

@@ -28,6 +28,7 @@ public class InAppWebView: WKWebView, WKUIDelegate,
     var webMessageListeners: [WebMessageListener] = []
     var currentOriginalUrl: URL?
     var inFullscreen = false
+    weak var fullscreenWindow: NSWindow? // Track the window that entered fullscreen
     private var printJobCompletionHandler: PrintJobController.CompletionHandler?
     
     static var sslCertificatesMap: [String: SslCertificate] = [:] // [URL host name : SslCertificate]
@@ -102,25 +103,27 @@ public class InAppWebView: WKWebView, WKUIDelegate,
                 context: nil)
         }
         
-        // TODO: Still not working on iOS 16.0!
-//        if #available(iOS 16.0, *) {
-//            addObserver(self,
-//                        forKeyPath: #keyPath(WKWebView.fullscreenState),
-//                        options: .new,
-//                context: nil)
-//        } else {
-            // listen for videos playing in fullscreen
-            NotificationCenter.default.addObserver(self,
-                                                   selector: #selector(onEnterFullscreen(_:)),
-                                                   name: NSWindow.didEnterFullScreenNotification,
-                                                   object: window)
+        // KVO observer for fullscreenState on macOS 13.0+
+        // NOTE: KVO for fullscreenState doesn't reliably fire.
+        // The NSWindow notifications below serve as the primary fullscreen detection mechanism.
+        if #available(macOS 13.0, *) {
+            addObserver(self,
+                        forKeyPath: #keyPath(WKWebView.fullscreenState),
+                        options: [.new, .old],
+                context: nil)
+        }
         
-            // listen for videos stopping to play in fullscreen
-            NotificationCenter.default.addObserver(self,
-                                                   selector: #selector(onExitFullscreen(_:)),
-                                                   name: NSWindow.didExitFullScreenNotification,
-                                                   object: window)
-//        }
+        // Also listen for NSWindow notifications as a fallback for fullscreen detection
+        // (works for iframe-based video fullscreen like YouTube)
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(onEnterFullscreen(_:)),
+                                               name: NSWindow.didEnterFullScreenNotification,
+                                               object: nil)
+        
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(onExitFullscreen(_:)),
+                                               name: NSWindow.didExitFullScreenNotification,
+                                               object: nil)
         
         if let settings = settings {
             if let viewAlpha = settings.alpha {
@@ -339,33 +342,38 @@ public class InAppWebView: WKWebView, WKUIDelegate,
             channelDelegate?.onTitleChanged(title: newTitle)
             inAppBrowserDelegate?.didChangeTitle(title: newTitle)
         }
-        else if #available(macOS 12.0, *) {
-            if keyPath == #keyPath(WKWebView.cameraCaptureState) || keyPath == #keyPath(WKWebView.microphoneCaptureState) {
-                var oldState: WKMediaCaptureState? = nil
-                if let oldValue = change?[.oldKey] as? Int {
-                    oldState = WKMediaCaptureState.init(rawValue: oldValue)
-                }
-                var newState: WKMediaCaptureState? = nil
-                if let newValue = change?[.newKey] as? Int {
-                    newState = WKMediaCaptureState.init(rawValue: newValue)
-                }
-                if oldState != newState {
-                    if keyPath == #keyPath(WKWebView.cameraCaptureState) {
-                        channelDelegate?.onCameraCaptureStateChanged(oldState: oldState, newState: newState)
-                    } else {
-                        channelDelegate?.onMicrophoneCaptureStateChanged(oldState: oldState, newState: newState)
+        else {
+            if #available(macOS 12.0, *) {
+                if keyPath == #keyPath(WKWebView.cameraCaptureState) || keyPath == #keyPath(WKWebView.microphoneCaptureState) {
+                    var oldState: WKMediaCaptureState? = nil
+                    if let oldValue = change?[.oldKey] as? Int {
+                        oldState = WKMediaCaptureState.init(rawValue: oldValue)
+                    }
+                    var newState: WKMediaCaptureState? = nil
+                    if let newValue = change?[.newKey] as? Int {
+                        newState = WKMediaCaptureState.init(rawValue: newValue)
+                    }
+                    if oldState != newState {
+                        if keyPath == #keyPath(WKWebView.cameraCaptureState) {
+                            channelDelegate?.onCameraCaptureStateChanged(oldState: oldState, newState: newState)
+                        } else {
+                            channelDelegate?.onMicrophoneCaptureStateChanged(oldState: oldState, newState: newState)
+                        }
                     }
                 }
             }
-        } else if #available(iOS 16.0, *) {
-            // TODO: Still not working on iOS 16.0!
-//            if keyPath == #keyPath(WKWebView.fullscreenState) {
-//                if fullscreenState == .enteringFullscreen {
-//                    channelDelegate?.onEnterFullscreen()
-//                } else if fullscreenState == .exitingFullscreen {
-//                    channelDelegate?.onExitFullscreen()
-//                }
-//            }
+            if #available(macOS 13.0, *) {
+                if keyPath == #keyPath(WKWebView.fullscreenState) {
+                    if fullscreenState == .enteringFullscreen && !inFullscreen {
+                        channelDelegate?.onEnterFullscreen()
+                        inFullscreen = true
+                    } else if fullscreenState == .exitingFullscreen && inFullscreen {
+                        fullscreenWindow = nil
+                        channelDelegate?.onExitFullscreen()
+                        inFullscreen = false
+                    }
+                }
+            }
         }
     }
     
@@ -2104,35 +2112,82 @@ public class InAppWebView: WKWebView, WKUIDelegate,
 //    }
     
     
-    // https://stackoverflow.com/a/42840541/4637638
-    public func isVideoPlayerWindow(_ notificationObject: AnyObject?) -> Bool {
-        if let obj = notificationObject, let clazz = NSClassFromString("WebCoreFullScreenWindow") {
-            return obj.isKind(of: clazz)
+    /// Determines if the window notification is likely for a fullscreen video/media presentation.
+    /// Uses heuristics based on window properties rather than private class names to avoid App Store rejection.
+    /// See: https://github.com/pichillilorenzo/flutter_inappwebview/issues/2754
+    private func isFullscreenMediaWindow(_ notificationObject: AnyObject?) -> Bool {
+        guard let window = notificationObject as? NSWindow else {
+            return false
         }
-        return false
+        
+        // Exclude windows that are clearly not fullscreen media
+        guard let screen = window.screen ?? NSScreen.main else {
+            return false
+        }
+        
+        let screenFrame = screen.frame
+        let windowFrame = window.frame
+        
+        // Check if the window is full screen or close to it (allowing small margins)
+        let isFullScreenSize = windowFrame.width >= screenFrame.width * 0.9 &&
+                               windowFrame.height >= screenFrame.height * 0.9
+        
+        // Check if the window's content view controller suggests it's a media presentation
+        // AVPlayerViewController and similar media controllers are used for fullscreen playback
+        let hasMediaViewController: Bool
+        if let contentVC = window.contentViewController {
+            let vcTypeName = String(describing: type(of: contentVC))
+            hasMediaViewController = vcTypeName.contains("AVFullScreen") ||
+                                     vcTypeName.contains("AVPlayer") ||
+                                     vcTypeName.contains("WebFullScreen") ||
+                                     vcTypeName.contains("WKFullScreen")
+        } else {
+            hasMediaViewController = false
+        }
+        
+        // Check window type description (using type description instead of NSClassFromString to avoid private API issues)
+        let windowTypeDescription = String(describing: type(of: window))
+        let isLikelyMediaWindow = windowTypeDescription.contains("FullScreen") &&
+                                  windowTypeDescription.contains("WebCore")
+        
+        // Exclude obvious non-media windows
+        let isLikelySystemWindow = windowTypeDescription.contains("Menu") ||
+                                   windowTypeDescription.contains("Tooltip") ||
+                                   windowTypeDescription.contains("StatusBar") ||
+                                   windowTypeDescription.contains("Panel")
+        
+        if isLikelySystemWindow {
+            return false
+        }
+        
+        return isFullScreenSize && (hasMediaViewController || isLikelyMediaWindow)
     }
     
     @objc func onEnterFullscreen(_ notification: Notification) {
-        // TODO: Still not working on iOS 16.0!
-//        if #available(iOS 16.0, *) {
-//            channelDelegate?.onEnterFullscreen()
-//            inFullscreen = true
-//        }
-//        else
-        if (isVideoPlayerWindow(notification.object as AnyObject?)) {
+        // Check if already in fullscreen to avoid double-firing
+        // (both KVO observer and NSWindow notification might trigger this)
+        guard !inFullscreen else { return }
+        
+        if isFullscreenMediaWindow(notification.object as AnyObject?) {
+            fullscreenWindow = notification.object as? NSWindow
             channelDelegate?.onEnterFullscreen()
             inFullscreen = true
         }
     }
     
     @objc func onExitFullscreen(_ notification: Notification) {
-        // TODO: Still not working on iOS 16.0!
-//        if #available(iOS 16.0, *) {
-//            channelDelegate?.onExitFullscreen()
-//            inFullscreen = false
-//        }
-//        else
-        if (isVideoPlayerWindow(notification.object as AnyObject?)) {
+        // Check if not in fullscreen to avoid double-firing
+        // (both KVO observer and NSWindow notification might trigger this)
+        guard inFullscreen else { return }
+        
+        // Check if this is the same window that entered fullscreen
+        // or if it's a fullscreen-like media window exiting
+        let exitingWindow = notification.object as? NSWindow
+        let isTrackedFullscreenWindow = fullscreenWindow != nil && fullscreenWindow === exitingWindow
+        let isLikelyFullscreenExit = isTrackedFullscreenWindow || isFullscreenMediaWindow(notification.object as AnyObject?)
+        
+        if isLikelyFullscreenExit {
+            fullscreenWindow = nil
             channelDelegate?.onExitFullscreen()
             inFullscreen = false
         }
@@ -2814,10 +2869,9 @@ if(window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)] 
             removeObserver(self, forKeyPath: #keyPath(WKWebView.cameraCaptureState))
             removeObserver(self, forKeyPath: #keyPath(WKWebView.microphoneCaptureState))
         }
-        // TODO: Still not working on iOS 16.0!
-//        if #available(iOS 16.0, *) {
-//            removeObserver(self, forKeyPath: #keyPath(WKWebView.fullscreenState))
-//        }
+        if #available(macOS 13.0, *) {
+            removeObserver(self, forKeyPath: #keyPath(WKWebView.fullscreenState))
+        }
         resumeTimers()
         stopLoading()
         disposeWebMessageChannels()

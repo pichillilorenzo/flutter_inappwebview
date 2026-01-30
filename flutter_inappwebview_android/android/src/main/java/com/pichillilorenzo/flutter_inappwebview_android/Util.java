@@ -99,13 +99,27 @@ public class Util {
   public static <T> T invokeMethodAndWaitResult(final @NonNull MethodChannel channel,
                                                 final @NonNull String method, final @Nullable Object arguments,
                                                 final @NonNull SyncBaseCallbackResultImpl<T> callback) throws InterruptedException {
+    return invokeMethodAndWaitResult(channel, method, arguments, callback, false);
+  }
+
+  public static <T> T invokeMethodAndWaitResult(final @NonNull MethodChannel channel,
+                                                final @NonNull String method, final @Nullable Object arguments,
+                                                final @NonNull SyncBaseCallbackResultImpl<T> callback,
+                                                final @NonNull boolean priority) throws InterruptedException {
     Handler handler = new Handler(Looper.getMainLooper());
-    handler.post(new Runnable() {
+    Runnable runnable = new Runnable() {
       @Override
       public void run() {
         channel.invokeMethod(method, arguments, callback);
       }
-    });
+    };
+
+    if (priority) {
+      handler.postAtFrontOfQueue(runnable);
+    } else {
+      handler.post(runnable);
+    }
+
     callback.latch.await();
     return callback.result;
   }

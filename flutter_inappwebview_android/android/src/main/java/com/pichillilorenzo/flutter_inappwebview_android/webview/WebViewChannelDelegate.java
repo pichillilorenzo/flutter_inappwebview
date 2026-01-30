@@ -1274,7 +1274,7 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
     MethodChannel channel = getChannel();
     if (channel == null) return null;
     final SyncShouldInterceptRequestCallback callback = new SyncShouldInterceptRequestCallback();
-    return Util.invokeMethodAndWaitResult(channel, "shouldInterceptRequest", request.toMap(), callback);
+    return Util.invokeMethodAndWaitResult(channel, "shouldInterceptRequest", request.toMap(), callback, true);
   }
 
   public static class RenderProcessUnresponsiveCallback extends BaseCallbackResultImpl<Integer> {

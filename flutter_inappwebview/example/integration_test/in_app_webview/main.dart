@@ -129,7 +129,7 @@ void main() {
     // programmaticScroll();
     // shouldOverrideUrlLoading();
     // onReceivedError();
-    // webViewWindows();
+    webViewWindows();
     // interceptAjaxRequest();
     // interceptFetchRequest();
     // contentBlocker();
@@ -161,7 +161,7 @@ void main() {
     // loadData();
     // loadFile();
     // reload();
-    webHistory();
+    // webHistory();
     // getProgress();
     // getHtml();
     // getFavicons();

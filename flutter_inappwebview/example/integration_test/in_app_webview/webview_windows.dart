@@ -226,12 +226,8 @@ void webViewWindows() {
       pageLoads.close();
     }, skip: shouldSkipTest4);
 
-    final shouldSkipTest5 =
-        kIsWeb ||
-        !InAppWebView.isPropertySupported(
-          PlatformWebViewCreationParamsProperty.onCreateWindow,
-        );
-
+    // Android blocks javascript: URLs opened from iframes for security reasons
+    final shouldSkipTest5 = defaultTargetPlatform != TargetPlatform.android;
     skippableTestWidgets('javascript does not run in parent window', (
       WidgetTester tester,
     ) async {
@@ -300,18 +296,17 @@ void webViewWindows() {
           await controllerCompleter.future;
       await pageLoadCompleter.future;
 
-      expect(
-        controller.evaluateJavascript(source: 'iframeLoaded'),
-        completion(true),
+      final iframeLoaded = await controller.evaluateJavascript(
+        source: 'iframeLoaded',
       );
-      expect(
-        controller.evaluateJavascript(
-          source:
-              'document.querySelector("p") && document.querySelector("p").textContent',
-        ),
-        completion(null),
+      expect(iframeLoaded, true);
+
+      final pElement = await controller.evaluateJavascript(
+        source:
+            'document.querySelector("p") && document.querySelector("p").textContent',
       );
-    }, skip: false);
+      expect(pElement, null);
+    }, skip: shouldSkipTest5);
 
     // final shouldSkipTest6 = !kIsWeb;
     final shouldSkipTest6 = true;

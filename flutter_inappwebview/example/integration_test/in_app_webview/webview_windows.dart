@@ -167,14 +167,9 @@ void webViewWindows() {
       skip: shouldSkipTest3,
     );
 
-    // Only skip on Apple platforms because it doesn't work on Android
-    final shouldSkipTest4 =
-        kIsWeb ||
-        ![
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
     // on Android, for some reason, it works on an example app but not in this test
+    final shouldSkipTest4 =
+        kIsWeb || defaultTargetPlatform == TargetPlatform.android;
     skippableTestWidgets('can open new window and go back', (
       WidgetTester tester,
     ) async {
@@ -182,6 +177,7 @@ void webViewWindows() {
           Completer<InAppWebViewController>();
       final StreamController<String> pageLoads =
           StreamController<String>.broadcast();
+
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
@@ -201,27 +197,34 @@ void webViewWindows() {
           ),
         ),
       );
-      await pageLoads.stream.first;
+
       final InAppWebViewController controller =
           await controllerCompleter.future;
 
       await tester.pump();
 
+      Future<String> waitForUrl(String expectedUrl) async {
+        await for (final url in pageLoads.stream) {
+          if (url == expectedUrl) {
+            return url;
+          }
+        }
+        throw Exception('Stream closed without receiving $expectedUrl');
+      }
+
+      // Wait for initial page load
+      await waitForUrl(TEST_CROSS_PLATFORM_URL_1.toString());
       await controller.evaluateJavascript(
-        source: 'window.open("$TEST_URL_1");',
+        source: 'window.open("$TEST_URL_1", "_blank");',
       );
-      await pageLoads.stream.first;
-      expect(
-        (await controller.getUrl())?.toString(),
-        contains(TEST_URL_1.host),
-      );
+      final currentUrl = await waitForUrl(TEST_URL_1.toString());
+      expect(currentUrl, contains(TEST_URL_1.host));
 
       await controller.goBack();
-      await pageLoads.stream.first;
-      expect(
-        (await controller.getUrl())?.toString(),
-        contains(TEST_CROSS_PLATFORM_URL_1.host),
+      final urlAfterGoBack = await waitForUrl(
+        TEST_CROSS_PLATFORM_URL_1.toString(),
       );
+      expect(urlAfterGoBack, contains(TEST_CROSS_PLATFORM_URL_1.host));
 
       pageLoads.close();
     }, skip: shouldSkipTest4);

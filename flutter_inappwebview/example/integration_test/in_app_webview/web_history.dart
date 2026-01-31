@@ -15,6 +15,8 @@ void webHistory() {
     ) async {
       final Completer<InAppWebViewController> controllerCompleter =
           Completer<InAppWebViewController>();
+      final StreamController<String> pageLoads =
+          StreamController<String>.broadcast();
 
       await tester.pumpWidget(
         Directionality(
@@ -25,8 +27,8 @@ void webHistory() {
             onWebViewCreated: (controller) {
               controllerCompleter.complete(controller);
             },
-            onLoadStart: (controller, url) {
-              // pageLoads.add(url!.toString());
+            onLoadStop: (controller, url) {
+              pageLoads.add(url!.toString());
             },
           ),
         ),
@@ -35,8 +37,19 @@ void webHistory() {
       final InAppWebViewController controller =
           await controllerCompleter.future;
 
-      await Future.delayed(Duration(seconds: 1));
-      var url = (await controller.getUrl()).toString();
+      await tester.pump();
+
+      Future<String> waitForUrl(String expectedUrl) async {
+        await for (final url in pageLoads.stream) {
+          if (url == expectedUrl) {
+            return url;
+          }
+        }
+        throw Exception('Stream closed without receiving $expectedUrl');
+      }
+
+      // Wait for initial page load
+      var url = await waitForUrl(TEST_CROSS_PLATFORM_URL_1.toString());
       var webHistory = await controller.getCopyBackForwardList();
       expect(url, TEST_CROSS_PLATFORM_URL_1.toString());
       expect(webHistory!.currentIndex, 0);
@@ -46,9 +59,10 @@ void webHistory() {
         TEST_CROSS_PLATFORM_URL_1.toString(),
       );
 
+      // Start listening BEFORE navigation to avoid race condition
+      var loadFuture = waitForUrl(TEST_URL_1.toString());
       await controller.loadUrl(urlRequest: URLRequest(url: TEST_URL_1));
-      await Future.delayed(Duration(seconds: 1));
-      url = (await controller.getUrl()).toString();
+      url = await loadFuture;
       webHistory = await controller.getCopyBackForwardList();
       expect(url, TEST_URL_1.toString());
       expect(await controller.canGoBack(), true);
@@ -63,10 +77,9 @@ void webHistory() {
       );
       expect(webHistory.list![1].url.toString(), TEST_URL_1.toString());
 
-      await Future.delayed(Duration(seconds: 1));
+      loadFuture = waitForUrl(TEST_CROSS_PLATFORM_URL_1.toString());
       await controller.goBack();
-      await Future.delayed(Duration(seconds: 1));
-      url = (await controller.getUrl()).toString();
+      url = await loadFuture;
       webHistory = await controller.getCopyBackForwardList();
       expect(url, TEST_CROSS_PLATFORM_URL_1.toString());
       expect(await controller.canGoBack(), false);
@@ -81,10 +94,9 @@ void webHistory() {
       );
       expect(webHistory.list![1].url.toString(), TEST_URL_1.toString());
 
-      await Future.delayed(Duration(seconds: 1));
+      loadFuture = waitForUrl(TEST_URL_1.toString());
       await controller.goForward();
-      await Future.delayed(Duration(seconds: 1));
-      url = (await controller.getUrl()).toString();
+      url = await loadFuture;
       webHistory = await controller.getCopyBackForwardList();
       expect(url, TEST_URL_1.toString());
       expect(await controller.canGoBack(), true);
@@ -99,10 +111,9 @@ void webHistory() {
       );
       expect(webHistory.list![1].url.toString(), TEST_URL_1.toString());
 
-      await Future.delayed(Duration(seconds: 1));
+      loadFuture = waitForUrl(TEST_CROSS_PLATFORM_URL_1.toString());
       await controller.goTo(historyItem: webHistory.list![0]);
-      await Future.delayed(Duration(seconds: 1));
-      url = (await controller.getUrl()).toString();
+      url = await loadFuture;
       webHistory = await controller.getCopyBackForwardList();
       expect(url, TEST_CROSS_PLATFORM_URL_1.toString());
       expect(await controller.canGoBack(), false);
@@ -116,6 +127,8 @@ void webHistory() {
         TEST_CROSS_PLATFORM_URL_1.toString(),
       );
       expect(webHistory.list![1].url.toString(), TEST_URL_1.toString());
+
+      pageLoads.close();
     }, skip: shouldSkipTest1);
 
     final shouldSkipTest2 = !kIsWeb;

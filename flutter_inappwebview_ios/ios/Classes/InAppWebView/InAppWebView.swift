@@ -1760,13 +1760,15 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         }
         completeList.append(contentsOf: currentList.forwardList)
         
-        var history: [[String: String]] = []
+        var history: [[String: Any]] = []
         
-        for historyItem in completeList {
-            var historyItemMap: [String: String] = [:]
+        for (i, historyItem) in completeList.enumerated() {
+            var historyItemMap: [String: Any] = [:]
             historyItemMap["originalUrl"] = historyItem.initialURL.absoluteString
             historyItemMap["title"] = historyItem.title
             historyItemMap["url"] = historyItem.url.absoluteString
+            historyItemMap["index"] = i
+            historyItemMap["offset"] = i - currentIndex
             history.append(historyItemMap)
         }
         

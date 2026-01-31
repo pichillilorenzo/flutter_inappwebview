@@ -1,13 +1,9 @@
 part of 'main.dart';
 
 void contentBlocker() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebViewSettings.isPropertySupported(
+    InAppWebViewSettingsProperty.contentBlockers,
+  );
 
   skippableTestWidgets('Content Blocker', (WidgetTester tester) async {
     final Completer<InAppWebViewController> controllerCompleter =

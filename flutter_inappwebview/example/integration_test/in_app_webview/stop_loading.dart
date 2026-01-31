@@ -1,13 +1,9 @@
 part of 'main.dart';
 
 void stopLoading() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebViewController.isMethodSupported(
+    PlatformInAppWebViewControllerMethod.stopLoading,
+  );
 
   skippableTestWidgets('stopLoading', (WidgetTester tester) async {
     final Completer<InAppWebViewController> controllerCompleter =

@@ -15,6 +15,8 @@ part 'run_and_dispose.dart';
 part 'set_get_settings.dart';
 
 void main() {
+  final shouldSkip = !HeadlessInAppWebView.isClassSupported();
+
   skippableGroup('HeadlessInAppWebView', () {
     supported();
     runAndDispose();
@@ -22,5 +24,5 @@ void main() {
     customSize();
     setGetSettings();
     convertToInAppWebView();
-  });
+  }, skip: shouldSkip);
 }

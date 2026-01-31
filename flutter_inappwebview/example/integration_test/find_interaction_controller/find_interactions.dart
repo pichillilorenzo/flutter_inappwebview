@@ -1,13 +1,7 @@
 part of 'main.dart';
 
 void findInteractions() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !FindInteractionController.isClassSupported();
 
   skippableTestWidgets('find interactions', (WidgetTester tester) async {
     final Completer<void> pageLoaded = Completer<void>();
@@ -42,9 +36,8 @@ void findInteractions() {
       completes,
     );
     expect(await findInteractionController.getSearchText(), firstSearchText);
-    if ([TargetPlatform.android].contains(defaultTargetPlatform)) {
-      await Future.delayed(Duration(seconds: 1));
-    }
+    // Allow extra time for find results to be processed
+    await Future.delayed(Duration(seconds: 1));
     final session = await findInteractionController.getActiveFindSession();
     expect(session!.resultCount, 2);
     await expectLater(
@@ -62,10 +55,9 @@ void findInteractions() {
       findInteractionController.setSearchText(secondSearchText),
       completes,
     );
-    if ([
-      TargetPlatform.iOS,
-      TargetPlatform.macOS,
-    ].contains(defaultTargetPlatform)) {
+    if (FindInteractionController.isMethodSupported(
+      PlatformFindInteractionControllerMethod.presentFindNavigator,
+    )) {
       await expectLater(
         findInteractionController.presentFindNavigator(),
         completes,

@@ -1,9 +1,9 @@
 part of 'main.dart';
 
 void apply() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![TargetPlatform.android].contains(defaultTargetPlatform);
+  final shouldSkip = !ProcessGlobalConfig.isMethodSupported(
+    PlatformProcessGlobalConfigMethod.apply,
+  );
 
   skippableTestWidgets('apply', (WidgetTester tester) async {
     await expectLater(

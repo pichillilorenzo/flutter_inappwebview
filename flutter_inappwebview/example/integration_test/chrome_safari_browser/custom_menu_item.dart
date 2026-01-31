@@ -1,12 +1,9 @@
 part of 'main.dart';
 
 void customMenuItem() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !ChromeSafariBrowser.isMethodSupported(
+    PlatformChromeSafariBrowserMethod.addMenuItem,
+  );
 
   skippableTest('add custom menu item', () async {
     var chromeSafariBrowser = MyChromeSafariBrowser();

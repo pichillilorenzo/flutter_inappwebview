@@ -1,13 +1,9 @@
 part of 'main.dart';
 
 void shouldOverrideUrlLoading() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebView.isPropertySupported(
+    PlatformWebViewCreationParamsProperty.shouldOverrideUrlLoading,
+  );
 
   skippableGroup('shouldOverrideUrlLoading', () {
     final String page =
@@ -58,12 +54,13 @@ void shouldOverrideUrlLoading() {
       pageLoads.close();
     });
 
-    final shouldSkipTest2 = kIsWeb
-        ? true
-        : ![
-            TargetPlatform.iOS,
-            TargetPlatform.macOS,
-          ].contains(defaultTargetPlatform);
+    // iOS/macOS only test for NavigationType.LINK_ACTIVATED
+    final shouldSkipTest2 =
+        kIsWeb ||
+        ![
+          TargetPlatform.iOS,
+          TargetPlatform.macOS,
+        ].contains(defaultTargetPlatform);
 
     testWidgets(
       'allow requests on iOS only if navigationType == NavigationType.LINK_ACTIVATED',

@@ -1,22 +1,14 @@
 part of 'main.dart';
 
 void webHistory() {
-  final shouldSkip = kIsWeb
-      ? false
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebViewController.isMethodSupported(
+    PlatformInAppWebViewControllerMethod.getCopyBackForwardList,
+  );
 
   skippableGroup('web history', () {
-    final shouldSkipTest1 = kIsWeb
-        ? true
-        : ![
-            TargetPlatform.android,
-            TargetPlatform.iOS,
-            TargetPlatform.macOS,
-          ].contains(defaultTargetPlatform);
+    final shouldSkipTest1 = !InAppWebViewController.isMethodSupported(
+      PlatformInAppWebViewControllerMethod.getCopyBackForwardList,
+    );
 
     skippableTestWidgets('get history list and go back/forward', (
       WidgetTester tester,
@@ -184,9 +176,9 @@ void webHistory() {
       pageLoads.close();
     }, skip: shouldSkipTest2);
 
-    final shouldSkipTest3 = kIsWeb
-        ? true
-        : ![TargetPlatform.android].contains(defaultTargetPlatform);
+    final shouldSkipTest3 = !InAppWebViewController.isMethodSupported(
+      PlatformInAppWebViewControllerMethod.clearHistory,
+    );
 
     skippableTestWidgets('clearHistory', (WidgetTester tester) async {
       final Completer<InAppWebViewController> controllerCompleter =

@@ -1,13 +1,7 @@
 part of 'main.dart';
 
 void httpAuthCredentialDatabase() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !HttpAuthCredentialDatabase.isClassSupported();
 
   skippableGroup('Http Auth Credential Database', () {
     skippableTestWidgets('use saved credentials', (WidgetTester tester) async {

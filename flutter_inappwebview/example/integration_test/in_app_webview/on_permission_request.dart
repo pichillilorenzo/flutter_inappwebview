@@ -1,13 +1,9 @@
 part of 'main.dart';
 
 void onPermissionRequest() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebView.isPropertySupported(
+    PlatformWebViewCreationParamsProperty.onPermissionRequest,
+  );
 
   final expectedValue = [PermissionResourceType.CAMERA];
 
@@ -53,11 +49,9 @@ void onPermissionRequest() {
     expect(listEquals(resources, expectedValue), true);
   }, skip: shouldSkip);
 
-  // final shouldSkip2 = kIsWeb
-  //     ? true
-  //     : ![
-  //         TargetPlatform.android,
-  //       ].contains(defaultTargetPlatform);
+  // final shouldSkip2 = !InAppWebView.isPropertySupported(
+  //   PlatformWebViewCreationParamsProperty.onPermissionRequestCanceled,
+  // );
   // TODO: this test is not working
   final shouldSkip2 = true;
 

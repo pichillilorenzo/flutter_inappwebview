@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:collection';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -26,6 +27,10 @@ void skippableGroup(
 }) {
   if (!skip) {
     group(description.toString(), body, skip: skip);
+  } else {
+    print(
+      'SKIPPING GROUP "$description" for platform ${defaultTargetPlatform.toString()}',
+    );
   }
 }
 
@@ -50,6 +55,10 @@ void skippableTest(
       tags: tags,
       retry: retry,
     );
+  } else {
+    print(
+      'SKIPPING TEST "$description" for platform ${defaultTargetPlatform.toString()}',
+    );
   }
 }
 
@@ -71,6 +80,10 @@ void skippableTestWidgets(
       semanticsEnabled: semanticsEnabled,
       variant: variant,
       tags: tags,
+    );
+  } else {
+    print(
+      'SKIPPING TEST WIDGET "$description" for platform ${defaultTargetPlatform.toString()}',
     );
   }
 }

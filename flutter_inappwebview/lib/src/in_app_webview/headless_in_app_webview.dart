@@ -27,9 +27,13 @@ class HeadlessInAppWebView {
   final PlatformHeadlessInAppWebView platform;
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView.id}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView.id.supported_platforms}
   String get id => platform.id;
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView.webViewController}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView.webViewController.supported_platforms}
   InAppWebViewController? get webViewController {
     final webViewControllerPlatform = platform.webViewController;
     if (webViewControllerPlatform == null) {

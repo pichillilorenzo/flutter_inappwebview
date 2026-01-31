@@ -1,9 +1,9 @@
 part of 'main.dart';
 
 void customTabs() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![TargetPlatform.android].contains(defaultTargetPlatform);
+  final shouldSkip = !ChromeSafariBrowser.isMethodSupported(
+    PlatformChromeSafariBrowserMethod.launchUrl,
+  );
 
   skippableGroup('Custom Tabs', () {
     skippableTest('custom referrer', () async {

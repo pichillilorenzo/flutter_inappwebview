@@ -1,12 +1,9 @@
 part of 'main.dart';
 
 void convertToInAppWebView() {
-  final shouldSkip = kIsWeb
-      ? false
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebView.isPropertySupported(
+    PlatformInAppWebViewWidgetCreationParamsProperty.headlessWebView,
+  );
 
   skippableTestWidgets('convert to InAppWebView', (WidgetTester tester) async {
     final Completer<InAppWebViewController> controllerCompleter =

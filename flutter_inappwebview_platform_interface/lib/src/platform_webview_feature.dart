@@ -6,22 +6,35 @@ import 'inappwebview_platform.dart';
 
 part 'platform_webview_feature.g.dart';
 
+///{@template flutter_inappwebview_platform_interface.PlatformWebViewFeatureCreationParams}
 /// Object specifying creation parameters for creating a [PlatformWebViewFeature].
 ///
 /// Platform specific implementations can add additional fields by extending
 /// this class.
+///{@endtemplate}
+///
+///{@macro flutter_inappwebview_platform_interface.PlatformWebViewFeatureCreationParams.supported_platforms}
+@SupportedPlatforms(platforms: [AndroidPlatform()])
 @immutable
 class PlatformWebViewFeatureCreationParams {
   /// Used by the platform implementation to create a new [PlatformWebViewFeature].
   const PlatformWebViewFeatureCreationParams();
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformWebViewFeatureCreationParams.isClassSupported}
+  ///Check if the current class is supported by the [defaultTargetPlatform] or a specific [platform].
+  ///{@endtemplate}
+  bool isClassSupported({TargetPlatform? platform}) =>
+      _PlatformWebViewFeatureCreationParamsClassSupported.isClassSupported(
+        platform: platform,
+      );
 }
 
 ///{@template flutter_inappwebview_platform_interface.PlatformWebViewFeature}
 ///Class that represents an Android-specific utility class for checking which WebView Support Library features are supported on the device.
-///
-///**Officially Supported Platforms/Implementations**:
-///- Android native WebView
 ///{@endtemplate}
+///
+///{@macro flutter_inappwebview_platform_interface.PlatformWebViewFeature.supported_platforms}
+@SupportedPlatforms(platforms: [AndroidPlatform()])
 abstract class PlatformWebViewFeature extends PlatformInterface {
   /// Creates a new [PlatformWebViewFeature]
   factory PlatformWebViewFeature(PlatformWebViewFeatureCreationParams params) {
@@ -79,9 +92,18 @@ abstract class PlatformWebViewFeature extends PlatformInterface {
   ///**Note**: If this method returns `false`, it is not safe to invoke the methods
   ///requiring the desired feature.
   ///Furthermore, if this method returns `false` for a particular feature, any callback guarded by that feature will not be invoked.
-  ///
-  ///**Official Android API**: https://developer.android.com/reference/androidx/webkit/WebViewFeature#isFeatureSupported(java.lang.String)
   ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewFeature.isFeatureSupported.supported_platforms}
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(
+        apiName: 'WebViewFeature.isFeatureSupported',
+        apiUrl:
+            'https://developer.android.com/reference/androidx/webkit/WebViewFeature#isFeatureSupported(java.lang.String)',
+      ),
+    ],
+  )
   Future<bool> isFeatureSupported(WebViewFeature feature) {
     throw UnimplementedError(
       'isFeatureSupported is not implemented on the current platform',
@@ -102,14 +124,38 @@ abstract class PlatformWebViewFeature extends PlatformInterface {
   ///**Note**: If this method returns `false`, it is not safe to invoke the methods requiring the desired feature.
   ///Furthermore, if this method returns `false` for a particular feature,
   ///any callback guarded by that feature will not be invoked.
-  ///
-  ///**Official Android API**: https://developer.android.com/reference/androidx/webkit/WebViewFeature#isFeatureSupported(java.lang.String)
   ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewFeature.isStartupFeatureSupported.supported_platforms}
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(
+        apiName: 'WebViewFeature.isStartupFeatureSupported',
+        apiUrl:
+            'https://developer.android.com/reference/androidx/webkit/WebViewFeature#isStartupFeatureSupported(android.content.Context,java.lang.String)',
+      ),
+    ],
+  )
   Future<bool> isStartupFeatureSupported(WebViewFeature startupFeature) {
     throw UnimplementedError(
       'isStartupFeatureSupported is not implemented on the current platform',
     );
   }
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewFeatureCreationParams.isClassSupported}
+  bool isClassSupported({TargetPlatform? platform}) =>
+      params.isClassSupported(platform: platform);
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformWebViewFeature.isMethodSupported}
+  ///Check if the given [method] is supported by the [defaultTargetPlatform] or a specific [platform].
+  ///{@endtemplate}
+  bool isMethodSupported(
+    PlatformWebViewFeatureMethod method, {
+    TargetPlatform? platform,
+  }) => _PlatformWebViewFeatureMethodSupported.isMethodSupported(
+    method,
+    platform: platform,
+  );
 }
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewFeature}

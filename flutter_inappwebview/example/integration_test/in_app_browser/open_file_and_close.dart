@@ -1,13 +1,7 @@
 part of 'main.dart';
 
 void openFileAndClose() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppBrowser.isClassSupported();
 
   skippableTest('open file and close', () async {
     var inAppBrowser = new MyInAppBrowser();

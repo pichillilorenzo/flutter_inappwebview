@@ -1,12 +1,9 @@
 part of 'main.dart';
 
 void loadFileUrl() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebViewSettings.isPropertySupported(
+    InAppWebViewSettingsProperty.allowingReadAccessTo,
+  );
 
   skippableGroup('load file URL', () {
     late Directory appSupportDir;

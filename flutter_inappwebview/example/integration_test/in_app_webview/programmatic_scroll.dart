@@ -1,22 +1,14 @@
 part of 'main.dart';
 
 void programmaticScroll() {
-  final shouldSkip = kIsWeb
-      ? false
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebViewController.isMethodSupported(
+    PlatformInAppWebViewControllerMethod.scrollTo,
+  );
 
   skippableGroup('Programmatic Scroll', () {
-    final shouldSkipTest1 = kIsWeb
-        ? false
-        : ![
-            TargetPlatform.android,
-            TargetPlatform.iOS,
-            TargetPlatform.macOS,
-          ].contains(defaultTargetPlatform);
+    final shouldSkipTest1 = !InAppWebViewController.isMethodSupported(
+      PlatformInAppWebViewControllerMethod.scrollTo,
+    );
 
     skippableTestWidgets('set and get scroll position', (
       WidgetTester tester,
@@ -94,9 +86,11 @@ void programmaticScroll() {
       expect(scrollPosY, Y_SCROLL * 2);
     }, skip: shouldSkipTest1);
 
-    final shouldSkipTest2 = kIsWeb
-        ? true
-        : ![TargetPlatform.android].contains(defaultTargetPlatform);
+    final shouldSkipTest2 =
+        kIsWeb ||
+        !InAppWebViewSettings.isPropertySupported(
+          InAppWebViewSettingsProperty.useHybridComposition,
+        );
 
     testWidgets(
       'set and get scroll position on Android without Hybrid Composition',

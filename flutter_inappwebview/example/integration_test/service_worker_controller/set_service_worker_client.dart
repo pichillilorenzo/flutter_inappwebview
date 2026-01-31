@@ -1,9 +1,9 @@
 part of 'main.dart';
 
 void setServiceWorkerClient() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![TargetPlatform.android].contains(defaultTargetPlatform);
+  final shouldSkip = !ServiceWorkerController.isMethodSupported(
+    PlatformServiceWorkerControllerMethod.setServiceWorkerClient,
+  );
 
   skippableTestWidgets('setServiceWorkerClient to null', (
     WidgetTester tester,

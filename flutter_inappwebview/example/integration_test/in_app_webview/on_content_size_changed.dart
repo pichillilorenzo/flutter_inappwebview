@@ -1,12 +1,9 @@
 part of 'main.dart';
 
 void onContentSizeChanged() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebView.isPropertySupported(
+    PlatformWebViewCreationParamsProperty.onContentSizeChanged,
+  );
 
   skippableTestWidgets('onContentSizeChanged', (WidgetTester tester) async {
     final Completer<void> onContentSizeChangedCompleter = Completer<void>();

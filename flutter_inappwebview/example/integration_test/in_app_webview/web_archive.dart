@@ -1,21 +1,14 @@
 part of 'main.dart';
 
 void webArchive() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebViewController.isMethodSupported(
+    PlatformInAppWebViewControllerMethod.saveWebArchive,
+  );
 
   skippableGroup('web archive', () {
-    final shouldSkipTest1 = kIsWeb
-        ? true
-        : ![
-            TargetPlatform.iOS,
-            TargetPlatform.macOS,
-          ].contains(defaultTargetPlatform);
+    final shouldSkipTest1 = !InAppWebViewController.isMethodSupported(
+      PlatformInAppWebViewControllerMethod.createWebArchiveData,
+    );
 
     skippableTestWidgets('create data', (WidgetTester tester) async {
       final Completer<InAppWebViewController> controllerCompleter =

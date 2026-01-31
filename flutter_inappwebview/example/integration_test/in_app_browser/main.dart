@@ -15,7 +15,7 @@ part 'hide_and_show.dart';
 part 'custom_menu_items.dart';
 
 void main() {
-  final shouldSkip = kIsWeb;
+  final shouldSkip = !InAppBrowser.isClassSupported();
 
   skippableGroup('InAppBrowser', () {
     supported();

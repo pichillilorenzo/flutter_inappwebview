@@ -41,6 +41,14 @@ class DefaultInAppLocalhostServer extends PlatformInAppLocalhostServer {
   String _documentRoot = './';
   Future<bool> Function(HttpRequest)? _customOnData;
 
+  static final DefaultInAppLocalhostServer _staticValue =
+      DefaultInAppLocalhostServer(
+        const PlatformInAppLocalhostServerCreationParams(),
+      );
+
+  /// Creates a new empty [DefaultInAppLocalhostServer] to access static methods.
+  factory DefaultInAppLocalhostServer.static() => _staticValue;
+
   /// Creates a new [DefaultInAppLocalhostServer].
   DefaultInAppLocalhostServer(PlatformInAppLocalhostServerCreationParams params)
     : super.implementation(

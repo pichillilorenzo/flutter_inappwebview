@@ -1,12 +1,9 @@
 part of 'main.dart';
 
 void applePayAPI() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebViewSettings.isPropertySupported(
+    InAppWebViewSettingsProperty.applePayAPIEnabled,
+  );
 
   skippableTestWidgets('Apple Pay API enabled', (WidgetTester tester) async {
     final Completer<void> pageLoaded = Completer<void>();

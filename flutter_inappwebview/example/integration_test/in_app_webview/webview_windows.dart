@@ -1,22 +1,16 @@
 part of 'main.dart';
 
 void webViewWindows() {
-  final shouldSkip = kIsWeb
-      ? false
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebView.isPropertySupported(
+    PlatformWebViewCreationParamsProperty.onCreateWindow,
+  );
 
   skippableGroup('WebView Windows', () {
-    final shouldSkipTest1 = kIsWeb
-        ? true
-        : ![
-            TargetPlatform.android,
-            TargetPlatform.iOS,
-            TargetPlatform.macOS,
-          ].contains(defaultTargetPlatform);
+    final shouldSkipTest1 =
+        kIsWeb ||
+        !InAppWebView.isPropertySupported(
+          PlatformWebViewCreationParamsProperty.onCreateWindow,
+        );
 
     skippableTestWidgets('onCreateWindow return false', (
       WidgetTester tester,
@@ -54,13 +48,11 @@ void webViewWindows() {
       await expectLater(pageLoaded.future, completes);
     }, skip: shouldSkipTest1);
 
-    final shouldSkipTest2 = kIsWeb
-        ? true
-        : ![
-            TargetPlatform.android,
-            TargetPlatform.iOS,
-            TargetPlatform.macOS,
-          ].contains(defaultTargetPlatform);
+    final shouldSkipTest2 =
+        kIsWeb ||
+        !InAppWebView.isPropertySupported(
+          PlatformWebViewCreationParamsProperty.windowId,
+        );
 
     skippableTestWidgets('onCreateWindow return true', (
       WidgetTester tester,
@@ -127,13 +119,11 @@ void webViewWindows() {
       await expectLater(onCloseWindowCompleter.future, completes);
     }, skip: shouldSkipTest2);
 
-    final shouldSkipTest3 = kIsWeb
-        ? true
-        : ![
-            TargetPlatform.android,
-            TargetPlatform.iOS,
-            TargetPlatform.macOS,
-          ].contains(defaultTargetPlatform);
+    final shouldSkipTest3 =
+        kIsWeb ||
+        !InAppWebView.isPropertySupported(
+          PlatformWebViewCreationParamsProperty.onCreateWindow,
+        );
 
     skippableTestWidgets(
       'window.open() with target _blank opens in same window',
@@ -177,12 +167,13 @@ void webViewWindows() {
       skip: shouldSkipTest3,
     );
 
-    final shouldSkipTest4 = kIsWeb
-        ? true
-        : ![
-            TargetPlatform.iOS,
-            TargetPlatform.macOS,
-          ].contains(defaultTargetPlatform);
+    // Only skip on Apple platforms because it doesn't work on Android
+    final shouldSkipTest4 =
+        kIsWeb ||
+        ![
+          TargetPlatform.iOS,
+          TargetPlatform.macOS,
+        ].contains(defaultTargetPlatform);
     // on Android, for some reason, it works on an example app but not in this test
     skippableTestWidgets('can open new window and go back', (
       WidgetTester tester,
@@ -235,13 +226,11 @@ void webViewWindows() {
       pageLoads.close();
     }, skip: shouldSkipTest4);
 
-    final shouldSkipTest5 = kIsWeb
-        ? true
-        : ![
-            TargetPlatform.android,
-            TargetPlatform.iOS,
-            TargetPlatform.macOS,
-          ].contains(defaultTargetPlatform);
+    final shouldSkipTest5 =
+        kIsWeb ||
+        !InAppWebView.isPropertySupported(
+          PlatformWebViewCreationParamsProperty.onCreateWindow,
+        );
 
     skippableTestWidgets('javascript does not run in parent window', (
       WidgetTester tester,
@@ -322,7 +311,7 @@ void webViewWindows() {
         ),
         completion(null),
       );
-    }, skip: shouldSkipTest5);
+    }, skip: false);
 
     // final shouldSkipTest6 = !kIsWeb;
     final shouldSkipTest6 = true;

@@ -1,13 +1,7 @@
 part of 'main.dart';
 
 void setGetSettings() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppBrowser.isClassSupported();
 
   skippableTest('set/get settings', () async {
     var inAppBrowser = new MyInAppBrowser();

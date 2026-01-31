@@ -1,13 +1,9 @@
 part of 'main.dart';
 
 void userScripts() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebViewController.isMethodSupported(
+    PlatformInAppWebViewControllerMethod.addUserScript,
+  );
 
   skippableGroup('user scripts', () {
     skippableTestWidgets('initialUserScripts', (WidgetTester tester) async {

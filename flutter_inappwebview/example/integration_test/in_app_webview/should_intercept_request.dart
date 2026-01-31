@@ -1,9 +1,9 @@
 part of 'main.dart';
 
 void shouldInterceptRequest() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![TargetPlatform.android].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebView.isPropertySupported(
+    PlatformWebViewCreationParamsProperty.shouldInterceptRequest,
+  );
 
   skippableTestWidgets('shouldInterceptRequest', (WidgetTester tester) async {
     List<String> resourceList = [

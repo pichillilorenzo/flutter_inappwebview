@@ -1,9 +1,13 @@
 part of 'main.dart';
 
 void startAndStop() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![TargetPlatform.android].contains(defaultTargetPlatform);
+  final shouldSkip =
+      !TracingController.isMethodSupported(
+        PlatformTracingControllerMethod.start,
+      ) ||
+      !TracingController.isMethodSupported(
+        PlatformTracingControllerMethod.stop,
+      );
 
   skippableTestWidgets('start and stop', (WidgetTester tester) async {
     final Completer<void> pageLoaded = Completer<void>();

@@ -1,13 +1,9 @@
 part of 'main.dart';
 
 void onDownloadStarting() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebView.isPropertySupported(
+    PlatformWebViewCreationParamsProperty.onDownloadStarting,
+  );
 
   skippableTestWidgets('onDownloadStarting', (WidgetTester tester) async {
     final Completer<InAppWebViewController> controllerCompleter =

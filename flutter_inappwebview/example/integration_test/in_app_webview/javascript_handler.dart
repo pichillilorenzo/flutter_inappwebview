@@ -1,13 +1,9 @@
 part of 'main.dart';
 
 void javascriptHandler() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebViewController.isMethodSupported(
+    PlatformInAppWebViewControllerMethod.addJavaScriptHandler,
+  );
 
   skippableTestWidgets('JavaScript Handler', (WidgetTester tester) async {
     final Completer<InAppWebViewController> controllerCompleter =

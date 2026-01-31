@@ -1,22 +1,14 @@
 part of 'main.dart';
 
 void javascriptCodeEvaluation() {
-  final shouldSkip = kIsWeb
-      ? false
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebViewController.isMethodSupported(
+    PlatformInAppWebViewControllerMethod.evaluateJavascript,
+  );
 
   skippableGroup('javascript code evaluation', () {
-    final shouldSkipTest1 = kIsWeb
-        ? false
-        : ![
-            TargetPlatform.android,
-            TargetPlatform.iOS,
-            TargetPlatform.macOS,
-          ].contains(defaultTargetPlatform);
+    final shouldSkipTest1 = !InAppWebViewController.isMethodSupported(
+      PlatformInAppWebViewControllerMethod.evaluateJavascript,
+    );
 
     skippableTestWidgets('evaluateJavascript', (WidgetTester tester) async {
       final Completer<InAppWebViewController> controllerCompleter =
@@ -58,13 +50,11 @@ void javascriptCodeEvaluation() {
       );
     }, skip: shouldSkipTest1);
 
-    final shouldSkipTest2 = kIsWeb
-        ? true
-        : ![
-            TargetPlatform.android,
-            TargetPlatform.iOS,
-            TargetPlatform.macOS,
-          ].contains(defaultTargetPlatform);
+    final shouldSkipTest2 =
+        kIsWeb ||
+        !InAppWebViewController.isMethodSupported(
+          PlatformInAppWebViewControllerMethod.evaluateJavascript,
+        );
 
     skippableTestWidgets('evaluateJavascript with content world', (
       WidgetTester tester,
@@ -106,13 +96,9 @@ void javascriptCodeEvaluation() {
       expect(result, 49);
     }, skip: shouldSkipTest2);
 
-    final shouldSkipTest3 = kIsWeb
-        ? true
-        : ![
-            TargetPlatform.android,
-            TargetPlatform.iOS,
-            TargetPlatform.macOS,
-          ].contains(defaultTargetPlatform);
+    final shouldSkipTest3 = !InAppWebViewController.isMethodSupported(
+      PlatformInAppWebViewControllerMethod.callAsyncJavaScript,
+    );
 
     skippableTestWidgets('callAsyncJavaScript', (WidgetTester tester) async {
       final Completer<InAppWebViewController> controllerCompleter =
@@ -169,13 +155,9 @@ void javascriptCodeEvaluation() {
       expect(result.error, 'error message');
     }, skip: shouldSkipTest3);
 
-    final shouldSkipTest4 = kIsWeb
-        ? true
-        : ![
-            TargetPlatform.android,
-            TargetPlatform.iOS,
-            TargetPlatform.macOS,
-          ].contains(defaultTargetPlatform);
+    final shouldSkipTest4 = !InAppWebViewController.isMethodSupported(
+      PlatformInAppWebViewControllerMethod.callAsyncJavaScript,
+    );
 
     skippableTestWidgets('callAsyncJavaScript with content world', (
       WidgetTester tester,

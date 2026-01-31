@@ -1,13 +1,9 @@
 part of 'main.dart';
 
 void onLoadResource() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebView.isPropertySupported(
+    PlatformWebViewCreationParamsProperty.onLoadResource,
+  );
 
   skippableTestWidgets('onLoadResource', (WidgetTester tester) async {
     List<String> resourceList = [

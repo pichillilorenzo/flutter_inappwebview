@@ -1,13 +1,9 @@
 part of 'main.dart';
 
 void clearAndSetProxyOverride() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !ProxyController.isMethodSupported(
+    PlatformProxyControllerMethod.setProxyOverride,
+  );
 
   skippableTestWidgets('clear and set proxy override', (
     WidgetTester tester,
@@ -17,7 +13,7 @@ void clearAndSetProxyOverride() {
     final Completer<String> pageLoaded = Completer<String>();
 
     var proxyAvailable =
-        defaultTargetPlatform != TargetPlatform.android ||
+        !PlatformWebViewFeature.static().isClassSupported() ||
         await WebViewFeature.isFeatureSupported(WebViewFeature.PROXY_OVERRIDE);
 
     if (proxyAvailable) {

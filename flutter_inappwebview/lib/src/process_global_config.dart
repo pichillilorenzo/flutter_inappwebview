@@ -3,6 +3,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformProcessGlobalConfig}
+///
+///{@macro flutter_inappwebview_platform_interface.PlatformProcessGlobalConfig.supported_platforms}
 class ProcessGlobalConfig {
   ///{@macro flutter_inappwebview_platform_interface.PlatformProcessGlobalConfig}
   ProcessGlobalConfig()
@@ -34,6 +36,8 @@ class ProcessGlobalConfig {
   }
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformProcessGlobalConfig.apply}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformProcessGlobalConfig.apply.supported_platforms}
   Future<void> apply({required ProcessGlobalConfigSettings settings}) =>
       platform.apply(settings: settings);
 

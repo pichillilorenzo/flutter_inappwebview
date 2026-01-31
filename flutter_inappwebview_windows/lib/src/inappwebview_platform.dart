@@ -205,13 +205,108 @@ class WindowsInAppWebViewPlatform extends InAppWebViewPlatform {
     return WindowsSessionStorage.defaultStorage(controller: null);
   }
 
-  /// Creates a new empty [PlatformWebStorageManager] to access static methods.
+  /// Creates a new [WindowsWebMessageChannel].
   ///
   /// This function should only be called by the app-facing package.
-  /// Look at using [WebStorageManager] in `flutter_inappwebview` instead.
+  /// Look at using [WebMessageChannel] in `flutter_inappwebview` instead.
   @override
-  PlatformWebStorageManager createPlatformWebStorageManagerStatic() {
-    return _PlatformWebStorageManager.static();
+  WindowsWebMessageChannel createPlatformWebMessageChannel(
+    PlatformWebMessageChannelCreationParams params,
+  ) {
+    return WindowsWebMessageChannel(params);
+  }
+
+  /// Creates a new empty [WindowsWebMessageChannel] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [WebMessageChannel] in `flutter_inappwebview` instead.
+  @override
+  WindowsWebMessageChannel createPlatformWebMessageChannelStatic() {
+    return WindowsWebMessageChannel.static();
+  }
+
+  /// Creates a new [WindowsWebMessagePort].
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [WebMessagePort] in `flutter_inappwebview` instead.
+  @override
+  WindowsWebMessagePort createPlatformWebMessagePort(
+    PlatformWebMessagePortCreationParams params,
+  ) {
+    return WindowsWebMessagePort(params);
+  }
+
+  /// Creates a new [WindowsWebMessageListener].
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [WebMessageListener] in `flutter_inappwebview` instead.
+  @override
+  WindowsWebMessageListener createPlatformWebMessageListener(
+    PlatformWebMessageListenerCreationParams params,
+  ) {
+    return WindowsWebMessageListener(params);
+  }
+
+  /// Creates a new [WindowsJavaScriptReplyProxy].
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [JavaScriptReplyProxy] in `flutter_inappwebview` instead.
+  @override
+  WindowsJavaScriptReplyProxy createPlatformJavaScriptReplyProxy(
+    PlatformJavaScriptReplyProxyCreationParams params,
+  ) {
+    return WindowsJavaScriptReplyProxy(params);
+  }
+
+  /// Creates a new empty [WindowsWebMessageListener] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [WebMessageListener] in `flutter_inappwebview` instead.
+  @override
+  WindowsWebMessageListener createPlatformWebMessageListenerStatic() {
+    return WindowsWebMessageListener.static();
+  }
+
+  /// Creates a new [WindowsFindInteractionController].
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [FindInteractionController] in `flutter_inappwebview` instead.
+  @override
+  WindowsFindInteractionController createPlatformFindInteractionController(
+    PlatformFindInteractionControllerCreationParams params,
+  ) {
+    return WindowsFindInteractionController(params);
+  }
+
+  /// Creates a new empty [WindowsFindInteractionController] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [FindInteractionController] in `flutter_inappwebview` instead.
+  @override
+  WindowsFindInteractionController
+  createPlatformFindInteractionControllerStatic() {
+    return WindowsFindInteractionController.static();
+  }
+
+  /// Creates a new [WindowsWebNotificationController].
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [WebNotificationController] in `flutter_inappwebview` instead.
+  @override
+  WindowsWebNotificationController createPlatformWebNotificationController(
+    PlatformWebNotificationControllerCreationParams params,
+  ) {
+    return WindowsWebNotificationController(params);
+  }
+
+  /// Creates a new empty [WindowsWebNotificationController] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [WebNotificationController] in `flutter_inappwebview` instead.
+  @override
+  WindowsWebNotificationController
+  createPlatformWebNotificationControllerStatic() {
+    return WindowsWebNotificationController.static();
   }
 
   // ************************************************************************ //
@@ -220,6 +315,15 @@ class WindowsInAppWebViewPlatform extends InAppWebViewPlatform {
   // static methods without throwing a missing platform implementation        //
   // exception.                                                               //
   // ************************************************************************ //
+
+  /// Creates a new empty [PlatformWebStorageManager] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [WebStorageManager] in `flutter_inappwebview` instead.
+  @override
+  PlatformWebStorageManager createPlatformWebStorageManagerStatic() {
+    return _PlatformWebStorageManager.static();
+  }
 
   /// Creates a new empty [PlatformChromeSafariBrowser] to access static methods.
   ///
@@ -276,27 +380,6 @@ class WindowsInAppWebViewPlatform extends InAppWebViewPlatform {
     return _PlatformTracingController.static();
   }
 
-  /// Creates a new [WindowsFindInteractionController].
-  ///
-  /// This function should only be called by the app-facing package.
-  /// Look at using [FindInteractionController] in `flutter_inappwebview` instead.
-  @override
-  WindowsFindInteractionController createPlatformFindInteractionController(
-    PlatformFindInteractionControllerCreationParams params,
-  ) {
-    return WindowsFindInteractionController(params);
-  }
-
-  /// Creates a new empty [PlatformFindInteractionController] to access static methods.
-  ///
-  /// This function should only be called by the app-facing package.
-  /// Look at using [FindInteractionController] in `flutter_inappwebview` instead.
-  @override
-  PlatformFindInteractionController
-  createPlatformFindInteractionControllerStatic() {
-    return WindowsFindInteractionController.static();
-  }
-
   /// Creates a new empty [PlatformPrintJobController] to access static methods.
   ///
   /// This function should only be called by the app-facing package.
@@ -304,27 +387,6 @@ class WindowsInAppWebViewPlatform extends InAppWebViewPlatform {
   @override
   PlatformPrintJobController createPlatformPrintJobControllerStatic() {
     return _PlatformPrintJobController.static();
-  }
-
-  /// Creates a new [WindowsWebNotificationController].
-  ///
-  /// This function should only be called by the app-facing package.
-  /// Look at using [WebNotificationController] in `flutter_inappwebview` instead.
-  @override
-  WindowsWebNotificationController createPlatformWebNotificationController(
-    PlatformWebNotificationControllerCreationParams params,
-  ) {
-    return WindowsWebNotificationController(params);
-  }
-
-  /// Creates a new empty [PlatformWebNotificationController] to access static methods.
-  ///
-  /// This function should only be called by the app-facing package.
-  /// Look at using [WebNotificationController] in `flutter_inappwebview` instead.
-  @override
-  PlatformWebNotificationController
-  createPlatformWebNotificationControllerStatic() {
-    return WindowsWebNotificationController.static();
   }
 
   /// Creates a new empty [PlatformPullToRefreshController] to access static methods.
@@ -347,66 +409,70 @@ class WindowsInAppWebViewPlatform extends InAppWebViewPlatform {
     return _PlatformWebAuthenticationSession.static();
   }
 
-  /// Creates a new [WindowsWebMessageChannel].
+  /// Creates a new empty [PlatformAssetsPathHandler] to access static methods.
   ///
   /// This function should only be called by the app-facing package.
-  /// Look at using [WebMessageChannel] in `flutter_inappwebview` instead.
+  /// Look at using [AssetsPathHandler] in `flutter_inappwebview` instead.
   @override
-  WindowsWebMessageChannel createPlatformWebMessageChannel(
-    PlatformWebMessageChannelCreationParams params,
+  PlatformAssetsPathHandler createPlatformAssetsPathHandlerStatic() {
+    return _PlatformAssetsPathHandler.static();
+  }
+
+  /// Creates a new empty [PlatformResourcesPathHandler] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [ResourcesPathHandler] in `flutter_inappwebview` instead.
+  @override
+  PlatformResourcesPathHandler createPlatformResourcesPathHandlerStatic() {
+    return _PlatformResourcesPathHandler.static();
+  }
+
+  /// Creates a new empty [PlatformInternalStoragePathHandler] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [InternalStoragePathHandler] in `flutter_inappwebview` instead.
+  @override
+  PlatformInternalStoragePathHandler
+  createPlatformInternalStoragePathHandlerStatic() {
+    return _PlatformInternalStoragePathHandler.static();
+  }
+
+  /// Creates a new empty [PlatformCustomPathHandler] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [CustomPathHandler] in `flutter_inappwebview` instead.
+  @override
+  PlatformCustomPathHandler createPlatformCustomPathHandlerStatic() {
+    return _PlatformCustomPathHandler.static();
+  }
+
+  /// Creates a new [DefaultInAppLocalhostServer].
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [InAppLocalhostServer] in `flutter_inappwebview` instead.
+  @override
+  DefaultInAppLocalhostServer createPlatformInAppLocalhostServer(
+    PlatformInAppLocalhostServerCreationParams params,
   ) {
-    return WindowsWebMessageChannel(params);
+    return DefaultInAppLocalhostServer(params);
   }
 
-  /// Creates a new empty [PlatformWebMessageChannel] to access static methods.
+  /// Creates a new empty [DefaultInAppLocalhostServer] to access static methods.
   ///
   /// This function should only be called by the app-facing package.
-  /// Look at using [WebMessageChannel] in `flutter_inappwebview` instead.
+  /// Look at using [InAppLocalhostServer] in `flutter_inappwebview` instead.
   @override
-  PlatformWebMessageChannel createPlatformWebMessageChannelStatic() {
-    return WindowsWebMessageChannel.static();
+  DefaultInAppLocalhostServer createPlatformInAppLocalhostServerStatic() {
+    return DefaultInAppLocalhostServer.static();
   }
 
-  /// Creates a new [WindowsWebMessagePort].
+  /// Creates a new empty [PlatformWebViewFeature] to access static methods.
   ///
   /// This function should only be called by the app-facing package.
-  /// Look at using [WebMessagePort] in `flutter_inappwebview` instead.
+  /// Look at using [WebViewFeature] in `flutter_inappwebview` instead
   @override
-  WindowsWebMessagePort createPlatformWebMessagePort(
-    PlatformWebMessagePortCreationParams params,
-  ) {
-    return WindowsWebMessagePort(params);
-  }
-
-  /// Creates a new [WindowsWebMessageListener].
-  ///
-  /// This function should only be called by the app-facing package.
-  /// Look at using [WebMessageListener] in `flutter_inappwebview` instead.
-  @override
-  WindowsWebMessageListener createPlatformWebMessageListener(
-    PlatformWebMessageListenerCreationParams params,
-  ) {
-    return WindowsWebMessageListener(params);
-  }
-
-  /// Creates a new empty [PlatformWebMessageListener] to access static methods.
-  ///
-  /// This function should only be called by the app-facing package.
-  /// Look at using [WebMessageListener] in `flutter_inappwebview` instead.
-  @override
-  PlatformWebMessageListener createPlatformWebMessageListenerStatic() {
-    return WindowsWebMessageListener.static();
-  }
-
-  /// Creates a new [WindowsJavaScriptReplyProxy].
-  ///
-  /// This function should only be called by the app-facing package.
-  /// Look at using [JavaScriptReplyProxy] in `flutter_inappwebview` instead.
-  @override
-  WindowsJavaScriptReplyProxy createPlatformJavaScriptReplyProxy(
-    PlatformJavaScriptReplyProxyCreationParams params,
-  ) {
-    return WindowsJavaScriptReplyProxy(params);
+  PlatformWebViewFeature createPlatformWebViewFeatureStatic() {
+    return _PlatformWebViewFeature.static();
   }
 }
 
@@ -530,4 +596,122 @@ class _PlatformWebStorageManager extends PlatformWebStorageManager {
       );
 
   factory _PlatformWebStorageManager.static() => _staticValue;
+}
+
+class _PlatformWebViewFeature extends PlatformWebViewFeature {
+  _PlatformWebViewFeature(PlatformWebViewFeatureCreationParams params)
+    : super.implementation(params);
+
+  static final _PlatformWebViewFeature _staticValue = _PlatformWebViewFeature(
+    PlatformWebViewFeatureCreationParams(),
+  );
+  factory _PlatformWebViewFeature.static() => _staticValue;
+}
+
+class _PlatformAssetsPathHandler extends PlatformAssetsPathHandler {
+  _PlatformAssetsPathHandler(PlatformAssetsPathHandlerCreationParams params)
+    : super.implementation(params);
+
+  static final _PlatformAssetsPathHandler _staticValue =
+      _PlatformAssetsPathHandler(
+        PlatformAssetsPathHandlerCreationParams(
+          PlatformPathHandlerCreationParams(path: ''),
+        ),
+      );
+
+  factory _PlatformAssetsPathHandler.static() => _staticValue;
+
+  @override
+  PlatformPathHandlerEvents? eventHandler;
+
+  @override
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) => {
+    "path": path,
+    "type": type,
+  };
+
+  @override
+  Map<String, dynamic> toJson() => toMap();
+}
+
+class _PlatformResourcesPathHandler extends PlatformResourcesPathHandler {
+  _PlatformResourcesPathHandler(
+    PlatformResourcesPathHandlerCreationParams params,
+  ) : super.implementation(params);
+
+  static final _PlatformResourcesPathHandler _staticValue =
+      _PlatformResourcesPathHandler(
+        PlatformResourcesPathHandlerCreationParams(
+          PlatformPathHandlerCreationParams(path: ''),
+        ),
+      );
+
+  factory _PlatformResourcesPathHandler.static() => _staticValue;
+
+  @override
+  PlatformPathHandlerEvents? eventHandler;
+
+  @override
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) => {
+    "path": path,
+    "type": type,
+  };
+
+  @override
+  Map<String, dynamic> toJson() => toMap();
+}
+
+class _PlatformInternalStoragePathHandler
+    extends PlatformInternalStoragePathHandler {
+  _PlatformInternalStoragePathHandler(
+    PlatformInternalStoragePathHandlerCreationParams params,
+  ) : super.implementation(params);
+
+  static final _PlatformInternalStoragePathHandler _staticValue =
+      _PlatformInternalStoragePathHandler(
+        PlatformInternalStoragePathHandlerCreationParams(
+          PlatformPathHandlerCreationParams(path: ''),
+          directory: '',
+        ),
+      );
+
+  factory _PlatformInternalStoragePathHandler.static() => _staticValue;
+
+  @override
+  PlatformPathHandlerEvents? eventHandler;
+
+  @override
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) => {
+    "path": path,
+    "type": type,
+  };
+
+  @override
+  Map<String, dynamic> toJson() => toMap();
+}
+
+class _PlatformCustomPathHandler extends PlatformCustomPathHandler {
+  _PlatformCustomPathHandler(PlatformCustomPathHandlerCreationParams params)
+    : super.implementation(params);
+
+  static final _PlatformCustomPathHandler _staticValue =
+      _PlatformCustomPathHandler(
+        PlatformCustomPathHandlerCreationParams(
+          PlatformPathHandlerCreationParams(path: ''),
+        ),
+      );
+
+  factory _PlatformCustomPathHandler.static() => _staticValue;
+
+  @override
+  PlatformPathHandlerEvents? eventHandler;
+
+  @override
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) => {
+    "path": path,
+    "type": type,
+  };
+
+  @override
+  Map<String, dynamic> toJson() => toMap();
 }

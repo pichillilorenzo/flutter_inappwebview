@@ -1,12 +1,9 @@
 part of 'main.dart';
 
 void createPdf() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebViewController.isMethodSupported(
+    PlatformInAppWebViewControllerMethod.createPdf,
+  );
 
   skippableTestWidgets('createPdf', (WidgetTester tester) async {
     final Completer<InAppWebViewController> controllerCompleter =

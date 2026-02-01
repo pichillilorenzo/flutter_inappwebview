@@ -2539,7 +2539,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
         apiUrl:
             'https://developer.android.com/reference/android/webkit/WebView#saveWebArchive(java.lang.String,%20boolean,%20android.webkit.ValueCallback%3Cjava.lang.String%3E)',
         note:
-            'if [autoname] is `false`, the [filePath] must ends with the [WebArchiveFormat.MHT] file extension.',
+            'If [autoname] is `false`, the [filePath] must ends with the [WebArchiveFormat.MHT] file extension.',
       ),
       IOSPlatform(
         available: '14.0',
@@ -2551,7 +2551,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
         apiUrl:
             'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebView.save_to_file.html',
         note:
-            'Saves as MHTML format. If [autoname] is `false`, the [filePath] must end with the .mht extension.',
+            'If [autoname] is `false`, the [filePath] must ends with the [WebArchiveFormat.MHT] file extension.',
       ),
       MacOSPlatform(
         available: '11.0',

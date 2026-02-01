@@ -22,8 +22,8 @@ class _MyAppState extends State<MyApp> {
   final GlobalKey webViewKey = GlobalKey();
 
   MacOSInAppWebViewController? webViewController;
-  InAppWebViewSettings settings = InAppWebViewSettings(
-      isInspectable: kDebugMode, mediaPlaybackRequiresUserGesture: false);
+  InAppWebViewSettings settings =
+      InAppWebViewSettings();
 
   String url = "";
   double progress = 0;

@@ -33,7 +33,7 @@ void webViewWindows() {
               controllerCompleter.complete(controller);
             },
             onLoadStop: (controller, url) {
-              if (url!.toString() == TEST_CROSS_PLATFORM_URL_1.toString()) {
+              if (url!.toString() == TEST_URL_EXAMPLE.toString()) {
                 pageLoaded.complete();
               }
             },
@@ -83,6 +83,8 @@ void webViewWindows() {
         ),
       );
 
+      await tester.pump();
+
       var windowId = await onCreateWindowCompleter.future;
 
       final Completer windowControllerCompleter =
@@ -113,9 +115,11 @@ void webViewWindows() {
         ),
       );
 
+      await tester.pump();
+
       final String windowUrlLoaded = await windowPageLoaded.future;
 
-      expect(windowUrlLoaded, TEST_CROSS_PLATFORM_URL_1.toString());
+      expect(windowUrlLoaded, TEST_URL_EXAMPLE.toString());
       await expectLater(onCloseWindowCompleter.future, completes);
     }, skip: shouldSkipTest2);
 
@@ -198,10 +202,10 @@ void webViewWindows() {
         ),
       );
 
+      await tester.pump();
+
       final InAppWebViewController controller =
           await controllerCompleter.future;
-
-      await tester.pump();
 
       Future<String> waitForUrl(String expectedUrl) async {
         await for (final url in pageLoads.stream) {

@@ -71,9 +71,9 @@ void webArchive() {
       var supportDir = await getApplicationSupportDirectory();
 
       var fileName = "flutter-website.";
-      if (defaultTargetPlatform == TargetPlatform.android) {
+      if (WebArchiveFormat.MHT.isSupported()) {
         fileName = fileName + WebArchiveFormat.MHT.toValue();
-      } else if (defaultTargetPlatform == TargetPlatform.iOS) {
+      } else {
         fileName = fileName + WebArchiveFormat.WEBARCHIVE.toValue();
       }
 

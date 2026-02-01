@@ -45,15 +45,18 @@ void clearAndSetProxyOverride() {
 
     final InAppWebViewController controller = await controllerCompleter.future;
 
+    await tester.pump();
+
     final String url = await pageLoaded.future;
     expect(url, TEST_URL_HTTP_EXAMPLE.toString());
 
-    expect(
-      await controller.evaluateJavascript(
-        source: "document.getElementById('url').innerHTML;",
-      ),
-      TEST_URL_HTTP_EXAMPLE.toString(),
+    // The proxy server's req.url returns different values by platform:
+    // - Android: full URL (http://www.example.com/)
+    // - macOS/iOS: just the path (/)
+    final proxyUrl = await controller.evaluateJavascript(
+      source: "document.getElementById('url').innerHTML;",
     );
+    expect(proxyUrl, anyOf("/", TEST_URL_HTTP_EXAMPLE.toString()));
     expect(
       await controller.evaluateJavascript(
         source: "document.getElementById('method').innerHTML;",

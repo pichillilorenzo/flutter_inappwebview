@@ -45,5 +45,28 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+		<key>NSAllowsArbitraryLoadsInWebContent</key>
+		<true/>
+		<key>NSAllowsLocalNetworking</key>
+		<true/>
+	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>InAppWebView requires access to cam.</string>
+	<key>NSDocumentsFolderUsageDescription</key>
+	<string>InAppWebView requires access to documents folder</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Allow Flutter tools on your computer to connect and debug your application.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Need location</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Need location</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Need location</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>InAppWebView requires access to mic.</string>
 </dict>
 </plist>

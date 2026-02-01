@@ -9,7 +9,7 @@ void onLoadResource() {
     List<String> resourceList = [
       "https://getbootstrap.com/docs/4.3/dist/css/bootstrap.min.css",
       "https://code.jquery.com/jquery-3.3.1.min.js",
-      "https://via.placeholder.com/100x50",
+      "https://placehold.co/100x50",
     ];
     List<String> resourceLoaded = [];
 

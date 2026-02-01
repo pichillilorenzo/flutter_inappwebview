@@ -212,10 +212,6 @@ public class InAppWebView: WKWebView, WKUIDelegate,
         }
         configuration.userContentController.initialize()
         
-        if let applePayAPIEnabled = settings?.applePayAPIEnabled, applePayAPIEnabled {
-            return
-        }
-        
         if javaScriptBridgeEnabled {
             let pluginScriptsOriginAllowList = settings?.pluginScriptsOriginAllowList
             let pluginScriptsForMainFrameOnly = settings?.pluginScriptsForMainFrameOnly ?? true
@@ -562,19 +558,6 @@ public class InAppWebView: WKWebView, WKUIDelegate,
     
     func setSettings(newSettings: InAppWebViewSettings, newSettingsMap: [String: Any]) {
         
-        // MUST be the first! In this way, all the settings that uses evaluateJavaScript can be applied/blocked!
-        if newSettingsMap["applePayAPIEnabled"] != nil && settings?.applePayAPIEnabled != newSettings.applePayAPIEnabled {
-            if let settings = settings {
-                settings.applePayAPIEnabled = newSettings.applePayAPIEnabled
-            }
-            if !newSettings.applePayAPIEnabled {
-                // re-add WKUserScripts for the next page load
-                prepareAndAddUserScripts()
-            } else {
-                configuration.userContentController.removeAllUserScripts()
-            }
-        }
-        
         if newSettingsMap["alpha"] != nil, settings?.alpha != newSettings.alpha, let viewAlpha = newSettings.alpha {
             alphaValue = CGFloat(viewAlpha)
         }
@@ -625,56 +608,39 @@ public class InAppWebView: WKWebView, WKUIDelegate,
         }
         
         if newSettingsMap["useOnLoadResource"] != nil && settings?.useOnLoadResource != newSettings.useOnLoadResource {
-            if let applePayAPIEnabled = settings?.applePayAPIEnabled, !applePayAPIEnabled {
-                if javaScriptBridgeEnabled {
-                    enablePluginScriptAtRuntime(flagVariable: OnLoadResourceJS.FLAG_VARIABLE_FOR_ON_LOAD_RESOURCE_JS_SOURCE(),
-                                                enable: newSettings.useOnLoadResource,
-                                                pluginScript: OnLoadResourceJS.ON_LOAD_RESOURCE_JS_PLUGIN_SCRIPT(allowedOriginRules: newSettings.pluginScriptsOriginAllowList,
-                                                                                                                 forMainFrameOnly: newSettings.pluginScriptsForMainFrameOnly))
-                }
-            } else {
-                newSettings.useOnLoadResource = false
+            if javaScriptBridgeEnabled {
+                enablePluginScriptAtRuntime(flagVariable: OnLoadResourceJS.FLAG_VARIABLE_FOR_ON_LOAD_RESOURCE_JS_SOURCE(),
+                                            enable: newSettings.useOnLoadResource,
+                                            pluginScript: OnLoadResourceJS.ON_LOAD_RESOURCE_JS_PLUGIN_SCRIPT(allowedOriginRules: newSettings.pluginScriptsOriginAllowList,
+                                                                                                             forMainFrameOnly: newSettings.pluginScriptsForMainFrameOnly))
             }
         }
         
         if newSettingsMap["useShouldInterceptAjaxRequest"] != nil && settings?.useShouldInterceptAjaxRequest != newSettings.useShouldInterceptAjaxRequest {
-            if let applePayAPIEnabled = settings?.applePayAPIEnabled, !applePayAPIEnabled {
-                if javaScriptBridgeEnabled {
-                    enablePluginScriptAtRuntime(flagVariable: InterceptAjaxRequestJS.FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_AJAX_REQUEST_JS_SOURCE(),
-                                                enable: newSettings.useShouldInterceptAjaxRequest,
-                                                pluginScript: InterceptAjaxRequestJS.INTERCEPT_AJAX_REQUEST_JS_PLUGIN_SCRIPT(allowedOriginRules: newSettings.pluginScriptsOriginAllowList,
-                                                                                                                             forMainFrameOnly: newSettings.pluginScriptsForMainFrameOnly,
-                                                                                                                             initialUseOnAjaxReadyStateChange: newSettings.useOnAjaxReadyStateChange,
-                                                                                                                             initialUseOnAjaxProgress: newSettings.useOnAjaxProgress))
-                }
-            } else {
-                newSettings.useShouldInterceptAjaxRequest = false
+            if javaScriptBridgeEnabled {
+                enablePluginScriptAtRuntime(flagVariable: InterceptAjaxRequestJS.FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_AJAX_REQUEST_JS_SOURCE(),
+                                            enable: newSettings.useShouldInterceptAjaxRequest,
+                                            pluginScript: InterceptAjaxRequestJS.INTERCEPT_AJAX_REQUEST_JS_PLUGIN_SCRIPT(allowedOriginRules: newSettings.pluginScriptsOriginAllowList,
+                                                                                                                         forMainFrameOnly: newSettings.pluginScriptsForMainFrameOnly,
+                                                                                                                         initialUseOnAjaxReadyStateChange: newSettings.useOnAjaxReadyStateChange,
+                                                                                                                         initialUseOnAjaxProgress: newSettings.useOnAjaxProgress))
             }
         }
         
         if newSettingsMap["useOnAjaxReadyStateChange"] != nil && settings?.useOnAjaxReadyStateChange != newSettings.useOnAjaxReadyStateChange {
-            if let applePayAPIEnabled = settings?.applePayAPIEnabled, !applePayAPIEnabled {
-                if javaScriptBridgeEnabled {
-                    evaluateJavaScript("\(InterceptAjaxRequestJS.FLAG_VARIABLE_FOR_ON_AJAX_READY_STATE_CHANGE()) = \(newSettings.useOnAjaxReadyStateChange);")
-                }
-            } else {
-                newSettings.useOnAjaxReadyStateChange = false
+            if javaScriptBridgeEnabled {
+                evaluateJavaScript("\(InterceptAjaxRequestJS.FLAG_VARIABLE_FOR_ON_AJAX_READY_STATE_CHANGE()) = \(newSettings.useOnAjaxReadyStateChange);")
             }
         }
         
         if newSettingsMap["useOnAjaxProgress"] != nil && settings?.useOnAjaxProgress != newSettings.useOnAjaxProgress {
-            if let applePayAPIEnabled = settings?.applePayAPIEnabled, !applePayAPIEnabled {
-                if javaScriptBridgeEnabled {
-                    evaluateJavaScript("\(InterceptAjaxRequestJS.FLAG_VARIABLE_FOR_ON_AJAX_PROGRESS()) = \(newSettings.useOnAjaxProgress);")
-                }
-            } else {
-                newSettings.useOnAjaxProgress = false
+            if javaScriptBridgeEnabled {
+                evaluateJavaScript("\(InterceptAjaxRequestJS.FLAG_VARIABLE_FOR_ON_AJAX_PROGRESS()) = \(newSettings.useOnAjaxProgress);")
             }
         }
         
         if newSettingsMap["interceptOnlyAsyncAjaxRequests"] != nil && settings?.interceptOnlyAsyncAjaxRequests != newSettings.interceptOnlyAsyncAjaxRequests {
-            if let applePayAPIEnabled = settings?.applePayAPIEnabled, !applePayAPIEnabled,
-               let interceptOnlyAsyncAjaxRequestsPluginScript = interceptOnlyAsyncAjaxRequestsPluginScript {
+            if let interceptOnlyAsyncAjaxRequestsPluginScript = interceptOnlyAsyncAjaxRequestsPluginScript {
                 if javaScriptBridgeEnabled {
                     enablePluginScriptAtRuntime(flagVariable: InterceptAjaxRequestJS.FLAG_VARIABLE_FOR_INTERCEPT_ONLY_ASYNC_AJAX_REQUESTS_JS_SOURCE(),
                                                 enable: newSettings.interceptOnlyAsyncAjaxRequests,
@@ -684,15 +650,11 @@ public class InAppWebView: WKWebView, WKUIDelegate,
         }
         
         if newSettingsMap["useShouldInterceptFetchRequest"] != nil && settings?.useShouldInterceptFetchRequest != newSettings.useShouldInterceptFetchRequest {
-            if let applePayAPIEnabled = settings?.applePayAPIEnabled, !applePayAPIEnabled {
-                if javaScriptBridgeEnabled {
-                    enablePluginScriptAtRuntime(flagVariable: InterceptFetchRequestJS.FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_FETCH_REQUEST_JS_SOURCE(),
-                                                enable: newSettings.useShouldInterceptFetchRequest,
-                                                pluginScript: InterceptFetchRequestJS.INTERCEPT_FETCH_REQUEST_JS_PLUGIN_SCRIPT(allowedOriginRules: newSettings.pluginScriptsOriginAllowList,
-                                                                                                                               forMainFrameOnly: newSettings.pluginScriptsForMainFrameOnly))
-                }
-            } else {
-                newSettings.useShouldInterceptFetchRequest = false
+            if javaScriptBridgeEnabled {
+                enablePluginScriptAtRuntime(flagVariable: InterceptFetchRequestJS.FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_FETCH_REQUEST_JS_SOURCE(),
+                                            enable: newSettings.useShouldInterceptFetchRequest,
+                                            pluginScript: InterceptFetchRequestJS.INTERCEPT_FETCH_REQUEST_JS_PLUGIN_SCRIPT(allowedOriginRules: newSettings.pluginScriptsOriginAllowList,
+                                                                                                                           forMainFrameOnly: newSettings.pluginScriptsForMainFrameOnly))
             }
         }
         
@@ -938,31 +900,16 @@ public class InAppWebView: WKWebView, WKUIDelegate,
     
 #if compiler(>=6.0)
     public override func evaluateJavaScript(_ javaScriptString: String, completionHandler: (@MainActor @Sendable (Any?, (any Error)?) -> Void)? = nil) {
-        if let applePayAPIEnabled = settings?.applePayAPIEnabled, applePayAPIEnabled {
-            if let completionHandler = completionHandler {
-                completionHandler(nil, nil)
-            }
-            return
-        }
         super.evaluateJavaScript(javaScriptString, completionHandler: completionHandler)
     }
 #else
     public override func evaluateJavaScript(_ javaScriptString: String, completionHandler: ((Any?, Error?) -> Void)? = nil) {
-        if let applePayAPIEnabled = settings?.applePayAPIEnabled, applePayAPIEnabled {
-            if let completionHandler = completionHandler {
-                completionHandler(nil, nil)
-            }
-            return
-        }
         super.evaluateJavaScript(javaScriptString, completionHandler: completionHandler)
     }
 #endif
     
     @available(macOS 11.0, *)
     public func evaluateJavaScript(_ javaScript: String, frame: WKFrameInfo? = nil, contentWorld: WKContentWorld, completionHandler: ((Result<Any, Error>) -> Void)? = nil) {
-        if let applePayAPIEnabled = settings?.applePayAPIEnabled, applePayAPIEnabled {
-            return
-        }
         super.evaluateJavaScript(javaScript, in: frame, in: contentWorld, completionHandler: completionHandler)
     }
     
@@ -977,9 +924,6 @@ public class InAppWebView: WKWebView, WKUIDelegate,
     
     @available(macOS 11.0, *)
     public func callAsyncJavaScript(_ functionBody: String, arguments: [String : Any] = [:], frame: WKFrameInfo? = nil, contentWorld: WKContentWorld, completionHandler: ((Result<Any, Error>) -> Void)? = nil) {
-        if let applePayAPIEnabled = settings?.applePayAPIEnabled, applePayAPIEnabled {
-            return
-        }
         super.callAsyncJavaScript(functionBody, arguments: arguments, in: frame, in: contentWorld, completionHandler: completionHandler)
     }
     
@@ -1015,10 +959,6 @@ public class InAppWebView: WKWebView, WKUIDelegate,
     }
     
     public func callAsyncJavaScript(functionBody: String, arguments: [String:Any], completionHandler: ((Any?) -> Void)? = nil) {
-        if let applePayAPIEnabled = settings?.applePayAPIEnabled, applePayAPIEnabled {
-            completionHandler?(nil)
-        }
-        
         var jsToInject = functionBody
         
         let resultUuid = NSUUID().uuidString

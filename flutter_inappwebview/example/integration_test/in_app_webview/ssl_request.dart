@@ -31,7 +31,7 @@ void sslRequest() {
           onReceivedClientCertRequest: (controller, challenge) async {
             return new ClientCertResponse(
               certificatePath: "test_assets/certificate.pfx",
-              certificatePassword: "",
+              certificatePassword: "password",
               keyStoreType: "PKCS12",
               action: ClientCertResponseAction.PROCEED,
             );

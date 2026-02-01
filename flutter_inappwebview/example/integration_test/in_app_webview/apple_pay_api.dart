@@ -38,7 +38,7 @@ void applePayAPI() {
           },
           onJsAlert: (controller, jsAlertRequest) async {
             alertMessageCompleter.complete(jsAlertRequest.message);
-            return null;
+            return JsAlertResponse(handledByClient: true);
           },
         ),
       ),

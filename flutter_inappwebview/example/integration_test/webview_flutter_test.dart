@@ -35,16 +35,16 @@ void main() {
   PlatformFindInteractionController.debugLoggingSettings.maxLogMessageLength =
       7000;
 
-  // process_global_config_tests.main();
+  process_global_config_tests.main();
   in_app_webview_tests.main();
-  // find_interaction_controller_tests.main();
-  // service_worker_controller_tests.main();
-  // proxy_controller_tests.main();
-  // tracing_controller_tests.main();
-  // headless_in_app_webview_tests.main();
-  // cookie_manager_tests.main();
-  // in_app_browser_tests.main();
-  // chrome_safari_browser_tests.main();
-  // in_app_localhost_server_tests.main();
-  // support_methods_tests.main();
+  find_interaction_controller_tests.main();
+  service_worker_controller_tests.main();
+  proxy_controller_tests.main();
+  tracing_controller_tests.main();
+  headless_in_app_webview_tests.main();
+  cookie_manager_tests.main();
+  in_app_browser_tests.main();
+  chrome_safari_browser_tests.main();
+  in_app_localhost_server_tests.main();
+  support_methods_tests.main();
 }

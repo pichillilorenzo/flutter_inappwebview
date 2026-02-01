@@ -242,16 +242,6 @@ class InAppWebViewSettings {
   ///- [PlatformInAppWebViewController.createWebMessageChannel]
   ///- [PlatformInAppWebViewController.addWebMessageListener]
   ///
-  ///Also, on MacOS:
-  ///- [PlatformInAppWebViewController.getScrollX]
-  ///- [PlatformInAppWebViewController.getScrollY]
-  ///- [PlatformInAppWebViewController.scrollTo]
-  ///- [PlatformInAppWebViewController.scrollBy]
-  ///- [PlatformInAppWebViewController.getContentHeight]
-  ///- [PlatformInAppWebViewController.getContentWidth]
-  ///- [PlatformInAppWebViewController.canScrollVertically]
-  ///- [PlatformInAppWebViewController.canScrollHorizontally]
-  ///
   ///Settings affected:
   ///- [PlatformWebViewCreationParams.initialUserScripts]
   ///- [InAppWebViewSettings.supportZoom]
@@ -275,12 +265,8 @@ class InAppWebViewSettings {
   ///- [PlatformWebViewCreationParams.onFindResultReceived]
   ///- [FindInteractionController.onFindResultReceived]
   ///
-  ///Also, on MacOS:
-  ///- [PlatformWebViewCreationParams.onScrollChanged]
-  ///
   ///**Officially Supported Platforms/Implementations**:
   ///- iOS WKWebView 13.0+
-  ///- macOS WKWebView 10.15+
   bool? applePayAPIEnabled;
 
   ///Append to the existing user-agent. Setting userAgent will override this.
@@ -3267,7 +3253,6 @@ enum InAppWebViewSettingsProperty {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- iOS WKWebView 13.0+
-  ///- macOS WKWebView 10.15+
   ///
   ///Use the [InAppWebViewSettings.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
@@ -5495,10 +5480,7 @@ extension _InAppWebViewSettingsPropertySupported on InAppWebViewSettings {
             ].contains(platform ?? defaultTargetPlatform);
       case InAppWebViewSettingsProperty.applePayAPIEnabled:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [
-              TargetPlatform.iOS,
-              TargetPlatform.macOS,
-            ].contains(platform ?? defaultTargetPlatform);
+            [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
       case InAppWebViewSettingsProperty.applicationNameForUserAgent:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [

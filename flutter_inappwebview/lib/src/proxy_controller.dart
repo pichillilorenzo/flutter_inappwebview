@@ -4,6 +4,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformProxyController}
+///
+///{@macro flutter_inappwebview_platform_interface.PlatformProxyController.supported_platforms}
 class ProxyController {
   ///{@macro flutter_inappwebview_platform_interface.PlatformProxyController}
   ProxyController()
@@ -35,10 +37,14 @@ class ProxyController {
   }
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformProxyController.setProxyOverride}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformProxyController.setProxyOverride.supported_platforms}
   Future<void> setProxyOverride({required ProxySettings settings}) =>
       platform.setProxyOverride(settings: settings);
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformProxyController.clearProxyOverride}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformProxyController.clearProxyOverride.supported_platforms}
   Future<void> clearProxyOverride() => platform.clearProxyOverride();
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformProxyControllerCreationParams.isClassSupported}

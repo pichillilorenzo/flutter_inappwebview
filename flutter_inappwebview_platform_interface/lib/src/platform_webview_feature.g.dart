@@ -1125,3 +1125,87 @@ class AndroidWebViewFeature {
     return _value;
   }
 }
+
+// **************************************************************************
+// SupportedPlatformsGenerator
+// **************************************************************************
+
+extension _PlatformWebViewFeatureCreationParamsClassSupported
+    on PlatformWebViewFeatureCreationParams {
+  ///{@template flutter_inappwebview_platform_interface.PlatformWebViewFeatureCreationParams.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android WebView
+  ///
+  ///Use the [PlatformWebViewFeatureCreationParams.isClassSupported] method to check if this class is supported at runtime.
+  ///{@endtemplate}
+  static bool isClassSupported({TargetPlatform? platform}) {
+    return ((kIsWeb && platform != null) || !kIsWeb) &&
+        [TargetPlatform.android].contains(platform ?? defaultTargetPlatform);
+  }
+}
+
+extension _PlatformWebViewFeatureClassSupported on PlatformWebViewFeature {
+  ///{@template flutter_inappwebview_platform_interface.PlatformWebViewFeature.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android WebView
+  ///
+  ///Use the [PlatformWebViewFeature.isClassSupported] method to check if this class is supported at runtime.
+  ///{@endtemplate}
+  static bool isClassSupported({TargetPlatform? platform}) {
+    return ((kIsWeb && platform != null) || !kIsWeb) &&
+        [TargetPlatform.android].contains(platform ?? defaultTargetPlatform);
+  }
+}
+
+///List of [PlatformWebViewFeature]'s methods that can be used to check if they are supported or not by the current platform.
+enum PlatformWebViewFeatureMethod {
+  ///Can be used to check if the [PlatformWebViewFeature.isFeatureSupported] method is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PlatformWebViewFeature.isFeatureSupported.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android WebView ([Official API - WebViewFeature.isFeatureSupported](https://developer.android.com/reference/androidx/webkit/WebViewFeature#isFeatureSupported(java.lang.String)))
+  ///
+  ///**Parameters - Officially Supported Platforms/Implementations**:
+  ///- [feature]: all platforms
+  ///
+  ///Use the [PlatformWebViewFeature.isMethodSupported] method to check if this method is supported at runtime.
+  ///{@endtemplate}
+  isFeatureSupported,
+
+  ///Can be used to check if the [PlatformWebViewFeature.isStartupFeatureSupported] method is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PlatformWebViewFeature.isStartupFeatureSupported.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android WebView ([Official API - WebViewFeature.isStartupFeatureSupported](https://developer.android.com/reference/androidx/webkit/WebViewFeature#isStartupFeatureSupported(android.content.Context,java.lang.String)))
+  ///
+  ///**Parameters - Officially Supported Platforms/Implementations**:
+  ///- [startupFeature]: all platforms
+  ///
+  ///Use the [PlatformWebViewFeature.isMethodSupported] method to check if this method is supported at runtime.
+  ///{@endtemplate}
+  isStartupFeatureSupported,
+}
+
+extension _PlatformWebViewFeatureMethodSupported on PlatformWebViewFeature {
+  static bool isMethodSupported(
+    PlatformWebViewFeatureMethod method, {
+    TargetPlatform? platform,
+  }) {
+    switch (method) {
+      case PlatformWebViewFeatureMethod.isFeatureSupported:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
+      case PlatformWebViewFeatureMethod.isStartupFeatureSupported:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
+    }
+  }
+}

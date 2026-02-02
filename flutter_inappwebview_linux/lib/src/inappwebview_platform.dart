@@ -335,6 +335,60 @@ class LinuxInAppWebViewPlatform extends InAppWebViewPlatform {
   ) {
     return LinuxWebStorageManager(params);
   }
+
+  /// Creates a new empty [PlatformAssetsPathHandler] to access static methods.
+  @override
+  PlatformAssetsPathHandler createPlatformAssetsPathHandlerStatic() {
+    return _PlatformAssetsPathHandler.static();
+  }
+
+  /// Creates a new empty [PlatformResourcesPathHandler] to access static methods.
+  @override
+  PlatformResourcesPathHandler createPlatformResourcesPathHandlerStatic() {
+    return _PlatformResourcesPathHandler.static();
+  }
+
+  /// Creates a new empty [PlatformInternalStoragePathHandler] to access static methods.
+  @override
+  PlatformInternalStoragePathHandler
+  createPlatformInternalStoragePathHandlerStatic() {
+    return _PlatformInternalStoragePathHandler.static();
+  }
+
+  /// Creates a new empty [PlatformCustomPathHandler] to access static methods.
+  @override
+  PlatformCustomPathHandler createPlatformCustomPathHandlerStatic() {
+    return _PlatformCustomPathHandler.static();
+  }
+
+  /// Creates a new [DefaultInAppLocalhostServer].
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [InAppLocalhostServer] in `flutter_inappwebview` instead.
+  @override
+  DefaultInAppLocalhostServer createPlatformInAppLocalhostServer(
+    PlatformInAppLocalhostServerCreationParams params,
+  ) {
+    return DefaultInAppLocalhostServer(params);
+  }
+
+  /// Creates a new empty [DefaultInAppLocalhostServer] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [InAppLocalhostServer] in `flutter_inappwebview` instead.
+  @override
+  DefaultInAppLocalhostServer createPlatformInAppLocalhostServerStatic() {
+    return DefaultInAppLocalhostServer.static();
+  }
+
+  /// Creates a new empty [PlatformWebViewFeature] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [WebViewFeature] in `flutter_inappwebview` instead
+  @override
+  PlatformWebViewFeature createPlatformWebViewFeatureStatic() {
+    return _PlatformWebViewFeature.static();
+  }
 }
 
 // Stub implementations for unsupported classes
@@ -441,4 +495,122 @@ class _PlatformWebNotificationController
       );
 
   factory _PlatformWebNotificationController.static() => _staticValue;
+}
+
+class _PlatformWebViewFeature extends PlatformWebViewFeature {
+  _PlatformWebViewFeature(PlatformWebViewFeatureCreationParams params)
+    : super.implementation(params);
+
+  static final _PlatformWebViewFeature _staticValue = _PlatformWebViewFeature(
+    PlatformWebViewFeatureCreationParams(),
+  );
+  factory _PlatformWebViewFeature.static() => _staticValue;
+}
+
+class _PlatformAssetsPathHandler extends PlatformAssetsPathHandler {
+  _PlatformAssetsPathHandler(PlatformAssetsPathHandlerCreationParams params)
+    : super.implementation(params);
+
+  static final _PlatformAssetsPathHandler _staticValue =
+      _PlatformAssetsPathHandler(
+        PlatformAssetsPathHandlerCreationParams(
+          PlatformPathHandlerCreationParams(path: ''),
+        ),
+      );
+
+  factory _PlatformAssetsPathHandler.static() => _staticValue;
+
+  @override
+  PlatformPathHandlerEvents? eventHandler;
+
+  @override
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) => {
+    "path": path,
+    "type": type,
+  };
+
+  @override
+  Map<String, dynamic> toJson() => toMap();
+}
+
+class _PlatformResourcesPathHandler extends PlatformResourcesPathHandler {
+  _PlatformResourcesPathHandler(
+    PlatformResourcesPathHandlerCreationParams params,
+  ) : super.implementation(params);
+
+  static final _PlatformResourcesPathHandler _staticValue =
+      _PlatformResourcesPathHandler(
+        PlatformResourcesPathHandlerCreationParams(
+          PlatformPathHandlerCreationParams(path: ''),
+        ),
+      );
+
+  factory _PlatformResourcesPathHandler.static() => _staticValue;
+
+  @override
+  PlatformPathHandlerEvents? eventHandler;
+
+  @override
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) => {
+    "path": path,
+    "type": type,
+  };
+
+  @override
+  Map<String, dynamic> toJson() => toMap();
+}
+
+class _PlatformInternalStoragePathHandler
+    extends PlatformInternalStoragePathHandler {
+  _PlatformInternalStoragePathHandler(
+    PlatformInternalStoragePathHandlerCreationParams params,
+  ) : super.implementation(params);
+
+  static final _PlatformInternalStoragePathHandler _staticValue =
+      _PlatformInternalStoragePathHandler(
+        PlatformInternalStoragePathHandlerCreationParams(
+          PlatformPathHandlerCreationParams(path: ''),
+          directory: '',
+        ),
+      );
+
+  factory _PlatformInternalStoragePathHandler.static() => _staticValue;
+
+  @override
+  PlatformPathHandlerEvents? eventHandler;
+
+  @override
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) => {
+    "path": path,
+    "type": type,
+  };
+
+  @override
+  Map<String, dynamic> toJson() => toMap();
+}
+
+class _PlatformCustomPathHandler extends PlatformCustomPathHandler {
+  _PlatformCustomPathHandler(PlatformCustomPathHandlerCreationParams params)
+    : super.implementation(params);
+
+  static final _PlatformCustomPathHandler _staticValue =
+      _PlatformCustomPathHandler(
+        PlatformCustomPathHandlerCreationParams(
+          PlatformPathHandlerCreationParams(path: ''),
+        ),
+      );
+
+  factory _PlatformCustomPathHandler.static() => _staticValue;
+
+  @override
+  PlatformPathHandlerEvents? eventHandler;
+
+  @override
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) => {
+    "path": path,
+    "type": type,
+  };
+
+  @override
+  Map<String, dynamic> toJson() => toMap();
 }

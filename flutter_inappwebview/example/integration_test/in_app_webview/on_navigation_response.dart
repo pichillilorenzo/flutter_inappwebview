@@ -1,12 +1,9 @@
 part of 'main.dart';
 
 void onNavigationResponse() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebView.isPropertySupported(
+    PlatformWebViewCreationParamsProperty.onNavigationResponse,
+  );
 
   skippableGroup('onNavigationResponse', () {
     skippableTestWidgets('allow navigation', (WidgetTester tester) async {

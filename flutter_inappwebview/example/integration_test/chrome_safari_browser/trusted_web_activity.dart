@@ -1,9 +1,9 @@
 part of 'main.dart';
 
 void trustedWebActivity() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![TargetPlatform.android].contains(defaultTargetPlatform);
+  final shouldSkip = !ChromeSafariBrowser.isMethodSupported(
+    PlatformChromeSafariBrowserMethod.validateRelationship,
+  );
 
   skippableGroup('Trusted Web Activity', () {
     skippableTest('basic', () async {

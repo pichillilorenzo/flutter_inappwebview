@@ -1,13 +1,9 @@
 part of 'main.dart';
 
 void videoPlaybackPolicy() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebViewSettings.isPropertySupported(
+    InAppWebViewSettingsProperty.mediaPlaybackRequiresUserGesture,
+  );
 
   skippableGroup('Video playback policy', () {
     String videoTestBase64 = "";
@@ -123,12 +119,9 @@ void videoPlaybackPolicy() {
       expect(isPaused, true);
     });
 
-    final shouldSkipTest2 = kIsWeb
-        ? true
-        : ![
-            TargetPlatform.iOS,
-            TargetPlatform.macOS,
-          ].contains(defaultTargetPlatform);
+    final shouldSkipTest2 = !InAppWebViewSettings.isPropertySupported(
+      InAppWebViewSettingsProperty.allowsInlineMediaPlayback,
+    );
 
     skippableTestWidgets(
       'Video plays inline when allowsInlineMediaPlayback is true',
@@ -172,12 +165,9 @@ void videoPlaybackPolicy() {
       skip: shouldSkipTest2,
     );
 
-    final shouldSkipTest3 = kIsWeb
-        ? true
-        : ![
-            TargetPlatform.iOS,
-            TargetPlatform.macOS,
-          ].contains(defaultTargetPlatform);
+    final shouldSkipTest3 = !InAppWebViewSettings.isPropertySupported(
+      InAppWebViewSettingsProperty.allowsInlineMediaPlayback,
+    );
 
     testWidgets(
       'Video plays fullscreen when allowsInlineMediaPlayback is false',
@@ -224,12 +214,9 @@ void videoPlaybackPolicy() {
       skip: shouldSkipTest3,
     );
 
-    final shouldSkipTest4 = kIsWeb
-        ? true
-        : ![
-            TargetPlatform.iOS,
-            TargetPlatform.macOS,
-          ].contains(defaultTargetPlatform);
+    final shouldSkipTest4 = !InAppWebViewSettings.isPropertySupported(
+      InAppWebViewSettingsProperty.allowsInlineMediaPlayback,
+    );
     // on Android, entering fullscreen requires user interaction
     skippableTestWidgets('exit fullscreen event', (WidgetTester tester) async {
       Completer<InAppWebViewController> controllerCompleter =

@@ -1,9 +1,9 @@
 part of 'main.dart';
 
 void shouldInterceptRequest() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![TargetPlatform.android].contains(defaultTargetPlatform);
+  final shouldSkip = !ServiceWorkerController.isMethodSupported(
+    PlatformServiceWorkerControllerMethod.setServiceWorkerClient,
+  );
 
   skippableTestWidgets('shouldInterceptRequest', (WidgetTester tester) async {
     final Completer completer = Completer();

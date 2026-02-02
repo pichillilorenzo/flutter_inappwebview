@@ -1,13 +1,7 @@
 part of 'main.dart';
 
 void setGetSettings() {
-  final shouldSkip = kIsWeb
-      ? false
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = false;
 
   skippableTest('set/get settings', () async {
     final Completer<InAppWebViewController> controllerCompleter =

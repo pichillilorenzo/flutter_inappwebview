@@ -1,13 +1,9 @@
 part of 'main.dart';
 
 void onReceivedError() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebView.isPropertySupported(
+    PlatformWebViewCreationParamsProperty.onReceivedError,
+  );
 
   skippableGroup('onReceivedError', () {
     skippableTestWidgets('invalid url', (WidgetTester tester) async {

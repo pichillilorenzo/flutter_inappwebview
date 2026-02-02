@@ -1,9 +1,9 @@
 part of 'main.dart';
 
 void onReceivedTouchIconUrl() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![TargetPlatform.android].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebView.isPropertySupported(
+    PlatformWebViewCreationParamsProperty.onReceivedTouchIconUrl,
+  );
 
   skippableTestWidgets('onReceivedTouchIconUrl', (WidgetTester tester) async {
     final Completer<InAppWebViewController> controllerCompleter =

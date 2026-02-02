@@ -114,6 +114,17 @@ class AndroidAssetsPathHandler extends PlatformAssetsPathHandler
       ) {
     _init(params);
   }
+
+  static final AndroidAssetsPathHandler _staticValue = AndroidAssetsPathHandler(
+    AndroidAssetsPathHandlerCreationParams(
+      PlatformAssetsPathHandlerCreationParams(
+        PlatformPathHandlerCreationParams(path: ''),
+      ),
+    ),
+  );
+
+  /// Creates a new empty [AndroidAssetsPathHandler] to access static methods.
+  factory AndroidAssetsPathHandler.static() => _staticValue;
 }
 
 /// Object specifying creation parameters for creating a [AndroidResourcesPathHandler].
@@ -153,6 +164,18 @@ class AndroidResourcesPathHandler extends PlatformResourcesPathHandler
       ) {
     _init(params);
   }
+
+  static final AndroidResourcesPathHandler _staticValue =
+      AndroidResourcesPathHandler(
+        AndroidResourcesPathHandlerCreationParams(
+          PlatformResourcesPathHandlerCreationParams(
+            PlatformPathHandlerCreationParams(path: ''),
+          ),
+        ),
+      );
+
+  /// Creates a new empty [AndroidResourcesPathHandler] to access static methods.
+  factory AndroidResourcesPathHandler.static() => _staticValue;
 }
 
 /// Object specifying creation parameters for creating a [AndroidInternalStoragePathHandler].
@@ -194,6 +217,19 @@ class AndroidInternalStoragePathHandler
       ) {
     _init(params);
   }
+
+  static final AndroidInternalStoragePathHandler _staticValue =
+      AndroidInternalStoragePathHandler(
+        AndroidInternalStoragePathHandlerCreationParams(
+          PlatformInternalStoragePathHandlerCreationParams(
+            PlatformPathHandlerCreationParams(path: ''),
+            directory: '',
+          ),
+        ),
+      );
+
+  /// Creates a new empty [AndroidInternalStoragePathHandler] to access static methods.
+  factory AndroidInternalStoragePathHandler.static() => _staticValue;
 
   AndroidInternalStoragePathHandlerCreationParams get _internalParams =>
       params as AndroidInternalStoragePathHandlerCreationParams;
@@ -244,4 +280,15 @@ class AndroidCustomPathHandler extends PlatformCustomPathHandler
       ) {
     _init(params);
   }
+
+  static final AndroidCustomPathHandler _staticValue = AndroidCustomPathHandler(
+    AndroidCustomPathHandlerCreationParams(
+      PlatformCustomPathHandlerCreationParams(
+        PlatformPathHandlerCreationParams(path: ''),
+      ),
+    ),
+  );
+
+  /// Creates a new empty [AndroidCustomPathHandler] to access static methods.
+  factory AndroidCustomPathHandler.static() => _staticValue;
 }

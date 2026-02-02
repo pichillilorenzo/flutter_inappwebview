@@ -2,13 +2,29 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
+part 'platform_in_app_localhost_server.g.dart';
+
+///{@template flutter_inappwebview_platform_interface.PlatformInAppLocalhostServerCreationParams}
 /// Object specifying creation parameters for creating a [PlatformInAppLocalhostServer].
 ///
 /// Platform specific implementations can add additional fields by extending
 /// this class.
+///{@endtemplate}
+///
+///{@macro flutter_inappwebview_platform_interface.PlatformInAppLocalhostServerCreationParams.supported_platforms}
+@SupportedPlatforms(
+  platforms: [
+    AndroidPlatform(),
+    IOSPlatform(),
+    MacOSPlatform(),
+    WindowsPlatform(),
+    LinuxPlatform(),
+  ],
+)
 @immutable
 class PlatformInAppLocalhostServerCreationParams {
   /// Used by the platform implementation to create a new [PlatformInAppLocalhostServer].
@@ -34,19 +50,32 @@ class PlatformInAppLocalhostServerCreationParams {
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppLocalhostServer.onData}
   final Future<bool> Function(HttpRequest request)? onData;
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppLocalhostServerCreationParams.isClassSupported}
+  ///Check if the current class is supported by the [defaultTargetPlatform] or a specific [platform].
+  ///{@endtemplate}
+  bool isClassSupported({TargetPlatform? platform}) =>
+      _PlatformInAppLocalhostServerCreationParamsClassSupported.isClassSupported(
+        platform: platform,
+      );
 }
 
 ///{@template flutter_inappwebview_platform_interface.PlatformInAppLocalhostServer}
 ///This class allows you to create a simple server on `http://localhost:[port]/`
 ///in order to be able to load your assets file on a local server.
 ///The default `port` value is `8080`.
-///
-///**Officially Supported Platforms/Implementations**:
-///- Android native WebView
-///- iOS
-///- MacOS
-///- Windows
 ///{@endtemplate}
+///
+///{@macro flutter_inappwebview_platform_interface.PlatformInAppLocalhostServer.supported_platforms}
+@SupportedPlatforms(
+  platforms: [
+    AndroidPlatform(),
+    IOSPlatform(),
+    MacOSPlatform(),
+    WindowsPlatform(),
+    LinuxPlatform(),
+  ],
+)
 abstract class PlatformInAppLocalhostServer extends PlatformInterface {
   /// Creates a new [PlatformInAppLocalhostServer]
   factory PlatformInAppLocalhostServer(
@@ -65,6 +94,22 @@ abstract class PlatformInAppLocalhostServer extends PlatformInterface {
         );
     PlatformInterface.verify(inAppLocalhostServer, _token);
     return inAppLocalhostServer;
+  }
+
+  /// Creates a new empty [PlatformInAppLocalhostServer] to access static methods.
+  factory PlatformInAppLocalhostServer.static() {
+    assert(
+      InAppWebViewPlatform.instance != null,
+      'A platform implementation for `flutter_inappwebview` has not been set. Please '
+      'ensure that an implementation of `InAppWebViewPlatform` has been set to '
+      '`InAppWebViewPlatform.instance` before use. For unit testing, '
+      '`InAppWebViewPlatform.instance` can be set with your own test implementation.',
+    );
+    final PlatformInAppLocalhostServer inAppLocalhostServerStatic =
+        InAppWebViewPlatform.instance!
+            .createPlatformInAppLocalhostServerStatic();
+    PlatformInterface.verify(inAppLocalhostServerStatic, _token);
+    return inAppLocalhostServerStatic;
   }
 
   /// Used by the platform implementation to create a new
@@ -128,6 +173,17 @@ abstract class PlatformInAppLocalhostServer extends PlatformInterface {
   ///```
   ///The `NSAllowsLocalNetworking` key is available since **iOS 10**.
   ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppLocalhostServer.start.supported_platforms}
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(),
+      IOSPlatform(),
+      MacOSPlatform(),
+      WindowsPlatform(),
+      LinuxPlatform(),
+    ],
+  )
   Future<void> start() {
     throw UnimplementedError(
       'start is not implemented on the current platform',
@@ -137,6 +193,17 @@ abstract class PlatformInAppLocalhostServer extends PlatformInterface {
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppLocalhostServer.close}
   ///Closes the server.
   ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppLocalhostServer.close.supported_platforms}
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(),
+      IOSPlatform(),
+      MacOSPlatform(),
+      WindowsPlatform(),
+      LinuxPlatform(),
+    ],
+  )
   Future<void> close() {
     throw UnimplementedError(
       'close is not implemented on the current platform',
@@ -146,9 +213,35 @@ abstract class PlatformInAppLocalhostServer extends PlatformInterface {
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppLocalhostServer.isRunning}
   ///Indicates if the server is running or not.
   ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppLocalhostServer.isRunning.supported_platforms}
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(),
+      IOSPlatform(),
+      MacOSPlatform(),
+      WindowsPlatform(),
+      LinuxPlatform(),
+    ],
+  )
   bool isRunning() {
     throw UnimplementedError(
       'isRunning is not implemented on the current platform',
     );
   }
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppLocalhostServerCreationParams.isClassSupported}
+  bool isClassSupported({TargetPlatform? platform}) =>
+      params.isClassSupported(platform: platform);
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppLocalhostServer.isMethodSupported}
+  ///Check if the given [method] is supported by the [defaultTargetPlatform] or a specific [platform].
+  ///{@endtemplate}
+  bool isMethodSupported(
+    PlatformInAppLocalhostServerMethod method, {
+    TargetPlatform? platform,
+  }) => _PlatformInAppLocalhostServerMethodSupported.isMethodSupported(
+    method,
+    platform: platform,
+  );
 }

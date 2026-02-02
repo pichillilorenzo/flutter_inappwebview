@@ -1,13 +1,9 @@
 part of 'main.dart';
 
 void injectCSS() {
-  final shouldSkip = kIsWeb
-      ? false
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebViewController.isMethodSupported(
+    PlatformInAppWebViewControllerMethod.injectCSSCode,
+  );
 
   var url = !kIsWeb ? TEST_URL_ABOUT_BLANK : TEST_WEB_PLATFORM_URL_1;
 

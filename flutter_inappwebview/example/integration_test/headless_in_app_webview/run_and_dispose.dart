@@ -1,13 +1,9 @@
 part of 'main.dart';
 
 void runAndDispose() {
-  final shouldSkip = kIsWeb
-      ? false
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !HeadlessInAppWebView.isMethodSupported(
+    PlatformHeadlessInAppWebViewMethod.run,
+  );
 
   skippableTest('run and dispose', () async {
     final Completer<InAppWebViewController> controllerCompleter =

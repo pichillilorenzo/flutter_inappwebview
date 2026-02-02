@@ -1,9 +1,9 @@
 part of 'main.dart';
 
 void safeBrowsing() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![TargetPlatform.android].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebView.isPropertySupported(
+    PlatformWebViewCreationParamsProperty.onSafeBrowsingHit,
+  );
 
   skippableGroup('safe browsing', () {
     skippableTestWidgets('onSafeBrowsingHit', (WidgetTester tester) async {

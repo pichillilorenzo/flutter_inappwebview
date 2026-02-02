@@ -1,13 +1,9 @@
 part of 'main.dart';
 
 void loadUrl() {
-  final shouldSkip1 = kIsWeb
-      ? false
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip1 = !InAppWebViewController.isMethodSupported(
+    PlatformInAppWebViewControllerMethod.loadUrl,
+  );
 
   var initialUrl = !kIsWeb ? TEST_URL_1 : TEST_WEB_PLATFORM_URL_1;
 
@@ -48,12 +44,9 @@ void loadUrl() {
     expect(await loadedUrl.future, TEST_CROSS_PLATFORM_URL_1.toString());
   }, skip: shouldSkip1);
 
-  final shouldSkip2 = kIsWeb
-      ? true
-      : ![
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip2 = !InAppWebViewController.isMethodSupported(
+    PlatformInAppWebViewControllerMethod.loadSimulatedRequest,
+  );
 
   skippableTestWidgets('loadSimulatedRequest', (WidgetTester tester) async {
     final Completer<InAppWebViewController> controllerCompleter =

@@ -1,13 +1,9 @@
 part of 'main.dart';
 
 void getTitle() {
-  final shouldSkip = kIsWeb
-      ? false
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebViewController.isMethodSupported(
+    PlatformInAppWebViewControllerMethod.getTitle,
+  );
 
   final String getTitleTest = '''
         <!DOCTYPE html><html>

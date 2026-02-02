@@ -1,13 +1,9 @@
 part of 'main.dart';
 
 void sslRequest() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebView.isPropertySupported(
+    PlatformWebViewCreationParamsProperty.onReceivedServerTrustAuthRequest,
+  );
 
   skippableTestWidgets('SSL request', (WidgetTester tester) async {
     final Completer<InAppWebViewController> controllerCompleter =
@@ -35,7 +31,7 @@ void sslRequest() {
           onReceivedClientCertRequest: (controller, challenge) async {
             return new ClientCertResponse(
               certificatePath: "test_assets/certificate.pfx",
-              certificatePassword: "",
+              certificatePassword: "password",
               keyStoreType: "PKCS12",
               action: ClientCertResponseAction.PROCEED,
             );

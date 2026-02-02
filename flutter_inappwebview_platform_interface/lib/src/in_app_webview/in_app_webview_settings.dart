@@ -1891,16 +1891,6 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
   ///- [PlatformInAppWebViewController.createWebMessageChannel]
   ///- [PlatformInAppWebViewController.addWebMessageListener]
   ///
-  ///Also, on MacOS:
-  ///- [PlatformInAppWebViewController.getScrollX]
-  ///- [PlatformInAppWebViewController.getScrollY]
-  ///- [PlatformInAppWebViewController.scrollTo]
-  ///- [PlatformInAppWebViewController.scrollBy]
-  ///- [PlatformInAppWebViewController.getContentHeight]
-  ///- [PlatformInAppWebViewController.getContentWidth]
-  ///- [PlatformInAppWebViewController.canScrollVertically]
-  ///- [PlatformInAppWebViewController.canScrollHorizontally]
-  ///
   ///Settings affected:
   ///- [PlatformWebViewCreationParams.initialUserScripts]
   ///- [InAppWebViewSettings.supportZoom]
@@ -1923,15 +1913,7 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
   ///- [PlatformWebViewCreationParams.onWindowBlur]
   ///- [PlatformWebViewCreationParams.onFindResultReceived]
   ///- [FindInteractionController.onFindResultReceived]
-  ///
-  ///Also, on MacOS:
-  ///- [PlatformWebViewCreationParams.onScrollChanged]
-  @SupportedPlatforms(
-    platforms: [
-      IOSPlatform(available: "13.0"),
-      MacOSPlatform(available: "10.15"),
-    ],
-  )
+  @SupportedPlatforms(platforms: [IOSPlatform(available: "13.0")])
   bool? applePayAPIEnabled;
 
   ///Used in combination with [PlatformWebViewCreationParams.initialUrlRequest] or [PlatformWebViewCreationParams.initialData] (using the `file://` scheme), it represents the URL from which to read the web content.

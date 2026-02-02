@@ -1,13 +1,9 @@
 part of 'main.dart';
 
 void onConsoleMessage() {
-  final shouldSkip = kIsWeb
-      ? false
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebView.isPropertySupported(
+    PlatformWebViewCreationParamsProperty.onConsoleMessage,
+  );
 
   skippableTestWidgets('onConsoleMessage', (WidgetTester tester) async {
     final Completer<InAppWebViewController> controllerCompleter =

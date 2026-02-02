@@ -1,13 +1,9 @@
 part of 'main.dart';
 
 void requestImageRef() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebViewController.isMethodSupported(
+    PlatformInAppWebViewControllerMethod.requestImageRef,
+  );
 
   skippableTestWidgets('requestImageRef', (WidgetTester tester) async {
     final Completer<InAppWebViewController> controllerCompleter =

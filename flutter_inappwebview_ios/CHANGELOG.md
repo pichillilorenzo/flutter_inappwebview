@@ -8,6 +8,7 @@
 - Fixed internal javascript callback handlers when the WebView has windowId not null
 - Fixed "When useShouldInterceptAjaxRequest is true, some ajax requests doesn't work" [#2197](https://github.com/pichillilorenzo/flutter_inappwebview/issues/2197)
 - Fixed "iOS App rejected by apple for violating Guideline 2.5.1 - Performance - Software Requirements | Flutter 3.35.x seems to use non-public or deprecated APIs" [#2754](https://github.com/pichillilorenzo/flutter_inappwebview/issues/2754)
+- Fixed "InAppWebViewController.goTo" implementation
 - Merged "fix #2484, Remove not-empty assert for Cookie.value" [#2486](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2486) (thanks to [laishere](https://github.com/laishere))
 - Merged "Fix gesture recognition delay prevention for latest Flutter versions" [#2538](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2538) (thanks to [muccy-timeware](https://github.com/muccy-timeware))
 

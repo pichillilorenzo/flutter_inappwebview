@@ -7,6 +7,8 @@ import 'android/web_storage_manager.dart';
 import 'ios/web_storage_manager.dart';
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformWebStorageManager}
+///
+///{@macro flutter_inappwebview_platform_interface.PlatformWebStorageManager.supported_platforms}
 class WebStorageManager {
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebStorageManager}
   WebStorageManager()
@@ -59,35 +61,51 @@ class WebStorageManager {
   }
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebStorageManager.getOrigins}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebStorageManager.getOrigins.supported_platforms}
   Future<List<WebStorageOrigin>> getOrigins() => platform.getOrigins();
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebStorageManager.deleteAllData}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebStorageManager.deleteAllData.supported_platforms}
   Future<void> deleteAllData() => platform.deleteAllData();
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebStorageManager.deleteOrigin}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebStorageManager.deleteOrigin.supported_platforms}
   Future<void> deleteOrigin({required String origin}) =>
       platform.deleteOrigin(origin: origin);
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebStorageManager.getQuotaForOrigin}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebStorageManager.getQuotaForOrigin.supported_platforms}
   Future<int> getQuotaForOrigin({required String origin}) =>
       platform.getQuotaForOrigin(origin: origin);
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebStorageManager.getUsageForOrigin}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebStorageManager.getUsageForOrigin.supported_platforms}
   Future<int> getUsageForOrigin({required String origin}) =>
       platform.getUsageForOrigin(origin: origin);
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebStorageManager.fetchDataRecords}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebStorageManager.fetchDataRecords.supported_platforms}
   Future<List<WebsiteDataRecord>> fetchDataRecords({
     required Set<WebsiteDataType> dataTypes,
   }) => platform.fetchDataRecords(dataTypes: dataTypes);
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebStorageManager.removeDataFor}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebStorageManager.removeDataFor.supported_platforms}
   Future<void> removeDataFor({
     required Set<WebsiteDataType> dataTypes,
     required List<WebsiteDataRecord> dataRecords,
   }) => platform.removeDataFor(dataTypes: dataTypes, dataRecords: dataRecords);
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebStorageManager.removeDataModifiedSince}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebStorageManager.removeDataModifiedSince.supported_platforms}
   Future<void> removeDataModifiedSince({
     required Set<WebsiteDataType> dataTypes,
     required DateTime date,

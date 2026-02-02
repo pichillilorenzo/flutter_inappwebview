@@ -17,13 +17,41 @@ class WebArchiveFormat {
     Function nativeValue,
   ) => WebArchiveFormat._internal(value, nativeValue());
 
-  ///Web Archive format used only by Android.
-  static const MHT = WebArchiveFormat._internal('mht', 'mht');
+  ///MHT (MIME HTML) is a web Archive format that saves a web page's HTML code, images, CSS, and scripts into one document, allowing for offline viewing.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android WebView
+  ///- Linux WPE WebKit
+  static final MHT = WebArchiveFormat._internalMultiPlatform('mht', () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+        return 'mht';
+      case TargetPlatform.linux:
+        return 'mht';
+      default:
+        break;
+    }
+    return null;
+  });
 
-  ///Web Archive format used only by iOS.
-  static const WEBARCHIVE = WebArchiveFormat._internal(
+  ///WebArchive is a web Archive format used primarily on iOS and macOS platforms to save web pages, including HTML content, images, stylesheets, and scripts, into a single file for offline access.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- iOS WKWebView
+  ///- macOS WKWebView
+  static final WEBARCHIVE = WebArchiveFormat._internalMultiPlatform(
     'webarchive',
-    'webarchive',
+    () {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.iOS:
+          return 'webarchive';
+        case TargetPlatform.macOS:
+          return 'webarchive';
+        default:
+          break;
+      }
+      return null;
+    },
   );
 
   ///Set of all values of [WebArchiveFormat].

@@ -1,18 +1,14 @@
 part of 'main.dart';
 
 void programmaticZoomScale() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebView.isPropertySupported(
+    PlatformWebViewCreationParamsProperty.onZoomScaleChanged,
+  );
 
   skippableGroup('programmatic zoom scale', () {
-    final shouldSkipTest1 = kIsWeb
-        ? true
-        : ![TargetPlatform.android].contains(defaultTargetPlatform);
+    final shouldSkipTest1 = !InAppWebViewController.isMethodSupported(
+      PlatformInAppWebViewControllerMethod.zoomIn,
+    );
 
     skippableTestWidgets('zoomIn/zoomOut', (WidgetTester tester) async {
       final Completer<InAppWebViewController> controllerCompleter =

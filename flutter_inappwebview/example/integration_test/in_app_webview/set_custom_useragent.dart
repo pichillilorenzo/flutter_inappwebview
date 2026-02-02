@@ -1,13 +1,9 @@
 part of 'main.dart';
 
 void setCustomUserAgent() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebViewSettings.isPropertySupported(
+    InAppWebViewSettingsProperty.userAgent,
+  );
 
   skippableTestWidgets('set custom userAgent', (WidgetTester tester) async {
     final Completer controllerCompleter1 = Completer<InAppWebViewController>();

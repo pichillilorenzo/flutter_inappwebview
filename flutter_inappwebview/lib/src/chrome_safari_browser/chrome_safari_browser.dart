@@ -35,6 +35,8 @@ class ChromeSafariBrowser implements PlatformChromeSafariBrowserEvents {
   final PlatformChromeSafariBrowser platform;
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.id}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.id.supported_platforms}
   String get id => platform.id;
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.open}

@@ -1,13 +1,9 @@
 part of 'main.dart';
 
 void interceptAjaxRequest() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebView.isPropertySupported(
+    PlatformWebViewCreationParamsProperty.shouldInterceptAjaxRequest,
+  );
 
   skippableGroup('intercept ajax request', () {
     skippableTestWidgets('send string data', (WidgetTester tester) async {

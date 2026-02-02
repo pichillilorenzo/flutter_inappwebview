@@ -56,6 +56,8 @@ class InAppBrowser implements PlatformInAppBrowserEvents {
   final PlatformInAppBrowser platform;
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppBrowser.id}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppBrowser.id.supported_platforms}
   String get id => platform.id;
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.contextMenu}
@@ -102,6 +104,8 @@ class InAppBrowser implements PlatformInAppBrowserEvents {
   int? get windowId => platform.windowId;
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppBrowser.webViewController}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppBrowser.webViewController.supported_platforms}
   InAppWebViewController? get webViewController {
     final webViewControllerPlatform = platform.webViewController;
     if (webViewControllerPlatform == null) {

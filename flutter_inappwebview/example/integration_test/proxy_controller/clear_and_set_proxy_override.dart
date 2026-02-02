@@ -1,13 +1,9 @@
 part of 'main.dart';
 
 void clearAndSetProxyOverride() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !ProxyController.isMethodSupported(
+    PlatformProxyControllerMethod.setProxyOverride,
+  );
 
   skippableTestWidgets('clear and set proxy override', (
     WidgetTester tester,
@@ -17,7 +13,7 @@ void clearAndSetProxyOverride() {
     final Completer<String> pageLoaded = Completer<String>();
 
     var proxyAvailable =
-        defaultTargetPlatform != TargetPlatform.android ||
+        !PlatformWebViewFeature.static().isClassSupported() ||
         await WebViewFeature.isFeatureSupported(WebViewFeature.PROXY_OVERRIDE);
 
     if (proxyAvailable) {
@@ -49,15 +45,18 @@ void clearAndSetProxyOverride() {
 
     final InAppWebViewController controller = await controllerCompleter.future;
 
+    await tester.pump();
+
     final String url = await pageLoaded.future;
     expect(url, TEST_URL_HTTP_EXAMPLE.toString());
 
-    expect(
-      await controller.evaluateJavascript(
-        source: "document.getElementById('url').innerHTML;",
-      ),
-      TEST_URL_HTTP_EXAMPLE.toString(),
+    // The proxy server's req.url returns different values by platform:
+    // - Android: full URL (http://www.example.com/)
+    // - macOS/iOS: just the path (/)
+    final proxyUrl = await controller.evaluateJavascript(
+      source: "document.getElementById('url').innerHTML;",
     );
+    expect(proxyUrl, anyOf("/", TEST_URL_HTTP_EXAMPLE.toString()));
     expect(
       await controller.evaluateJavascript(
         source: "document.getElementById('method').innerHTML;",

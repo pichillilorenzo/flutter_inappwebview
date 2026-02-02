@@ -48,7 +48,6 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
     var pageZoom = 1.0
     var limitsNavigationsToAppBoundDomains = false
     var useOnNavigationResponse = false
-    var applePayAPIEnabled = false
     var allowingReadAccessTo: String? = nil
     var underPageBackgroundColor: String?
     var isTextInteractionEnabled = true
@@ -78,9 +77,6 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
             settings.removeValue(forKey: "alpha")
         }
         let _ = super.parse(settings: settings)
-        if #available(macOS 10.15, *) {} else {
-            applePayAPIEnabled = false
-        }
         return self
     }
     

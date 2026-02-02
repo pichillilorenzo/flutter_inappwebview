@@ -531,7 +531,8 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
         }
         return null;
       case "onJsBeforeUnload":
-        if ((webviewParams != null && webviewParams!.onJsBeforeUnload != null) ||
+        if ((webviewParams != null &&
+                webviewParams!.onJsBeforeUnload != null) ||
             _inAppBrowserEventHandler != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
@@ -787,7 +788,10 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
           )!;
           if (webviewParams != null &&
               webviewParams!.onRenderProcessGone != null)
-            webviewParams!.onRenderProcessGone!(_controllerFromPlatform, detail);
+            webviewParams!.onRenderProcessGone!(
+              _controllerFromPlatform,
+              detail,
+            );
           else
             _inAppBrowserEventHandler!.onRenderProcessGone(detail);
         }
@@ -1875,6 +1879,13 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
     required String filePath,
     bool autoname = false,
   }) async {
+    if (!autoname) {
+      assert(
+        WebArchiveFormat.MHT.isSupported() &&
+            filePath.endsWith("." + WebArchiveFormat.MHT.toNativeValue()!),
+      );
+    }
+
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('filePath', () => filePath);
     args.putIfAbsent('autoname', () => autoname);

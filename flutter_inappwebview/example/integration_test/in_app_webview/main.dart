@@ -103,16 +103,13 @@ part 'webview_windows.dart';
 part 'keep_alive.dart';
 
 void main() {
-  final shouldSkip = kIsWeb
-      ? false
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebViewController.isClassSupported();
 
   skippableGroup('InAppWebView', () {
     setUpAll(() async {
-      if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
+      if (InAppWebViewController.isMethodSupported(
+        PlatformInAppWebViewControllerMethod.setWebContentsDebuggingEnabled,
+      )) {
         await InAppWebViewController.setWebContentsDebuggingEnabled(true);
       }
     });

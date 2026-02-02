@@ -1,13 +1,9 @@
 part of 'main.dart';
 
 void pauseResumeTimers() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebViewController.isMethodSupported(
+    PlatformInAppWebViewControllerMethod.pauseTimers,
+  );
 
   skippableTestWidgets('pause/resume timers', (WidgetTester tester) async {
     final Completer<InAppWebViewController> controllerCompleter =

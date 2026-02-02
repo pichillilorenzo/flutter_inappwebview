@@ -1733,6 +1733,7 @@ FlValue* InAppWebView::getCopyBackForwardList() const {
   int currentIndex = g_list_length(backList);
 
   FlValue* historyList = fl_value_new_list();
+  int index = 0;
 
   for (GList* l = backList; l != nullptr; l = l->next) {
     WebKitBackForwardListItem* item = WEBKIT_BACK_FORWARD_LIST_ITEM(l->data);
@@ -1745,9 +1746,12 @@ FlValue* InAppWebView::getCopyBackForwardList() const {
       {"originalUrl", make_fl_value(originalUri ? originalUri : "")},
       {"title", make_fl_value(title ? title : "")},
       {"url", make_fl_value(uri ? uri : "")},
+      {"index", make_fl_value(index)},
+      {"offset", make_fl_value(index - currentIndex)},
     });
 
     fl_value_append_take(historyList, itemMap);
+    index++;
   }
 
   if (currentItem != nullptr) {
@@ -1759,9 +1763,12 @@ FlValue* InAppWebView::getCopyBackForwardList() const {
       {"originalUrl", make_fl_value(originalUri ? originalUri : "")},
       {"title", make_fl_value(title ? title : "")},
       {"url", make_fl_value(uri ? uri : "")},
+      {"index", make_fl_value(index)},
+      {"offset", make_fl_value(index - currentIndex)},
     });
 
     fl_value_append_take(historyList, itemMap);
+    index++;
   }
 
   for (GList* l = forwardList; l != nullptr; l = l->next) {
@@ -1775,9 +1782,12 @@ FlValue* InAppWebView::getCopyBackForwardList() const {
       {"originalUrl", make_fl_value(originalUri ? originalUri : "")},
       {"title", make_fl_value(title ? title : "")},
       {"url", make_fl_value(uri ? uri : "")},
+      {"index", make_fl_value(index)},
+      {"offset", make_fl_value(index - currentIndex)},
     });
 
     fl_value_append_take(historyList, itemMap);
+    index++;
   }
 
   return to_fl_map({

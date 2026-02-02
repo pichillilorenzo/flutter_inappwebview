@@ -1370,15 +1370,17 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     int currentSize = currentList.getSize();
     int currentIndex = currentList.getCurrentIndex();
 
-    List<HashMap<String, String>> history = new ArrayList<HashMap<String, String>>();
+    List<HashMap<String, Object>> history = new ArrayList<HashMap<String, Object>>();
 
     for (int i = 0; i < currentSize; i++) {
       WebHistoryItem historyItem = currentList.getItemAtIndex(i);
-      HashMap<String, String> historyItemMap = new HashMap<>();
+      HashMap<String, Object> historyItemMap = new HashMap<>();
 
       historyItemMap.put("originalUrl", historyItem.getOriginalUrl());
       historyItemMap.put("title", historyItem.getTitle());
       historyItemMap.put("url", historyItem.getUrl());
+      historyItemMap.put("index", i);
+      historyItemMap.put("offset", i - currentIndex);
 
       history.add(historyItemMap);
     }

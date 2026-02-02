@@ -1,13 +1,9 @@
 part of 'main.dart';
 
 void takeScreenshot() {
-  final shouldSkip =
-      kIsWeb ||
-      ![
-        TargetPlatform.android,
-        TargetPlatform.iOS,
-        TargetPlatform.macOS,
-      ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebViewController.isMethodSupported(
+    PlatformInAppWebViewControllerMethod.takeScreenshot,
+  );
 
   skippableTest('take screenshot', () async {
     final Completer<InAppWebViewController> controllerCompleter =

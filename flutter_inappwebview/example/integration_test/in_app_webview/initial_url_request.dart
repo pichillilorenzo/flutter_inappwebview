@@ -1,21 +1,14 @@
 part of 'main.dart';
 
 void initialUrlRequest() {
-  final shouldSkip = kIsWeb
-      ? false
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebView.isPropertySupported(
+    PlatformWebViewCreationParamsProperty.initialUrlRequest,
+  );
 
   skippableGroup('initial url request', () {
-    final shouldSkipTest2 = kIsWeb
-        ? true
-        : ![
-            TargetPlatform.iOS,
-            TargetPlatform.macOS,
-          ].contains(defaultTargetPlatform);
+    final shouldSkipTest2 = !InAppWebViewSettings.isPropertySupported(
+      InAppWebViewSettingsProperty.allowsBackForwardNavigationGestures,
+    );
 
     skippableTestWidgets(
       'launches with allowsBackForwardNavigationGestures true',
@@ -55,13 +48,9 @@ void initialUrlRequest() {
       skip: shouldSkipTest2,
     );
 
-    final shouldSkipTest1 = kIsWeb
-        ? false
-        : ![
-            TargetPlatform.android,
-            TargetPlatform.iOS,
-            TargetPlatform.macOS,
-          ].contains(defaultTargetPlatform);
+    final shouldSkipTest1 = !InAppWebView.isPropertySupported(
+      PlatformWebViewCreationParamsProperty.initialUrlRequest,
+    );
 
     skippableTestWidgets('basic', (WidgetTester tester) async {
       final Completer<void> pageLoaded = Completer<void>();

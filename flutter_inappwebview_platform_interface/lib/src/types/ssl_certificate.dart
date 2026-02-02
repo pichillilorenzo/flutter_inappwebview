@@ -1,6 +1,5 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 
-import '../util.dart';
 import '../x509_certificate/x509_certificate.dart';
 import '../x509_certificate/asn1_distinguished_names.dart';
 import 'enum_method.dart';
@@ -52,68 +51,68 @@ class SslCertificate_ {
       print(stacktrace);
     }
 
-    if (Util.isIOS) {
-      if (x509Certificate != null) {
-        return SslCertificate(
-          issuedBy: SslCertificateDName(
-            CName:
-                x509Certificate.issuer(
-                  dn: ASN1DistinguishedNames.COMMON_NAME,
-                ) ??
-                "",
-            DName: x509Certificate.issuerDistinguishedName ?? "",
-            OName:
-                x509Certificate.issuer(
-                  dn: ASN1DistinguishedNames.ORGANIZATION_NAME,
-                ) ??
-                "",
-            UName:
-                x509Certificate.issuer(
-                  dn: ASN1DistinguishedNames.ORGANIZATIONAL_UNIT_NAME,
-                ) ??
-                "",
-          ),
-          issuedTo: SslCertificateDName(
-            CName:
-                x509Certificate.subject(
-                  dn: ASN1DistinguishedNames.COMMON_NAME,
-                ) ??
-                "",
-            DName: x509Certificate.subjectDistinguishedName ?? "",
-            OName:
-                x509Certificate.subject(
-                  dn: ASN1DistinguishedNames.ORGANIZATION_NAME,
-                ) ??
-                "",
-            UName:
-                x509Certificate.subject(
-                  dn: ASN1DistinguishedNames.ORGANIZATIONAL_UNIT_NAME,
-                ) ??
-                "",
-          ),
-          validNotAfterDate: x509Certificate.notAfter,
-          validNotBeforeDate: x509Certificate.notBefore,
-          x509Certificate: x509Certificate,
-        );
-      }
-      return null;
+    // Try to get issuedBy from map, otherwise fall back to x509Certificate
+    SslCertificateDName? issuedBy = SslCertificateDName.fromMap(
+      map["issuedBy"]?.cast<String, dynamic>(),
+      enumMethod: enumMethod,
+    );
+    if (issuedBy == null && x509Certificate != null) {
+      issuedBy = SslCertificateDName(
+        CName:
+            x509Certificate.issuer(dn: ASN1DistinguishedNames.COMMON_NAME) ??
+            "",
+        DName: x509Certificate.issuerDistinguishedName ?? "",
+        OName:
+            x509Certificate.issuer(
+              dn: ASN1DistinguishedNames.ORGANIZATION_NAME,
+            ) ??
+            "",
+        UName:
+            x509Certificate.issuer(
+              dn: ASN1DistinguishedNames.ORGANIZATIONAL_UNIT_NAME,
+            ) ??
+            "",
+      );
     }
 
+    // Try to get issuedTo from map, otherwise fall back to x509Certificate
+    SslCertificateDName? issuedTo = SslCertificateDName.fromMap(
+      map["issuedTo"]?.cast<String, dynamic>(),
+      enumMethod: enumMethod,
+    );
+    if (issuedTo == null && x509Certificate != null) {
+      issuedTo = SslCertificateDName(
+        CName:
+            x509Certificate.subject(dn: ASN1DistinguishedNames.COMMON_NAME) ??
+            "",
+        DName: x509Certificate.subjectDistinguishedName ?? "",
+        OName:
+            x509Certificate.subject(
+              dn: ASN1DistinguishedNames.ORGANIZATION_NAME,
+            ) ??
+            "",
+        UName:
+            x509Certificate.subject(
+              dn: ASN1DistinguishedNames.ORGANIZATIONAL_UNIT_NAME,
+            ) ??
+            "",
+      );
+    }
+
+    // Try to get dates from map, otherwise fall back to x509Certificate
+    DateTime? validNotAfterDate = map["validNotAfterDate"] != null
+        ? DateTime.fromMillisecondsSinceEpoch(map["validNotAfterDate"])
+        : x509Certificate?.notAfter;
+
+    DateTime? validNotBeforeDate = map["validNotBeforeDate"] != null
+        ? DateTime.fromMillisecondsSinceEpoch(map["validNotBeforeDate"])
+        : x509Certificate?.notBefore;
+
     return SslCertificate(
-      issuedBy: SslCertificateDName.fromMap(
-        map["issuedBy"]?.cast<String, dynamic>(),
-        enumMethod: enumMethod,
-      ),
-      issuedTo: SslCertificateDName.fromMap(
-        map["issuedTo"]?.cast<String, dynamic>(),
-        enumMethod: enumMethod,
-      ),
-      validNotAfterDate: map["validNotAfterDate"] != null
-          ? DateTime.fromMillisecondsSinceEpoch(map["validNotAfterDate"])
-          : null,
-      validNotBeforeDate: map["validNotBeforeDate"] != null
-          ? DateTime.fromMillisecondsSinceEpoch(map["validNotBeforeDate"])
-          : null,
+      issuedBy: issuedBy,
+      issuedTo: issuedTo,
+      validNotAfterDate: validNotAfterDate,
+      validNotBeforeDate: validNotBeforeDate,
       x509Certificate: x509Certificate,
     );
   }

@@ -1,12 +1,9 @@
 part of 'main.dart';
 
 void openAndClose() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !ChromeSafariBrowser.isMethodSupported(
+    PlatformChromeSafariBrowserMethod.open,
+  );
 
   skippableTest('open and close', () async {
     var chromeSafariBrowser = MyChromeSafariBrowser();
@@ -42,7 +39,7 @@ void openAndClose() {
         activityButton: ActivityButton(
           templateImage: UIImage(systemName: "sun.max"),
           extensionIdentifier:
-              "com.pichillilorenzo.flutterinappwebview-ios-example3.test",
+              "com.pichillilorenzo.flutterinappwebview-ios-example5.test",
         ),
       ),
     );

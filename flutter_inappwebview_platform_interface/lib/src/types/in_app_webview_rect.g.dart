@@ -25,7 +25,7 @@ class InAppWebViewRect {
     required this.width,
     required this.height,
   }) {
-    assert(this.x >= 0 && this.y >= 0 && this.width >= 0 && this.height >= 0);
+    assert(this.width >= 0 && this.height >= 0);
   }
 
   ///Gets a possible [InAppWebViewRect] instance from a [Map] value.

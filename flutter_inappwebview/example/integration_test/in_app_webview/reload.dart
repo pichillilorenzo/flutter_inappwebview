@@ -1,23 +1,16 @@
 part of 'main.dart';
 
 void reload() {
-  final shouldSkip = kIsWeb
-      ? false
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebViewController.isMethodSupported(
+    PlatformInAppWebViewControllerMethod.reload,
+  );
 
   var url = !kIsWeb ? TEST_URL_1 : TEST_WEB_PLATFORM_URL_1;
 
   skippableGroup('reload', () {
-    final shouldSkipTest1 = kIsWeb
-        ? true
-        : ![
-            TargetPlatform.iOS,
-            TargetPlatform.macOS,
-          ].contains(defaultTargetPlatform);
+    final shouldSkipTest1 = !InAppWebViewController.isMethodSupported(
+      PlatformInAppWebViewControllerMethod.reloadFromOrigin,
+    );
 
     skippableTestWidgets('from origin', (WidgetTester tester) async {
       final Completer<InAppWebViewController> controllerCompleter =

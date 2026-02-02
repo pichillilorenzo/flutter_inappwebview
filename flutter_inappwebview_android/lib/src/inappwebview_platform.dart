@@ -457,6 +457,43 @@ class AndroidInAppWebViewPlatform extends InAppWebViewPlatform {
     return AndroidCustomPathHandler(params);
   }
 
+  /// Creates a new empty [AndroidAssetsPathHandler] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [AssetsPathHandler] in `flutter_inappwebview` instead.
+  @override
+  AndroidAssetsPathHandler createPlatformAssetsPathHandlerStatic() {
+    return AndroidAssetsPathHandler.static();
+  }
+
+  /// Creates a new empty [AndroidResourcesPathHandler] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [ResourcesPathHandler] in `flutter_inappwebview` instead.
+  @override
+  AndroidResourcesPathHandler createPlatformResourcesPathHandlerStatic() {
+    return AndroidResourcesPathHandler.static();
+  }
+
+  /// Creates a new empty [AndroidInternalStoragePathHandler] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [InternalStoragePathHandler] in `flutter_inappwebview` instead.
+  @override
+  AndroidInternalStoragePathHandler
+  createPlatformInternalStoragePathHandlerStatic() {
+    return AndroidInternalStoragePathHandler.static();
+  }
+
+  /// Creates a new empty [AndroidCustomPathHandler] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [CustomPathHandler] in `flutter_inappwebview` instead.
+  @override
+  AndroidCustomPathHandler createPlatformCustomPathHandlerStatic() {
+    return AndroidCustomPathHandler.static();
+  }
+
   /// Creates a new [wv.AndroidWebViewFeature].
   ///
   /// This function should only be called by the app-facing package.
@@ -515,6 +552,26 @@ class AndroidInAppWebViewPlatform extends InAppWebViewPlatform {
   @override
   AndroidWebStorageManager createPlatformWebStorageManagerStatic() {
     return AndroidWebStorageManager.static();
+  }
+
+  /// Creates a new [DefaultInAppLocalhostServer].
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [InAppLocalhostServer] in `flutter_inappwebview` instead.
+  @override
+  DefaultInAppLocalhostServer createPlatformInAppLocalhostServer(
+    PlatformInAppLocalhostServerCreationParams params,
+  ) {
+    return DefaultInAppLocalhostServer(params);
+  }
+
+  /// Creates a new empty [DefaultInAppLocalhostServer] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [InAppLocalhostServer] in `flutter_inappwebview` instead.
+  @override
+  DefaultInAppLocalhostServer createPlatformInAppLocalhostServerStatic() {
+    return DefaultInAppLocalhostServer.static();
   }
 
   // ************************************************************************ //

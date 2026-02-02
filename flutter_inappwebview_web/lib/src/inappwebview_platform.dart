@@ -312,6 +312,61 @@ class WebPlatformInAppWebViewPlatform extends InAppWebViewPlatform {
   createPlatformWebNotificationControllerStatic() {
     return _PlatformWebNotificationController.static();
   }
+
+  /// Creates a new empty [PlatformAssetsPathHandler] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [AssetsPathHandler] in `flutter_inappwebview` instead.
+  @override
+  PlatformAssetsPathHandler createPlatformAssetsPathHandlerStatic() {
+    return _PlatformAssetsPathHandler.static();
+  }
+
+  /// Creates a new empty [PlatformResourcesPathHandler] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [ResourcesPathHandler] in `flutter_inappwebview` instead.
+  @override
+  PlatformResourcesPathHandler createPlatformResourcesPathHandlerStatic() {
+    return _PlatformResourcesPathHandler.static();
+  }
+
+  /// Creates a new empty [PlatformInternalStoragePathHandler] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [InternalStoragePathHandler] in `flutter_inappwebview` instead.
+  @override
+  PlatformInternalStoragePathHandler
+  createPlatformInternalStoragePathHandlerStatic() {
+    return _PlatformInternalStoragePathHandler.static();
+  }
+
+  /// Creates a new empty [PlatformCustomPathHandler] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [CustomPathHandler] in `flutter_inappwebview` instead.
+  @override
+  PlatformCustomPathHandler createPlatformCustomPathHandlerStatic() {
+    return _PlatformCustomPathHandler.static();
+  }
+
+  /// Creates a new empty [PlatformInAppLocalhostServer] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [InAppLocalhostServer] in `flutter_inappwebview` instead.
+  @override
+  PlatformInAppLocalhostServer createPlatformInAppLocalhostServerStatic() {
+    return _PlatformInAppLocalhostServer.static();
+  }
+
+  /// Creates a new empty [PlatformWebViewFeature] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [WebViewFeature] in `flutter_inappwebview` instead
+  @override
+  PlatformWebViewFeature createPlatformWebViewFeatureStatic() {
+    return _PlatformWebViewFeature.static();
+  }
 }
 
 class _PlatformInAppBrowser extends PlatformInAppBrowser {
@@ -553,4 +608,135 @@ class _PlatformWebNotificationController
       );
 
   factory _PlatformWebNotificationController.static() => _staticValue;
+}
+
+class _PlatformWebViewFeature extends PlatformWebViewFeature {
+  _PlatformWebViewFeature(PlatformWebViewFeatureCreationParams params)
+    : super.implementation(params);
+
+  static final _PlatformWebViewFeature _staticValue = _PlatformWebViewFeature(
+    PlatformWebViewFeatureCreationParams(),
+  );
+  factory _PlatformWebViewFeature.static() => _staticValue;
+}
+
+class _PlatformAssetsPathHandler extends PlatformAssetsPathHandler {
+  _PlatformAssetsPathHandler(PlatformAssetsPathHandlerCreationParams params)
+    : super.implementation(params);
+
+  static final _PlatformAssetsPathHandler _staticValue =
+      _PlatformAssetsPathHandler(
+        PlatformAssetsPathHandlerCreationParams(
+          PlatformPathHandlerCreationParams(path: ''),
+        ),
+      );
+
+  factory _PlatformAssetsPathHandler.static() => _staticValue;
+
+  @override
+  PlatformPathHandlerEvents? eventHandler;
+
+  @override
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) => {
+    "path": path,
+    "type": type,
+  };
+
+  @override
+  Map<String, dynamic> toJson() => toMap();
+}
+
+class _PlatformResourcesPathHandler extends PlatformResourcesPathHandler {
+  _PlatformResourcesPathHandler(
+    PlatformResourcesPathHandlerCreationParams params,
+  ) : super.implementation(params);
+
+  static final _PlatformResourcesPathHandler _staticValue =
+      _PlatformResourcesPathHandler(
+        PlatformResourcesPathHandlerCreationParams(
+          PlatformPathHandlerCreationParams(path: ''),
+        ),
+      );
+
+  factory _PlatformResourcesPathHandler.static() => _staticValue;
+
+  @override
+  PlatformPathHandlerEvents? eventHandler;
+
+  @override
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) => {
+    "path": path,
+    "type": type,
+  };
+
+  @override
+  Map<String, dynamic> toJson() => toMap();
+}
+
+class _PlatformInternalStoragePathHandler
+    extends PlatformInternalStoragePathHandler {
+  _PlatformInternalStoragePathHandler(
+    PlatformInternalStoragePathHandlerCreationParams params,
+  ) : super.implementation(params);
+
+  static final _PlatformInternalStoragePathHandler _staticValue =
+      _PlatformInternalStoragePathHandler(
+        PlatformInternalStoragePathHandlerCreationParams(
+          PlatformPathHandlerCreationParams(path: ''),
+          directory: '',
+        ),
+      );
+
+  factory _PlatformInternalStoragePathHandler.static() => _staticValue;
+
+  @override
+  PlatformPathHandlerEvents? eventHandler;
+
+  @override
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) => {
+    "path": path,
+    "type": type,
+  };
+
+  @override
+  Map<String, dynamic> toJson() => toMap();
+}
+
+class _PlatformCustomPathHandler extends PlatformCustomPathHandler {
+  _PlatformCustomPathHandler(PlatformCustomPathHandlerCreationParams params)
+    : super.implementation(params);
+
+  static final _PlatformCustomPathHandler _staticValue =
+      _PlatformCustomPathHandler(
+        PlatformCustomPathHandlerCreationParams(
+          PlatformPathHandlerCreationParams(path: ''),
+        ),
+      );
+
+  factory _PlatformCustomPathHandler.static() => _staticValue;
+
+  @override
+  PlatformPathHandlerEvents? eventHandler;
+
+  @override
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) => {
+    "path": path,
+    "type": type,
+  };
+
+  @override
+  Map<String, dynamic> toJson() => toMap();
+}
+
+class _PlatformInAppLocalhostServer extends PlatformInAppLocalhostServer {
+  _PlatformInAppLocalhostServer(
+    PlatformInAppLocalhostServerCreationParams params,
+  ) : super.implementation(params);
+
+  static final _PlatformInAppLocalhostServer _staticValue =
+      _PlatformInAppLocalhostServer(
+        const PlatformInAppLocalhostServerCreationParams(),
+      );
+
+  factory _PlatformInAppLocalhostServer.static() => _staticValue;
 }

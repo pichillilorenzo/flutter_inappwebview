@@ -533,6 +533,16 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
     );
   }
 
+  /// Creates a new empty [PlatformAssetsPathHandler] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [AssetsPathHandler] in `flutter_inappwebview` instead.
+  PlatformAssetsPathHandler createPlatformAssetsPathHandlerStatic() {
+    throw UnimplementedError(
+      'createPlatformAssetsPathHandlerStatic is not implemented on the current platform.',
+    );
+  }
+
   /// Creates a new [PlatformResourcesPathHandler].
   ///
   /// This function should only be called by the app-facing package.
@@ -542,6 +552,16 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
   ) {
     throw UnimplementedError(
       'createPlatformResourcesPathHandler is not implemented on the current platform.',
+    );
+  }
+
+  /// Creates a new empty [PlatformResourcesPathHandler] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [ResourcesPathHandler] in `flutter_inappwebview` instead.
+  PlatformResourcesPathHandler createPlatformResourcesPathHandlerStatic() {
+    throw UnimplementedError(
+      'createPlatformResourcesPathHandlerStatic is not implemented on the current platform.',
     );
   }
 
@@ -557,6 +577,17 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
     );
   }
 
+  /// Creates a new empty [PlatformInternalStoragePathHandler] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [InternalStoragePathHandler] in `flutter_inappwebview` instead.
+  PlatformInternalStoragePathHandler
+  createPlatformInternalStoragePathHandlerStatic() {
+    throw UnimplementedError(
+      'createPlatformInternalStoragePathHandlerStatic is not implemented on the current platform.',
+    );
+  }
+
   /// Creates a new [PlatformCustomPathHandler].
   ///
   /// This function should only be called by the app-facing package.
@@ -566,6 +597,16 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
   ) {
     throw UnimplementedError(
       'createPlatformCustomPathHandler is not implemented on the current platform.',
+    );
+  }
+
+  /// Creates a new empty [PlatformCustomPathHandler] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [CustomPathHandler] in `flutter_inappwebview` instead.
+  PlatformCustomPathHandler createPlatformCustomPathHandlerStatic() {
+    throw UnimplementedError(
+      'createPlatformCustomPathHandlerStatic is not implemented on the current platform.',
     );
   }
 
@@ -599,6 +640,16 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
     PlatformInAppLocalhostServerCreationParams params,
   ) {
     return DefaultInAppLocalhostServer(params);
+  }
+
+  /// Creates a new empty [PlatformInAppLocalhostServer] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [DefaultInAppLocalhostServer] in `flutter_inappwebview` instead.
+  PlatformInAppLocalhostServer createPlatformInAppLocalhostServerStatic() {
+    return DefaultInAppLocalhostServer(
+      const PlatformInAppLocalhostServerCreationParams(),
+    );
   }
 
   /// Creates a new [PlatformChromeSafariBrowser].

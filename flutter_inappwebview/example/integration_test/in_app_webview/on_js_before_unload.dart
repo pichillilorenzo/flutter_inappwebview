@@ -1,11 +1,9 @@
 part of 'main.dart';
 
 void onJsBeforeUnload() {
-  // final shouldSkip = kIsWeb
-  //     ? true
-  //     : ![
-  //         TargetPlatform.android,
-  //       ].contains(defaultTargetPlatform);
+  // final shouldSkip = !InAppWebView.isPropertySupported(
+  //   PlatformWebViewCreationParamsProperty.onJsBeforeUnload,
+  // );
   final shouldSkip = true;
   // on Android, for some reason, it works on an example app but not in this test
   skippableTestWidgets('onJsBeforeUnload', (WidgetTester tester) async {

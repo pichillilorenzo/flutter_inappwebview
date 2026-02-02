@@ -1,13 +1,9 @@
 part of 'main.dart';
 
 void keepAlive() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebView.isPropertySupported(
+    PlatformInAppWebViewWidgetCreationParamsProperty.keepAlive,
+  );
 
   final initialUrl = !kIsWeb
       ? TEST_CROSS_PLATFORM_URL_1

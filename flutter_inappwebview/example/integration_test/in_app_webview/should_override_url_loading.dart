@@ -1,13 +1,9 @@
 part of 'main.dart';
 
 void shouldOverrideUrlLoading() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebView.isPropertySupported(
+    PlatformWebViewCreationParamsProperty.shouldOverrideUrlLoading,
+  );
 
   skippableGroup('shouldOverrideUrlLoading', () {
     final String page =
@@ -48,23 +44,17 @@ void shouldOverrideUrlLoading() {
       final InAppWebViewController controller =
           await controllerCompleter.future;
       await controller.evaluateJavascript(
-        source: 'location.href = "$TEST_URL_2"',
+        source: 'location.href = "$TEST_URL_EXAMPLE"',
       );
 
       await pageLoads.stream.first; // Wait for the next page load.
       final String? currentUrl = (await controller.getUrl())?.toString();
-      expect(currentUrl, TEST_URL_2.toString());
+      expect(currentUrl, TEST_URL_EXAMPLE.toString());
 
       pageLoads.close();
     });
 
-    final shouldSkipTest2 = kIsWeb
-        ? true
-        : ![
-            TargetPlatform.iOS,
-            TargetPlatform.macOS,
-          ].contains(defaultTargetPlatform);
-
+    final shouldSkipTest2 = !NavigationType.LINK_ACTIVATED.isSupported();
     testWidgets(
       'allow requests on iOS only if navigationType == NavigationType.LINK_ACTIVATED',
       (WidgetTester tester) async {
@@ -214,12 +204,12 @@ void shouldOverrideUrlLoading() {
       final InAppWebViewController controller =
           await controllerCompleter.future;
       await controller.evaluateJavascript(
-        source: 'location.href = "$TEST_URL_2"',
+        source: 'location.href = "$TEST_URL_EXAMPLE"',
       );
 
       await pageLoads.stream.first; // Wait for second page to load.
       final String? currentUrl = (await controller.getUrl())?.toString();
-      expect(currentUrl, TEST_URL_2.toString());
+      expect(currentUrl, TEST_URL_EXAMPLE.toString());
 
       pageLoads.close();
     });

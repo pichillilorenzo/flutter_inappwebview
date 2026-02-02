@@ -1,13 +1,9 @@
 part of 'main.dart';
 
 void interceptFetchRequest() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebView.isPropertySupported(
+    PlatformWebViewCreationParamsProperty.shouldInterceptFetchRequest,
+  );
 
   skippableGroup('intercept fetch request', () {
     skippableTestWidgets('send string data', (WidgetTester tester) async {

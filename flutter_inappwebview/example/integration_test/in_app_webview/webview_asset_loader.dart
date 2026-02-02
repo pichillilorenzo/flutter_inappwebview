@@ -1,9 +1,9 @@
 part of 'main.dart';
 
 void webViewAssetLoader() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![TargetPlatform.android].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebViewSettings.isPropertySupported(
+    InAppWebViewSettingsProperty.webViewAssetLoader,
+  );
 
   skippableTestWidgets('WebViewAssetLoader', (WidgetTester tester) async {
     final Completer<InAppWebViewController> controllerCompleter =

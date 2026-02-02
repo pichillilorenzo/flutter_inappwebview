@@ -1,9 +1,9 @@
 part of 'main.dart';
 
 void sfSafariViewController() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![TargetPlatform.iOS].contains(defaultTargetPlatform);
+  final shouldSkip = !ChromeSafariBrowser.isMethodSupported(
+    PlatformChromeSafariBrowserMethod.prewarmConnections,
+  );
 
   skippableGroup('SF Safari View Controller', () {
     skippableTest('onCompletedInitialLoad did load successfully', () async {

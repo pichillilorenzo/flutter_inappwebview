@@ -1,22 +1,16 @@
 part of 'main.dart';
 
 void webViewWindows() {
-  final shouldSkip = kIsWeb
-      ? false
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebView.isPropertySupported(
+    PlatformWebViewCreationParamsProperty.onCreateWindow,
+  );
 
   skippableGroup('WebView Windows', () {
-    final shouldSkipTest1 = kIsWeb
-        ? true
-        : ![
-            TargetPlatform.android,
-            TargetPlatform.iOS,
-            TargetPlatform.macOS,
-          ].contains(defaultTargetPlatform);
+    final shouldSkipTest1 =
+        kIsWeb ||
+        !InAppWebView.isPropertySupported(
+          PlatformWebViewCreationParamsProperty.onCreateWindow,
+        );
 
     skippableTestWidgets('onCreateWindow return false', (
       WidgetTester tester,
@@ -39,7 +33,7 @@ void webViewWindows() {
               controllerCompleter.complete(controller);
             },
             onLoadStop: (controller, url) {
-              if (url!.toString() == TEST_CROSS_PLATFORM_URL_1.toString()) {
+              if (url!.toString() == TEST_URL_EXAMPLE.toString()) {
                 pageLoaded.complete();
               }
             },
@@ -54,13 +48,11 @@ void webViewWindows() {
       await expectLater(pageLoaded.future, completes);
     }, skip: shouldSkipTest1);
 
-    final shouldSkipTest2 = kIsWeb
-        ? true
-        : ![
-            TargetPlatform.android,
-            TargetPlatform.iOS,
-            TargetPlatform.macOS,
-          ].contains(defaultTargetPlatform);
+    final shouldSkipTest2 =
+        kIsWeb ||
+        !InAppWebView.isPropertySupported(
+          PlatformWebViewCreationParamsProperty.windowId,
+        );
 
     skippableTestWidgets('onCreateWindow return true', (
       WidgetTester tester,
@@ -90,6 +82,8 @@ void webViewWindows() {
           ),
         ),
       );
+
+      await tester.pump();
 
       var windowId = await onCreateWindowCompleter.future;
 
@@ -121,19 +115,19 @@ void webViewWindows() {
         ),
       );
 
+      await tester.pump();
+
       final String windowUrlLoaded = await windowPageLoaded.future;
 
-      expect(windowUrlLoaded, TEST_CROSS_PLATFORM_URL_1.toString());
+      expect(windowUrlLoaded, TEST_URL_EXAMPLE.toString());
       await expectLater(onCloseWindowCompleter.future, completes);
     }, skip: shouldSkipTest2);
 
-    final shouldSkipTest3 = kIsWeb
-        ? true
-        : ![
-            TargetPlatform.android,
-            TargetPlatform.iOS,
-            TargetPlatform.macOS,
-          ].contains(defaultTargetPlatform);
+    final shouldSkipTest3 =
+        kIsWeb ||
+        !InAppWebView.isPropertySupported(
+          PlatformWebViewCreationParamsProperty.onCreateWindow,
+        );
 
     skippableTestWidgets(
       'window.open() with target _blank opens in same window',
@@ -177,13 +171,9 @@ void webViewWindows() {
       skip: shouldSkipTest3,
     );
 
-    final shouldSkipTest4 = kIsWeb
-        ? true
-        : ![
-            TargetPlatform.iOS,
-            TargetPlatform.macOS,
-          ].contains(defaultTargetPlatform);
     // on Android, for some reason, it works on an example app but not in this test
+    final shouldSkipTest4 =
+        kIsWeb || defaultTargetPlatform == TargetPlatform.android;
     skippableTestWidgets('can open new window and go back', (
       WidgetTester tester,
     ) async {
@@ -191,6 +181,7 @@ void webViewWindows() {
           Completer<InAppWebViewController>();
       final StreamController<String> pageLoads =
           StreamController<String>.broadcast();
+
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
@@ -210,39 +201,40 @@ void webViewWindows() {
           ),
         ),
       );
-      await pageLoads.stream.first;
-      final InAppWebViewController controller =
-          await controllerCompleter.future;
 
       await tester.pump();
 
+      final InAppWebViewController controller =
+          await controllerCompleter.future;
+
+      Future<String> waitForUrl(String expectedUrl) async {
+        await for (final url in pageLoads.stream) {
+          if (url == expectedUrl) {
+            return url;
+          }
+        }
+        throw Exception('Stream closed without receiving $expectedUrl');
+      }
+
+      // Wait for initial page load
+      await waitForUrl(TEST_CROSS_PLATFORM_URL_1.toString());
       await controller.evaluateJavascript(
-        source: 'window.open("$TEST_URL_1");',
+        source: 'window.open("$TEST_URL_1", "_blank");',
       );
-      await pageLoads.stream.first;
-      expect(
-        (await controller.getUrl())?.toString(),
-        contains(TEST_URL_1.host),
-      );
+      final currentUrl = await waitForUrl(TEST_URL_1.toString());
+      expect(currentUrl, contains(TEST_URL_1.host));
 
       await controller.goBack();
-      await pageLoads.stream.first;
-      expect(
-        (await controller.getUrl())?.toString(),
-        contains(TEST_CROSS_PLATFORM_URL_1.host),
+      final urlAfterGoBack = await waitForUrl(
+        TEST_CROSS_PLATFORM_URL_1.toString(),
       );
+      expect(urlAfterGoBack, contains(TEST_CROSS_PLATFORM_URL_1.host));
 
       pageLoads.close();
     }, skip: shouldSkipTest4);
 
-    final shouldSkipTest5 = kIsWeb
-        ? true
-        : ![
-            TargetPlatform.android,
-            TargetPlatform.iOS,
-            TargetPlatform.macOS,
-          ].contains(defaultTargetPlatform);
-
+    // Android blocks javascript: URLs opened from iframes for security reasons
+    final shouldSkipTest5 = defaultTargetPlatform != TargetPlatform.android;
     skippableTestWidgets('javascript does not run in parent window', (
       WidgetTester tester,
     ) async {
@@ -311,17 +303,16 @@ void webViewWindows() {
           await controllerCompleter.future;
       await pageLoadCompleter.future;
 
-      expect(
-        controller.evaluateJavascript(source: 'iframeLoaded'),
-        completion(true),
+      final iframeLoaded = await controller.evaluateJavascript(
+        source: 'iframeLoaded',
       );
-      expect(
-        controller.evaluateJavascript(
-          source:
-              'document.querySelector("p") && document.querySelector("p").textContent',
-        ),
-        completion(null),
+      expect(iframeLoaded, true);
+
+      final pElement = await controller.evaluateJavascript(
+        source:
+            'document.querySelector("p") && document.querySelector("p").textContent',
       );
+      expect(pElement, null);
     }, skip: shouldSkipTest5);
 
     // final shouldSkipTest6 = !kIsWeb;

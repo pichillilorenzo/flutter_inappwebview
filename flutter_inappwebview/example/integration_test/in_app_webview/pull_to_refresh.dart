@@ -1,13 +1,7 @@
 part of 'main.dart';
 
 void pullToRefresh() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !PullToRefreshController.isClassSupported();
 
   skippableTestWidgets('launches with pull-to-refresh feature', (
     WidgetTester tester,

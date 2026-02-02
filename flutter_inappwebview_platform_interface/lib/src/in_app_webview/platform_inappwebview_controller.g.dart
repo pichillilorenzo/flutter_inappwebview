@@ -2114,11 +2114,11 @@ enum PlatformInAppWebViewControllerMethod {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView ([Official API - WebView.saveWebArchive](https://developer.android.com/reference/android/webkit/WebView#saveWebArchive(java.lang.String,%20boolean,%20android.webkit.ValueCallback%3Cjava.lang.String%3E))):
-  ///    - if [autoname] is `false`, the [filePath] must ends with the [WebArchiveFormat.MHT] file extension.
+  ///    - If [autoname] is `false`, the [filePath] must ends with the [WebArchiveFormat.MHT] file extension.
   ///- iOS WKWebView 14.0+:
   ///    - If [autoname] is `false`, the [filePath] must ends with the [WebArchiveFormat.WEBARCHIVE] file extension.
   ///- Linux WPE WebKit ([Official API - webkit_web_view_save_to_file](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebView.save_to_file.html)):
-  ///    - Saves as MHTML format. If [autoname] is `false`, the [filePath] must end with the .mht extension.
+  ///    - If [autoname] is `false`, the [filePath] must ends with the [WebArchiveFormat.MHT] file extension.
   ///- macOS WKWebView 11.0+:
   ///    - If [autoname] is `false`, the [filePath] must ends with the [WebArchiveFormat.WEBARCHIVE] file extension.
   ///

@@ -3,6 +3,8 @@ import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_pla
 import 'web_message_port.dart';
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageChannel}
+///
+///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageChannel.supported_platforms}
 class WebMessageChannel {
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageChannel}
   WebMessageChannel({
@@ -70,17 +72,25 @@ class WebMessageChannel {
   }
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageChannel.id}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageChannel.id.supported_platforms}
   String get id => platform.id;
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageChannel.port1}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageChannel.port1.supported_platforms}
   WebMessagePort get port1 =>
       WebMessagePort.fromPlatform(platform: platform.port1);
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageChannel.port2}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageChannel.port2.supported_platforms}
   WebMessagePort get port2 =>
       WebMessagePort.fromPlatform(platform: platform.port2);
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageChannel.dispose}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageChannel.dispose.supported_platforms}
   void dispose() => platform.dispose();
 
   @override

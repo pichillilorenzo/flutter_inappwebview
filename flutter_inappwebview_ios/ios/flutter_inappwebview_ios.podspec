@@ -13,25 +13,25 @@ A new Flutter plugin.
   s.license          = { :file => '../LICENSE' }
   s.author           = { 'Your Company' => 'email@example.com' }
   s.source           = { :path => '.' }
-  s.source_files = 'Classes/**/*'
-  s.resources = 'Storyboards/**/*.storyboard'
-  s.public_header_files = 'Classes/**/*.h'
+  s.source_files = 'flutter_inappwebview_ios/Sources/flutter_inappwebview_ios/**/*.swift'
+  s.resources = 'flutter_inappwebview_ios/Sources/flutter_inappwebview_ios/Resources/**/*.storyboard'
   s.dependency 'Flutter'
-  s.resource_bundles = {'flutter_inappwebview_ios_privacy' => ['Resources/PrivacyInfo.xcprivacy']}
+  s.resource_bundles = {'flutter_inappwebview_ios_privacy' => ['flutter_inappwebview_ios/Sources/flutter_inappwebview_ios/Resources/PrivacyInfo.xcprivacy']}
 
-  # Flutter.framework does not contain a i386 slice. Only x86_64 simulators are supported.
-  s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'VALID_ARCHS[sdk=iphonesimulator*]' => 'x86_64' }
+  s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES' }
 
   s.libraries = 'swiftCoreGraphics'
+  
+  s.dependency 'swift-collections', '~>1.1.1'
 
   s.xcconfig = {
-      'LIBRARY_SEARCH_PATHS' => '$(SDKROOT)/usr/lib/swift',
+    'LIBRARY_SEARCH_PATHS' => '$(TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME)/ $(SDKROOT)/usr/lib/swift',
+    'LD_RUNPATH_SEARCH_PATHS' => '/usr/lib/swift',
   }
 
   s.swift_version = '5.0'
 
   s.platforms = { :ios => '12.0' }
-  s.dependency 'OrderedSet', '~>6.0.3'
 
   s.default_subspec = 'Core'
 

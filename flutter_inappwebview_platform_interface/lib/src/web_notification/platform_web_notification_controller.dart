@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
-import '../in_app_webview/platform_inappwebview_controller.dart';
 import '../inappwebview_platform.dart';
 import '../types/disposable.dart';
 import '../types/web_notification.dart';

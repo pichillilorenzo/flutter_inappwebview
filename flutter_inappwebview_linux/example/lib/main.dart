@@ -22,7 +22,7 @@ class TestInAppBrowserEventHandler extends PlatformInAppBrowserEvents {
 
   @override
   void onBrowserCreated() {
-    print('[TEST] InAppBrowser: onBrowserCreated fired');
+    debugPrint('[TEST] InAppBrowser: onBrowserCreated fired');
     browserCreated = true;
     if (!browserCreatedCompleter.isCompleted) {
       browserCreatedCompleter.complete();
@@ -31,7 +31,7 @@ class TestInAppBrowserEventHandler extends PlatformInAppBrowserEvents {
 
   @override
   void onExit() {
-    print('[TEST] InAppBrowser: onExit fired');
+    debugPrint('[TEST] InAppBrowser: onExit fired');
     browserExited = true;
     if (!browserExitedCompleter.isCompleted) {
       browserExitedCompleter.complete();
@@ -40,24 +40,24 @@ class TestInAppBrowserEventHandler extends PlatformInAppBrowserEvents {
 
   @override
   void onLoadStart(WebUri? url) {
-    print('[TEST] InAppBrowser: onLoadStart - $url');
+    debugPrint('[TEST] InAppBrowser: onLoadStart - $url');
   }
 
   @override
   void onLoadStop(WebUri? url) {
-    print('[TEST] InAppBrowser: onLoadStop - $url');
+    debugPrint('[TEST] InAppBrowser: onLoadStop - $url');
   }
 
   @override
   FutureOr<NavigationActionPolicy> shouldOverrideUrlLoading(navigationAction) {
-    print("\n\nOverride ${navigationAction.request.url}\n\n");
+    debugPrint("\n\nOverride ${navigationAction.request.url}\n\n");
     return NavigationActionPolicy.ALLOW;
   }
 }
 
 /// Test InAppBrowser implementation
 Future<void> testInAppBrowser() async {
-  print('[TEST] InAppBrowser: Starting test...');
+  debugPrint('[TEST] InAppBrowser: Starting test...');
 
   final browser = LinuxInAppBrowser(LinuxInAppBrowserCreationParams());
   final eventHandler = TestInAppBrowserEventHandler();
@@ -79,9 +79,9 @@ Future<void> testInAppBrowser() async {
         ),
       ),
     );
-    print('[TEST] InAppBrowser: openUrlRequest completed');
+    debugPrint('[TEST] InAppBrowser: openUrlRequest completed');
   } catch (e) {
-    print('[TEST] ❌ InAppBrowser: openUrlRequest failed - $e');
+    debugPrint('[TEST] ❌ InAppBrowser: openUrlRequest failed - $e');
     return;
   }
 
@@ -90,59 +90,63 @@ Future<void> testInAppBrowser() async {
     await eventHandler.browserCreatedCompleter.future.timeout(
       const Duration(seconds: 5),
       onTimeout: () {
-        print('[TEST] ❌ InAppBrowser: Timeout waiting for onBrowserCreated');
+        debugPrint(
+          '[TEST] ❌ InAppBrowser: Timeout waiting for onBrowserCreated',
+        );
       },
     );
   } catch (e) {
-    print('[TEST] ❌ InAppBrowser: Error waiting for browser - $e');
+    debugPrint('[TEST] ❌ InAppBrowser: Error waiting for browser - $e');
   }
 
   if (!eventHandler.browserCreated) {
-    print('[TEST] ❌ InAppBrowser: onBrowserCreated not fired');
+    debugPrint('[TEST] ❌ InAppBrowser: onBrowserCreated not fired');
     return;
   }
 
-  print('[TEST] ✅ InAppBrowser: Browser created successfully');
+  debugPrint('[TEST] ✅ InAppBrowser: Browser created successfully');
 
   // Test isHidden
   try {
     final isHidden = await browser.isHidden();
-    print('[TEST] InAppBrowser: isHidden = $isHidden');
+    debugPrint('[TEST] InAppBrowser: isHidden = $isHidden');
     if (isHidden == false) {
-      print('[TEST] ✅ InAppBrowser: isHidden returned correct value (false)');
+      debugPrint(
+        '[TEST] ✅ InAppBrowser: isHidden returned correct value (false)',
+      );
     }
   } catch (e) {
-    print('[TEST] ❌ InAppBrowser: isHidden failed - $e');
+    debugPrint('[TEST] ❌ InAppBrowser: isHidden failed - $e');
   }
 
   // Test hide
   try {
     await browser.hide();
-    print('[TEST] ✅ InAppBrowser: hide() called successfully');
+    debugPrint('[TEST] ✅ InAppBrowser: hide() called successfully');
     await Future.delayed(const Duration(milliseconds: 500));
 
     final isHiddenAfterHide = await browser.isHidden();
-    print('[TEST] InAppBrowser: isHidden after hide = $isHiddenAfterHide');
+    debugPrint('[TEST] InAppBrowser: isHidden after hide = $isHiddenAfterHide');
     if (isHiddenAfterHide == true) {
-      print('[TEST] ✅ InAppBrowser: hide() worked correctly');
+      debugPrint('[TEST] ✅ InAppBrowser: hide() worked correctly');
     }
   } catch (e) {
-    print('[TEST] ❌ InAppBrowser: hide failed - $e');
+    debugPrint('[TEST] ❌ InAppBrowser: hide failed - $e');
   }
 
   // Test show
   try {
     await browser.show();
-    print('[TEST] ✅ InAppBrowser: show() called successfully');
+    debugPrint('[TEST] ✅ InAppBrowser: show() called successfully');
     await Future.delayed(const Duration(milliseconds: 500));
 
     final isHiddenAfterShow = await browser.isHidden();
-    print('[TEST] InAppBrowser: isHidden after show = $isHiddenAfterShow');
+    debugPrint('[TEST] InAppBrowser: isHidden after show = $isHiddenAfterShow');
     if (isHiddenAfterShow == false) {
-      print('[TEST] ✅ InAppBrowser: show() worked correctly');
+      debugPrint('[TEST] ✅ InAppBrowser: show() worked correctly');
     }
   } catch (e) {
-    print('[TEST] ❌ InAppBrowser: show failed - $e');
+    debugPrint('[TEST] ❌ InAppBrowser: show failed - $e');
   }
 
   // Test setSettings
@@ -154,18 +158,18 @@ Future<void> testInAppBrowser() async {
         ),
       ),
     );
-    print('[TEST] ✅ InAppBrowser: setSettings() called successfully');
+    debugPrint('[TEST] ✅ InAppBrowser: setSettings() called successfully');
   } catch (e) {
-    print('[TEST] ❌ InAppBrowser: setSettings failed - $e');
+    debugPrint('[TEST] ❌ InAppBrowser: setSettings failed - $e');
   }
 
   // Test getSettings
   try {
     final settings = await browser.getSettings();
-    print('[TEST] InAppBrowser: getSettings() = $settings');
-    print('[TEST] ✅ InAppBrowser: getSettings() called successfully');
+    debugPrint('[TEST] InAppBrowser: getSettings() = $settings');
+    debugPrint('[TEST] ✅ InAppBrowser: getSettings() called successfully');
   } catch (e) {
-    print('[TEST] ❌ InAppBrowser: getSettings failed - $e');
+    debugPrint('[TEST] ❌ InAppBrowser: getSettings failed - $e');
   }
 
   // Wait for browser exit (with timeout)
@@ -173,52 +177,52 @@ Future<void> testInAppBrowser() async {
     await eventHandler.browserExitedCompleter.future.timeout(
       const Duration(seconds: 3),
       onTimeout: () {
-        print('[TEST] ⚠️ InAppBrowser: Timeout waiting for onExit');
+        debugPrint('[TEST] ⚠️ InAppBrowser: Timeout waiting for onExit');
       },
     );
   } catch (e) {
-    print('[TEST] ⚠️ InAppBrowser: Error waiting for exit - $e');
+    debugPrint('[TEST] ⚠️ InAppBrowser: Error waiting for exit - $e');
   }
 
   if (eventHandler.browserExited) {
-    print('[TEST] ✅ InAppBrowser: All tests passed!');
+    debugPrint('[TEST] ✅ InAppBrowser: All tests passed!');
   } else {
-    print('[TEST] ⚠️ InAppBrowser: Tests completed but onExit not fired');
+    debugPrint('[TEST] ⚠️ InAppBrowser: Tests completed but onExit not fired');
   }
 }
 
 /// Test openWithSystemBrowser
 Future<void> testOpenWithSystemBrowser() async {
-  print('[TEST] openWithSystemBrowser: Starting test...');
+  debugPrint('[TEST] openWithSystemBrowser: Starting test...');
   try {
     final browser = LinuxInAppBrowser(LinuxInAppBrowserCreationParams());
     await browser.openWithSystemBrowser(url: WebUri('https://flutter.dev'));
-    print('[TEST] ✅ openWithSystemBrowser: Command executed successfully');
+    debugPrint('[TEST] ✅ openWithSystemBrowser: Command executed successfully');
   } catch (e) {
-    print('[TEST] ❌ openWithSystemBrowser: $e');
+    debugPrint('[TEST] ❌ openWithSystemBrowser: $e');
   }
 }
 
 /// Run all InAppBrowser tests
 Future<void> runAllInAppBrowserTests() async {
-  print('');
-  print('========================================');
-  print('[TEST] Starting InAppBrowser Test Suite');
-  print('========================================');
-  print('');
+  debugPrint('');
+  debugPrint('========================================');
+  debugPrint('[TEST] Starting InAppBrowser Test Suite');
+  debugPrint('========================================');
+  debugPrint('');
 
   // Test 1: InAppBrowser
   await testInAppBrowser();
 
-  print('');
-  print('----------------------------------------');
-  print('');
+  debugPrint('');
+  debugPrint('----------------------------------------');
+  debugPrint('');
 
-  print('');
-  print('========================================');
-  print('[TEST] InAppBrowser Test Suite Complete');
-  print('========================================');
-  print('');
+  debugPrint('');
+  debugPrint('========================================');
+  debugPrint('[TEST] InAppBrowser Test Suite Complete');
+  debugPrint('========================================');
+  debugPrint('');
 }
 
 class MyApp extends StatefulWidget {
@@ -294,7 +298,11 @@ class _MyAppState extends State<MyApp> {
                     child: LinuxInAppWebViewWidget(
                       LinuxInAppWebViewWidgetCreationParams(
                         key: webViewKey,
-                        initialUrlRequest: URLRequest(url: WebUri("https://www.youtube.com/watch?v=d7j6vZHskNY&themeRefresh=1"),),
+                        initialUrlRequest: URLRequest(
+                          url: WebUri(
+                            "https://www.youtube.com/watch?v=d7j6vZHskNY&themeRefresh=1",
+                          ),
+                        ),
                         // initialFile: "assets/date_input_test.html",
                         initialSettings: settings,
                         onWebViewCreated: (controller) async {
@@ -306,11 +314,11 @@ class _MyAppState extends State<MyApp> {
                               url: WebUri('https://flutter.dev'),
                             ),
                           );
-                          print('[TEST] Loaded flutter.dev');
+                          debugPrint('[TEST] Loaded flutter.dev');
 
                           await Future.delayed(Duration(seconds: 2));
                           controller.reload();
-                          print('[TEST] Reloaded flutter.dev');
+                          debugPrint('[TEST] Reloaded flutter.dev');
 
                           await Future.delayed(Duration(seconds: 2));
                           controller.loadUrl(
@@ -318,19 +326,19 @@ class _MyAppState extends State<MyApp> {
                               url: WebUri('https://google.com'),
                             ),
                           );
-                          print('[TEST] Loaded google.com');
+                          debugPrint('[TEST] Loaded google.com');
 
                           await Future.delayed(Duration(seconds: 2));
                           controller.reload();
-                          print('[TEST] Reloaded google.com');
+                          debugPrint('[TEST] Reloaded google.com');
 
                           await Future.delayed(Duration(seconds: 2));
                           controller.goBack();
-                          print('[TEST] Should go back to flutter.dev');
+                          debugPrint('[TEST] Should go back to flutter.dev');
 
                           await Future.delayed(Duration(seconds: 2));
                           controller.goBack();
-                          print('[TEST] Should go back to YouTube');
+                          debugPrint('[TEST] Should go back to YouTube');
                         },
                       ),
                     ).build(context),

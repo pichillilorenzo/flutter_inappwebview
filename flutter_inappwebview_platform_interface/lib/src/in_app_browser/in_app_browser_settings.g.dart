@@ -245,7 +245,7 @@ class InAppBrowserSettings
     this.hideToolbarTop = false,
     this.hideUrlBar = false,
     this.menuButtonColor,
-    this.presentationStyle = ModalPresentationStyle.FULL_SCREEN,
+    ModalPresentationStyle? presentationStyle,
     this.shouldCloseOnBackButtonPressed = false,
     this.toolbarBottomBackgroundColor,
     this.toolbarBottomTintColor,
@@ -254,13 +254,15 @@ class InAppBrowserSettings
     this.toolbarTopFixedTitle,
     this.toolbarTopTintColor,
     this.toolbarTopTranslucent = true,
-    this.transitionStyle = ModalTransitionStyle.COVER_VERTICAL,
+    ModalTransitionStyle? transitionStyle,
     this.windowAlphaValue = 1.0,
     this.windowFrame,
     this.windowStyleMask,
     this.windowTitlebarSeparatorStyle,
     this.windowType,
-  });
+  }) : presentationStyle =
+           presentationStyle ?? ModalPresentationStyle.FULL_SCREEN,
+       transitionStyle = transitionStyle ?? ModalTransitionStyle.COVER_VERTICAL;
 
   ///Gets a possible [InAppBrowserSettings] instance from a [Map] value.
   static InAppBrowserSettings? fromMap(

@@ -291,7 +291,7 @@ class PermissionResourceType {
           case TargetPlatform.android:
             return 'android.webkit.resource.PROTECTED_MEDIA_ID';
           case TargetPlatform.linux:
-            return null;
+            return 'PROTECTED_MEDIA_ID';
           default:
             break;
         }

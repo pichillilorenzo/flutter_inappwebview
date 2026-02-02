@@ -505,7 +505,7 @@ class PrintJobSettings {
     this.pagesDown,
     this.pagesPerSide,
     this.paperName,
-    this.printDialogKind = PrintJobDialogKind.BROWSER,
+    PrintJobDialogKind? printDialogKind,
     this.printerName,
     this.resolution,
     this.scalingFactor,
@@ -526,7 +526,7 @@ class PrintJobSettings {
     this.showsScaling = true,
     this.time,
     this.verticalPagination,
-  });
+  }) : printDialogKind = printDialogKind ?? PrintJobDialogKind.BROWSER;
 
   ///Gets a possible [PrintJobSettings] instance from a [Map] value.
   static PrintJobSettings? fromMap(

@@ -37,8 +37,6 @@ class CookieManager {
 
   static CookieManager? _instance;
 
-  WebViewEnvironment? _webViewEnvironment;
-
   ///Gets the [CookieManager] shared instance.
   ///
   ///[webViewEnvironment] (Supported only on Windows) - Used to create the [CookieManager] using the specified environment.

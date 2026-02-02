@@ -20,11 +20,11 @@ class HttpAuthResponse {
   ///Represents the username used for the authentication if the [action] corresponds to [HttpAuthResponseAction.PROCEED]
   String username;
   HttpAuthResponse({
-    this.action = HttpAuthResponseAction.CANCEL,
+    HttpAuthResponseAction? action,
     this.password = "",
     this.permanentPersistence = false,
     this.username = "",
-  });
+  }) : action = action ?? HttpAuthResponseAction.CANCEL;
 
   ///Gets a possible [HttpAuthResponse] instance from a [Map] value.
   static HttpAuthResponse? fromMap(

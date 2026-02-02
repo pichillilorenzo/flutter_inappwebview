@@ -29,14 +29,14 @@ class JsPromptResponse {
   ///Value of the prompt dialog.
   String? value;
   JsPromptResponse({
-    this.action = JsPromptResponseAction.CANCEL,
+    JsPromptResponseAction? action,
     this.cancelButtonTitle = "",
     this.confirmButtonTitle = "",
     this.defaultValue = "",
     this.handledByClient = false,
     this.message = "",
     this.value,
-  });
+  }) : action = action ?? JsPromptResponseAction.CANCEL;
 
   ///Gets a possible [JsPromptResponse] instance from a [Map] value.
   static JsPromptResponse? fromMap(

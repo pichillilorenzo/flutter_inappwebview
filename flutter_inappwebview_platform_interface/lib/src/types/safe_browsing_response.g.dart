@@ -14,10 +14,8 @@ class SafeBrowsingResponse {
 
   ///If reporting is enabled, all reports will be sent according to the privacy policy referenced by [PlatformInAppWebViewController.getSafeBrowsingPrivacyPolicyUrl].
   bool report;
-  SafeBrowsingResponse({
-    this.action = SafeBrowsingResponseAction.SHOW_INTERSTITIAL,
-    this.report = true,
-  });
+  SafeBrowsingResponse({SafeBrowsingResponseAction? action, this.report = true})
+    : action = action ?? SafeBrowsingResponseAction.SHOW_INTERSTITIAL;
 
   ///Gets a possible [SafeBrowsingResponse] instance from a [Map] value.
   static SafeBrowsingResponse? fromMap(

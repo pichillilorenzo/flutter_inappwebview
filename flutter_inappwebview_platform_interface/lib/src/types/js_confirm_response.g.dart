@@ -23,12 +23,12 @@ class JsConfirmResponse {
   ///Message to be displayed in the window.
   String message;
   JsConfirmResponse({
-    this.action = JsConfirmResponseAction.CANCEL,
+    JsConfirmResponseAction? action,
     this.cancelButtonTitle = "",
     this.confirmButtonTitle = "",
     this.handledByClient = false,
     this.message = "",
-  });
+  }) : action = action ?? JsConfirmResponseAction.CANCEL;
 
   ///Gets a possible [JsConfirmResponse] instance from a [Map] value.
   static JsConfirmResponse? fromMap(

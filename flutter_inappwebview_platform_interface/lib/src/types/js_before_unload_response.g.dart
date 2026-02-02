@@ -23,12 +23,12 @@ class JsBeforeUnloadResponse {
   ///Message to be displayed in the window.
   String message;
   JsBeforeUnloadResponse({
-    this.action = JsBeforeUnloadResponseAction.CONFIRM,
+    JsBeforeUnloadResponseAction? action,
     this.cancelButtonTitle = "",
     this.confirmButtonTitle = "",
     this.handledByClient = false,
     this.message = "",
-  });
+  }) : action = action ?? JsBeforeUnloadResponseAction.CONFIRM;
 
   ///Gets a possible [JsBeforeUnloadResponse] instance from a [Map] value.
   static JsBeforeUnloadResponse? fromMap(

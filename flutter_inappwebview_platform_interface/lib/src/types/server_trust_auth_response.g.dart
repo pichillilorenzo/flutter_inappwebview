@@ -10,7 +10,8 @@ part of 'server_trust_auth_response.dart';
 class ServerTrustAuthResponse {
   ///Indicate the [ServerTrustAuthResponseAction] to take in response of the server trust authentication challenge.
   ServerTrustAuthResponseAction? action;
-  ServerTrustAuthResponse({this.action = ServerTrustAuthResponseAction.CANCEL});
+  ServerTrustAuthResponse({ServerTrustAuthResponseAction? action})
+    : action = action ?? ServerTrustAuthResponseAction.CANCEL;
 
   ///Gets a possible [ServerTrustAuthResponse] instance from a [Map] value.
   static ServerTrustAuthResponse? fromMap(

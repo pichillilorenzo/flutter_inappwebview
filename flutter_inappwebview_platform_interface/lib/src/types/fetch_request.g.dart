@@ -47,7 +47,7 @@ class FetchRequest {
   ///The URL of the request.
   WebUri? url;
   FetchRequest({
-    this.action = FetchRequestAction.PROCEED,
+    FetchRequestAction? action,
     this.body,
     this.cache,
     this.credentials,
@@ -60,7 +60,7 @@ class FetchRequest {
     this.referrer,
     this.referrerPolicy,
     this.url,
-  });
+  }) : action = action ?? FetchRequestAction.PROCEED;
 
   ///Gets a possible [FetchRequest] instance from a [Map] value.
   static FetchRequest? fromMap(

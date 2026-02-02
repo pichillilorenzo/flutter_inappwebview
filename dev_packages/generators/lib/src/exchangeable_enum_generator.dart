@@ -2,7 +2,6 @@ import 'package:build/build.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/dart/analysis/results.dart';
-import 'package:collection/collection.dart';
 import 'package:source_gen/source_gen.dart';
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 import 'package:analyzer/dart/constant/value.dart';
@@ -187,7 +186,6 @@ class ExchangeableEnumGenerator
               <DartObject>[];
           var hasWebSupport = false;
           var webSupportValue = null;
-          var allPlatformsWithoutValue = true;
           if (platforms.isNotEmpty) {
             for (var platform in platforms) {
               final targetPlatformName = platform
@@ -198,10 +196,7 @@ class ExchangeableEnumGenerator
                   platformValueField != null && !platformValueField.isNull
                   ? platformValueField.toIntValue() ??
                         "'${platformValueField.toStringValue()}'"
-                  : null;
-              if (allPlatformsWithoutValue && platformValue != null) {
-                allPlatformsWithoutValue = false;
-              }
+                  : constantValue;
               if (targetPlatformName == "web") {
                 hasWebSupport = true;
                 webSupportValue = platformValue;
@@ -222,15 +217,9 @@ class ExchangeableEnumGenerator
           nativeValueBody += "return $defaultValue;";
           nativeValueBody += "}";
 
-          if (!allPlatformsWithoutValue) {
-            classBuffer.writeln(
-              "static final $fieldName = $extClassName._internalMultiPlatform($constantValue, $nativeValueBody);",
-            );
-          } else {
-            classBuffer.writeln(
-              "static const $fieldName = $extClassName._internal($constantValue, ${defaultValue ?? constantValue});",
-            );
-          }
+          classBuffer.writeln(
+            "static final $fieldName = $extClassName._internalMultiPlatform($constantValue, $nativeValueBody);",
+          );
         } else {
           classBuffer.writeln(
             "static const $fieldName = $extClassName._internal($constantValue, $constantValue);",
@@ -349,12 +338,22 @@ class ExchangeableEnumGenerator
       ParsedLibraryResult parsed =
           methodLibrary.session.getParsedLibraryByElement(methodLibrary)
               as ParsedLibraryResult;
-      final methodBody = parsed
+      final methodBodyRaw = parsed
           .getFragmentDeclaration(methodElement.firstFragment)
           ?.node
-          .toString()
-          .replaceAll(className, extClassName);
-      if (methodBody != null) {
+          .toString();
+      if (methodBodyRaw != null) {
+        // Replace type names: first className, then type references ending with _
+        var methodBody = methodBodyRaw
+            .replaceAll(className, extClassName)
+            .replaceAll("_.", ".")
+            .replaceAll("_?", "?")
+            .replaceAll("_>", ">")
+            .replaceAllMapped(
+              RegExp(r'([A-Z][a-zA-Z0-9]*)_\b'),
+              (match) => match.group(1)!,
+            );
+
         final docs = methodElement.documentationComment;
         if (docs != null) {
           classBuffer.writeln(docs);
@@ -395,18 +394,47 @@ class ExchangeableEnumGenerator
       classBuffer.writeln('///Gets the name of the value.');
       classBuffer.writeln('String name() {');
       classBuffer.writeln('switch(_value) {');
+
+      // Track unique case values to avoid duplicates
+      final Set<String> addedCases = {};
+
       for (final entry in fieldEntriesSorted) {
         final fieldName = entry.key;
         final fieldElement = entry.value;
+
+        // Skip custom values using ExchangeableEnumCustomValue
+        final isEnumCustomValue =
+            _coreCheckerEnumCustomValue.firstAnnotationOf(fieldElement) != null;
+        if (isEnumCustomValue) {
+          continue;
+        }
+
         if (!fieldElement.isPrivate && fieldElement.isStatic) {
           final fieldValue = fieldElement.computeConstantValue()?.getField(
             "_value",
           );
           dynamic constantValue = fieldValue?.toIntValue();
+          String caseValueStr;
+
           if (enumValue.type.isDartCoreString) {
-            constantValue = "'${fieldValue?.toStringValue()}'";
+            final stringValue = fieldValue?.toStringValue();
+            if (stringValue == null) {
+              // For nullable String types with null value
+              constantValue = 'null';
+              caseValueStr = 'null';
+            } else {
+              constantValue = "'$stringValue'";
+              caseValueStr = stringValue;
+            }
+          } else {
+            caseValueStr = constantValue.toString();
           }
-          classBuffer.writeln("case $constantValue: return '$fieldName';");
+
+          // Only add unique case values
+          if (!addedCases.contains(caseValueStr)) {
+            addedCases.add(caseValueStr);
+            classBuffer.writeln("case $constantValue: return '$fieldName';");
+          }
         }
       }
       classBuffer.writeln('}');

@@ -22,7 +22,18 @@ class WebViewRenderProcessAction {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView
-  static const TERMINATE = WebViewRenderProcessAction._internal(0, 0);
+  static final TERMINATE = WebViewRenderProcessAction._internalMultiPlatform(
+    0,
+    () {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.android:
+          return 0;
+        default:
+          break;
+      }
+      return null;
+    },
+  );
 
   ///Set of all values of [WebViewRenderProcessAction].
   static final Set<WebViewRenderProcessAction> values = [

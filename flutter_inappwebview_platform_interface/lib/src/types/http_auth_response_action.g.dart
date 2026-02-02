@@ -24,7 +24,21 @@ class HttpAuthResponseAction {
   ///- iOS WKWebView
   ///- macOS WKWebView
   ///- Windows WebView2
-  static const CANCEL = HttpAuthResponseAction._internal(0, 0);
+  static final CANCEL = HttpAuthResponseAction._internalMultiPlatform(0, () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+        return 0;
+      case TargetPlatform.iOS:
+        return 0;
+      case TargetPlatform.macOS:
+        return 0;
+      case TargetPlatform.windows:
+        return 0;
+      default:
+        break;
+    }
+    return null;
+  });
 
   ///Instructs the WebView to proceed with the authentication with the given credentials.
   ///
@@ -33,7 +47,21 @@ class HttpAuthResponseAction {
   ///- iOS WKWebView
   ///- macOS WKWebView
   ///- Windows WebView2
-  static const PROCEED = HttpAuthResponseAction._internal(1, 1);
+  static final PROCEED = HttpAuthResponseAction._internalMultiPlatform(1, () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+        return 1;
+      case TargetPlatform.iOS:
+        return 1;
+      case TargetPlatform.macOS:
+        return 1;
+      case TargetPlatform.windows:
+        return 1;
+      default:
+        break;
+    }
+    return null;
+  });
 
   ///Uses the credentials stored for the current host.
   ///
@@ -41,8 +69,20 @@ class HttpAuthResponseAction {
   ///- Android WebView
   ///- iOS WKWebView
   ///- macOS WKWebView
-  static const USE_SAVED_HTTP_AUTH_CREDENTIALS =
-      HttpAuthResponseAction._internal(2, 2);
+  static final USE_SAVED_HTTP_AUTH_CREDENTIALS =
+      HttpAuthResponseAction._internalMultiPlatform(2, () {
+        switch (defaultTargetPlatform) {
+          case TargetPlatform.android:
+            return 2;
+          case TargetPlatform.iOS:
+            return 2;
+          case TargetPlatform.macOS:
+            return 2;
+          default:
+            break;
+        }
+        return null;
+      });
 
   ///Set of all values of [HttpAuthResponseAction].
   static final Set<HttpAuthResponseAction> values = [

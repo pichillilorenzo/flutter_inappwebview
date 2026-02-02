@@ -66,11 +66,11 @@ class ScreenshotConfiguration {
   ScreenshotConfiguration({
     this.rect,
     this.snapshotWidth,
-    this.compressFormat = CompressFormat.PNG,
+    CompressFormat? compressFormat,
     this.quality = 100,
     @Deprecated("Use afterScreenUpdates instead") this.iosAfterScreenUpdates,
     this.afterScreenUpdates = true,
-  }) {
+  }) : compressFormat = compressFormat ?? CompressFormat.PNG {
     assert(this.quality >= 0);
     this.afterScreenUpdates = this.iosAfterScreenUpdates != null
         ? this.iosAfterScreenUpdates!

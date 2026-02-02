@@ -26,7 +26,21 @@ class CompressFormat {
   ///- iOS WKWebView
   ///- macOS WKWebView
   ///- Windows WebView2
-  static const JPEG = CompressFormat._internal('JPEG', 'JPEG');
+  static final JPEG = CompressFormat._internalMultiPlatform('JPEG', () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+        return 'JPEG';
+      case TargetPlatform.iOS:
+        return 'JPEG';
+      case TargetPlatform.macOS:
+        return 'JPEG';
+      case TargetPlatform.windows:
+        return 'JPEG';
+      default:
+        break;
+    }
+    return null;
+  });
 
   ///Compress to the `PNG` format.
   ///PNG is lossless, so `quality` is ignored.
@@ -36,7 +50,21 @@ class CompressFormat {
   ///- iOS WKWebView
   ///- macOS WKWebView
   ///- Windows WebView2
-  static const PNG = CompressFormat._internal('PNG', 'PNG');
+  static final PNG = CompressFormat._internalMultiPlatform('PNG', () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+        return 'PNG';
+      case TargetPlatform.iOS:
+        return 'PNG';
+      case TargetPlatform.macOS:
+        return 'PNG';
+      case TargetPlatform.windows:
+        return 'PNG';
+      default:
+        break;
+    }
+    return null;
+  });
 
   ///Compress to the `WEBP` lossy format.
   ///Quality of `0` means compress for the smallest size.
@@ -45,7 +73,17 @@ class CompressFormat {
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView
   ///- Windows WebView2
-  static const WEBP = CompressFormat._internal('WEBP', 'WEBP');
+  static final WEBP = CompressFormat._internalMultiPlatform('WEBP', () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+        return 'WEBP';
+      case TargetPlatform.windows:
+        return 'WEBP';
+      default:
+        break;
+    }
+    return null;
+  });
 
   ///Compress to the `WEBP` lossless format.
   ///Quality refers to how much effort to put into compression.
@@ -54,9 +92,17 @@ class CompressFormat {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView 30+
-  static const WEBP_LOSSLESS = CompressFormat._internal(
+  static final WEBP_LOSSLESS = CompressFormat._internalMultiPlatform(
     'WEBP_LOSSLESS',
-    'WEBP_LOSSLESS',
+    () {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.android:
+          return 'WEBP_LOSSLESS';
+        default:
+          break;
+      }
+      return null;
+    },
   );
 
   ///Compress to the `WEBP` lossy format.
@@ -65,9 +111,17 @@ class CompressFormat {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView 30+
-  static const WEBP_LOSSY = CompressFormat._internal(
+  static final WEBP_LOSSY = CompressFormat._internalMultiPlatform(
     'WEBP_LOSSY',
-    'WEBP_LOSSY',
+    () {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.android:
+          return 'WEBP_LOSSY';
+        default:
+          break;
+      }
+      return null;
+    },
   );
 
   ///Set of all values of [CompressFormat].

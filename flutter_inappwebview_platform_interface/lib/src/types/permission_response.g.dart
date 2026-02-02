@@ -16,9 +16,9 @@ class PermissionResponse {
   ///**NOTE for iOS, macOS and Windows**: not used. The [action] taken is based on the [PermissionRequest.resources].
   List<PermissionResourceType> resources;
   PermissionResponse({
-    this.action = PermissionResponseAction.DENY,
+    PermissionResponseAction? action,
     this.resources = const [],
-  });
+  }) : action = action ?? PermissionResponseAction.DENY;
 
   ///Gets a possible [PermissionResponse] instance from a [Map] value.
   static PermissionResponse? fromMap(
@@ -91,9 +91,9 @@ class PermissionRequestResponse {
   ///Resources granted to be accessed by origin.
   List<String> resources;
   PermissionRequestResponse({
-    this.action = PermissionRequestResponseAction.DENY,
+    PermissionRequestResponseAction? action,
     this.resources = const [],
-  });
+  }) : action = action ?? PermissionRequestResponseAction.DENY;
 
   ///Gets a possible [PermissionRequestResponse] instance from a [Map] value.
   static PermissionRequestResponse? fromMap(

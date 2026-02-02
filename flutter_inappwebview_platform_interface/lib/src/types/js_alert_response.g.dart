@@ -20,11 +20,11 @@ class JsAlertResponse {
   ///Message to be displayed in the window.
   String message;
   JsAlertResponse({
-    this.action = JsAlertResponseAction.CONFIRM,
+    JsAlertResponseAction? action,
     this.confirmButtonTitle = "",
     this.handledByClient = false,
     this.message = "",
-  });
+  }) : action = action ?? JsAlertResponseAction.CONFIRM;
 
   ///Gets a possible [JsAlertResponse] instance from a [Map] value.
   static JsAlertResponse? fromMap(

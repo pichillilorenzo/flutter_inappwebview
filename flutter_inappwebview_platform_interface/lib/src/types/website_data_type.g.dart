@@ -178,8 +178,6 @@ class WebsiteDataType {
   ///Gets the name of the value.
   String name() {
     switch (_value) {
-      case 'null':
-        return 'ALL';
       case 'WKWebsiteDataTypeCookies':
         return 'WKWebsiteDataTypeCookies';
       case 'WKWebsiteDataTypeDiskCache':
@@ -401,8 +399,6 @@ class IOSWKWebsiteDataType {
   ///Gets the name of the value.
   String name() {
     switch (_value) {
-      case 'null':
-        return 'ALL';
       case 'WKWebsiteDataTypeCookies':
         return 'WKWebsiteDataTypeCookies';
       case 'WKWebsiteDataTypeDiskCache':

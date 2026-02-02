@@ -75,7 +75,7 @@ class AjaxRequest {
   ///In addition, this flag is also used to indicate when cookies are to be ignored in the response. The default is false.
   bool? withCredentials;
   AjaxRequest({
-    this.action = AjaxRequestAction.PROCEED,
+    AjaxRequestAction? action,
     this.data,
     this.event,
     this.headers,
@@ -94,7 +94,7 @@ class AjaxRequest {
     this.url,
     this.user,
     this.withCredentials,
-  });
+  }) : action = action ?? AjaxRequestAction.PROCEED;
 
   ///Gets a possible [AjaxRequest] instance from a [Map] value.
   static AjaxRequest? fromMap(

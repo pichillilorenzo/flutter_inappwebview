@@ -16,10 +16,8 @@ class ConsoleMessage {
 
   ///Console message level
   ConsoleMessageLevel messageLevel;
-  ConsoleMessage({
-    this.message = "",
-    this.messageLevel = ConsoleMessageLevel.LOG,
-  });
+  ConsoleMessage({this.message = "", ConsoleMessageLevel? messageLevel})
+    : messageLevel = messageLevel ?? ConsoleMessageLevel.LOG;
 
   ///Gets a possible [ConsoleMessage] instance from a [Map] value.
   static ConsoleMessage? fromMap(

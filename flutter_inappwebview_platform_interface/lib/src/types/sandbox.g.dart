@@ -178,16 +178,12 @@ class Sandbox {
   ///Gets the name of the value.
   String name() {
     switch (_value) {
-      case 'null':
-        return 'ALLOW_ALL';
       case 'allow-downloads':
         return 'ALLOW_DOWNLOADS';
       case 'allow-forms':
         return 'ALLOW_FORMS';
       case 'allow-modals':
         return 'ALLOW_MODALS';
-      case 'null':
-        return 'ALLOW_NONE';
       case 'allow-orientation-lock':
         return 'ALLOW_ORIENTATION_LOCK';
       case 'allow-pointer-lock':

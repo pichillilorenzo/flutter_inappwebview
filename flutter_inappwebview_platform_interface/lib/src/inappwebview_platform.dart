@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 import 'chrome_safari_browser/platform_chrome_safari_browser.dart';
@@ -27,10 +28,24 @@ import 'web_storage/platform_web_storage.dart';
 import 'web_storage/platform_web_storage_manager.dart';
 import 'webview_environment/platform_webview_environment.dart';
 
+// Logs the donation link in debug mode only once.
+// If you are reading this, consider supporting the
+// development of this project, thanks!
+bool _alreadyShown = false;
+void _logPluginSupportLinks() {
+  if (_alreadyShown || !kDebugMode) return;
+  _alreadyShown = true;
+  print("""\n
+🚀 Hi, flutter_inappwebview here, thank you for using it! If you like this plugin → 💙 Support development https://inappwebview.dev/donate ⭐ Star on GitHub https://github.com/pichillilorenzo/flutter_inappwebview 📱 Showcase your app https://inappwebview.dev/showcase
+""");
+}
+
 /// Interface for a platform implementation of a WebView.
 abstract class InAppWebViewPlatform extends PlatformInterface {
   /// Creates a new [InAppWebViewPlatform].
-  InAppWebViewPlatform() : super(token: _token);
+  InAppWebViewPlatform() : super(token: _token) {
+    _logPluginSupportLinks();
+  }
 
   static final Object _token = Object();
 

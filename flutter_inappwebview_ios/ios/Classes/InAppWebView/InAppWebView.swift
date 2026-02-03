@@ -1456,6 +1456,21 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         if let applePayAPIEnabled = settings?.applePayAPIEnabled, applePayAPIEnabled {
             return
         }
+        // Fix for iOS 17+ crash (EXC_BAD_ACCESS) when evaluateJavaScript is called
+        // on a WebView created with windowId. The contentWorld parameter causes crashes
+        // on windowId-created WebViews because the internal WKContentWorld state is not
+        // properly initialized for popup windows.
+        // Workaround: Use the non-contentWorld version for windowId WebViews.
+        if windowId != nil {
+            super.evaluateJavaScript(javaScript) { result, error in
+                if let error = error {
+                    completionHandler?(.failure(error))
+                } else {
+                    completionHandler?(.success(result as Any))
+                }
+            }
+            return
+        }
         super.evaluateJavaScript(javaScript, in: frame, in: contentWorld, completionHandler: completionHandler)
     }
     
@@ -1471,6 +1486,14 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
     @available(iOS 14.0, *)
     public func callAsyncJavaScript(_ functionBody: String, arguments: [String : Any] = [:], frame: WKFrameInfo? = nil, contentWorld: WKContentWorld, completionHandler: ((Result<Any, Error>) -> Void)? = nil) {
         if let applePayAPIEnabled = settings?.applePayAPIEnabled, applePayAPIEnabled {
+            return
+        }
+        // Fix for iOS 17+ crash (EXC_BAD_ACCESS) when callAsyncJavaScript is called
+        // on a WebView created with windowId. The contentWorld parameter causes crashes
+        // on windowId-created WebViews.
+        // Workaround: Use WKContentWorld.page instead of custom contentWorld for windowId WebViews.
+        if windowId != nil {
+            super.callAsyncJavaScript(functionBody, arguments: arguments, in: frame, in: WKContentWorld.page, completionHandler: completionHandler)
             return
         }
         super.callAsyncJavaScript(functionBody, arguments: arguments, in: frame, in: contentWorld, completionHandler: completionHandler)

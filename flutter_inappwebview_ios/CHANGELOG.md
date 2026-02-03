@@ -1,3 +1,7 @@
+## 1.1.3
+
+- Fixed iOS 17+ crash (EXC_BAD_ACCESS) when calling `evaluateJavaScript` or `callAsyncJavaScript` on WebViews created with `windowId` (popup windows)
+
 ## 1.1.2
 
 - Updated flutter_inappwebview_platform_interface version to ^1.3.0

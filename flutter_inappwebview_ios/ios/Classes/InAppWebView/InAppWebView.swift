@@ -1456,11 +1456,33 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         if let applePayAPIEnabled = settings?.applePayAPIEnabled, applePayAPIEnabled {
             return
         }
-        // Fix for iOS 17 crash (EXC_BAD_ACCESS) when evaluateJavaScript is called
-        // on a WebView created with windowId. The contentWorld parameter causes crashes
-        // on windowId-created WebViews because the internal WKContentWorld state is not
-        // properly initialized for popup windows.
-        // Workaround: Use the non-contentWorld version for windowId WebViews on iOS < 18.
+        // MARK: - Workaround for iOS 14~17 EXC_BAD_ACCESS crash on windowId WebViews
+        //
+        // Problem:
+        //   On iOS 17 and below (iOS 14~17), calling evaluateJavaScript with contentWorld
+        //   parameter on WebViews created via windowId (popup windows from window.open or
+        //   target="_blank") causes EXC_BAD_ACCESS (code=1, address=0x0) - null pointer dereference.
+        //
+        // Root Cause Analysis (Based on code investigation, not official Apple documentation):
+        //   1. WindowId WebViews reuse the WKWebView instance created by the parent during
+        //      onCreateWindow (see FlutterWebViewController.swift:43-44).
+        //   2. These WebViews share the same WKWebViewConfiguration reference with the parent
+        //      (see InAppWebView.swift:502-506 - prepareAndAddUserScripts returns early).
+        //   3. WKContentWorld instances are associated with WKUserContentController, but
+        //      windowId WebViews skip custom UserContentController initialization.
+        //   4. When evaluateJavaScript is called with a custom contentWorld, the internal
+        //      content world state may not be properly initialized for the popup WebView.
+        //
+        // Affected iOS Versions:
+        //   - iOS 14.0~17.x: Crash occurs (iOS 14.0 introduced WKContentWorld API)
+        //   - iOS 18.0+: Apple may have fixed this issue (needs verification)
+        //   Note: This is based on testing and code analysis. Apple has not officially
+        //   documented these internal implementation details.
+        //
+        // Workaround:
+        //   Use the non-contentWorld version of evaluateJavaScript for windowId WebViews.
+        //   This uses WKContentWorld.page internally, which is always valid.
+        //
         if #unavailable(iOS 18.0), windowId != nil {
             super.evaluateJavaScript(javaScript) { result, error in
                 if let error = error {
@@ -1488,10 +1510,11 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         if let applePayAPIEnabled = settings?.applePayAPIEnabled, applePayAPIEnabled {
             return
         }
-        // Fix for iOS 17 crash (EXC_BAD_ACCESS) when callAsyncJavaScript is called
-        // on a WebView created with windowId. The contentWorld parameter causes crashes
-        // on windowId-created WebViews.
-        // Workaround: Use WKContentWorld.page instead of custom contentWorld for windowId WebViews on iOS < 18.
+        // MARK: - Workaround for iOS 14~17 EXC_BAD_ACCESS crash on windowId WebViews
+        // See evaluateJavaScript(_:frame:contentWorld:completionHandler:) above for detailed explanation.
+        // Same root cause: contentWorld parameter crashes on windowId WebViews (iOS 14~17)
+        // due to uninitialized WKContentWorld state in popup windows.
+        // Workaround: Use WKContentWorld.page which is always valid.
         if #unavailable(iOS 18.0), windowId != nil {
             super.callAsyncJavaScript(functionBody, arguments: arguments, in: frame, in: WKContentWorld.page, completionHandler: completionHandler)
             return

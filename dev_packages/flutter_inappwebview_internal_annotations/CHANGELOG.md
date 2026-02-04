@@ -1,3 +1,7 @@
+## 1.3.0
+
+- Updated linux platform name
+
 ## 1.2.0
 
 - Updated `ExchangeableEnum` and `ExchangeableObjectProperty`.

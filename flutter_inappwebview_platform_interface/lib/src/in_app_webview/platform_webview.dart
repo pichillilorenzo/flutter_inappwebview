@@ -18,7 +18,6 @@ import 'platform_inappwebview_widget.dart';
 import 'platform_headless_in_app_webview.dart';
 import '../platform_webview_feature.dart';
 import '../in_app_browser/platform_in_app_browser.dart';
-import '../web_notification/main.dart';
 
 part 'platform_webview.g.dart';
 

@@ -6208,6 +6208,7 @@ void InAppWebView::setMicrophoneCaptureState(int state) {
 // === Theme Color ===
 
 std::optional<std::string> InAppWebView::getMetaThemeColor() const {
+#if WEBKIT_CHECK_VERSION(2, 50, 0)
   if (webview_ == nullptr) return std::nullopt;
   
   WebKitColor color;
@@ -6238,6 +6239,9 @@ std::optional<std::string> InAppWebView::getMetaThemeColor() const {
   }
   
   return std::string(hexColor);
+#else
+  return std::nullopt;
+#endif
 }
 
 // === Audio State (Playing and Mute) ===

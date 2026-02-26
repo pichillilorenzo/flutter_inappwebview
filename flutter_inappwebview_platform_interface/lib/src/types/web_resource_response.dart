@@ -1,6 +1,7 @@
 import 'dart:typed_data';
-
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
+
+import 'enum_method.dart';
 
 part 'web_resource_response.g.dart';
 
@@ -33,11 +34,12 @@ class WebResourceResponse_ {
   ///**NOTE**: available on Android 21+. For Android < 21 it won't be used.
   String? reasonPhrase;
 
-  WebResourceResponse_(
-      {this.contentType = "",
-      this.contentEncoding = "utf-8",
-      this.data,
-      this.headers,
-      this.statusCode,
-      this.reasonPhrase});
+  WebResourceResponse_({
+    this.contentType = "",
+    this.contentEncoding = "utf-8",
+    this.data,
+    this.headers,
+    this.statusCode,
+    this.reasonPhrase,
+  });
 }

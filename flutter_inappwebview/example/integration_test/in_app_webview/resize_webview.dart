@@ -1,13 +1,11 @@
 part of 'main.dart';
 
 void resizeWebView() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip =
+      kIsWeb ||
+      !InAppWebViewController.isMethodSupported(
+        PlatformInAppWebViewControllerMethod.addJavaScriptHandler,
+      );
 
   skippableTestWidgets('resize webview', (WidgetTester tester) async {
     final String resizeTest = '''
@@ -26,8 +24,9 @@ void resizeWebView() {
         </body>
         </html>
       ''';
-    final String resizeTestBase64 =
-        base64Encode(const Utf8Encoder().convert(resizeTest));
+    final String resizeTestBase64 = base64Encode(
+      const Utf8Encoder().convert(resizeTest),
+    );
     final Completer<void> resizeCompleter = Completer<void>();
     final Completer<void> pageStarted = Completer<void>();
     final Completer<void> pageLoaded = Completer<void>();
@@ -38,15 +37,17 @@ void resizeWebView() {
     final InAppWebView webView = InAppWebView(
       key: key,
       initialUrlRequest: URLRequest(
-          url: WebUri('data:text/html;charset=utf-8;base64,$resizeTestBase64')),
+        url: WebUri('data:text/html;charset=utf-8;base64,$resizeTestBase64'),
+      ),
       onWebViewCreated: (controller) {
         controllerCompleter.complete(controller);
 
         controller.addJavaScriptHandler(
-            handlerName: 'resize',
-            callback: (args) {
-              resizeCompleter.complete(true);
-            });
+          handlerName: 'resize',
+          callback: (args) {
+            resizeCompleter.complete(true);
+          },
+        );
       },
       onLoadStart: (controller, url) {
         pageStarted.complete();
@@ -61,13 +62,7 @@ void resizeWebView() {
       Directionality(
         textDirection: TextDirection.ltr,
         child: Column(
-          children: <Widget>[
-            SizedBox(
-              width: 200,
-              height: 200,
-              child: webView,
-            ),
-          ],
+          children: <Widget>[SizedBox(width: 200, height: 200, child: webView)],
         ),
       ),
     );
@@ -82,13 +77,7 @@ void resizeWebView() {
       Directionality(
         textDirection: TextDirection.ltr,
         child: Column(
-          children: <Widget>[
-            SizedBox(
-              width: 400,
-              height: 400,
-              child: webView,
-            ),
-          ],
+          children: <Widget>[SizedBox(width: 400, height: 400, child: webView)],
         ),
       ),
     );

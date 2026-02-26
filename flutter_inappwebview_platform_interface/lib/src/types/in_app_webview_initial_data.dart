@@ -1,6 +1,7 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 
 import '../web_uri.dart';
+import 'enum_method.dart';
 
 part 'in_app_webview_initial_data.g.dart';
 
@@ -27,11 +28,12 @@ class InAppWebViewInitialData_ {
   @SupportedPlatforms(platforms: [AndroidPlatform()])
   WebUri? historyUrl;
 
-  InAppWebViewInitialData_(
-      {required this.data,
-      this.mimeType = "text/html",
-      this.encoding = "utf8",
-      this.baseUrl,
-      @Deprecated('Use historyUrl instead') this.androidHistoryUrl,
-      this.historyUrl});
+  InAppWebViewInitialData_({
+    required this.data,
+    this.mimeType = "text/html",
+    this.encoding = "utf8",
+    this.baseUrl,
+    @Deprecated('Use historyUrl instead') this.androidHistoryUrl,
+    this.historyUrl,
+  });
 }

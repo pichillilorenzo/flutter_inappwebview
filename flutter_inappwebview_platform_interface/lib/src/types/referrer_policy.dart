@@ -18,16 +18,18 @@ class ReferrerPolicy_ {
   static const NO_REFERRER = const ReferrerPolicy_._internal("no-referrer");
 
   ///The Referer header will not be sent to origins without TLS (HTTPS).
-  static const NO_REFERRER_WHEN_DOWNGRADE =
-      const ReferrerPolicy_._internal("no-referrer-when-downgrade");
+  static const NO_REFERRER_WHEN_DOWNGRADE = const ReferrerPolicy_._internal(
+    "no-referrer-when-downgrade",
+  );
 
   ///The sent referrer will be limited to the origin of the referring page: its scheme, host, and port.
   static const ORIGIN = const ReferrerPolicy_._internal("origin");
 
   ///The referrer sent to other origins will be limited to the scheme, the host, and the port.
   ///Navigations on the same origin will still include the path.
-  static const ORIGIN_WHEN_CROSS_ORIGIN =
-      const ReferrerPolicy_._internal("origin-when-cross-origin");
+  static const ORIGIN_WHEN_CROSS_ORIGIN = const ReferrerPolicy_._internal(
+    "origin-when-cross-origin",
+  );
 
   ///A referrer will be sent for same origin, but cross-origin requests will contain no referrer information.
   static const SAME_ORIGIN = const ReferrerPolicy_._internal("same-origin");

@@ -13,23 +13,21 @@ class FetchRequestCredentialDefault extends FetchRequestCredential {
   FetchRequestCredentialDefault({this.value, String? type}) : super(type: type);
 
   ///Gets a possible [FetchRequestCredentialDefault] instance from a [Map] value.
-  static FetchRequestCredentialDefault? fromMap(Map<String, dynamic>? map) {
+  static FetchRequestCredentialDefault? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
-    final instance = FetchRequestCredentialDefault(
-      value: map['value'],
-    );
+    final instance = FetchRequestCredentialDefault(value: map['value']);
     instance.type = map['type'];
     return instance;
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
-    return {
-      "type": type,
-      "value": value,
-    };
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
+    return {"type": type, "value": value};
   }
 
   ///Converts instance to a map.

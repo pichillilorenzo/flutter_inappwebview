@@ -15,7 +15,7 @@ namespace flutter_inappwebview_plugin
       {"request", request->toEncodableMap()},
       {"isForMainFrame", isForMainFrame},
       {"isRedirect", make_fl_value(isRedirect)},
-      {"navigationType", make_fl_value(navigationType)}
+      {"navigationType", make_fl_value(NavigationActionTypeToInteger(navigationType))}
     };
   }
 }

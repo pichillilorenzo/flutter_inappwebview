@@ -1,6 +1,7 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 
 import 'url_protection_space.dart';
+import 'enum_method.dart';
 
 part 'url_authentication_challenge.g.dart';
 
@@ -11,7 +12,5 @@ class URLAuthenticationChallenge_ {
   ///The protection space requiring authentication.
   URLProtectionSpace_ protectionSpace;
 
-  URLAuthenticationChallenge_({
-    required this.protectionSpace,
-  });
+  URLAuthenticationChallenge_({required this.protectionSpace});
 }

@@ -24,8 +24,9 @@ class ASN1DistinguishedNames {
   static ASN1DistinguishedNames? fromValue(String? oid) {
     if (oid != null) {
       try {
-        return ASN1DistinguishedNames.values
-            .firstWhere((element) => element.oid() == oid);
+        return ASN1DistinguishedNames.values.firstWhere(
+          (element) => element.oid() == oid,
+        );
       } catch (e) {
         return null;
       }
@@ -40,30 +41,52 @@ class ASN1DistinguishedNames {
   @override
   String toString() => "($_oid, $_representation)";
 
-  static const COMMON_NAME =
-      const ASN1DistinguishedNames._internal("2.5.4.3", "CN");
-  static const DN_QUALIFIER =
-      const ASN1DistinguishedNames._internal("2.5.4.46", "DNQ");
-  static const SERIAL_NUMBER =
-      const ASN1DistinguishedNames._internal("2.5.4.5", "SERIALNUMBER");
-  static const GIVEN_NAME =
-      const ASN1DistinguishedNames._internal("2.5.4.42", "GIVENNAME");
-  static const SURNAME =
-      const ASN1DistinguishedNames._internal("2.5.4.4", "SURNAME");
+  static const COMMON_NAME = const ASN1DistinguishedNames._internal(
+    "2.5.4.3",
+    "CN",
+  );
+  static const DN_QUALIFIER = const ASN1DistinguishedNames._internal(
+    "2.5.4.46",
+    "DNQ",
+  );
+  static const SERIAL_NUMBER = const ASN1DistinguishedNames._internal(
+    "2.5.4.5",
+    "SERIALNUMBER",
+  );
+  static const GIVEN_NAME = const ASN1DistinguishedNames._internal(
+    "2.5.4.42",
+    "GIVENNAME",
+  );
+  static const SURNAME = const ASN1DistinguishedNames._internal(
+    "2.5.4.4",
+    "SURNAME",
+  );
   static const ORGANIZATIONAL_UNIT_NAME =
       const ASN1DistinguishedNames._internal("2.5.4.11", "OU");
-  static const ORGANIZATION_NAME =
-      const ASN1DistinguishedNames._internal("2.5.4.10", "O");
-  static const STREET_ADDRESS =
-      const ASN1DistinguishedNames._internal("2.5.4.9", "STREET");
-  static const LOCALITY_NAME =
-      const ASN1DistinguishedNames._internal("2.5.4.7", "L");
-  static const STATE_OR_PROVINCE_NAME =
-      const ASN1DistinguishedNames._internal("2.5.4.8", "ST");
-  static const COUNTRY_NAME =
-      const ASN1DistinguishedNames._internal("2.5.4.6", "C");
-  static const EMAIL =
-      const ASN1DistinguishedNames._internal("1.2.840.113549.1.9.1", "E");
+  static const ORGANIZATION_NAME = const ASN1DistinguishedNames._internal(
+    "2.5.4.10",
+    "O",
+  );
+  static const STREET_ADDRESS = const ASN1DistinguishedNames._internal(
+    "2.5.4.9",
+    "STREET",
+  );
+  static const LOCALITY_NAME = const ASN1DistinguishedNames._internal(
+    "2.5.4.7",
+    "L",
+  );
+  static const STATE_OR_PROVINCE_NAME = const ASN1DistinguishedNames._internal(
+    "2.5.4.8",
+    "ST",
+  );
+  static const COUNTRY_NAME = const ASN1DistinguishedNames._internal(
+    "2.5.4.6",
+    "C",
+  );
+  static const EMAIL = const ASN1DistinguishedNames._internal(
+    "1.2.840.113549.1.9.1",
+    "E",
+  );
 
   bool operator ==(value) => value == _oid;
 

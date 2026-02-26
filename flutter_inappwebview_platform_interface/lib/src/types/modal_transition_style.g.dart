@@ -9,12 +9,13 @@ part of 'modal_transition_style.dart';
 ///Class used to specify the transition style when presenting a view controller.
 class ModalTransitionStyle {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const ModalTransitionStyle._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory ModalTransitionStyle._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      ModalTransitionStyle._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => ModalTransitionStyle._internal(value, nativeValue());
 
   ///When the view controller is presented, its view slides up from the bottom of the screen.
   ///On dismissal, the view slides back down. This is the default transition style.
@@ -46,8 +47,9 @@ class ModalTransitionStyle {
   static ModalTransitionStyle? fromValue(int? value) {
     if (value != null) {
       try {
-        return ModalTransitionStyle.values
-            .firstWhere((element) => element.toValue() == value);
+        return ModalTransitionStyle.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -59,8 +61,9 @@ class ModalTransitionStyle {
   static ModalTransitionStyle? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return ModalTransitionStyle.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return ModalTransitionStyle.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -68,20 +71,45 @@ class ModalTransitionStyle {
     return null;
   }
 
+  /// Gets a possible [ModalTransitionStyle] instance value with name [name].
+  ///
+  /// Goes through [ModalTransitionStyle.values] looking for a value with
+  /// name [name], as reported by [ModalTransitionStyle.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static ModalTransitionStyle? byName(String? name) {
+    if (name != null) {
+      try {
+        return ModalTransitionStyle.values.firstWhere(
+          (element) => element.name() == name,
+        );
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [ModalTransitionStyle] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, ModalTransitionStyle> asNameMap() =>
+      <String, ModalTransitionStyle>{
+        for (final value in ModalTransitionStyle.values) value.name(): value,
+      };
+
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
-  @override
-  int get hashCode => _value.hashCode;
-
-  @override
-  bool operator ==(value) => value == _value;
-
-  @override
-  String toString() {
+  ///Gets the name of the value.
+  String name() {
     switch (_value) {
       case 0:
         return 'COVER_VERTICAL';
@@ -94,6 +122,22 @@ class ModalTransitionStyle {
     }
     return _value.toString();
   }
+
+  @override
+  int get hashCode => _value.hashCode;
+
+  @override
+  bool operator ==(value) => value == _value;
+
+  ///Checks if the value is supported by the [defaultTargetPlatform].
+  bool isSupported() {
+    return _nativeValue != null;
+  }
+
+  @override
+  String toString() {
+    return name();
+  }
 }
 
 ///An iOS-specific class used to specify the transition style when presenting a view controller.
@@ -101,12 +145,13 @@ class ModalTransitionStyle {
 @Deprecated('Use ModalTransitionStyle instead')
 class IOSUIModalTransitionStyle {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const IOSUIModalTransitionStyle._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory IOSUIModalTransitionStyle._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      IOSUIModalTransitionStyle._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => IOSUIModalTransitionStyle._internal(value, nativeValue());
 
   ///When the view controller is presented, its view slides up from the bottom of the screen.
   ///On dismissal, the view slides back down. This is the default transition style.
@@ -138,8 +183,9 @@ class IOSUIModalTransitionStyle {
   static IOSUIModalTransitionStyle? fromValue(int? value) {
     if (value != null) {
       try {
-        return IOSUIModalTransitionStyle.values
-            .firstWhere((element) => element.toValue() == value);
+        return IOSUIModalTransitionStyle.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -151,8 +197,9 @@ class IOSUIModalTransitionStyle {
   static IOSUIModalTransitionStyle? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return IOSUIModalTransitionStyle.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return IOSUIModalTransitionStyle.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -160,20 +207,46 @@ class IOSUIModalTransitionStyle {
     return null;
   }
 
+  /// Gets a possible [IOSUIModalTransitionStyle] instance value with name [name].
+  ///
+  /// Goes through [IOSUIModalTransitionStyle.values] looking for a value with
+  /// name [name], as reported by [IOSUIModalTransitionStyle.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static IOSUIModalTransitionStyle? byName(String? name) {
+    if (name != null) {
+      try {
+        return IOSUIModalTransitionStyle.values.firstWhere(
+          (element) => element.name() == name,
+        );
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [IOSUIModalTransitionStyle] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, IOSUIModalTransitionStyle> asNameMap() =>
+      <String, IOSUIModalTransitionStyle>{
+        for (final value in IOSUIModalTransitionStyle.values)
+          value.name(): value,
+      };
+
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
-  @override
-  int get hashCode => _value.hashCode;
-
-  @override
-  bool operator ==(value) => value == _value;
-
-  @override
-  String toString() {
+  ///Gets the name of the value.
+  String name() {
     switch (_value) {
       case 0:
         return 'COVER_VERTICAL';
@@ -185,5 +258,21 @@ class IOSUIModalTransitionStyle {
         return 'PARTIAL_CURL';
     }
     return _value.toString();
+  }
+
+  @override
+  int get hashCode => _value.hashCode;
+
+  @override
+  bool operator ==(value) => value == _value;
+
+  ///Checks if the value is supported by the [defaultTargetPlatform].
+  bool isSupported() {
+    return _nativeValue != null;
+  }
+
+  @override
+  String toString() {
+    return name();
   }
 }

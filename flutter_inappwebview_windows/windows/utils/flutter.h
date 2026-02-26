@@ -122,8 +122,8 @@ namespace flutter_inappwebview_plugin
   template<typename T, typename std::enable_if<std::is_same<T, int32_t>::value, bool>::type* = nullptr>
   static inline std::optional<int64_t> get_optional_fl_map_value(const flutter::EncodableMap& map, const char* key)
   {
-    if (fl_map_contains_not_null(map, key)) {
-      auto fl_key = make_fl_value(key);
+    auto fl_key = make_fl_value(key);
+    if (fl_map_contains_not_null(map, key) && (std::holds_alternative<int32_t>(map.at(fl_key)) || std::holds_alternative<int64_t>(map.at(fl_key)))) {
       return std::make_optional<int64_t>(map.at(fl_key).LongValue());
     }
     return std::nullopt;
@@ -132,8 +132,8 @@ namespace flutter_inappwebview_plugin
   template<typename T, typename std::enable_if<std::is_same<T, int64_t>::value, bool>::type* = nullptr>
   static inline std::optional<int64_t> get_optional_fl_map_value(const flutter::EncodableMap& map, const char* key)
   {
-    if (fl_map_contains_not_null(map, key)) {
-      auto fl_key = make_fl_value(key);
+    auto fl_key = make_fl_value(key);
+    if (fl_map_contains_not_null(map, key) && (std::holds_alternative<int32_t>(map.at(fl_key)) || std::holds_alternative<int64_t>(map.at(fl_key)))) {
       return std::make_optional<int64_t>(map.at(fl_key).LongValue());
     }
     return std::nullopt;
@@ -177,7 +177,7 @@ namespace flutter_inappwebview_plugin
 
     auto flList = std::get_if<flutter::EncodableList>(&map.at(make_fl_value(key)));
     if (flList) {
-      T vecValue(flList->size());
+      T vecValue;
       for (auto itr = flList->begin(); itr != flList->end(); itr++) {
         vecValue.push_back(std::get<V>(*itr));
       }

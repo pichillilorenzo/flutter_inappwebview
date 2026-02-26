@@ -17,12 +17,12 @@ namespace flutter_inappwebview_plugin
   {}
 
   WebResourceResponse::WebResourceResponse(const flutter::EncodableMap& map)
-    : contentType(get_optional_fl_map_value<std::string>(map, "contentType")),
-    contentEncoding(get_optional_fl_map_value<std::string>(map, "contentEncoding")),
-    statusCode(get_optional_fl_map_value<int64_t>(map, "statusCode")),
-    reasonPhrase(get_optional_fl_map_value<std::string>(map, "reasonPhrase")),
-    headers(get_optional_fl_map_value<std::map<std::string, std::string>>(map, "headers")),
-    data(get_optional_fl_map_value<std::vector<uint8_t>>(map, "data"))
+    : WebResourceResponse(get_optional_fl_map_value<std::string>(map, "contentType"),
+      get_optional_fl_map_value<std::string>(map, "contentEncoding"),
+      get_optional_fl_map_value<int64_t>(map, "statusCode"),
+      get_optional_fl_map_value<std::string>(map, "reasonPhrase"),
+      get_optional_fl_map_value<std::map<std::string, std::string>>(map, "headers"),
+      get_optional_fl_map_value<std::vector<uint8_t>>(map, "data"))
   {}
 
   flutter::EncodableMap WebResourceResponse::toEncodableMap() const

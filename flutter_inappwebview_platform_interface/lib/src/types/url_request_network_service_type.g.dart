@@ -9,12 +9,13 @@ part of 'url_request_network_service_type.dart';
 ///Class that represents the constants that specify how a request uses network resources.
 class URLRequestNetworkServiceType {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const URLRequestNetworkServiceType._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory URLRequestNetworkServiceType._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      URLRequestNetworkServiceType._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => URLRequestNetworkServiceType._internal(value, nativeValue());
 
   ///A service type for streaming audio/video data.
   static const AV_STREAMING = URLRequestNetworkServiceType._internal(8, 8);
@@ -63,8 +64,9 @@ class URLRequestNetworkServiceType {
   static URLRequestNetworkServiceType? fromValue(int? value) {
     if (value != null) {
       try {
-        return URLRequestNetworkServiceType.values
-            .firstWhere((element) => element.toValue() == value);
+        return URLRequestNetworkServiceType.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -76,8 +78,9 @@ class URLRequestNetworkServiceType {
   static URLRequestNetworkServiceType? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return URLRequestNetworkServiceType.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return URLRequestNetworkServiceType.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -85,20 +88,46 @@ class URLRequestNetworkServiceType {
     return null;
   }
 
+  /// Gets a possible [URLRequestNetworkServiceType] instance value with name [name].
+  ///
+  /// Goes through [URLRequestNetworkServiceType.values] looking for a value with
+  /// name [name], as reported by [URLRequestNetworkServiceType.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static URLRequestNetworkServiceType? byName(String? name) {
+    if (name != null) {
+      try {
+        return URLRequestNetworkServiceType.values.firstWhere(
+          (element) => element.name() == name,
+        );
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [URLRequestNetworkServiceType] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, URLRequestNetworkServiceType> asNameMap() =>
+      <String, URLRequestNetworkServiceType>{
+        for (final value in URLRequestNetworkServiceType.values)
+          value.name(): value,
+      };
+
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
-  @override
-  int get hashCode => _value.hashCode;
-
-  @override
-  bool operator ==(value) => value == _value;
-
-  @override
-  String toString() {
+  ///Gets the name of the value.
+  String name() {
     switch (_value) {
       case 8:
         return 'AV_STREAMING';
@@ -119,6 +148,22 @@ class URLRequestNetworkServiceType {
     }
     return _value.toString();
   }
+
+  @override
+  int get hashCode => _value.hashCode;
+
+  @override
+  bool operator ==(value) => value == _value;
+
+  ///Checks if the value is supported by the [defaultTargetPlatform].
+  bool isSupported() {
+    return _nativeValue != null;
+  }
+
+  @override
+  String toString() {
+    return name();
+  }
 }
 
 ///An iOS-specific Class that represents the constants that specify how a request uses network resources.
@@ -126,13 +171,16 @@ class URLRequestNetworkServiceType {
 @Deprecated('Use URLRequestNetworkServiceType instead')
 class IOSURLRequestNetworkServiceType {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const IOSURLRequestNetworkServiceType._internal(
-      this._value, this._nativeValue);
-// ignore: unused_element
+    this._value,
+    this._nativeValue,
+  );
+  // ignore: unused_element
   factory IOSURLRequestNetworkServiceType._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      IOSURLRequestNetworkServiceType._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => IOSURLRequestNetworkServiceType._internal(value, nativeValue());
 
   ///A service type for streaming audio/video data.
   static const AV_STREAMING = IOSURLRequestNetworkServiceType._internal(8, 8);
@@ -146,8 +194,10 @@ class IOSURLRequestNetworkServiceType {
   ///A service type for call signaling.
   ///
   ///Use this service type with network traffic that establishes, maintains, or tears down a VoIP call.
-  static const CALL_SIGNALING =
-      IOSURLRequestNetworkServiceType._internal(11, 11);
+  static const CALL_SIGNALING = IOSURLRequestNetworkServiceType._internal(
+    11,
+    11,
+  );
 
   ///A service type for standard network traffic.
   static const DEFAULT = IOSURLRequestNetworkServiceType._internal(0, 0);
@@ -158,8 +208,10 @@ class IOSURLRequestNetworkServiceType {
   ///A service type for data that the user is actively waiting for.
   ///
   ///Use this service type for interactive situations where the user is anticipating a quick response, like instant messaging or completing a purchase.
-  static const RESPONSIVE_DATA =
-      IOSURLRequestNetworkServiceType._internal(6, 6);
+  static const RESPONSIVE_DATA = IOSURLRequestNetworkServiceType._internal(
+    6,
+    6,
+  );
 
   ///A service type for video traffic.
   static const VIDEO = IOSURLRequestNetworkServiceType._internal(2, 2);
@@ -183,8 +235,9 @@ class IOSURLRequestNetworkServiceType {
   static IOSURLRequestNetworkServiceType? fromValue(int? value) {
     if (value != null) {
       try {
-        return IOSURLRequestNetworkServiceType.values
-            .firstWhere((element) => element.toValue() == value);
+        return IOSURLRequestNetworkServiceType.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -196,8 +249,9 @@ class IOSURLRequestNetworkServiceType {
   static IOSURLRequestNetworkServiceType? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return IOSURLRequestNetworkServiceType.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return IOSURLRequestNetworkServiceType.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -205,20 +259,46 @@ class IOSURLRequestNetworkServiceType {
     return null;
   }
 
+  /// Gets a possible [IOSURLRequestNetworkServiceType] instance value with name [name].
+  ///
+  /// Goes through [IOSURLRequestNetworkServiceType.values] looking for a value with
+  /// name [name], as reported by [IOSURLRequestNetworkServiceType.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static IOSURLRequestNetworkServiceType? byName(String? name) {
+    if (name != null) {
+      try {
+        return IOSURLRequestNetworkServiceType.values.firstWhere(
+          (element) => element.name() == name,
+        );
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [IOSURLRequestNetworkServiceType] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, IOSURLRequestNetworkServiceType> asNameMap() =>
+      <String, IOSURLRequestNetworkServiceType>{
+        for (final value in IOSURLRequestNetworkServiceType.values)
+          value.name(): value,
+      };
+
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
-  @override
-  int get hashCode => _value.hashCode;
-
-  @override
-  bool operator ==(value) => value == _value;
-
-  @override
-  String toString() {
+  ///Gets the name of the value.
+  String name() {
     switch (_value) {
       case 8:
         return 'AV_STREAMING';
@@ -238,5 +318,21 @@ class IOSURLRequestNetworkServiceType {
         return 'VOICE';
     }
     return _value.toString();
+  }
+
+  @override
+  int get hashCode => _value.hashCode;
+
+  @override
+  bool operator ==(value) => value == _value;
+
+  ///Checks if the value is supported by the [defaultTargetPlatform].
+  bool isSupported() {
+    return _nativeValue != null;
+  }
+
+  @override
+  String toString() {
+    return name();
   }
 }

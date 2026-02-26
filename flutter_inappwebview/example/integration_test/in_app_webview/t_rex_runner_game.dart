@@ -1,13 +1,9 @@
 part of 'main.dart';
 
 void tRexRunnerGame() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebViewController.isPropertySupported(
+    PlatformInAppWebViewControllerProperty.tRexRunnerHtml,
+  );
 
   skippableTestWidgets('T-Rex Runner game', (WidgetTester tester) async {
     final Completer<InAppWebViewController> controllerCompleter =

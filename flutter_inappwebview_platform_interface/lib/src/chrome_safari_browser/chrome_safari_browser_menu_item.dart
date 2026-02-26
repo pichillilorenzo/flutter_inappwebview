@@ -3,14 +3,17 @@ import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_i
 import '../types/ui_image.dart';
 import 'platform_chrome_safari_browser.dart';
 import '../web_uri.dart';
+import '../types/enum_method.dart';
 
 part 'chrome_safari_browser_menu_item.g.dart';
 
 ///Class that represents a custom menu item for a [PlatformChromeSafariBrowser] instance.
-@SupportedPlatforms(platforms: [
-  AndroidPlatform(note: 'Not available in an Android Trusted Web Activity.'),
-  IOSPlatform()
-])
+@SupportedPlatforms(
+  platforms: [
+    AndroidPlatform(note: 'Not available in an Android Trusted Web Activity.'),
+    IOSPlatform(),
+  ],
+)
 @ExchangeableObject()
 class ChromeSafariBrowserMenuItem_ {
   ///The menu item id. It should be different from [ChromeSafariBrowserActionButton.id].
@@ -30,10 +33,11 @@ class ChromeSafariBrowserMenuItem_ {
   void Function(WebUri? url, String title)? onClick;
 
   @ExchangeableObjectConstructor()
-  ChromeSafariBrowserMenuItem_(
-      {required this.id,
-      required this.label,
-      this.image,
-      @Deprecated("Use onClick instead") this.action,
-      this.onClick});
+  ChromeSafariBrowserMenuItem_({
+    required this.id,
+    required this.label,
+    this.image,
+    @Deprecated("Use onClick instead") this.action,
+    this.onClick,
+  });
 }

@@ -20,7 +20,8 @@ class AndroidTracingControllerCreationParams
 
   /// Creates a [AndroidTracingControllerCreationParams] instance based on [PlatformTracingControllerCreationParams].
   factory AndroidTracingControllerCreationParams.fromPlatformTracingControllerCreationParams(
-      PlatformTracingControllerCreationParams params) {
+    PlatformTracingControllerCreationParams params,
+  ) {
     return AndroidTracingControllerCreationParams(params);
   }
 }
@@ -30,14 +31,16 @@ class AndroidTracingController extends PlatformTracingController
     with ChannelController {
   /// Creates a new [AndroidTracingController].
   AndroidTracingController(PlatformTracingControllerCreationParams params)
-      : super.implementation(
-          params is AndroidTracingControllerCreationParams
-              ? params
-              : AndroidTracingControllerCreationParams
-                  .fromPlatformTracingControllerCreationParams(params),
-        ) {
+    : super.implementation(
+        params is AndroidTracingControllerCreationParams
+            ? params
+            : AndroidTracingControllerCreationParams.fromPlatformTracingControllerCreationParams(
+                params,
+              ),
+      ) {
     channel = const MethodChannel(
-        'com.pichillilorenzo/flutter_inappwebview_tracingcontroller');
+      'com.pichillilorenzo/flutter_inappwebview_tracingcontroller',
+    );
     handler = handleMethod;
     initMethodCallHandler();
   }
@@ -50,9 +53,23 @@ class AndroidTracingController extends PlatformTracingController
   }
 
   static AndroidTracingController _init() {
-    _instance = AndroidTracingController(AndroidTracingControllerCreationParams(
-        const PlatformTracingControllerCreationParams()));
+    _instance = AndroidTracingController(
+      AndroidTracingControllerCreationParams(
+        const PlatformTracingControllerCreationParams(),
+      ),
+    );
     return _instance!;
+  }
+
+  static final AndroidTracingController _staticValue = AndroidTracingController(
+    AndroidTracingControllerCreationParams(
+      const PlatformTracingControllerCreationParams(),
+    ),
+  );
+
+  /// Provide static access.
+  factory AndroidTracingController.static() {
+    return _staticValue;
   }
 
   Future<dynamic> _handleMethod(MethodCall call) async {}

@@ -1,5 +1,8 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
+
 import '../in_app_webview/platform_webview.dart';
+import 'enum_method.dart';
+
 part 'login_request.g.dart';
 
 ///Class used by [PlatformWebViewCreationParams.onReceivedLoginRequest] event.

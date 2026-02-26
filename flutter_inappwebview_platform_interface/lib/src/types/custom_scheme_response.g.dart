@@ -17,13 +17,17 @@ class CustomSchemeResponse {
 
   ///Data enconded to 'base64'.
   Uint8List data;
-  CustomSchemeResponse(
-      {this.contentEncoding = 'utf-8',
-      required this.contentType,
-      required this.data});
+  CustomSchemeResponse({
+    this.contentEncoding = 'utf-8',
+    required this.contentType,
+    required this.data,
+  });
 
   ///Gets a possible [CustomSchemeResponse] instance from a [Map] value.
-  static CustomSchemeResponse? fromMap(Map<String, dynamic>? map) {
+  static CustomSchemeResponse? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
@@ -31,12 +35,14 @@ class CustomSchemeResponse {
       contentType: map['contentType'],
       data: Uint8List.fromList(map['data'].cast<int>()),
     );
-    instance.contentEncoding = map['contentEncoding'];
+    if (map['contentEncoding'] != null) {
+      instance.contentEncoding = map['contentEncoding'];
+    }
     return instance;
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
       "contentEncoding": contentEncoding,
       "contentType": contentType,

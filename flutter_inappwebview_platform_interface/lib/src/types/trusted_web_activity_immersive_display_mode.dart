@@ -2,6 +2,7 @@ import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_i
 
 import 'trusted_web_activity_display_mode.dart';
 import 'layout_in_display_cutout_mode.dart';
+import 'enum_method.dart';
 
 part 'trusted_web_activity_immersive_display_mode.g.dart';
 
@@ -23,19 +24,21 @@ class TrustedWebActivityImmersiveDisplayMode_
   static final _type = "IMMERSIVE_MODE";
 
   @ExchangeableObjectConstructor()
-  TrustedWebActivityImmersiveDisplayMode_(
-      {required this.isSticky,
-      this.displayCutoutMode = LayoutInDisplayCutoutMode_.DEFAULT,
-      this.layoutInDisplayCutoutMode}) {
+  TrustedWebActivityImmersiveDisplayMode_({
+    required this.isSticky,
+    this.displayCutoutMode = LayoutInDisplayCutoutMode_.DEFAULT,
+    this.layoutInDisplayCutoutMode,
+  }) {
     this.displayCutoutMode = this.layoutInDisplayCutoutMode != null
         ? LayoutInDisplayCutoutMode_.fromNativeValue(
-            layoutInDisplayCutoutMode?.toNativeValue())!
+            layoutInDisplayCutoutMode?.toNativeValue(),
+          )!
         : this.displayCutoutMode;
   }
 
   @ExchangeableObjectMethod(toMapMergeWith: true)
   // ignore: unused_element
-  Map<String, dynamic> _toMapMergeWith() {
+  Map<String, dynamic> _toMapMergeWith({EnumMethod? enumMethod}) {
     return {"type": _type};
   }
 

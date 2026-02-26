@@ -16,31 +16,49 @@ class FindSession {
 
   /// Defines how results are reported through the find panel's UI.
   SearchResultDisplayStyle searchResultDisplayStyle;
-  FindSession(
-      {required this.highlightedResultIndex,
-      required this.resultCount,
-      required this.searchResultDisplayStyle});
+  FindSession({
+    required this.highlightedResultIndex,
+    required this.resultCount,
+    required this.searchResultDisplayStyle,
+  });
 
   ///Gets a possible [FindSession] instance from a [Map] value.
-  static FindSession? fromMap(Map<String, dynamic>? map) {
+  static FindSession? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
     final instance = FindSession(
       highlightedResultIndex: map['highlightedResultIndex'],
       resultCount: map['resultCount'],
-      searchResultDisplayStyle: SearchResultDisplayStyle.fromNativeValue(
-          map['searchResultDisplayStyle'])!,
+      searchResultDisplayStyle: switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => SearchResultDisplayStyle.fromNativeValue(
+          map['searchResultDisplayStyle'],
+        ),
+        EnumMethod.value => SearchResultDisplayStyle.fromValue(
+          map['searchResultDisplayStyle'],
+        ),
+        EnumMethod.name => SearchResultDisplayStyle.byName(
+          map['searchResultDisplayStyle'],
+        ),
+      }!,
     );
     return instance;
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
       "highlightedResultIndex": highlightedResultIndex,
       "resultCount": resultCount,
-      "searchResultDisplayStyle": searchResultDisplayStyle.toNativeValue(),
+      "searchResultDisplayStyle": switch (enumMethod ??
+          EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => searchResultDisplayStyle.toNativeValue(),
+        EnumMethod.value => searchResultDisplayStyle.toValue(),
+        EnumMethod.name => searchResultDisplayStyle.name(),
+      },
     };
   }
 

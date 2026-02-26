@@ -14,12 +14,17 @@ class AndroidWebStorageManager {
   Future<List<AndroidWebStorageOrigin>> getOrigins() async {
     List<AndroidWebStorageOrigin> originsList = [];
 
-    List<WebStorageOrigin> origins =
-        await WebStorageManager.instance().getOrigins();
+    List<WebStorageOrigin> origins = await WebStorageManager.instance()
+        .getOrigins();
 
     for (var origin in origins) {
-      originsList.add(AndroidWebStorageOrigin(
-          origin: origin.origin, quota: origin.quota, usage: origin.usage));
+      originsList.add(
+        AndroidWebStorageOrigin(
+          origin: origin.origin,
+          quota: origin.quota,
+          usage: origin.usage,
+        ),
+      );
     }
 
     return originsList;

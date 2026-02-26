@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -12,8 +11,7 @@ part 'trusted_web_activity.dart';
 part 'sf_safari_view_controller.dart';
 
 void main() {
-  final shouldSkip =
-      kIsWeb || [TargetPlatform.macOS].contains(defaultTargetPlatform);
+  final shouldSkip = !ChromeSafariBrowser.isClassSupported();
 
   skippableGroup('ChromeSafariBrowser', () {
     openAndClose();

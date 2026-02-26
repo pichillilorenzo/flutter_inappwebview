@@ -1,6 +1,8 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
+
 import '../in_app_webview/platform_webview.dart';
 import 'js_confirm_response_action.dart';
+import 'enum_method.dart';
 
 part 'js_confirm_response.g.dart';
 
@@ -22,10 +24,11 @@ class JsConfirmResponse_ {
   ///Action used to confirm that the user hit confirm or cancel button.
   JsConfirmResponseAction_? action;
 
-  JsConfirmResponse_(
-      {this.message = "",
-      this.handledByClient = false,
-      this.confirmButtonTitle = "",
-      this.cancelButtonTitle = "",
-      this.action = JsConfirmResponseAction_.CANCEL});
+  JsConfirmResponse_({
+    this.message = "",
+    this.handledByClient = false,
+    this.confirmButtonTitle = "",
+    this.cancelButtonTitle = "",
+    this.action = JsConfirmResponseAction_.CANCEL,
+  });
 }

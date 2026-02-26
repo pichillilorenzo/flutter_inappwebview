@@ -1,13 +1,9 @@
 part of 'main.dart';
 
 void onProgressChanged() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebView.isPropertySupported(
+    PlatformWebViewCreationParamsProperty.onProgressChanged,
+  );
 
   skippableTestWidgets('onProgressChanged', (WidgetTester tester) async {
     final Completer<void> onProgressChangedCompleter = Completer<void>();
@@ -17,9 +13,7 @@ void onProgressChanged() {
         child: InAppWebView(
           key: GlobalKey(),
           initialUrlRequest: URLRequest(url: TEST_URL_1),
-          initialSettings: InAppWebViewSettings(
-            clearCache: true,
-          ),
+          initialSettings: InAppWebViewSettings(clearCache: true),
           onProgressChanged: (controller, progress) {
             if (progress == 100 && !onProgressChangedCompleter.isCompleted) {
               onProgressChangedCompleter.complete();

@@ -11,7 +11,7 @@
 
 namespace flutter_inappwebview_plugin
 {
-  enum UserScriptInjectionTime {
+  enum class UserScriptInjectionTime {
     atDocumentStart = 0,
     atDocumentEnd
   };
@@ -23,14 +23,16 @@ namespace flutter_inappwebview_plugin
     const std::optional<std::string> groupName;
     const std::string source;
     const UserScriptInjectionTime injectionTime;
-    const std::vector<std::string> allowedOriginRules;
+    const bool forMainFrameOnly;
+    const std::optional<std::vector<std::string>> allowedOriginRules;
     const std::shared_ptr<ContentWorld> contentWorld;
 
     UserScript(
       const std::optional<std::string>& groupName,
       const std::string& source,
       const UserScriptInjectionTime& injectionTime,
-      const std::vector<std::string>& allowedOriginRules,
+      const bool& forMainFrameOnly,
+      const std::optional<std::vector<std::string>>& allowedOriginRules,
       std::shared_ptr<ContentWorld> contentWorld
     );
     UserScript(const flutter::EncodableMap& map);

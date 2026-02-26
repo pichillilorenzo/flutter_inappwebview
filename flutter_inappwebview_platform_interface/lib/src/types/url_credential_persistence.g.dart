@@ -9,12 +9,13 @@ part of 'url_credential_persistence.dart';
 ///Class that represents the constants that specify how long the credential will be kept.
 class URLCredentialPersistence {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const URLCredentialPersistence._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory URLCredentialPersistence._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      URLCredentialPersistence._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => URLCredentialPersistence._internal(value, nativeValue());
 
   ///The credential should be stored only for this session
   static const FOR_SESSION = URLCredentialPersistence._internal(1, 1);
@@ -41,8 +42,9 @@ class URLCredentialPersistence {
   static URLCredentialPersistence? fromValue(int? value) {
     if (value != null) {
       try {
-        return URLCredentialPersistence.values
-            .firstWhere((element) => element.toValue() == value);
+        return URLCredentialPersistence.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -54,8 +56,9 @@ class URLCredentialPersistence {
   static URLCredentialPersistence? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return URLCredentialPersistence.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return URLCredentialPersistence.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -63,20 +66,46 @@ class URLCredentialPersistence {
     return null;
   }
 
+  /// Gets a possible [URLCredentialPersistence] instance value with name [name].
+  ///
+  /// Goes through [URLCredentialPersistence.values] looking for a value with
+  /// name [name], as reported by [URLCredentialPersistence.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static URLCredentialPersistence? byName(String? name) {
+    if (name != null) {
+      try {
+        return URLCredentialPersistence.values.firstWhere(
+          (element) => element.name() == name,
+        );
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [URLCredentialPersistence] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, URLCredentialPersistence> asNameMap() =>
+      <String, URLCredentialPersistence>{
+        for (final value in URLCredentialPersistence.values)
+          value.name(): value,
+      };
+
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
-  @override
-  int get hashCode => _value.hashCode;
-
-  @override
-  bool operator ==(value) => value == _value;
-
-  @override
-  String toString() {
+  ///Gets the name of the value.
+  String name() {
     switch (_value) {
       case 1:
         return 'FOR_SESSION';
@@ -89,6 +118,22 @@ class URLCredentialPersistence {
     }
     return _value.toString();
   }
+
+  @override
+  int get hashCode => _value.hashCode;
+
+  @override
+  bool operator ==(value) => value == _value;
+
+  ///Checks if the value is supported by the [defaultTargetPlatform].
+  bool isSupported() {
+    return _nativeValue != null;
+  }
+
+  @override
+  String toString() {
+    return name();
+  }
 }
 
 ///An iOS-specific class that represents the constants that specify how long the credential will be kept.
@@ -96,12 +141,13 @@ class URLCredentialPersistence {
 @Deprecated('Use URLCredentialPersistence instead')
 class IOSURLCredentialPersistence {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const IOSURLCredentialPersistence._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory IOSURLCredentialPersistence._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      IOSURLCredentialPersistence._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => IOSURLCredentialPersistence._internal(value, nativeValue());
 
   ///The credential should be stored only for this session
   static const FOR_SESSION = IOSURLCredentialPersistence._internal(1, 1);
@@ -128,8 +174,9 @@ class IOSURLCredentialPersistence {
   static IOSURLCredentialPersistence? fromValue(int? value) {
     if (value != null) {
       try {
-        return IOSURLCredentialPersistence.values
-            .firstWhere((element) => element.toValue() == value);
+        return IOSURLCredentialPersistence.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -141,8 +188,9 @@ class IOSURLCredentialPersistence {
   static IOSURLCredentialPersistence? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return IOSURLCredentialPersistence.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return IOSURLCredentialPersistence.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -150,20 +198,46 @@ class IOSURLCredentialPersistence {
     return null;
   }
 
+  /// Gets a possible [IOSURLCredentialPersistence] instance value with name [name].
+  ///
+  /// Goes through [IOSURLCredentialPersistence.values] looking for a value with
+  /// name [name], as reported by [IOSURLCredentialPersistence.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static IOSURLCredentialPersistence? byName(String? name) {
+    if (name != null) {
+      try {
+        return IOSURLCredentialPersistence.values.firstWhere(
+          (element) => element.name() == name,
+        );
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [IOSURLCredentialPersistence] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, IOSURLCredentialPersistence> asNameMap() =>
+      <String, IOSURLCredentialPersistence>{
+        for (final value in IOSURLCredentialPersistence.values)
+          value.name(): value,
+      };
+
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
-  @override
-  int get hashCode => _value.hashCode;
-
-  @override
-  bool operator ==(value) => value == _value;
-
-  @override
-  String toString() {
+  ///Gets the name of the value.
+  String name() {
     switch (_value) {
       case 1:
         return 'FOR_SESSION';
@@ -175,5 +249,21 @@ class IOSURLCredentialPersistence {
         return 'SYNCHRONIZABLE';
     }
     return _value.toString();
+  }
+
+  @override
+  int get hashCode => _value.hashCode;
+
+  @override
+  bool operator ==(value) => value == _value;
+
+  ///Checks if the value is supported by the [defaultTargetPlatform].
+  bool isSupported() {
+    return _nativeValue != null;
+  }
+
+  @override
+  String toString() {
+    return name();
   }
 }

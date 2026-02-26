@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
+
 import 'web_message_port.dart';
 
 /// Object specifying creation parameters for creating a [WindowsWebMessageChannel].
@@ -12,21 +13,28 @@ import 'web_message_port.dart';
 class WindowsWebMessageChannelCreationParams
     extends PlatformWebMessageChannelCreationParams {
   /// Creates a new [WindowsWebMessageChannelCreationParams] instance.
-  const WindowsWebMessageChannelCreationParams(
-      {required super.id, required super.port1, required super.port2});
+  const WindowsWebMessageChannelCreationParams({
+    required super.id,
+    required super.port1,
+    required super.port2,
+  });
 
   /// Creates a [WindowsWebMessageChannelCreationParams] instance based on [PlatformWebMessageChannelCreationParams].
   factory WindowsWebMessageChannelCreationParams.fromPlatformWebMessageChannelCreationParams(
-      // Recommended placeholder to prevent being broken by platform interface.
-      // ignore: avoid_unused_constructor_parameters
-      PlatformWebMessageChannelCreationParams params) {
+    // Recommended placeholder to prevent being broken by platform interface.
+    // ignore: avoid_unused_constructor_parameters
+    PlatformWebMessageChannelCreationParams params,
+  ) {
     return WindowsWebMessageChannelCreationParams(
-        id: params.id, port1: params.port1, port2: params.port2);
+      id: params.id,
+      port1: params.port1,
+      port2: params.port2,
+    );
   }
 
   @override
   String toString() {
-    return 'MacOSWebMessageChannelCreationParams{id: $id, port1: $port1, port2: $port2}';
+    return 'WindowsWebMessageChannelCreationParams{id: $id, port1: $port1, port2: $port2}';
   }
 }
 
@@ -35,48 +43,58 @@ class WindowsWebMessageChannel extends PlatformWebMessageChannel
     with ChannelController {
   /// Constructs a [WindowsWebMessageChannel].
   WindowsWebMessageChannel(PlatformWebMessageChannelCreationParams params)
-      : super.implementation(
-          params is WindowsWebMessageChannelCreationParams
-              ? params
-              : WindowsWebMessageChannelCreationParams
-                  .fromPlatformWebMessageChannelCreationParams(params),
-        ) {
+    : super.implementation(
+        params is WindowsWebMessageChannelCreationParams
+            ? params
+            : WindowsWebMessageChannelCreationParams.fromPlatformWebMessageChannelCreationParams(
+                params,
+              ),
+      ) {
     channel = MethodChannel(
-        'com.pichillilorenzo/flutter_inappwebview_web_message_channel_${params.id}');
+      'com.pichillilorenzo/flutter_inappwebview_web_message_channel_${params.id}',
+    );
     handler = _handleMethod;
     initMethodCallHandler();
   }
 
   static final WindowsWebMessageChannel _staticValue = WindowsWebMessageChannel(
-      WindowsWebMessageChannelCreationParams(
-          id: '',
-          port1: WindowsWebMessagePort(
-              WindowsWebMessagePortCreationParams(index: 0)),
-          port2: WindowsWebMessagePort(
-              WindowsWebMessagePortCreationParams(index: 1))));
+    WindowsWebMessageChannelCreationParams(
+      id: '',
+      port1: WindowsWebMessagePort(
+        WindowsWebMessagePortCreationParams(index: 0),
+      ),
+      port2: WindowsWebMessagePort(
+        WindowsWebMessagePortCreationParams(index: 1),
+      ),
+    ),
+  );
 
   /// Provide static access.
   factory WindowsWebMessageChannel.static() {
     return _staticValue;
   }
 
-  WindowsWebMessagePort get _macosPort1 => port1 as WindowsWebMessagePort;
+  WindowsWebMessagePort get _windowsPort1 => port1 as WindowsWebMessagePort;
 
-  WindowsWebMessagePort get _macosPort2 => port2 as WindowsWebMessagePort;
+  WindowsWebMessagePort get _windowsPort2 => port2 as WindowsWebMessagePort;
 
   static WindowsWebMessageChannel? _fromMap(Map<String, dynamic>? map) {
     if (map == null) {
       return null;
     }
     var webMessageChannel = WindowsWebMessageChannel(
-        WindowsWebMessageChannelCreationParams(
-            id: map["id"],
-            port1: WindowsWebMessagePort(
-                WindowsWebMessagePortCreationParams(index: 0)),
-            port2: WindowsWebMessagePort(
-                WindowsWebMessagePortCreationParams(index: 1))));
-    webMessageChannel._macosPort1.webMessageChannel = webMessageChannel;
-    webMessageChannel._macosPort2.webMessageChannel = webMessageChannel;
+      WindowsWebMessageChannelCreationParams(
+        id: map["id"],
+        port1: WindowsWebMessagePort(
+          WindowsWebMessagePortCreationParams(index: 0),
+        ),
+        port2: WindowsWebMessagePort(
+          WindowsWebMessagePortCreationParams(index: 1),
+        ),
+      ),
+    );
+    webMessageChannel._windowsPort1.webMessageChannel = webMessageChannel;
+    webMessageChannel._windowsPort2.webMessageChannel = webMessageChannel;
     return webMessageChannel;
   }
 
@@ -84,11 +102,12 @@ class WindowsWebMessageChannel extends PlatformWebMessageChannel
     switch (call.method) {
       case "onMessage":
         int index = call.arguments["index"];
-        var port = index == 0 ? _macosPort1 : _macosPort2;
+        var port = index == 0 ? _windowsPort1 : _windowsPort2;
         if (port.onMessage != null) {
           WebMessage? message = call.arguments["message"] != null
               ? WebMessage.fromMap(
-                  call.arguments["message"].cast<String, dynamic>())
+                  call.arguments["message"].cast<String, dynamic>(),
+                )
               : null;
           port.onMessage!(message);
         }
@@ -111,7 +130,7 @@ class WindowsWebMessageChannel extends PlatformWebMessageChannel
 
   @override
   String toString() {
-    return 'MacOSWebMessageChannel{id: $id, port1: $port1, port2: $port2}';
+    return 'WindowsWebMessageChannel{id: $id, port1: $port1, port2: $port2}';
   }
 }
 

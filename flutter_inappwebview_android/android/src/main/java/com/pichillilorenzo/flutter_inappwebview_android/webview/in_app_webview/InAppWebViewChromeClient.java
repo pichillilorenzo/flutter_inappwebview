@@ -1,5 +1,7 @@
 package com.pichillilorenzo.flutter_inappwebview_android.webview.in_app_webview;
 
+import static android.app.Activity.RESULT_OK;
+
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -43,16 +45,18 @@ import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 
 import com.pichillilorenzo.flutter_inappwebview_android.InAppWebViewFileProvider;
-import com.pichillilorenzo.flutter_inappwebview_android.types.CreateWindowAction;
+import com.pichillilorenzo.flutter_inappwebview_android.InAppWebViewFlutterPlugin;
 import com.pichillilorenzo.flutter_inappwebview_android.in_app_browser.ActivityResultListener;
 import com.pichillilorenzo.flutter_inappwebview_android.in_app_browser.InAppBrowserDelegate;
-import com.pichillilorenzo.flutter_inappwebview_android.InAppWebViewFlutterPlugin;
+import com.pichillilorenzo.flutter_inappwebview_android.types.CreateWindowAction;
 import com.pichillilorenzo.flutter_inappwebview_android.types.GeolocationPermissionShowPromptResponse;
 import com.pichillilorenzo.flutter_inappwebview_android.types.JsAlertResponse;
 import com.pichillilorenzo.flutter_inappwebview_android.types.JsBeforeUnloadResponse;
 import com.pichillilorenzo.flutter_inappwebview_android.types.JsConfirmResponse;
 import com.pichillilorenzo.flutter_inappwebview_android.types.JsPromptResponse;
 import com.pichillilorenzo.flutter_inappwebview_android.types.PermissionResponse;
+import com.pichillilorenzo.flutter_inappwebview_android.types.ShowFileChooserRequest;
+import com.pichillilorenzo.flutter_inappwebview_android.types.ShowFileChooserResponse;
 import com.pichillilorenzo.flutter_inappwebview_android.types.URLRequest;
 import com.pichillilorenzo.flutter_inappwebview_android.webview.WebViewChannelDelegate;
 
@@ -62,11 +66,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import io.flutter.plugin.common.PluginRegistry;
-
-import static android.app.Activity.RESULT_OK;
 
 public class InAppWebViewChromeClient extends WebChromeClient implements PluginRegistry.ActivityResultListener, ActivityResultListener {
 
@@ -76,7 +79,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
   private static final int PICKER = 1;
   private static final int PICKER_LEGACY = 3;
   final String DEFAULT_MIME_TYPES = "*/*";
-  final Map<DialogInterface, JsResult> dialogs = new HashMap();
+  final Map<DialogInterface, JsResult> dialogs = new HashMap<>();
 
   protected static final FrameLayout.LayoutParams FULLSCREEN_LAYOUT_PARAMS = new FrameLayout.LayoutParams(
           ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, Gravity.CENTER);
@@ -524,7 +527,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
 
   @Override
   public boolean onJsBeforeUnload(final WebView view, String url, final String message,
-                           final JsResult result) {
+                                  final JsResult result) {
     if (inAppWebView != null && inAppWebView.channelDelegate != null) {
       inAppWebView.channelDelegate.onJsBeforeUnload(url, message, new WebViewChannelDelegate.JsBeforeUnloadCallback() {
         @Override
@@ -634,13 +637,13 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     String url = result.getExtra();
 
     // Ensure that images with hyperlink return the correct URL, not the image source
-    if(result.getType() == WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE) {
+    if (result.getType() == WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE) {
       Message href = view.getHandler().obtainMessage();
       view.requestFocusNodeHref(href);
       Bundle data = href.getData();
       if (data != null) {
         String imageUrl = data.getString("url");
-        if(imageUrl != null && !imageUrl.isEmpty()) {
+        if (imageUrl != null && !imageUrl.isEmpty()) {
           url = imageUrl;
         }
       }
@@ -800,8 +803,8 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
 
   @Override
   public void onReceivedTouchIconUrl(WebView view,
-                                      String url,
-                                      boolean precomposed) {
+                                     String url,
+                                     boolean precomposed) {
     super.onReceivedTouchIconUrl(view, url, precomposed);
 
     InAppWebView webView = (InAppWebView) view;
@@ -819,25 +822,78 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     return (ViewGroup) activity.findViewById(android.R.id.content);
   }
 
+  private boolean onShowFileChooser(@NonNull ShowFileChooserRequest request, @NonNull ValueCallback<?> filePathsCallback) {
+    WebViewChannelDelegate.ShowFileChooserCallback callback = new WebViewChannelDelegate.ShowFileChooserCallback() {
+      @Override
+      public boolean nonNullSuccess(@NonNull ShowFileChooserResponse response) {
+        if (response.isHandledByClient()) {
+          Uri[] uriArray = null;
+          if (response.getFilePaths() != null) {
+            uriArray = new Uri[response.getFilePaths().size()];
+            for (int i = 0; i < response.getFilePaths().size(); i++) {
+              uriArray[i] = Uri.parse(response.getFilePaths().get(i));
+            }
+          }
+          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            ((ValueCallback<Uri[]>) filePathsCallback).onReceiveValue(uriArray);
+          } else {
+            ((ValueCallback<Uri>) filePathsCallback).onReceiveValue(uriArray != null ? uriArray[0] : null);
+          }
+          return false;
+        }
+        return true;
+      }
+
+      @Override
+      public void defaultBehaviour(@Nullable ShowFileChooserResponse response) {
+        String[] acceptTypes = request.getAcceptTypes().toArray(new String[0]);
+        boolean captureEnabled = request.isCaptureEnabled();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+          boolean allowMultiple = request.getMode() == WebChromeClient.FileChooserParams.MODE_OPEN_MULTIPLE;
+          startPickerIntent((ValueCallback<Uri[]>) filePathsCallback, acceptTypes, allowMultiple, captureEnabled);
+        } else {
+          startPickerIntent((ValueCallback<Uri>) filePathsCallback, acceptTypes.length > 0 ? acceptTypes[0] : "", captureEnabled);
+        }
+      }
+
+      @Override
+      public void error(String errorCode, @Nullable String errorMessage, @Nullable Object errorDetails) {
+        Log.e(LOG_TAG, errorCode + ", " + ((errorMessage != null) ? errorMessage : ""));
+        defaultBehaviour(null);
+      }
+    };
+
+    if (inAppWebView != null && inAppWebView.channelDelegate != null && inAppWebView.customSettings.useOnShowFileChooser) {
+      inAppWebView.channelDelegate.onShowFileChooser(request, callback);
+    } else {
+      callback.defaultBehaviour(null);
+    }
+
+    return true;
+  }
+
   protected void openFileChooser(ValueCallback<Uri> filePathCallback, String acceptType) {
-    startPickerIntent(filePathCallback, acceptType, null);
+    List<String> acceptTypes = new ArrayList<>();
+    acceptTypes.add(acceptType);
+    onShowFileChooser(new ShowFileChooserRequest(0, acceptTypes, false, null, null), filePathCallback);
   }
 
   protected void openFileChooser(ValueCallback<Uri> filePathCallback) {
-    startPickerIntent(filePathCallback, "", null);
+    List<String> acceptTypes = new ArrayList<>();
+    acceptTypes.add("");
+    onShowFileChooser(new ShowFileChooserRequest(0, acceptTypes, false, null, null), filePathCallback);
   }
 
   protected void openFileChooser(ValueCallback<Uri> filePathCallback, String acceptType, String capture) {
-    startPickerIntent(filePathCallback, acceptType, capture);
+    List<String> acceptTypes = new ArrayList<>();
+    acceptTypes.add(acceptType);
+    onShowFileChooser(new ShowFileChooserRequest(0, acceptTypes, true, null, null), filePathCallback);
   }
 
   @TargetApi(Build.VERSION_CODES.LOLLIPOP)
   @Override
   public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
-    String[] acceptTypes = fileChooserParams.getAcceptTypes();
-    boolean allowMultiple = fileChooserParams.getMode() == WebChromeClient.FileChooserParams.MODE_OPEN_MULTIPLE;
-    boolean captureEnabled = fileChooserParams.isCaptureEnabled();
-    return startPickerIntent(filePathCallback, acceptTypes, allowMultiple, captureEnabled);
+    return onShowFileChooser(ShowFileChooserRequest.fromFileChooserParams(fileChooserParams), filePathCallback);
   }
 
   @Override
@@ -939,7 +995,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     return null;
   }
 
-  public void startPickerIntent(ValueCallback<Uri> filePathCallback, String acceptType, @Nullable String capture) {
+  public void startPickerIntent(ValueCallback<Uri> filePathCallback, String acceptType, boolean captureEnabled) {
     filePathCallbackLegacy = filePathCallback;
 
     boolean images = acceptsImages(acceptType);
@@ -947,12 +1003,11 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
 
     Intent pickerIntent = null;
 
-    if (capture != null) {
+    if (captureEnabled) {
       if (!needsCameraPermission()) {
         if (images) {
           pickerIntent = getPhotoIntent();
-        }
-        else if (video) {
+        } else if (video) {
           pickerIntent = getVideoIntent();
         }
       }
@@ -995,8 +1050,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
       if (!needsCameraPermission()) {
         if (images) {
           pickerIntent = getPhotoIntent();
-        }
-        else if (video) {
+        } else if (video) {
           pickerIntent = getVideoIntent();
         }
       }
@@ -1271,8 +1325,8 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
           defaultBehaviour(null);
         }
       };
-      
-      if(inAppWebView != null && inAppWebView.channelDelegate != null) {
+
+      if (inAppWebView != null && inAppWebView.channelDelegate != null) {
         inAppWebView.channelDelegate.onPermissionRequest(request.getOrigin().toString(),
                 Arrays.asList(request.getResources()), null, callback);
       } else {
@@ -1283,17 +1337,17 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
 
   @Override
   public void onRequestFocus(WebView view) {
-    if(inAppWebView != null && inAppWebView.channelDelegate != null) {
+    if (inAppWebView != null && inAppWebView.channelDelegate != null) {
       inAppWebView.channelDelegate.onRequestFocus();
     }
   }
 
   @Override
   public void onPermissionRequestCanceled(PermissionRequest request) {
-    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP &&
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP &&
             inAppWebView != null && inAppWebView.channelDelegate != null) {
       inAppWebView.channelDelegate.onPermissionRequestCanceled(request.getOrigin().toString(),
-                Arrays.asList(request.getResources()));
+              Arrays.asList(request.getResources()));
     }
   }
 

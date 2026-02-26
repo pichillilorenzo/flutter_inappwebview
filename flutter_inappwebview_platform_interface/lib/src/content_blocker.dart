@@ -16,16 +16,27 @@ class ContentBlocker {
 
   ContentBlocker({required this.trigger, required this.action});
 
-  Map<String, Map<String, dynamic>> toMap() {
-    return {"trigger": trigger.toMap(), "action": action.toMap()};
+  Map<String, Map<String, dynamic>> toMap({EnumMethod? enumMethod}) {
+    return {
+      "trigger": trigger.toMap(enumMethod: enumMethod),
+      "action": action.toMap(enumMethod: enumMethod),
+    };
   }
 
-  static ContentBlocker fromMap(Map<dynamic, Map<dynamic, dynamic>> map) {
+  static ContentBlocker fromMap(
+    Map<dynamic, Map<dynamic, dynamic>> map, {
+    EnumMethod? enumMethod,
+  }) {
     return ContentBlocker(
-        trigger: ContentBlockerTrigger.fromMap(
-            Map<String, dynamic>.from(map["trigger"]!)),
-        action: ContentBlockerAction.fromMap(
-            Map<String, dynamic>.from(map["action"]!)));
+      trigger: ContentBlockerTrigger.fromMap(
+        Map<String, dynamic>.from(map["trigger"]!),
+        enumMethod: enumMethod,
+      ),
+      action: ContentBlockerAction.fromMap(
+        Map<String, dynamic>.from(map["action"]!),
+        enumMethod: enumMethod,
+      ),
+    );
   }
 
   @override
@@ -122,34 +133,71 @@ class ContentBlockerTrigger {
   ///- MacOS
   List<ContentBlockerTriggerLoadContext> loadContext;
 
-  ContentBlockerTrigger(
-      {required this.urlFilter,
-      this.ifFrameUrl = const <String>[],
-      this.urlFilterIsCaseSensitive = false,
-      this.resourceType = const <ContentBlockerTriggerResourceType>[],
-      this.ifDomain = const <String>[],
-      this.unlessDomain = const <String>[],
-      this.loadType = const <ContentBlockerTriggerLoadType>[],
-      this.ifTopUrl = const <String>[],
-      this.unlessTopUrl = const <String>[],
-      this.loadContext = const <ContentBlockerTriggerLoadContext>[]}) {
+  ContentBlockerTrigger({
+    required this.urlFilter,
+    this.ifFrameUrl = const <String>[],
+    this.urlFilterIsCaseSensitive = false,
+    this.resourceType = const <ContentBlockerTriggerResourceType>[],
+    this.ifDomain = const <String>[],
+    this.unlessDomain = const <String>[],
+    this.loadType = const <ContentBlockerTriggerLoadType>[],
+    this.ifTopUrl = const <String>[],
+    this.unlessTopUrl = const <String>[],
+    this.loadContext = const <ContentBlockerTriggerLoadContext>[],
+  }) {
     assert(!(this.ifDomain.isEmpty || this.unlessDomain.isEmpty) == false);
     assert(this.loadType.length <= 2);
     assert(!(this.ifTopUrl.isEmpty || this.unlessTopUrl.isEmpty) == false);
   }
 
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     List<String> resourceTypeStringList = [];
     resourceType.forEach((type) {
-      resourceTypeStringList.add(type.toNativeValue());
+      switch (enumMethod ?? EnumMethod.nativeValue) {
+        case EnumMethod.nativeValue:
+          if (type.isSupported()) {
+            resourceTypeStringList.add(type.toNativeValue()!);
+          }
+          break;
+        case EnumMethod.value:
+          resourceTypeStringList.add(type.toValue());
+          break;
+        case EnumMethod.name:
+          resourceTypeStringList.add(type.name());
+          break;
+      }
     });
     List<String> loadTypeStringList = [];
     loadType.forEach((type) {
-      loadTypeStringList.add(type.toNativeValue());
+      switch (enumMethod ?? EnumMethod.nativeValue) {
+        case EnumMethod.nativeValue:
+          if (type.isSupported()) {
+            loadTypeStringList.add(type.toNativeValue()!);
+          }
+          break;
+        case EnumMethod.value:
+          loadTypeStringList.add(type.toValue());
+          break;
+        case EnumMethod.name:
+          loadTypeStringList.add(type.name());
+          break;
+      }
     });
     List<String> loadContextStringList = [];
     loadContext.forEach((type) {
-      loadContextStringList.add(type.toNativeValue());
+      switch (enumMethod ?? EnumMethod.nativeValue) {
+        case EnumMethod.nativeValue:
+          if (type.isSupported()) {
+            loadContextStringList.add(type.toNativeValue()!);
+          }
+          break;
+        case EnumMethod.value:
+          loadContextStringList.add(type.toValue());
+          break;
+        case EnumMethod.name:
+          loadContextStringList.add(type.name());
+          break;
+      }
     });
 
     Map<String, dynamic> map = {
@@ -162,28 +210,41 @@ class ContentBlockerTrigger {
       "load-type": loadTypeStringList,
       "if-top-url": ifTopUrl,
       "unless-top-url": unlessTopUrl,
-      "load-context": loadContextStringList
+      "load-context": loadContextStringList,
     };
 
     map.keys
-        .where((key) =>
-            map[key] == null ||
-            (map[key] is List && (map[key] as List).length == 0)) // filter keys
+        .where(
+          (key) =>
+              map[key] == null ||
+              (map[key] is List && (map[key] as List).length == 0),
+        ) // filter keys
         .toList() // create a copy to avoid concurrent modifications
         .forEach(map.remove);
 
     return map;
   }
 
-  static ContentBlockerTrigger fromMap(Map<String, dynamic> map) {
+  static ContentBlockerTrigger fromMap(
+    Map<String, dynamic> map, {
+    EnumMethod? enumMethod,
+  }) {
     List<ContentBlockerTriggerResourceType> resourceType = [];
     List<ContentBlockerTriggerLoadType> loadType = [];
     List<ContentBlockerTriggerLoadContext> loadContext = [];
 
-    List<String> resourceTypeStringList =
-        List<String>.from(map["resource-type"] ?? []);
+    List<String> resourceTypeStringList = List<String>.from(
+      map["resource-type"] ?? [],
+    );
     resourceTypeStringList.forEach((typeValue) {
-      var type = ContentBlockerTriggerResourceType.fromNativeValue(typeValue);
+      var type = switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue =>
+          ContentBlockerTriggerResourceType.fromNativeValue(typeValue),
+        EnumMethod.value => ContentBlockerTriggerResourceType.fromValue(
+          typeValue,
+        ),
+        EnumMethod.name => ContentBlockerTriggerResourceType.byName(typeValue),
+      };
       if (type != null) {
         resourceType.add(type);
       }
@@ -191,32 +252,47 @@ class ContentBlockerTrigger {
 
     List<String> loadTypeStringList = List<String>.from(map["load-type"] ?? []);
     loadTypeStringList.forEach((typeValue) {
-      var type = ContentBlockerTriggerLoadType.fromNativeValue(typeValue);
+      var type = switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => ContentBlockerTriggerLoadType.fromNativeValue(
+          typeValue,
+        ),
+        EnumMethod.value => ContentBlockerTriggerLoadType.fromValue(typeValue),
+        EnumMethod.name => ContentBlockerTriggerLoadType.byName(typeValue),
+      };
       if (type != null) {
         loadType.add(type);
       }
     });
 
-    List<String> loadContextStringList =
-        List<String>.from(map["load-context"] ?? []);
+    List<String> loadContextStringList = List<String>.from(
+      map["load-context"] ?? [],
+    );
     loadContextStringList.forEach((typeValue) {
-      var context = ContentBlockerTriggerLoadContext.fromNativeValue(typeValue);
+      var context = switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue =>
+          ContentBlockerTriggerLoadContext.fromNativeValue(typeValue),
+        EnumMethod.value => ContentBlockerTriggerLoadContext.fromValue(
+          typeValue,
+        ),
+        EnumMethod.name => ContentBlockerTriggerLoadContext.byName(typeValue),
+      };
       if (context != null) {
         loadContext.add(context);
       }
     });
 
     return ContentBlockerTrigger(
-        urlFilter: map["url-filter"],
-        ifFrameUrl: List<String>.from(map["if-frame-url"] ?? []),
-        urlFilterIsCaseSensitive: map["url-filter-is-case-sensitive"],
-        ifDomain: List<String>.from(map["if-domain"] ?? []),
-        unlessDomain: List<String>.from(map["unless-domain"] ?? []),
-        resourceType: resourceType,
-        loadType: loadType,
-        ifTopUrl: List<String>.from(map["if-top-url"] ?? []),
-        unlessTopUrl: List<String>.from(map["unless-top-url"] ?? []),
-        loadContext: loadContext);
+      urlFilter: map["url-filter"],
+      ifFrameUrl: List<String>.from(map["if-frame-url"] ?? []),
+      urlFilterIsCaseSensitive: map["url-filter-is-case-sensitive"],
+      ifDomain: List<String>.from(map["if-domain"] ?? []),
+      unlessDomain: List<String>.from(map["unless-domain"] ?? []),
+      resourceType: resourceType,
+      loadType: loadType,
+      ifTopUrl: List<String>.from(map["if-top-url"] ?? []),
+      unlessTopUrl: List<String>.from(map["unless-top-url"] ?? []),
+      loadContext: loadContext,
+    );
   }
 
   @override
@@ -244,26 +320,42 @@ class ContentBlockerAction {
     }
   }
 
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     Map<String, dynamic> map = {
-      "type": type.toNativeValue(),
-      "selector": selector
+      "type": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => type.toNativeValue(),
+        EnumMethod.value => type.toValue(),
+        EnumMethod.name => type.name(),
+      },
+      "selector": selector,
     };
 
     map.keys
-        .where((key) =>
-            map[key] == null ||
-            (map[key] is List && (map[key] as List).length == 0)) // filter keys
+        .where(
+          (key) =>
+              map[key] == null ||
+              (map[key] is List && (map[key] as List).length == 0),
+        ) // filter keys
         .toList() // create a copy to avoid concurrent modifications
         .forEach(map.remove);
 
     return map;
   }
 
-  static ContentBlockerAction fromMap(Map<String, dynamic> map) {
+  static ContentBlockerAction fromMap(
+    Map<String, dynamic> map, {
+    EnumMethod? enumMethod,
+  }) {
     return ContentBlockerAction(
-        type: ContentBlockerActionType.fromNativeValue(map["type"])!,
-        selector: map["selector"]);
+      type: switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => ContentBlockerActionType.fromNativeValue(
+          map["type"],
+        ),
+        EnumMethod.value => ContentBlockerActionType.fromValue(map["type"]),
+        EnumMethod.name => ContentBlockerActionType.byName(map["type"]),
+      }!,
+      selector: map["selector"],
+    );
   }
 
   @override

@@ -1,13 +1,9 @@
 part of 'main.dart';
 
 void contentBlocker() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebViewSettings.isPropertySupported(
+    InAppWebViewSettingsProperty.contentBlockers,
+  );
 
   skippableTestWidgets('Content Blocker', (WidgetTester tester) async {
     final Completer<InAppWebViewController> controllerCompleter =
@@ -22,18 +18,24 @@ void contentBlocker() {
           onWebViewCreated: (controller) {
             controllerCompleter.complete(controller);
           },
-          initialSettings:
-              InAppWebViewSettings(clearCache: true, contentBlockers: [
-            ContentBlocker(
-                trigger: ContentBlockerTrigger(urlFilter: ".*", resourceType: [
-                  ContentBlockerTriggerResourceType.IMAGE,
-                  ContentBlockerTriggerResourceType.STYLE_SHEET
-                ], ifTopUrl: [
-                  TEST_CROSS_PLATFORM_URL_1.toString()
-                ]),
-                action:
-                    ContentBlockerAction(type: ContentBlockerActionType.BLOCK))
-          ]),
+          initialSettings: InAppWebViewSettings(
+            clearCache: true,
+            contentBlockers: [
+              ContentBlocker(
+                trigger: ContentBlockerTrigger(
+                  urlFilter: ".*",
+                  resourceType: [
+                    ContentBlockerTriggerResourceType.IMAGE,
+                    ContentBlockerTriggerResourceType.STYLE_SHEET,
+                  ],
+                  ifTopUrl: [TEST_CROSS_PLATFORM_URL_1.toString()],
+                ),
+                action: ContentBlockerAction(
+                  type: ContentBlockerActionType.BLOCK,
+                ),
+              ),
+            ],
+          ),
           onLoadStop: (controller, url) {
             pageLoaded.complete();
           },

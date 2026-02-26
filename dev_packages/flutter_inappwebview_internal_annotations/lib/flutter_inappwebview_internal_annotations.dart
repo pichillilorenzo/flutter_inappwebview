@@ -8,3 +8,4 @@ export 'src/exchangeable_enum.dart';
 export 'src/exchangeable_enum_custom_value.dart';
 export 'src/supported_platforms.dart';
 export 'src/enum_supported_platforms.dart';
+export 'src/constants.dart';

@@ -18,6 +18,7 @@ class CrossOrigin_ {
   static const ANONYMOUS = const CrossOrigin_._internal("anonymous");
 
   ///CORS requests for this element will have the credentials flag set to 'include'.
-  static const USE_CREDENTIALS =
-      const CrossOrigin_._internal("use-credentials");
+  static const USE_CREDENTIALS = const CrossOrigin_._internal(
+    "use-credentials",
+  );
 }

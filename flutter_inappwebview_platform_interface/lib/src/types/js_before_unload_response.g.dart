@@ -22,32 +22,53 @@ class JsBeforeUnloadResponse {
 
   ///Message to be displayed in the window.
   String message;
-  JsBeforeUnloadResponse(
-      {this.action = JsBeforeUnloadResponseAction.CONFIRM,
-      this.cancelButtonTitle = "",
-      this.confirmButtonTitle = "",
-      this.handledByClient = false,
-      this.message = ""});
+  JsBeforeUnloadResponse({
+    JsBeforeUnloadResponseAction? action,
+    this.cancelButtonTitle = "",
+    this.confirmButtonTitle = "",
+    this.handledByClient = false,
+    this.message = "",
+  }) : action = action ?? JsBeforeUnloadResponseAction.CONFIRM;
 
   ///Gets a possible [JsBeforeUnloadResponse] instance from a [Map] value.
-  static JsBeforeUnloadResponse? fromMap(Map<String, dynamic>? map) {
+  static JsBeforeUnloadResponse? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
     final instance = JsBeforeUnloadResponse();
-    instance.action =
-        JsBeforeUnloadResponseAction.fromNativeValue(map['action']);
-    instance.cancelButtonTitle = map['cancelButtonTitle'];
-    instance.confirmButtonTitle = map['confirmButtonTitle'];
-    instance.handledByClient = map['handledByClient'];
-    instance.message = map['message'];
+    instance.action = switch (enumMethod ?? EnumMethod.nativeValue) {
+      EnumMethod.nativeValue => JsBeforeUnloadResponseAction.fromNativeValue(
+        map['action'],
+      ),
+      EnumMethod.value => JsBeforeUnloadResponseAction.fromValue(map['action']),
+      EnumMethod.name => JsBeforeUnloadResponseAction.byName(map['action']),
+    };
+    if (map['cancelButtonTitle'] != null) {
+      instance.cancelButtonTitle = map['cancelButtonTitle'];
+    }
+    if (map['confirmButtonTitle'] != null) {
+      instance.confirmButtonTitle = map['confirmButtonTitle'];
+    }
+    if (map['handledByClient'] != null) {
+      instance.handledByClient = map['handledByClient'];
+    }
+    if (map['message'] != null) {
+      instance.message = map['message'];
+    }
     return instance;
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
-      "action": action?.toNativeValue(),
+      "action": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => action?.toNativeValue(),
+        EnumMethod.value => action?.toValue(),
+        EnumMethod.name => action?.name(),
+      },
       "cancelButtonTitle": cancelButtonTitle,
       "confirmButtonTitle": confirmButtonTitle,
       "handledByClient": handledByClient,

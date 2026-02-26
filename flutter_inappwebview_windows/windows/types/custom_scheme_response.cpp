@@ -11,9 +11,9 @@ namespace flutter_inappwebview_plugin
   {}
 
   CustomSchemeResponse::CustomSchemeResponse(const flutter::EncodableMap& map)
-    : data(get_fl_map_value<std::vector<uint8_t>>(map, "data")),
-    contentType(get_fl_map_value<std::string>(map, "contentType")),
-    contentEncoding(get_fl_map_value<std::string>(map, "contentEncoding"))
+    : CustomSchemeResponse(get_fl_map_value<std::vector<uint8_t>>(map, "data"),
+      get_fl_map_value<std::string>(map, "contentType"),
+      get_fl_map_value<std::string>(map, "contentEncoding"))
   {}
 
   flutter::EncodableMap CustomSchemeResponse::toEncodableMap() const

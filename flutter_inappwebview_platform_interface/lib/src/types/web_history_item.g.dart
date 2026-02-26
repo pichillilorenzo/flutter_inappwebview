@@ -12,7 +12,7 @@ class WebHistoryItem {
   ///Unique id of the navigation history entry.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows
+  ///- Windows WebView2
   int? entryId;
 
   ///0-based position index in the back-forward [WebHistory.list].
@@ -29,16 +29,20 @@ class WebHistoryItem {
 
   ///Url of this history item.
   WebUri? url;
-  WebHistoryItem(
-      {this.entryId,
-      this.index,
-      this.offset,
-      this.originalUrl,
-      this.title,
-      this.url});
+  WebHistoryItem({
+    this.entryId,
+    this.index,
+    this.offset,
+    this.originalUrl,
+    this.title,
+    this.url,
+  });
 
   ///Gets a possible [WebHistoryItem] instance from a [Map] value.
-  static WebHistoryItem? fromMap(Map<String, dynamic>? map) {
+  static WebHistoryItem? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
@@ -46,8 +50,9 @@ class WebHistoryItem {
       entryId: map['entryId'],
       index: map['index'],
       offset: map['offset'],
-      originalUrl:
-          map['originalUrl'] != null ? WebUri(map['originalUrl']) : null,
+      originalUrl: map['originalUrl'] != null
+          ? WebUri(map['originalUrl'])
+          : null,
       title: map['title'],
       url: map['url'] != null ? WebUri(map['url']) : null,
     );
@@ -55,7 +60,7 @@ class WebHistoryItem {
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
       "entryId": entryId,
       "index": index,

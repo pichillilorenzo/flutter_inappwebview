@@ -10,12 +10,13 @@ part of 'navigation_response_action.dart';
 ///It represents the policy to pass back to the decision handler.
 class NavigationResponseAction {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const NavigationResponseAction._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory NavigationResponseAction._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      NavigationResponseAction._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => NavigationResponseAction._internal(value, nativeValue());
 
   ///Allow the navigation to continue.
   static const ALLOW = NavigationResponseAction._internal(1, 1);
@@ -39,8 +40,9 @@ class NavigationResponseAction {
   static NavigationResponseAction? fromValue(int? value) {
     if (value != null) {
       try {
-        return NavigationResponseAction.values
-            .firstWhere((element) => element.toValue() == value);
+        return NavigationResponseAction.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -52,8 +54,9 @@ class NavigationResponseAction {
   static NavigationResponseAction? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return NavigationResponseAction.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return NavigationResponseAction.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -61,20 +64,46 @@ class NavigationResponseAction {
     return null;
   }
 
+  /// Gets a possible [NavigationResponseAction] instance value with name [name].
+  ///
+  /// Goes through [NavigationResponseAction.values] looking for a value with
+  /// name [name], as reported by [NavigationResponseAction.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static NavigationResponseAction? byName(String? name) {
+    if (name != null) {
+      try {
+        return NavigationResponseAction.values.firstWhere(
+          (element) => element.name() == name,
+        );
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [NavigationResponseAction] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, NavigationResponseAction> asNameMap() =>
+      <String, NavigationResponseAction>{
+        for (final value in NavigationResponseAction.values)
+          value.name(): value,
+      };
+
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
-  @override
-  int get hashCode => _value.hashCode;
-
-  @override
-  bool operator ==(value) => value == _value;
-
-  @override
-  String toString() {
+  ///Gets the name of the value.
+  String name() {
     switch (_value) {
       case 1:
         return 'ALLOW';
@@ -85,6 +114,22 @@ class NavigationResponseAction {
     }
     return _value.toString();
   }
+
+  @override
+  int get hashCode => _value.hashCode;
+
+  @override
+  bool operator ==(value) => value == _value;
+
+  ///Checks if the value is supported by the [defaultTargetPlatform].
+  bool isSupported() {
+    return _nativeValue != null;
+  }
+
+  @override
+  String toString() {
+    return name();
+  }
 }
 
 ///Class that is used by [PlatformWebViewCreationParams.onNavigationResponse] event.
@@ -93,12 +138,13 @@ class NavigationResponseAction {
 @Deprecated('Use NavigationResponseAction instead')
 class IOSNavigationResponseAction {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const IOSNavigationResponseAction._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory IOSNavigationResponseAction._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      IOSNavigationResponseAction._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => IOSNavigationResponseAction._internal(value, nativeValue());
 
   ///Allow the navigation to continue.
   static const ALLOW = IOSNavigationResponseAction._internal(1, 1);
@@ -116,8 +162,9 @@ class IOSNavigationResponseAction {
   static IOSNavigationResponseAction? fromValue(int? value) {
     if (value != null) {
       try {
-        return IOSNavigationResponseAction.values
-            .firstWhere((element) => element.toValue() == value);
+        return IOSNavigationResponseAction.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -129,8 +176,9 @@ class IOSNavigationResponseAction {
   static IOSNavigationResponseAction? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return IOSNavigationResponseAction.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return IOSNavigationResponseAction.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -138,20 +186,46 @@ class IOSNavigationResponseAction {
     return null;
   }
 
+  /// Gets a possible [IOSNavigationResponseAction] instance value with name [name].
+  ///
+  /// Goes through [IOSNavigationResponseAction.values] looking for a value with
+  /// name [name], as reported by [IOSNavigationResponseAction.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static IOSNavigationResponseAction? byName(String? name) {
+    if (name != null) {
+      try {
+        return IOSNavigationResponseAction.values.firstWhere(
+          (element) => element.name() == name,
+        );
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [IOSNavigationResponseAction] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, IOSNavigationResponseAction> asNameMap() =>
+      <String, IOSNavigationResponseAction>{
+        for (final value in IOSNavigationResponseAction.values)
+          value.name(): value,
+      };
+
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
-  @override
-  int get hashCode => _value.hashCode;
-
-  @override
-  bool operator ==(value) => value == _value;
-
-  @override
-  String toString() {
+  ///Gets the name of the value.
+  String name() {
     switch (_value) {
       case 1:
         return 'ALLOW';
@@ -159,5 +233,21 @@ class IOSNavigationResponseAction {
         return 'CANCEL';
     }
     return _value.toString();
+  }
+
+  @override
+  int get hashCode => _value.hashCode;
+
+  @override
+  bool operator ==(value) => value == _value;
+
+  ///Checks if the value is supported by the [defaultTargetPlatform].
+  bool isSupported() {
+    return _nativeValue != null;
+  }
+
+  @override
+  String toString() {
+    return name();
   }
 }

@@ -10,10 +10,10 @@ namespace flutter_inappwebview_plugin
   {}
 
   CustomSchemeRegistration::CustomSchemeRegistration(const flutter::EncodableMap& map)
-    : scheme(get_fl_map_value<std::string>(map, "scheme")),
-    allowedOrigins(get_optional_fl_map_value<std::vector<std::string>>(map, "allowedOrigins")),
-    treatAsSecure(get_optional_fl_map_value<bool>(map, "treatAsSecure")),
-    hasAuthorityComponent(get_optional_fl_map_value<bool>(map, "hasAuthorityComponent"))
+    : CustomSchemeRegistration(get_fl_map_value<std::string>(map, "scheme"),
+      get_optional_fl_map_value<std::vector<std::string>>(map, "allowedOrigins"),
+      get_optional_fl_map_value<bool>(map, "treatAsSecure"),
+      get_optional_fl_map_value<bool>(map, "hasAuthorityComponent"))
   {}
 
   flutter::EncodableMap CustomSchemeRegistration::toEncodableMap() const

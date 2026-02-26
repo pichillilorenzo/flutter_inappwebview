@@ -18,8 +18,8 @@ class JsPromptRequest {
   ///Indicates whether the request was made for the main frame.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
-  ///- MacOS
+  ///- iOS WKWebView
+  ///- macOS WKWebView
   bool? isMainFrame;
 
   ///Message to be displayed in the window.
@@ -27,17 +27,21 @@ class JsPromptRequest {
 
   ///The url of the page requesting the dialog.
   WebUri? url;
-  JsPromptRequest(
-      {this.defaultValue,
-      @Deprecated('Use isMainFrame instead') this.iosIsMainFrame,
-      this.isMainFrame,
-      this.message,
-      this.url}) {
+  JsPromptRequest({
+    this.defaultValue,
+    @Deprecated('Use isMainFrame instead') this.iosIsMainFrame,
+    this.isMainFrame,
+    this.message,
+    this.url,
+  }) {
     isMainFrame = isMainFrame ?? iosIsMainFrame;
   }
 
   ///Gets a possible [JsPromptRequest] instance from a [Map] value.
-  static JsPromptRequest? fromMap(Map<String, dynamic>? map) {
+  static JsPromptRequest? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
@@ -52,7 +56,7 @@ class JsPromptRequest {
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
       "defaultValue": defaultValue,
       "isMainFrame": isMainFrame,

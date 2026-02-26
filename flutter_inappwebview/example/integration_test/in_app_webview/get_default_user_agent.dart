@@ -1,13 +1,9 @@
 part of 'main.dart';
 
 void getDefaultUserAgent() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebViewController.isMethodSupported(
+    PlatformInAppWebViewControllerMethod.getDefaultUserAgent,
+  );
 
   skippableTest('getDefaultUserAgent', () async {
     expect(await InAppWebViewController.getDefaultUserAgent(), isNotNull);

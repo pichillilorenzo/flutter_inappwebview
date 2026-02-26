@@ -1,17 +1,20 @@
 part of 'main.dart';
 
 void startAndStop() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![
-          TargetPlatform.android,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip =
+      !TracingController.isMethodSupported(
+        PlatformTracingControllerMethod.start,
+      ) ||
+      !TracingController.isMethodSupported(
+        PlatformTracingControllerMethod.stop,
+      );
 
   skippableTestWidgets('start and stop', (WidgetTester tester) async {
     final Completer<void> pageLoaded = Completer<void>();
 
     final tracingAvailable = await WebViewFeature.isFeatureSupported(
-        WebViewFeature.TRACING_CONTROLLER_BASIC_USAGE);
+      WebViewFeature.TRACING_CONTROLLER_BASIC_USAGE,
+    );
 
     if (!tracingAvailable) {
       return;
@@ -20,12 +23,11 @@ void startAndStop() {
     final tracingController = TracingController.instance();
     expect(await tracingController.isTracing(), false);
     await tracingController.start(
-        settings: TracingSettings(
-            tracingMode: TracingMode.RECORD_CONTINUOUSLY,
-            categories: [
-          TracingCategory.CATEGORIES_ANDROID_WEBVIEW,
-          "blink*"
-        ]));
+      settings: TracingSettings(
+        tracingMode: TracingMode.RECORD_CONTINUOUSLY,
+        categories: [TracingCategory.CATEGORIES_ANDROID_WEBVIEW, "blink*"],
+      ),
+    );
     expect(await tracingController.isTracing(), true);
 
     await tester.pumpWidget(

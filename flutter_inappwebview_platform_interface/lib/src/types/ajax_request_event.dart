@@ -2,6 +2,7 @@ import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_i
 
 import 'ajax_request.dart';
 import 'ajax_request_event_type.dart';
+import 'enum_method.dart';
 
 part 'ajax_request_event.g.dart';
 
@@ -24,6 +25,10 @@ class AjaxRequestEvent_ {
   ///When downloading a resource using HTTP, this only represent the content itself, not headers and other overhead.
   int? total;
 
-  AjaxRequestEvent_(
-      {this.type, this.lengthComputable, this.loaded, this.total});
+  AjaxRequestEvent_({
+    this.type,
+    this.lengthComputable,
+    this.loaded,
+    this.total,
+  });
 }

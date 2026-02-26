@@ -1,13 +1,9 @@
 part of 'main.dart';
 
 void setGetSettings() {
-  final shouldSkip = kIsWeb
-      ? false
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebViewController.isMethodSupported(
+    PlatformInAppWebViewControllerMethod.getSettings,
+  );
 
   final url = !kIsWeb ? TEST_CROSS_PLATFORM_URL_1 : TEST_WEB_PLATFORM_URL_1;
 
@@ -47,7 +43,8 @@ void setGetSettings() {
     }
 
     await controller.setSettings(
-        settings: InAppWebViewSettings(javaScriptEnabled: true));
+      settings: InAppWebViewSettings(javaScriptEnabled: true),
+    );
 
     settings = await controller.getSettings();
     expect(settings, isNotNull);

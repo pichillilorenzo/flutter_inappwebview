@@ -1,13 +1,9 @@
 part of 'main.dart';
 
 void onReceivedError() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebView.isPropertySupported(
+    PlatformWebViewCreationParamsProperty.onReceivedError,
+  );
 
   skippableGroup('onReceivedError', () {
     skippableTestWidgets('invalid url', (WidgetTester tester) async {
@@ -36,8 +32,9 @@ void onReceivedError() {
       expect(url, TEST_NOT_A_WEBSITE_URL.toString());
     });
 
-    skippableTestWidgets('event is not called with valid url',
-        (WidgetTester tester) async {
+    skippableTestWidgets('event is not called with valid url', (
+      WidgetTester tester,
+    ) async {
       final Completer<void> onReceivedErrorCompleter = Completer<void>();
 
       await tester.pumpWidget(
@@ -46,8 +43,10 @@ void onReceivedError() {
           child: InAppWebView(
             key: GlobalKey(),
             initialUrlRequest: URLRequest(
-                url: WebUri(
-                    'data:text/html;charset=utf-8;base64,PCFET0NUWVBFIGh0bWw+')),
+              url: WebUri(
+                'data:text/html;charset=utf-8;base64,PCFET0NUWVBFIGh0bWw+',
+              ),
+            ),
             onReceivedError: (controller, request, error) {
               onReceivedErrorCompleter.complete();
             },

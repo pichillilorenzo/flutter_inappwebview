@@ -1,5 +1,6 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 
+import 'enum_method.dart';
 import 'ssl_error_type.dart';
 
 part 'ssl_error.g.dart';
@@ -22,9 +23,10 @@ class SslError_ {
   ///The message associated to the [code].
   String? message;
 
-  SslError_(
-      {@Deprecated('Use code instead') this.androidError,
-      @Deprecated('Use code instead') this.iosError,
-      this.code,
-      this.message}) {}
+  SslError_({
+    @Deprecated('Use code instead') this.androidError,
+    @Deprecated('Use code instead') this.iosError,
+    this.code,
+    this.message,
+  }) {}
 }

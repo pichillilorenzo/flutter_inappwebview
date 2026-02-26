@@ -10,13 +10,16 @@ part of 'trusted_web_activity_screen_orientation.dart';
 ///https://www.w3.org/TR/screen-orientation/#screenorientation-interface
 class TrustedWebActivityScreenOrientation {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const TrustedWebActivityScreenOrientation._internal(
-      this._value, this._nativeValue);
-// ignore: unused_element
+    this._value,
+    this._nativeValue,
+  );
+  // ignore: unused_element
   factory TrustedWebActivityScreenOrientation._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      TrustedWebActivityScreenOrientation._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => TrustedWebActivityScreenOrientation._internal(value, nativeValue());
 
   /// Any is an orientation that means the screen can be locked to any one of portrait-primary,
   /// portrait-secondary, landscape-primary and landscape-secondary.
@@ -56,8 +59,10 @@ class TrustedWebActivityScreenOrientation {
   ///  Portrait-primary is an orientation where the screen width is less than or equal to the
   ///  screen height. If the device's natural orientation is portrait, then it is in
   ///  portrait-primary when held in that position.
-  static const PORTRAIT_PRIMARY =
-      TrustedWebActivityScreenOrientation._internal(1, 1);
+  static const PORTRAIT_PRIMARY = TrustedWebActivityScreenOrientation._internal(
+    1,
+    1,
+  );
 
   /// Portrait-secondary is an orientation where the screen width is less than or equal to the
   /// screen height. If the device's natural orientation is portrait, then it is in
@@ -82,8 +87,9 @@ class TrustedWebActivityScreenOrientation {
   static TrustedWebActivityScreenOrientation? fromValue(int? value) {
     if (value != null) {
       try {
-        return TrustedWebActivityScreenOrientation.values
-            .firstWhere((element) => element.toValue() == value);
+        return TrustedWebActivityScreenOrientation.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -95,8 +101,9 @@ class TrustedWebActivityScreenOrientation {
   static TrustedWebActivityScreenOrientation? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return TrustedWebActivityScreenOrientation.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return TrustedWebActivityScreenOrientation.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -104,20 +111,46 @@ class TrustedWebActivityScreenOrientation {
     return null;
   }
 
+  /// Gets a possible [TrustedWebActivityScreenOrientation] instance value with name [name].
+  ///
+  /// Goes through [TrustedWebActivityScreenOrientation.values] looking for a value with
+  /// name [name], as reported by [TrustedWebActivityScreenOrientation.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static TrustedWebActivityScreenOrientation? byName(String? name) {
+    if (name != null) {
+      try {
+        return TrustedWebActivityScreenOrientation.values.firstWhere(
+          (element) => element.name() == name,
+        );
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [TrustedWebActivityScreenOrientation] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, TrustedWebActivityScreenOrientation> asNameMap() =>
+      <String, TrustedWebActivityScreenOrientation>{
+        for (final value in TrustedWebActivityScreenOrientation.values)
+          value.name(): value,
+      };
+
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
-  @override
-  int get hashCode => _value.hashCode;
-
-  @override
-  bool operator ==(value) => value == _value;
-
-  @override
-  String toString() {
+  ///Gets the name of the value.
+  String name() {
     switch (_value) {
       case 5:
         return 'ANY';
@@ -139,5 +172,21 @@ class TrustedWebActivityScreenOrientation {
         return 'PORTRAIT_SECONDARY';
     }
     return _value.toString();
+  }
+
+  @override
+  int get hashCode => _value.hashCode;
+
+  @override
+  bool operator ==(value) => value == _value;
+
+  ///Checks if the value is supported by the [defaultTargetPlatform].
+  bool isSupported() {
+    return _nativeValue != null;
+  }
+
+  @override
+  String toString() {
+    return name();
   }
 }

@@ -9,12 +9,13 @@ part of 'dismiss_button_style.dart';
 ///Class used to set the custom style for the dismiss button.
 class DismissButtonStyle {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const DismissButtonStyle._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory DismissButtonStyle._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      DismissButtonStyle._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => DismissButtonStyle._internal(value, nativeValue());
 
   ///Makes the button title the localized string "Cancel".
   static const CANCEL = DismissButtonStyle._internal(2, 2);
@@ -36,8 +37,9 @@ class DismissButtonStyle {
   static DismissButtonStyle? fromValue(int? value) {
     if (value != null) {
       try {
-        return DismissButtonStyle.values
-            .firstWhere((element) => element.toValue() == value);
+        return DismissButtonStyle.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -49,8 +51,9 @@ class DismissButtonStyle {
   static DismissButtonStyle? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return DismissButtonStyle.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return DismissButtonStyle.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -58,20 +61,45 @@ class DismissButtonStyle {
     return null;
   }
 
+  /// Gets a possible [DismissButtonStyle] instance value with name [name].
+  ///
+  /// Goes through [DismissButtonStyle.values] looking for a value with
+  /// name [name], as reported by [DismissButtonStyle.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static DismissButtonStyle? byName(String? name) {
+    if (name != null) {
+      try {
+        return DismissButtonStyle.values.firstWhere(
+          (element) => element.name() == name,
+        );
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [DismissButtonStyle] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, DismissButtonStyle> asNameMap() =>
+      <String, DismissButtonStyle>{
+        for (final value in DismissButtonStyle.values) value.name(): value,
+      };
+
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
-  @override
-  int get hashCode => _value.hashCode;
-
-  @override
-  bool operator ==(value) => value == _value;
-
-  @override
-  String toString() {
+  ///Gets the name of the value.
+  String name() {
     switch (_value) {
       case 2:
         return 'CANCEL';
@@ -81,6 +109,22 @@ class DismissButtonStyle {
         return 'DONE';
     }
     return _value.toString();
+  }
+
+  @override
+  int get hashCode => _value.hashCode;
+
+  @override
+  bool operator ==(value) => value == _value;
+
+  ///Checks if the value is supported by the [defaultTargetPlatform].
+  bool isSupported() {
+    return _nativeValue != null;
+  }
+
+  @override
+  String toString() {
+    return name();
   }
 }
 
@@ -92,12 +136,13 @@ class DismissButtonStyle {
 @Deprecated('Use DismissButtonStyle instead')
 class IOSSafariDismissButtonStyle {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const IOSSafariDismissButtonStyle._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory IOSSafariDismissButtonStyle._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      IOSSafariDismissButtonStyle._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => IOSSafariDismissButtonStyle._internal(value, nativeValue());
 
   ///Makes the button title the localized string "Cancel".
   static const CANCEL = IOSSafariDismissButtonStyle._internal(2, 2);
@@ -119,8 +164,9 @@ class IOSSafariDismissButtonStyle {
   static IOSSafariDismissButtonStyle? fromValue(int? value) {
     if (value != null) {
       try {
-        return IOSSafariDismissButtonStyle.values
-            .firstWhere((element) => element.toValue() == value);
+        return IOSSafariDismissButtonStyle.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -132,8 +178,9 @@ class IOSSafariDismissButtonStyle {
   static IOSSafariDismissButtonStyle? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return IOSSafariDismissButtonStyle.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return IOSSafariDismissButtonStyle.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -141,20 +188,46 @@ class IOSSafariDismissButtonStyle {
     return null;
   }
 
+  /// Gets a possible [IOSSafariDismissButtonStyle] instance value with name [name].
+  ///
+  /// Goes through [IOSSafariDismissButtonStyle.values] looking for a value with
+  /// name [name], as reported by [IOSSafariDismissButtonStyle.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static IOSSafariDismissButtonStyle? byName(String? name) {
+    if (name != null) {
+      try {
+        return IOSSafariDismissButtonStyle.values.firstWhere(
+          (element) => element.name() == name,
+        );
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [IOSSafariDismissButtonStyle] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, IOSSafariDismissButtonStyle> asNameMap() =>
+      <String, IOSSafariDismissButtonStyle>{
+        for (final value in IOSSafariDismissButtonStyle.values)
+          value.name(): value,
+      };
+
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
-  @override
-  int get hashCode => _value.hashCode;
-
-  @override
-  bool operator ==(value) => value == _value;
-
-  @override
-  String toString() {
+  ///Gets the name of the value.
+  String name() {
     switch (_value) {
       case 2:
         return 'CANCEL';
@@ -164,5 +237,21 @@ class IOSSafariDismissButtonStyle {
         return 'DONE';
     }
     return _value.toString();
+  }
+
+  @override
+  int get hashCode => _value.hashCode;
+
+  @override
+  bool operator ==(value) => value == _value;
+
+  ///Checks if the value is supported by the [defaultTargetPlatform].
+  bool isSupported() {
+    return _nativeValue != null;
+  }
+
+  @override
+  String toString() {
+    return name();
   }
 }

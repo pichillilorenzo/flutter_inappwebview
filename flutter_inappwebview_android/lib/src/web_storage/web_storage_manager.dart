@@ -21,7 +21,8 @@ class AndroidWebStorageManagerCreationParams
 
   /// Creates a [AndroidWebStorageManagerCreationParams] instance based on [PlatformWebStorageManagerCreationParams].
   factory AndroidWebStorageManagerCreationParams.fromPlatformWebStorageManagerCreationParams(
-      PlatformWebStorageManagerCreationParams params) {
+    PlatformWebStorageManagerCreationParams params,
+  ) {
     return AndroidWebStorageManagerCreationParams(params);
   }
 }
@@ -31,15 +32,17 @@ class AndroidWebStorageManager extends PlatformWebStorageManager
     with ChannelController {
   /// Creates a new [AndroidWebStorageManager].
   AndroidWebStorageManager(PlatformWebStorageManagerCreationParams params)
-      : super.implementation(
-          params is AndroidWebStorageManagerCreationParams
-              ? params
-              : AndroidWebStorageManagerCreationParams
-                  .fromPlatformWebStorageManagerCreationParams(params),
-        ) {
+    : super.implementation(
+        params is AndroidWebStorageManagerCreationParams
+            ? params
+            : AndroidWebStorageManagerCreationParams.fromPlatformWebStorageManagerCreationParams(
+                params,
+              ),
+      ) {
     channel = const MethodChannel(
-        'com.pichillilorenzo/flutter_inappwebview_webstoragemanager');
-    handler = handleMethod;
+      'com.pichillilorenzo/flutter_inappwebview_webstoragemanager',
+    );
+    handler = _handleMethod;
     initMethodCallHandler();
   }
 
@@ -51,9 +54,24 @@ class AndroidWebStorageManager extends PlatformWebStorageManager
   }
 
   static AndroidWebStorageManager _init() {
-    _instance = AndroidWebStorageManager(AndroidWebStorageManagerCreationParams(
-        const PlatformWebStorageManagerCreationParams()));
+    _instance = AndroidWebStorageManager(
+      AndroidWebStorageManagerCreationParams(
+        const PlatformWebStorageManagerCreationParams(),
+      ),
+    );
     return _instance!;
+  }
+
+  static AndroidWebStorageManager? _static;
+
+  /// Provide static access.
+  factory AndroidWebStorageManager.static() {
+    _static ??= AndroidWebStorageManager(
+      AndroidWebStorageManagerCreationParams(
+        const PlatformWebStorageManagerCreationParams(),
+      ),
+    );
+    return _static!;
   }
 
   Future<dynamic> _handleMethod(MethodCall call) async {}
@@ -64,15 +82,20 @@ class AndroidWebStorageManager extends PlatformWebStorageManager
 
     Map<String, dynamic> args = <String, dynamic>{};
     List<Map<dynamic, dynamic>> origins =
-        (await channel?.invokeMethod<List>('getOrigins', args))
-                ?.cast<Map<dynamic, dynamic>>() ??
-            [];
+        (await channel?.invokeMethod<List>(
+          'getOrigins',
+          args,
+        ))?.cast<Map<dynamic, dynamic>>() ??
+        [];
 
     for (var origin in origins) {
-      originsList.add(WebStorageOrigin(
+      originsList.add(
+        WebStorageOrigin(
           origin: origin["origin"],
           quota: origin["quota"],
-          usage: origin["usage"]));
+          usage: origin["usage"],
+        ),
+      );
     }
 
     return originsList;
@@ -109,8 +132,4 @@ class AndroidWebStorageManager extends PlatformWebStorageManager
   void dispose() {
     // empty
   }
-}
-
-extension InternalWebStorageManager on AndroidWebStorageManager {
-  get handleMethod => _handleMethod;
 }

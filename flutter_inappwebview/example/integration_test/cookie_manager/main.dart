@@ -10,7 +10,7 @@ import '../util.dart';
 part 'set_get_delete.dart';
 
 void main() {
-  final shouldSkip = kIsWeb;
+  final shouldSkip = !CookieManager.isClassSupported();
 
   skippableGroup('Cookie Manager', () {
     setGetDelete();

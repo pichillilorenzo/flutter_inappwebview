@@ -1,11 +1,9 @@
 part of 'main.dart';
 
 void webViewAssetLoader() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![
-          TargetPlatform.android,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebViewSettings.isPropertySupported(
+    InAppWebViewSettingsProperty.webViewAssetLoader,
+  );
 
   skippableTestWidgets('WebViewAssetLoader', (WidgetTester tester) async {
     final Completer<InAppWebViewController> controllerCompleter =
@@ -19,13 +17,15 @@ void webViewAssetLoader() {
           key: GlobalKey(),
           initialUrlRequest: URLRequest(url: TEST_WEBVIEW_ASSET_LOADER_URL),
           initialSettings: InAppWebViewSettings(
-              allowFileAccessFromFileURLs: false,
-              allowUniversalAccessFromFileURLs: false,
-              allowFileAccess: false,
-              allowContentAccess: false,
-              webViewAssetLoader: WebViewAssetLoader(
-                  domain: TEST_WEBVIEW_ASSET_LOADER_DOMAIN,
-                  pathHandlers: [AssetsPathHandler(path: '/assets/')])),
+            allowFileAccessFromFileURLs: false,
+            allowUniversalAccessFromFileURLs: false,
+            allowFileAccess: false,
+            allowContentAccess: false,
+            webViewAssetLoader: WebViewAssetLoader(
+              domain: TEST_WEBVIEW_ASSET_LOADER_DOMAIN,
+              pathHandlers: [AssetsPathHandler(path: '/assets/')],
+            ),
+          ),
           onWebViewCreated: (controller) {
             controllerCompleter.complete(controller);
           },
@@ -42,8 +42,10 @@ void webViewAssetLoader() {
     expect(url, TEST_WEBVIEW_ASSET_LOADER_URL.toString());
 
     expect(
-        await controller.evaluateJavascript(
-            source: "document.querySelector('h1').innerHTML"),
-        'WebViewAssetLoader');
+      await controller.evaluateJavascript(
+        source: "document.querySelector('h1').innerHTML",
+      ),
+      'WebViewAssetLoader',
+    );
   }, skip: shouldSkip);
 }

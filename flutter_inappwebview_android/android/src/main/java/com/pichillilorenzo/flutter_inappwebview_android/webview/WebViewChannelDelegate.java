@@ -29,6 +29,8 @@ import com.pichillilorenzo.flutter_inappwebview_android.types.GeolocationPermiss
 import com.pichillilorenzo.flutter_inappwebview_android.types.HitTestResult;
 import com.pichillilorenzo.flutter_inappwebview_android.types.HttpAuthResponse;
 import com.pichillilorenzo.flutter_inappwebview_android.types.HttpAuthenticationChallenge;
+import com.pichillilorenzo.flutter_inappwebview_android.types.InAppWebViewRect;
+import com.pichillilorenzo.flutter_inappwebview_android.types.JavaScriptHandlerFunctionData;
 import com.pichillilorenzo.flutter_inappwebview_android.types.JsAlertResponse;
 import com.pichillilorenzo.flutter_inappwebview_android.types.JsBeforeUnloadResponse;
 import com.pichillilorenzo.flutter_inappwebview_android.types.JsConfirmResponse;
@@ -39,6 +41,8 @@ import com.pichillilorenzo.flutter_inappwebview_android.types.PermissionResponse
 import com.pichillilorenzo.flutter_inappwebview_android.types.SafeBrowsingResponse;
 import com.pichillilorenzo.flutter_inappwebview_android.types.ServerTrustAuthResponse;
 import com.pichillilorenzo.flutter_inappwebview_android.types.ServerTrustChallenge;
+import com.pichillilorenzo.flutter_inappwebview_android.types.ShowFileChooserRequest;
+import com.pichillilorenzo.flutter_inappwebview_android.types.ShowFileChooserResponse;
 import com.pichillilorenzo.flutter_inappwebview_android.types.SslCertificateExt;
 import com.pichillilorenzo.flutter_inappwebview_android.types.SyncBaseCallbackResultImpl;
 import com.pichillilorenzo.flutter_inappwebview_android.types.URLRequest;
@@ -231,9 +235,9 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
       case getSettings:
         if (webView != null && webView.getInAppBrowserDelegate() instanceof InAppBrowserActivity) {
           InAppBrowserActivity inAppBrowserActivity = (InAppBrowserActivity) webView.getInAppBrowserDelegate();
-          result.success(inAppBrowserActivity.getCustomSettings());
+          result.success(inAppBrowserActivity.getCustomSettingsMap());
         } else {
-          result.success((webView != null) ? webView.getCustomSettings() : null);
+          result.success((webView != null) ? webView.getCustomSettingsMap() : null);
         }
         break;
       case close:
@@ -474,6 +478,23 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
         }
         result.success(true);
         break;
+      case requestFocus:
+        if (webView != null) {
+          boolean resultValue = false;
+          Integer direction = (Integer) call.argument("direction");
+          InAppWebViewRect previouslyFocusedRect = InAppWebViewRect.fromMap((Map<String, Object>) call.argument("previouslyFocusedRect"));
+          if (direction != null && previouslyFocusedRect != null) {
+            resultValue = webView.requestFocus(direction, previouslyFocusedRect.toRect());
+          } else if (direction != null) {
+            resultValue = webView.requestFocus(direction);
+          } else {
+            resultValue = webView.requestFocus();
+          }
+          result.success(resultValue);
+        } else {
+          result.success(false);
+        }
+        break;
       case setContextMenu:
         if (webView != null) {
           Map<String, Object> contextMenu = (Map<String, Object>) call.argument("contextMenu");
@@ -675,6 +696,37 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
           webView.clearFormData();
         }
         result.success(true);
+      case hideInputMethod:
+        if (webView != null) {
+          webView.hideInputMethod();
+          result.success(true);
+        } else {
+          result.success(false);
+        }
+        break;
+      case showInputMethod:
+        if (webView != null) {
+          webView.showInputMethod();
+          result.success(true);
+        } else {
+          result.success(false);
+        }
+        break;
+      case saveState:
+        if (webView != null) {
+          result.success(webView.saveState());
+        } else {
+          result.success(null);
+        }
+        break;
+      case restoreState:
+        if (webView != null) {
+          byte[] state = (byte[]) call.argument("state");
+          result.success(webView.restoreState(state));
+        } else {
+          result.success(false);
+        }
+        break;
     }
   }
 
@@ -707,10 +759,10 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
     channel.invokeMethod("onScrollChanged", obj);
   }
 
-  public void onDownloadStartRequest(DownloadStartRequest downloadStartRequest) {
+  public void onDownloadStarting(DownloadStartRequest downloadStartRequest) {
     MethodChannel channel = getChannel();
     if (channel == null) return;
-    channel.invokeMethod("onDownloadStartRequest", downloadStartRequest.toMap());
+    channel.invokeMethod("onDownloadStarting", downloadStartRequest.toMap());
   }
 
   public void onCreateContextMenu(HitTestResult hitTestResult) {
@@ -1271,7 +1323,7 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
     }
   }
 
-  public void onCallJsHandler(String handlerName, String args, @NonNull CallJsHandlerCallback callback) {
+  public void onCallJsHandler(String handlerName, JavaScriptHandlerFunctionData data, @NonNull CallJsHandlerCallback callback) {
     MethodChannel channel = getChannel();
     if (channel == null) {
       callback.defaultBehaviour(null);
@@ -1279,7 +1331,7 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
     }
     Map<String, Object> obj = new HashMap<>();
     obj.put("handlerName", handlerName);
-    obj.put("args", args);
+    obj.put("data", data.toMap());
     channel.invokeMethod("onCallJsHandler", obj, callback);
   }
 
@@ -1308,6 +1360,23 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
     if (channel == null) return;
     Map<String, Object> obj = new HashMap<>();
     channel.invokeMethod("onRequestFocus", obj);
+  }
+
+  public static class ShowFileChooserCallback extends BaseCallbackResultImpl<ShowFileChooserResponse> {
+    @Nullable
+    @Override
+    public ShowFileChooserResponse decodeResult(@Nullable Object obj) {
+      return ShowFileChooserResponse.fromMap((Map<String, Object>) obj);
+    }
+  }
+
+  public void onShowFileChooser(ShowFileChooserRequest request, @NonNull ShowFileChooserCallback callback) {
+    MethodChannel channel = getChannel();
+    if (channel == null) {
+      callback.defaultBehaviour(null);
+      return;
+    }
+    channel.invokeMethod("onShowFileChooser", request.toMap(), callback);
   }
 
   @Override

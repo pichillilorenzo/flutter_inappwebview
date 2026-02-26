@@ -20,7 +20,8 @@ class IOSHttpAuthCredentialDatabaseCreationParams
 
   /// Creates a [IOSHttpAuthCredentialDatabaseCreationParams] instance based on [PlatformHttpAuthCredentialDatabaseCreationParams].
   factory IOSHttpAuthCredentialDatabaseCreationParams.fromPlatformHttpAuthCredentialDatabaseCreationParams(
-      PlatformHttpAuthCredentialDatabaseCreationParams params) {
+    PlatformHttpAuthCredentialDatabaseCreationParams params,
+  ) {
     return IOSHttpAuthCredentialDatabaseCreationParams(params);
   }
 }
@@ -30,15 +31,17 @@ class IOSHttpAuthCredentialDatabase extends PlatformHttpAuthCredentialDatabase
     with ChannelController {
   /// Creates a new [IOSHttpAuthCredentialDatabase].
   IOSHttpAuthCredentialDatabase(
-      PlatformHttpAuthCredentialDatabaseCreationParams params)
-      : super.implementation(
-          params is IOSHttpAuthCredentialDatabaseCreationParams
-              ? params
-              : IOSHttpAuthCredentialDatabaseCreationParams
-                  .fromPlatformHttpAuthCredentialDatabaseCreationParams(params),
-        ) {
+    PlatformHttpAuthCredentialDatabaseCreationParams params,
+  ) : super.implementation(
+        params is IOSHttpAuthCredentialDatabaseCreationParams
+            ? params
+            : IOSHttpAuthCredentialDatabaseCreationParams.fromPlatformHttpAuthCredentialDatabaseCreationParams(
+                params,
+              ),
+      ) {
     channel = const MethodChannel(
-        'com.pichillilorenzo/flutter_inappwebview_credential_database');
+      'com.pichillilorenzo/flutter_inappwebview_credential_database',
+    );
     handler = handleMethod;
     initMethodCallHandler();
   }
@@ -52,16 +55,29 @@ class IOSHttpAuthCredentialDatabase extends PlatformHttpAuthCredentialDatabase
 
   static IOSHttpAuthCredentialDatabase _init() {
     _instance = IOSHttpAuthCredentialDatabase(
-        IOSHttpAuthCredentialDatabaseCreationParams(
-            const PlatformHttpAuthCredentialDatabaseCreationParams()));
+      IOSHttpAuthCredentialDatabaseCreationParams(
+        const PlatformHttpAuthCredentialDatabaseCreationParams(),
+      ),
+    );
     return _instance!;
+  }
+
+  static final IOSHttpAuthCredentialDatabase _staticValue =
+      IOSHttpAuthCredentialDatabase(
+        IOSHttpAuthCredentialDatabaseCreationParams(
+          const PlatformHttpAuthCredentialDatabaseCreationParams(),
+        ),
+      );
+
+  factory IOSHttpAuthCredentialDatabase.static() {
+    return _staticValue;
   }
 
   Future<dynamic> _handleMethod(MethodCall call) async {}
 
   @override
   Future<List<URLProtectionSpaceHttpAuthCredentials>>
-      getAllAuthCredentials() async {
+  getAllAuthCredentials() async {
     Map<String, dynamic> args = <String, dynamic>{};
     List<dynamic> allCredentials =
         await channel?.invokeMethod<List>('getAllAuthCredentials', args) ?? [];
@@ -70,7 +86,8 @@ class IOSHttpAuthCredentialDatabase extends PlatformHttpAuthCredentialDatabase
 
     for (Map<dynamic, dynamic> map in allCredentials) {
       var element = URLProtectionSpaceHttpAuthCredentials.fromMap(
-          map.cast<String, dynamic>());
+        map.cast<String, dynamic>(),
+      );
       if (element != null) {
         result.add(element);
       }
@@ -79,8 +96,9 @@ class IOSHttpAuthCredentialDatabase extends PlatformHttpAuthCredentialDatabase
   }
 
   @override
-  Future<List<URLCredential>> getHttpAuthCredentials(
-      {required URLProtectionSpace protectionSpace}) async {
+  Future<List<URLCredential>> getHttpAuthCredentials({
+    required URLProtectionSpace protectionSpace,
+  }) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent("host", () => protectionSpace.host);
     args.putIfAbsent("protocol", () => protectionSpace.protocol);
@@ -99,9 +117,10 @@ class IOSHttpAuthCredentialDatabase extends PlatformHttpAuthCredentialDatabase
   }
 
   @override
-  Future<void> setHttpAuthCredential(
-      {required URLProtectionSpace protectionSpace,
-      required URLCredential credential}) async {
+  Future<void> setHttpAuthCredential({
+    required URLProtectionSpace protectionSpace,
+    required URLCredential credential,
+  }) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent("host", () => protectionSpace.host);
     args.putIfAbsent("protocol", () => protectionSpace.protocol);
@@ -113,9 +132,10 @@ class IOSHttpAuthCredentialDatabase extends PlatformHttpAuthCredentialDatabase
   }
 
   @override
-  Future<void> removeHttpAuthCredential(
-      {required URLProtectionSpace protectionSpace,
-      required URLCredential credential}) async {
+  Future<void> removeHttpAuthCredential({
+    required URLProtectionSpace protectionSpace,
+    required URLCredential credential,
+  }) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent("host", () => protectionSpace.host);
     args.putIfAbsent("protocol", () => protectionSpace.protocol);
@@ -127,8 +147,9 @@ class IOSHttpAuthCredentialDatabase extends PlatformHttpAuthCredentialDatabase
   }
 
   @override
-  Future<void> removeHttpAuthCredentials(
-      {required URLProtectionSpace protectionSpace}) async {
+  Future<void> removeHttpAuthCredentials({
+    required URLProtectionSpace protectionSpace,
+  }) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent("host", () => protectionSpace.host);
     args.putIfAbsent("protocol", () => protectionSpace.protocol);

@@ -22,12 +22,13 @@ class AndroidInAppBrowserOptions implements BrowserOptions, AndroidOptions {
   ///Set to `true` to close the InAppBrowser when the user click on the Android back button. The default value is `false`.
   bool shouldCloseOnBackButtonPressed;
 
-  AndroidInAppBrowserOptions(
-      {this.hideTitleBar = false,
-      this.toolbarTopFixedTitle,
-      this.closeOnCannotGoBack = true,
-      this.allowGoBackWithBackButton = true,
-      this.shouldCloseOnBackButtonPressed = false});
+  AndroidInAppBrowserOptions({
+    this.hideTitleBar = false,
+    this.toolbarTopFixedTitle,
+    this.closeOnCannotGoBack = true,
+    this.allowGoBackWithBackButton = true,
+    this.shouldCloseOnBackButtonPressed = false,
+  });
 
   @override
   Map<String, dynamic> toMap() {

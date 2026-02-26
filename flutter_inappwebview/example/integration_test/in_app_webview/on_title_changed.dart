@@ -1,13 +1,9 @@
 part of 'main.dart';
 
 void onTitleChanged() {
-  final shouldSkip = kIsWeb
-      ? false
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebView.isPropertySupported(
+    PlatformWebViewCreationParamsProperty.onTitleChanged,
+  );
 
   var url = !kIsWeb ? TEST_URL_1 : TEST_WEB_PLATFORM_URL_1;
 
@@ -44,7 +40,8 @@ void onTitleChanged() {
     await tester.pump();
     await pageLoaded.future;
     await controller.evaluateJavascript(
-        source: "document.title = 'title test';");
+      source: "document.title = 'title test';",
+    );
     await expectLater(onTitleChangedCompleter.future, completes);
   }, skip: shouldSkip);
 }

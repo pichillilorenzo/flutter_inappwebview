@@ -28,17 +28,21 @@ class URLResponse {
 
   ///The URL for the response.
   WebUri? url;
-  URLResponse(
-      {required this.expectedContentLength,
-      this.headers,
-      this.mimeType,
-      this.statusCode,
-      this.suggestedFilename,
-      this.textEncodingName,
-      this.url});
+  URLResponse({
+    required this.expectedContentLength,
+    this.headers,
+    this.mimeType,
+    this.statusCode,
+    this.suggestedFilename,
+    this.textEncodingName,
+    this.url,
+  });
 
   ///Gets a possible [URLResponse] instance from a [Map] value.
-  static URLResponse? fromMap(Map<String, dynamic>? map) {
+  static URLResponse? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
@@ -55,7 +59,7 @@ class URLResponse {
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
       "expectedContentLength": expectedContentLength,
       "headers": headers,
@@ -101,17 +105,21 @@ class IOSURLResponse {
 
   ///The URL for the response.
   Uri? url;
-  IOSURLResponse(
-      {required this.expectedContentLength,
-      this.headers,
-      this.mimeType,
-      this.statusCode,
-      this.suggestedFilename,
-      this.textEncodingName,
-      this.url});
+  IOSURLResponse({
+    required this.expectedContentLength,
+    this.headers,
+    this.mimeType,
+    this.statusCode,
+    this.suggestedFilename,
+    this.textEncodingName,
+    this.url,
+  });
 
   ///Gets a possible [IOSURLResponse] instance from a [Map] value.
-  static IOSURLResponse? fromMap(Map<String, dynamic>? map) {
+  static IOSURLResponse? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
@@ -128,7 +136,7 @@ class IOSURLResponse {
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
       "expectedContentLength": expectedContentLength,
       "headers": headers,

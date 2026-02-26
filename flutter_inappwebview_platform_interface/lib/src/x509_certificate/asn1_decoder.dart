@@ -71,14 +71,14 @@ class ASN1DERDecoder {
             ASN1IdentifierTagNumber.GENERAL_STRING,
             ASN1IdentifierTagNumber.UNIVERSAL_STRING,
             ASN1IdentifierTagNumber.CHARACTER_STRING,
-            ASN1IdentifierTagNumber.T61_STRING
+            ASN1IdentifierTagNumber.T61_STRING,
           ].contains(tagNumber)) {
             asn1obj.value = utf8.decode(contentData, allowMalformed: true);
           } else if (tagNumber == ASN1IdentifierTagNumber.BMP_STRING) {
             asn1obj.value = String.fromCharCodes(contentData);
           } else if ([
             ASN1IdentifierTagNumber.VISIBLE_STRING,
-            ASN1IdentifierTagNumber.IA5_STRING
+            ASN1IdentifierTagNumber.IA5_STRING,
           ].contains(tagNumber)) {
             asn1obj.value = ascii.decode(contentData, allowInvalid: true);
           } else if (tagNumber == ASN1IdentifierTagNumber.UTC_TIME) {
@@ -283,10 +283,14 @@ class ASN1DERDecoder {
       c = utc[end];
       if (c == '+' || c == '-') {
         // get hours+minutes offset
-        var hhoffset =
-            int.parse(utc.substring(end + 1, end + 1 + 2), radix: 10);
-        var mmoffset =
-            int.parse(utc.substring(end + 4, end + 4 + 2), radix: 10);
+        var hhoffset = int.parse(
+          utc.substring(end + 1, end + 1 + 2),
+          radix: 10,
+        );
+        var mmoffset = int.parse(
+          utc.substring(end + 4, end + 4 + 2),
+          radix: 10,
+        );
 
         // calculate offset in milliseconds
         var offset = hhoffset * 60 + mmoffset;
@@ -362,10 +366,14 @@ class ASN1DERDecoder {
     var c = gentime[end];
     if (c == '+' || c == '-') {
       // get hours+minutes offset
-      var hhoffset =
-          int.parse(gentime.substring(end + 1, end + 1 + 2), radix: 10);
-      var mmoffset =
-          int.parse(gentime.substring(end + 4, end + 4 + 2), radix: 10);
+      var hhoffset = int.parse(
+        gentime.substring(end + 1, end + 1 + 2),
+        radix: 10,
+      );
+      var mmoffset = int.parse(
+        gentime.substring(end + 4, end + 4 + 2),
+        radix: 10,
+      );
 
       // calculate offset in milliseconds
       offset = hhoffset * 60 + mmoffset;

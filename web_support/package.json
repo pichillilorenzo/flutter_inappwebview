@@ -1,0 +1,14 @@
+{
+  "name": "web_support",
+  "version": "1.0.0",
+  "description": "",
+  "main": "",
+  "scripts": {
+    "build": "esbuild --format=esm --platform=browser --sourcemap=inline --bundle --outfile=../flutter_inappwebview_web/lib/assets/web/web_support.js src/index.ts"
+  },
+  "devDependencies": {
+    "esbuild": "^0.24.0",
+    "typescript": "^5.5.3"
+  },
+  "private": true
+}

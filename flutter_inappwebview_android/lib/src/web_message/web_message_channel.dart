@@ -12,16 +12,23 @@ import 'web_message_port.dart';
 class AndroidWebMessageChannelCreationParams
     extends PlatformWebMessageChannelCreationParams {
   /// Creates a new [AndroidWebMessageChannelCreationParams] instance.
-  const AndroidWebMessageChannelCreationParams(
-      {required super.id, required super.port1, required super.port2});
+  const AndroidWebMessageChannelCreationParams({
+    required super.id,
+    required super.port1,
+    required super.port2,
+  });
 
   /// Creates a [AndroidWebMessageChannelCreationParams] instance based on [PlatformWebMessageChannelCreationParams].
   factory AndroidWebMessageChannelCreationParams.fromPlatformWebMessageChannelCreationParams(
-      // Recommended placeholder to prevent being broken by platform interface.
-      // ignore: avoid_unused_constructor_parameters
-      PlatformWebMessageChannelCreationParams params) {
+    // Recommended placeholder to prevent being broken by platform interface.
+    // ignore: avoid_unused_constructor_parameters
+    PlatformWebMessageChannelCreationParams params,
+  ) {
     return AndroidWebMessageChannelCreationParams(
-        id: params.id, port1: params.port1, port2: params.port2);
+      id: params.id,
+      port1: params.port1,
+      port2: params.port2,
+    );
   }
 
   @override
@@ -35,25 +42,31 @@ class AndroidWebMessageChannel extends PlatformWebMessageChannel
     with ChannelController {
   /// Constructs a [AndroidWebMessageChannel].
   AndroidWebMessageChannel(PlatformWebMessageChannelCreationParams params)
-      : super.implementation(
-          params is AndroidWebMessageChannelCreationParams
-              ? params
-              : AndroidWebMessageChannelCreationParams
-                  .fromPlatformWebMessageChannelCreationParams(params),
-        ) {
+    : super.implementation(
+        params is AndroidWebMessageChannelCreationParams
+            ? params
+            : AndroidWebMessageChannelCreationParams.fromPlatformWebMessageChannelCreationParams(
+                params,
+              ),
+      ) {
     channel = MethodChannel(
-        'com.pichillilorenzo/flutter_inappwebview_web_message_channel_${params.id}');
+      'com.pichillilorenzo/flutter_inappwebview_web_message_channel_${params.id}',
+    );
     handler = _handleMethod;
     initMethodCallHandler();
   }
 
   static final AndroidWebMessageChannel _staticValue = AndroidWebMessageChannel(
-      AndroidWebMessageChannelCreationParams(
-          id: '',
-          port1: AndroidWebMessagePort(
-              AndroidWebMessagePortCreationParams(index: 0)),
-          port2: AndroidWebMessagePort(
-              AndroidWebMessagePortCreationParams(index: 1))));
+    AndroidWebMessageChannelCreationParams(
+      id: '',
+      port1: AndroidWebMessagePort(
+        AndroidWebMessagePortCreationParams(index: 0),
+      ),
+      port2: AndroidWebMessagePort(
+        AndroidWebMessagePortCreationParams(index: 1),
+      ),
+    ),
+  );
 
   /// Provide static access.
   factory AndroidWebMessageChannel.static() {
@@ -69,12 +82,16 @@ class AndroidWebMessageChannel extends PlatformWebMessageChannel
       return null;
     }
     var webMessageChannel = AndroidWebMessageChannel(
-        AndroidWebMessageChannelCreationParams(
-            id: map["id"],
-            port1: AndroidWebMessagePort(
-                AndroidWebMessagePortCreationParams(index: 0)),
-            port2: AndroidWebMessagePort(
-                AndroidWebMessagePortCreationParams(index: 1))));
+      AndroidWebMessageChannelCreationParams(
+        id: map["id"],
+        port1: AndroidWebMessagePort(
+          AndroidWebMessagePortCreationParams(index: 0),
+        ),
+        port2: AndroidWebMessagePort(
+          AndroidWebMessagePortCreationParams(index: 1),
+        ),
+      ),
+    );
     webMessageChannel._androidPort1.webMessageChannel = webMessageChannel;
     webMessageChannel._androidPort2.webMessageChannel = webMessageChannel;
     return webMessageChannel;
@@ -88,7 +105,8 @@ class AndroidWebMessageChannel extends PlatformWebMessageChannel
         if (port.onMessage != null) {
           WebMessage? message = call.arguments["message"] != null
               ? WebMessage.fromMap(
-                  call.arguments["message"].cast<String, dynamic>())
+                  call.arguments["message"].cast<String, dynamic>(),
+                )
               : null;
           port.onMessage!(message);
         }

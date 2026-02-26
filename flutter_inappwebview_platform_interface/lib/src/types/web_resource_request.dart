@@ -1,6 +1,7 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 
 import '../web_uri.dart';
+import 'enum_method.dart';
 
 part 'web_resource_request.g.dart';
 
@@ -38,11 +39,12 @@ class WebResourceRequest_ {
   ///**NOTE**: available on Android 21+. For Android < 21 it will be always `false`.
   bool? isRedirect;
 
-  WebResourceRequest_(
-      {required this.url,
-      this.headers,
-      this.method,
-      this.hasGesture,
-      this.isForMainFrame,
-      this.isRedirect});
+  WebResourceRequest_({
+    required this.url,
+    this.headers,
+    this.method,
+    this.hasGesture,
+    this.isForMainFrame,
+    this.isRedirect,
+  });
 }

@@ -21,9 +21,10 @@ class DebugLoggingSettings {
   ///Use [print] instead of `developer.log` to log messages.
   bool usePrint;
 
-  DebugLoggingSettings(
-      {this.enabled = kDebugMode,
-      this.excludeFilter = const [],
-      this.maxLogMessageLength = -1,
-      this.usePrint = false});
+  DebugLoggingSettings({
+    this.enabled = kDebugMode,
+    this.excludeFilter = const [],
+    this.maxLogMessageLength = -1,
+    this.usePrint = false,
+  });
 }

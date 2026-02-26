@@ -1,13 +1,17 @@
 import 'dart:async';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformServiceWorkerController}
+///
+///{@macro flutter_inappwebview_platform_interface.PlatformServiceWorkerController.supported_platforms}
 class ServiceWorkerController {
   ///{@macro flutter_inappwebview_platform_interface.PlatformServiceWorkerController}
   ServiceWorkerController()
-      : this.fromPlatformCreationParams(
-          const PlatformServiceWorkerControllerCreationParams(),
-        );
+    : this.fromPlatformCreationParams(
+        const PlatformServiceWorkerControllerCreationParams(),
+      );
 
   /// Constructs a [ServiceWorkerController] from creation params for a specific
   /// platform.
@@ -33,43 +37,78 @@ class ServiceWorkerController {
   }
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformServiceWorkerController.serviceWorkerClient}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformServiceWorkerController.serviceWorkerClient.supported_platforms}
   ServiceWorkerClient? get serviceWorkerClient => platform.serviceWorkerClient;
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformServiceWorkerController.setServiceWorkerClient}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformServiceWorkerController.setServiceWorkerClient.supported_platforms}
   setServiceWorkerClient(ServiceWorkerClient? value) =>
       platform.setServiceWorkerClient(value);
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformServiceWorkerController.getAllowContentAccess}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformServiceWorkerController.getAllowContentAccess.supported_platforms}
   static Future<bool> getAllowContentAccess() =>
       PlatformServiceWorkerController.static().getAllowContentAccess();
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformServiceWorkerController.getAllowFileAccess}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformServiceWorkerController.getAllowFileAccess.supported_platforms}
   static Future<bool> getAllowFileAccess() =>
       PlatformServiceWorkerController.static().getAllowFileAccess();
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformServiceWorkerController.getBlockNetworkLoads}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformServiceWorkerController.getBlockNetworkLoads.supported_platforms}
   static Future<bool> getBlockNetworkLoads() =>
       PlatformServiceWorkerController.static().getBlockNetworkLoads();
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformServiceWorkerController.getCacheMode}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformServiceWorkerController.getCacheMode.supported_platforms}
   static Future<CacheMode?> getCacheMode() =>
       PlatformServiceWorkerController.static().getCacheMode();
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformServiceWorkerController.setAllowContentAccess}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformServiceWorkerController.setAllowContentAccess.supported_platforms}
   static Future<void> setAllowContentAccess(bool allow) =>
       PlatformServiceWorkerController.static().setAllowContentAccess(allow);
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformServiceWorkerController.setAllowFileAccess}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformServiceWorkerController.setAllowFileAccess.supported_platforms}
   static Future<void> setAllowFileAccess(bool allow) =>
       PlatformServiceWorkerController.static().setAllowFileAccess(allow);
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformServiceWorkerController.setBlockNetworkLoads}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformServiceWorkerController.setBlockNetworkLoads.supported_platforms}
   static Future<void> setBlockNetworkLoads(bool flag) =>
       PlatformServiceWorkerController.static().setBlockNetworkLoads(flag);
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformServiceWorkerController.setCacheMode}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformServiceWorkerController.setCacheMode.supported_platforms}
   static Future<void> setCacheMode(CacheMode mode) =>
       PlatformServiceWorkerController.static().setCacheMode(mode);
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformServiceWorkerControllerCreationParams.isClassSupported}
+  static bool isClassSupported({TargetPlatform? platform}) =>
+      PlatformServiceWorkerController.static().isClassSupported(
+        platform: platform,
+      );
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformServiceWorkerController.isMethodSupported}
+  static bool isMethodSupported(
+    PlatformServiceWorkerControllerMethod method, {
+    TargetPlatform? platform,
+  }) => PlatformServiceWorkerController.static().isMethodSupported(
+    method,
+    platform: platform,
+  );
 }
 
 ///Class that represents an Android-specific class that manages Service Workers used by `WebView`.
@@ -105,10 +144,12 @@ class AndroidServiceWorkerController {
   ///Sets the service worker client
   setServiceWorkerClient(AndroidServiceWorkerClient? value) async {
     await ServiceWorkerController.instance().setServiceWorkerClient(
-        value != null
-            ? ServiceWorkerClient(
-                shouldInterceptRequest: value.shouldInterceptRequest)
-            : null);
+      value != null
+          ? ServiceWorkerClient(
+              shouldInterceptRequest: value.shouldInterceptRequest,
+            )
+          : null,
+    );
     _serviceWorkerClient = value;
   }
 
@@ -150,7 +191,8 @@ class AndroidServiceWorkerController {
   ///**Official Android API**: https://developer.android.com/reference/androidx/webkit/ServiceWorkerWebSettingsCompat#getCacheMode()
   static Future<AndroidCacheMode?> getCacheMode() async {
     return AndroidCacheMode.fromNativeValue(
-        (await ServiceWorkerController.getCacheMode())?.toNativeValue());
+      (await ServiceWorkerController.getCacheMode())?.toNativeValue(),
+    );
   }
 
   ///Enables or disables content URL access from Service Workers.
@@ -191,7 +233,8 @@ class AndroidServiceWorkerController {
   ///**Official Android API**: https://developer.android.com/reference/androidx/webkit/ServiceWorkerWebSettingsCompat#setCacheMode(int)
   static Future<void> setCacheMode(AndroidCacheMode mode) async {
     await ServiceWorkerController.setCacheMode(
-        CacheMode.fromNativeValue(mode.toNativeValue())!);
+      CacheMode.fromNativeValue(mode.toNativeValue())!,
+    );
   }
 }
 
@@ -214,7 +257,7 @@ class AndroidServiceWorkerClient {
   ///
   ///**NOTE**: available on Android 24+.
   final Future<WebResourceResponse?> Function(WebResourceRequest request)?
-      shouldInterceptRequest;
+  shouldInterceptRequest;
 
   AndroidServiceWorkerClient({this.shouldInterceptRequest});
 }

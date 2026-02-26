@@ -11,17 +11,21 @@ import '../in_app_webview/in_app_webview_controller.dart';
 /// more information.
 class IOSWebStorageCreationParams extends PlatformWebStorageCreationParams {
   /// Creates a new [IOSWebStorageCreationParams] instance.
-  IOSWebStorageCreationParams(
-      {required super.localStorage, required super.sessionStorage});
+  IOSWebStorageCreationParams({
+    required super.localStorage,
+    required super.sessionStorage,
+  });
 
   /// Creates a [IOSWebStorageCreationParams] instance based on [PlatformWebStorageCreationParams].
   factory IOSWebStorageCreationParams.fromPlatformWebStorageCreationParams(
-      // Recommended placeholder to prevent being broken by platform interface.
-      // ignore: avoid_unused_constructor_parameters
-      PlatformWebStorageCreationParams params) {
+    // Recommended placeholder to prevent being broken by platform interface.
+    // ignore: avoid_unused_constructor_parameters
+    PlatformWebStorageCreationParams params,
+  ) {
     return IOSWebStorageCreationParams(
-        localStorage: params.localStorage,
-        sessionStorage: params.sessionStorage);
+      localStorage: params.localStorage,
+      sessionStorage: params.sessionStorage,
+    );
   }
 }
 
@@ -29,12 +33,13 @@ class IOSWebStorageCreationParams extends PlatformWebStorageCreationParams {
 class IOSWebStorage extends PlatformWebStorage {
   /// Constructs a [IOSWebStorage].
   IOSWebStorage(PlatformWebStorageCreationParams params)
-      : super.implementation(
-          params is IOSWebStorageCreationParams
-              ? params
-              : IOSWebStorageCreationParams
-                  .fromPlatformWebStorageCreationParams(params),
-        );
+    : super.implementation(
+        params is IOSWebStorageCreationParams
+            ? params
+            : IOSWebStorageCreationParams.fromPlatformWebStorageCreationParams(
+                params,
+              ),
+      );
 
   @override
   PlatformLocalStorage get localStorage => params.localStorage;
@@ -56,16 +61,21 @@ class IOSWebStorage extends PlatformWebStorage {
 /// more information.
 class IOSStorageCreationParams extends PlatformStorageCreationParams {
   /// Creates a new [IOSStorageCreationParams] instance.
-  IOSStorageCreationParams(
-      {required super.controller, required super.webStorageType});
+  IOSStorageCreationParams({
+    required super.controller,
+    required super.webStorageType,
+  });
 
   /// Creates a [IOSStorageCreationParams] instance based on [PlatformStorageCreationParams].
   factory IOSStorageCreationParams.fromPlatformStorageCreationParams(
-      // Recommended placeholder to prevent being broken by platform interface.
-      // ignore: avoid_unused_constructor_parameters
-      PlatformStorageCreationParams params) {
+    // Recommended placeholder to prevent being broken by platform interface.
+    // ignore: avoid_unused_constructor_parameters
+    PlatformStorageCreationParams params,
+  ) {
     return IOSStorageCreationParams(
-        controller: params.controller, webStorageType: params.webStorageType);
+      controller: params.controller,
+      webStorageType: params.webStorageType,
+    );
   }
 }
 
@@ -76,25 +86,34 @@ abstract mixin class IOSStorage implements PlatformStorage {
 
   @override
   Future<int?> length() async {
-    var result = await controller?.evaluateJavascript(source: """
+    var result = await controller?.evaluateJavascript(
+      source:
+          """
     window.$webStorageType.length;
-    """);
+    """,
+    );
     return result != null ? int.parse(json.decode(result)) : null;
   }
 
   @override
   Future<void> setItem({required String key, required dynamic value}) async {
     var encodedValue = json.encode(value);
-    await controller?.evaluateJavascript(source: """
+    await controller?.evaluateJavascript(
+      source:
+          """
     window.$webStorageType.setItem("$key", ${value is String ? encodedValue : "JSON.stringify($encodedValue)"});
-    """);
+    """,
+    );
   }
 
   @override
   Future<dynamic> getItem({required String key}) async {
-    var itemValue = await controller?.evaluateJavascript(source: """
+    var itemValue = await controller?.evaluateJavascript(
+      source:
+          """
     window.$webStorageType.getItem("$key");
-    """);
+    """,
+    );
 
     if (itemValue == null) {
       return null;
@@ -109,17 +128,21 @@ abstract mixin class IOSStorage implements PlatformStorage {
 
   @override
   Future<void> removeItem({required String key}) async {
-    await controller?.evaluateJavascript(source: """
+    await controller?.evaluateJavascript(
+      source:
+          """
     window.$webStorageType.removeItem("$key");
-    """);
+    """,
+    );
   }
 
   @override
   Future<List<WebStorageItem>> getItems() async {
     var webStorageItems = <WebStorageItem>[];
 
-    List<Map<dynamic, dynamic>>? items =
-        (await controller?.evaluateJavascript(source: """
+    List<Map<dynamic, dynamic>>? items = (await controller?.evaluateJavascript(
+      source:
+          """
 (function() {
   var webStorageItems = [];
   for(var i = 0; i < window.$webStorageType.length; i++){
@@ -133,15 +156,17 @@ abstract mixin class IOSStorage implements PlatformStorage {
   }
   return webStorageItems;
 })();
-    """))?.cast<Map<dynamic, dynamic>>();
+    """,
+    ))?.cast<Map<dynamic, dynamic>>();
 
     if (items == null) {
       return webStorageItems;
     }
 
     for (var item in items) {
-      webStorageItems
-          .add(WebStorageItem(key: item["key"], value: item["value"]));
+      webStorageItems.add(
+        WebStorageItem(key: item["key"], value: item["value"]),
+      );
     }
 
     return webStorageItems;
@@ -149,16 +174,22 @@ abstract mixin class IOSStorage implements PlatformStorage {
 
   @override
   Future<void> clear() async {
-    await controller?.evaluateJavascript(source: """
+    await controller?.evaluateJavascript(
+      source:
+          """
     window.$webStorageType.clear();
-    """);
+    """,
+    );
   }
 
   @override
   Future<String> key({required int index}) async {
-    var result = await controller?.evaluateJavascript(source: """
+    var result = await controller?.evaluateJavascript(
+      source:
+          """
     window.$webStorageType.key($index);
-    """);
+    """,
+    );
     return result != null ? json.decode(result) : null;
   }
 
@@ -179,9 +210,10 @@ class IOSLocalStorageCreationParams extends PlatformLocalStorageCreationParams {
 
   /// Creates a [IOSLocalStorageCreationParams] instance based on [PlatformLocalStorageCreationParams].
   factory IOSLocalStorageCreationParams.fromPlatformLocalStorageCreationParams(
-      // Recommended placeholder to prevent being broken by platform interface.
-      // ignore: avoid_unused_constructor_parameters
-      PlatformLocalStorageCreationParams params) {
+    // Recommended placeholder to prevent being broken by platform interface.
+    // ignore: avoid_unused_constructor_parameters
+    PlatformLocalStorageCreationParams params,
+  ) {
     return IOSLocalStorageCreationParams(params);
   }
 }
@@ -190,20 +222,28 @@ class IOSLocalStorageCreationParams extends PlatformLocalStorageCreationParams {
 class IOSLocalStorage extends PlatformLocalStorage with IOSStorage {
   /// Constructs a [IOSLocalStorage].
   IOSLocalStorage(PlatformLocalStorageCreationParams params)
-      : super.implementation(
-          params is IOSLocalStorageCreationParams
-              ? params
-              : IOSLocalStorageCreationParams
-                  .fromPlatformLocalStorageCreationParams(params),
-        );
+    : super.implementation(
+        params is IOSLocalStorageCreationParams
+            ? params
+            : IOSLocalStorageCreationParams.fromPlatformLocalStorageCreationParams(
+                params,
+              ),
+      );
 
   /// Default storage
-  factory IOSLocalStorage.defaultStorage(
-      {required PlatformInAppWebViewController? controller}) {
-    return IOSLocalStorage(IOSLocalStorageCreationParams(
-        PlatformLocalStorageCreationParams(PlatformStorageCreationParams(
+  factory IOSLocalStorage.defaultStorage({
+    required PlatformInAppWebViewController? controller,
+  }) {
+    return IOSLocalStorage(
+      IOSLocalStorageCreationParams(
+        PlatformLocalStorageCreationParams(
+          PlatformStorageCreationParams(
             controller: controller,
-            webStorageType: WebStorageType.LOCAL_STORAGE))));
+            webStorageType: WebStorageType.LOCAL_STORAGE,
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -223,9 +263,10 @@ class IOSSessionStorageCreationParams
 
   /// Creates a [IOSSessionStorageCreationParams] instance based on [PlatformSessionStorageCreationParams].
   factory IOSSessionStorageCreationParams.fromPlatformSessionStorageCreationParams(
-      // Recommended placeholder to prevent being broken by platform interface.
-      // ignore: avoid_unused_constructor_parameters
-      PlatformSessionStorageCreationParams params) {
+    // Recommended placeholder to prevent being broken by platform interface.
+    // ignore: avoid_unused_constructor_parameters
+    PlatformSessionStorageCreationParams params,
+  ) {
     return IOSSessionStorageCreationParams(params);
   }
 }
@@ -234,20 +275,28 @@ class IOSSessionStorageCreationParams
 class IOSSessionStorage extends PlatformSessionStorage with IOSStorage {
   /// Constructs a [IOSSessionStorage].
   IOSSessionStorage(PlatformSessionStorageCreationParams params)
-      : super.implementation(
-          params is IOSSessionStorageCreationParams
-              ? params
-              : IOSSessionStorageCreationParams
-                  .fromPlatformSessionStorageCreationParams(params),
-        );
+    : super.implementation(
+        params is IOSSessionStorageCreationParams
+            ? params
+            : IOSSessionStorageCreationParams.fromPlatformSessionStorageCreationParams(
+                params,
+              ),
+      );
 
   /// Default storage
-  factory IOSSessionStorage.defaultStorage(
-      {required PlatformInAppWebViewController? controller}) {
-    return IOSSessionStorage(IOSSessionStorageCreationParams(
-        PlatformSessionStorageCreationParams(PlatformStorageCreationParams(
+  factory IOSSessionStorage.defaultStorage({
+    required PlatformInAppWebViewController? controller,
+  }) {
+    return IOSSessionStorage(
+      IOSSessionStorageCreationParams(
+        PlatformSessionStorageCreationParams(
+          PlatformStorageCreationParams(
             controller: controller,
-            webStorageType: WebStorageType.SESSION_STORAGE))));
+            webStorageType: WebStorageType.SESSION_STORAGE,
+          ),
+        ),
+      ),
+    );
   }
 
   @override

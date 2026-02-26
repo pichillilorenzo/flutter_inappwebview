@@ -21,44 +21,73 @@ class TrustedWebActivityImmersiveDisplayMode
   ///Use [displayCutoutMode] instead.
   @Deprecated('Use displayCutoutMode instead')
   AndroidLayoutInDisplayCutoutMode? layoutInDisplayCutoutMode;
-  TrustedWebActivityImmersiveDisplayMode(
-      {required this.isSticky,
-      this.displayCutoutMode = LayoutInDisplayCutoutMode.DEFAULT,
-      this.layoutInDisplayCutoutMode}) {
+  TrustedWebActivityImmersiveDisplayMode({
+    required this.isSticky,
+    this.displayCutoutMode = LayoutInDisplayCutoutMode.DEFAULT,
+    this.layoutInDisplayCutoutMode,
+  }) {
     this.displayCutoutMode = this.layoutInDisplayCutoutMode != null
         ? LayoutInDisplayCutoutMode.fromNativeValue(
-            layoutInDisplayCutoutMode?.toNativeValue())!
+            layoutInDisplayCutoutMode?.toNativeValue(),
+          )!
         : this.displayCutoutMode;
   }
 
   ///Gets a possible [TrustedWebActivityImmersiveDisplayMode] instance from a [Map] value.
   static TrustedWebActivityImmersiveDisplayMode? fromMap(
-      Map<String, dynamic>? map) {
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
     final instance = TrustedWebActivityImmersiveDisplayMode(
       isSticky: map['isSticky'],
-      layoutInDisplayCutoutMode:
+      layoutInDisplayCutoutMode: switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue =>
           AndroidLayoutInDisplayCutoutMode.fromNativeValue(
-              map['displayCutoutMode']),
+            map['displayCutoutMode'],
+          ),
+        EnumMethod.value => AndroidLayoutInDisplayCutoutMode.fromValue(
+          map['displayCutoutMode'],
+        ),
+        EnumMethod.name => AndroidLayoutInDisplayCutoutMode.byName(
+          map['displayCutoutMode'],
+        ),
+      },
     );
-    instance.displayCutoutMode =
-        LayoutInDisplayCutoutMode.fromNativeValue(map['displayCutoutMode'])!;
+    if (map['displayCutoutMode'] != null) {
+      instance.displayCutoutMode = switch (enumMethod ??
+          EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => LayoutInDisplayCutoutMode.fromNativeValue(
+          map['displayCutoutMode'],
+        ),
+        EnumMethod.value => LayoutInDisplayCutoutMode.fromValue(
+          map['displayCutoutMode'],
+        ),
+        EnumMethod.name => LayoutInDisplayCutoutMode.byName(
+          map['displayCutoutMode'],
+        ),
+      }!;
+    }
     return instance;
   }
 
   @ExchangeableObjectMethod(toMapMergeWith: true)
-  Map<String, dynamic> _toMapMergeWith() {
+  Map<String, dynamic> _toMapMergeWith({EnumMethod? enumMethod}) {
     return {"type": _type};
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
-      "displayCutoutMode": displayCutoutMode.toNativeValue(),
+      "displayCutoutMode": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => displayCutoutMode.toNativeValue(),
+        EnumMethod.value => displayCutoutMode.toValue(),
+        EnumMethod.name => displayCutoutMode.name(),
+      },
       "isSticky": isSticky,
-      ..._toMapMergeWith(),
+      ..._toMapMergeWith(enumMethod: enumMethod),
     };
   }
 

@@ -3,8 +3,9 @@ import 'package:flutter/services.dart';
 ///Platform native utilities
 class PlatformUtil {
   static PlatformUtil? _instance;
-  static const MethodChannel _channel =
-      MethodChannel('com.pichillilorenzo/flutter_inappwebview_platformutil');
+  static const MethodChannel _channel = MethodChannel(
+    'com.pichillilorenzo/flutter_inappwebview_platformutil',
+  );
 
   PlatformUtil._();
 
@@ -36,8 +37,10 @@ class PlatformUtil {
       return _cachedSystemVersion!;
     }
     Map<String, dynamic> args = <String, dynamic>{};
-    _cachedSystemVersion =
-        await _channel.invokeMethod('getSystemVersion', args);
+    _cachedSystemVersion = await _channel.invokeMethod(
+      'getSystemVersion',
+      args,
+    );
     return _cachedSystemVersion!;
   }
 

@@ -5,6 +5,7 @@ import 'url_response.dart';
 import 'url_authentication_challenge.dart';
 import 'url_protection_space.dart';
 import '../in_app_webview/platform_webview.dart';
+import 'enum_method.dart';
 
 part 'http_authentication_challenge.g.dart';
 
@@ -43,13 +44,13 @@ class HttpAuthenticationChallenge_ extends URLAuthenticationChallenge_ {
   ///**NOTE**: available only on iOS.
   String? error;
 
-  HttpAuthenticationChallenge_(
-      {required this.previousFailureCount,
-      required URLProtectionSpace_ protectionSpace,
-      @Deprecated("Use failureResponse instead") this.iosFailureResponse,
-      this.failureResponse,
-      this.proposedCredential,
-      @Deprecated("Use error instead") this.iosError,
-      this.error})
-      : super(protectionSpace: protectionSpace);
+  HttpAuthenticationChallenge_({
+    required this.previousFailureCount,
+    required URLProtectionSpace_ protectionSpace,
+    @Deprecated("Use failureResponse instead") this.iosFailureResponse,
+    this.failureResponse,
+    this.proposedCredential,
+    @Deprecated("Use error instead") this.iosError,
+    this.error,
+  }) : super(protectionSpace: protectionSpace);
 }

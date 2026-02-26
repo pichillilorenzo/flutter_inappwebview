@@ -1,13 +1,9 @@
 part of 'main.dart';
 
 void isSecureContext() {
-  final shouldSkip = kIsWeb
-      ? false
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebViewController.isMethodSupported(
+    PlatformInAppWebViewControllerMethod.isSecureContext,
+  );
 
   var url = !kIsWeb ? TEST_CROSS_PLATFORM_URL_1 : TEST_WEB_PLATFORM_URL_1;
 
@@ -40,7 +36,8 @@ void isSecureContext() {
 
     if (!kIsWeb) {
       await controller.loadUrl(
-          urlRequest: URLRequest(url: WebUri('http://example.com/')));
+        urlRequest: URLRequest(url: WebUri('http://example.com/')),
+      );
       await pageLoads.stream.first;
       expect(await controller.isSecureContext(), false);
     }

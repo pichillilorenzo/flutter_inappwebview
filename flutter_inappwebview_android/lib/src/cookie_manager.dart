@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
 /// Object specifying creation parameters for creating a [AndroidCookieManager].
@@ -22,7 +21,8 @@ class AndroidCookieManagerCreationParams
 
   /// Creates a [AndroidCookieManagerCreationParams] instance based on [PlatformCookieManagerCreationParams].
   factory AndroidCookieManagerCreationParams.fromPlatformCookieManagerCreationParams(
-      PlatformCookieManagerCreationParams params) {
+    PlatformCookieManagerCreationParams params,
+  ) {
     return AndroidCookieManagerCreationParams(params);
   }
 }
@@ -32,16 +32,26 @@ class AndroidCookieManager extends PlatformCookieManager
     with ChannelController {
   /// Creates a new [AndroidCookieManager].
   AndroidCookieManager(PlatformCookieManagerCreationParams params)
-      : super.implementation(
-          params is AndroidCookieManagerCreationParams
-              ? params
-              : AndroidCookieManagerCreationParams
-                  .fromPlatformCookieManagerCreationParams(params),
-        ) {
+    : super.implementation(
+        params is AndroidCookieManagerCreationParams
+            ? params
+            : AndroidCookieManagerCreationParams.fromPlatformCookieManagerCreationParams(
+                params,
+              ),
+      ) {
     channel = const MethodChannel(
-        'com.pichillilorenzo/flutter_inappwebview_cookiemanager');
+      'com.pichillilorenzo/flutter_inappwebview_cookiemanager',
+    );
     handler = handleMethod;
     initMethodCallHandler();
+  }
+
+  static final AndroidCookieManager _staticValue = AndroidCookieManager(
+    AndroidCookieManagerCreationParams(PlatformCookieManagerCreationParams()),
+  );
+
+  factory AndroidCookieManager.static() {
+    return _staticValue;
   }
 
   static AndroidCookieManager? _instance;
@@ -52,31 +62,34 @@ class AndroidCookieManager extends PlatformCookieManager
   }
 
   static AndroidCookieManager _init() {
-    _instance = AndroidCookieManager(AndroidCookieManagerCreationParams(
-        const PlatformCookieManagerCreationParams()));
+    _instance = AndroidCookieManager(
+      AndroidCookieManagerCreationParams(
+        const PlatformCookieManagerCreationParams(),
+      ),
+    );
     return _instance!;
   }
 
   Future<dynamic> _handleMethod(MethodCall call) async {}
 
   @override
-  Future<bool> setCookie(
-      {required WebUri url,
-      required String name,
-      required String value,
-      String path = "/",
-      String? domain,
-      int? expiresDate,
-      int? maxAge,
-      bool? isSecure,
-      bool? isHttpOnly,
-      HTTPCookieSameSitePolicy? sameSite,
-      @Deprecated("Use webViewController instead")
-      PlatformInAppWebViewController? iosBelow11WebViewController,
-      PlatformInAppWebViewController? webViewController}) async {
+  Future<bool> setCookie({
+    required WebUri url,
+    required String name,
+    required String value,
+    String path = "/",
+    String? domain,
+    int? expiresDate,
+    int? maxAge,
+    bool? isSecure,
+    bool? isHttpOnly,
+    HTTPCookieSameSitePolicy? sameSite,
+    @Deprecated("Use webViewController instead")
+    PlatformInAppWebViewController? iosBelow11WebViewController,
+    PlatformInAppWebViewController? webViewController,
+  }) async {
     assert(url.toString().isNotEmpty);
     assert(name.isNotEmpty);
-    assert(value.isNotEmpty);
     assert(path.isNotEmpty);
 
     Map<String, dynamic> args = <String, dynamic>{};
@@ -95,11 +108,12 @@ class AndroidCookieManager extends PlatformCookieManager
   }
 
   @override
-  Future<List<Cookie>> getCookies(
-      {required WebUri url,
-      @Deprecated("Use webViewController instead")
-      PlatformInAppWebViewController? iosBelow11WebViewController,
-      PlatformInAppWebViewController? webViewController}) async {
+  Future<List<Cookie>> getCookies({
+    required WebUri url,
+    @Deprecated("Use webViewController instead")
+    PlatformInAppWebViewController? iosBelow11WebViewController,
+    PlatformInAppWebViewController? webViewController,
+  }) async {
     assert(url.toString().isNotEmpty);
 
     List<Cookie> cookies = [];
@@ -111,28 +125,33 @@ class AndroidCookieManager extends PlatformCookieManager
     cookieListMap = cookieListMap.cast<Map<dynamic, dynamic>>();
 
     cookieListMap.forEach((cookieMap) {
-      cookies.add(Cookie(
+      cookies.add(
+        Cookie(
           name: cookieMap["name"],
           value: cookieMap["value"],
           expiresDate: cookieMap["expiresDate"],
           isSessionOnly: cookieMap["isSessionOnly"],
           domain: cookieMap["domain"],
-          sameSite:
-              HTTPCookieSameSitePolicy.fromNativeValue(cookieMap["sameSite"]),
+          sameSite: HTTPCookieSameSitePolicy.fromNativeValue(
+            cookieMap["sameSite"],
+          ),
           isSecure: cookieMap["isSecure"],
           isHttpOnly: cookieMap["isHttpOnly"],
-          path: cookieMap["path"]));
+          path: cookieMap["path"],
+        ),
+      );
     });
     return cookies;
   }
 
   @override
-  Future<Cookie?> getCookie(
-      {required WebUri url,
-      required String name,
-      @Deprecated("Use webViewController instead")
-      PlatformInAppWebViewController? iosBelow11WebViewController,
-      PlatformInAppWebViewController? webViewController}) async {
+  Future<Cookie?> getCookie({
+    required WebUri url,
+    required String name,
+    @Deprecated("Use webViewController instead")
+    PlatformInAppWebViewController? iosBelow11WebViewController,
+    PlatformInAppWebViewController? webViewController,
+  }) async {
     assert(url.toString().isNotEmpty);
     assert(name.isNotEmpty);
 
@@ -145,29 +164,32 @@ class AndroidCookieManager extends PlatformCookieManager
       cookies[i] = cookies[i].cast<String, dynamic>();
       if (cookies[i]["name"] == name)
         return Cookie(
-            name: cookies[i]["name"],
-            value: cookies[i]["value"],
-            expiresDate: cookies[i]["expiresDate"],
-            isSessionOnly: cookies[i]["isSessionOnly"],
-            domain: cookies[i]["domain"],
-            sameSite: HTTPCookieSameSitePolicy.fromNativeValue(
-                cookies[i]["sameSite"]),
-            isSecure: cookies[i]["isSecure"],
-            isHttpOnly: cookies[i]["isHttpOnly"],
-            path: cookies[i]["path"]);
+          name: cookies[i]["name"],
+          value: cookies[i]["value"],
+          expiresDate: cookies[i]["expiresDate"],
+          isSessionOnly: cookies[i]["isSessionOnly"],
+          domain: cookies[i]["domain"],
+          sameSite: HTTPCookieSameSitePolicy.fromNativeValue(
+            cookies[i]["sameSite"],
+          ),
+          isSecure: cookies[i]["isSecure"],
+          isHttpOnly: cookies[i]["isHttpOnly"],
+          path: cookies[i]["path"],
+        );
     }
     return null;
   }
 
   @override
-  Future<bool> deleteCookie(
-      {required WebUri url,
-      required String name,
-      String path = "/",
-      String? domain,
-      @Deprecated("Use webViewController instead")
-      PlatformInAppWebViewController? iosBelow11WebViewController,
-      PlatformInAppWebViewController? webViewController}) async {
+  Future<bool> deleteCookie({
+    required WebUri url,
+    required String name,
+    String path = "/",
+    String? domain,
+    @Deprecated("Use webViewController instead")
+    PlatformInAppWebViewController? iosBelow11WebViewController,
+    PlatformInAppWebViewController? webViewController,
+  }) async {
     assert(url.toString().isNotEmpty);
     assert(name.isNotEmpty);
 
@@ -180,13 +202,14 @@ class AndroidCookieManager extends PlatformCookieManager
   }
 
   @override
-  Future<bool> deleteCookies(
-      {required WebUri url,
-      String path = "/",
-      String? domain,
-      @Deprecated("Use webViewController instead")
-      PlatformInAppWebViewController? iosBelow11WebViewController,
-      PlatformInAppWebViewController? webViewController}) async {
+  Future<bool> deleteCookies({
+    required WebUri url,
+    String path = "/",
+    String? domain,
+    @Deprecated("Use webViewController instead")
+    PlatformInAppWebViewController? iosBelow11WebViewController,
+    PlatformInAppWebViewController? webViewController,
+  }) async {
     assert(url.toString().isNotEmpty);
 
     Map<String, dynamic> args = <String, dynamic>{};
@@ -207,6 +230,12 @@ class AndroidCookieManager extends PlatformCookieManager
     Map<String, dynamic> args = <String, dynamic>{};
     return await channel?.invokeMethod<bool>('removeSessionCookies', args) ??
         false;
+  }
+
+  @override
+  Future<void> flush() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    await channel?.invokeMethod('flush', args);
   }
 
   @override

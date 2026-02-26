@@ -2,6 +2,7 @@ import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_i
 
 import 'context_menu.dart';
 import '../util.dart';
+import '../types/enum_method.dart';
 
 part 'context_menu_item.g.dart';
 
@@ -28,12 +29,13 @@ class ContextMenuItem_ {
   Function()? action;
 
   @ExchangeableObjectConstructor()
-  ContextMenuItem_(
-      {this.id,
-      @Deprecated("Use id instead") this.androidId,
-      @Deprecated("Use id instead") this.iosId,
-      required this.title,
-      this.action}) {
+  ContextMenuItem_({
+    this.id,
+    @Deprecated("Use id instead") this.androidId,
+    @Deprecated("Use id instead") this.iosId,
+    required this.title,
+    this.action,
+  }) {
     if (Util.isAndroid) {
       // ignore: deprecated_member_use_from_same_package
       this.id = this.id ?? this.androidId;
@@ -47,7 +49,7 @@ class ContextMenuItem_ {
 
   @ExchangeableObjectMethod(toMapMergeWith: true)
   // ignore: unused_element
-  Map<String, dynamic> _toMapMergeWith() {
+  Map<String, dynamic> _toMapMergeWith({EnumMethod? enumMethod}) {
     return {"androidId": androidId, "iosId": iosId};
   }
 }

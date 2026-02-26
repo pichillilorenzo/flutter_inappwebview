@@ -10,10 +10,22 @@
     tools:context="com.pichillilorenzo.flutter_inappwebview_android.in_app_browser.InAppBrowserActivity"
     android:focusable="true">
 
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        app:titleTextColor="@android:color/black"
+        android:layout_alignParentTop="true"
+        android:elevation="4dp"
+        />
+
     <com.pichillilorenzo.flutter_inappwebview_android.pull_to_refresh.PullToRefreshLayout
         android:id="@+id/pullToRefresh"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_below="@id/toolbar">
         <com.pichillilorenzo.flutter_inappwebview_android.webview.in_app_webview.InAppWebView
             android:id="@+id/webView"
             android:layout_width="match_parent"
@@ -25,6 +37,8 @@
         style="@android:style/Widget.Holo.ProgressBar.Horizontal"
         android:layout_width="match_parent"
         android:layout_height="5dp"
+        android:layout_below="@id/toolbar"
+        android:elevation="5dp"
         android:max="100"
         android:progress="0" />
 

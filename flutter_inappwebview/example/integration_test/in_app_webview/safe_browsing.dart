@@ -1,11 +1,9 @@
 part of 'main.dart';
 
 void safeBrowsing() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![
-          TargetPlatform.android,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebView.isPropertySupported(
+    PlatformWebViewCreationParamsProperty.onSafeBrowsingHit,
+  );
 
   skippableGroup('safe browsing', () {
     skippableTestWidgets('onSafeBrowsingHit', (WidgetTester tester) async {
@@ -15,8 +13,9 @@ void safeBrowsing() {
           textDirection: TextDirection.ltr,
           child: InAppWebView(
             key: GlobalKey(),
-            initialUrlRequest:
-                URLRequest(url: TEST_CHROME_SAFE_BROWSING_MALWARE),
+            initialUrlRequest: URLRequest(
+              url: TEST_CHROME_SAFE_BROWSING_MALWARE,
+            ),
             initialSettings: InAppWebViewSettings(
               // if I set javaScriptEnabled to true, it will crash!
               javaScriptEnabled: false,
@@ -31,7 +30,9 @@ void safeBrowsing() {
             },
             onSafeBrowsingHit: (controller, url, threatType) async {
               return SafeBrowsingResponse(
-                  report: true, action: SafeBrowsingResponseAction.PROCEED);
+                report: true,
+                action: SafeBrowsingResponseAction.PROCEED,
+              );
             },
           ),
         ),
@@ -42,15 +43,19 @@ void safeBrowsing() {
     });
 
     skippableTest('getSafeBrowsingPrivacyPolicyUrl', () async {
-      expect(await InAppWebViewController.getSafeBrowsingPrivacyPolicyUrl(),
-          isNotNull);
+      expect(
+        await InAppWebViewController.getSafeBrowsingPrivacyPolicyUrl(),
+        isNotNull,
+      );
     });
 
     skippableTest('setSafeBrowsingWhitelist', () async {
       expect(
-          await InAppWebViewController.setSafeBrowsingAllowlist(
-              hosts: ["flutter.dev", "github.com"]),
-          true);
+        await InAppWebViewController.setSafeBrowsingAllowlist(
+          hosts: ["flutter.dev", "github.com"],
+        ),
+        true,
+      );
     });
   }, skip: shouldSkip);
 }

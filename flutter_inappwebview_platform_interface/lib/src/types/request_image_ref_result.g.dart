@@ -13,7 +13,10 @@ class RequestImageRefResult {
   RequestImageRefResult({this.url});
 
   ///Gets a possible [RequestImageRefResult] instance from a [Map] value.
-  static RequestImageRefResult? fromMap(Map<String, dynamic>? map) {
+  static RequestImageRefResult? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
@@ -24,10 +27,8 @@ class RequestImageRefResult {
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
-    return {
-      "url": url?.toString(),
-    };
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
+    return {"url": url?.toString()};
   }
 
   ///Converts instance to a map.

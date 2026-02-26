@@ -1,6 +1,8 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
+
 import '../in_app_webview/platform_webview.dart';
 import 'js_prompt_response_action.dart';
+import 'enum_method.dart';
 
 part 'js_prompt_response.g.dart';
 
@@ -28,12 +30,13 @@ class JsPromptResponse_ {
   ///Action used to confirm that the user hit confirm or cancel button.
   JsPromptResponseAction_? action;
 
-  JsPromptResponse_(
-      {this.message = "",
-      this.defaultValue = "",
-      this.handledByClient = false,
-      this.confirmButtonTitle = "",
-      this.cancelButtonTitle = "",
-      this.value,
-      this.action = JsPromptResponseAction_.CANCEL});
+  JsPromptResponse_({
+    this.message = "",
+    this.defaultValue = "",
+    this.handledByClient = false,
+    this.confirmButtonTitle = "",
+    this.cancelButtonTitle = "",
+    this.value,
+    this.action = JsPromptResponseAction_.CANCEL,
+  });
 }

@@ -9,17 +9,18 @@ part of 'print_job_page_order.dart';
 ///Class representing the page order that will be used to generate the pages of a [PlatformPrintJobController].
 class PrintJobPageOrder {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const PrintJobPageOrder._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory PrintJobPageOrder._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      PrintJobPageOrder._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => PrintJobPageOrder._internal(value, nativeValue());
 
   ///Ascending (back to front) page order.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   static final ASCENDING = PrintJobPageOrder._internalMultiPlatform(1, () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.macOS:
@@ -33,7 +34,7 @@ class PrintJobPageOrder {
   ///Descending (front to back) page order.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   static final DESCENDING = PrintJobPageOrder._internalMultiPlatform(-1, () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.macOS:
@@ -47,7 +48,7 @@ class PrintJobPageOrder {
   ///The spooler does not rearrange pages—they are printed in the order received by the spooler.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   static final SPECIAL = PrintJobPageOrder._internalMultiPlatform(0, () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.macOS:
@@ -61,7 +62,7 @@ class PrintJobPageOrder {
   ///No page order specified.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   static final UNKNOWN = PrintJobPageOrder._internalMultiPlatform(2, () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.macOS:
@@ -84,8 +85,9 @@ class PrintJobPageOrder {
   static PrintJobPageOrder? fromValue(int? value) {
     if (value != null) {
       try {
-        return PrintJobPageOrder.values
-            .firstWhere((element) => element.toValue() == value);
+        return PrintJobPageOrder.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -97,8 +99,9 @@ class PrintJobPageOrder {
   static PrintJobPageOrder? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return PrintJobPageOrder.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return PrintJobPageOrder.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -106,20 +109,45 @@ class PrintJobPageOrder {
     return null;
   }
 
+  /// Gets a possible [PrintJobPageOrder] instance value with name [name].
+  ///
+  /// Goes through [PrintJobPageOrder.values] looking for a value with
+  /// name [name], as reported by [PrintJobPageOrder.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static PrintJobPageOrder? byName(String? name) {
+    if (name != null) {
+      try {
+        return PrintJobPageOrder.values.firstWhere(
+          (element) => element.name() == name,
+        );
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [PrintJobPageOrder] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, PrintJobPageOrder> asNameMap() =>
+      <String, PrintJobPageOrder>{
+        for (final value in PrintJobPageOrder.values) value.name(): value,
+      };
+
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
-  @override
-  int get hashCode => _value.hashCode;
-
-  @override
-  bool operator ==(value) => value == _value;
-
-  @override
-  String toString() {
+  ///Gets the name of the value.
+  String name() {
     switch (_value) {
       case 1:
         return 'ASCENDING';
@@ -131,5 +159,21 @@ class PrintJobPageOrder {
         return 'UNKNOWN';
     }
     return _value.toString();
+  }
+
+  @override
+  int get hashCode => _value.hashCode;
+
+  @override
+  bool operator ==(value) => value == _value;
+
+  ///Checks if the value is supported by the [defaultTargetPlatform].
+  bool isSupported() {
+    return _nativeValue != null;
+  }
+
+  @override
+  String toString() {
+    return name();
   }
 }

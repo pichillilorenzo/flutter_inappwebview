@@ -1,13 +1,9 @@
 part of 'main.dart';
 
 void onPageCommitVisible() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebView.isPropertySupported(
+    PlatformWebViewCreationParamsProperty.onPageCommitVisible,
+  );
 
   skippableTestWidgets('onPageCommitVisible', (WidgetTester tester) async {
     final Completer<InAppWebViewController> controllerCompleter =

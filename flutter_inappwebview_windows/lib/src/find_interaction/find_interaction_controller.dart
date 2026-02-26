@@ -11,16 +11,19 @@ import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_pla
 class WindowsFindInteractionControllerCreationParams
     extends PlatformFindInteractionControllerCreationParams {
   /// Creates a new [WindowsFindInteractionControllerCreationParams] instance.
-  const WindowsFindInteractionControllerCreationParams(
-      {super.onFindResultReceived});
+  const WindowsFindInteractionControllerCreationParams({
+    super.onFindResultReceived,
+  });
 
   /// Creates a [WindowsFindInteractionControllerCreationParams] instance based on [PlatformFindInteractionControllerCreationParams].
   factory WindowsFindInteractionControllerCreationParams.fromPlatformFindInteractionControllerCreationParams(
-      // Recommended placeholder to prevent being broken by platform interface.
-      // ignore: avoid_unused_constructor_parameters
-      PlatformFindInteractionControllerCreationParams params) {
+    // Recommended placeholder to prevent being broken by platform interface.
+    // ignore: avoid_unused_constructor_parameters
+    PlatformFindInteractionControllerCreationParams params,
+  ) {
     return WindowsFindInteractionControllerCreationParams(
-        onFindResultReceived: params.onFindResultReceived);
+      onFindResultReceived: params.onFindResultReceived,
+    );
   }
 }
 
@@ -29,21 +32,33 @@ class WindowsFindInteractionController extends PlatformFindInteractionController
     with ChannelController {
   /// Constructs a [WindowsFindInteractionController].
   WindowsFindInteractionController(
-      PlatformFindInteractionControllerCreationParams params)
-      : super.implementation(
-          params is WindowsFindInteractionControllerCreationParams
-              ? params
-              : WindowsFindInteractionControllerCreationParams
-                  .fromPlatformFindInteractionControllerCreationParams(params),
-        );
+    PlatformFindInteractionControllerCreationParams params,
+  ) : super.implementation(
+        params is WindowsFindInteractionControllerCreationParams
+            ? params
+            : WindowsFindInteractionControllerCreationParams.fromPlatformFindInteractionControllerCreationParams(
+                params,
+              ),
+      );
+
+  static final WindowsFindInteractionController _staticValue =
+      WindowsFindInteractionController(
+        const WindowsFindInteractionControllerCreationParams(),
+      );
+
+  /// Provide static access.
+  factory WindowsFindInteractionController.static() {
+    return _staticValue;
+  }
 
   _debugLog(String method, dynamic args) {
     debugLog(
-        className: this.runtimeType.toString(),
-        debugLoggingSettings:
-            PlatformFindInteractionController.debugLoggingSettings,
-        method: method,
-        args: args);
+      className: this.runtimeType.toString(),
+      debugLoggingSettings:
+          PlatformFindInteractionController.debugLoggingSettings,
+      method: method,
+      args: args,
+    );
   }
 
   Future<dynamic> _handleMethod(MethodCall call) async {
@@ -56,7 +71,11 @@ class WindowsFindInteractionController extends PlatformFindInteractionController
           int numberOfMatches = call.arguments["numberOfMatches"];
           bool isDoneCounting = call.arguments["isDoneCounting"];
           onFindResultReceived!(
-              this, activeMatchOrdinal, numberOfMatches, isDoneCounting);
+            this,
+            activeMatchOrdinal,
+            numberOfMatches,
+            isDoneCounting,
+          );
         }
         break;
       default:
@@ -66,6 +85,7 @@ class WindowsFindInteractionController extends PlatformFindInteractionController
   }
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.findAll}
+  @override
   Future<void> findAll({String? find}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('find', () => find);
@@ -73,6 +93,7 @@ class WindowsFindInteractionController extends PlatformFindInteractionController
   }
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.findNext}
+  @override
   Future<void> findNext({bool forward = true}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('forward', () => forward);
@@ -80,30 +101,43 @@ class WindowsFindInteractionController extends PlatformFindInteractionController
   }
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.clearMatches}
+  @override
   Future<void> clearMatches() async {
     Map<String, dynamic> args = <String, dynamic>{};
     await channel?.invokeMethod('clearMatches', args);
   }
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.setSearchText}
+  @override
   Future<void> setSearchText(String? searchText) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('searchText', () => searchText);
     await channel?.invokeMethod('setSearchText', args);
   }
 
+  ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.setFindOptions}
+  @override
+  Future<void> setFindOptions({FindOptions? options}) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('options', () => options?.toMap());
+    await channel?.invokeMethod('setFindOptions', args);
+  }
+
   ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.getSearchText}
+  @override
   Future<String?> getSearchText() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await channel?.invokeMethod<String?>('getSearchText', args);
   }
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.getActiveFindSession}
+  @override
   Future<FindSession?> getActiveFindSession() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    Map<String, dynamic>? result =
-        (await channel?.invokeMethod('getActiveFindSession', args))
-            ?.cast<String, dynamic>();
+    Map<String, dynamic>? result = (await channel?.invokeMethod(
+      'getActiveFindSession',
+      args,
+    ))?.cast<String, dynamic>();
     return FindSession.fromMap(result);
   }
 
@@ -118,7 +152,8 @@ extension InternalFindInteractionController
     on WindowsFindInteractionController {
   void init(dynamic id) {
     channel = MethodChannel(
-        'com.pichillilorenzo/flutter_inappwebview_find_interaction_$id');
+      'com.pichillilorenzo/flutter_inappwebview_find_interaction_$id',
+    );
     handler = _handleMethod;
     initMethodCallHandler();
   }

@@ -1,13 +1,9 @@
 part of 'main.dart';
 
 void getProgress() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebViewController.isMethodSupported(
+    PlatformInAppWebViewControllerMethod.getProgress,
+  );
 
   skippableTestWidgets('getProgress', (WidgetTester tester) async {
     final Completer<InAppWebViewController> controllerCompleter =

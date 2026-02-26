@@ -20,7 +20,10 @@ class LoginRequest {
   LoginRequest({this.account, required this.args, required this.realm});
 
   ///Gets a possible [LoginRequest] instance from a [Map] value.
-  static LoginRequest? fromMap(Map<String, dynamic>? map) {
+  static LoginRequest? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
@@ -33,12 +36,8 @@ class LoginRequest {
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
-    return {
-      "account": account,
-      "args": args,
-      "realm": realm,
-    };
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
+    return {"account": account, "args": args, "realm": realm};
   }
 
   ///Converts instance to a map.

@@ -91,7 +91,7 @@ public class WebMessageListener implements Disposable {
               "  var scheme = !isPageBlank ? window.location.protocol.replace(':', '') : null;" +
               "  var host = !isPageBlank ? window.location.hostname : null;" +
               "  var port = !isPageBlank ? window.location.port : null;" +
-              "  if (window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + "._isOriginAllowed(allowedOriginRules, scheme, host, port)) {" +
+              "  if (window." + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + "._isOriginAllowed(allowedOriginRules, scheme, host, port)) {" +
               "      window['" + jsObjectNameEscaped + "'] = new FlutterInAppWebViewWebMessageListener('" + jsObjectNameEscaped + "');" +
               "  }" +
               "})();";
@@ -101,7 +101,8 @@ public class WebMessageListener implements Disposable {
               UserScriptInjectionTime.AT_DOCUMENT_START,
               null,
               false,
-              null
+              webView.getCustomSettings().pluginScriptsOriginAllowList,
+              webView.getCustomSettings().pluginScriptsForMainFrameOnly
       ));
     }
   }

@@ -1,11 +1,9 @@
 part of 'main.dart';
 
 void sfSafariViewController() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![
-          TargetPlatform.iOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !ChromeSafariBrowser.isMethodSupported(
+    PlatformChromeSafariBrowserMethod.prewarmConnections,
+  );
 
   skippableGroup('SF Safari View Controller', () {
     skippableTest('onCompletedInitialLoad did load successfully', () async {
@@ -31,12 +29,14 @@ void sfSafariViewController() {
     // });
 
     skippableTest('create and invalidate Prewarming Token', () async {
-      final prewarmingToken =
-          await ChromeSafariBrowser.prewarmConnections([TEST_URL_1]);
+      final prewarmingToken = await ChromeSafariBrowser.prewarmConnections([
+        TEST_URL_1,
+      ]);
       expect(prewarmingToken, isNotNull);
       await expectLater(
-          ChromeSafariBrowser.invalidatePrewarmingToken(prewarmingToken!),
-          completes);
+        ChromeSafariBrowser.invalidatePrewarmingToken(prewarmingToken!),
+        completes,
+      );
     });
   }, skip: shouldSkip);
 }

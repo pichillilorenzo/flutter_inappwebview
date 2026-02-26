@@ -26,9 +26,11 @@
   <br>
   <a href="/heavy-page.html" id="link-heavy-page">Go to heavy-page</a>
   <script>
-    window.addEventListener('load', function (event) {
-      setTimeout(function () {
-        console.log('message');
+    window.addEventListener('flutterInAppWebViewPlatformReady', function (event) {
+      console.log('message');
+
+      window.flutter_inappwebview.callHandler('testHandler', 'Hello from page 1').then(function(result) {
+        console.log(result + 3);
       });
     });
   </script>

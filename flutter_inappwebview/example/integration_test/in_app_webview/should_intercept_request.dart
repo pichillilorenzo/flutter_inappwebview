@@ -1,17 +1,15 @@
 part of 'main.dart';
 
 void shouldInterceptRequest() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![
-          TargetPlatform.android,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebView.isPropertySupported(
+    PlatformWebViewCreationParamsProperty.shouldInterceptRequest,
+  );
 
   skippableTestWidgets('shouldInterceptRequest', (WidgetTester tester) async {
     List<String> resourceList = [
       "https://getbootstrap.com/docs/4.3/dist/css/bootstrap.min.css",
       "https://code.jquery.com/jquery-3.3.1.min.js",
-      "https://via.placeholder.com/100x50"
+      "https://via.placeholder.com/100x50",
     ];
     List<String> resourceLoaded = [];
 
@@ -25,7 +23,8 @@ void shouldInterceptRequest() {
         textDirection: TextDirection.ltr,
         child: InAppWebView(
           key: GlobalKey(),
-          initialData: InAppWebViewInitialData(data: """
+          initialData: InAppWebViewInitialData(
+            data: """
 <!doctype html>
 <html lang="en">
     <head>
@@ -39,7 +38,8 @@ void shouldInterceptRequest() {
       <img src="https://via.placeholder.com/100x50" alt="placeholder 100x50">
     </body>
 </html>
-                    """),
+                    """,
+          ),
           onWebViewCreated: (controller) {
             controllerCompleter.complete(controller);
           },

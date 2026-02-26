@@ -1,13 +1,9 @@
 part of 'main.dart';
 
 void javascriptHandler() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebViewController.isMethodSupported(
+    PlatformInAppWebViewControllerMethod.addJavaScriptHandler,
+  );
 
   skippableTestWidgets('JavaScript Handler', (WidgetTester tester) async {
     final Completer<InAppWebViewController> controllerCompleter =
@@ -28,24 +24,28 @@ void javascriptHandler() {
             controllerCompleter.complete(controller);
 
             controller.addJavaScriptHandler(
-                handlerName: 'handlerFoo',
-                callback: (args) {
-                  handlerFoo.complete();
-                  return Foo(bar: 'bar_value', baz: 'baz_value');
-                });
+              handlerName: 'handlerFoo',
+              callback: (args) {
+                handlerFoo.complete();
+                return Foo(bar: 'bar_value', baz: 'baz_value');
+              },
+            );
 
             controller.addJavaScriptHandler(
-                handlerName: 'handlerFooWithArgs',
-                callback: (args) {
-                  messagesReceived.add(args[0] as int);
-                  messagesReceived.add(args[1] as bool);
-                  messagesReceived.add(args[2] as List<dynamic>?);
-                  messagesReceived.add(
-                      args[3]?.cast<String, String>() as Map<String, String>?);
-                  messagesReceived.add(
-                      args[4]?.cast<String, String>() as Map<String, String>?);
-                  handlerFooWithArgs.complete();
-                });
+              handlerName: 'handlerFooWithArgs',
+              callback: (args) {
+                messagesReceived.add(args[0] as int);
+                messagesReceived.add(args[1] as bool);
+                messagesReceived.add(args[2] as List<dynamic>?);
+                messagesReceived.add(
+                  args[3]?.cast<String, String>() as Map<String, String>?,
+                );
+                messagesReceived.add(
+                  args[4]?.cast<String, String>() as Map<String, String>?,
+                );
+                handlerFooWithArgs.complete();
+              },
+            );
           },
           initialSettings: InAppWebViewSettings(javaScriptEnabled: true),
           onLoadStart: (controller, url) {
@@ -68,8 +68,8 @@ void javascriptHandler() {
     expect(listEquals(messagesReceived[2] as List<dynamic>?, ["bar", 5]), true);
     expect(mapEquals(messagesReceived[3], {"foo": "baz"}), true);
     expect(
-        mapEquals(
-            messagesReceived[4], {"bar": "bar_value", "baz": "baz_value"}),
-        true);
+      mapEquals(messagesReceived[4], {"bar": "bar_value", "baz": "baz_value"}),
+      true,
+    );
   }, skip: shouldSkip);
 }

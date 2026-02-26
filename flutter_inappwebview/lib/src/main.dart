@@ -7,6 +7,7 @@ export 'http_auth_credentials_database.dart';
 export 'pull_to_refresh/main.dart';
 export 'web_message/main.dart';
 export 'web_authentication_session/main.dart';
+export 'web_notification/main.dart';
 export 'print_job/main.dart';
 export 'find_interaction/main.dart';
 export 'service_worker_controller.dart';

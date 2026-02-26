@@ -1,12 +1,9 @@
 part of 'main.dart';
 
 void takeScreenshot() {
-  final shouldSkip = kIsWeb ||
-      ![
-        TargetPlatform.android,
-        TargetPlatform.iOS,
-        TargetPlatform.macOS,
-      ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebViewController.isMethodSupported(
+    PlatformInAppWebViewControllerMethod.takeScreenshot,
+  );
 
   skippableTest('take screenshot', () async {
     final Completer<InAppWebViewController> controllerCompleter =
@@ -14,15 +11,16 @@ void takeScreenshot() {
     final Completer<void> pageLoaded = Completer<void>();
 
     var headlessWebView = new HeadlessInAppWebView(
-        initialUrlRequest: URLRequest(url: TEST_URL_1),
-        onWebViewCreated: (controller) {
-          controllerCompleter.complete(controller);
-        },
-        onLoadStop: (controller, url) async {
-          if (!pageLoaded.isCompleted) {
-            pageLoaded.complete();
-          }
-        });
+      initialUrlRequest: URLRequest(url: TEST_URL_1),
+      onWebViewCreated: (controller) {
+        controllerCompleter.complete(controller);
+      },
+      onLoadStop: (controller, url) async {
+        if (!pageLoaded.isCompleted) {
+          pageLoaded.complete();
+        }
+      },
+    );
 
     await headlessWebView.run();
     expect(headlessWebView.isRunning(), true);

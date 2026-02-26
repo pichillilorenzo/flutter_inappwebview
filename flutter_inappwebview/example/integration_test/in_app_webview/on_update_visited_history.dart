@@ -1,13 +1,9 @@
 part of 'main.dart';
 
 void onUpdateVisitedHistory() {
-  final shouldSkip = kIsWeb
-      ? false
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebView.isPropertySupported(
+    PlatformWebViewCreationParamsProperty.onUpdateVisitedHistory,
+  );
 
   var url = !kIsWeb ? TEST_CROSS_PLATFORM_URL_1 : TEST_WEB_PLATFORM_URL_1;
 
@@ -46,7 +42,8 @@ void onUpdateVisitedHistory() {
     await tester.pump();
     await pageLoaded.future;
 
-    await controller.evaluateJavascript(source: """
+    await controller.evaluateJavascript(
+      source: """
 var state = {}
 var title = ''
 var url = 'first-push';
@@ -56,14 +53,19 @@ setTimeout(function() {
     var url = 'second-push';
     history.pushState(state, title, url);
 }, 500);
-""");
+""",
+    );
 
     var firstPushUrl = await firstPushCompleter.future;
-    expect(firstPushUrl,
-        '${!kIsWeb ? TEST_CROSS_PLATFORM_URL_1 : TEST_WEB_PLATFORM_BASE_URL}first-push');
+    expect(
+      firstPushUrl,
+      '${!kIsWeb ? TEST_CROSS_PLATFORM_URL_1 : TEST_WEB_PLATFORM_BASE_URL}first-push',
+    );
 
     var secondPushUrl = await secondPushCompleter.future;
-    expect(secondPushUrl,
-        '${!kIsWeb ? TEST_CROSS_PLATFORM_URL_1 : TEST_WEB_PLATFORM_BASE_URL}second-push');
+    expect(
+      secondPushUrl,
+      '${!kIsWeb ? TEST_CROSS_PLATFORM_URL_1 : TEST_WEB_PLATFORM_BASE_URL}second-push',
+    );
   }, skip: shouldSkip);
 }

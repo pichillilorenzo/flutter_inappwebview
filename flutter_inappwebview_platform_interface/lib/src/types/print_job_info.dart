@@ -6,6 +6,7 @@ import 'print_job_rendering_quality.dart';
 import 'print_job_state.dart';
 import 'print_job_page_order.dart';
 import 'printer.dart';
+import 'enum_method.dart';
 
 part 'print_job_info.g.dart';
 
@@ -125,21 +126,22 @@ class PrintJobInfo_ {
   ///- MacOS
   PrintJobAttributes_? attributes;
 
-  PrintJobInfo_(
-      {this.state,
-      this.copies,
-      this.numberOfPages,
-      this.creationTime,
-      this.label,
-      this.printer,
-      this.pageOrder,
-      this.preferredRenderingQuality,
-      this.showsProgressPanel,
-      this.showsPrintPanel,
-      this.canSpawnSeparateThread,
-      this.isCopyingOperation,
-      this.currentPage,
-      this.firstPage,
-      this.lastPage,
-      this.attributes});
+  PrintJobInfo_({
+    this.state,
+    this.copies,
+    this.numberOfPages,
+    this.creationTime,
+    this.label,
+    this.printer,
+    this.pageOrder,
+    this.preferredRenderingQuality,
+    this.showsProgressPanel,
+    this.showsPrintPanel,
+    this.canSpawnSeparateThread,
+    this.isCopyingOperation,
+    this.currentPage,
+    this.firstPage,
+    this.lastPage,
+    this.attributes,
+  });
 }

@@ -18,9 +18,10 @@ class IOSChromeSafariBrowserCreationParams
 
   /// Creates a [IOSChromeSafariBrowserCreationParams] instance based on [PlatformChromeSafariBrowserCreationParams].
   factory IOSChromeSafariBrowserCreationParams.fromPlatformChromeSafariBrowserCreationParams(
-      // Recommended placeholder to prevent being broken by platform interface.
-      // ignore: avoid_unused_constructor_parameters
-      PlatformChromeSafariBrowserCreationParams params) {
+    // Recommended placeholder to prevent being broken by platform interface.
+    // ignore: avoid_unused_constructor_parameters
+    PlatformChromeSafariBrowserCreationParams params,
+  ) {
     return IOSChromeSafariBrowserCreationParams();
   }
 }
@@ -33,15 +34,17 @@ class IOSChromeSafariBrowser extends PlatformChromeSafariBrowser
 
   /// Constructs a [IOSChromeSafariBrowser].
   IOSChromeSafariBrowser(PlatformChromeSafariBrowserCreationParams params)
-      : super.implementation(
-          params is IOSChromeSafariBrowserCreationParams
-              ? params
-              : IOSChromeSafariBrowserCreationParams
-                  .fromPlatformChromeSafariBrowserCreationParams(params),
-        );
+    : super.implementation(
+        params is IOSChromeSafariBrowserCreationParams
+            ? params
+            : IOSChromeSafariBrowserCreationParams.fromPlatformChromeSafariBrowserCreationParams(
+                params,
+              ),
+      );
 
-  static final IOSChromeSafariBrowser _staticValue =
-      IOSChromeSafariBrowser(IOSChromeSafariBrowserCreationParams());
+  static final IOSChromeSafariBrowser _staticValue = IOSChromeSafariBrowser(
+    IOSChromeSafariBrowserCreationParams(),
+  );
 
   /// Provide static access.
   factory IOSChromeSafariBrowser.static() {
@@ -50,23 +53,26 @@ class IOSChromeSafariBrowser extends PlatformChromeSafariBrowser
 
   Map<int, ChromeSafariBrowserMenuItem> _menuItems = new HashMap();
   bool _isOpened = false;
-  static const MethodChannel _staticChannel =
-      const MethodChannel('com.pichillilorenzo/flutter_chromesafaribrowser');
+  static const MethodChannel _staticChannel = const MethodChannel(
+    'com.pichillilorenzo/flutter_chromesafaribrowser',
+  );
 
   _init() {
-    channel =
-        MethodChannel('com.pichillilorenzo/flutter_chromesafaribrowser_$id');
+    channel = MethodChannel(
+      'com.pichillilorenzo/flutter_chromesafaribrowser_$id',
+    );
     handler = _handleMethod;
     initMethodCallHandler();
   }
 
   _debugLog(String method, dynamic args) {
     debugLog(
-        className: this.runtimeType.toString(),
-        id: id,
-        debugLoggingSettings: PlatformChromeSafariBrowser.debugLoggingSettings,
-        method: method,
-        args: args);
+      className: this.runtimeType.toString(),
+      id: id,
+      debugLoggingSettings: PlatformChromeSafariBrowser.debugLoggingSettings,
+      method: method,
+      args: args,
+    );
   }
 
   Future<dynamic> _handleMethod(MethodCall call) async {
@@ -113,21 +119,24 @@ class IOSChromeSafariBrowser extends PlatformChromeSafariBrowser
   }
 
   @override
-  Future<void> open(
-      {WebUri? url,
-      Map<String, String>? headers,
-      List<WebUri>? otherLikelyURLs,
-      WebUri? referrer,
-      @Deprecated('Use settings instead')
-      // ignore: deprecated_member_use_from_same_package
-      ChromeSafariBrowserClassOptions? options,
-      ChromeSafariBrowserSettings? settings}) async {
+  Future<void> open({
+    WebUri? url,
+    Map<String, String>? headers,
+    List<WebUri>? otherLikelyURLs,
+    WebUri? referrer,
+    @Deprecated('Use settings instead')
+    // ignore: deprecated_member_use_from_same_package
+    ChromeSafariBrowserClassOptions? options,
+    ChromeSafariBrowserSettings? settings,
+  }) async {
     assert(!_isOpened, 'The browser is already opened.');
     _isOpened = true;
 
     assert(url != null, 'The specified URL must not be null on iOS.');
-    assert(['http', 'https'].contains(url!.scheme),
-        'The specified URL has an unsupported scheme. Only HTTP and HTTPS URLs are supported on iOS.');
+    assert(
+      ['http', 'https'].contains(url!.scheme),
+      'The specified URL has an unsupported scheme. Only HTTP and HTTPS URLs are supported on iOS.',
+    );
     if (url != null) {
       assert(url.toString().isNotEmpty, 'The specified URL must not be empty.');
     }
@@ -139,7 +148,8 @@ class IOSChromeSafariBrowser extends PlatformChromeSafariBrowser
       menuItemList.add(value.toMap());
     });
 
-    var initialSettings = settings?.toMap() ??
+    var initialSettings =
+        settings?.toMap() ??
         options?.toMap() ??
         ChromeSafariBrowserSettings().toMap();
 
@@ -147,8 +157,10 @@ class IOSChromeSafariBrowser extends PlatformChromeSafariBrowser
     args.putIfAbsent('id', () => id);
     args.putIfAbsent('url', () => url?.toString());
     args.putIfAbsent('headers', () => headers);
-    args.putIfAbsent('otherLikelyURLs',
-        () => otherLikelyURLs?.map((e) => e.toString()).toList());
+    args.putIfAbsent(
+      'otherLikelyURLs',
+      () => otherLikelyURLs?.map((e) => e.toString()).toList(),
+    );
     args.putIfAbsent('referrer', () => referrer?.toString());
     args.putIfAbsent('settings', () => initialSettings);
     args.putIfAbsent('menuItemList', () => menuItemList);
@@ -190,15 +202,17 @@ class IOSChromeSafariBrowser extends PlatformChromeSafariBrowser
   Future<PrewarmingToken?> prewarmConnections(List<WebUri> URLs) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('URLs', () => URLs.map((e) => e.toString()).toList());
-    Map<String, dynamic>? result =
-        (await _staticChannel.invokeMethod("prewarmConnections", args))
-            ?.cast<String, dynamic>();
+    Map<String, dynamic>? result = (await _staticChannel.invokeMethod(
+      "prewarmConnections",
+      args,
+    ))?.cast<String, dynamic>();
     return PrewarmingToken.fromMap(result);
   }
 
   @override
   Future<void> invalidatePrewarmingToken(
-      PrewarmingToken prewarmingToken) async {
+    PrewarmingToken prewarmingToken,
+  ) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('prewarmingToken', () => prewarmingToken.toMap());
     await _staticChannel.invokeMethod("invalidatePrewarmingToken", args);

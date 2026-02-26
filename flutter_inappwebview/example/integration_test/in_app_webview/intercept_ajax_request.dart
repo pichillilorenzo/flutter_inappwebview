@@ -1,13 +1,9 @@
 part of 'main.dart';
 
 void interceptAjaxRequest() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebView.isPropertySupported(
+    PlatformWebViewCreationParamsProperty.shouldInterceptAjaxRequest,
+  );
 
   skippableGroup('intercept ajax request', () {
     skippableTestWidgets('send string data', (WidgetTester tester) async {
@@ -24,7 +20,9 @@ void interceptAjaxRequest() {
           textDirection: TextDirection.ltr,
           child: InAppWebView(
             key: GlobalKey(),
-            initialData: InAppWebViewInitialData(data: """
+            initialData: InAppWebViewInitialData(
+              data:
+                  """
 <!doctype html>
 <html lang="en">
     <head>
@@ -45,7 +43,8 @@ void interceptAjaxRequest() {
         </script>
     </body>
 </html>
-                    """),
+                    """,
+            ),
             onWebViewCreated: (controller) {
               controllerCompleter.complete(controller);
             },
@@ -83,13 +82,19 @@ void interceptAjaxRequest() {
           await onAjaxProgressCompleter.future;
 
       expect(
-          mapEquals(onAjaxReadyStateChangeValue,
-              {'firstname': 'Foo2', 'lastname': 'Bar2'}),
-          true);
+        mapEquals(onAjaxReadyStateChangeValue, {
+          'firstname': 'Foo2',
+          'lastname': 'Bar2',
+        }),
+        true,
+      );
       expect(
-          mapEquals(
-              onAjaxProgressValue, {'firstname': 'Foo2', 'lastname': 'Bar2'}),
-          true);
+        mapEquals(onAjaxProgressValue, {
+          'firstname': 'Foo2',
+          'lastname': 'Bar2',
+        }),
+        true,
+      );
     });
 
     skippableTestWidgets('send json data', (WidgetTester tester) async {
@@ -106,7 +111,9 @@ void interceptAjaxRequest() {
           textDirection: TextDirection.ltr,
           child: InAppWebView(
             key: GlobalKey(),
-            initialData: InAppWebViewInitialData(data: """
+            initialData: InAppWebViewInitialData(
+              data:
+                  """
 <!doctype html>
 <html lang="en">
     <head>
@@ -131,14 +138,17 @@ void interceptAjaxRequest() {
         </script>
     </body>
 </html>
-                    """),
+                    """,
+            ),
             onWebViewCreated: (controller) {
               controllerCompleter.complete(controller);
             },
             shouldInterceptAjaxRequest: (controller, ajaxRequest) async {
               String data = ajaxRequest.data;
-              assert(data.contains('"firstname":"Foo"') &&
-                  data.contains('"lastname":"Bar"'));
+              assert(
+                data.contains('"firstname":"Foo"') &&
+                    data.contains('"lastname":"Bar"'),
+              );
 
               ajaxRequest.responseType = 'json';
               ajaxRequest.data = '{"firstname": "Foo2", "lastname": "Bar2"}';
@@ -171,17 +181,24 @@ void interceptAjaxRequest() {
           await onAjaxProgressCompleter.future;
 
       expect(
-          mapEquals(onAjaxReadyStateChangeValue,
-              {'firstname': 'Foo2', 'lastname': 'Bar2'}),
-          true);
+        mapEquals(onAjaxReadyStateChangeValue, {
+          'firstname': 'Foo2',
+          'lastname': 'Bar2',
+        }),
+        true,
+      );
       expect(
-          mapEquals(
-              onAjaxProgressValue, {'firstname': 'Foo2', 'lastname': 'Bar2'}),
-          true);
+        mapEquals(onAjaxProgressValue, {
+          'firstname': 'Foo2',
+          'lastname': 'Bar2',
+        }),
+        true,
+      );
     });
 
-    skippableTestWidgets('send URLSearchParams data',
-        (WidgetTester tester) async {
+    skippableTestWidgets('send URLSearchParams data', (
+      WidgetTester tester,
+    ) async {
       final Completer<InAppWebViewController> controllerCompleter =
           Completer<InAppWebViewController>();
       final Completer shouldInterceptAjaxPostRequestCompleter =
@@ -195,7 +212,9 @@ void interceptAjaxRequest() {
           textDirection: TextDirection.ltr,
           child: InAppWebView(
             key: GlobalKey(),
-            initialData: InAppWebViewInitialData(data: """
+            initialData: InAppWebViewInitialData(
+              data:
+                  """
 <!doctype html>
 <html lang="en">
     <head>
@@ -218,7 +237,8 @@ void interceptAjaxRequest() {
         </script>
     </body>
 </html>
-                    """),
+                    """,
+            ),
             onWebViewCreated: (controller) {
               controllerCompleter.complete(controller);
             },
@@ -256,13 +276,19 @@ void interceptAjaxRequest() {
           await onAjaxProgressCompleter.future;
 
       expect(
-          mapEquals(onAjaxReadyStateChangeValue,
-              {'firstname': 'Foo2', 'lastname': 'Bar2'}),
-          true);
+        mapEquals(onAjaxReadyStateChangeValue, {
+          'firstname': 'Foo2',
+          'lastname': 'Bar2',
+        }),
+        true,
+      );
       expect(
-          mapEquals(
-              onAjaxProgressValue, {'firstname': 'Foo2', 'lastname': 'Bar2'}),
-          true);
+        mapEquals(onAjaxProgressValue, {
+          'firstname': 'Foo2',
+          'lastname': 'Bar2',
+        }),
+        true,
+      );
     });
 
     skippableTestWidgets('send FormData', (WidgetTester tester) async {
@@ -279,7 +305,9 @@ void interceptAjaxRequest() {
           textDirection: TextDirection.ltr,
           child: InAppWebView(
             key: GlobalKey(),
-            initialData: InAppWebViewInitialData(data: """
+            initialData: InAppWebViewInitialData(
+              data:
+                  """
 <!doctype html>
 <html lang="en">
     <head>
@@ -302,7 +330,8 @@ void interceptAjaxRequest() {
         </script>
     </body>
 </html>
-                    """),
+                    """,
+            ),
             onWebViewCreated: (controller) {
               controllerCompleter.complete(controller);
             },
@@ -313,9 +342,11 @@ void interceptAjaxRequest() {
               var bodyString = String.fromCharCodes(body);
               assert(bodyString.indexOf("WebKitFormBoundary") >= 0);
 
-              ajaxRequest.data = utf8.encode(bodyString
-                  .replaceFirst("Foo", "Foo2")
-                  .replaceFirst("Bar", "Bar2"));
+              ajaxRequest.data = utf8.encode(
+                bodyString
+                    .replaceFirst("Foo", "Foo2")
+                    .replaceFirst("Bar", "Bar2"),
+              );
               ajaxRequest.responseType = 'json';
               shouldInterceptAjaxPostRequestCompleter.complete(controller);
               return ajaxRequest;
@@ -346,13 +377,19 @@ void interceptAjaxRequest() {
           await onAjaxProgressCompleter.future;
 
       expect(
-          mapEquals(onAjaxReadyStateChangeValue,
-              {'firstname': 'Foo2', 'lastname': 'Bar2'}),
-          true);
+        mapEquals(onAjaxReadyStateChangeValue, {
+          'firstname': 'Foo2',
+          'lastname': 'Bar2',
+        }),
+        true,
+      );
       expect(
-          mapEquals(
-              onAjaxProgressValue, {'firstname': 'Foo2', 'lastname': 'Bar2'}),
-          true);
+        mapEquals(onAjaxProgressValue, {
+          'firstname': 'Foo2',
+          'lastname': 'Bar2',
+        }),
+        true,
+      );
     });
   }, skip: shouldSkip);
 }

@@ -1,13 +1,7 @@
 part of 'main.dart';
 
 void setGetSettings() {
-  final shouldSkip = kIsWeb
-      ? false
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = false;
 
   skippableTest('set/get settings', () async {
     final Completer<InAppWebViewController> controllerCompleter =
@@ -34,7 +28,8 @@ void setGetSettings() {
     expect(settings!.javaScriptEnabled, false);
 
     await controller.setSettings(
-        settings: InAppWebViewSettings(javaScriptEnabled: true));
+      settings: InAppWebViewSettings(javaScriptEnabled: true),
+    );
 
     settings = await controller.getSettings();
     expect(settings, isNotNull);

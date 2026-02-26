@@ -9,12 +9,13 @@ part of 'permission_response_action.dart';
 ///Class used by [PermissionResponse] class.
 class PermissionResponseAction {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const PermissionResponseAction._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory PermissionResponseAction._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      PermissionResponseAction._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => PermissionResponseAction._internal(value, nativeValue());
 
   ///Denies the request.
   static const DENY = PermissionResponseAction._internal(0, 0);
@@ -36,8 +37,9 @@ class PermissionResponseAction {
   static PermissionResponseAction? fromValue(int? value) {
     if (value != null) {
       try {
-        return PermissionResponseAction.values
-            .firstWhere((element) => element.toValue() == value);
+        return PermissionResponseAction.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -49,8 +51,9 @@ class PermissionResponseAction {
   static PermissionResponseAction? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return PermissionResponseAction.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return PermissionResponseAction.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -58,20 +61,46 @@ class PermissionResponseAction {
     return null;
   }
 
+  /// Gets a possible [PermissionResponseAction] instance value with name [name].
+  ///
+  /// Goes through [PermissionResponseAction.values] looking for a value with
+  /// name [name], as reported by [PermissionResponseAction.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static PermissionResponseAction? byName(String? name) {
+    if (name != null) {
+      try {
+        return PermissionResponseAction.values.firstWhere(
+          (element) => element.name() == name,
+        );
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [PermissionResponseAction] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, PermissionResponseAction> asNameMap() =>
+      <String, PermissionResponseAction>{
+        for (final value in PermissionResponseAction.values)
+          value.name(): value,
+      };
+
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
-  @override
-  int get hashCode => _value.hashCode;
-
-  @override
-  bool operator ==(value) => value == _value;
-
-  @override
-  String toString() {
+  ///Gets the name of the value.
+  String name() {
     switch (_value) {
       case 0:
         return 'DENY';
@@ -82,6 +111,22 @@ class PermissionResponseAction {
     }
     return _value.toString();
   }
+
+  @override
+  int get hashCode => _value.hashCode;
+
+  @override
+  bool operator ==(value) => value == _value;
+
+  ///Checks if the value is supported by the [defaultTargetPlatform].
+  bool isSupported() {
+    return _nativeValue != null;
+  }
+
+  @override
+  String toString() {
+    return name();
+  }
 }
 
 ///Class used by [PermissionRequestResponse] class.
@@ -89,13 +134,16 @@ class PermissionResponseAction {
 @Deprecated('Use PermissionResponseAction instead')
 class PermissionRequestResponseAction {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const PermissionRequestResponseAction._internal(
-      this._value, this._nativeValue);
-// ignore: unused_element
+    this._value,
+    this._nativeValue,
+  );
+  // ignore: unused_element
   factory PermissionRequestResponseAction._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      PermissionRequestResponseAction._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => PermissionRequestResponseAction._internal(value, nativeValue());
 
   ///Denies the request.
   static const DENY = PermissionRequestResponseAction._internal(0, 0);
@@ -113,8 +161,9 @@ class PermissionRequestResponseAction {
   static PermissionRequestResponseAction? fromValue(int? value) {
     if (value != null) {
       try {
-        return PermissionRequestResponseAction.values
-            .firstWhere((element) => element.toValue() == value);
+        return PermissionRequestResponseAction.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -126,8 +175,9 @@ class PermissionRequestResponseAction {
   static PermissionRequestResponseAction? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return PermissionRequestResponseAction.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return PermissionRequestResponseAction.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -135,20 +185,46 @@ class PermissionRequestResponseAction {
     return null;
   }
 
+  /// Gets a possible [PermissionRequestResponseAction] instance value with name [name].
+  ///
+  /// Goes through [PermissionRequestResponseAction.values] looking for a value with
+  /// name [name], as reported by [PermissionRequestResponseAction.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static PermissionRequestResponseAction? byName(String? name) {
+    if (name != null) {
+      try {
+        return PermissionRequestResponseAction.values.firstWhere(
+          (element) => element.name() == name,
+        );
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [PermissionRequestResponseAction] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, PermissionRequestResponseAction> asNameMap() =>
+      <String, PermissionRequestResponseAction>{
+        for (final value in PermissionRequestResponseAction.values)
+          value.name(): value,
+      };
+
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
-  @override
-  int get hashCode => _value.hashCode;
-
-  @override
-  bool operator ==(value) => value == _value;
-
-  @override
-  String toString() {
+  ///Gets the name of the value.
+  String name() {
     switch (_value) {
       case 0:
         return 'DENY';
@@ -156,5 +232,21 @@ class PermissionRequestResponseAction {
         return 'GRANT';
     }
     return _value.toString();
+  }
+
+  @override
+  int get hashCode => _value.hashCode;
+
+  @override
+  bool operator ==(value) => value == _value;
+
+  ///Checks if the value is supported by the [defaultTargetPlatform].
+  bool isSupported() {
+    return _nativeValue != null;
+  }
+
+  @override
+  String toString() {
+    return name();
   }
 }

@@ -1,19 +1,23 @@
 import 'dart:async';
-import 'dart:typed_data';
-import 'dart:ui';
+import 'dart:collection';
+import 'dart:convert';
+import 'dart:developer';
+import 'dart:js_interop';
+import 'dart:typed_data' as typed_data;
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
-import 'dart:js_interop';
-import 'dart:developer';
 import 'package:web/web.dart';
 
 import 'headless_inappwebview_manager.dart';
-import 'web_platform_manager.dart';
+import 'in_app_webview_manager.dart';
 import 'js_bridge.dart';
 
 extension on HTMLIFrameElement {
   // https://developer.mozilla.org/en-US/docs/Web/API/HTMLIFrameElement/csp
   external set csp(String? value);
+
   external String? get csp;
 }
 
@@ -26,15 +30,22 @@ class InAppWebViewWebElement implements Disposable {
   InAppWebViewSettings? initialSettings;
   URLRequest? initialUrlRequest;
   InAppWebViewInitialData? initialData;
+  UnmodifiableListView<UserScript>? initialUserScripts;
   String? initialFile;
   String? headlessWebViewId;
+  final UserContentController userContentController = UserContentController();
+  late final int? windowId;
 
   InAppWebViewSettings? settings;
   JSWebView? jsWebView;
   bool isLoading = false;
 
-  InAppWebViewWebElement(
-      {required dynamic viewId, required BinaryMessenger messenger}) {
+  late final String _expectedBridgeSecret;
+
+  InAppWebViewWebElement({
+    required dynamic viewId,
+    required BinaryMessenger messenger,
+  }) {
     this._viewId = viewId;
     this._messenger = messenger;
     iframeContainer = HTMLDivElement()
@@ -59,13 +70,31 @@ class InAppWebViewWebElement implements Disposable {
       try {
         return await handleMethodCall(call);
       } on Error catch (e) {
-        log(e.toString(),
-            name: runtimeType.toString(), error: e, stackTrace: e.stackTrace);
+        log(
+          e.toString(),
+          name: runtimeType.toString(),
+          error: e,
+          stackTrace: e.stackTrace,
+        );
       }
     });
 
+    try {
+      _expectedBridgeSecret = window.crypto.randomUUID();
+    } catch (e) {
+      _expectedBridgeSecret =
+          (window.crypto.getRandomValues(typed_data.Uint32List(5).toJS)
+                  as JSUint32Array)
+              .toDart
+              .join('-');
+    }
+
     jsWebView = flutterInAppWebView?.createFlutterInAppWebView(
-        _viewId, iframe, iframeContainer);
+      _viewId is int ? (_viewId as int).toJS : _viewId.toString().toJS,
+      iframe,
+      iframeContainer,
+      _expectedBridgeSecret,
+    );
   }
 
   /// Handles method calls over the MethodChannel of this plugin.
@@ -75,7 +104,8 @@ class InAppWebViewWebElement implements Disposable {
         return getIFrameId();
       case "loadUrl":
         URLRequest urlRequest = URLRequest.fromMap(
-            call.arguments["urlRequest"].cast<String, dynamic>())!;
+          call.arguments["urlRequest"].cast<String, dynamic>(),
+        )!;
         await loadUrl(urlRequest: urlRequest);
         break;
       case "loadData":
@@ -111,8 +141,10 @@ class InAppWebViewWebElement implements Disposable {
       case "getSettings":
         return await getSettings();
       case "setSettings":
-        InAppWebViewSettings newSettings = InAppWebViewSettings.fromMap(
-                call.arguments["settings"].cast<String, dynamic>()) ??
+        InAppWebViewSettings newSettings =
+            InAppWebViewSettings.fromMap(
+              call.arguments["settings"].cast<String, dynamic>(),
+            ) ??
             InAppWebViewSettings();
         await setSettings(newSettings);
         break;
@@ -126,10 +158,13 @@ class InAppWebViewWebElement implements Disposable {
         return await postUrl(url: url, postData: postData);
       case "injectJavascriptFileFromUrl":
         String urlFile = call.arguments["urlFile"];
-        Map<String, dynamic> scriptHtmlTagAttributes =
-            call.arguments["scriptHtmlTagAttributes"].cast<String, dynamic>();
+        Map<String, dynamic> scriptHtmlTagAttributes = call
+            .arguments["scriptHtmlTagAttributes"]
+            .cast<String, dynamic>();
         await injectJavascriptFileFromUrl(
-            urlFile: urlFile, scriptHtmlTagAttributes: scriptHtmlTagAttributes);
+          urlFile: urlFile,
+          scriptHtmlTagAttributes: scriptHtmlTagAttributes,
+        );
         break;
       case "injectCSSCode":
         String source = call.arguments["source"];
@@ -137,11 +172,13 @@ class InAppWebViewWebElement implements Disposable {
         break;
       case "injectCSSFileFromUrl":
         String urlFile = call.arguments["urlFile"];
-        Map<String, dynamic> cssLinkHtmlTagAttributes =
-            call.arguments["cssLinkHtmlTagAttributes"].cast<String, dynamic>();
+        Map<String, dynamic> cssLinkHtmlTagAttributes = call
+            .arguments["cssLinkHtmlTagAttributes"]
+            .cast<String, dynamic>();
         await injectCSSFileFromUrl(
-            urlFile: urlFile,
-            cssLinkHtmlTagAttributes: cssLinkHtmlTagAttributes);
+          urlFile: urlFile,
+          cssLinkHtmlTagAttributes: cssLinkHtmlTagAttributes,
+        );
         break;
       case "scrollTo":
         int x = call.arguments["x"];
@@ -176,6 +213,25 @@ class InAppWebViewWebElement implements Disposable {
         return await canScrollVertically();
       case "canScrollHorizontally":
         return await canScrollHorizontally();
+      case "addUserScript":
+        UserScript userScript = UserScript.fromMap(
+          call.arguments["userScript"].cast<String, dynamic>(),
+        )!;
+        userContentController.addUserOnlyScript(userScript);
+        break;
+      case "removeUserScript":
+        UserScript userScript = UserScript.fromMap(
+          call.arguments["userScript"].cast<String, dynamic>(),
+        )!;
+        userContentController.removeUserOnlyScript(userScript);
+        break;
+      case "removeUserScriptsByGroupName":
+        String groupName = call.arguments["groupName"];
+        userContentController.removeUserOnlyScriptsByGroupName(groupName);
+        break;
+      case "removeAllUserScripts":
+        userContentController.removeAllUserOnlyScripts();
+        break;
       case "dispose":
         dispose();
         break;
@@ -206,9 +262,14 @@ class InAppWebViewWebElement implements Disposable {
           initialUrlRequest = webView.initialUrlRequest;
           initialData = webView.initialData;
           initialFile = webView.initialFile;
+          initialUserScripts = webView.initialUserScripts;
 
           jsWebView = flutterInAppWebView?.createFlutterInAppWebView(
-              _viewId, iframe, iframeContainer);
+            _viewId is int ? (_viewId as int).toJS : _viewId.toString().toJS,
+            iframe,
+            iframeContainer,
+            _expectedBridgeSecret,
+          );
         }
       }
     }
@@ -226,29 +287,45 @@ class InAppWebViewWebElement implements Disposable {
       iframe.allow = settings!.iframeAllow ?? iframe.allow;
       iframe.allowFullscreen =
           settings!.iframeAllowFullscreen ?? iframe.allowFullscreen;
-      iframe.referrerPolicy = settings!.iframeReferrerPolicy?.toNativeValue() ??
+      iframe.referrerPolicy =
+          settings!.iframeReferrerPolicy?.toNativeValue() ??
           iframe.referrerPolicy;
       iframe.name = settings!.iframeName ?? iframe.name;
       iframe.csp = settings!.iframeCsp ?? iframe.csp;
+      iframe.role = settings!.iframeRole ?? iframe.role;
+      iframe.ariaHidden = settings!.iframeAriaHidden ?? iframe.ariaHidden;
 
       if (settings!.iframeSandbox != null &&
           settings!.iframeSandbox != Sandbox.ALLOW_ALL) {
-        iframe.setAttribute("sandbox",
-            settings!.iframeSandbox!.map((e) => e.toNativeValue()).join(" "));
+        iframe.setAttribute(
+          "sandbox",
+          settings!.iframeSandbox!.map((e) => e.toNativeValue()).join(" "),
+        );
       } else if (settings!.iframeSandbox == Sandbox.ALLOW_ALL) {
         iframe.removeAttribute("sandbox");
       } else if (sandbox != Sandbox.values) {
         iframe.setAttribute(
-            "sandbox", sandbox.map((e) => e.toNativeValue()).join(" "));
+          "sandbox",
+          sandbox.map((e) => e.toNativeValue()).join(" "),
+        );
         settings!.iframeSandbox = sandbox;
       }
+    }
+
+    if (initialUserScripts != null) {
+      userContentController.addUserOnlyScripts(initialUserScripts!.toList());
     }
 
     jsWebView?.prepare(settings?.toMap().jsify());
   }
 
   void makeInitialLoad() async {
-    if (initialUrlRequest != null) {
+    if (windowId != null) {
+      if (InAppWebViewManager.windowActions.containsKey(windowId!)) {
+        final createWindowAction = InAppWebViewManager.windowActions[windowId!];
+        loadUrl(urlRequest: createWindowAction!.request);
+      }
+    } else if (initialUrlRequest != null) {
       loadUrl(urlRequest: initialUrlRequest!);
     } else if (initialData != null) {
       loadData(data: initialData!.data, mimeType: initialData!.mimeType);
@@ -257,19 +334,23 @@ class InAppWebViewWebElement implements Disposable {
     }
   }
 
-  Future<XMLHttpRequest> _makeRequest(URLRequest urlRequest,
-      {bool? withCredentials,
-      String? responseType,
-      String? mimeType,
-      void onProgress(ProgressEvent e)?}) {
-    return HttpRequest.request(urlRequest.url?.toString() ?? 'about:blank',
-        method: urlRequest.method,
-        requestHeaders: urlRequest.headers,
-        sendData: urlRequest.body,
-        withCredentials: withCredentials,
-        responseType: responseType,
-        mimeType: mimeType,
-        onProgress: onProgress);
+  Future<XMLHttpRequest> _makeRequest(
+    URLRequest urlRequest, {
+    bool? withCredentials,
+    String? responseType,
+    String? mimeType,
+    void onProgress(ProgressEvent e)?,
+  }) {
+    return HttpRequest.request(
+      urlRequest.url?.toString() ?? 'about:blank',
+      method: urlRequest.method,
+      requestHeaders: urlRequest.headers,
+      sendData: urlRequest.body,
+      withCredentials: withCredentials,
+      responseType: responseType,
+      mimeType: mimeType,
+      onProgress: onProgress,
+    );
   }
 
   String _convertHttpResponseToData(XMLHttpRequest httpRequest) {
@@ -290,19 +371,27 @@ class InAppWebViewWebElement implements Disposable {
       try {
         iframe.src = _convertHttpResponseToData(await _makeRequest(urlRequest));
       } catch (e) {
-        log('Can\'t load the URLRequest for "${urlRequest.url}". Probably caused by a CORS policy error.',
-            name: runtimeType.toString(), error: e);
+        log(
+          'Can\'t load the URLRequest for "${urlRequest.url}". Probably caused by a CORS policy error.',
+          name: runtimeType.toString(),
+          error: e,
+        );
         if (urlRequest.method == null || urlRequest.method == "GET") {
-          log('Load the request using just the URL.',
-              name: runtimeType.toString(), error: e);
+          log(
+            'Load the request using just the URL.',
+            name: runtimeType.toString(),
+            error: e,
+          );
           iframe.src = urlRequest.url.toString();
         }
       }
     }
   }
 
-  Future<void> loadData(
-      {required String data, String mimeType = "text/html"}) async {
+  Future<void> loadData({
+    required String data,
+    String mimeType = "text/html",
+  }) async {
     iframe.src = 'data:$mimeType,' + Uri.encodeComponent(data);
   }
 
@@ -346,38 +435,52 @@ class InAppWebViewWebElement implements Disposable {
     return jsWebView?.getTitle()?.toDart;
   }
 
-  Future<void> postUrl(
-      {required String url, required Uint8List postData}) async {
+  Future<void> postUrl({
+    required String url,
+    required Uint8List postData,
+  }) async {
     await loadUrl(
-        urlRequest:
-            URLRequest(url: WebUri(url), method: "POST", body: postData));
+      urlRequest: URLRequest(url: WebUri(url), method: "POST", body: postData),
+    );
   }
 
-  Future<void> injectJavascriptFileFromUrl(
-      {required String urlFile,
-      Map<String, dynamic>? scriptHtmlTagAttributes}) async {
+  Future<void> injectJavascriptFileFromUrl({
+    required String urlFile,
+    Map<String, dynamic>? scriptHtmlTagAttributes,
+  }) async {
     jsWebView?.injectJavascriptFileFromUrl(
-        urlFile.toJS, scriptHtmlTagAttributes?.jsify());
+      urlFile.toJS,
+      scriptHtmlTagAttributes?.jsify(),
+    );
   }
 
   Future<void> injectCSSCode({required String source}) async {
     jsWebView?.injectCSSCode(source.toJS);
   }
 
-  Future<void> injectCSSFileFromUrl(
-      {required String urlFile,
-      Map<String, dynamic>? cssLinkHtmlTagAttributes}) async {
+  Future<void> injectCSSFileFromUrl({
+    required String urlFile,
+    Map<String, dynamic>? cssLinkHtmlTagAttributes,
+  }) async {
     jsWebView?.injectCSSFileFromUrl(
-        urlFile.toJS, cssLinkHtmlTagAttributes?.jsify());
+      urlFile.toJS,
+      cssLinkHtmlTagAttributes?.jsify(),
+    );
   }
 
-  Future<void> scrollTo(
-      {required int x, required int y, bool animated = false}) async {
+  Future<void> scrollTo({
+    required int x,
+    required int y,
+    bool animated = false,
+  }) async {
     jsWebView?.scrollTo(x.toJS, y.toJS, animated.toJS);
   }
 
-  Future<void> scrollBy(
-      {required int x, required int y, bool animated = false}) async {
+  Future<void> scrollBy({
+    required int x,
+    required int y,
+    bool animated = false,
+  }) async {
     jsWebView?.scrollBy(x.toJS, y.toJS, animated.toJS);
   }
 
@@ -470,18 +573,28 @@ class InAppWebViewWebElement implements Disposable {
     if (settings!.iframeCsp != newSettings.iframeCsp) {
       iframe.csp = newSettings.iframeCsp;
     }
+    if (settings!.iframeRole != newSettings.iframeRole) {
+      iframe.role = newSettings.iframeRole;
+    }
+    if (settings!.iframeAriaHidden != newSettings.iframeAriaHidden) {
+      iframe.ariaHidden = newSettings.iframeAriaHidden;
+    }
 
     if (settings!.iframeSandbox != newSettings.iframeSandbox) {
       var sandbox = newSettings.iframeSandbox;
       if (sandbox != null && sandbox != Sandbox.ALLOW_ALL) {
         iframe.setAttribute(
-            "sandbox", sandbox.map((e) => e.toNativeValue()).join(" "));
+          "sandbox",
+          sandbox.map((e) => e.toNativeValue()).join(" "),
+        );
       } else if (sandbox == Sandbox.ALLOW_ALL) {
         iframe.removeAttribute("sandbox");
       }
     } else if (sandbox != Sandbox.values) {
       iframe.setAttribute(
-          "sandbox", sandbox.map((e) => e.toNativeValue()).join(" "));
+        "sandbox",
+        sandbox.map((e) => e.toNativeValue()).join(" "),
+      );
     }
     newSettings.iframeSandbox = sandbox;
 
@@ -540,7 +653,10 @@ class InAppWebViewWebElement implements Disposable {
   }
 
   Future<bool?> onCreateWindow(
-      int windowId, String url, String? target, String? windowFeatures) async {
+    String url,
+    String? target,
+    String? windowFeatures,
+  ) async {
     Map<String, dynamic> windowFeaturesMap = {};
     List<String> features = windowFeatures?.split(",") ?? [];
     for (var feature in features) {
@@ -556,13 +672,32 @@ class InAppWebViewWebElement implements Disposable {
       }
     }
 
-    var obj = {
+    final windowId = InAppWebViewManager.windowAutoincrementId;
+    InAppWebViewManager.windowAutoincrementId++;
+
+    final createWindowAction = CreateWindowAction.fromMap({
       "windowId": windowId,
       "isForMainFrame": true,
       "request": {"url": url, "method": "GET"},
-      "windowFeatures": windowFeaturesMap
-    };
-    return await _channel?.invokeMethod("onCreateWindow", obj);
+      "windowFeatures": windowFeaturesMap,
+    });
+
+    InAppWebViewManager.windowActions[windowId] = createWindowAction!;
+    final handledByClient =
+        await _channel?.invokeMethod<bool>(
+          "onCreateWindow",
+          createWindowAction.toMap(),
+        ) ??
+        false;
+    if (!handledByClient &&
+        InAppWebViewManager.windowActions.containsKey(windowId)) {
+      InAppWebViewManager.windowActions.remove(windowId);
+    }
+    return handledByClient;
+  }
+
+  void onCloseWindow() async {
+    await _channel?.invokeMethod("onCloseWindow");
   }
 
   void onWindowFocus() async {
@@ -607,13 +742,112 @@ class InAppWebViewWebElement implements Disposable {
     await _channel?.invokeMethod("onInjectedScriptError", [id]);
   }
 
+  Future<dynamic> onCallJsHandler(
+    String handlerName,
+    Map<String, dynamic> data,
+  ) async {
+    final String bridgeSecret = data["_bridgeSecret"];
+    final String origin = data["origin"];
+
+    if (_expectedBridgeSecret != bridgeSecret) {
+      if (kDebugMode) {
+        print(
+          "Bridge access attempt with wrong secret token, possibly from malicious code from origin: " +
+              origin,
+        );
+      }
+      return null;
+    }
+
+    var isOriginAllowed = false;
+    var javaScriptHandlersOriginAllowList =
+        settings?.javaScriptHandlersOriginAllowList;
+    if (javaScriptHandlersOriginAllowList != null) {
+      for (String allowedOrigin in javaScriptHandlersOriginAllowList) {
+        if (RegExp(allowedOrigin).hasMatch(origin)) {
+          isOriginAllowed = true;
+          break;
+        }
+      }
+    } else {
+      // origin is by default allowed if the allow list is null
+      isOriginAllowed = true;
+    }
+    if (!isOriginAllowed) {
+      if (kDebugMode) {
+        print("Bridge access attempt from an origin not allowed: " + origin);
+      }
+      return null;
+    }
+
+    var obj = {"handlerName": handlerName, "data": data};
+    final result = await _channel?.invokeMethod<String>("onCallJsHandler", obj);
+    return result != null ? jsonDecode(result) : null;
+  }
+
   @override
   void dispose() {
     _channel?.setMethodCallHandler(null);
     _channel = null;
-    iframeContainer.remove();
-    if (WebPlatformManager.webViews.containsKey(_viewId)) {
-      WebPlatformManager.webViews.remove(_viewId);
+    if (windowId != null &&
+        InAppWebViewManager.windowActions.containsKey(windowId)) {
+      InAppWebViewManager.windowActions.remove(windowId);
     }
+    iframeContainer.remove();
+    if (InAppWebViewManager.webViews.containsKey(_viewId)) {
+      InAppWebViewManager.webViews.remove(_viewId);
+    }
+  }
+}
+
+class UserContentController implements Disposable {
+  final Map<UserScriptInjectionTime, List<UserScript>> _userOnlyScripts = {
+    UserScriptInjectionTime.AT_DOCUMENT_START: [],
+    UserScriptInjectionTime.AT_DOCUMENT_END: [],
+  };
+
+  UserContentController();
+
+  List<UserScript> getUserOnlyScriptsAt(UserScriptInjectionTime injectionTime) {
+    return _userOnlyScripts[injectionTime]!;
+  }
+
+  void addUserOnlyScript(UserScript userScript) {
+    _userOnlyScripts[userScript.injectionTime]!.add(userScript);
+  }
+
+  void addUserOnlyScripts(List<UserScript> userScripts) {
+    for (var userScript in userScripts) {
+      addUserOnlyScript(userScript);
+    }
+  }
+
+  bool removeUserOnlyScript(UserScript userScript) {
+    return _userOnlyScripts[userScript.injectionTime]!.remove(userScript);
+  }
+
+  UserScript removeUserOnlyScriptAt(
+    int index,
+    UserScriptInjectionTime injectionTime,
+  ) {
+    return _userOnlyScripts[injectionTime]!.removeAt(index);
+  }
+
+  void removeUserOnlyScriptsByGroupName(String groupName) {
+    for (var injectionTime in UserScriptInjectionTime.values) {
+      _userOnlyScripts[injectionTime]!.removeWhere(
+        (userScript) => userScript.groupName == groupName,
+      );
+    }
+  }
+
+  removeAllUserOnlyScripts() {
+    _userOnlyScripts[UserScriptInjectionTime.AT_DOCUMENT_START]!.clear();
+    _userOnlyScripts[UserScriptInjectionTime.AT_DOCUMENT_END]!.clear();
+  }
+
+  @override
+  void dispose() {
+    removeAllUserOnlyScripts();
   }
 }

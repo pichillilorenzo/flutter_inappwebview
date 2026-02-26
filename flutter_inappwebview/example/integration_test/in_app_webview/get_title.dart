@@ -1,13 +1,9 @@
 part of 'main.dart';
 
 void getTitle() {
-  final shouldSkip = kIsWeb
-      ? false
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebViewController.isMethodSupported(
+    PlatformInAppWebViewControllerMethod.getTitle,
+  );
 
   final String getTitleTest = '''
         <!DOCTYPE html><html>
@@ -17,8 +13,9 @@ void getTitle() {
         </body>
         </html>
       ''';
-  final String getTitleTestBase64 =
-      base64Encode(const Utf8Encoder().convert(getTitleTest));
+  final String getTitleTestBase64 = base64Encode(
+    const Utf8Encoder().convert(getTitleTest),
+  );
 
   var url = !kIsWeb
       ? WebUri('data:text/html;charset=utf-8;base64,$getTitleTestBase64')

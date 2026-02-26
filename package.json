@@ -4,24 +4,39 @@
   "private": true,
   "scripts": {
     "build": "cd flutter_inappwebview_platform_interface && ../.fvm/flutter_sdk/bin/flutter pub run build_runner build --delete-conflicting-outputs",
+    "build:windows": "cd flutter_inappwebview_platform_interface && ..\\.fvm\\flutter_sdk\\bin\\flutter.bat pub run build_runner build --delete-conflicting-outputs",
     "watch": "cd flutter_inappwebview_platform_interface && ../.fvm/flutter_sdk/bin/flutter pub run build_runner watch --delete-conflicting-outputs",
+    "watch:windows": "cd flutter_inappwebview_platform_interface && ..\\.fvm\\flutter_sdk\\bin\\flutter.bat pub run build_runner watch --delete-conflicting-outputs",
 
     "publish:dry": ".fvm/flutter_sdk/bin/flutter pub publish --dry-run",
+    "publish:dry:windows": ".fvm\\flutter_sdk\\bin\\flutter.bat pub publish --dry-run",
     "format": ".fvm/flutter_sdk/bin/dart format flutter_inappwebview/lib flutter_inappwebview/example/integration_test flutter_inappwebview_platform_interface/lib flutter_inappwebview_android/lib flutter_inappwebview_ios/lib flutter_inappwebview_macos/lib  flutter_inappwebview_web/lib  flutter_inappwebview_windows/lib",
+    "format:windows": ".fvm\\flutter_sdk\\bin\\dart.bat format flutter_inappwebview/lib flutter_inappwebview/example/integration_test flutter_inappwebview_platform_interface/lib flutter_inappwebview_android/lib flutter_inappwebview_ios/lib flutter_inappwebview_macos/lib  flutter_inappwebview_web/lib  flutter_inappwebview_windows/lib",
 
-    "docs:gen": "cd flutter_inappwebview && ../.fvm/flutter_sdk/bin/dart doc ../",
+    "docs:gen": "cd flutter_inappwebview && ../.fvm/flutter_sdk/bin/dart doc --output=../doc/api .",
+    "docs:gen:windows": "cd flutter_inappwebview && ..\\.fvm\\flutter_sdk\\bin\\dart.bat doc --output=../doc/api .",
     "docs:serve": ".fvm/flutter_sdk/bin/flutter pub global activate dhttpd && .fvm/flutter_sdk/bin/flutter pub global run dhttpd:dhttpd --path doc/api",
+    "docs:serve:windows": ".fvm\\flutter_sdk\\bin\\flutter.bat pub global activate dhttpd && .fvm\\flutter_sdk\\bin\\flutter.bat pub global run dhttpd:dhttpd --path doc/api",
 
     "publish:platform_interface": "cd flutter_inappwebview_platform_interface && ../.fvm/flutter_sdk/bin/flutter pub publish && cd ..",
+    "publish:platform_interface:windows": "cd flutter_inappwebview_platform_interface && ..\\.fvm\\flutter_sdk\\bin\\flutter.bat pub publish && cd ..",
     "publish:android": "cd flutter_inappwebview_android && ../.fvm/flutter_sdk/bin/flutter pub publish && cd ..",
+    "publish:android:windows": "cd flutter_inappwebview_android && ..\\.fvm\\flutter_sdk\\bin\\flutter.bat pub publish && cd ..",
     "publish:ios": "cd flutter_inappwebview_ios && ../.fvm/flutter_sdk/bin/flutter pub publish && cd ..",
+    "publish:ios:windows": "cd flutter_inappwebview_ios && ..\\.fvm\\flutter_sdk\\bin\\flutter.bat pub publish && cd ..",
     "publish:macos": "cd flutter_inappwebview_macos && ../.fvm/flutter_sdk/bin/flutter pub publish && cd ..",
+    "publish:macos:windows": "cd flutter_inappwebview_macos && ..\\.fvm\\flutter_sdk\\bin\\flutter.bat pub publish && cd ..",
     "publish:web": "cd flutter_inappwebview_web && ../.fvm/flutter_sdk/bin/flutter pub publish && cd ..",
+    "publish:web:windows": "cd flutter_inappwebview_web && ..\\.fvm\\flutter_sdk\\bin\\flutter.bat pub publish && cd ..",
     "publish:windows": "cd flutter_inappwebview_windows && ../.fvm/flutter_sdk/bin/flutter pub publish && cd ..",
+    "publish:windows:windows": "cd flutter_inappwebview_windows && ..\\.fvm\\flutter_sdk\\bin\\flutter.bat pub publish && cd ..",
     "publish:all_platforms": "npm run publish:android && npm run publish:ios && npm run publish:macos && npm run publish:web && npm run publish:windows",
+    "publish:all_platforms:windows": "npm run publish:android:windows && npm run publish:ios:windows && npm run publish:macos:windows && npm run publish:web:windows && npm run publish:windows:windows",
     "publish:interface_and_all_platforms": "npm run publish:platform_interface && npm run publish:all_platforms",
+    "publish:interface_and_all_platforms:windows": "npm run publish:platform_interface:windows && npm run publish:all_platforms:windows",
 
-    "publish:plugin": "cd flutter_inappwebview && ../.fvm/flutter_sdk/bin/flutter pub publish && cd .."
+    "publish:plugin": "cd flutter_inappwebview && ../.fvm/flutter_sdk/bin/flutter pub publish && cd ..",
+    "publish:plugin:windows": "cd flutter_inappwebview && ..\\.fvm\\flutter_sdk\\bin\\flutter.bat pub publish && cd .."
   },
   "repository": {
     "type": "git",

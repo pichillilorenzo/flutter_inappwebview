@@ -5,6 +5,7 @@
 #include <windows.graphics.capture.h>
 
 #include "../in_app_webview/in_app_webview_settings.h"
+#include "../plugin_scripts_js/javascript_bridge_js.h"
 #include "../types/url_request.h"
 #include "../types/user_script.h"
 #include "../utils/flutter.h"
@@ -42,12 +43,18 @@ namespace flutter_inappwebview_plugin
 
         graphics_context_ = std::make_unique<GraphicsContext>(rohelper_.get());
         compositor_ = graphics_context_->CreateCompositor();
+        if (compositor_) {
+          // fix for KernelBase.dll RaiseFailFastException
+          // when app is closing 
+          compositor_->AddRef();
+        }
         valid_ = graphics_context_->IsValid();
       }
     }
 
     windowClass_.lpszClassName = CustomPlatformView::CLASS_NAME;
     windowClass_.lpfnWndProc = &DefWindowProc;
+    windowClass_.style |= CS_NOCLOSE;
 
     RegisterClass(&windowClass_);
   }
@@ -81,6 +88,14 @@ namespace flutter_inappwebview_plugin
       auto keepAliveId = get_fl_map_value<std::string>(*arguments, "keepAliveId");
       disposeKeepAlive(keepAliveId);
       result->Success();
+    }
+    else if (string_equals(methodName, "setJavaScriptBridgeName")) {
+      auto bridgeName = get_fl_map_value<std::string>(*arguments, "bridgeName");
+      JavaScriptBridgeJS::set_JAVASCRIPT_BRIDGE_NAME(bridgeName);
+      result->Success();
+    }
+    else if (string_equals(methodName, "getJavaScriptBridgeName")) {
+      result->Success(JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME());
     }
     else {
       result->NotImplemented();

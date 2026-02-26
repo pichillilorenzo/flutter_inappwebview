@@ -1,20 +1,16 @@
 part of 'main.dart';
 
 void hideAndShow() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppBrowser.isClassSupported();
 
   skippableTest('hide and show', () async {
     var inAppBrowser = new MyInAppBrowser();
     await inAppBrowser.openUrlRequest(
-        urlRequest: URLRequest(url: TEST_URL_1),
-        settings: InAppBrowserClassSettings(
-            browserSettings: InAppBrowserSettings(hidden: true)));
+      urlRequest: URLRequest(url: TEST_URL_1),
+      settings: InAppBrowserClassSettings(
+        browserSettings: InAppBrowserSettings(hidden: true),
+      ),
+    );
     await inAppBrowser.browserCreated.future;
     await inAppBrowser.firstPageLoaded.future;
 

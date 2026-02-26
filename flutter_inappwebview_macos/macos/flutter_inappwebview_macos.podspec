@@ -14,15 +14,19 @@ A new Flutter plugin project.
   s.author           = { 'Your Company' => 'email@example.com' }
 
   s.source           = { :path => '.' }
-  s.source_files     = 'Classes/**/*'
-  s.resources = 'Storyboards/**/*.storyboard'
-  s.public_header_files = 'Classes/**/*.h'
+  s.source_files     = 'flutter_inappwebview_macos/Sources/flutter_inappwebview_macos/**/*.swift'
   s.dependency 'FlutterMacOS'
-  s.resource_bundles = {'flutter_inappwebview_macos_privacy' => ['Resources/PrivacyInfo.xcprivacy']}
+  s.resource_bundles = {'flutter_inappwebview_macos_privacy' => ['flutter_inappwebview_macos/Sources/flutter_inappwebview_macos/Resources/PrivacyInfo.xcprivacy']}
+
+  # swift-collections podspec doesn't declare macOS support, so we must use OrderedSet library
+  # s.dependency 'swift-collections', '~>1.1.1'
+  s.dependency 'OrderedSet', '~>6.0.3'
 
   s.platform = :osx, '10.14'
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES' }
+  s.xcconfig = {
+    'LIBRARY_SEARCH_PATHS' => '$(TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME)/ $(SDKROOT)/usr/lib/swift',
+    'LD_RUNPATH_SEARCH_PATHS' => '/usr/lib/swift',
+  }
   s.swift_version = '5.0'
-
-  s.dependency 'OrderedSet', '~>6.0.3'
 end

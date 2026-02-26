@@ -28,16 +28,19 @@ public class PrintJobController implements Disposable  {
   @Nullable
   public PrintJobSettings settings;
 
-  public PrintJobController(@NonNull String id, @NonNull android.print.PrintJob job,
-                            @Nullable PrintJobSettings settings, @NonNull InAppWebViewFlutterPlugin plugin) {
+  public PrintJobController(@NonNull String id, @Nullable PrintJobSettings settings,
+                            @NonNull InAppWebViewFlutterPlugin plugin) {
     this.id = id;
     this.plugin = plugin;
-    this.job = job;
     this.settings = settings;
     final MethodChannel channel = new MethodChannel(plugin.messenger, METHOD_CHANNEL_NAME_PREFIX + id);
     this.channelDelegate = new PrintJobChannelDelegate(this, channel);
   }
-  
+
+  public void setJob(@Nullable android.print.PrintJob job) {
+    this.job = job;
+  }
+
   public void cancel() {
     if (this.job != null) {
       this.job.cancel();
@@ -92,5 +95,9 @@ public class PrintJobController implements Disposable  {
       job = null;
     }
     plugin = null;
+  }
+
+  public void onComplete(boolean completed, @Nullable String error) {
+    if (channelDelegate != null) channelDelegate.onComplete(completed, error);
   }
 }

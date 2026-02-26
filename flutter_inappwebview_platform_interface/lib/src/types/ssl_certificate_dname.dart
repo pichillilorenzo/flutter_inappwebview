@@ -1,5 +1,6 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 
+import 'enum_method.dart';
 import 'ssl_certificate.dart';
 
 part 'ssl_certificate_dname.g.dart';
@@ -19,6 +20,10 @@ class SslCertificateDName_ {
   ///Organizational Unit (OU) component of the name
   String? UName;
 
-  SslCertificateDName_(
-      {this.CName = "", this.DName = "", this.OName = "", this.UName = ""});
+  SslCertificateDName_({
+    this.CName = "",
+    this.DName = "",
+    this.OName = "",
+    this.UName = "",
+  });
 }

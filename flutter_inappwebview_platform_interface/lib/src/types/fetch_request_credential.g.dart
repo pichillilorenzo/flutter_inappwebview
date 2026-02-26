@@ -13,21 +13,20 @@ class FetchRequestCredential {
   FetchRequestCredential({this.type});
 
   ///Gets a possible [FetchRequestCredential] instance from a [Map] value.
-  static FetchRequestCredential? fromMap(Map<String, dynamic>? map) {
+  static FetchRequestCredential? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
-    final instance = FetchRequestCredential(
-      type: map['type'],
-    );
+    final instance = FetchRequestCredential(type: map['type']);
     return instance;
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
-    return {
-      "type": type,
-    };
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
+    return {"type": type};
   }
 
   ///Converts instance to a map.

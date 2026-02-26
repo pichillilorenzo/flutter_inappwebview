@@ -19,16 +19,20 @@ class InAppWebViewRect {
 
   ///y position
   double y;
-  InAppWebViewRect(
-      {required this.x,
-      required this.y,
-      required this.width,
-      required this.height}) {
-    assert(this.x >= 0 && this.y >= 0 && this.width >= 0 && this.height >= 0);
+  InAppWebViewRect({
+    required this.x,
+    required this.y,
+    required this.width,
+    required this.height,
+  }) {
+    assert(this.width >= 0 && this.height >= 0);
   }
 
   ///Gets a possible [InAppWebViewRect] instance from a [Map] value.
-  static InAppWebViewRect? fromMap(Map<String, dynamic>? map) {
+  static InAppWebViewRect? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
@@ -42,13 +46,8 @@ class InAppWebViewRect {
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
-    return {
-      "height": height,
-      "width": width,
-      "x": x,
-      "y": y,
-    };
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
+    return {"height": height, "width": width, "x": x, "y": y};
   }
 
   ///Converts instance to a map.

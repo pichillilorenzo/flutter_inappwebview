@@ -9,9 +9,9 @@ part of 'force_dark.dart';
 ///Class used to indicate the force dark mode.
 class ForceDark {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const ForceDark._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory ForceDark._internalMultiPlatform(int value, Function nativeValue) =>
       ForceDark._internal(value, nativeValue());
 
@@ -36,8 +36,9 @@ class ForceDark {
   static ForceDark? fromValue(int? value) {
     if (value != null) {
       try {
-        return ForceDark.values
-            .firstWhere((element) => element.toValue() == value);
+        return ForceDark.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -49,8 +50,9 @@ class ForceDark {
   static ForceDark? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return ForceDark.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return ForceDark.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -58,20 +60,42 @@ class ForceDark {
     return null;
   }
 
+  /// Gets a possible [ForceDark] instance value with name [name].
+  ///
+  /// Goes through [ForceDark.values] looking for a value with
+  /// name [name], as reported by [ForceDark.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static ForceDark? byName(String? name) {
+    if (name != null) {
+      try {
+        return ForceDark.values.firstWhere((element) => element.name() == name);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [ForceDark] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, ForceDark> asNameMap() => <String, ForceDark>{
+    for (final value in ForceDark.values) value.name(): value,
+  };
+
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
-  @override
-  int get hashCode => _value.hashCode;
-
-  @override
-  bool operator ==(value) => value == _value;
-
-  @override
-  String toString() {
+  ///Gets the name of the value.
+  String name() {
     switch (_value) {
       case 1:
         return 'AUTO';
@@ -81,6 +105,22 @@ class ForceDark {
         return 'ON';
     }
     return _value.toString();
+  }
+
+  @override
+  int get hashCode => _value.hashCode;
+
+  @override
+  bool operator ==(value) => value == _value;
+
+  ///Checks if the value is supported by the [defaultTargetPlatform].
+  bool isSupported() {
+    return _nativeValue != null;
+  }
+
+  @override
+  String toString() {
+    return name();
   }
 }
 
@@ -92,12 +132,13 @@ class ForceDark {
 @Deprecated('Use ForceDark instead')
 class AndroidForceDark {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const AndroidForceDark._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory AndroidForceDark._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      AndroidForceDark._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => AndroidForceDark._internal(value, nativeValue());
 
   ///Enable force dark dependent on the state of the WebView parent view.
   static const FORCE_DARK_AUTO = AndroidForceDark._internal(1, 1);
@@ -120,8 +161,9 @@ class AndroidForceDark {
   static AndroidForceDark? fromValue(int? value) {
     if (value != null) {
       try {
-        return AndroidForceDark.values
-            .firstWhere((element) => element.toValue() == value);
+        return AndroidForceDark.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -133,8 +175,9 @@ class AndroidForceDark {
   static AndroidForceDark? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return AndroidForceDark.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return AndroidForceDark.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -142,20 +185,45 @@ class AndroidForceDark {
     return null;
   }
 
+  /// Gets a possible [AndroidForceDark] instance value with name [name].
+  ///
+  /// Goes through [AndroidForceDark.values] looking for a value with
+  /// name [name], as reported by [AndroidForceDark.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static AndroidForceDark? byName(String? name) {
+    if (name != null) {
+      try {
+        return AndroidForceDark.values.firstWhere(
+          (element) => element.name() == name,
+        );
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [AndroidForceDark] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, AndroidForceDark> asNameMap() =>
+      <String, AndroidForceDark>{
+        for (final value in AndroidForceDark.values) value.name(): value,
+      };
+
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
-  @override
-  int get hashCode => _value.hashCode;
-
-  @override
-  bool operator ==(value) => value == _value;
-
-  @override
-  String toString() {
+  ///Gets the name of the value.
+  String name() {
     switch (_value) {
       case 1:
         return 'FORCE_DARK_AUTO';
@@ -165,5 +233,21 @@ class AndroidForceDark {
         return 'FORCE_DARK_ON';
     }
     return _value.toString();
+  }
+
+  @override
+  int get hashCode => _value.hashCode;
+
+  @override
+  bool operator ==(value) => value == _value;
+
+  ///Checks if the value is supported by the [defaultTargetPlatform].
+  bool isSupported() {
+    return _nativeValue != null;
+  }
+
+  @override
+  String toString() {
+    return name();
   }
 }

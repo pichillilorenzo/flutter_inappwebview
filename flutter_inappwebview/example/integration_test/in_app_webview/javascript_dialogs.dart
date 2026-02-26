@@ -1,13 +1,9 @@
 part of 'main.dart';
 
 void javascriptDialogs() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebView.isPropertySupported(
+    PlatformWebViewCreationParamsProperty.onJsAlert,
+  );
 
   skippableTestWidgets('javascript dialogs', (WidgetTester tester) async {
     final Completer<InAppWebViewController> controllerCompleter =
@@ -23,23 +19,23 @@ void javascriptDialogs() {
         child: InAppWebView(
           key: GlobalKey(),
           initialFile: "test_assets/in_app_webview_on_js_dialog_test.html",
-          initialSettings: InAppWebViewSettings(
-            clearCache: true,
-          ),
+          initialSettings: InAppWebViewSettings(clearCache: true),
           onWebViewCreated: (controller) {
             controllerCompleter.complete(controller);
 
             controller.addJavaScriptHandler(
-                handlerName: 'confirm',
-                callback: (args) {
-                  confirmCompleter.complete(args[0] as bool);
-                });
+              handlerName: 'confirm',
+              callback: (args) {
+                confirmCompleter.complete(args[0] as bool);
+              },
+            );
 
             controller.addJavaScriptHandler(
-                handlerName: 'prompt',
-                callback: (args) {
-                  promptCompleter.complete(args[0] as String);
-                });
+              handlerName: 'prompt',
+              callback: (args) {
+                promptCompleter.complete(args[0] as String);
+              },
+            );
           },
           onLoadStop: (controller, url) {
             pageLoaded.complete();
@@ -56,7 +52,10 @@ void javascriptDialogs() {
           onJsPrompt: (controller, jsPromptRequest) async {
             JsPromptResponseAction action = JsPromptResponseAction.CONFIRM;
             return JsPromptResponse(
-                handledByClient: true, action: action, value: 'new value');
+              handledByClient: true,
+              action: action,
+              value: 'new value',
+            );
           },
         ),
       ),

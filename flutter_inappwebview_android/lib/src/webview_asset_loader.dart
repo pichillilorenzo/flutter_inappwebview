@@ -19,7 +19,8 @@ class AndroidPathHandlerCreationParams
 
   /// Creates a [AndroidPathHandlerCreationParams] instance based on [PlatformPathHandlerCreationParams].
   factory AndroidPathHandlerCreationParams.fromPlatformPathHandlerCreationParams(
-      PlatformPathHandlerCreationParams params) {
+    PlatformPathHandlerCreationParams params,
+  ) {
     return AndroidPathHandlerCreationParams(params);
   }
 }
@@ -38,7 +39,8 @@ abstract mixin class AndroidPathHandler
   void _init(PlatformPathHandlerCreationParams params) {
     this.path = params.path;
     channel = MethodChannel(
-        'com.pichillilorenzo/flutter_inappwebview_custompathhandler_${_id}');
+      'com.pichillilorenzo/flutter_inappwebview_custompathhandler_${_id}',
+    );
     handler = _handleMethod;
     initMethodCallHandler();
   }
@@ -54,7 +56,7 @@ abstract mixin class AndroidPathHandler
   }
 
   @override
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {"path": path, "type": type, "id": _id};
   }
 
@@ -92,7 +94,8 @@ class AndroidAssetsPathHandlerCreationParams
 
   /// Creates a [AndroidAssetsPathHandlerCreationParams] instance based on [PlatformAssetsPathHandlerCreationParams].
   factory AndroidAssetsPathHandlerCreationParams.fromPlatformAssetsPathHandlerCreationParams(
-      PlatformAssetsPathHandlerCreationParams params) {
+    PlatformAssetsPathHandlerCreationParams params,
+  ) {
     return AndroidAssetsPathHandlerCreationParams(params);
   }
 }
@@ -102,14 +105,26 @@ class AndroidAssetsPathHandler extends PlatformAssetsPathHandler
     with AndroidPathHandler, ChannelController {
   /// Constructs a [AndroidAssetsPathHandler].
   AndroidAssetsPathHandler(PlatformAssetsPathHandlerCreationParams params)
-      : super.implementation(
-          params is AndroidAssetsPathHandlerCreationParams
-              ? params
-              : AndroidAssetsPathHandlerCreationParams
-                  .fromPlatformAssetsPathHandlerCreationParams(params),
-        ) {
+    : super.implementation(
+        params is AndroidAssetsPathHandlerCreationParams
+            ? params
+            : AndroidAssetsPathHandlerCreationParams.fromPlatformAssetsPathHandlerCreationParams(
+                params,
+              ),
+      ) {
     _init(params);
   }
+
+  static final AndroidAssetsPathHandler _staticValue = AndroidAssetsPathHandler(
+    AndroidAssetsPathHandlerCreationParams(
+      PlatformAssetsPathHandlerCreationParams(
+        PlatformPathHandlerCreationParams(path: ''),
+      ),
+    ),
+  );
+
+  /// Creates a new empty [AndroidAssetsPathHandler] to access static methods.
+  factory AndroidAssetsPathHandler.static() => _staticValue;
 }
 
 /// Object specifying creation parameters for creating a [AndroidResourcesPathHandler].
@@ -129,7 +144,8 @@ class AndroidResourcesPathHandlerCreationParams
 
   /// Creates a [AndroidResourcesPathHandlerCreationParams] instance based on [PlatformResourcesPathHandlerCreationParams].
   factory AndroidResourcesPathHandlerCreationParams.fromPlatformResourcesPathHandlerCreationParams(
-      PlatformResourcesPathHandlerCreationParams params) {
+    PlatformResourcesPathHandlerCreationParams params,
+  ) {
     return AndroidResourcesPathHandlerCreationParams(params);
   }
 }
@@ -139,14 +155,27 @@ class AndroidResourcesPathHandler extends PlatformResourcesPathHandler
     with AndroidPathHandler, ChannelController {
   /// Constructs a [AndroidResourcesPathHandler].
   AndroidResourcesPathHandler(PlatformResourcesPathHandlerCreationParams params)
-      : super.implementation(
-          params is AndroidResourcesPathHandlerCreationParams
-              ? params
-              : AndroidResourcesPathHandlerCreationParams
-                  .fromPlatformResourcesPathHandlerCreationParams(params),
-        ) {
+    : super.implementation(
+        params is AndroidResourcesPathHandlerCreationParams
+            ? params
+            : AndroidResourcesPathHandlerCreationParams.fromPlatformResourcesPathHandlerCreationParams(
+                params,
+              ),
+      ) {
     _init(params);
   }
+
+  static final AndroidResourcesPathHandler _staticValue =
+      AndroidResourcesPathHandler(
+        AndroidResourcesPathHandlerCreationParams(
+          PlatformResourcesPathHandlerCreationParams(
+            PlatformPathHandlerCreationParams(path: ''),
+          ),
+        ),
+      );
+
+  /// Creates a new empty [AndroidResourcesPathHandler] to access static methods.
+  factory AndroidResourcesPathHandler.static() => _staticValue;
 }
 
 /// Object specifying creation parameters for creating a [AndroidInternalStoragePathHandler].
@@ -166,7 +195,8 @@ class AndroidInternalStoragePathHandlerCreationParams
 
   /// Creates a [AndroidInternalStoragePathHandlerCreationParams] instance based on [PlatformInternalStoragePathHandlerCreationParams].
   factory AndroidInternalStoragePathHandlerCreationParams.fromPlatformInternalStoragePathHandlerCreationParams(
-      PlatformInternalStoragePathHandlerCreationParams params) {
+    PlatformInternalStoragePathHandlerCreationParams params,
+  ) {
     return AndroidInternalStoragePathHandlerCreationParams(params);
   }
 }
@@ -177,15 +207,29 @@ class AndroidInternalStoragePathHandler
     with AndroidPathHandler, ChannelController {
   /// Constructs a [AndroidInternalStoragePathHandler].
   AndroidInternalStoragePathHandler(
-      PlatformInternalStoragePathHandlerCreationParams params)
-      : super.implementation(
-          params is AndroidInternalStoragePathHandlerCreationParams
-              ? params
-              : AndroidInternalStoragePathHandlerCreationParams
-                  .fromPlatformInternalStoragePathHandlerCreationParams(params),
-        ) {
+    PlatformInternalStoragePathHandlerCreationParams params,
+  ) : super.implementation(
+        params is AndroidInternalStoragePathHandlerCreationParams
+            ? params
+            : AndroidInternalStoragePathHandlerCreationParams.fromPlatformInternalStoragePathHandlerCreationParams(
+                params,
+              ),
+      ) {
     _init(params);
   }
+
+  static final AndroidInternalStoragePathHandler _staticValue =
+      AndroidInternalStoragePathHandler(
+        AndroidInternalStoragePathHandlerCreationParams(
+          PlatformInternalStoragePathHandlerCreationParams(
+            PlatformPathHandlerCreationParams(path: ''),
+            directory: '',
+          ),
+        ),
+      );
+
+  /// Creates a new empty [AndroidInternalStoragePathHandler] to access static methods.
+  factory AndroidInternalStoragePathHandler.static() => _staticValue;
 
   AndroidInternalStoragePathHandlerCreationParams get _internalParams =>
       params as AndroidInternalStoragePathHandlerCreationParams;
@@ -194,8 +238,8 @@ class AndroidInternalStoragePathHandler
   String get directory => _internalParams.directory;
 
   @override
-  Map<String, dynamic> toMap() {
-    return {...toMap(), 'directory': directory};
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
+    return {...super.toMap(), 'directory': directory};
   }
 }
 
@@ -216,7 +260,8 @@ class AndroidCustomPathHandlerCreationParams
 
   /// Creates a [AndroidCustomPathHandlerCreationParams] instance based on [PlatformCustomPathHandlerCreationParams].
   factory AndroidCustomPathHandlerCreationParams.fromPlatformCustomPathHandlerCreationParams(
-      PlatformCustomPathHandlerCreationParams params) {
+    PlatformCustomPathHandlerCreationParams params,
+  ) {
     return AndroidCustomPathHandlerCreationParams(params);
   }
 }
@@ -226,12 +271,24 @@ class AndroidCustomPathHandler extends PlatformCustomPathHandler
     with AndroidPathHandler, ChannelController {
   /// Constructs a [AndroidCustomPathHandler].
   AndroidCustomPathHandler(PlatformCustomPathHandlerCreationParams params)
-      : super.implementation(
-          params is AndroidCustomPathHandlerCreationParams
-              ? params
-              : AndroidCustomPathHandlerCreationParams
-                  .fromPlatformCustomPathHandlerCreationParams(params),
-        ) {
+    : super.implementation(
+        params is AndroidCustomPathHandlerCreationParams
+            ? params
+            : AndroidCustomPathHandlerCreationParams.fromPlatformCustomPathHandlerCreationParams(
+                params,
+              ),
+      ) {
     _init(params);
   }
+
+  static final AndroidCustomPathHandler _staticValue = AndroidCustomPathHandler(
+    AndroidCustomPathHandlerCreationParams(
+      PlatformCustomPathHandlerCreationParams(
+        PlatformPathHandlerCreationParams(path: ''),
+      ),
+    ),
+  );
+
+  /// Creates a new empty [AndroidCustomPathHandler] to access static methods.
+  factory AndroidCustomPathHandler.static() => _staticValue;
 }

@@ -15,9 +15,10 @@ class IOSWebAuthenticationSessionCreationParams
 
   /// Creates a [IOSWebAuthenticationSessionCreationParams] instance based on [PlatformWebAuthenticationSessionCreationParams].
   factory IOSWebAuthenticationSessionCreationParams.fromPlatformWebAuthenticationSessionCreationParams(
-      // Recommended placeholder to prevent being broken by platform interface.
-      // ignore: avoid_unused_constructor_parameters
-      PlatformWebAuthenticationSessionCreationParams params) {
+    // Recommended placeholder to prevent being broken by platform interface.
+    // ignore: avoid_unused_constructor_parameters
+    PlatformWebAuthenticationSessionCreationParams params,
+  ) {
     return IOSWebAuthenticationSessionCreationParams();
   }
 }
@@ -27,13 +28,14 @@ class IOSWebAuthenticationSession extends PlatformWebAuthenticationSession
     with ChannelController {
   /// Constructs a [IOSWebAuthenticationSession].
   IOSWebAuthenticationSession(
-      PlatformWebAuthenticationSessionCreationParams params)
-      : super.implementation(
-          params is IOSWebAuthenticationSessionCreationParams
-              ? params
-              : IOSWebAuthenticationSessionCreationParams
-                  .fromPlatformWebAuthenticationSessionCreationParams(params),
-        );
+    PlatformWebAuthenticationSessionCreationParams params,
+  ) : super.implementation(
+        params is IOSWebAuthenticationSessionCreationParams
+            ? params
+            : IOSWebAuthenticationSessionCreationParams.fromPlatformWebAuthenticationSessionCreationParams(
+                params,
+              ),
+      );
 
   static final IOSWebAuthenticationSession _staticValue =
       IOSWebAuthenticationSession(IOSWebAuthenticationSessionCreationParams());
@@ -59,19 +61,22 @@ class IOSWebAuthenticationSession extends PlatformWebAuthenticationSession
   late final WebAuthenticationSessionCompletionHandler onComplete;
 
   static const MethodChannel _staticChannel = const MethodChannel(
-      'com.pichillilorenzo/flutter_webauthenticationsession');
+    'com.pichillilorenzo/flutter_webauthenticationsession',
+  );
 
   @override
-  Future<IOSWebAuthenticationSession> create(
-      {required WebUri url,
-      String? callbackURLScheme,
-      WebAuthenticationSessionCompletionHandler onComplete,
-      WebAuthenticationSessionSettings? initialSettings}) async {
+  Future<IOSWebAuthenticationSession> create({
+    required WebUri url,
+    String? callbackURLScheme,
+    WebAuthenticationSessionCompletionHandler onComplete,
+    WebAuthenticationSessionSettings? initialSettings,
+  }) async {
     var session = IOSWebAuthenticationSession._create(
-        url: url,
-        callbackURLScheme: callbackURLScheme,
-        onComplete: onComplete,
-        initialSettings: initialSettings);
+      url: url,
+      callbackURLScheme: callbackURLScheme,
+      onComplete: onComplete,
+      initialSettings: initialSettings,
+    );
     initialSettings =
         session.initialSettings ?? WebAuthenticationSessionSettings();
     Map<String, dynamic> args = <String, dynamic>{};
@@ -83,32 +88,36 @@ class IOSWebAuthenticationSession extends PlatformWebAuthenticationSession
     return session;
   }
 
-  IOSWebAuthenticationSession._create(
-      {required this.url,
-      this.callbackURLScheme,
-      this.onComplete,
-      WebAuthenticationSessionSettings? initialSettings})
-      : super.implementation(IOSWebAuthenticationSessionCreationParams()) {
+  IOSWebAuthenticationSession._create({
+    required this.url,
+    this.callbackURLScheme,
+    this.onComplete,
+    WebAuthenticationSessionSettings? initialSettings,
+  }) : super.implementation(IOSWebAuthenticationSessionCreationParams()) {
     assert(url.toString().isNotEmpty);
-    assert(['http', 'https'].contains(url.scheme),
-        'The specified URL has an unsupported scheme. Only HTTP and HTTPS URLs are supported on iOS.');
+    assert(
+      ['http', 'https'].contains(url.scheme),
+      'The specified URL has an unsupported scheme. Only HTTP and HTTPS URLs are supported on iOS.',
+    );
 
     this.initialSettings =
         initialSettings ?? WebAuthenticationSessionSettings();
     channel = MethodChannel(
-        'com.pichillilorenzo/flutter_webauthenticationsession_$id');
+      'com.pichillilorenzo/flutter_webauthenticationsession_$id',
+    );
     handler = _handleMethod;
     initMethodCallHandler();
   }
 
   _debugLog(String method, dynamic args) {
     debugLog(
-        className: this.runtimeType.toString(),
-        debugLoggingSettings:
-            PlatformWebAuthenticationSession.debugLoggingSettings,
-        id: id,
-        method: method,
-        args: args);
+      className: this.runtimeType.toString(),
+      debugLoggingSettings:
+          PlatformWebAuthenticationSession.debugLoggingSettings,
+      id: id,
+      method: method,
+      args: args,
+    );
   }
 
   Future<dynamic> _handleMethod(MethodCall call) async {
@@ -119,7 +128,8 @@ class IOSWebAuthenticationSession extends PlatformWebAuthenticationSession
         String? url = call.arguments["url"];
         WebUri? uri = url != null ? WebUri(url) : null;
         var error = WebAuthenticationSessionError.fromNativeValue(
-            call.arguments["errorCode"]);
+          call.arguments["errorCode"],
+        );
         if (onComplete != null) {
           onComplete!(uri, error);
         }

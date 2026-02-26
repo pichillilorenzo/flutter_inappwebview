@@ -1,13 +1,9 @@
 part of 'main.dart';
 
 void sslRequest() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebView.isPropertySupported(
+    PlatformWebViewCreationParamsProperty.onReceivedServerTrustAuthRequest,
+  );
 
   skippableTestWidgets('SSL request', (WidgetTester tester) async {
     final Completer<InAppWebViewController> controllerCompleter =
@@ -19,7 +15,8 @@ void sslRequest() {
         child: InAppWebView(
           key: GlobalKey(),
           initialUrlRequest: URLRequest(
-              url: WebUri("https://${environment["NODE_SERVER_IP"]}:4433/")),
+            url: WebUri("https://${environment["NODE_SERVER_IP"]}:4433/"),
+          ),
           onWebViewCreated: (controller) {
             controllerCompleter.complete(controller);
           },
@@ -28,14 +25,16 @@ void sslRequest() {
           },
           onReceivedServerTrustAuthRequest: (controller, challenge) async {
             return new ServerTrustAuthResponse(
-                action: ServerTrustAuthResponseAction.PROCEED);
+              action: ServerTrustAuthResponseAction.PROCEED,
+            );
           },
           onReceivedClientCertRequest: (controller, challenge) async {
             return new ClientCertResponse(
-                certificatePath: "test_assets/certificate.pfx",
-                certificatePassword: "",
-                keyStoreType: "PKCS12",
-                action: ClientCertResponseAction.PROCEED);
+              certificatePath: "test_assets/certificate.pfx",
+              certificatePassword: "password",
+              keyStoreType: "PKCS12",
+              action: ClientCertResponseAction.PROCEED,
+            );
           },
         ),
       ),
@@ -44,7 +43,8 @@ void sslRequest() {
     await pageLoaded.future;
 
     final String h1Content = await controller.evaluateJavascript(
-        source: "document.body.querySelector('h1').textContent");
+      source: "document.body.querySelector('h1').textContent",
+    );
     expect(h1Content, "Authorized");
   }, skip: shouldSkip);
 }

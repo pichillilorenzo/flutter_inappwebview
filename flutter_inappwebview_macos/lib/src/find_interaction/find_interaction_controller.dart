@@ -11,16 +11,19 @@ import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_pla
 class MacOSFindInteractionControllerCreationParams
     extends PlatformFindInteractionControllerCreationParams {
   /// Creates a new [MacOSFindInteractionControllerCreationParams] instance.
-  const MacOSFindInteractionControllerCreationParams(
-      {super.onFindResultReceived});
+  const MacOSFindInteractionControllerCreationParams({
+    super.onFindResultReceived,
+  });
 
   /// Creates a [MacOSFindInteractionControllerCreationParams] instance based on [PlatformFindInteractionControllerCreationParams].
   factory MacOSFindInteractionControllerCreationParams.fromPlatformFindInteractionControllerCreationParams(
-      // Recommended placeholder to prevent being broken by platform interface.
-      // ignore: avoid_unused_constructor_parameters
-      PlatformFindInteractionControllerCreationParams params) {
+    // Recommended placeholder to prevent being broken by platform interface.
+    // ignore: avoid_unused_constructor_parameters
+    PlatformFindInteractionControllerCreationParams params,
+  ) {
     return MacOSFindInteractionControllerCreationParams(
-        onFindResultReceived: params.onFindResultReceived);
+      onFindResultReceived: params.onFindResultReceived,
+    );
   }
 }
 
@@ -29,21 +32,33 @@ class MacOSFindInteractionController extends PlatformFindInteractionController
     with ChannelController {
   /// Constructs a [MacOSFindInteractionController].
   MacOSFindInteractionController(
-      PlatformFindInteractionControllerCreationParams params)
-      : super.implementation(
-          params is MacOSFindInteractionControllerCreationParams
-              ? params
-              : MacOSFindInteractionControllerCreationParams
-                  .fromPlatformFindInteractionControllerCreationParams(params),
-        );
+    PlatformFindInteractionControllerCreationParams params,
+  ) : super.implementation(
+        params is MacOSFindInteractionControllerCreationParams
+            ? params
+            : MacOSFindInteractionControllerCreationParams.fromPlatformFindInteractionControllerCreationParams(
+                params,
+              ),
+      );
+
+  static final MacOSFindInteractionController _staticValue =
+      MacOSFindInteractionController(
+        MacOSFindInteractionControllerCreationParams(),
+      );
+
+  /// Provide static access.
+  factory MacOSFindInteractionController.static() {
+    return _staticValue;
+  }
 
   _debugLog(String method, dynamic args) {
     debugLog(
-        className: this.runtimeType.toString(),
-        debugLoggingSettings:
-            PlatformFindInteractionController.debugLoggingSettings,
-        method: method,
-        args: args);
+      className: this.runtimeType.toString(),
+      debugLoggingSettings:
+          PlatformFindInteractionController.debugLoggingSettings,
+      method: method,
+      args: args,
+    );
   }
 
   Future<dynamic> _handleMethod(MethodCall call) async {
@@ -56,7 +71,11 @@ class MacOSFindInteractionController extends PlatformFindInteractionController
           int numberOfMatches = call.arguments["numberOfMatches"];
           bool isDoneCounting = call.arguments["isDoneCounting"];
           onFindResultReceived!(
-              this, activeMatchOrdinal, numberOfMatches, isDoneCounting);
+            this,
+            activeMatchOrdinal,
+            numberOfMatches,
+            isDoneCounting,
+          );
         }
         break;
       default:
@@ -101,9 +120,10 @@ class MacOSFindInteractionController extends PlatformFindInteractionController
   ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.getActiveFindSession}
   Future<FindSession?> getActiveFindSession() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    Map<String, dynamic>? result =
-        (await channel?.invokeMethod('getActiveFindSession', args))
-            ?.cast<String, dynamic>();
+    Map<String, dynamic>? result = (await channel?.invokeMethod(
+      'getActiveFindSession',
+      args,
+    ))?.cast<String, dynamic>();
     return FindSession.fromMap(result);
   }
 
@@ -117,7 +137,8 @@ class MacOSFindInteractionController extends PlatformFindInteractionController
 extension InternalFindInteractionController on MacOSFindInteractionController {
   void init(dynamic id) {
     channel = MethodChannel(
-        'com.pichillilorenzo/flutter_inappwebview_find_interaction_$id');
+      'com.pichillilorenzo/flutter_inappwebview_find_interaction_$id',
+    );
     handler = _handleMethod;
     initMethodCallHandler();
   }

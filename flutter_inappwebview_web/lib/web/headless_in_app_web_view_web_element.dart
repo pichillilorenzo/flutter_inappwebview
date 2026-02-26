@@ -11,10 +11,11 @@ class HeadlessInAppWebViewWebElement extends ChannelController {
   late BinaryMessenger _messenger;
   InAppWebViewWebElement? webView;
 
-  HeadlessInAppWebViewWebElement(
-      {required this.id,
-      required BinaryMessenger messenger,
-      required this.webView}) {
+  HeadlessInAppWebViewWebElement({
+    required this.id,
+    required BinaryMessenger messenger,
+    required this.webView,
+  }) {
     this._messenger = messenger;
 
     channel = MethodChannel(
@@ -32,8 +33,9 @@ class HeadlessInAppWebViewWebElement extends ChannelController {
         dispose();
         break;
       case "setSize":
-        Size size =
-            MapSize.fromMap(call.arguments['size'].cast<String, dynamic>())!;
+        Size size = MapSize.fromMap(
+          call.arguments['size'].cast<String, dynamic>(),
+        )!;
         setSize(size);
         break;
       case "getSize":

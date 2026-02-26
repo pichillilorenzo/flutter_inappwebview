@@ -1,13 +1,7 @@
 part of 'main.dart';
 
 void openFileAndClose() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppBrowser.isClassSupported();
 
   skippableTest('open file and close', () async {
     var inAppBrowser = new MyInAppBrowser();
@@ -17,12 +11,14 @@ void openFileAndClose() {
     }, throwsAssertionError);
 
     await inAppBrowser.openFile(
-        assetFilePath: "test_assets/in_app_webview_initial_file_test.html");
+      assetFilePath: "test_assets/in_app_webview_initial_file_test.html",
+    );
     await inAppBrowser.browserCreated.future;
     expect(inAppBrowser.isOpened(), true);
     expect(() async {
       await inAppBrowser.openUrlRequest(
-          urlRequest: URLRequest(url: TEST_URL_1));
+        urlRequest: URLRequest(url: TEST_URL_1),
+      );
     }, throwsAssertionError);
 
     await inAppBrowser.firstPageLoaded.future;

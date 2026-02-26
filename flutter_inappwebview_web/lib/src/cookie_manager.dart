@@ -25,7 +25,8 @@ class WebPlatformCookieManagerCreationParams
 
   /// Creates a [WebPlatformCookieManagerCreationParams] instance based on [PlatformCookieManagerCreationParams].
   factory WebPlatformCookieManagerCreationParams.fromPlatformCookieManagerCreationParams(
-      PlatformCookieManagerCreationParams params) {
+    PlatformCookieManagerCreationParams params,
+  ) {
     return WebPlatformCookieManagerCreationParams(params);
   }
 }
@@ -35,16 +36,28 @@ class WebPlatformCookieManager extends PlatformCookieManager
     with ChannelController {
   /// Creates a new [WebPlatformCookieManager].
   WebPlatformCookieManager(PlatformCookieManagerCreationParams params)
-      : super.implementation(
-          params is WebPlatformCookieManagerCreationParams
-              ? params
-              : WebPlatformCookieManagerCreationParams
-                  .fromPlatformCookieManagerCreationParams(params),
-        ) {
+    : super.implementation(
+        params is WebPlatformCookieManagerCreationParams
+            ? params
+            : WebPlatformCookieManagerCreationParams.fromPlatformCookieManagerCreationParams(
+                params,
+              ),
+      ) {
     channel = const MethodChannel(
-        'com.pichillilorenzo/flutter_inappwebview_cookiemanager');
+      'com.pichillilorenzo/flutter_inappwebview_cookiemanager',
+    );
     handler = handleMethod;
     initMethodCallHandler();
+  }
+
+  static final WebPlatformCookieManager _staticValue = WebPlatformCookieManager(
+    WebPlatformCookieManagerCreationParams(
+      PlatformCookieManagerCreationParams(),
+    ),
+  );
+
+  factory WebPlatformCookieManager.static() {
+    return _staticValue;
   }
 
   static WebPlatformCookieManager? _instance;
@@ -55,60 +68,65 @@ class WebPlatformCookieManager extends PlatformCookieManager
   }
 
   static WebPlatformCookieManager _init() {
-    _instance = WebPlatformCookieManager(WebPlatformCookieManagerCreationParams(
-        const PlatformCookieManagerCreationParams()));
+    _instance = WebPlatformCookieManager(
+      WebPlatformCookieManagerCreationParams(
+        const PlatformCookieManagerCreationParams(),
+      ),
+    );
     return _instance!;
   }
 
   Future<dynamic> _handleMethod(MethodCall call) async {}
 
   @override
-  Future<bool> setCookie(
-      {required WebUri url,
-      required String name,
-      required String value,
-      String path = "/",
-      String? domain,
-      int? expiresDate,
-      int? maxAge,
-      bool? isSecure,
-      bool? isHttpOnly,
-      HTTPCookieSameSitePolicy? sameSite,
-      @Deprecated("Use webViewController instead")
-      PlatformInAppWebViewController? iosBelow11WebViewController,
-      PlatformInAppWebViewController? webViewController}) async {
+  Future<bool> setCookie({
+    required WebUri url,
+    required String name,
+    required String value,
+    String path = "/",
+    String? domain,
+    int? expiresDate,
+    int? maxAge,
+    bool? isSecure,
+    bool? isHttpOnly,
+    HTTPCookieSameSitePolicy? sameSite,
+    @Deprecated("Use webViewController instead")
+    PlatformInAppWebViewController? iosBelow11WebViewController,
+    PlatformInAppWebViewController? webViewController,
+  }) async {
     webViewController = webViewController ?? iosBelow11WebViewController;
 
     assert(url.toString().isNotEmpty);
     assert(name.isNotEmpty);
-    assert(value.isNotEmpty);
     assert(path.isNotEmpty);
 
     await _setCookieWithJavaScript(
-        url: url,
-        name: name,
-        value: value,
-        domain: domain,
-        path: path,
-        expiresDate: expiresDate,
-        maxAge: maxAge,
-        isSecure: isSecure,
-        sameSite: sameSite,
-        webViewController: webViewController);
+      url: url,
+      name: name,
+      value: value,
+      domain: domain,
+      path: path,
+      expiresDate: expiresDate,
+      maxAge: maxAge,
+      isSecure: isSecure,
+      sameSite: sameSite,
+      webViewController: webViewController,
+    );
     return true;
   }
 
-  Future<void> _setCookieWithJavaScript(
-      {required WebUri url,
-      required String name,
-      required String value,
-      String path = "/",
-      String? domain,
-      int? expiresDate,
-      int? maxAge,
-      bool? isSecure,
-      HTTPCookieSameSitePolicy? sameSite,
-      PlatformInAppWebViewController? webViewController}) async {
+  Future<void> _setCookieWithJavaScript({
+    required WebUri url,
+    required String name,
+    required String value,
+    String path = "/",
+    String? domain,
+    int? expiresDate,
+    int? maxAge,
+    bool? isSecure,
+    HTTPCookieSameSitePolicy? sameSite,
+    PlatformInAppWebViewController? webViewController,
+  }) async {
     var cookieValue = name + "=" + value + "; Path=" + path;
 
     if (domain != null) cookieValue += "; Domain=" + domain;
@@ -120,8 +138,8 @@ class WebPlatformCookieManager extends PlatformCookieManager
 
     if (isSecure != null && isSecure) cookieValue += "; Secure";
 
-    if (sameSite != null)
-      cookieValue += "; SameSite=" + sameSite.toNativeValue();
+    if (sameSite != null && sameSite.isSupported())
+      cookieValue += "; SameSite=" + sameSite.toNativeValue()!;
 
     cookieValue += ";";
 
@@ -130,42 +148,50 @@ class WebPlatformCookieManager extends PlatformCookieManager
           (await webViewController.getSettings())?.javaScriptEnabled ?? false;
       if (javaScriptEnabled) {
         await webViewController.evaluateJavascript(
-            source: 'document.cookie="$cookieValue"');
+          source: 'document.cookie="$cookieValue"',
+        );
         return;
       }
     }
 
     final setCookieCompleter = Completer<void>();
     final headlessWebView = WebPlatformHeadlessInAppWebView(
-        WebPlatformHeadlessInAppWebViewCreationParams(
-            initialUrlRequest: URLRequest(url: url),
-            onLoadStop: (controller, url) async {
-              await controller.evaluateJavascript(
-                  source: 'document.cookie="$cookieValue"');
-              setCookieCompleter.complete();
-            }));
+      WebPlatformHeadlessInAppWebViewCreationParams(
+        initialUrlRequest: URLRequest(url: url),
+        onLoadStop: (controller, url) async {
+          await controller.evaluateJavascript(
+            source: 'document.cookie="$cookieValue"',
+          );
+          setCookieCompleter.complete();
+        },
+      ),
+    );
     await headlessWebView.run();
     await setCookieCompleter.future;
     await headlessWebView.dispose();
   }
 
   @override
-  Future<List<Cookie>> getCookies(
-      {required WebUri url,
-      @Deprecated("Use webViewController instead")
-      PlatformInAppWebViewController? iosBelow11WebViewController,
-      PlatformInAppWebViewController? webViewController}) async {
+  Future<List<Cookie>> getCookies({
+    required WebUri url,
+    @Deprecated("Use webViewController instead")
+    PlatformInAppWebViewController? iosBelow11WebViewController,
+    PlatformInAppWebViewController? webViewController,
+  }) async {
     assert(url.toString().isNotEmpty);
 
     webViewController = webViewController ?? iosBelow11WebViewController;
 
     return await _getCookiesWithJavaScript(
-        url: url, webViewController: webViewController);
+      url: url,
+      webViewController: webViewController,
+    );
   }
 
-  Future<List<Cookie>> _getCookiesWithJavaScript(
-      {required WebUri url,
-      PlatformInAppWebViewController? webViewController}) async {
+  Future<List<Cookie>> _getCookiesWithJavaScript({
+    required WebUri url,
+    PlatformInAppWebViewController? webViewController,
+  }) async {
     assert(url.toString().isNotEmpty);
 
     List<Cookie> cookies = [];
@@ -174,18 +200,18 @@ class WebPlatformCookieManager extends PlatformCookieManager
       final javaScriptEnabled =
           (await webViewController.getSettings())?.javaScriptEnabled ?? false;
       if (javaScriptEnabled) {
-        List<String> documentCookies = (await webViewController
-                .evaluateJavascript(source: 'document.cookie') as String)
-            .split(';')
-            .map((documentCookie) => documentCookie.trim())
-            .toList();
+        List<String> documentCookies =
+            (await webViewController.evaluateJavascript(
+                      source: 'document.cookie',
+                    )
+                    as String)
+                .split(';')
+                .map((documentCookie) => documentCookie.trim())
+                .toList();
         documentCookies.forEach((documentCookie) {
           List<String> cookie = documentCookie.split('=');
           if (cookie.length > 1) {
-            cookies.add(Cookie(
-              name: cookie[0],
-              value: cookie[1],
-            ));
+            cookies.add(Cookie(name: cookie[0], value: cookie[1]));
           }
         });
         return cookies;
@@ -194,27 +220,28 @@ class WebPlatformCookieManager extends PlatformCookieManager
 
     final pageLoaded = Completer<void>();
     final headlessWebView = WebPlatformHeadlessInAppWebView(
-        WebPlatformHeadlessInAppWebViewCreationParams(
-      initialUrlRequest: URLRequest(url: url),
-      onLoadStop: (controller, url) async {
-        pageLoaded.complete();
-      },
-    ));
+      WebPlatformHeadlessInAppWebViewCreationParams(
+        initialUrlRequest: URLRequest(url: url),
+        onLoadStop: (controller, url) async {
+          pageLoaded.complete();
+        },
+      ),
+    );
     await headlessWebView.run();
     await pageLoaded.future;
 
-    List<String> documentCookies = (await headlessWebView.webViewController!
-            .evaluateJavascript(source: 'document.cookie') as String)
-        .split(';')
-        .map((documentCookie) => documentCookie.trim())
-        .toList();
+    List<String> documentCookies =
+        (await headlessWebView.webViewController!.evaluateJavascript(
+                  source: 'document.cookie',
+                )
+                as String)
+            .split(';')
+            .map((documentCookie) => documentCookie.trim())
+            .toList();
     documentCookies.forEach((documentCookie) {
       List<String> cookie = documentCookie.split('=');
       if (cookie.length > 1) {
-        cookies.add(Cookie(
-          name: cookie[0],
-          value: cookie[1],
-        ));
+        cookies.add(Cookie(name: cookie[0], value: cookie[1]));
       }
     });
     await headlessWebView.dispose();
@@ -222,72 +249,82 @@ class WebPlatformCookieManager extends PlatformCookieManager
   }
 
   @override
-  Future<Cookie?> getCookie(
-      {required WebUri url,
-      required String name,
-      @Deprecated("Use webViewController instead")
-      PlatformInAppWebViewController? iosBelow11WebViewController,
-      PlatformInAppWebViewController? webViewController}) async {
+  Future<Cookie?> getCookie({
+    required WebUri url,
+    required String name,
+    @Deprecated("Use webViewController instead")
+    PlatformInAppWebViewController? iosBelow11WebViewController,
+    PlatformInAppWebViewController? webViewController,
+  }) async {
     assert(url.toString().isNotEmpty);
     assert(name.isNotEmpty);
 
     webViewController = webViewController ?? iosBelow11WebViewController;
 
     List<Cookie> cookies = await _getCookiesWithJavaScript(
-        url: url, webViewController: webViewController);
-    return cookies
-        .cast<Cookie?>()
-        .firstWhere((cookie) => cookie!.name == name, orElse: () => null);
+      url: url,
+      webViewController: webViewController,
+    );
+    return cookies.cast<Cookie?>().firstWhere(
+      (cookie) => cookie!.name == name,
+      orElse: () => null,
+    );
   }
 
   @override
-  Future<bool> deleteCookie(
-      {required WebUri url,
-      required String name,
-      String path = "/",
-      String? domain,
-      @Deprecated("Use webViewController instead")
-      PlatformInAppWebViewController? iosBelow11WebViewController,
-      PlatformInAppWebViewController? webViewController}) async {
+  Future<bool> deleteCookie({
+    required WebUri url,
+    required String name,
+    String path = "/",
+    String? domain,
+    @Deprecated("Use webViewController instead")
+    PlatformInAppWebViewController? iosBelow11WebViewController,
+    PlatformInAppWebViewController? webViewController,
+  }) async {
     assert(url.toString().isNotEmpty);
     assert(name.isNotEmpty);
 
     webViewController = webViewController ?? iosBelow11WebViewController;
 
     await _setCookieWithJavaScript(
-        url: url,
-        name: name,
-        value: "",
-        path: path,
-        domain: domain,
-        maxAge: -1,
-        webViewController: webViewController);
+      url: url,
+      name: name,
+      value: "",
+      path: path,
+      domain: domain,
+      maxAge: -1,
+      webViewController: webViewController,
+    );
     return true;
   }
 
   @override
-  Future<bool> deleteCookies(
-      {required WebUri url,
-      String path = "/",
-      String? domain,
-      @Deprecated("Use webViewController instead")
-      PlatformInAppWebViewController? iosBelow11WebViewController,
-      PlatformInAppWebViewController? webViewController}) async {
+  Future<bool> deleteCookies({
+    required WebUri url,
+    String path = "/",
+    String? domain,
+    @Deprecated("Use webViewController instead")
+    PlatformInAppWebViewController? iosBelow11WebViewController,
+    PlatformInAppWebViewController? webViewController,
+  }) async {
     assert(url.toString().isNotEmpty);
 
     webViewController = webViewController ?? iosBelow11WebViewController;
 
     List<Cookie> cookies = await _getCookiesWithJavaScript(
-        url: url, webViewController: webViewController);
+      url: url,
+      webViewController: webViewController,
+    );
     for (var i = 0; i < cookies.length; i++) {
       await _setCookieWithJavaScript(
-          url: url,
-          name: cookies[i].name,
-          value: "",
-          path: path,
-          domain: domain,
-          maxAge: -1,
-          webViewController: webViewController);
+        url: url,
+        name: cookies[i].name,
+        value: "",
+        path: path,
+        domain: domain,
+        maxAge: -1,
+        webViewController: webViewController,
+      );
     }
     return true;
   }

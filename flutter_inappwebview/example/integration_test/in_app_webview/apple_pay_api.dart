@@ -1,12 +1,9 @@
 part of 'main.dart';
 
 void applePayAPI() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebViewSettings.isPropertySupported(
+    InAppWebViewSettingsProperty.applePayAPIEnabled,
+  );
 
   skippableTestWidgets('Apple Pay API enabled', (WidgetTester tester) async {
     final Completer<void> pageLoaded = Completer<void>();
@@ -17,7 +14,8 @@ void applePayAPI() {
         textDirection: TextDirection.ltr,
         child: InAppWebView(
           key: GlobalKey(),
-          initialData: InAppWebViewInitialData(data: """
+          initialData: InAppWebViewInitialData(
+            data: """
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -32,16 +30,15 @@ void applePayAPI() {
     </script>
 </body>
 </html>
-                  """),
-          initialSettings: InAppWebViewSettings(
-            applePayAPIEnabled: true,
+                  """,
           ),
+          initialSettings: InAppWebViewSettings(applePayAPIEnabled: true),
           onLoadStop: (controller, url) {
             pageLoaded.complete();
           },
           onJsAlert: (controller, jsAlertRequest) async {
             alertMessageCompleter.complete(jsAlertRequest.message);
-            return null;
+            return JsAlertResponse(handledByClient: true);
           },
         ),
       ),

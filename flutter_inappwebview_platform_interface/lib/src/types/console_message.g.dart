@@ -16,26 +16,42 @@ class ConsoleMessage {
 
   ///Console message level
   ConsoleMessageLevel messageLevel;
-  ConsoleMessage(
-      {this.message = "", this.messageLevel = ConsoleMessageLevel.LOG});
+  ConsoleMessage({this.message = "", ConsoleMessageLevel? messageLevel})
+    : messageLevel = messageLevel ?? ConsoleMessageLevel.LOG;
 
   ///Gets a possible [ConsoleMessage] instance from a [Map] value.
-  static ConsoleMessage? fromMap(Map<String, dynamic>? map) {
+  static ConsoleMessage? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
     final instance = ConsoleMessage();
-    instance.message = map['message'];
-    instance.messageLevel =
-        ConsoleMessageLevel.fromNativeValue(map['messageLevel'])!;
+    if (map['message'] != null) {
+      instance.message = map['message'];
+    }
+    if (map['messageLevel'] != null) {
+      instance.messageLevel = switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => ConsoleMessageLevel.fromNativeValue(
+          map['messageLevel'],
+        ),
+        EnumMethod.value => ConsoleMessageLevel.fromValue(map['messageLevel']),
+        EnumMethod.name => ConsoleMessageLevel.byName(map['messageLevel']),
+      }!;
+    }
     return instance;
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
       "message": message,
-      "messageLevel": messageLevel.toNativeValue(),
+      "messageLevel": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => messageLevel.toNativeValue(),
+        EnumMethod.value => messageLevel.toValue(),
+        EnumMethod.name => messageLevel.name(),
+      },
     };
   }
 

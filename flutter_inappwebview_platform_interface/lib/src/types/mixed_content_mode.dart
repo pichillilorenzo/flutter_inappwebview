@@ -11,8 +11,9 @@ class MixedContentMode_ {
 
   ///In this mode, the WebView will allow a secure origin to load content from any other origin, even if that origin is insecure.
   ///This is the least secure mode of operation for the WebView, and where possible apps should not set this mode.
-  static const MIXED_CONTENT_ALWAYS_ALLOW =
-      const MixedContentMode_._internal(0);
+  static const MIXED_CONTENT_ALWAYS_ALLOW = const MixedContentMode_._internal(
+    0,
+  );
 
   ///In this mode, the WebView will not allow a secure origin to load content from an insecure origin.
   ///This is the preferred and most secure mode of operation for the WebView and apps are strongly advised to use this mode.

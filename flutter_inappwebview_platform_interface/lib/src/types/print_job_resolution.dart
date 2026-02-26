@@ -1,6 +1,7 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 
 import '../print_job/main.dart';
+import 'enum_method.dart';
 
 part 'print_job_resolution.g.dart';
 
@@ -27,9 +28,10 @@ class PrintJobResolution_ {
   ///The horizontal resolution in DPI (dots per inch).
   final int horizontalDpi;
 
-  const PrintJobResolution_(
-      {required this.id,
-      required this.label,
-      required this.verticalDpi,
-      required this.horizontalDpi});
+  const PrintJobResolution_({
+    required this.id,
+    required this.label,
+    required this.verticalDpi,
+    required this.horizontalDpi,
+  });
 }

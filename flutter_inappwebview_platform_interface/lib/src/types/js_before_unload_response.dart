@@ -1,6 +1,8 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
+
 import '../in_app_webview/platform_webview.dart';
 import 'js_before_unload_response_action.dart';
+import 'enum_method.dart';
 
 part 'js_before_unload_response.g.dart';
 
@@ -22,10 +24,11 @@ class JsBeforeUnloadResponse_ {
   ///Action used to confirm that the user hit confirm or cancel button.
   JsBeforeUnloadResponseAction_? action;
 
-  JsBeforeUnloadResponse_(
-      {this.message = "",
-      this.handledByClient = false,
-      this.confirmButtonTitle = "",
-      this.cancelButtonTitle = "",
-      this.action = JsBeforeUnloadResponseAction_.CONFIRM});
+  JsBeforeUnloadResponse_({
+    this.message = "",
+    this.handledByClient = false,
+    this.confirmButtonTitle = "",
+    this.cancelButtonTitle = "",
+    this.action = JsBeforeUnloadResponseAction_.CONFIRM,
+  });
 }

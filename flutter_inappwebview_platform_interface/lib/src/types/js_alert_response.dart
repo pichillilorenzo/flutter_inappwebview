@@ -1,6 +1,8 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
+
 import '../in_app_webview/platform_webview.dart';
 import 'js_alert_response_action.dart';
+import 'enum_method.dart';
 
 part 'js_alert_response.g.dart';
 
@@ -19,9 +21,10 @@ class JsAlertResponse_ {
   ///Action used to confirm that the user hit confirm button.
   JsAlertResponseAction_? action;
 
-  JsAlertResponse_(
-      {this.message = "",
-      this.handledByClient = false,
-      this.confirmButtonTitle = "",
-      this.action = JsAlertResponseAction_.CONFIRM});
+  JsAlertResponse_({
+    this.message = "",
+    this.handledByClient = false,
+    this.confirmButtonTitle = "",
+    this.action = JsAlertResponseAction_.CONFIRM,
+  });
 }

@@ -8,8 +8,8 @@ namespace flutter_inappwebview_plugin
   {}
 
   WebResourceError::WebResourceError(const flutter::EncodableMap& map)
-    : description(get_fl_map_value<std::string>(map, "description")),
-    type(get_fl_map_value<int>(map, "type"))
+    : WebResourceError(get_fl_map_value<std::string>(map, "description"),
+      get_fl_map_value<int>(map, "type"))
   {}
 
   flutter::EncodableMap WebResourceError::toEncodableMap() const

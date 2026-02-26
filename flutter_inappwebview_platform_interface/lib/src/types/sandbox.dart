@@ -16,8 +16,9 @@ class Sandbox_ {
       return Sandbox._NONE;
     }
     try {
-      return Sandbox.values
-          .firstWhere((element) => element.toNativeValue() == value);
+      return Sandbox.values.firstWhere(
+        (element) => element.toNativeValue() == value,
+      );
     } catch (e) {
       return null;
     }
@@ -68,12 +69,14 @@ class Sandbox_ {
   static const ALLOW_MODALS = const Sandbox_._internal("allow-modals");
 
   ///Lets the resource lock the screen orientation.
-  static const ALLOW_ORIENTATION_LOCK =
-      const Sandbox_._internal("allow-orientation-lock");
+  static const ALLOW_ORIENTATION_LOCK = const Sandbox_._internal(
+    "allow-orientation-lock",
+  );
 
   ///Lets the resource use the Pointer Lock API.
-  static const ALLOW_POINTER_LOCK =
-      const Sandbox_._internal("allow-pointer-lock");
+  static const ALLOW_POINTER_LOCK = const Sandbox_._internal(
+    "allow-pointer-lock",
+  );
 
   ///Allows popups (such as `window.open()`, `target="_blank"`, or `showModalDialog()`).
   ///If this keyword is not used, the popup will silently fail to open.
@@ -81,24 +84,28 @@ class Sandbox_ {
 
   ///Lets the sandboxed document open new windows without those windows inheriting the sandboxing.
   ///For example, this can safely sandbox an advertisement without forcing the same restrictions upon the page the ad links to.
-  static const ALLOW_POPUPS_TO_ESCAPE_SANDBOX =
-      const Sandbox_._internal("allow-popups-to-escape-sandbox");
+  static const ALLOW_POPUPS_TO_ESCAPE_SANDBOX = const Sandbox_._internal(
+    "allow-popups-to-escape-sandbox",
+  );
 
   ///Lets the resource start a presentation session.
-  static const ALLOW_PRESENTATION =
-      const Sandbox_._internal("allow-presentation");
+  static const ALLOW_PRESENTATION = const Sandbox_._internal(
+    "allow-presentation",
+  );
 
   ///If this token is not used, the resource is treated as being from a special origin that always fails the
   ///same-origin policy (potentially preventing access to data storage/cookies and some JavaScript APIs).
-  static const ALLOW_SAME_ORIGIN =
-      const Sandbox_._internal("allow-same-origin");
+  static const ALLOW_SAME_ORIGIN = const Sandbox_._internal(
+    "allow-same-origin",
+  );
 
   ///Lets the resource run scripts (but not create popup windows).
   static const ALLOW_SCRIPTS = const Sandbox_._internal("allow-scripts");
 
   ///Lets the resource navigate the top-level browsing context (the one named `_top`).
-  static const ALLOW_TOP_NAVIGATION =
-      const Sandbox_._internal("allow-top-navigation");
+  static const ALLOW_TOP_NAVIGATION = const Sandbox_._internal(
+    "allow-top-navigation",
+  );
 
   ///Lets the resource navigate the top-level browsing context, but only if initiated by a user gesture.
   static const ALLOW_TOP_NAVIGATION_BY_USER_ACTIVATION =

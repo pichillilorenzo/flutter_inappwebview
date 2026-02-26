@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import '../types/enum_method.dart';
 import 'x509_certificate.dart';
 import 'asn1_object.dart';
 import 'oid.dart';
@@ -157,11 +158,8 @@ class BasicConstraintExtension extends X509Extension {
     return toMap().toString();
   }
 
-  Map<String, dynamic> toMap() {
-    return {
-      "isCA": isCA,
-      "pathLenConstraint": pathLenConstraint,
-    };
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
+    return {"isCA": isCA, "pathLenConstraint": pathLenConstraint};
   }
 
   Map<String, dynamic> toJson() {
@@ -187,10 +185,8 @@ class SubjectKeyIdentifierExtension extends X509Extension {
     return toMap().toString();
   }
 
-  Map<String, dynamic> toMap() {
-    return {
-      "value": value,
-    };
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
+    return {"value": value};
   }
 
   Map<String, dynamic> toJson() {
@@ -209,11 +205,8 @@ class AuthorityInfoAccess {
     return toMap().toString();
   }
 
-  Map<String, dynamic> toMap() {
-    return {
-      "method": method,
-      "location": location,
-    };
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
+    return {"method": method, "location": location};
   }
 
   Map<String, dynamic> toJson() {
@@ -251,9 +244,11 @@ class AuthorityInfoAccessExtension extends X509Extension {
     return toMap().toString();
   }
 
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
-      "infoAccess": infoAccess?.map((e) => e.toMap()).toList(),
+      "infoAccess": infoAccess
+          ?.map((e) => e.toMap(enumMethod: enumMethod))
+          .toList(),
     };
   }
 
@@ -278,7 +273,8 @@ class AuthorityKeyIdentifierExtension extends X509Extension {
     ASN1Object? sub;
     try {
       sub = sequence.firstWhere(
-          (element) => element.identifier?.tagNumber().toValue() == 0);
+        (element) => element.identifier?.tagNumber().toValue() == 0,
+      );
       return sub.encoded;
     } catch (e) {}
     return null;
@@ -292,7 +288,8 @@ class AuthorityKeyIdentifierExtension extends X509Extension {
     ASN1Object? sub;
     try {
       sub = sequence.firstWhere(
-          (element) => element.identifier?.tagNumber().toValue() == 1);
+        (element) => element.identifier?.tagNumber().toValue() == 1,
+      );
       List<String>? result;
       if (sub.sub != null) {
         result = <String>[];
@@ -316,7 +313,8 @@ class AuthorityKeyIdentifierExtension extends X509Extension {
     ASN1Object? sub;
     try {
       sub = sequence.firstWhere(
-          (element) => element.identifier?.tagNumber().toValue() == 2);
+        (element) => element.identifier?.tagNumber().toValue() == 2,
+      );
       return sub.encoded;
     } catch (e) {}
     return null;
@@ -327,7 +325,7 @@ class AuthorityKeyIdentifierExtension extends X509Extension {
     return toMap().toString();
   }
 
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
       "keyIdentifier": keyIdentifier,
       "certificateIssuer": certificateIssuer,
@@ -351,11 +349,8 @@ class CertificatePolicyQualifier {
     return toMap().toString();
   }
 
-  Map<String, dynamic> toMap() {
-    return {
-      "oid": oid,
-      "value": value,
-    };
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
+    return {"oid": oid, "value": value};
   }
 
   Map<String, dynamic> toJson() {
@@ -374,10 +369,12 @@ class CertificatePolicy {
     return toMap().toString();
   }
 
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
       "oid": oid,
-      "qualifiers": qualifiers?.map((e) => e.toMap()).toList(),
+      "qualifiers": qualifiers
+          ?.map((e) => e.toMap(enumMethod: enumMethod))
+          .toList(),
     };
   }
 
@@ -436,9 +433,11 @@ class CertificatePoliciesExtension extends X509Extension {
     return toMap().toString();
   }
 
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
-      "policies": policies?.map((e) => e.toMap()).toList(),
+      "policies": policies
+          ?.map((e) => e.toMap(enumMethod: enumMethod))
+          .toList(),
     };
   }
 
@@ -470,10 +469,8 @@ class CRLDistributionPointsExtension extends X509Extension {
     return toMap().toString();
   }
 
-  Map<String, dynamic> toMap() {
-    return {
-      "crls": crls,
-    };
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
+    return {"crls": crls};
   }
 
   Map<String, dynamic> toJson() {

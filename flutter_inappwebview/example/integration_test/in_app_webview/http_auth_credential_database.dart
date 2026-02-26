@@ -1,13 +1,7 @@
 part of 'main.dart';
 
 void httpAuthCredentialDatabase() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !HttpAuthCredentialDatabase.isClassSupported();
 
   skippableGroup('Http Auth Credential Database', () {
     skippableTestWidgets('use saved credentials', (WidgetTester tester) async {
@@ -18,13 +12,14 @@ void httpAuthCredentialDatabase() {
       final Completer<void> pageLoaded = Completer<void>();
 
       httpAuthCredentialDatabase.setHttpAuthCredential(
-          protectionSpace: URLProtectionSpace(
-              host: environment["NODE_SERVER_IP"]!,
-              protocol: "http",
-              realm: "Node",
-              port: 8081),
-          credential:
-              URLCredential(username: "USERNAME", password: "PASSWORD"));
+        protectionSpace: URLProtectionSpace(
+          host: environment["NODE_SERVER_IP"]!,
+          protocol: "http",
+          realm: "Node",
+          port: 8081,
+        ),
+        credential: URLCredential(username: "USERNAME", password: "PASSWORD"),
+      );
 
       await tester.pumpWidget(
         Directionality(
@@ -32,20 +27,19 @@ void httpAuthCredentialDatabase() {
           child: InAppWebView(
             key: GlobalKey(),
             initialUrlRequest: URLRequest(
-                url: WebUri("http://${environment["NODE_SERVER_IP"]}:8081/")),
+              url: WebUri("http://${environment["NODE_SERVER_IP"]}:8081/"),
+            ),
             onWebViewCreated: (controller) {
               controllerCompleter.complete(controller);
             },
-            initialSettings: InAppWebViewSettings(
-              clearCache: true,
-            ),
+            initialSettings: InAppWebViewSettings(clearCache: true),
             onLoadStop: (controller, url) {
               pageLoaded.complete();
             },
             onReceivedHttpAuthRequest: (controller, challenge) async {
               return new HttpAuthResponse(
-                  action:
-                      HttpAuthResponseAction.USE_SAVED_HTTP_AUTH_CREDENTIALS);
+                action: HttpAuthResponseAction.USE_SAVED_HTTP_AUTH_CREDENTIALS,
+              );
             },
           ),
         ),
@@ -55,24 +49,29 @@ void httpAuthCredentialDatabase() {
       await pageLoaded.future;
 
       final String h1Content = await controller.evaluateJavascript(
-          source: "document.body.querySelector('h1').textContent");
+        source: "document.body.querySelector('h1').textContent",
+      );
       expect(h1Content, "Authorized");
 
       var credentials = await httpAuthCredentialDatabase.getHttpAuthCredentials(
-          protectionSpace: URLProtectionSpace(
-              host: environment["NODE_SERVER_IP"]!,
-              protocol: "http",
-              realm: "Node",
-              port: 8081));
+        protectionSpace: URLProtectionSpace(
+          host: environment["NODE_SERVER_IP"]!,
+          protocol: "http",
+          realm: "Node",
+          port: 8081,
+        ),
+      );
       expect(credentials.length, 1);
 
       await httpAuthCredentialDatabase.clearAllAuthCredentials();
       credentials = await httpAuthCredentialDatabase.getHttpAuthCredentials(
-          protectionSpace: URLProtectionSpace(
-              host: environment["NODE_SERVER_IP"]!,
-              protocol: "http",
-              realm: "Node",
-              port: 8081));
+        protectionSpace: URLProtectionSpace(
+          host: environment["NODE_SERVER_IP"]!,
+          protocol: "http",
+          realm: "Node",
+          port: 8081,
+        ),
+      );
       expect(credentials, isEmpty);
     });
 
@@ -87,22 +86,22 @@ void httpAuthCredentialDatabase() {
           child: InAppWebView(
             key: GlobalKey(),
             initialUrlRequest: URLRequest(
-                url: WebUri("http://${environment["NODE_SERVER_IP"]}:8081/")),
+              url: WebUri("http://${environment["NODE_SERVER_IP"]}:8081/"),
+            ),
             onWebViewCreated: (controller) {
               controllerCompleter.complete(controller);
             },
-            initialSettings: InAppWebViewSettings(
-              clearCache: true,
-            ),
+            initialSettings: InAppWebViewSettings(clearCache: true),
             onLoadStop: (controller, url) {
               pageLoaded.complete();
             },
             onReceivedHttpAuthRequest: (controller, challenge) async {
               return new HttpAuthResponse(
-                  username: "USERNAME",
-                  password: "PASSWORD",
-                  action: HttpAuthResponseAction.PROCEED,
-                  permanentPersistence: true);
+                username: "USERNAME",
+                password: "PASSWORD",
+                action: HttpAuthResponseAction.PROCEED,
+                permanentPersistence: true,
+              );
             },
           ),
         ),
@@ -112,7 +111,8 @@ void httpAuthCredentialDatabase() {
       await pageLoaded.future;
 
       final String h1Content = await controller.evaluateJavascript(
-          source: "document.body.querySelector('h1').textContent");
+        source: "document.body.querySelector('h1').textContent",
+      );
       expect(h1Content, "Authorized");
     });
   }, skip: shouldSkip);

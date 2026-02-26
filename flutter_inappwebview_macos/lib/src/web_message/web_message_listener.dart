@@ -11,20 +11,23 @@ import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_pla
 class MacOSWebMessageListenerCreationParams
     extends PlatformWebMessageListenerCreationParams {
   /// Creates a new [MacOSWebMessageListenerCreationParams] instance.
-  const MacOSWebMessageListenerCreationParams(
-      {required this.allowedOriginRules,
-      required super.jsObjectName,
-      super.onPostMessage});
+  const MacOSWebMessageListenerCreationParams({
+    required this.allowedOriginRules,
+    required super.jsObjectName,
+    super.onPostMessage,
+  });
 
   /// Creates a [MacOSWebMessageListenerCreationParams] instance based on [PlatformWebMessageListenerCreationParams].
   factory MacOSWebMessageListenerCreationParams.fromPlatformWebMessageListenerCreationParams(
-      // Recommended placeholder to prevent being broken by platform interface.
-      // ignore: avoid_unused_constructor_parameters
-      PlatformWebMessageListenerCreationParams params) {
+    // Recommended placeholder to prevent being broken by platform interface.
+    // ignore: avoid_unused_constructor_parameters
+    PlatformWebMessageListenerCreationParams params,
+  ) {
     return MacOSWebMessageListenerCreationParams(
-        allowedOriginRules: params.allowedOriginRules ?? Set.from(["*"]),
-        jsObjectName: params.jsObjectName,
-        onPostMessage: params.onPostMessage);
+      allowedOriginRules: params.allowedOriginRules ?? Set.from(["*"]),
+      jsObjectName: params.jsObjectName,
+      onPostMessage: params.onPostMessage,
+    );
   }
 
   @override
@@ -41,18 +44,34 @@ class MacOSWebMessageListener extends PlatformWebMessageListener
     with ChannelController {
   /// Constructs a [MacOSWebMessageListener].
   MacOSWebMessageListener(PlatformWebMessageListenerCreationParams params)
-      : super.implementation(
-          params is MacOSWebMessageListenerCreationParams
-              ? params
-              : MacOSWebMessageListenerCreationParams
-                  .fromPlatformWebMessageListenerCreationParams(params),
-        ) {
-    assert(!this._macosParams.allowedOriginRules.contains(""),
-        "allowedOriginRules cannot contain empty strings");
+    : super.implementation(
+        params is MacOSWebMessageListenerCreationParams
+            ? params
+            : MacOSWebMessageListenerCreationParams.fromPlatformWebMessageListenerCreationParams(
+                params,
+              ),
+      ) {
+    assert(
+      !this._macosParams.allowedOriginRules.contains(""),
+      "allowedOriginRules cannot contain empty strings",
+    );
     channel = MethodChannel(
-        'com.pichillilorenzo/flutter_inappwebview_web_message_listener_${_id}_${params.jsObjectName}');
+      'com.pichillilorenzo/flutter_inappwebview_web_message_listener_${_id}_${params.jsObjectName}',
+    );
     handler = _handleMethod;
     initMethodCallHandler();
+  }
+
+  static final MacOSWebMessageListener _staticValue = MacOSWebMessageListener(
+    MacOSWebMessageListenerCreationParams(
+      jsObjectName: '',
+      allowedOriginRules: Set.from(["*"]),
+    ),
+  );
+
+  /// Provide static access.
+  factory MacOSWebMessageListener.static() {
+    return _staticValue;
   }
 
   ///Message Listener ID used internally.
@@ -68,13 +87,16 @@ class MacOSWebMessageListener extends PlatformWebMessageListener
       case "onPostMessage":
         if (_replyProxy == null) {
           _replyProxy = MacOSJavaScriptReplyProxy(
-              PlatformJavaScriptReplyProxyCreationParams(
-                  webMessageListener: this));
+            PlatformJavaScriptReplyProxyCreationParams(
+              webMessageListener: this,
+            ),
+          );
         }
         if (onPostMessage != null) {
           WebMessage? message = call.arguments["message"] != null
               ? WebMessage.fromMap(
-                  call.arguments["message"].cast<String, dynamic>())
+                  call.arguments["message"].cast<String, dynamic>(),
+                )
               : null;
           WebUri? sourceOrigin = call.arguments["sourceOrigin"] != null
               ? WebUri(call.arguments["sourceOrigin"])
@@ -123,16 +145,19 @@ class MacOSWebMessageListener extends PlatformWebMessageListener
 class MacOSJavaScriptReplyProxyCreationParams
     extends PlatformJavaScriptReplyProxyCreationParams {
   /// Creates a new [MacOSJavaScriptReplyProxyCreationParams] instance.
-  const MacOSJavaScriptReplyProxyCreationParams(
-      {required super.webMessageListener});
+  const MacOSJavaScriptReplyProxyCreationParams({
+    required super.webMessageListener,
+  });
 
   /// Creates a [MacOSJavaScriptReplyProxyCreationParams] instance based on [PlatformJavaScriptReplyProxyCreationParams].
   factory MacOSJavaScriptReplyProxyCreationParams.fromPlatformJavaScriptReplyProxyCreationParams(
-      // Recommended placeholder to prevent being broken by platform interface.
-      // ignore: avoid_unused_constructor_parameters
-      PlatformJavaScriptReplyProxyCreationParams params) {
+    // Recommended placeholder to prevent being broken by platform interface.
+    // ignore: avoid_unused_constructor_parameters
+    PlatformJavaScriptReplyProxyCreationParams params,
+  ) {
     return MacOSJavaScriptReplyProxyCreationParams(
-        webMessageListener: params.webMessageListener);
+      webMessageListener: params.webMessageListener,
+    );
   }
 }
 
@@ -140,12 +165,13 @@ class MacOSJavaScriptReplyProxyCreationParams
 class MacOSJavaScriptReplyProxy extends PlatformJavaScriptReplyProxy {
   /// Constructs a [MacOSWebMessageListener].
   MacOSJavaScriptReplyProxy(PlatformJavaScriptReplyProxyCreationParams params)
-      : super.implementation(
-          params is MacOSJavaScriptReplyProxyCreationParams
-              ? params
-              : MacOSJavaScriptReplyProxyCreationParams
-                  .fromPlatformJavaScriptReplyProxyCreationParams(params),
-        );
+    : super.implementation(
+        params is MacOSJavaScriptReplyProxyCreationParams
+            ? params
+            : MacOSJavaScriptReplyProxyCreationParams.fromPlatformJavaScriptReplyProxyCreationParams(
+                params,
+              ),
+      );
 
   MacOSWebMessageListener get _macosWebMessageListener =>
       params.webMessageListener as MacOSWebMessageListener;

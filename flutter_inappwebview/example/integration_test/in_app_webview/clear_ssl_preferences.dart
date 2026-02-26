@@ -1,11 +1,9 @@
 part of 'main.dart';
 
 void clearSslPreferences() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![
-          TargetPlatform.android,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebViewController.isMethodSupported(
+    PlatformInAppWebViewControllerMethod.clearSslPreferences,
+  );
 
   skippableTestWidgets('clearSslPreferences', (WidgetTester tester) async {
     final Completer<InAppWebViewController> controllerCompleter =

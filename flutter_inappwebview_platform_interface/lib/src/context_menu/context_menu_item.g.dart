@@ -26,12 +26,13 @@ class ContextMenuItem {
 
   ///Menu item title.
   String title;
-  ContextMenuItem(
-      {this.id,
-      @Deprecated("Use id instead") this.androidId,
-      @Deprecated("Use id instead") this.iosId,
-      required this.title,
-      this.action}) {
+  ContextMenuItem({
+    this.id,
+    @Deprecated("Use id instead") this.androidId,
+    @Deprecated("Use id instead") this.iosId,
+    required this.title,
+    this.action,
+  }) {
     if (Util.isAndroid) {
       this.id = this.id ?? this.androidId;
       assert(this.id is int);
@@ -42,7 +43,10 @@ class ContextMenuItem {
   }
 
   ///Gets a possible [ContextMenuItem] instance from a [Map] value.
-  static ContextMenuItem? fromMap(Map<String, dynamic>? map) {
+  static ContextMenuItem? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
@@ -56,16 +60,16 @@ class ContextMenuItem {
   }
 
   @ExchangeableObjectMethod(toMapMergeWith: true)
-  Map<String, dynamic> _toMapMergeWith() {
+  Map<String, dynamic> _toMapMergeWith({EnumMethod? enumMethod}) {
     return {"androidId": androidId, "iosId": iosId};
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
       "id": id,
       "title": title,
-      ..._toMapMergeWith(),
+      ..._toMapMergeWith(enumMethod: enumMethod),
     };
   }
 

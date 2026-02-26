@@ -22,7 +22,7 @@ class Favicon {
   Favicon({this.height, this.rel, required this.url, this.width});
 
   ///Gets a possible [Favicon] instance from a [Map] value.
-  static Favicon? fromMap(Map<String, dynamic>? map) {
+  static Favicon? fromMap(Map<String, dynamic>? map, {EnumMethod? enumMethod}) {
     if (map == null) {
       return null;
     }
@@ -36,7 +36,7 @@ class Favicon {
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
       "height": height,
       "rel": rel,

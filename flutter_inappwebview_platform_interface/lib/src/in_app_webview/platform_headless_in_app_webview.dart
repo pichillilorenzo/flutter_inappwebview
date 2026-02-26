@@ -1,154 +1,227 @@
-import 'dart:ui';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
+
 import '../inappwebview_platform.dart';
 import '../types/disposable.dart';
 import '../webview_environment/platform_webview_environment.dart';
 import 'platform_inappwebview_controller.dart';
 import 'platform_webview.dart';
 
-/// Object specifying creation parameters for creating a [PlatformInAppWebViewWidget].
+part 'platform_headless_in_app_webview.g.dart';
+
+///{@template flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebViewCreationParams}
+///Object specifying creation parameters for creating a [PlatformInAppWebViewWidget].
 ///
-/// Platform specific implementations can add additional fields by extending
-/// this class.
+///Platform specific implementations can add additional fields by extending
+///this class.
+///{@endtemplate}
+///
+///{@macro flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebViewCreationParams.supported_platforms}
+@SupportedPlatforms(
+  platforms: [
+    AndroidPlatform(),
+    IOSPlatform(),
+    MacOSPlatform(),
+    WebPlatform(requiresSameOrigin: false),
+    WindowsPlatform(),
+    LinuxPlatform(),
+  ],
+)
 class PlatformHeadlessInAppWebViewCreationParams
     extends PlatformWebViewCreationParams {
-  /// Used by the platform implementation to create a new [PlatformHeadlessInAppWebView].
-  const PlatformHeadlessInAppWebViewCreationParams(
-      {this.initialSize = const Size(-1, -1),
-      this.webViewEnvironment,
-      super.controllerFromPlatform,
-      super.windowId,
-      super.onWebViewCreated,
-      super.onLoadStart,
-      super.onLoadStop,
-      @Deprecated('Use onReceivedError instead') super.onLoadError,
-      super.onReceivedError,
-      @Deprecated("Use onReceivedHttpError instead") super.onLoadHttpError,
-      super.onReceivedHttpError,
-      super.onProgressChanged,
-      super.onConsoleMessage,
-      super.shouldOverrideUrlLoading,
-      super.onLoadResource,
-      super.onScrollChanged,
-      @Deprecated('Use onDownloadStartRequest instead') super.onDownloadStart,
-      super.onDownloadStartRequest,
-      @Deprecated('Use onLoadResourceWithCustomScheme instead')
-      super.onLoadResourceCustomScheme,
-      super.onLoadResourceWithCustomScheme,
-      super.onCreateWindow,
-      super.onCloseWindow,
-      super.onJsAlert,
-      super.onJsConfirm,
-      super.onJsPrompt,
-      super.onReceivedHttpAuthRequest,
-      super.onReceivedServerTrustAuthRequest,
-      super.onReceivedClientCertRequest,
-      @Deprecated('Use FindInteractionController.onFindResultReceived instead')
-      super.onFindResultReceived,
-      super.shouldInterceptAjaxRequest,
-      super.onAjaxReadyStateChange,
-      super.onAjaxProgress,
-      super.shouldInterceptFetchRequest,
-      super.onUpdateVisitedHistory,
-      @Deprecated("Use onPrintRequest instead") super.onPrint,
-      super.onPrintRequest,
-      super.onLongPressHitTestResult,
-      super.onEnterFullscreen,
-      super.onExitFullscreen,
-      super.onPageCommitVisible,
-      super.onTitleChanged,
-      super.onWindowFocus,
-      super.onWindowBlur,
-      super.onOverScrolled,
-      super.onZoomScaleChanged,
-      @Deprecated('Use onSafeBrowsingHit instead')
-      super.androidOnSafeBrowsingHit,
-      super.onSafeBrowsingHit,
-      @Deprecated('Use onPermissionRequest instead')
-      super.androidOnPermissionRequest,
-      super.onPermissionRequest,
-      @Deprecated('Use onGeolocationPermissionsShowPrompt instead')
-      super.androidOnGeolocationPermissionsShowPrompt,
-      super.onGeolocationPermissionsShowPrompt,
-      @Deprecated('Use onGeolocationPermissionsHidePrompt instead')
-      super.androidOnGeolocationPermissionsHidePrompt,
-      super.onGeolocationPermissionsHidePrompt,
-      @Deprecated('Use shouldInterceptRequest instead')
-      super.androidShouldInterceptRequest,
-      super.shouldInterceptRequest,
-      @Deprecated('Use onRenderProcessGone instead')
-      super.androidOnRenderProcessGone,
-      super.onRenderProcessGone,
-      @Deprecated('Use onRenderProcessResponsive instead')
-      super.androidOnRenderProcessResponsive,
-      super.onRenderProcessResponsive,
-      @Deprecated('Use onRenderProcessUnresponsive instead')
-      super.androidOnRenderProcessUnresponsive,
-      super.onRenderProcessUnresponsive,
-      @Deprecated('Use onFormResubmission instead')
-      super.androidOnFormResubmission,
-      super.onFormResubmission,
-      @Deprecated('Use onZoomScaleChanged instead') super.androidOnScaleChanged,
-      @Deprecated('Use onReceivedIcon instead') super.androidOnReceivedIcon,
-      super.onReceivedIcon,
-      @Deprecated('Use onReceivedTouchIconUrl instead')
-      super.androidOnReceivedTouchIconUrl,
-      super.onReceivedTouchIconUrl,
-      @Deprecated('Use onJsBeforeUnload instead') super.androidOnJsBeforeUnload,
-      super.onJsBeforeUnload,
-      @Deprecated('Use onReceivedLoginRequest instead')
-      super.androidOnReceivedLoginRequest,
-      super.onReceivedLoginRequest,
-      super.onPermissionRequestCanceled,
-      super.onRequestFocus,
-      @Deprecated('Use onWebContentProcessDidTerminate instead')
-      super.iosOnWebContentProcessDidTerminate,
-      super.onWebContentProcessDidTerminate,
-      @Deprecated(
-          'Use onDidReceiveServerRedirectForProvisionalNavigation instead')
-      super.iosOnDidReceiveServerRedirectForProvisionalNavigation,
-      super.onDidReceiveServerRedirectForProvisionalNavigation,
-      @Deprecated('Use onNavigationResponse instead')
-      super.iosOnNavigationResponse,
-      super.onNavigationResponse,
-      @Deprecated('Use shouldAllowDeprecatedTLS instead')
-      super.iosShouldAllowDeprecatedTLS,
-      super.shouldAllowDeprecatedTLS,
-      super.onCameraCaptureStateChanged,
-      super.onMicrophoneCaptureStateChanged,
-      super.onContentSizeChanged,
-      super.initialUrlRequest,
-      super.initialFile,
-      super.initialData,
-      @Deprecated('Use initialSettings instead') super.initialOptions,
-      super.initialSettings,
-      super.contextMenu,
-      super.initialUserScripts,
-      super.pullToRefreshController,
-      super.findInteractionController});
+  ///{@macro flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebViewCreationParams}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebViewCreationParams.supported_platforms}
+  const PlatformHeadlessInAppWebViewCreationParams({
+    this.initialSize = const Size(-1, -1),
+    this.webViewEnvironment,
+    super.controllerFromPlatform,
+    super.windowId,
+    super.onWebViewCreated,
+    super.onLoadStart,
+    super.onLoadStop,
+    super.onContentLoading,
+    super.onDOMContentLoaded,
+    @Deprecated('Use onReceivedError instead') super.onLoadError,
+    super.onReceivedError,
+    @Deprecated("Use onReceivedHttpError instead") super.onLoadHttpError,
+    super.onReceivedHttpError,
+    super.onProgressChanged,
+    super.onConsoleMessage,
+    super.shouldOverrideUrlLoading,
+    super.onLaunchingExternalUriScheme,
+    super.onLoadResource,
+    super.onScrollChanged,
+    @Deprecated('Use onDownloadStarting instead') super.onDownloadStart,
+    @Deprecated('Use onDownloadStarting instead') super.onDownloadStartRequest,
+    super.onDownloadStarting,
+    @Deprecated('Use onLoadResourceWithCustomScheme instead')
+    super.onLoadResourceCustomScheme,
+    super.onLoadResourceWithCustomScheme,
+    super.onCreateWindow,
+    super.onCloseWindow,
+    super.onJsAlert,
+    super.onJsConfirm,
+    super.onJsPrompt,
+    super.onReceivedHttpAuthRequest,
+    super.onReceivedServerTrustAuthRequest,
+    super.onReceivedClientCertRequest,
+    @Deprecated('Use FindInteractionController.onFindResultReceived instead')
+    super.onFindResultReceived,
+    super.shouldInterceptAjaxRequest,
+    super.onAjaxReadyStateChange,
+    super.onAjaxProgress,
+    super.shouldInterceptFetchRequest,
+    super.onUpdateVisitedHistory,
+    @Deprecated("Use onPrintRequest instead") super.onPrint,
+    super.onPrintRequest,
+    super.onLongPressHitTestResult,
+    super.onEnterFullscreen,
+    super.onExitFullscreen,
+    super.onPageCommitVisible,
+    super.onTitleChanged,
+    super.onWindowFocus,
+    super.onWindowBlur,
+    super.onOverScrolled,
+    super.onZoomScaleChanged,
+    @Deprecated('Use onSafeBrowsingHit instead') super.androidOnSafeBrowsingHit,
+    super.onSafeBrowsingHit,
+    @Deprecated('Use onPermissionRequest instead')
+    super.androidOnPermissionRequest,
+    super.onPermissionRequest,
+    @Deprecated('Use onGeolocationPermissionsShowPrompt instead')
+    super.androidOnGeolocationPermissionsShowPrompt,
+    super.onGeolocationPermissionsShowPrompt,
+    @Deprecated('Use onGeolocationPermissionsHidePrompt instead')
+    super.androidOnGeolocationPermissionsHidePrompt,
+    super.onGeolocationPermissionsHidePrompt,
+    @Deprecated('Use shouldInterceptRequest instead')
+    super.androidShouldInterceptRequest,
+    super.shouldInterceptRequest,
+    @Deprecated('Use onRenderProcessGone instead')
+    super.androidOnRenderProcessGone,
+    super.onRenderProcessGone,
+    @Deprecated('Use onRenderProcessResponsive instead')
+    super.androidOnRenderProcessResponsive,
+    super.onRenderProcessResponsive,
+    @Deprecated('Use onRenderProcessUnresponsive instead')
+    super.androidOnRenderProcessUnresponsive,
+    super.onRenderProcessUnresponsive,
+    @Deprecated('Use onFormResubmission instead')
+    super.androidOnFormResubmission,
+    super.onFormResubmission,
+    @Deprecated('Use onZoomScaleChanged instead') super.androidOnScaleChanged,
+    @Deprecated('Use onReceivedIcon instead') super.androidOnReceivedIcon,
+    @Deprecated('Use onFaviconChanged instead') super.onReceivedIcon,
+    super.onFaviconChanged,
+    @Deprecated('Use onReceivedTouchIconUrl instead')
+    super.androidOnReceivedTouchIconUrl,
+    super.onReceivedTouchIconUrl,
+    @Deprecated('Use onJsBeforeUnload instead') super.androidOnJsBeforeUnload,
+    super.onJsBeforeUnload,
+    @Deprecated('Use onReceivedLoginRequest instead')
+    super.androidOnReceivedLoginRequest,
+    super.onReceivedLoginRequest,
+    super.onPermissionRequestCanceled,
+    super.onRequestFocus,
+    @Deprecated('Use onWebContentProcessDidTerminate instead')
+    super.iosOnWebContentProcessDidTerminate,
+    super.onWebContentProcessDidTerminate,
+    @Deprecated(
+      'Use onDidReceiveServerRedirectForProvisionalNavigation instead',
+    )
+    super.iosOnDidReceiveServerRedirectForProvisionalNavigation,
+    super.onDidReceiveServerRedirectForProvisionalNavigation,
+    @Deprecated('Use onNavigationResponse instead')
+    super.iosOnNavigationResponse,
+    super.onNavigationResponse,
+    @Deprecated('Use shouldAllowDeprecatedTLS instead')
+    super.iosShouldAllowDeprecatedTLS,
+    super.shouldAllowDeprecatedTLS,
+    super.onCameraCaptureStateChanged,
+    super.onMicrophoneCaptureStateChanged,
+    super.onContentSizeChanged,
+    super.onProcessFailed,
+    super.onNotificationReceived,
+    super.onSaveAsUIShowing,
+    super.onSaveFileSecurityCheckStarting,
+    super.onScreenCaptureStarting,
+    super.onAcceleratorKeyPressed,
+    super.onShowFileChooser,
+    super.initialUrlRequest,
+    super.initialFile,
+    super.initialData,
+    @Deprecated('Use initialSettings instead') super.initialOptions,
+    super.initialSettings,
+    super.contextMenu,
+    super.initialUserScripts,
+    super.pullToRefreshController,
+    super.findInteractionController,
+  });
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebViewCreationParams.initialSize}
   ///The WebView initial size in pixels.
   ///
   ///Set `-1` to match the corresponding width or height of the current device screen size.
   ///`Size(-1, -1)` will match both width and height of the current device screen size.
+  ///{@endtemplate}
   ///
-  ///**NOTE for Android**: `Size` width and height values will be converted to `int` values because they cannot have `double` values.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- Web
-  ///- MacOS
+  ///{@macro flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebViewCreationParams.initialSize.supported_platforms}
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(
+        note:
+            '`Size` width and height values will be converted to `int` values because they cannot have `double` values.',
+      ),
+      IOSPlatform(),
+      MacOSPlatform(),
+      WebPlatform(requiresSameOrigin: false),
+      WindowsPlatform(),
+      LinuxPlatform(),
+    ],
+  )
   final Size initialSize;
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebViewCreationParams.webViewEnvironment}
   ///Used to create the [PlatformHeadlessInAppWebView] using the specified environment.
+  ///{@endtemplate}
   ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Windows
+  ///{@macro flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebViewCreationParams.webViewEnvironment.supported_platforms}
+  @SupportedPlatforms(
+    platforms: [
+      WindowsPlatform(),
+      LinuxPlatform(
+        apiName: 'WebKitWebContext',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/class.WebContext.html',
+      ),
+    ],
+  )
   final PlatformWebViewEnvironment? webViewEnvironment;
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebViewCreationParams.isClassSupported}
+  ///Check if the current class is supported by the [defaultTargetPlatform] or a specific [platform].
+  ///{@endtemplate}
+  @override
+  bool isClassSupported({TargetPlatform? platform}) =>
+      _PlatformHeadlessInAppWebViewCreationParamsClassSupported.isClassSupported(
+        platform: platform,
+      );
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebViewCreationParams.isPropertySupported}
+  ///Check if the given [property] is supported by the [defaultTargetPlatform] or a specific [platform].
+  ///The property should be one of the [PlatformWebViewCreationParamsProperty] or [PlatformHeadlessInAppWebViewCreationParamsProperty] values.
+  ///{@endtemplate}
+  @override
+  bool isPropertySupported(dynamic property, {TargetPlatform? platform}) =>
+      property is PlatformWebViewCreationParamsProperty
+      ? super.isPropertySupported(property, platform: platform)
+      : _PlatformHeadlessInAppWebViewCreationParamsPropertySupported.isPropertySupported(
+          property,
+          platform: platform,
+        );
 }
 
 ///{@template flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView}
@@ -156,19 +229,25 @@ class PlatformHeadlessInAppWebViewCreationParams
 ///It can be used to run a WebView in background without attaching an `InAppWebView` to the widget tree.
 ///
 ///**NOTE**: Remember to dispose it when you don't need it anymore.
-///
-///**Officially Supported Platforms/Implementations**:
-///- Android native WebView
-///- iOS
-///- Web
-///- MacOS
-///- Windows
 ///{@endtemplate}
+///
+///{@macro flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView.supported_platforms}
+@SupportedPlatforms(
+  platforms: [
+    AndroidPlatform(),
+    IOSPlatform(),
+    MacOSPlatform(),
+    WebPlatform(requiresSameOrigin: false),
+    WindowsPlatform(),
+    LinuxPlatform(),
+  ],
+)
 abstract class PlatformHeadlessInAppWebView extends PlatformInterface
     implements Disposable {
   /// Creates a new [PlatformHeadlessInAppWebView]
   factory PlatformHeadlessInAppWebView(
-      PlatformHeadlessInAppWebViewCreationParams params) {
+    PlatformHeadlessInAppWebViewCreationParams params,
+  ) {
     assert(
       InAppWebViewPlatform.instance != null,
       'A platform implementation for `flutter_inappwebview` has not been set. Please '
@@ -177,10 +256,27 @@ abstract class PlatformHeadlessInAppWebView extends PlatformInterface
       '`InAppWebViewPlatform.instance` can be set with your own test implementation.',
     );
     final PlatformHeadlessInAppWebView webViewControllerDelegate =
-        InAppWebViewPlatform.instance!
-            .createPlatformHeadlessInAppWebView(params);
+        InAppWebViewPlatform.instance!.createPlatformHeadlessInAppWebView(
+          params,
+        );
     PlatformInterface.verify(webViewControllerDelegate, _token);
     return webViewControllerDelegate;
+  }
+
+  /// Creates a new [PlatformHeadlessInAppWebView] to access static methods.
+  factory PlatformHeadlessInAppWebView.static() {
+    assert(
+      InAppWebViewPlatform.instance != null,
+      'A platform implementation for `flutter_inappwebview` has not been set. Please '
+      'ensure that an implementation of `InAppWebViewPlatform` has been set to '
+      '`InAppWebViewPlatform.instance` before use. For unit testing, '
+      '`InAppWebViewPlatform.instance` can be set with your own test implementation.',
+    );
+    final PlatformHeadlessInAppWebView headlessInAppWebViewStatic =
+        InAppWebViewPlatform.instance!
+            .createPlatformHeadlessInAppWebViewStatic();
+    PlatformInterface.verify(headlessInAppWebViewStatic, _token);
+    return headlessInAppWebViewStatic;
   }
 
   /// Used by the platform implementation to create a new [PlatformHeadlessInAppWebView].
@@ -189,7 +285,7 @@ abstract class PlatformHeadlessInAppWebView extends PlatformInterface
   /// a class that only contains a factory constructor.
   @protected
   PlatformHeadlessInAppWebView.implementation(this.params)
-      : super(token: _token);
+    : super(token: _token);
 
   static final Object _token = Object();
 
@@ -207,35 +303,50 @@ abstract class PlatformHeadlessInAppWebView extends PlatformInterface
   ///{@endtemplate}
   PlatformInAppWebViewController? get webViewController =>
       throw UnimplementedError(
-          'webViewController is not implemented on the current platform');
+        'webViewController is not implemented on the current platform',
+      );
 
   ///{@template flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView.run}
   ///Runs the headless WebView.
-  ///
-  ///**NOTE for Web**: it will append a new `iframe` to the body.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- Web
-  ///- MacOS
   ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView.run.supported_platforms}
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(),
+      IOSPlatform(),
+      MacOSPlatform(),
+      WebPlatform(
+        requiresSameOrigin: false,
+        note: 'It will append a new `iframe` to the body.',
+      ),
+      WindowsPlatform(),
+      LinuxPlatform(),
+    ],
+  )
   Future<void> run() {
     throw UnimplementedError('run is not implemented on the current platform');
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView.isRunning}
   ///Indicates if the headless WebView is running or not.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- Web
-  ///- MacOS
   ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView.isRunning.supported_platforms}
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(),
+      IOSPlatform(),
+      MacOSPlatform(),
+      WebPlatform(requiresSameOrigin: false),
+      WindowsPlatform(),
+      LinuxPlatform(),
+    ],
+  )
   bool isRunning() {
     throw UnimplementedError(
-        'isRunning is not implemented on the current platform');
+      'isRunning is not implemented on the current platform',
+    );
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView.setSize}
@@ -245,47 +356,86 @@ abstract class PlatformHeadlessInAppWebView extends PlatformInterface
   ///`Size(-1, -1)` will match both width and height of the current device screen size.
   ///
   ///Note that if the [PlatformHeadlessInAppWebView] is not running, this method won't have effect.
-  ///
-  ///**NOTE for Android**: `Size` width and height values will be converted to `int` values because they cannot have `double` values.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- Web
-  ///- MacOS
   ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView.setSize.supported_platforms}
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(
+        note:
+            '`Size` width and height values will be converted to `int` values because they cannot have `double` values.',
+      ),
+      IOSPlatform(),
+      MacOSPlatform(),
+      WebPlatform(requiresSameOrigin: false),
+      LinuxPlatform(),
+    ],
+  )
   Future<void> setSize(Size size) {
     throw UnimplementedError(
-        'setSize is not implemented on the current platform');
+      'setSize is not implemented on the current platform',
+    );
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView.getSize}
   ///Gets the current size in pixels of the WebView.
   ///
   ///Note that if the [PlatformHeadlessInAppWebView] is not running, this method will return `null`.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- Web
-  ///- MacOS
   ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView.getSize.supported_platforms}
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(),
+      IOSPlatform(),
+      MacOSPlatform(),
+      WebPlatform(requiresSameOrigin: false),
+      LinuxPlatform(),
+    ],
+  )
   Future<Size?> getSize() {
     throw UnimplementedError(
-        'getSize is not implemented on the current platform');
+      'getSize is not implemented on the current platform',
+    );
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView.dispose}
   ///Disposes the headless WebView.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- Web
-  ///- MacOS
   ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView.dispose.supported_platforms}
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(),
+      IOSPlatform(),
+      MacOSPlatform(),
+      WebPlatform(requiresSameOrigin: false),
+      WindowsPlatform(),
+      LinuxPlatform(),
+    ],
+  )
   Future<void> dispose() {
     throw UnimplementedError(
-        'dispose is not implemented on the current platform');
+      'dispose is not implemented on the current platform',
+    );
   }
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebViewCreationParams.isClassSupported}
+  bool isClassSupported({TargetPlatform? platform}) =>
+      params.isClassSupported(platform: platform);
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebViewCreationParams.isPropertySupported}
+  bool isPropertySupported(dynamic property, {TargetPlatform? platform}) =>
+      params.isPropertySupported(property, platform: platform);
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView.isMethodSupported}
+  ///Check if the given [method] is supported by the [defaultTargetPlatform] or a specific [platform].
+  ///{@endtemplate}
+  bool isMethodSupported(
+    PlatformHeadlessInAppWebViewMethod method, {
+    TargetPlatform? platform,
+  }) => _PlatformHeadlessInAppWebViewMethodSupported.isMethodSupported(
+    method,
+    platform: platform,
+  );
 }

@@ -9,6 +9,7 @@ linter:
 # https://dart.dev/guides/language/analysis-options
 analyzer:
   errors:
+    constant_identifier_names: ignore
     deprecated_member_use: ignore
     deprecated_member_use_from_same_package: ignore
     unnecessary_cast: ignore

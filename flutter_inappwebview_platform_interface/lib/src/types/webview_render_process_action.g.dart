@@ -10,15 +10,30 @@ part of 'webview_render_process_action.dart';
 ///to terminate the Android [WebViewRenderProcess](https://developer.android.com/reference/android/webkit/WebViewRenderProcess).
 class WebViewRenderProcessAction {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const WebViewRenderProcessAction._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory WebViewRenderProcessAction._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      WebViewRenderProcessAction._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => WebViewRenderProcessAction._internal(value, nativeValue());
 
   ///Cause this renderer to terminate.
-  static const TERMINATE = WebViewRenderProcessAction._internal(0, 0);
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android WebView
+  static final TERMINATE = WebViewRenderProcessAction._internalMultiPlatform(
+    0,
+    () {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.android:
+          return 0;
+        default:
+          break;
+      }
+      return null;
+    },
+  );
 
   ///Set of all values of [WebViewRenderProcessAction].
   static final Set<WebViewRenderProcessAction> values = [
@@ -29,8 +44,9 @@ class WebViewRenderProcessAction {
   static WebViewRenderProcessAction? fromValue(int? value) {
     if (value != null) {
       try {
-        return WebViewRenderProcessAction.values
-            .firstWhere((element) => element.toValue() == value);
+        return WebViewRenderProcessAction.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -42,8 +58,9 @@ class WebViewRenderProcessAction {
   static WebViewRenderProcessAction? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return WebViewRenderProcessAction.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return WebViewRenderProcessAction.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -51,11 +68,52 @@ class WebViewRenderProcessAction {
     return null;
   }
 
+  /// Gets a possible [WebViewRenderProcessAction] instance value with name [name].
+  ///
+  /// Goes through [WebViewRenderProcessAction.values] looking for a value with
+  /// name [name], as reported by [WebViewRenderProcessAction.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static WebViewRenderProcessAction? byName(String? name) {
+    if (name != null) {
+      try {
+        return WebViewRenderProcessAction.values.firstWhere(
+          (element) => element.name() == name,
+        );
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [WebViewRenderProcessAction] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, WebViewRenderProcessAction> asNameMap() =>
+      <String, WebViewRenderProcessAction>{
+        for (final value in WebViewRenderProcessAction.values)
+          value.name(): value,
+      };
+
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
+
+  ///Gets the name of the value.
+  String name() {
+    switch (_value) {
+      case 0:
+        return 'TERMINATE';
+    }
+    return _value.toString();
+  }
 
   @override
   int get hashCode => _value.hashCode;
@@ -63,12 +121,13 @@ class WebViewRenderProcessAction {
   @override
   bool operator ==(value) => value == _value;
 
+  ///Checks if the value is supported by the [defaultTargetPlatform].
+  bool isSupported() {
+    return _nativeValue != null;
+  }
+
   @override
   String toString() {
-    switch (_value) {
-      case 0:
-        return 'TERMINATE';
-    }
-    return _value.toString();
+    return name();
   }
 }

@@ -11,16 +11,15 @@ import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_pla
 class MacOSPrintJobControllerCreationParams
     extends PlatformPrintJobControllerCreationParams {
   /// Creates a new [MacOSPrintJobControllerCreationParams] instance.
-  const MacOSPrintJobControllerCreationParams(
-      {required super.id, super.onComplete});
+  const MacOSPrintJobControllerCreationParams({required super.id});
 
   /// Creates a [MacOSPrintJobControllerCreationParams] instance based on [PlatformPrintJobControllerCreationParams].
   factory MacOSPrintJobControllerCreationParams.fromPlatformPrintJobControllerCreationParams(
-      // Recommended placeholder to prevent being broken by platform interface.
-      // ignore: avoid_unused_constructor_parameters
-      PlatformPrintJobControllerCreationParams params) {
-    return MacOSPrintJobControllerCreationParams(
-        id: params.id, onComplete: params.onComplete);
+    // Recommended placeholder to prevent being broken by platform interface.
+    // ignore: avoid_unused_constructor_parameters
+    PlatformPrintJobControllerCreationParams params,
+  ) {
+    return MacOSPrintJobControllerCreationParams(id: params.id);
   }
 }
 
@@ -29,17 +28,27 @@ class MacOSPrintJobController extends PlatformPrintJobController
     with ChannelController {
   /// Constructs a [MacOSPrintJobController].
   MacOSPrintJobController(PlatformPrintJobControllerCreationParams params)
-      : super.implementation(
-          params is MacOSPrintJobControllerCreationParams
-              ? params
-              : MacOSPrintJobControllerCreationParams
-                  .fromPlatformPrintJobControllerCreationParams(params),
-        ) {
-    onComplete = params.onComplete;
+    : super.implementation(
+        params is MacOSPrintJobControllerCreationParams
+            ? params
+            : MacOSPrintJobControllerCreationParams.fromPlatformPrintJobControllerCreationParams(
+                params,
+              ),
+      ) {
     channel = MethodChannel(
-        'com.pichillilorenzo/flutter_inappwebview_printjobcontroller_${params.id}');
+      'com.pichillilorenzo/flutter_inappwebview_printjobcontroller_${params.id}',
+    );
     handler = _handleMethod;
     initMethodCallHandler();
+  }
+
+  static final MacOSPrintJobController _staticValue = MacOSPrintJobController(
+    MacOSPrintJobControllerCreationParams(id: ''),
+  );
+
+  /// Provide static access.
+  factory MacOSPrintJobController.static() {
+    return _staticValue;
   }
 
   Future<dynamic> _handleMethod(MethodCall call) async {
@@ -59,8 +68,10 @@ class MacOSPrintJobController extends PlatformPrintJobController
   @override
   Future<PrintJobInfo?> getInfo() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    Map<String, dynamic>? infoMap =
-        (await channel?.invokeMethod('getInfo', args))?.cast<String, dynamic>();
+    Map<String, dynamic>? infoMap = (await channel?.invokeMethod(
+      'getInfo',
+      args,
+    ))?.cast<String, dynamic>();
     return PrintJobInfo.fromMap(infoMap);
   }
 

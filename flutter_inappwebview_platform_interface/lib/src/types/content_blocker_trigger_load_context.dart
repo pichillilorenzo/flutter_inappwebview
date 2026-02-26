@@ -13,10 +13,12 @@ class ContentBlockerTriggerLoadContext_ {
   const ContentBlockerTriggerLoadContext_._internal(this._value);
 
   ///Top frame load context
-  static const TOP_FRAME =
-      const ContentBlockerTriggerLoadContext_._internal('top-frame');
+  static const TOP_FRAME = const ContentBlockerTriggerLoadContext_._internal(
+    'top-frame',
+  );
 
   ///Child frame load context
-  static const CHILD_FRAME =
-      const ContentBlockerTriggerLoadContext_._internal('child-frame');
+  static const CHILD_FRAME = const ContentBlockerTriggerLoadContext_._internal(
+    'child-frame',
+  );
 }

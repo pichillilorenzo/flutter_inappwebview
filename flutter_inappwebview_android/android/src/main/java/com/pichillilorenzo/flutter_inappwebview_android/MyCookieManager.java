@@ -103,6 +103,9 @@ public class MyCookieManager extends ChannelDelegateImpl {
       case "removeSessionCookies":
         removeSessionCookies(result);
         break;
+      case "flush":
+        flush(result);
+        break;
       default:
         result.notImplemented();
     }
@@ -250,7 +253,7 @@ public class MyCookieManager extends ChannelDelegateImpl {
 
           if (cookieParamName.equalsIgnoreCase("Expires")) {
             try {
-              final SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd MMM yyyy hh:mm:ss z", Locale.US);
+              final SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
               Date expiryDate = sdf.parse(cookieParamValue);
               if (expiryDate != null) {
                 cookieMap.put("expiresDate", expiryDate.getTime());
@@ -423,8 +426,22 @@ public class MyCookieManager extends ChannelDelegateImpl {
     }
   }
 
+  public void flush(MethodChannel.Result result) {
+    cookieManager = getCookieManager();
+    if (cookieManager == null) {
+      result.success(false);
+      return;
+    }
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+      cookieManager.flush();
+    } else if (plugin != null) {
+      CookieSyncManager cookieSyncMngr = CookieSyncManager.createInstance(plugin.applicationContext);
+      cookieSyncMngr.sync();
+    }
+  }
+
   public static String getCookieExpirationDate(Long timestamp) {
-    final SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd MMM yyyy hh:mm:ss z", Locale.US);
+    final SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
     sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
     return sdf.format(new Date(timestamp));
   }

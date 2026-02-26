@@ -11,17 +11,21 @@ import '../in_app_webview/in_app_webview_controller.dart';
 /// more information.
 class MacOSWebStorageCreationParams extends PlatformWebStorageCreationParams {
   /// Creates a new [MacOSWebStorageCreationParams] instance.
-  MacOSWebStorageCreationParams(
-      {required super.localStorage, required super.sessionStorage});
+  MacOSWebStorageCreationParams({
+    required super.localStorage,
+    required super.sessionStorage,
+  });
 
   /// Creates a [MacOSWebStorageCreationParams] instance based on [PlatformWebStorageCreationParams].
   factory MacOSWebStorageCreationParams.fromPlatformWebStorageCreationParams(
-      // Recommended placeholder to prevent being broken by platform interface.
-      // ignore: avoid_unused_constructor_parameters
-      PlatformWebStorageCreationParams params) {
+    // Recommended placeholder to prevent being broken by platform interface.
+    // ignore: avoid_unused_constructor_parameters
+    PlatformWebStorageCreationParams params,
+  ) {
     return MacOSWebStorageCreationParams(
-        localStorage: params.localStorage,
-        sessionStorage: params.sessionStorage);
+      localStorage: params.localStorage,
+      sessionStorage: params.sessionStorage,
+    );
   }
 }
 
@@ -29,12 +33,13 @@ class MacOSWebStorageCreationParams extends PlatformWebStorageCreationParams {
 class MacOSWebStorage extends PlatformWebStorage {
   /// Constructs a [MacOSWebStorage].
   MacOSWebStorage(PlatformWebStorageCreationParams params)
-      : super.implementation(
-          params is MacOSWebStorageCreationParams
-              ? params
-              : MacOSWebStorageCreationParams
-                  .fromPlatformWebStorageCreationParams(params),
-        );
+    : super.implementation(
+        params is MacOSWebStorageCreationParams
+            ? params
+            : MacOSWebStorageCreationParams.fromPlatformWebStorageCreationParams(
+                params,
+              ),
+      );
 
   @override
   PlatformLocalStorage get localStorage => params.localStorage;
@@ -56,16 +61,21 @@ class MacOSWebStorage extends PlatformWebStorage {
 /// more information.
 class MacOSStorageCreationParams extends PlatformStorageCreationParams {
   /// Creates a new [MacOSStorageCreationParams] instance.
-  MacOSStorageCreationParams(
-      {required super.controller, required super.webStorageType});
+  MacOSStorageCreationParams({
+    required super.controller,
+    required super.webStorageType,
+  });
 
   /// Creates a [MacOSStorageCreationParams] instance based on [PlatformStorageCreationParams].
   factory MacOSStorageCreationParams.fromPlatformStorageCreationParams(
-      // Recommended placeholder to prevent being broken by platform interface.
-      // ignore: avoid_unused_constructor_parameters
-      PlatformStorageCreationParams params) {
+    // Recommended placeholder to prevent being broken by platform interface.
+    // ignore: avoid_unused_constructor_parameters
+    PlatformStorageCreationParams params,
+  ) {
     return MacOSStorageCreationParams(
-        controller: params.controller, webStorageType: params.webStorageType);
+      controller: params.controller,
+      webStorageType: params.webStorageType,
+    );
   }
 }
 
@@ -76,25 +86,34 @@ abstract mixin class MacOSStorage implements PlatformStorage {
 
   @override
   Future<int?> length() async {
-    var result = await controller?.evaluateJavascript(source: """
+    var result = await controller?.evaluateJavascript(
+      source:
+          """
     window.$webStorageType.length;
-    """);
+    """,
+    );
     return result != null ? int.parse(json.decode(result)) : null;
   }
 
   @override
   Future<void> setItem({required String key, required dynamic value}) async {
     var encodedValue = json.encode(value);
-    await controller?.evaluateJavascript(source: """
+    await controller?.evaluateJavascript(
+      source:
+          """
     window.$webStorageType.setItem("$key", ${value is String ? encodedValue : "JSON.stringify($encodedValue)"});
-    """);
+    """,
+    );
   }
 
   @override
   Future<dynamic> getItem({required String key}) async {
-    var itemValue = await controller?.evaluateJavascript(source: """
+    var itemValue = await controller?.evaluateJavascript(
+      source:
+          """
     window.$webStorageType.getItem("$key");
-    """);
+    """,
+    );
 
     if (itemValue == null) {
       return null;
@@ -109,17 +128,21 @@ abstract mixin class MacOSStorage implements PlatformStorage {
 
   @override
   Future<void> removeItem({required String key}) async {
-    await controller?.evaluateJavascript(source: """
+    await controller?.evaluateJavascript(
+      source:
+          """
     window.$webStorageType.removeItem("$key");
-    """);
+    """,
+    );
   }
 
   @override
   Future<List<WebStorageItem>> getItems() async {
     var webStorageItems = <WebStorageItem>[];
 
-    List<Map<dynamic, dynamic>>? items =
-        (await controller?.evaluateJavascript(source: """
+    List<Map<dynamic, dynamic>>? items = (await controller?.evaluateJavascript(
+      source:
+          """
 (function() {
   var webStorageItems = [];
   for(var i = 0; i < window.$webStorageType.length; i++){
@@ -133,15 +156,17 @@ abstract mixin class MacOSStorage implements PlatformStorage {
   }
   return webStorageItems;
 })();
-    """))?.cast<Map<dynamic, dynamic>>();
+    """,
+    ))?.cast<Map<dynamic, dynamic>>();
 
     if (items == null) {
       return webStorageItems;
     }
 
     for (var item in items) {
-      webStorageItems
-          .add(WebStorageItem(key: item["key"], value: item["value"]));
+      webStorageItems.add(
+        WebStorageItem(key: item["key"], value: item["value"]),
+      );
     }
 
     return webStorageItems;
@@ -149,16 +174,22 @@ abstract mixin class MacOSStorage implements PlatformStorage {
 
   @override
   Future<void> clear() async {
-    await controller?.evaluateJavascript(source: """
+    await controller?.evaluateJavascript(
+      source:
+          """
     window.$webStorageType.clear();
-    """);
+    """,
+    );
   }
 
   @override
   Future<String> key({required int index}) async {
-    var result = await controller?.evaluateJavascript(source: """
+    var result = await controller?.evaluateJavascript(
+      source:
+          """
     window.$webStorageType.key($index);
-    """);
+    """,
+    );
     return result != null ? json.decode(result) : null;
   }
 
@@ -180,9 +211,10 @@ class MacOSLocalStorageCreationParams
 
   /// Creates a [MacOSLocalStorageCreationParams] instance based on [PlatformLocalStorageCreationParams].
   factory MacOSLocalStorageCreationParams.fromPlatformLocalStorageCreationParams(
-      // Recommended placeholder to prevent being broken by platform interface.
-      // ignore: avoid_unused_constructor_parameters
-      PlatformLocalStorageCreationParams params) {
+    // Recommended placeholder to prevent being broken by platform interface.
+    // ignore: avoid_unused_constructor_parameters
+    PlatformLocalStorageCreationParams params,
+  ) {
     return MacOSLocalStorageCreationParams(params);
   }
 }
@@ -191,20 +223,28 @@ class MacOSLocalStorageCreationParams
 class MacOSLocalStorage extends PlatformLocalStorage with MacOSStorage {
   /// Constructs a [MacOSLocalStorage].
   MacOSLocalStorage(PlatformLocalStorageCreationParams params)
-      : super.implementation(
-          params is MacOSLocalStorageCreationParams
-              ? params
-              : MacOSLocalStorageCreationParams
-                  .fromPlatformLocalStorageCreationParams(params),
-        );
+    : super.implementation(
+        params is MacOSLocalStorageCreationParams
+            ? params
+            : MacOSLocalStorageCreationParams.fromPlatformLocalStorageCreationParams(
+                params,
+              ),
+      );
 
   /// Default storage
-  factory MacOSLocalStorage.defaultStorage(
-      {required PlatformInAppWebViewController? controller}) {
-    return MacOSLocalStorage(MacOSLocalStorageCreationParams(
-        PlatformLocalStorageCreationParams(PlatformStorageCreationParams(
+  factory MacOSLocalStorage.defaultStorage({
+    required PlatformInAppWebViewController? controller,
+  }) {
+    return MacOSLocalStorage(
+      MacOSLocalStorageCreationParams(
+        PlatformLocalStorageCreationParams(
+          PlatformStorageCreationParams(
             controller: controller,
-            webStorageType: WebStorageType.LOCAL_STORAGE))));
+            webStorageType: WebStorageType.LOCAL_STORAGE,
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -224,9 +264,10 @@ class MacOSSessionStorageCreationParams
 
   /// Creates a [MacOSSessionStorageCreationParams] instance based on [PlatformSessionStorageCreationParams].
   factory MacOSSessionStorageCreationParams.fromPlatformSessionStorageCreationParams(
-      // Recommended placeholder to prevent being broken by platform interface.
-      // ignore: avoid_unused_constructor_parameters
-      PlatformSessionStorageCreationParams params) {
+    // Recommended placeholder to prevent being broken by platform interface.
+    // ignore: avoid_unused_constructor_parameters
+    PlatformSessionStorageCreationParams params,
+  ) {
     return MacOSSessionStorageCreationParams(params);
   }
 }
@@ -235,20 +276,28 @@ class MacOSSessionStorageCreationParams
 class MacOSSessionStorage extends PlatformSessionStorage with MacOSStorage {
   /// Constructs a [MacOSSessionStorage].
   MacOSSessionStorage(PlatformSessionStorageCreationParams params)
-      : super.implementation(
-          params is MacOSSessionStorageCreationParams
-              ? params
-              : MacOSSessionStorageCreationParams
-                  .fromPlatformSessionStorageCreationParams(params),
-        );
+    : super.implementation(
+        params is MacOSSessionStorageCreationParams
+            ? params
+            : MacOSSessionStorageCreationParams.fromPlatformSessionStorageCreationParams(
+                params,
+              ),
+      );
 
   /// Default storage
-  factory MacOSSessionStorage.defaultStorage(
-      {required PlatformInAppWebViewController? controller}) {
-    return MacOSSessionStorage(MacOSSessionStorageCreationParams(
-        PlatformSessionStorageCreationParams(PlatformStorageCreationParams(
+  factory MacOSSessionStorage.defaultStorage({
+    required PlatformInAppWebViewController? controller,
+  }) {
+    return MacOSSessionStorage(
+      MacOSSessionStorageCreationParams(
+        PlatformSessionStorageCreationParams(
+          PlatformStorageCreationParams(
             controller: controller,
-            webStorageType: WebStorageType.SESSION_STORAGE))));
+            webStorageType: WebStorageType.SESSION_STORAGE,
+          ),
+        ),
+      ),
+    );
   }
 
   @override

@@ -74,21 +74,22 @@ class AndroidChromeCustomTabsOptions
   ///**NOTE**: Available only in a Trusted Web Activity.
   TrustedWebActivityScreenOrientation screenOrientation;
 
-  AndroidChromeCustomTabsOptions(
-      {@Deprecated('Use shareState instead') this.addDefaultShareMenuItem,
-      this.shareState = CustomTabsShareState.SHARE_STATE_DEFAULT,
-      this.showTitle = true,
-      this.toolbarBackgroundColor,
-      this.enableUrlBarHiding = false,
-      this.instantAppsEnabled = false,
-      this.packageName,
-      this.keepAliveEnabled = false,
-      this.isSingleInstance = false,
-      this.noHistory = false,
-      this.isTrustedWebActivity = false,
-      this.additionalTrustedOrigins = const [],
-      this.displayMode,
-      this.screenOrientation = TrustedWebActivityScreenOrientation.DEFAULT});
+  AndroidChromeCustomTabsOptions({
+    @Deprecated('Use shareState instead') this.addDefaultShareMenuItem,
+    this.shareState = CustomTabsShareState.SHARE_STATE_DEFAULT,
+    this.showTitle = true,
+    this.toolbarBackgroundColor,
+    this.enableUrlBarHiding = false,
+    this.instantAppsEnabled = false,
+    this.packageName,
+    this.keepAliveEnabled = false,
+    this.isSingleInstance = false,
+    this.noHistory = false,
+    this.isTrustedWebActivity = false,
+    this.additionalTrustedOrigins = const [],
+    this.displayMode,
+    this.screenOrientation = TrustedWebActivityScreenOrientation.DEFAULT,
+  });
 
   @override
   Map<String, dynamic> toMap() {
@@ -107,7 +108,7 @@ class AndroidChromeCustomTabsOptions
       "isTrustedWebActivity": isTrustedWebActivity,
       "additionalTrustedOrigins": additionalTrustedOrigins,
       "displayMode": displayMode?.toMap(),
-      "screenOrientation": screenOrientation.toNativeValue()
+      "screenOrientation": screenOrientation.toNativeValue(),
     };
   }
 
@@ -118,8 +119,9 @@ class AndroidChromeCustomTabsOptions
     options.addDefaultShareMenuItem = map["addDefaultShareMenuItem"];
     options.shareState = map["shareState"];
     options.showTitle = map["showTitle"];
-    options.toolbarBackgroundColor =
-        UtilColor.fromHex(map["toolbarBackgroundColor"]);
+    options.toolbarBackgroundColor = UtilColor.fromHex(
+      map["toolbarBackgroundColor"],
+    );
     options.enableUrlBarHiding = map["enableUrlBarHiding"];
     options.instantAppsEnabled = map["instantAppsEnabled"];
     options.packageName = map["packageName"];
@@ -130,8 +132,9 @@ class AndroidChromeCustomTabsOptions
     options.additionalTrustedOrigins = map["additionalTrustedOrigins"];
     switch (map["displayMode"]["type"]) {
       case "IMMERSIVE_MODE":
-        options.displayMode =
-            TrustedWebActivityImmersiveDisplayMode.fromMap(map["displayMode"]);
+        options.displayMode = TrustedWebActivityImmersiveDisplayMode.fromMap(
+          map["displayMode"],
+        );
         break;
       case "DEFAULT_MODE":
       default:

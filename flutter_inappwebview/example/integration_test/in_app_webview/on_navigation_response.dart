@@ -1,12 +1,9 @@
 part of 'main.dart';
 
 void onNavigationResponse() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebView.isPropertySupported(
+    PlatformWebViewCreationParamsProperty.onNavigationResponse,
+  );
 
   skippableGroup('onNavigationResponse', () {
     skippableTestWidgets('allow navigation', (WidgetTester tester) async {
@@ -29,8 +26,9 @@ void onNavigationResponse() {
               pageLoaded.complete();
             },
             onNavigationResponse: (controller, navigationResponse) async {
-              onNavigationResponseCompleter
-                  .complete(navigationResponse.response!.url.toString());
+              onNavigationResponseCompleter.complete(
+                navigationResponse.response!.url.toString(),
+              );
               return NavigationResponseAction.ALLOW;
             },
           ),
@@ -62,8 +60,9 @@ void onNavigationResponse() {
               pageLoaded.complete();
             },
             onNavigationResponse: (controller, navigationResponse) async {
-              onNavigationResponseCompleter
-                  .complete(navigationResponse.response!.url.toString());
+              onNavigationResponseCompleter.complete(
+                navigationResponse.response!.url.toString(),
+              );
               return NavigationResponseAction.CANCEL;
             },
           ),

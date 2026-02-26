@@ -1,11 +1,9 @@
 part of 'main.dart';
 
 void onReceivedTouchIconUrl() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![
-          TargetPlatform.android,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebView.isPropertySupported(
+    PlatformWebViewCreationParamsProperty.onReceivedTouchIconUrl,
+  );
 
   skippableTestWidgets('onReceivedTouchIconUrl', (WidgetTester tester) async {
     final Completer<InAppWebViewController> controllerCompleter =
@@ -18,7 +16,8 @@ void onReceivedTouchIconUrl() {
         textDirection: TextDirection.ltr,
         child: InAppWebView(
           key: GlobalKey(),
-          initialData: InAppWebViewInitialData(data: """
+          initialData: InAppWebViewInitialData(
+            data: """
 <!doctype html>
 <html lang="en">
     <head>
@@ -29,7 +28,8 @@ void onReceivedTouchIconUrl() {
     </head>
     <body></body>
 </html>
-                    """),
+                    """,
+          ),
           onWebViewCreated: (controller) {
             controllerCompleter.complete(controller);
           },

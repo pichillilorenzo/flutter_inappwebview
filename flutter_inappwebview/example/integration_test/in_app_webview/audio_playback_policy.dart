@@ -1,22 +1,21 @@
 part of 'main.dart';
 
 void audioPlaybackPolicy() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebViewSettings.isPropertySupported(
+    InAppWebViewSettingsProperty.mediaPlaybackRequiresUserGesture,
+  );
 
   skippableGroup('Audio playback policy', () {
     String audioTestBase64 = "";
     setUpAll(() async {
-      final ByteData audioData =
-          await rootBundle.load('test_assets/sample_audio.ogg');
-      final String base64AudioData =
-          base64Encode(Uint8List.view(audioData.buffer));
-      final String audioTest = '''
+      final ByteData audioData = await rootBundle.load(
+        'test_assets/sample_audio.ogg',
+      );
+      final String base64AudioData = base64Encode(
+        Uint8List.view(audioData.buffer),
+      );
+      final String audioTest =
+          '''
         <!DOCTYPE html><html>
         <head><title>Audio auto play</title>
           <script type="text/javascript">
@@ -52,14 +51,17 @@ void audioPlaybackPolicy() {
           child: InAppWebView(
             key: GlobalKey(),
             initialUrlRequest: URLRequest(
-                url: WebUri(
-                    'data:text/html;charset=utf-8;base64,$audioTestBase64')),
+              url: WebUri(
+                'data:text/html;charset=utf-8;base64,$audioTestBase64',
+              ),
+            ),
             onWebViewCreated: (controller) {
               controllerCompleter.complete(controller);
             },
             initialSettings: InAppWebViewSettings(
-                javaScriptEnabled: true,
-                mediaPlaybackRequiresUserGesture: false),
+              javaScriptEnabled: true,
+              mediaPlaybackRequiresUserGesture: false,
+            ),
             onLoadStart: (controller, url) {
               pageStarted.complete();
             },
@@ -73,8 +75,9 @@ void audioPlaybackPolicy() {
       await pageStarted.future;
       await pageLoaded.future;
 
-      bool isPaused =
-          await controller.evaluateJavascript(source: 'isPaused();');
+      bool isPaused = await controller.evaluateJavascript(
+        source: 'isPaused();',
+      );
       expect(isPaused, false);
 
       controllerCompleter = Completer<InAppWebViewController>();
@@ -88,14 +91,17 @@ void audioPlaybackPolicy() {
           child: InAppWebView(
             key: GlobalKey(),
             initialUrlRequest: URLRequest(
-                url: WebUri(
-                    'data:text/html;charset=utf-8;base64,$audioTestBase64')),
+              url: WebUri(
+                'data:text/html;charset=utf-8;base64,$audioTestBase64',
+              ),
+            ),
             onWebViewCreated: (controller) {
               controllerCompleter.complete(controller);
             },
             initialSettings: InAppWebViewSettings(
-                javaScriptEnabled: true,
-                mediaPlaybackRequiresUserGesture: true),
+              javaScriptEnabled: true,
+              mediaPlaybackRequiresUserGesture: true,
+            ),
             onLoadStart: (controller, url) {
               pageStarted.complete();
             },

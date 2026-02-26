@@ -343,11 +343,9 @@ namespace flutter_inappwebview_plugin
 
     std::string source = userScript->source;
     if (userScript->injectionTime == UserScriptInjectionTime::atDocumentEnd) {
-      source = replace_all_copy(USER_SCRIPTS_AT_DOCUMENT_END_WRAPPER_JS_SOURCE, VAR_PLACEHOLDER_VALUE, source);
-      std::ostringstream address;
-      address << std::addressof(userScript);
-      replace_all(source, VAR_PLACEHOLDER_MEMORY_ADDRESS_VALUE, address.str());
+      source = "if (document.readyState === 'complete') { " + source + "} else { window.addEventListener('load', function() { " + source + " }); }";
     }
+    source = UserContentController::wrapSourceCodeAddChecks(source, userScript);
 
     nlohmann::json parameters = {
       {"source", source}
@@ -419,6 +417,44 @@ namespace flutter_inappwebview_plugin
         }
       }
     }
+  }
+
+  std::string UserContentController::wrapSourceCodeAddChecks(const std::string& source, const std::shared_ptr<UserScript> userScript)
+  {
+    auto allowedOriginRules = userScript->allowedOriginRules;
+    auto forMainFrameOnly = userScript->forMainFrameOnly;
+
+    std::string ifStatement = "if (";
+
+    if (allowedOriginRules.has_value() && !vector_contains<std::string>(allowedOriginRules.value(), "*")) {
+      if (allowedOriginRules.value().empty()) {
+        // return empty source string if allowedOriginRules is an empty list.
+        // an empty list means that this UserScript is not allowed for any origin.
+        return "";
+      }
+
+      std::string jsRegExpArray = "[";
+      for (const auto& allowedOriginRule : allowedOriginRules.value()) {
+        if (jsRegExpArray.length() > 1) {
+          jsRegExpArray += ", ";
+        }
+        jsRegExpArray += "new RegExp('" + replace_all_copy(allowedOriginRule, "\'", "\\'") + "')";
+      }
+
+      if (jsRegExpArray.length() > 1) {
+        jsRegExpArray += "]";
+        ifStatement += jsRegExpArray + ".some(function(rx) { return rx.test(window.location.origin); })";
+      }
+    }
+
+    if (forMainFrameOnly) {
+      if (ifStatement.length() > 4) {
+        ifStatement += " && ";
+      }
+      ifStatement += "window === window.top";
+    }
+
+    return ifStatement.length() > 4 ? ifStatement + ") { " + source + "}" : source;
   }
 
   UserContentController::~UserContentController()

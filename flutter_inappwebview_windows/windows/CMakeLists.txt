@@ -4,9 +4,10 @@
 # customers of the plugin.
 cmake_minimum_required(VERSION 3.14)
 
-set(WIL_VERSION "1.0.231216.1")
-set(WEBVIEW_VERSION "1.0.2792.45")
-set(NLOHMANN_JSON "3.11.2")
+set(WIL_VERSION "1.0.250325.1")
+set(WEBVIEW_VERSION "1.0.3650.58")
+set(NLOHMANN_JSON_VERSION "3.12.0")
+set(CPP_WINRT_VERSION "2.0.250303.1")
 
 message(VERBOSE "CMake system version is ${CMAKE_SYSTEM_VERSION} (using SDK ${CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION})")
 
@@ -27,12 +28,13 @@ if(NOT NUGET)
   message(NOTICE "Nuget is not installed! The flutter_inappwebview_windows plugin requires it. Check https://inappwebview.dev/docs/intro#setup-windows")
 endif()
 
-add_custom_target(${PROJECT_NAME}_DEPENDENCIES_DOWNLOAD ALL)
+add_custom_target(${PROJECT_NAME}_DEPS ALL)
 add_custom_command(
-  TARGET ${PROJECT_NAME}_DEPENDENCIES_DOWNLOAD PRE_BUILD
+  TARGET ${PROJECT_NAME}_DEPS PRE_BUILD
   COMMAND ${NUGET} install Microsoft.Windows.ImplementationLibrary -Version ${WIL_VERSION} -ExcludeVersion -OutputDirectory ${CMAKE_BINARY_DIR}/packages
+  COMMAND ${NUGET} install Microsoft.Windows.CppWinRT -Version ${CPP_WINRT_VERSION} -ExcludeVersion -OutputDirectory ${CMAKE_BINARY_DIR}/packages
   COMMAND ${NUGET} install Microsoft.Web.WebView2 -Version ${WEBVIEW_VERSION} -ExcludeVersion -OutputDirectory ${CMAKE_BINARY_DIR}/packages
-  COMMAND ${NUGET} install nlohmann.json -Version ${NLOHMANN_JSON} -ExcludeVersion -OutputDirectory ${CMAKE_BINARY_DIR}/packages
+  COMMAND ${NUGET} install nlohmann.json -Version ${NLOHMANN_JSON_VERSION} -ExcludeVersion -OutputDirectory ${CMAKE_BINARY_DIR}/packages
   DEPENDS ${NUGET}
 )
 
@@ -41,6 +43,8 @@ list(APPEND PLUGIN_SOURCES
   "flutter_inappwebview_windows_plugin.cpp"
   "flutter_inappwebview_windows_plugin.h"
   "utils/log.h"
+  "utils/defer.h"
+  "utils/timer.h"
   "utils/strconv.h"
   "utils/map.h"
   "utils/vector.h"
@@ -49,6 +53,8 @@ list(APPEND PLUGIN_SOURCES
   "utils/flutter.h"
   "utils/base64.cpp"
   "utils/base64.h"
+  "utils/uri.h"
+  "utils/uuid.h"
   "types/channel_delegate.cpp"
   "types/channel_delegate.h"
   "types/base_callback_result.h"
@@ -93,6 +99,77 @@ list(APPEND PLUGIN_SOURCES
   "types/custom_scheme_response.h"
   "types/custom_scheme_registration.cpp"
   "types/custom_scheme_registration.h"
+  "types/javascript_handler_function_data.cpp"
+  "types/javascript_handler_function_data.h"
+  "types/ssl_error.cpp"
+  "types/ssl_error.h"
+  "types/url_credential.cpp"
+  "types/url_credential.h"
+  "types/url_protection_space.cpp"
+  "types/url_protection_space.h"
+  "types/url_authentication_challenge.cpp"
+  "types/url_authentication_challenge.h"
+  "types/http_authentication_challenge.cpp"
+  "types/http_authentication_challenge.h"
+  "types/http_auth_response.cpp"
+  "types/http_auth_response.h"
+  "types/client_cert_challenge.cpp"
+  "types/client_cert_challenge.h"
+  "types/client_cert_response.cpp"
+  "types/client_cert_response.h"
+  "types/server_trust_challenge.cpp"
+  "types/server_trust_challenge.h"
+  "types/server_trust_auth_response.cpp"
+  "types/server_trust_auth_response.h"
+  "types/security_origin.cpp"
+  "types/security_origin.h"
+  "types/frame_info.cpp"
+  "types/frame_info.h"
+  "types/process_failed_detail.cpp"
+  "types/process_failed_detail.h"
+  "types/render_process_gone_detail.cpp"
+  "types/render_process_gone_detail.h"
+  "types/download_start_request.cpp"
+  "types/download_start_request.h"
+  "types/download_start_response.cpp"
+  "types/download_start_response.h"
+  "types/favicon_changed_request.cpp"
+  "types/favicon_changed_request.h"
+  "types/favicon_image_format.h"
+  "types/launching_external_uri_scheme_request.cpp"
+  "types/launching_external_uri_scheme_request.h"
+  "types/launching_external_uri_scheme_response.cpp"
+  "types/launching_external_uri_scheme_response.h"
+  "types/text_direction_kind.h"
+  "types/notification_received_request.cpp"
+  "types/notification_received_request.h"
+  "types/notification_received_response.cpp"
+  "types/notification_received_response.h"
+  "types/save_as_kind.h"
+  "types/save_as_ui_showing_request.cpp"
+  "types/save_as_ui_showing_request.h"
+  "types/save_as_ui_showing_response.cpp"
+  "types/save_as_ui_showing_response.h"
+  "types/save_file_security_check_starting_request.cpp"
+  "types/save_file_security_check_starting_request.h"
+  "types/save_file_security_check_starting_response.cpp"
+  "types/save_file_security_check_starting_response.h"
+  "types/screen_capture_starting_request.cpp"
+  "types/screen_capture_starting_request.h"
+  "types/screen_capture_starting_response.cpp"
+  "types/screen_capture_starting_response.h"
+  "types/web_notification.cpp"
+  "types/web_notification.h"
+  "types/browser_process_exited_detail.cpp"
+  "types/browser_process_exited_detail.h"
+  "types/browser_process_info.cpp"
+  "types/browser_process_info.h"
+  "types/browser_process_infos_changed_detail.cpp"
+  "types/browser_process_infos_changed_detail.h"
+  "types/physical_key_status.cpp"
+  "types/physical_key_status.h"
+  "types/accelerator_key_pressed_detail.cpp"
+  "types/accelerator_key_pressed_detail.h"
   "custom_platform_view/custom_platform_view.cc"
   "custom_platform_view/custom_platform_view.h"
   "custom_platform_view/texture_bridge.cc"
@@ -107,8 +184,33 @@ list(APPEND PLUGIN_SOURCES
   "custom_platform_view/util/string_converter.h"
   "custom_platform_view/util/swizzle.h"
   "plugin_scripts_js/plugin_scripts_util.h"
-  "plugin_scripts_js/javascript_bridge_js.cpp"
   "plugin_scripts_js/javascript_bridge_js.h"
+  "plugin_scripts_js/web_message_channel_js.h"
+  "plugin_scripts_js/web_message_listener_js.h"
+  "find_interaction/find_interaction_channel_delegate.cpp"
+  "find_interaction/find_interaction_channel_delegate.h"
+  "find_interaction/find_interaction_controller.cpp"
+  "find_interaction/find_interaction_controller.h"
+  "web_notification/web_notification_channel_delegate.cpp"
+  "web_notification/web_notification_channel_delegate.h"
+  "web_notification/web_notification_controller.cpp"
+  "web_notification/web_notification_controller.h"
+  "print_job/print_job_channel_delegate.cpp"
+  "print_job/print_job_channel_delegate.h"
+  "print_job/print_job_controller.cpp"
+  "print_job/print_job_controller.h"
+  "print_job/print_job_info.cpp"
+  "print_job/print_job_info.h"
+  "print_job/print_job_manager.cpp"
+  "print_job/print_job_manager.h"
+  "print_job/print_job_settings.cpp"
+  "print_job/print_job_settings.h"
+  "web_message/web_message_channel.cpp"
+  "web_message/web_message_channel.h"
+  "web_message/web_message_listener.cpp"
+  "web_message/web_message_listener.h"
+  "web_message/web_message_listener_channel_delegate.cpp"
+  "web_message/web_message_listener_channel_delegate.h"
   "webview_environment/webview_environment_settings.cpp"
   "webview_environment/webview_environment_settings.h"
   "webview_environment/webview_environment.cpp"
@@ -143,6 +245,8 @@ list(APPEND PLUGIN_SOURCES
   "in_app_browser/in_app_browser_channel_delegate.h"
   "cookie_manager.cpp"
   "cookie_manager.h"
+  "platform_util.cpp"
+  "platform_util.h"
 )
 
 # Define the plugin library target. Its name must not be changed (see comment
@@ -184,10 +288,12 @@ endif()
 # IMPORTANT: The apply_standard_settings function is not used here because it
 # is causing the plugin to fail to compile because of the usage of /WX flag.
 # So, creating here a custom function to apply the standard settings without the /WX flag.
+# Also, added /bigobj flag.
 function(FLUTTER_INAPPWEBVIEW_WINDOWS_APPLY_STANDARD_SETTINGS TARGET)
   target_compile_features(${TARGET} PUBLIC cxx_std_17)
   target_compile_options(${TARGET} PRIVATE /W4 /wd"4100")
   target_compile_options(${TARGET} PRIVATE /EHsc)
+  target_compile_options(${TARGET} PRIVATE /bigobj)
   target_compile_definitions(${TARGET} PRIVATE "_HAS_EXCEPTIONS=0")
   target_compile_definitions(${TARGET} PRIVATE "$<$<CONFIG:Debug>:_DEBUG>")
 endfunction()
@@ -246,9 +352,15 @@ add_executable(${TEST_RUNNER}
   ${PLUGIN_SOURCES}
 )
 apply_standard_settings(${TEST_RUNNER})
+target_compile_options(${TEST_RUNNER} PRIVATE /bigobj)
+target_compile_options(${TEST_RUNNER} PRIVATE /WX-)
 target_include_directories(${TEST_RUNNER} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 target_link_libraries(${TEST_RUNNER} PRIVATE flutter_wrapper_plugin)
 target_link_libraries(${TEST_RUNNER} PRIVATE gtest_main gmock)
+add_dependencies(${TEST_RUNNER} ${PROJECT_NAME}_DEPS)
+target_link_libraries(${TEST_RUNNER} PRIVATE ${CMAKE_BINARY_DIR}/packages/Microsoft.Web.WebView2/build/native/Microsoft.Web.WebView2.targets)
+target_link_libraries(${TEST_RUNNER} PRIVATE ${CMAKE_BINARY_DIR}/packages/Microsoft.Windows.ImplementationLibrary/build/native/Microsoft.Windows.ImplementationLibrary.targets)
+target_link_libraries(${TEST_RUNNER} PRIVATE ${CMAKE_BINARY_DIR}/packages/nlohmann.json/build/native/nlohmann.json.targets)
 # flutter_wrapper_plugin has link dependencies on the Flutter DLL.
 add_custom_command(TARGET ${TEST_RUNNER} POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E copy_if_different

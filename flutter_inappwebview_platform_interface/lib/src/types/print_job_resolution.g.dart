@@ -27,14 +27,18 @@ class PrintJobResolution {
 
   ///The vertical resolution in DPI (dots per inch).
   final int verticalDpi;
-  const PrintJobResolution(
-      {required this.horizontalDpi,
-      required this.id,
-      required this.label,
-      required this.verticalDpi});
+  const PrintJobResolution({
+    required this.horizontalDpi,
+    required this.id,
+    required this.label,
+    required this.verticalDpi,
+  });
 
   ///Gets a possible [PrintJobResolution] instance from a [Map] value.
-  static PrintJobResolution? fromMap(Map<String, dynamic>? map) {
+  static PrintJobResolution? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
@@ -48,7 +52,7 @@ class PrintJobResolution {
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
       "horizontalDpi": horizontalDpi,
       "id": id,

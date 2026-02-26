@@ -1,13 +1,9 @@
 part of 'main.dart';
 
 void takeScreenshot() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebViewController.isMethodSupported(
+    PlatformInAppWebViewControllerMethod.takeScreenshot,
+  );
 
   skippableTestWidgets('takeScreenshot', (WidgetTester tester) async {
     final Completer<InAppWebViewController> controllerCompleter =
@@ -37,11 +33,13 @@ void takeScreenshot() {
     await tester.pump();
 
     var screenshotConfiguration = ScreenshotConfiguration(
-        compressFormat: CompressFormat.JPEG,
-        quality: 20,
-        rect: InAppWebViewRect(width: 100, height: 100, x: 50, y: 50));
+      compressFormat: CompressFormat.JPEG,
+      quality: 20,
+      rect: InAppWebViewRect(width: 100, height: 100, x: 50, y: 50),
+    );
     var screenshot = await controller.takeScreenshot(
-        screenshotConfiguration: screenshotConfiguration);
+      screenshotConfiguration: screenshotConfiguration,
+    );
     expect(screenshot, isNotNull);
   }, skip: shouldSkip);
 }

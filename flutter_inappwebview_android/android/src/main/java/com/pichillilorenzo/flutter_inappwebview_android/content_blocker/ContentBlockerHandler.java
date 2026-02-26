@@ -157,9 +157,9 @@ public class ContentBlockerHandler {
                         final String cssSelector = action.getSelector();
                         final String jsScript = "(function(d) { " +
                                 "   function hide () { " +
-                                "       if (d.body != null && !d.getElementById('" + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + "-css-display-none-style')) { " +
+                                "       if (d.body != null && !d.getElementById('" + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + "-css-display-none-style')) { " +
                                 "           var c = d.createElement('style'); " +
-                                "           c.id = '" + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + "-css-display-none-style'; " +
+                                "           c.id = '" + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + "-css-display-none-style'; " +
                                 "           c.innerHTML = '" + cssSelector + " { display: none !important; }'; " +
                                 "           d.body.appendChild(c); " +
                                 "       }" +

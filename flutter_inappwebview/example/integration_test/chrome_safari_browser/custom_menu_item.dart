@@ -1,18 +1,20 @@
 part of 'main.dart';
 
 void customMenuItem() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![TargetPlatform.android, TargetPlatform.iOS]
-          .contains(defaultTargetPlatform);
+  final shouldSkip = !ChromeSafariBrowser.isMethodSupported(
+    PlatformChromeSafariBrowserMethod.addMenuItem,
+  );
 
   skippableTest('add custom menu item', () async {
     var chromeSafariBrowser = MyChromeSafariBrowser();
-    chromeSafariBrowser.addMenuItem(ChromeSafariBrowserMenuItem(
+    chromeSafariBrowser.addMenuItem(
+      ChromeSafariBrowserMenuItem(
         id: 2,
         label: 'Custom item menu 1',
         image: UIImage(systemName: "pencil"),
-        onClick: (url, title) {}));
+        onClick: (url, title) {},
+      ),
+    );
     expect(chromeSafariBrowser.isOpened(), false);
 
     await chromeSafariBrowser.open(url: TEST_URL_1);

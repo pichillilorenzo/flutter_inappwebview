@@ -1,13 +1,7 @@
 part of 'main.dart';
 
 void openUrlAndClose() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppBrowser.isClassSupported();
 
   skippableTest('open url and close', () async {
     var inAppBrowser = new MyInAppBrowser();
@@ -21,7 +15,8 @@ void openUrlAndClose() {
     expect(inAppBrowser.isOpened(), true);
     expect(() async {
       await inAppBrowser.openUrlRequest(
-          urlRequest: URLRequest(url: TEST_CROSS_PLATFORM_URL_1));
+        urlRequest: URLRequest(url: TEST_CROSS_PLATFORM_URL_1),
+      );
     }, throwsAssertionError);
 
     await inAppBrowser.firstPageLoaded.future;

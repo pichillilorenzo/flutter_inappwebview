@@ -19,29 +19,55 @@ class PermissionRequest {
   ///**NOTE for iOS, macOS and Windows**: this list will have only 1 element and will be used by the [PermissionResponse.action]
   ///as the resource to consider when applying the corresponding action.
   List<PermissionResourceType> resources;
-  PermissionRequest(
-      {this.frame, required this.origin, this.resources = const []});
+  PermissionRequest({
+    this.frame,
+    required this.origin,
+    this.resources = const [],
+  });
 
   ///Gets a possible [PermissionRequest] instance from a [Map] value.
-  static PermissionRequest? fromMap(Map<String, dynamic>? map) {
+  static PermissionRequest? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
     final instance = PermissionRequest(
-      frame: FrameInfo.fromMap(map['frame']?.cast<String, dynamic>()),
+      frame: FrameInfo.fromMap(
+        map['frame']?.cast<String, dynamic>(),
+        enumMethod: enumMethod,
+      ),
       origin: WebUri(map['origin']),
     );
-    instance.resources = List<PermissionResourceType>.from(map['resources']
-        .map((e) => PermissionResourceType.fromNativeValue(e)!));
+    if (map['resources'] != null) {
+      instance.resources = List<PermissionResourceType>.from(
+        map['resources'].map(
+          (e) => switch (enumMethod ?? EnumMethod.nativeValue) {
+            EnumMethod.nativeValue => PermissionResourceType.fromNativeValue(e),
+            EnumMethod.value => PermissionResourceType.fromValue(e),
+            EnumMethod.name => PermissionResourceType.byName(e),
+          }!,
+        ),
+      );
+    }
     return instance;
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
-      "frame": frame?.toMap(),
+      "frame": frame?.toMap(enumMethod: enumMethod),
       "origin": origin.toString(),
-      "resources": resources.map((e) => e.toNativeValue()).toList(),
+      "resources": resources
+          .map(
+            (e) => switch (enumMethod ?? EnumMethod.nativeValue) {
+              EnumMethod.nativeValue => e.toNativeValue(),
+              EnumMethod.value => e.toValue(),
+              EnumMethod.name => e.name(),
+            },
+          )
+          .toList(),
     };
   }
 

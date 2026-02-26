@@ -1,6 +1,7 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 
 import 'web_resource_error_type.dart';
+import 'enum_method.dart';
 
 part 'web_resource_error.g.dart';
 

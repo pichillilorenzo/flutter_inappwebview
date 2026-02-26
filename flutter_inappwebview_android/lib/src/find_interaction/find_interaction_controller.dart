@@ -11,16 +11,19 @@ import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_pla
 class AndroidFindInteractionControllerCreationParams
     extends PlatformFindInteractionControllerCreationParams {
   /// Creates a new [AndroidFindInteractionControllerCreationParams] instance.
-  const AndroidFindInteractionControllerCreationParams(
-      {super.onFindResultReceived});
+  const AndroidFindInteractionControllerCreationParams({
+    super.onFindResultReceived,
+  });
 
   /// Creates a [AndroidFindInteractionControllerCreationParams] instance based on [PlatformFindInteractionControllerCreationParams].
   factory AndroidFindInteractionControllerCreationParams.fromPlatformFindInteractionControllerCreationParams(
-      // Recommended placeholder to prevent being broken by platform interface.
-      // ignore: avoid_unused_constructor_parameters
-      PlatformFindInteractionControllerCreationParams params) {
+    // Recommended placeholder to prevent being broken by platform interface.
+    // ignore: avoid_unused_constructor_parameters
+    PlatformFindInteractionControllerCreationParams params,
+  ) {
     return AndroidFindInteractionControllerCreationParams(
-        onFindResultReceived: params.onFindResultReceived);
+      onFindResultReceived: params.onFindResultReceived,
+    );
   }
 }
 
@@ -29,21 +32,33 @@ class AndroidFindInteractionController extends PlatformFindInteractionController
     with ChannelController {
   /// Constructs a [AndroidFindInteractionController].
   AndroidFindInteractionController(
-      PlatformFindInteractionControllerCreationParams params)
-      : super.implementation(
-          params is AndroidFindInteractionControllerCreationParams
-              ? params
-              : AndroidFindInteractionControllerCreationParams
-                  .fromPlatformFindInteractionControllerCreationParams(params),
-        );
+    PlatformFindInteractionControllerCreationParams params,
+  ) : super.implementation(
+        params is AndroidFindInteractionControllerCreationParams
+            ? params
+            : AndroidFindInteractionControllerCreationParams.fromPlatformFindInteractionControllerCreationParams(
+                params,
+              ),
+      );
+
+  static final AndroidFindInteractionController _staticValue =
+      AndroidFindInteractionController(
+        AndroidFindInteractionControllerCreationParams(),
+      );
+
+  /// Provide static access.
+  factory AndroidFindInteractionController.static() {
+    return _staticValue;
+  }
 
   _debugLog(String method, dynamic args) {
     debugLog(
-        className: this.runtimeType.toString(),
-        debugLoggingSettings:
-            PlatformFindInteractionController.debugLoggingSettings,
-        method: method,
-        args: args);
+      className: this.runtimeType.toString(),
+      debugLoggingSettings:
+          PlatformFindInteractionController.debugLoggingSettings,
+      method: method,
+      args: args,
+    );
   }
 
   Future<dynamic> _handleMethod(MethodCall call) async {
@@ -56,7 +71,11 @@ class AndroidFindInteractionController extends PlatformFindInteractionController
           int numberOfMatches = call.arguments["numberOfMatches"];
           bool isDoneCounting = call.arguments["isDoneCounting"];
           onFindResultReceived!(
-              this, activeMatchOrdinal, numberOfMatches, isDoneCounting);
+            this,
+            activeMatchOrdinal,
+            numberOfMatches,
+            isDoneCounting,
+          );
         }
         break;
       default:
@@ -101,9 +120,10 @@ class AndroidFindInteractionController extends PlatformFindInteractionController
   ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.getActiveFindSession}
   Future<FindSession?> getActiveFindSession() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    Map<String, dynamic>? result =
-        (await channel?.invokeMethod('getActiveFindSession', args))
-            ?.cast<String, dynamic>();
+    Map<String, dynamic>? result = (await channel?.invokeMethod(
+      'getActiveFindSession',
+      args,
+    ))?.cast<String, dynamic>();
     return FindSession.fromMap(result);
   }
 
@@ -118,7 +138,8 @@ extension InternalFindInteractionController
     on AndroidFindInteractionController {
   void init(dynamic id) {
     channel = MethodChannel(
-        'com.pichillilorenzo/flutter_inappwebview_find_interaction_$id');
+      'com.pichillilorenzo/flutter_inappwebview_find_interaction_$id',
+    );
     handler = _handleMethod;
     initMethodCallHandler();
   }

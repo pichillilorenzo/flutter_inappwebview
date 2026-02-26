@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:collection';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -19,10 +20,17 @@ class _NullOrEmpty extends Matcher {
       description.add('null or empty');
 }
 
-void skippableGroup(Object description, void Function() body,
-    {bool skip = false}) {
+void skippableGroup(
+  Object description,
+  void Function() body, {
+  bool skip = false,
+}) {
   if (!skip) {
     group(description.toString(), body, skip: skip);
+  } else {
+    print(
+      'SKIPPING GROUP "$description" for platform ${defaultTargetPlatform.toString()}',
+    );
   }
 }
 
@@ -47,6 +55,10 @@ void skippableTest(
       tags: tags,
       retry: retry,
     );
+  } else {
+    print(
+      'SKIPPING TEST "$description" for platform ${defaultTargetPlatform.toString()}',
+    );
   }
 }
 
@@ -60,12 +72,19 @@ void skippableTestWidgets(
   dynamic tags,
 }) {
   if (!skip) {
-    testWidgets(description, callback,
-        skip: skip,
-        timeout: timeout,
-        semanticsEnabled: semanticsEnabled,
-        variant: variant,
-        tags: tags);
+    testWidgets(
+      description,
+      callback,
+      skip: skip,
+      timeout: timeout,
+      semanticsEnabled: semanticsEnabled,
+      variant: variant,
+      tags: tags,
+    );
+  } else {
+    print(
+      'SKIPPING TEST WIDGET "$description" for platform ${defaultTargetPlatform.toString()}',
+    );
   }
 }
 
@@ -85,9 +104,10 @@ class MyInAppBrowser extends InAppBrowser {
   final Completer<void> firstPageLoaded = Completer<void>();
   final Completer<void> browserClosed = Completer<void>();
 
-  MyInAppBrowser(
-      {int? windowId, UnmodifiableListView<UserScript>? initialUserScripts})
-      : super(windowId: windowId, initialUserScripts: initialUserScripts);
+  MyInAppBrowser({
+    int? windowId,
+    UnmodifiableListView<UserScript>? initialUserScripts,
+  }) : super(windowId: windowId, initialUserScripts: initialUserScripts);
 
   @override
   Future onBrowserCreated() async {
@@ -165,7 +185,10 @@ class MyChromeSafariBrowser extends ChromeSafariBrowser {
 
   @override
   void onRelationshipValidationResult(
-      CustomTabsRelationType? relation, Uri? requestedOrigin, bool result) {
+    CustomTabsRelationType? relation,
+    Uri? requestedOrigin,
+    bool result,
+  ) {
     relationshipValidationResult.complete(result);
   }
 

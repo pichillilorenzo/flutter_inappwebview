@@ -16,25 +16,28 @@ import '../in_app_webview/in_app_webview_controller.dart';
 class MacOSInAppBrowserCreationParams
     extends PlatformInAppBrowserCreationParams {
   /// Creates a new [MacOSInAppBrowserCreationParams] instance.
-  MacOSInAppBrowserCreationParams(
-      {super.contextMenu,
-      super.pullToRefreshController,
-      this.findInteractionController,
-      super.initialUserScripts,
-      super.windowId});
+  MacOSInAppBrowserCreationParams({
+    super.contextMenu,
+    super.pullToRefreshController,
+    this.findInteractionController,
+    super.initialUserScripts,
+    super.windowId,
+  });
 
   /// Creates a [MacOSInAppBrowserCreationParams] instance based on [PlatformInAppBrowserCreationParams].
   factory MacOSInAppBrowserCreationParams.fromPlatformInAppBrowserCreationParams(
-      // Recommended placeholder to prevent being broken by platform interface.
-      // ignore: avoid_unused_constructor_parameters
-      PlatformInAppBrowserCreationParams params) {
+    // Recommended placeholder to prevent being broken by platform interface.
+    // ignore: avoid_unused_constructor_parameters
+    PlatformInAppBrowserCreationParams params,
+  ) {
     return MacOSInAppBrowserCreationParams(
-        contextMenu: params.contextMenu,
-        pullToRefreshController: params.pullToRefreshController,
-        findInteractionController:
-            params.findInteractionController as MacOSFindInteractionController?,
-        initialUserScripts: params.initialUserScripts,
-        windowId: params.windowId);
+      contextMenu: params.contextMenu,
+      pullToRefreshController: params.pullToRefreshController,
+      findInteractionController:
+          params.findInteractionController as MacOSFindInteractionController?,
+      initialUserScripts: params.initialUserScripts,
+      windowId: params.windowId,
+    );
   }
 
   @override
@@ -48,17 +51,19 @@ class MacOSInAppBrowser extends PlatformInAppBrowser with ChannelController {
 
   /// Constructs a [MacOSInAppBrowser].
   MacOSInAppBrowser(PlatformInAppBrowserCreationParams params)
-      : super.implementation(
-          params is MacOSInAppBrowserCreationParams
-              ? params
-              : MacOSInAppBrowserCreationParams
-                  .fromPlatformInAppBrowserCreationParams(params),
-        ) {
+    : super.implementation(
+        params is MacOSInAppBrowserCreationParams
+            ? params
+            : MacOSInAppBrowserCreationParams.fromPlatformInAppBrowserCreationParams(
+                params,
+              ),
+      ) {
     _contextMenu = params.contextMenu;
   }
 
-  static final MacOSInAppBrowser _staticValue =
-      MacOSInAppBrowser(MacOSInAppBrowserCreationParams());
+  static final MacOSInAppBrowser _staticValue = MacOSInAppBrowser(
+    MacOSInAppBrowserCreationParams(),
+  );
 
   /// Provide static access.
   factory MacOSInAppBrowser.static() {
@@ -68,8 +73,9 @@ class MacOSInAppBrowser extends PlatformInAppBrowser with ChannelController {
   MacOSInAppBrowserCreationParams get _macosParams =>
       params as MacOSInAppBrowserCreationParams;
 
-  static const MethodChannel _staticChannel =
-      const MethodChannel('com.pichillilorenzo/flutter_inappbrowser');
+  static const MethodChannel _staticChannel = const MethodChannel(
+    'com.pichillilorenzo/flutter_inappbrowser',
+  );
 
   ContextMenu? _contextMenu;
 
@@ -91,20 +97,22 @@ class MacOSInAppBrowser extends PlatformInAppBrowser with ChannelController {
     initMethodCallHandler();
 
     _webViewController = MacOSInAppWebViewController.fromInAppBrowser(
-        MacOSInAppWebViewControllerCreationParams(id: id),
-        channel!,
-        this,
-        this.initialUserScripts);
+      MacOSInAppWebViewControllerCreationParams(id: id),
+      channel!,
+      this,
+      this.initialUserScripts,
+    );
     _macosParams.findInteractionController?.init(id);
   }
 
   _debugLog(String method, dynamic args) {
     debugLog(
-        className: this.runtimeType.toString(),
-        id: id,
-        debugLoggingSettings: PlatformInAppBrowser.debugLoggingSettings,
-        method: method,
-        args: args);
+      className: this.runtimeType.toString(),
+      id: id,
+      debugLoggingSettings: PlatformInAppBrowser.debugLoggingSettings,
+      method: method,
+      args: args,
+    );
   }
 
   Future<dynamic> _handleMethod(MethodCall call) async {
@@ -138,21 +146,23 @@ class MacOSInAppBrowser extends PlatformInAppBrowser with ChannelController {
     }
   }
 
-  Map<String, dynamic> _prepareOpenRequest(
-      {@Deprecated('Use settings instead') InAppBrowserClassOptions? options,
-      InAppBrowserClassSettings? settings}) {
+  Map<String, dynamic> _prepareOpenRequest({
+    @Deprecated('Use settings instead') InAppBrowserClassOptions? options,
+    InAppBrowserClassSettings? settings,
+  }) {
     assert(!_isOpened, 'The browser is already opened.');
     _isOpened = true;
     _init();
 
-    var initialSettings = settings?.toMap() ??
+    var initialSettings =
+        settings?.toMap() ??
         options?.toMap() ??
         InAppBrowserClassSettings().toMap();
 
     Map<String, dynamic> pullToRefreshSettings =
         pullToRefreshController?.settings.toMap() ??
-            pullToRefreshController?.options.toMap() ??
-            PullToRefreshSettings(enabled: false).toMap();
+        pullToRefreshController?.options.toMap() ??
+        PullToRefreshSettings(enabled: false).toMap();
 
     List<Map<String, dynamic>> menuItemList = [];
     _menuItems.forEach((key, value) {
@@ -164,60 +174,73 @@ class MacOSInAppBrowser extends PlatformInAppBrowser with ChannelController {
     args.putIfAbsent('settings', () => initialSettings);
     args.putIfAbsent('contextMenu', () => contextMenu?.toMap() ?? {});
     args.putIfAbsent('windowId', () => windowId);
-    args.putIfAbsent('initialUserScripts',
-        () => initialUserScripts?.map((e) => e.toMap()).toList() ?? []);
+    args.putIfAbsent(
+      'initialUserScripts',
+      () => initialUserScripts?.map((e) => e.toMap()).toList() ?? [],
+    );
     args.putIfAbsent('pullToRefreshSettings', () => pullToRefreshSettings);
     args.putIfAbsent('menuItems', () => menuItemList);
     return args;
   }
 
   @override
-  Future<void> openUrlRequest(
-      {required URLRequest urlRequest,
-      // ignore: deprecated_member_use_from_same_package
-      @Deprecated('Use settings instead') InAppBrowserClassOptions? options,
-      InAppBrowserClassSettings? settings}) async {
+  Future<void> openUrlRequest({
+    required URLRequest urlRequest,
+    // ignore: deprecated_member_use_from_same_package
+    @Deprecated('Use settings instead') InAppBrowserClassOptions? options,
+    InAppBrowserClassSettings? settings,
+  }) async {
     assert(urlRequest.url != null && urlRequest.url.toString().isNotEmpty);
 
-    Map<String, dynamic> args =
-        _prepareOpenRequest(options: options, settings: settings);
+    Map<String, dynamic> args = _prepareOpenRequest(
+      options: options,
+      settings: settings,
+    );
     args.putIfAbsent('urlRequest', () => urlRequest.toMap());
     await _staticChannel.invokeMethod('open', args);
   }
 
   @override
-  Future<void> openFile(
-      {required String assetFilePath,
-      // ignore: deprecated_member_use_from_same_package
-      @Deprecated('Use settings instead') InAppBrowserClassOptions? options,
-      InAppBrowserClassSettings? settings}) async {
+  Future<void> openFile({
+    required String assetFilePath,
+    // ignore: deprecated_member_use_from_same_package
+    @Deprecated('Use settings instead') InAppBrowserClassOptions? options,
+    InAppBrowserClassSettings? settings,
+  }) async {
     assert(assetFilePath.isNotEmpty);
 
-    Map<String, dynamic> args =
-        _prepareOpenRequest(options: options, settings: settings);
+    Map<String, dynamic> args = _prepareOpenRequest(
+      options: options,
+      settings: settings,
+    );
     args.putIfAbsent('assetFilePath', () => assetFilePath);
     await _staticChannel.invokeMethod('open', args);
   }
 
   @override
-  Future<void> openData(
-      {required String data,
-      String mimeType = "text/html",
-      String encoding = "utf8",
-      WebUri? baseUrl,
-      @Deprecated("Use historyUrl instead") Uri? androidHistoryUrl,
-      WebUri? historyUrl,
-      // ignore: deprecated_member_use_from_same_package
-      @Deprecated('Use settings instead') InAppBrowserClassOptions? options,
-      InAppBrowserClassSettings? settings}) async {
-    Map<String, dynamic> args =
-        _prepareOpenRequest(options: options, settings: settings);
+  Future<void> openData({
+    required String data,
+    String mimeType = "text/html",
+    String encoding = "utf8",
+    WebUri? baseUrl,
+    @Deprecated("Use historyUrl instead") Uri? androidHistoryUrl,
+    WebUri? historyUrl,
+    // ignore: deprecated_member_use_from_same_package
+    @Deprecated('Use settings instead') InAppBrowserClassOptions? options,
+    InAppBrowserClassSettings? settings,
+  }) async {
+    Map<String, dynamic> args = _prepareOpenRequest(
+      options: options,
+      settings: settings,
+    );
     args.putIfAbsent('data', () => data);
     args.putIfAbsent('mimeType', () => mimeType);
     args.putIfAbsent('encoding', () => encoding);
     args.putIfAbsent('baseUrl', () => baseUrl?.toString() ?? "about:blank");
-    args.putIfAbsent('historyUrl',
-        () => (historyUrl ?? androidHistoryUrl)?.toString() ?? "about:blank");
+    args.putIfAbsent(
+      'historyUrl',
+      () => (historyUrl ?? androidHistoryUrl)?.toString() ?? "about:blank",
+    );
     await _staticChannel.invokeMethod('open', args);
   }
 
@@ -312,8 +335,10 @@ class MacOSInAppBrowser extends PlatformInAppBrowser with ChannelController {
     assert(_isOpened, 'The browser is not opened.');
     Map<String, dynamic> args = <String, dynamic>{};
 
-    Map<dynamic, dynamic>? options =
-        await channel?.invokeMethod('getSettings', args);
+    Map<dynamic, dynamic>? options = await channel?.invokeMethod(
+      'getSettings',
+      args,
+    );
     if (options != null) {
       options = options.cast<String, dynamic>();
       return InAppBrowserClassOptions.fromMap(options as Map<String, dynamic>);
@@ -323,8 +348,9 @@ class MacOSInAppBrowser extends PlatformInAppBrowser with ChannelController {
   }
 
   @override
-  Future<void> setSettings(
-      {required InAppBrowserClassSettings settings}) async {
+  Future<void> setSettings({
+    required InAppBrowserClassSettings settings,
+  }) async {
     assert(_isOpened, 'The browser is not opened.');
 
     Map<String, dynamic> args = <String, dynamic>{};
@@ -338,12 +364,15 @@ class MacOSInAppBrowser extends PlatformInAppBrowser with ChannelController {
 
     Map<String, dynamic> args = <String, dynamic>{};
 
-    Map<dynamic, dynamic>? settings =
-        await channel?.invokeMethod('getSettings', args);
+    Map<dynamic, dynamic>? settings = await channel?.invokeMethod(
+      'getSettings',
+      args,
+    );
     if (settings != null) {
       settings = settings.cast<String, dynamic>();
       return InAppBrowserClassSettings.fromMap(
-          settings as Map<String, dynamic>);
+        settings as Map<String, dynamic>,
+      );
     }
 
     return null;

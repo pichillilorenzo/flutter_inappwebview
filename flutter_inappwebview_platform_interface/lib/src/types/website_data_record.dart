@@ -1,6 +1,7 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 
 import 'website_data_type.dart';
+import 'enum_method.dart';
 
 part 'website_data_record.g.dart';
 

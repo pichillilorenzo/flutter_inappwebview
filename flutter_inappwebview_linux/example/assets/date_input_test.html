@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Date/Time Input Test</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    h1 {
+      color: #333;
+      border-bottom: 2px solid #4285f4;
+      padding-bottom: 10px;
+    }
+    .input-group {
+      background: white;
+      padding: 15px;
+      margin: 15px 0;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 8px;
+      color: #555;
+    }
+    input {
+      font-size: 16px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    input:focus {
+      outline: none;
+      border-color: #4285f4;
+      box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2);
+    }
+    .value-display {
+      margin-top: 8px;
+      padding: 8px;
+      background: #e8f0fe;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 14px;
+      color: #1967d2;
+    }
+    .section-title {
+      color: #4285f4;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-top: 30px;
+      margin-bottom: 10px;
+    }
+    .disabled-readonly {
+      opacity: 0.6;
+    }
+    .info-box {
+      background: #fff3cd;
+      border: 1px solid #ffc107;
+      border-radius: 8px;
+      padding: 15px;
+      margin: 20px 0;
+    }
+    .info-box h3 {
+      margin-top: 0;
+      color: #856404;
+    }
+    .info-box ul {
+      margin-bottom: 0;
+      color: #856404;
+    }
+  </style>
+</head>
+<body>
+    <p>Choose your colors:</p>
+
+<div>
+  <input type="color" id="foreground" name="foreground" value="#e66465" />
+  <label for="foreground">Foreground color</label>
+</div>
+
+<div>
+  <input
+    type="color"
+    id="background"
+    name="background"
+    value="oklab(50% 0.1 0.1 / 0.5)"
+    colorspace="display-p3"
+    alpha />
+  <label for="background">Background color</label>
+</div>
+
+
+  <h1>📅 Date/Time Input Test</h1>
+  
+  <div class="info-box">
+    <h3>How to use</h3>
+    <ul>
+      <li>Click the <strong>calendar icon</strong> (📅) to open the date picker</li>
+      <li>You can also <strong>type directly</strong> in the input field</li>
+      <li>The picker dialog is <strong>movable</strong> and <strong>non-modal</strong></li>
+      <li>Double-click a date to quickly confirm</li>
+    </ul>
+  </div>
+
+  <div class="section-title">Standard Inputs</div>
+  
+  <div class="input-group">
+    <label for="date1">Date (type="date")</label>
+    <input type="date" id="date1" value="2024-03-15">
+    <div class="value-display" id="date1-value">Value: 2024-03-15</div>
+  </div>
+
+  <div class="input-group">
+    <label for="datetime1">Date & Time (type="datetime-local")</label>
+    <input type="datetime-local" id="datetime1" value="2024-03-15T14:30">
+    <div class="value-display" id="datetime1-value">Value: 2024-03-15T14:30</div>
+  </div>
+
+  <div class="input-group">
+    <label for="time1">Time (type="time")</label>
+    <input type="time" id="time1" value="14:30">
+    <div class="value-display" id="time1-value">Value: 14:30</div>
+  </div>
+
+  <div class="input-group">
+    <label for="month1">Month (type="month")</label>
+    <input type="month" id="month1" value="2024-03">
+    <div class="value-display" id="month1-value">Value: 2024-03</div>
+  </div>
+
+  <div class="input-group">
+    <label for="week1">Week (type="week")</label>
+    <input type="week" id="week1" value="2024-W11">
+    <div class="value-display" id="week1-value">Value: 2024-W11</div>
+  </div>
+
+  <div class="section-title">With Constraints</div>
+
+  <div class="input-group">
+    <label for="date-constrained">Date with Min/Max (2024 only)</label>
+    <input type="date" id="date-constrained" min="2024-01-01" max="2024-12-31">
+    <div class="value-display" id="date-constrained-value">Value: (empty)</div>
+  </div>
+
+  <div class="section-title">Disabled / Readonly (should NOT open picker)</div>
+
+  <div class="input-group disabled-readonly">
+    <label for="date-disabled">Disabled Date</label>
+    <input type="date" id="date-disabled" disabled value="2024-01-01">
+    <div class="value-display">Disabled - should not open picker</div>
+  </div>
+
+  <div class="input-group disabled-readonly">
+    <label for="date-readonly">Readonly Date</label>
+    <input type="date" id="date-readonly" readonly value="2024-01-01">
+    <div class="value-display">Readonly - should not open picker</div>
+  </div>
+
+  <script>
+    // Update value displays when inputs change
+    document.querySelectorAll('input').forEach(input => {
+      const valueDisplay = document.getElementById(input.id + '-value');
+      
+      input.addEventListener('change', e => {
+        const value = e.target.value || '(empty)';
+        console.log(`${e.target.type} [${e.target.id}] changed to: ${value}`);
+        if (valueDisplay) {
+          valueDisplay.textContent = 'Value: ' + value;
+        }
+      });
+
+      input.addEventListener('input', e => {
+        const value = e.target.value || '(empty)';
+        console.log(`${e.target.type} [${e.target.id}] input event: ${value}`);
+        if (valueDisplay) {
+          valueDisplay.textContent = 'Value: ' + value;
+        }
+      });
+    });
+  </script>
+</body>
+</html>

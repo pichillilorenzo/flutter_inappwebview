@@ -1,15 +1,11 @@
 part of 'main.dart';
 
-void onDownloadStartRequest() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+void onDownloadStarting() {
+  final shouldSkip = !InAppWebView.isPropertySupported(
+    PlatformWebViewCreationParamsProperty.onDownloadStarting,
+  );
 
-  skippableTestWidgets('onDownloadStartRequest', (WidgetTester tester) async {
+  skippableTestWidgets('onDownloadStarting', (WidgetTester tester) async {
     final Completer<InAppWebViewController> controllerCompleter =
         Completer<InAppWebViewController>();
     final Completer<String> onDownloadStartCompleter = Completer<String>();
@@ -18,7 +14,9 @@ void onDownloadStartRequest() {
         textDirection: TextDirection.ltr,
         child: InAppWebView(
           key: GlobalKey(),
-          initialData: InAppWebViewInitialData(data: """
+          initialData: InAppWebViewInitialData(
+            data:
+                """
 <!doctype html>
 <html lang="en">
     <head>
@@ -37,12 +35,14 @@ void onDownloadStartRequest() {
         </script>
     </body>
 </html>
-          """),
+          """,
+          ),
           onWebViewCreated: (controller) {
             controllerCompleter.complete(controller);
           },
-          onDownloadStartRequest: (controller, request) {
+          onDownloadStarting: (controller, request) {
             onDownloadStartCompleter.complete(request.url.toString());
+            return null;
           },
         ),
       ),
@@ -50,6 +50,8 @@ void onDownloadStartRequest() {
 
     final String url = await onDownloadStartCompleter.future;
     expect(
-        url, "http://${environment["NODE_SERVER_IP"]}:8082/test-download-file");
+      url,
+      "http://${environment["NODE_SERVER_IP"]}:8082/test-download-file",
+    );
   }, skip: shouldSkip);
 }

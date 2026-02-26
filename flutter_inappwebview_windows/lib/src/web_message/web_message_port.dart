@@ -16,15 +16,16 @@ class WindowsWebMessagePortCreationParams
 
   /// Creates a [WindowsWebMessagePortCreationParams] instance based on [PlatformWebMessagePortCreationParams].
   factory WindowsWebMessagePortCreationParams.fromPlatformWebMessagePortCreationParams(
-      // Recommended placeholder to prevent being broken by platform interface.
-      // ignore: avoid_unused_constructor_parameters
-      PlatformWebMessagePortCreationParams params) {
+    // Recommended placeholder to prevent being broken by platform interface.
+    // ignore: avoid_unused_constructor_parameters
+    PlatformWebMessagePortCreationParams params,
+  ) {
     return WindowsWebMessagePortCreationParams(index: params.index);
   }
 
   @override
   String toString() {
-    return 'MacOSWebMessagePortCreationParams{index: $index}';
+    return 'WindowsWebMessagePortCreationParams{index: $index}';
   }
 }
 
@@ -35,20 +36,23 @@ class WindowsWebMessagePort extends PlatformWebMessagePort {
 
   /// Constructs a [WindowsWebMessagePort].
   WindowsWebMessagePort(PlatformWebMessagePortCreationParams params)
-      : super.implementation(
-          params is WindowsWebMessagePortCreationParams
-              ? params
-              : WindowsWebMessagePortCreationParams
-                  .fromPlatformWebMessagePortCreationParams(params),
-        );
+    : super.implementation(
+        params is WindowsWebMessagePortCreationParams
+            ? params
+            : WindowsWebMessagePortCreationParams.fromPlatformWebMessagePortCreationParams(
+                params,
+              ),
+      );
 
   @override
   Future<void> setWebMessageCallback(WebMessageCallback? onMessage) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('index', () => params.index);
-    await _webMessageChannel.internalChannel
-        ?.invokeMethod('setWebMessageCallback', args);
-    this._onMessage = onMessage;
+    await _webMessageChannel.internalChannel?.invokeMethod(
+      'setWebMessageCallback',
+      args,
+    );
+    _onMessage = onMessage;
   }
 
   @override
@@ -67,10 +71,10 @@ class WindowsWebMessagePort extends PlatformWebMessagePort {
   }
 
   @override
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
       "index": params.index,
-      "webMessageChannelId": this._webMessageChannel.params.id
+      "webMessageChannelId": _webMessageChannel.params.id,
     };
   }
 
@@ -81,15 +85,15 @@ class WindowsWebMessagePort extends PlatformWebMessagePort {
 
   @override
   String toString() {
-    return 'MacOSWebMessagePort{index: ${params.index}}';
+    return 'WindowsWebMessagePort{index: ${params.index}}';
   }
 }
 
 extension InternalWebMessagePort on WindowsWebMessagePort {
   WebMessageCallback? get onMessage => _onMessage;
-  void set onMessage(WebMessageCallback? value) => _onMessage = value;
+  set onMessage(WebMessageCallback? value) => _onMessage = value;
 
   WindowsWebMessageChannel get webMessageChannel => _webMessageChannel;
-  void set webMessageChannel(WindowsWebMessageChannel value) =>
+  set webMessageChannel(WindowsWebMessageChannel value) =>
       _webMessageChannel = value;
 }

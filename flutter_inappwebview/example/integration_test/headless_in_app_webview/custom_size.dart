@@ -1,13 +1,9 @@
 part of 'main.dart';
 
 void customSize() {
-  final shouldSkip = kIsWeb
-      ? false
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !HeadlessInAppWebView.isMethodSupported(
+    PlatformHeadlessInAppWebViewMethod.getSize,
+  );
 
   skippableTest('set and get custom size', () async {
     final Completer<InAppWebViewController> controllerCompleter =

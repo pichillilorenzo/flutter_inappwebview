@@ -19,11 +19,18 @@ class SslCertificateDName {
 
   ///Organizational Unit (OU) component of the name
   String? UName;
-  SslCertificateDName(
-      {this.CName = "", this.DName = "", this.OName = "", this.UName = ""});
+  SslCertificateDName({
+    this.CName = "",
+    this.DName = "",
+    this.OName = "",
+    this.UName = "",
+  });
 
   ///Gets a possible [SslCertificateDName] instance from a [Map] value.
-  static SslCertificateDName? fromMap(Map<String, dynamic>? map) {
+  static SslCertificateDName? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
@@ -36,13 +43,8 @@ class SslCertificateDName {
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
-    return {
-      "CName": CName,
-      "DName": DName,
-      "OName": OName,
-      "UName": UName,
-    };
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
+    return {"CName": CName, "DName": DName, "OName": OName, "UName": UName};
   }
 
   ///Converts instance to a map.

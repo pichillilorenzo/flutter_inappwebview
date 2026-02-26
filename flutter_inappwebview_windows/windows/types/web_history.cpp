@@ -8,8 +8,8 @@ namespace flutter_inappwebview_plugin
   {}
 
   WebHistory::WebHistory(const flutter::EncodableMap& map)
-    : currentIndex(get_optional_fl_map_value<int64_t>(map, "currentIndex")),
-    list(functional_map(get_optional_fl_map_value<flutter::EncodableList>(map, "list"), [](const flutter::EncodableValue& m) { return std::make_shared<WebHistoryItem>(std::get<flutter::EncodableMap>(m)); }))
+    : WebHistory(get_optional_fl_map_value<int64_t>(map, "currentIndex"),
+      functional_map(get_optional_fl_map_value<flutter::EncodableList>(map, "list"), [](const flutter::EncodableValue& m) { return std::make_shared<WebHistoryItem>(std::get<flutter::EncodableMap>(m)); }))
   {}
 
   flutter::EncodableMap WebHistory::toEncodableMap() const

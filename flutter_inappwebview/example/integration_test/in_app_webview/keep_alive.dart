@@ -1,16 +1,13 @@
 part of 'main.dart';
 
 void keepAlive() {
-  final shouldSkip = kIsWeb
-      ? true
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebView.isPropertySupported(
+    PlatformInAppWebViewWidgetCreationParamsProperty.keepAlive,
+  );
 
-  final initialUrl =
-      !kIsWeb ? TEST_CROSS_PLATFORM_URL_1 : TEST_WEB_PLATFORM_URL_1;
+  final initialUrl = !kIsWeb
+      ? TEST_CROSS_PLATFORM_URL_1
+      : TEST_WEB_PLATFORM_URL_1;
 
   skippableTestWidgets('Keep Alive', (WidgetTester tester) async {
     final keepAlive = InAppWebViewKeepAlive();
@@ -50,19 +47,21 @@ void keepAlive() {
     await pageLoaded.future;
 
     await controller.loadUrl(
-        urlRequest: URLRequest(url: TEST_CROSS_PLATFORM_URL_2));
+      urlRequest: URLRequest(url: TEST_CROSS_PLATFORM_URL_2),
+    );
     await pageLoaded2.future;
 
     await tester.pumpWidget(
       Directionality(
-          textDirection: TextDirection.ltr,
-          child: InAppWebView(
-            key: GlobalKey(),
-            keepAlive: keepAlive,
-            onWebViewCreated: (controller) {
-              controllerCompleter2.complete(controller);
-            },
-          )),
+        textDirection: TextDirection.ltr,
+        child: InAppWebView(
+          key: GlobalKey(),
+          keepAlive: keepAlive,
+          onWebViewCreated: (controller) {
+            controllerCompleter2.complete(controller);
+          },
+        ),
+      ),
     );
     final InAppWebViewController controller2 =
         await controllerCompleter2.future;
@@ -71,6 +70,8 @@ void keepAlive() {
     expect(currentUrl, TEST_CROSS_PLATFORM_URL_2.toString());
 
     await expectLater(
-        InAppWebViewController.disposeKeepAlive(keepAlive), completes);
+      InAppWebViewController.disposeKeepAlive(keepAlive),
+      completes,
+    );
   }, skip: shouldSkip);
 }

@@ -9,8 +9,9 @@ import '../in_app_webview_controller.dart';
 class AndroidInAppWebViewController {
   PlatformInAppWebViewController? _controller;
 
-  AndroidInAppWebViewController(
-      {required PlatformInAppWebViewController controller}) {
+  AndroidInAppWebViewController({
+    required PlatformInAppWebViewController controller,
+  }) {
     this._controller = controller;
   }
 
@@ -76,15 +77,17 @@ class AndroidInAppWebViewController {
 
   ///Use [InAppWebViewController.getSafeBrowsingPrivacyPolicyUrl] instead.
   @Deprecated(
-      "Use InAppWebViewController.getSafeBrowsingPrivacyPolicyUrl instead")
+    "Use InAppWebViewController.getSafeBrowsingPrivacyPolicyUrl instead",
+  )
   static Future<Uri?> getSafeBrowsingPrivacyPolicyUrl() async {
     return await InAppWebViewController.getSafeBrowsingPrivacyPolicyUrl();
   }
 
   ///Use [InAppWebViewController.setSafeBrowsingWhitelist] instead.
   @Deprecated("Use InAppWebViewController.setSafeBrowsingAllowlist instead")
-  static Future<bool> setSafeBrowsingWhitelist(
-      {required List<String> hosts}) async {
+  static Future<bool> setSafeBrowsingWhitelist({
+    required List<String> hosts,
+  }) async {
     return await InAppWebViewController.setSafeBrowsingAllowlist(hosts: hosts);
   }
 
@@ -98,11 +101,14 @@ class AndroidInAppWebViewController {
 
   ///Use [InAppWebViewController.setWebContentsDebuggingEnabled] instead.
   @Deprecated(
-      "Use InAppWebViewController.setWebContentsDebuggingEnabled instead")
+    "Use InAppWebViewController.setWebContentsDebuggingEnabled instead",
+  )
   static Future<void> setWebContentsDebuggingEnabled(
-      bool debuggingEnabled) async {
+    bool debuggingEnabled,
+  ) async {
     return await InAppWebViewController.setWebContentsDebuggingEnabled(
-        debuggingEnabled);
+      debuggingEnabled,
+    );
   }
 
   ///Use [InAppWebViewController.getOriginalUrl] instead.

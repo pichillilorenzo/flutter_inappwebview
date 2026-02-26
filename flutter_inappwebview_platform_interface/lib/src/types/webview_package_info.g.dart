@@ -16,7 +16,10 @@ class WebViewPackageInfo {
   WebViewPackageInfo({this.packageName, this.versionName});
 
   ///Gets a possible [WebViewPackageInfo] instance from a [Map] value.
-  static WebViewPackageInfo? fromMap(Map<String, dynamic>? map) {
+  static WebViewPackageInfo? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
@@ -28,11 +31,8 @@ class WebViewPackageInfo {
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
-    return {
-      "packageName": packageName,
-      "versionName": versionName,
-    };
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
+    return {"packageName": packageName, "versionName": versionName};
   }
 
   ///Converts instance to a map.
@@ -58,7 +58,10 @@ class AndroidWebViewPackageInfo {
   AndroidWebViewPackageInfo({this.packageName, this.versionName});
 
   ///Gets a possible [AndroidWebViewPackageInfo] instance from a [Map] value.
-  static AndroidWebViewPackageInfo? fromMap(Map<String, dynamic>? map) {
+  static AndroidWebViewPackageInfo? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
@@ -70,11 +73,8 @@ class AndroidWebViewPackageInfo {
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
-    return {
-      "packageName": packageName,
-      "versionName": versionName,
-    };
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
+    return {"packageName": packageName, "versionName": versionName};
   }
 
   ///Converts instance to a map.

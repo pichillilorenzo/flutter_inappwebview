@@ -1,6 +1,8 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
+
 import '../in_app_webview/platform_webview.dart';
 import '../web_uri.dart';
+import 'enum_method.dart';
 
 part 'js_prompt_request.g.dart';
 
@@ -24,10 +26,11 @@ class JsPromptRequest_ {
   @SupportedPlatforms(platforms: [IOSPlatform(), MacOSPlatform()])
   bool? isMainFrame;
 
-  JsPromptRequest_(
-      {this.url,
-      this.message,
-      this.defaultValue,
-      @Deprecated("Use isMainFrame instead") this.iosIsMainFrame,
-      this.isMainFrame});
+  JsPromptRequest_({
+    this.url,
+    this.message,
+    this.defaultValue,
+    @Deprecated("Use isMainFrame instead") this.iosIsMainFrame,
+    this.isMainFrame,
+  });
 }

@@ -12,8 +12,8 @@ version: 1.0.0+1
 publish_to: none
 
 environment:
-  sdk: ">=3.3.0 <4.0.0"
-  flutter: ">=3.19.0"
+  sdk: ^3.8.0
+  flutter: ">=3.32.0"
 
 dependencies:
   flutter:
@@ -22,11 +22,15 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
-  flutter_downloader: 1.11.8
-  path_provider: 2.1.4
-  permission_handler: 11.3.1
-  url_launcher: 6.3.0
+  flutter_downloader: ^1.12.0
+  path_provider: ^2.1.5
+  permission_handler: ^12.0.1
+  url_launcher: ^6.3.2
   pointer_interceptor: ^0.10.1+2
+  shared_preferences: ^2.5.4
+  provider: ^6.1.5
+  intl: ^0.18.1
+  file_picker: ^10.3.8
   # mime: ^1.0.4
   # connectivity: ^0.4.5+6
   flutter_inappwebview:
@@ -45,6 +49,8 @@ dependency_overrides:
     path: ../../flutter_inappwebview_web
   flutter_inappwebview_windows:
     path: ../../flutter_inappwebview_windows
+  flutter_inappwebview_linux:
+    path: ../../flutter_inappwebview_linux
 
 dev_dependencies:
   flutter_test:

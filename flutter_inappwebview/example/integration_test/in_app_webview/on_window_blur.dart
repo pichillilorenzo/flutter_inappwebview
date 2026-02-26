@@ -1,13 +1,9 @@
 part of 'main.dart';
 
 void onWindowBlur() {
-  final shouldSkip = kIsWeb
-      ? false
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+  final shouldSkip = !InAppWebView.isPropertySupported(
+    PlatformWebViewCreationParamsProperty.onWindowBlur,
+  );
 
   var url = !kIsWeb ? TEST_URL_1 : TEST_WEB_PLATFORM_URL_1;
 
@@ -21,7 +17,8 @@ void onWindowBlur() {
           initialUrlRequest: URLRequest(url: url),
           onLoadStop: (controller, url) async {
             await controller.evaluateJavascript(
-                source: 'window.dispatchEvent(new Event("blur"));');
+              source: 'window.dispatchEvent(new Event("blur"));',
+            );
           },
           onWindowBlur: (controller) {
             onWindowBlurCompleter.complete();

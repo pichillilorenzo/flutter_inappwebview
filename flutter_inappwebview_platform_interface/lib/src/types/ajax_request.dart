@@ -5,6 +5,7 @@ import 'ajax_request_headers.dart';
 import 'ajax_request_ready_state.dart';
 import 'ajax_request_event.dart';
 import 'ajax_request_action.dart';
+import 'enum_method.dart';
 
 part 'ajax_request.g.dart';
 
@@ -78,24 +79,25 @@ class AjaxRequest_ {
   ///Indicates the [AjaxRequestAction] that can be used to control the `XMLHttpRequest` request.
   AjaxRequestAction_? action;
 
-  AjaxRequest_(
-      {this.data,
-      this.method,
-      this.url,
-      this.isAsync,
-      this.user,
-      this.password,
-      this.withCredentials,
-      this.headers,
-      this.readyState,
-      this.status,
-      this.responseURL,
-      this.responseType,
-      this.response,
-      this.responseText,
-      this.responseXML,
-      this.statusText,
-      this.responseHeaders,
-      this.event,
-      this.action = AjaxRequestAction_.PROCEED});
+  AjaxRequest_({
+    this.data,
+    this.method,
+    this.url,
+    this.isAsync,
+    this.user,
+    this.password,
+    this.withCredentials,
+    this.headers,
+    this.readyState,
+    this.status,
+    this.responseURL,
+    this.responseType,
+    this.response,
+    this.responseText,
+    this.responseXML,
+    this.statusText,
+    this.responseHeaders,
+    this.event,
+    this.action = AjaxRequestAction_.PROCEED,
+  });
 }

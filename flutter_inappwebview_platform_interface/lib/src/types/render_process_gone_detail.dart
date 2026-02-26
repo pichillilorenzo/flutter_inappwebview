@@ -1,6 +1,8 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
+
 import '../in_app_webview/platform_webview.dart';
 import 'renderer_priority.dart';
+import 'enum_method.dart';
 
 part 'render_process_gone_detail.g.dart';
 
@@ -17,6 +19,8 @@ class RenderProcessGoneDetail_ {
   /// any individual `WebView` requested using [].
   RendererPriority_? rendererPriorityAtExit;
 
-  RenderProcessGoneDetail_(
-      {required this.didCrash, this.rendererPriorityAtExit});
+  RenderProcessGoneDetail_({
+    required this.didCrash,
+    this.rendererPriorityAtExit,
+  });
 }

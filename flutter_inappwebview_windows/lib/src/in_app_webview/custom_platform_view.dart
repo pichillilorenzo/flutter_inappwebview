@@ -357,6 +357,18 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
   }
 
   @override
+  void onWindowMinimize() {
+    _reportSurfaceSize();
+    _reportWidgetPosition();
+  }
+
+  @override
+  void onWindowRestore() {
+    _reportSurfaceSize();
+    _reportWidgetPosition();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Focus(
       autofocus: true,

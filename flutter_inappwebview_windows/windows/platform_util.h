@@ -35,6 +35,7 @@ namespace flutter_inappwebview_plugin
     void PlatformUtil::_EmitEvent(std::string eventName);
     bool window_is_moving_ = false;
     bool window_start_move_sent_ = false;
+    bool window_is_minimized_ = false;
   };
 }
 

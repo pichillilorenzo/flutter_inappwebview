@@ -5,6 +5,8 @@ abstract mixin class PlatformUtilListener {
   void onWindowMove() {}
   void onWindowStartMove() {}
   void onWindowEndMove() {}
+  void onWindowMinimize() {}
+  void onWindowRestore() {}
 }
 
 ///Platform native utilities
@@ -50,6 +52,12 @@ class PlatformUtil {
             break;
           case 'onWindowEndMove':
             listener.onWindowEndMove();
+            break;
+          case 'onWindowMinimize':
+            listener.onWindowMinimize();
+            break;
+          case 'onWindowRestore':
+            listener.onWindowRestore();
             break;
         }
       }

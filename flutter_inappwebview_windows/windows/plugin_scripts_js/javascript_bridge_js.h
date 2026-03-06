@@ -27,6 +27,42 @@ namespace flutter_inappwebview_plugin
     inline static const std::string JAVASCRIPT_BRIDGE_JS_PLUGIN_SCRIPT_GROUP_NAME = "IN_APP_WEBVIEW_JAVASCRIPT_BRIDGE_JS_PLUGIN_SCRIPT";
 
     inline static const std::string VAR_JAVASCRIPT_BRIDGE_BRIDGE_SECRET = "$IN_APP_WEBVIEW_JAVASCRIPT_BRIDGE_BRIDGE_SECRET";
+    inline static const std::string BRIDGE_EVENTS_HANDLER_PREFIX = "__flutter_inappwebview_bridge_event__handler__:";
+    inline static const std::string BRIDGE_EVENTS_DOM_EVENT_PREFIX = "__flutter_inappwebview_bridge_event__dispatch__:";
+
+    static std::string BRIDGE_EVENTS_JS_SOURCE()
+    {
+      return "(function(window) { \
+          var bridge = window." + get_JAVASCRIPT_BRIDGE_NAME() + "; \
+          if (bridge == null || bridge.callHandler == null || bridge.bridgeEvents != null) { return; } \
+          var handlerPrefix = '" + BRIDGE_EVENTS_HANDLER_PREFIX + "'; \
+          var domEventPrefix = '" + BRIDGE_EVENTS_DOM_EVENT_PREFIX + "'; \
+          var listeners = {}; \
+          bridge.bridgeEvents = { \
+            on: function(eventName, callback) { \
+              var eventKey = domEventPrefix + String(eventName); \
+              var handler = function(e) { callback(e.detail); }; \
+              listeners[eventKey] = listeners[eventKey] || []; \
+              listeners[eventKey].push({ callback: callback, handler: handler }); \
+              window.addEventListener(eventKey, handler); \
+            }, \
+            off: function(eventName, callback) { \
+              var eventKey = domEventPrefix + String(eventName); \
+              var eventListeners = listeners[eventKey] || []; \
+              for (var i = eventListeners.length - 1; i >= 0; i--) { \
+                if (callback == null || eventListeners[i].callback === callback) { \
+                  window.removeEventListener(eventKey, eventListeners[i].handler); \
+                  eventListeners.splice(i, 1); \
+                } \
+              } \
+              if (eventListeners.length === 0) { delete listeners[eventKey]; } \
+            }, \
+            emit: function(eventName, data) { \
+              return bridge.callHandler(handlerPrefix + String(eventName), data); \
+            } \
+          }; \
+        })(window);";
+    }
 
     static std::string JAVASCRIPT_BRIDGE_JS_SOURCE()
     {
@@ -78,7 +114,7 @@ namespace flutter_inappwebview_plugin
               } catch(e) { resolve(); }\
             });\
           };\
-        })(window);";
+        })(window);" + BRIDGE_EVENTS_JS_SOURCE();
     }
 
     static std::string PLATFORM_READY_JS_SOURCE()

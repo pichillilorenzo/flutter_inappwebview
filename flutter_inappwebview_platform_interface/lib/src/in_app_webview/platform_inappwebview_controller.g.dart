@@ -163,6 +163,48 @@ enum PlatformInAppWebViewControllerMethod {
   ///{@endtemplate}
   addJavaScriptHandler,
 
+  ///Can be used to check if the [PlatformInAppWebViewController.addJsonJavaScriptHandler] method is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.addJsonJavaScriptHandler.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android WebView
+  ///- iOS WKWebView
+  ///- macOS WKWebView
+  ///- Web \<iframe\> but requires same origin
+  ///- Windows WebView2
+  ///
+  ///**Parameters - Officially Supported Platforms/Implementations**:
+  ///- [handlerName]: all platforms
+  ///- [fromJson]: all platforms
+  ///- [callback]: all platforms
+  ///- [toJson]: all platforms
+  ///
+  ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
+  ///{@endtemplate}
+  addJsonJavaScriptHandler,
+
+  ///Can be used to check if the [PlatformInAppWebViewController.addSerializedJavaScriptHandler] method is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.addSerializedJavaScriptHandler.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android WebView
+  ///- iOS WKWebView
+  ///- macOS WKWebView
+  ///- Web \<iframe\> but requires same origin
+  ///- Windows WebView2
+  ///
+  ///**Parameters - Officially Supported Platforms/Implementations**:
+  ///- [handlerName]: all platforms
+  ///- [deserialize]: all platforms
+  ///- [callback]: all platforms
+  ///- [serialize]: all platforms
+  ///
+  ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
+  ///{@endtemplate}
+  addSerializedJavaScriptHandler,
+
   ///Can be used to check if the [PlatformInAppWebViewController.addUserScript] method is supported at runtime.
   ///
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.addUserScript.supported_platforms}
@@ -2562,6 +2604,26 @@ extension _PlatformInAppWebViewControllerMethodSupported
               TargetPlatform.windows,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.addJavaScriptHandler:
+        return kIsWeb && platform == null
+            ? true
+            : ((kIsWeb && platform != null) || !kIsWeb) &&
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                    TargetPlatform.windows,
+                  ].contains(platform ?? defaultTargetPlatform);
+      case PlatformInAppWebViewControllerMethod.addJsonJavaScriptHandler:
+        return kIsWeb && platform == null
+            ? true
+            : ((kIsWeb && platform != null) || !kIsWeb) &&
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                    TargetPlatform.windows,
+                  ].contains(platform ?? defaultTargetPlatform);
+      case PlatformInAppWebViewControllerMethod.addSerializedJavaScriptHandler:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&

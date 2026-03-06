@@ -34,6 +34,52 @@ class JavaScriptBridgeJS {
 
   inline static const std::string VAR_JAVASCRIPT_BRIDGE_BRIDGE_SECRET =
       "$IN_APP_WEBVIEW_JAVASCRIPT_BRIDGE_BRIDGE_SECRET";
+  inline static const std::string BRIDGE_EVENTS_HANDLER_PREFIX =
+      "__flutter_inappwebview_bridge_event__handler__:";
+  inline static const std::string BRIDGE_EVENTS_DOM_EVENT_PREFIX =
+      "__flutter_inappwebview_bridge_event__dispatch__:";
+
+  static std::string BRIDGE_EVENTS_JS_SOURCE() {
+    return R"JS(
+(function(window) {
+  var bridge = window.)JS" +
+           get_JAVASCRIPT_BRIDGE_NAME() + R"JS(;
+  if (bridge == null || bridge.callHandler == null || bridge.bridgeEvents != null) {
+    return;
+  }
+  var handlerPrefix = ')JS" +
+           BRIDGE_EVENTS_HANDLER_PREFIX + R"JS(';
+  var domEventPrefix = ')JS" +
+           BRIDGE_EVENTS_DOM_EVENT_PREFIX + R"JS(';
+  var listeners = {};
+  bridge.bridgeEvents = {
+    on: function(eventName, callback) {
+      var eventKey = domEventPrefix + String(eventName);
+      var handler = function(e) { callback(e.detail); };
+      listeners[eventKey] = listeners[eventKey] || [];
+      listeners[eventKey].push({ callback: callback, handler: handler });
+      window.addEventListener(eventKey, handler);
+    },
+    off: function(eventName, callback) {
+      var eventKey = domEventPrefix + String(eventName);
+      var eventListeners = listeners[eventKey] || [];
+      for (var i = eventListeners.length - 1; i >= 0; i--) {
+        if (callback == null || eventListeners[i].callback === callback) {
+          window.removeEventListener(eventKey, eventListeners[i].handler);
+          eventListeners.splice(i, 1);
+        }
+      }
+      if (eventListeners.length === 0) {
+        delete listeners[eventKey];
+      }
+    },
+    emit: function(eventName, data) {
+      return bridge.callHandler(handlerPrefix + String(eventName), data);
+    }
+  };
+})(window);
+)JS";
+  }
 
   /**
    * Returns the JavaScript variable name for the window ID.
@@ -73,7 +119,7 @@ window.)JS" +
     _postMessage.call = window.Function.prototype.call;
   } catch (_) { return; }
   
-  window.)JS" +
+window.)JS" +
            get_JAVASCRIPT_BRIDGE_NAME() + R"JS(.callHandler = function() {
     var _windowId = )JS" +
            WINDOW_ID_VARIABLE_JS_SOURCE() + R"JS(;
@@ -87,7 +133,7 @@ window.)JS" +
     });
   };
 })(window);
-)JS";
+)JS" + BRIDGE_EVENTS_JS_SOURCE();
   }
 
   /**

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -21,6 +22,31 @@ class ControllersScreen extends StatefulWidget {
 
   @override
   State<ControllersScreen> createState() => _ControllersScreenState();
+}
+
+class _BridgeEventsUserRequest {
+  final String name;
+  final int age;
+
+  const _BridgeEventsUserRequest({required this.name, required this.age});
+
+  factory _BridgeEventsUserRequest.fromJson(Map<String, dynamic> json) {
+    return _BridgeEventsUserRequest(
+      name: json['name'] as String? ?? '',
+      age: (json['age'] as num?)?.toInt() ?? 0,
+    );
+  }
+}
+
+class _BridgeEventsUserResponse {
+  final bool ok;
+  final String message;
+
+  const _BridgeEventsUserResponse({required this.ok, required this.message});
+
+  Map<String, dynamic> toJson() {
+    return {'ok': ok, 'message': message};
+  }
 }
 
 class _ControllersScreenState extends State<ControllersScreen> {
@@ -53,6 +79,16 @@ class _ControllersScreenState extends State<ControllersScreen> {
   final Map<String, List<MethodResultEntry>> _methodHistory = {};
   final Map<String, int> _selectedHistoryIndex = {};
   static const int _maxHistoryEntries = 3;
+
+  static const String _bridgeEventFromJs = 'controllers_js_to_dart';
+  static const String _bridgeEventFromDart = 'controllers_dart_to_js';
+  static const String _bridgeEventAckHandler = 'controllersBridgeEventsAck';
+  static const String _bridgeTypedHandler = 'controllersBridgeTypedUser';
+  static const String _bridgeTypedResultHandler =
+      'controllersBridgeTypedResult';
+  static const String _bridgeJsToDartLabel = 'bridgeEvents.emit (JS -> Dart)';
+  static const String _bridgeDartToJsLabel = 'bridgeEvents.emit (Dart -> JS)';
+  static const String _bridgeTypedLabel = 'addJsonJavaScriptHandler';
 
   SupportedPlatform? get _currentPlatform {
     if (kIsWeb) return SupportedPlatform.web;
@@ -135,6 +171,15 @@ class _ControllersScreenState extends State<ControllersScreen> {
 
   @override
   void dispose() {
+    final controller = _webViewController;
+    if (controller != null) {
+      controller.bridgeEvents.off(_bridgeEventFromJs);
+      controller.removeJavaScriptHandler(handlerName: _bridgeEventAckHandler);
+      controller.removeJavaScriptHandler(
+        handlerName: _bridgeTypedResultHandler,
+      );
+      controller.removeJavaScriptHandler(handlerName: _bridgeTypedHandler);
+    }
     _searchController.dispose();
     _messageController.dispose();
     _findInteractionController?.dispose();
@@ -559,6 +604,297 @@ class _ControllersScreenState extends State<ControllersScreen> {
     );
   }
 
+  bool get _isBridgeEventsSupported {
+    return InAppWebViewController.isMethodSupported(
+          PlatformInAppWebViewControllerMethod.addJavaScriptHandler,
+        ) &&
+        InAppWebViewController.isMethodSupported(
+          PlatformInAppWebViewControllerMethod.removeJavaScriptHandler,
+        ) &&
+        InAppWebViewController.isMethodSupported(
+          PlatformInAppWebViewControllerMethod.hasJavaScriptHandler,
+        ) &&
+        InAppWebViewController.isMethodSupported(
+          PlatformInAppWebViewControllerMethod.evaluateJavascript,
+        );
+  }
+
+  void _registerBridgeEventsHandlers(InAppWebViewController controller) {
+    if (!_isBridgeEventsSupported) {
+      return;
+    }
+
+    controller.bridgeEvents.on(
+      eventName: _bridgeEventFromJs,
+      listener: (data) {
+        _recordMethodResult(
+          _bridgeJsToDartLabel,
+          'Received payload from JavaScript.',
+          isError: false,
+          value: data,
+        );
+        return {
+          'ok': true,
+          'eventName': _bridgeEventFromJs,
+          'receivedBy': 'dart',
+        };
+      },
+    );
+
+    controller.addJavaScriptHandler(
+      handlerName: _bridgeEventAckHandler,
+      callback: (JavaScriptHandlerFunctionData data) {
+        final payload = data.args.isNotEmpty ? data.args[0] : null;
+        _recordMethodResult(
+          _bridgeDartToJsLabel,
+          'JavaScript listener acknowledged the event.',
+          isError: false,
+          value: payload,
+        );
+        return null;
+      },
+    );
+
+    controller.addJsonJavaScriptHandler<
+      _BridgeEventsUserRequest,
+      _BridgeEventsUserResponse
+    >(
+      handlerName: _bridgeTypedHandler,
+      fromJson: _BridgeEventsUserRequest.fromJson,
+      callback: (request, meta) async {
+        return _BridgeEventsUserResponse(
+          ok: true,
+          message: 'updated:${request.name}:${request.age}',
+        );
+      },
+      toJson: (response) => response.toJson(),
+    );
+
+    controller.addJavaScriptHandler(
+      handlerName: _bridgeTypedResultHandler,
+      callback: (JavaScriptHandlerFunctionData data) {
+        dynamic payload = data.args.isNotEmpty ? data.args[0] : null;
+        if (payload is String && payload.isNotEmpty) {
+          try {
+            payload = jsonDecode(payload);
+          } catch (_) {
+            // Keep original value when decoding is not possible.
+          }
+        }
+        _recordMethodResult(
+          _bridgeTypedLabel,
+          'Typed handler response received.',
+          isError: false,
+          value: payload,
+        );
+        return null;
+      },
+    );
+  }
+
+  Future<void> _emitBridgeEventFromJs() async {
+    final controller = _webViewController;
+    if (controller == null || !_webViewReady) {
+      _recordMethodResult(
+        _bridgeJsToDartLabel,
+        'WebView is not ready.',
+        isError: true,
+      );
+      return;
+    }
+    if (!_isBridgeEventsSupported) {
+      _recordMethodResult(
+        _bridgeJsToDartLabel,
+        'Required JavaScript bridge methods are not supported.',
+        isError: true,
+      );
+      return;
+    }
+
+    final bridgeName = await InAppWebViewController.getJavaScriptBridgeName();
+    final encodedBridgeName = jsonEncode(bridgeName);
+    final encodedEventName = jsonEncode(_bridgeEventFromJs);
+    await controller.evaluateJavascript(
+      source:
+          """
+        (function() {
+          function emit() {
+            var bridge = window[$encodedBridgeName];
+            if (bridge == null || bridge.bridgeEvents == null) {
+              return;
+            }
+            window.__controllersBridgeSequence =
+              (window.__controllersBridgeSequence || 0) + 1;
+            bridge.bridgeEvents.emit($encodedEventName, {
+              message: 'hello_from_js',
+              sequence: window.__controllersBridgeSequence,
+              sentAt: new Date().toISOString()
+            });
+          }
+          var bridge = window[$encodedBridgeName];
+          if (bridge != null && bridge._platformReady) {
+            emit();
+            return;
+          }
+          window.addEventListener(
+            'flutterInAppWebViewPlatformReady',
+            emit,
+            { once: true }
+          );
+        })();
+      """,
+    );
+    _recordMethodResult(
+      _bridgeJsToDartLabel,
+      'JavaScript emit requested.',
+      isError: false,
+    );
+  }
+
+  Future<void> _emitBridgeEventFromDart() async {
+    final controller = _webViewController;
+    if (controller == null || !_webViewReady) {
+      _recordMethodResult(
+        _bridgeDartToJsLabel,
+        'WebView is not ready.',
+        isError: true,
+      );
+      return;
+    }
+    if (!_isBridgeEventsSupported) {
+      _recordMethodResult(
+        _bridgeDartToJsLabel,
+        'Required JavaScript bridge methods are not supported.',
+        isError: true,
+      );
+      return;
+    }
+
+    final bridgeName = await InAppWebViewController.getJavaScriptBridgeName();
+    final encodedBridgeName = jsonEncode(bridgeName);
+    final encodedEventName = jsonEncode(_bridgeEventFromDart);
+    final encodedAckHandlerName = jsonEncode(_bridgeEventAckHandler);
+
+    await controller.evaluateJavascript(
+      source:
+          """
+        (function() {
+          function registerListener() {
+            var bridge = window[$encodedBridgeName];
+            if (bridge == null || bridge.bridgeEvents == null) {
+              return;
+            }
+            bridge.bridgeEvents.off($encodedEventName);
+            bridge.bridgeEvents.on($encodedEventName, function(data) {
+              bridge.callHandler($encodedAckHandlerName, {
+                source: 'javascript',
+                eventName: $encodedEventName,
+                data: data
+              });
+            });
+          }
+          var bridge = window[$encodedBridgeName];
+          if (bridge != null && bridge._platformReady) {
+            registerListener();
+            return;
+          }
+          window.addEventListener(
+            'flutterInAppWebViewPlatformReady',
+            registerListener,
+            { once: true }
+          );
+        })();
+      """,
+    );
+
+    await controller.bridgeEvents.emit(_bridgeEventFromDart, {
+      'message': 'hello_from_dart',
+      'sentAt': DateTime.now().toIso8601String(),
+    });
+
+    _recordMethodResult(
+      _bridgeDartToJsLabel,
+      'Dart emit requested.',
+      isError: false,
+    );
+  }
+
+  Future<void> _invokeTypedBridgeHandlerFromJs() async {
+    final controller = _webViewController;
+    if (controller == null || !_webViewReady) {
+      _recordMethodResult(
+        _bridgeTypedLabel,
+        'WebView is not ready.',
+        isError: true,
+      );
+      return;
+    }
+    if (!_isBridgeEventsSupported) {
+      _recordMethodResult(
+        _bridgeTypedLabel,
+        'Required JavaScript bridge methods are not supported.',
+        isError: true,
+      );
+      return;
+    }
+
+    final bridgeName = await InAppWebViewController.getJavaScriptBridgeName();
+    final encodedBridgeName = jsonEncode(bridgeName);
+    final encodedTypedHandler = jsonEncode(_bridgeTypedHandler);
+    final encodedTypedResultHandler = jsonEncode(_bridgeTypedResultHandler);
+
+    await controller.evaluateJavascript(
+      source:
+          """
+        (function() {
+          function run() {
+            var bridge = window[$encodedBridgeName];
+            if (bridge == null || bridge.callHandler == null) {
+              return;
+            }
+            var payload = JSON.stringify({name: 'Alice', age: 31});
+            bridge.callHandler($encodedTypedHandler, payload)
+              .then(function(result) {
+                bridge.callHandler($encodedTypedResultHandler, result);
+              })
+              .catch(function(error) {
+                bridge.callHandler($encodedTypedResultHandler, {
+                  ok: false,
+                  message: String(error)
+                });
+              });
+          }
+          var bridge = window[$encodedBridgeName];
+          if (bridge != null && bridge._platformReady) {
+            run();
+            return;
+          }
+          window.addEventListener(
+            'flutterInAppWebViewPlatformReady',
+            run,
+            { once: true }
+          );
+        })();
+      """,
+    );
+    _recordMethodResult(
+      _bridgeTypedLabel,
+      'Typed JavaScript handler invocation requested.',
+      isError: false,
+    );
+  }
+
+  void _clearBridgeEventsHistory() {
+    setState(() {
+      _methodHistory.remove(_bridgeJsToDartLabel);
+      _methodHistory.remove(_bridgeDartToJsLabel);
+      _methodHistory.remove(_bridgeTypedLabel);
+      _selectedHistoryIndex.remove(_bridgeJsToDartLabel);
+      _selectedHistoryIndex.remove(_bridgeDartToJsLabel);
+      _selectedHistoryIndex.remove(_bridgeTypedLabel);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -629,6 +965,8 @@ class _ControllersScreenState extends State<ControllersScreen> {
               const SizedBox(height: 16),
               _buildWebMessageChannelSection(),
               const SizedBox(height: 16),
+              _buildBridgeEventsSection(),
+              const SizedBox(height: 16),
               _buildPrintJobSection(),
               const SizedBox(height: 16),
               const EventLogCard(),
@@ -656,6 +994,8 @@ class _ControllersScreenState extends State<ControllersScreen> {
                 const SizedBox(height: 16),
                 _buildWebMessageChannelSection(),
                 const SizedBox(height: 16),
+                _buildBridgeEventsSection(),
+                const SizedBox(height: 16),
                 _buildPrintJobSection(),
                 const SizedBox(height: 16),
                 const EventLogCard(),
@@ -682,6 +1022,7 @@ class _ControllersScreenState extends State<ControllersScreen> {
             pullToRefreshController: _pullToRefreshController,
             onWebViewCreated: (controller) {
               _webViewController = controller;
+              _registerBridgeEventsHandlers(controller);
             },
             onLoadStop: (controller, url) {
               setState(() => _webViewReady = true);
@@ -1279,6 +1620,88 @@ class _ControllersScreenState extends State<ControllersScreen> {
                     ),
                   ],
                 ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBridgeEventsSection() {
+    final supportedPlatforms = SupportCheckHelper.supportedPlatformsForMethod(
+      method: PlatformInAppWebViewControllerMethod.addJavaScriptHandler,
+      checker: InAppWebViewController.isMethodSupported,
+    );
+
+    return Card(
+      child: ExpansionTile(
+        title: Row(
+          children: [
+            const Text(
+              'Bridge Events',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: SupportBadgesRow(
+                  supportedPlatforms: supportedPlatforms,
+                  compact: true,
+                ),
+              ),
+            ),
+          ],
+        ),
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Validate bridgeEvents (on/off/emit) and addJsonJavaScriptHandler without bypassing JavaScript bridge security checks.',
+                ),
+                const SizedBox(height: 12),
+                if (!_isBridgeEventsSupported)
+                  Text(
+                    'Required JavaScript bridge methods are not supported on this platform.',
+                    style: TextStyle(color: Colors.red.shade700),
+                  ),
+                if (!_isBridgeEventsSupported) const SizedBox(height: 12),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    ElevatedButton(
+                      onPressed: (_webViewReady && _isBridgeEventsSupported)
+                          ? _emitBridgeEventFromJs
+                          : null,
+                      child: const Text('JS -> Dart Emit'),
+                    ),
+                    ElevatedButton(
+                      onPressed: (_webViewReady && _isBridgeEventsSupported)
+                          ? _emitBridgeEventFromDart
+                          : null,
+                      child: const Text('Dart -> JS Emit'),
+                    ),
+                    ElevatedButton(
+                      onPressed: (_webViewReady && _isBridgeEventsSupported)
+                          ? _invokeTypedBridgeHandlerFromJs
+                          : null,
+                      child: const Text('Typed Handler'),
+                    ),
+                    TextButton(
+                      onPressed: _clearBridgeEventsHistory,
+                      child: const Text('Clear Results'),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                _buildMethodHistory(_bridgeJsToDartLabel),
+                _buildMethodHistory(_bridgeDartToJsLabel),
+                _buildMethodHistory(_bridgeTypedLabel),
               ],
             ),
           ),

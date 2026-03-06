@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
 import 'dart:core';
@@ -1357,6 +1358,91 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   bool hasJavaScriptHandler({required String handlerName}) {
     throw UnimplementedError(
       '${PlatformInAppWebViewControllerMethod.hasJavaScriptHandler.name} is not implemented on the current platform',
+    );
+  }
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.addSerializedJavaScriptHandler}
+  ///Adds a JavaScript handler with user-defined serialization functions.
+  ///
+  ///This helper wraps [addJavaScriptHandler] and does not change the underlying
+  ///JavaScript bridge behavior or security checks.
+  ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.addSerializedJavaScriptHandler.supported_platforms}
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(),
+      IOSPlatform(),
+      MacOSPlatform(),
+      WebPlatform(),
+      WindowsPlatform(),
+    ],
+  )
+  void addSerializedJavaScriptHandler<TRequest, TResponse>({
+    required String handlerName,
+    required TRequest Function(Object? raw) deserialize,
+    required FutureOr<TResponse> Function(
+      TRequest request,
+      JavaScriptHandlerFunctionData meta,
+    )
+    callback,
+    Object? Function(TResponse value)? serialize,
+  }) {
+    addJavaScriptHandler(
+      handlerName: handlerName,
+      callback: (JavaScriptHandlerFunctionData data) async {
+        final raw = data.args.isNotEmpty ? data.args[0] : null;
+        final request = deserialize(raw);
+        final response = await callback(request, data);
+        return serialize != null ? serialize(response) : response;
+      },
+    );
+  }
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.addJsonJavaScriptHandler}
+  ///Adds a JavaScript handler with `fromJson` / `toJson` conversion.
+  ///
+  ///This is a convenience wrapper around [addSerializedJavaScriptHandler].
+  ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.addJsonJavaScriptHandler.supported_platforms}
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(),
+      IOSPlatform(),
+      MacOSPlatform(),
+      WebPlatform(),
+      WindowsPlatform(),
+    ],
+  )
+  void addJsonJavaScriptHandler<TRequest, TResponse>({
+    required String handlerName,
+    required TRequest Function(Map<String, dynamic> json) fromJson,
+    required FutureOr<TResponse> Function(
+      TRequest request,
+      JavaScriptHandlerFunctionData meta,
+    )
+    callback,
+    Map<String, dynamic> Function(TResponse value)? toJson,
+  }) {
+    addSerializedJavaScriptHandler<TRequest, TResponse>(
+      handlerName: handlerName,
+      deserialize: (raw) {
+        dynamic decoded = raw;
+        if (decoded is String && decoded.isNotEmpty) {
+          decoded = jsonDecode(decoded);
+        }
+        if (decoded is Map) {
+          return fromJson(Map<String, dynamic>.from(decoded));
+        }
+        throw ArgumentError.value(
+          raw,
+          "raw",
+          "Expected a JSON object for handler $handlerName.",
+        );
+      },
+      callback: callback,
+      serialize: toJson,
     );
   }
 

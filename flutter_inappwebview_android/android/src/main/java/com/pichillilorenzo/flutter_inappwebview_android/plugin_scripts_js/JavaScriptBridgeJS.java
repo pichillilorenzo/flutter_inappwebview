@@ -25,6 +25,8 @@ public class JavaScriptBridgeJS {
   public static final String JAVASCRIPT_BRIDGE_JS_PLUGIN_SCRIPT_GROUP_NAME = "IN_APP_WEBVIEW_JAVASCRIPT_BRIDGE_JS_PLUGIN_SCRIPT";
 
   private static final String VAR_JAVASCRIPT_BRIDGE_BRIDGE_SECRET = "$IN_APP_WEBVIEW_JAVASCRIPT_BRIDGE_BRIDGE_SECRET";
+  private static final String BRIDGE_EVENTS_HANDLER_PREFIX = "__flutter_inappwebview_bridge_event__handler__:";
+  private static final String BRIDGE_EVENTS_DOM_EVENT_PREFIX = "__flutter_inappwebview_bridge_event__dispatch__:";
 
   public static PluginScript JAVASCRIPT_BRIDGE_JS_PLUGIN_SCRIPT(@NonNull String expectedBridgeSecret,
                                                                 @Nullable Set<String> allowedOriginRules,
@@ -47,6 +49,39 @@ public class JavaScriptBridgeJS {
 
   public static String WEB_MESSAGE_CHANNELS_VARIABLE_NAME() {
     return "window." + get_JAVASCRIPT_BRIDGE_NAME() + "._webMessageChannels";
+  }
+
+  public static String BRIDGE_EVENTS_JS_SOURCE() {
+    return "(function(window) {" +
+            "  var bridge = window." + get_JAVASCRIPT_BRIDGE_NAME() + ";" +
+            "  if (bridge == null || bridge.callHandler == null || bridge.bridgeEvents != null) { return; }" +
+            "  var handlerPrefix = '" + BRIDGE_EVENTS_HANDLER_PREFIX + "';" +
+            "  var domEventPrefix = '" + BRIDGE_EVENTS_DOM_EVENT_PREFIX + "';" +
+            "  var listeners = {};" +
+            "  bridge.bridgeEvents = {" +
+            "    on: function(eventName, callback) {" +
+            "      var eventKey = domEventPrefix + String(eventName);" +
+            "      var handler = function(e) { callback(e.detail); };" +
+            "      listeners[eventKey] = listeners[eventKey] || [];" +
+            "      listeners[eventKey].push({ callback: callback, handler: handler });" +
+            "      window.addEventListener(eventKey, handler);" +
+            "    }," +
+            "    off: function(eventName, callback) {" +
+            "      var eventKey = domEventPrefix + String(eventName);" +
+            "      var eventListeners = listeners[eventKey] || [];" +
+            "      for (var i = eventListeners.length - 1; i >= 0; i--) {" +
+            "        if (callback == null || eventListeners[i].callback === callback) {" +
+            "          window.removeEventListener(eventKey, eventListeners[i].handler);" +
+            "          eventListeners.splice(i, 1);" +
+            "        }" +
+            "      }" +
+            "      if (eventListeners.length === 0) { delete listeners[eventKey]; }" +
+            "    }," +
+            "    emit: function(eventName, data) {" +
+            "      return bridge.callHandler(handlerPrefix + String(eventName), data);" +
+            "    }" +
+            "  };" +
+            "})(window);";
   }
 
   public static String UTIL_JS_SOURCE() {
@@ -352,6 +387,7 @@ public class JavaScriptBridgeJS {
             "  })(window);" +
             "}" +
             "if (window." + get_JAVASCRIPT_BRIDGE_NAME() + " != null) {" +
+            "  " + BRIDGE_EVENTS_JS_SOURCE() +
             "  " + UTIL_JS_SOURCE() +
             "}";
   }

@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'dart:convert';
 import 'dart:core';
 
 import 'package:flutter/services.dart';
@@ -8,6 +10,91 @@ import '../web_message/main.dart';
 import '../web_storage/web_storage.dart';
 import 'android/in_app_webview_controller.dart';
 import 'apple/in_app_webview_controller.dart';
+
+const String _kBridgeEventsHandlerPrefix =
+    "__flutter_inappwebview_bridge_event__handler__:";
+const String _kBridgeEventsCustomEventPrefix =
+    "__flutter_inappwebview_bridge_event__dispatch__:";
+
+typedef InAppWebViewBridgeEventListener =
+    FutureOr<dynamic> Function(dynamic data);
+
+/// High-level event bridge built on top of the existing JavaScript bridge.
+///
+/// This API never bypasses the native JavaScript bridge security checks because
+/// JavaScript -> Dart communication still uses `callHandler`.
+class InAppWebViewBridgeEvents {
+  InAppWebViewBridgeEvents._(this._controller);
+
+  final InAppWebViewController _controller;
+
+  static String _buildHandlerName(String eventName) {
+    return _kBridgeEventsHandlerPrefix + eventName;
+  }
+
+  static String _buildCustomEventName(String eventName) {
+    return _kBridgeEventsCustomEventPrefix + eventName;
+  }
+
+  static void _validateEventName(String eventName) {
+    if (eventName.isEmpty) {
+      throw ArgumentError.value(eventName, "eventName", "cannot be empty");
+    }
+  }
+
+  /// Emits an event from Dart to JavaScript listeners.
+  Future<void> emit(String eventName, [dynamic data]) async {
+    _validateEventName(eventName);
+    final encodedEventName = jsonEncode(_buildCustomEventName(eventName));
+    final encodedData = jsonEncode(data);
+    await _controller.evaluateJavascript(
+      source:
+          """
+        (function() {
+          var eventName = $encodedEventName;
+          var detail = $encodedData;
+          window.dispatchEvent(new CustomEvent(eventName, { detail: detail }));
+        })();
+      """,
+    );
+  }
+
+  /// Registers one Dart listener for a JavaScript event.
+  ///
+  /// Calling this again with the same [eventName] replaces the previous
+  /// listener.
+  void on({
+    required String eventName,
+    required InAppWebViewBridgeEventListener listener,
+  }) {
+    _validateEventName(eventName);
+    final handlerName = _buildHandlerName(eventName);
+    _controller.removeJavaScriptHandler(handlerName: handlerName);
+    _controller.addJavaScriptHandler(
+      handlerName: handlerName,
+      callback: (JavaScriptHandlerFunctionData handlerData) {
+        final data = handlerData.args.isNotEmpty ? handlerData.args[0] : null;
+        return listener(data);
+      },
+    );
+  }
+
+  /// Removes a Dart listener previously added through [on].
+  Function? off(String eventName) {
+    _validateEventName(eventName);
+    return _controller.removeJavaScriptHandler(
+      handlerName: _buildHandlerName(eventName),
+    );
+  }
+
+  /// Returns true if a Dart listener exists for [eventName].
+  bool hasListener(String eventName) {
+    _validateEventName(eventName);
+    return _controller.hasJavaScriptHandler(
+      handlerName: _buildHandlerName(eventName),
+    );
+  }
+}
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController}
 ///
@@ -37,6 +124,11 @@ class InAppWebViewController {
 
   /// Implementation of [PlatformInAppWebViewController] for the current platform.
   final PlatformInAppWebViewController platform;
+
+  /// High-level Dart/JavaScript event bridge.
+  late final InAppWebViewBridgeEvents bridgeEvents = InAppWebViewBridgeEvents._(
+    this,
+  );
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.webStorage}
   ///
@@ -273,6 +365,64 @@ class InAppWebViewController {
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.hasJavaScriptHandler.supported_platforms}
   bool hasJavaScriptHandler({required String handlerName}) =>
       platform.hasJavaScriptHandler(handlerName: handlerName);
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.addSerializedJavaScriptHandler}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.addSerializedJavaScriptHandler.supported_platforms}
+  void addSerializedJavaScriptHandler<TRequest, TResponse>({
+    required String handlerName,
+    required TRequest Function(Object? raw) deserialize,
+    required FutureOr<TResponse> Function(
+      TRequest request,
+      JavaScriptHandlerFunctionData meta,
+    )
+    callback,
+    Object? Function(TResponse value)? serialize,
+  }) {
+    addJavaScriptHandler(
+      handlerName: handlerName,
+      callback: (JavaScriptHandlerFunctionData data) async {
+        final raw = data.args.isNotEmpty ? data.args[0] : null;
+        final request = deserialize(raw);
+        final response = await callback(request, data);
+        return serialize != null ? serialize(response) : response;
+      },
+    );
+  }
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.addJsonJavaScriptHandler}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.addJsonJavaScriptHandler.supported_platforms}
+  void addJsonJavaScriptHandler<TRequest, TResponse>({
+    required String handlerName,
+    required TRequest Function(Map<String, dynamic> json) fromJson,
+    required FutureOr<TResponse> Function(
+      TRequest request,
+      JavaScriptHandlerFunctionData meta,
+    )
+    callback,
+    Map<String, dynamic> Function(TResponse value)? toJson,
+  }) {
+    addSerializedJavaScriptHandler<TRequest, TResponse>(
+      handlerName: handlerName,
+      deserialize: (raw) {
+        dynamic decoded = raw;
+        if (decoded is String && decoded.isNotEmpty) {
+          decoded = jsonDecode(decoded);
+        }
+        if (decoded is Map) {
+          return fromJson(Map<String, dynamic>.from(decoded));
+        }
+        throw ArgumentError.value(
+          raw,
+          "raw",
+          "Expected a JSON object for handler $handlerName.",
+        );
+      },
+      callback: callback,
+      serialize: toJson,
+    );
+  }
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.takeScreenshot}
   ///

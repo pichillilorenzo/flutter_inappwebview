@@ -84,6 +84,39 @@
                       );
                     }
                   };
+                  const bridge = iframe.contentWindow[javaScriptBridgeName];
+                  if (bridge != null && bridge.callHandler != null && bridge.bridgeEvents == null) {
+                    const handlerPrefix = "__flutter_inappwebview_bridge_event__handler__:";
+                    const domEventPrefix = "__flutter_inappwebview_bridge_event__dispatch__:";
+                    const listeners = {};
+                    bridge.bridgeEvents = {
+                      on: function(eventName, callback) {
+                        const eventKey = domEventPrefix + String(eventName);
+                        const handler = function(e) {
+                          callback(e.detail);
+                        };
+                        listeners[eventKey] = listeners[eventKey] || [];
+                        listeners[eventKey].push({ callback: callback, handler: handler });
+                        iframe.contentWindow.addEventListener(eventKey, handler);
+                      },
+                      off: function(eventName, callback) {
+                        const eventKey = domEventPrefix + String(eventName);
+                        const eventListeners = listeners[eventKey] || [];
+                        for (let i = eventListeners.length - 1; i >= 0; i--) {
+                          if (callback == null || eventListeners[i].callback === callback) {
+                            iframe.contentWindow.removeEventListener(eventKey, eventListeners[i].handler);
+                            eventListeners.splice(i, 1);
+                          }
+                        }
+                        if (eventListeners.length === 0) {
+                          delete listeners[eventKey];
+                        }
+                      },
+                      emit: function(eventName, data) {
+                        return bridge.callHandler(handlerPrefix + String(eventName), data);
+                      }
+                    };
+                  }
                 }
               } catch (e) {
                 console.log(e);

@@ -19,6 +19,8 @@ public class JavaScriptBridgeJS {
     public static let JAVASCRIPT_BRIDGE_JS_PLUGIN_SCRIPT_GROUP_NAME = "IN_APP_WEBVIEW_JAVASCRIPT_BRIDGE_JS_PLUGIN_SCRIPT"
     
     public static let VAR_JAVASCRIPT_BRIDGE_BRIDGE_SECRET = "$IN_APP_WEBVIEW_JAVASCRIPT_BRIDGE_BRIDGE_SECRET"
+    public static let BRIDGE_EVENTS_HANDLER_PREFIX = "__flutter_inappwebview_bridge_event__handler__:"
+    public static let BRIDGE_EVENTS_DOM_EVENT_PREFIX = "__flutter_inappwebview_bridge_event__dispatch__:"
 
     public static func JAVASCRIPT_BRIDGE_JS_PLUGIN_SCRIPT(expectedBridgeSecret: String, allowedOriginRules: [String]?, forMainFrameOnly: Bool) -> PluginScript {
         let source = JAVASCRIPT_BRIDGE_JS_SOURCE().replacingOccurrences(of: VAR_JAVASCRIPT_BRIDGE_BRIDGE_SECRET, with: expectedBridgeSecret)
@@ -73,6 +75,7 @@ public class JavaScriptBridgeJS {
                     });
                 };
             })(window);
+            \(BRIDGE_EVENTS_JS_SOURCE())
             \(WebMessageListenerJS.WEB_MESSAGE_LISTENER_JS_SOURCE())
             \(UTIL_JS_SOURCE())
         """
@@ -82,6 +85,45 @@ public class JavaScriptBridgeJS {
 
     public static func JAVASCRIPT_UTIL_VAR_NAME() -> String {
         return "window.\(get_JAVASCRIPT_BRIDGE_NAME())._Util"
+    }
+
+    public static func BRIDGE_EVENTS_JS_SOURCE() -> String {
+        return """
+            (function(window) {
+                var bridge = window.\(get_JAVASCRIPT_BRIDGE_NAME());
+                if (bridge == null || bridge.callHandler == null || bridge.bridgeEvents != null) {
+                    return;
+                }
+                var handlerPrefix = '\(BRIDGE_EVENTS_HANDLER_PREFIX)';
+                var domEventPrefix = '\(BRIDGE_EVENTS_DOM_EVENT_PREFIX)';
+                var listeners = {};
+                bridge.bridgeEvents = {
+                    on: function(eventName, callback) {
+                        var eventKey = domEventPrefix + String(eventName);
+                        var handler = function(e) { callback(e.detail); };
+                        listeners[eventKey] = listeners[eventKey] || [];
+                        listeners[eventKey].push({ callback: callback, handler: handler });
+                        window.addEventListener(eventKey, handler);
+                    },
+                    off: function(eventName, callback) {
+                        var eventKey = domEventPrefix + String(eventName);
+                        var eventListeners = listeners[eventKey] || [];
+                        for (var i = eventListeners.length - 1; i >= 0; i--) {
+                            if (callback == null || eventListeners[i].callback === callback) {
+                                window.removeEventListener(eventKey, eventListeners[i].handler);
+                                eventListeners.splice(i, 1);
+                            }
+                        }
+                        if (eventListeners.length === 0) {
+                            delete listeners[eventKey];
+                        }
+                    },
+                    emit: function(eventName, data) {
+                        return bridge.callHandler(handlerPrefix + String(eventName), data);
+                    }
+                };
+            })(window);
+        """
     }
 
     /*

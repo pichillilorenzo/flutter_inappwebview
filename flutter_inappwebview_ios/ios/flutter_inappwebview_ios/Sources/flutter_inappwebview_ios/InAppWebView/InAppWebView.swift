@@ -211,8 +211,12 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
 
         //Finding actual touch location in webView
         var touchLocation = sender.location(in: self)
-        touchLocation.x -= scrollView.contentInset.left
-        touchLocation.y -= scrollView.contentInset.top
+        if scrollView.contentInset.left > 0 {
+            touchLocation.x -= scrollView.contentInset.left
+        }
+        if scrollView.contentInset.top > 0 {
+            touchLocation.y -= scrollView.contentInset.top
+        }
         touchLocation.x /= scrollView.zoomScale
         touchLocation.y /= scrollView.zoomScale
 

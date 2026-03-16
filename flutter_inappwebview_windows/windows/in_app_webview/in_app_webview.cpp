@@ -1819,6 +1819,13 @@ namespace flutter_inappwebview_plugin
     }
   }
 
+  void InAppWebView::requestFocus()
+  {
+    if (webViewController) {
+      webViewController->MoveFocus(COREWEBVIEW2_MOVE_FOCUS_REASON_PROGRAMMATIC);
+    }
+  }
+
   bool InAppWebView::createSurface(const HWND parentWindow,
     winrt::com_ptr<ABI::Windows::UI::Composition::ICompositor> compositor)
   {

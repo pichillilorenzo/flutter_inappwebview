@@ -21,6 +21,7 @@ namespace flutter_inappwebview_plugin
   constexpr auto kMethodSetPointerButton = "setPointerButton";
   constexpr auto kMethodSetScrollDelta = "setScrollDelta";
   constexpr auto kMethodSetFpsLimit = "setFpsLimit";
+  constexpr auto kMethodRequestFocus = "requestFocus";
 
   constexpr auto kEventType = "type";
   constexpr auto kEventValue = "value";
@@ -330,6 +331,13 @@ namespace flutter_inappwebview_plugin
           : std::make_optional(*value));
         return result->Success();
       }
+    }
+    else if (method_name.compare(kMethodRequestFocus) == 0) {
+      if (view) {
+        view->requestFocus();
+        return result->Success();
+      }
+      return result->Error(kErrorInvalidArgs);
     }
 
     result->NotImplemented();

@@ -211,6 +211,15 @@ class CustomPlatformViewController
     return _methodChannel.invokeMethod('setScrollDelta', [dx, dy]);
   }
 
+  /// Requests focus for the underlying WebView2 control via MoveFocus.
+  Future<void> requestFocus() async {
+    if (_isDisposed) {
+      return;
+    }
+    assert(value.isInitialized);
+    return _methodChannel.invokeMethod('requestFocus');
+  }
+
   /// Sets the surface size to the provided [size].
   Future<void> _setSize(Size size, double scaleFactor) async {
     if (_isDisposed) {
@@ -303,7 +312,11 @@ class _CustomPlatformViewState extends State<CustomPlatformView> {
       focusNode: _focusNode,
       canRequestFocus: true,
       debugLabel: "flutter_inappwebview_windows_custom_platform_view",
-      onFocusChange: (focused) {},
+      onFocusChange: (focused) {
+        if (focused && _controller.value.isInitialized) {
+          _controller.requestFocus();
+        }
+      },
       child: SizedBox.expand(key: _key, child: _buildInner()),
     );
   }

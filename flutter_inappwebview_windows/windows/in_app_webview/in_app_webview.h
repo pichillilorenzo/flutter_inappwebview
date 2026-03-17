@@ -130,6 +130,7 @@ namespace flutter_inappwebview_plugin
     void sendScroll(double offset, bool horizontal);
     void setScrollDelta(double delta_x, double delta_y);
     void requestFocus();
+    void clearFocus();
     void onSurfaceSizeChanged(SurfaceSizeChangedCallback callback)
     {
       surfaceSizeChangedCallback_ = std::move(callback);

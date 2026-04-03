@@ -5,7 +5,7 @@ description: Demonstrates how to use the flutter_inappwebview_android plugin.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
 environment:
-  sdk: ^3.8.0
+  sdk: ^3.7.0
   flutter: ">=3.32.0"
 
 # Dependencies specify other packages that your package needs in order to work.

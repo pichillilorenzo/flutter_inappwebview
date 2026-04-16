@@ -10,7 +10,15 @@ import AuthenticationServices
 import SafariServices
 import Flutter
 
-public class WebAuthenticationSession: NSObject, ASWebAuthenticationPresentationContextProviding, Disposable {
+@available(iOS 13.0, *)
+private class WebAuthenticationPresentationContextProviding: NSObject, ASWebAuthenticationPresentationContextProviding {
+    
+    public func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
+        return UIApplication.shared.windows.first { $0.isKeyWindow } ?? ASPresentationAnchor()
+    }
+}
+
+public class WebAuthenticationSession: NSObject, Disposable {
     static let METHOD_CHANNEL_NAME_PREFIX = "com.pichillilorenzo/flutter_webauthenticationsession_"
     var id: String
     var plugin: InAppWebViewFlutterPlugin?
@@ -20,6 +28,8 @@ public class WebAuthenticationSession: NSObject, ASWebAuthenticationPresentation
     var session: Any?
     var channelDelegate: WebAuthenticationSessionChannelDelegate?
     private var _canStart = true
+    // keep reference
+    private var _presentationContextProvider: Any?
     
     public init(plugin: InAppWebViewFlutterPlugin, id: String, url: URL, callbackURLScheme: String?, settings: WebAuthenticationSessionSettings) {
         self.id = id
@@ -31,7 +41,10 @@ public class WebAuthenticationSession: NSObject, ASWebAuthenticationPresentation
         if #available(iOS 12.0, *) {
             let session = ASWebAuthenticationSession(url: self.url, callbackURLScheme: self.callbackURLScheme, completionHandler: self.completionHandler)
             if #available(iOS 13.0, *) {
-                session.presentationContextProvider = self
+                let provider = WebAuthenticationPresentationContextProviding()
+                // keep reference
+                self._presentationContextProvider = provider
+                session.presentationContextProvider = provider
             }
             self.session = session
         } else if #available(iOS 11.0, *) {
@@ -87,11 +100,6 @@ public class WebAuthenticationSession: NSObject, ASWebAuthenticationPresentation
         } else if #available(iOS 11.0, *), let session = session as? SFAuthenticationSession {
             session.cancel()
         }
-    }
-    
-    @available(iOS 12.0, *)
-    public func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
-        return UIApplication.shared.windows.first { $0.isKeyWindow } ?? ASPresentationAnchor()
     }
     
     public func dispose() {

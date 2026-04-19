@@ -396,6 +396,7 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
 
     _controller.initialize(
       onPlatformViewCreated: (id) {
+        if (!mounted) return;
         widget.onPlatformViewCreated?.call(id);
         setState(() {});
       },
@@ -416,11 +417,13 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
 
     // Report initial surface size and widget position
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
       _reportSurfaceSize();
       _reportWidgetPosition();
     });
 
     _cursorSubscription = _controller._cursor.listen((cursor) {
+      if (!mounted) return;
       setState(() {
         _cursor = cursor;
       });
@@ -759,6 +762,7 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
     final box = _key.currentContext?.findRenderObject() as RenderBox?;
     if (box != null) {
       await _controller.ready;
+      if (!mounted || !box.attached) return;
       unawaited(
         _controller._setSize(
           box.size,
@@ -772,6 +776,7 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
     final box = _key.currentContext?.findRenderObject() as RenderBox?;
     if (box != null) {
       await _controller.ready;
+      if (!mounted || !box.attached) return;
       final position = box.localToGlobal(Offset.zero);
       unawaited(
         _controller._setPosition(

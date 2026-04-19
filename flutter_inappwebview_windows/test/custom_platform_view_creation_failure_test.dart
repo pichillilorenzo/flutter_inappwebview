@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:flutter_inappwebview_windows/src/in_app_webview/_static_channel.dart';
@@ -144,5 +145,38 @@ void main() {
       'createInAppWebView',
       'dispose',
     ]);
+  });
+
+  testWidgets('late creation does not update a disposed widget', (
+    tester,
+  ) async {
+    final releaseCreation = Completer<void>();
+    var creationCallbackCount = 0;
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(IN_APP_WEBVIEW_STATIC_CHANNEL, (call) async {
+          pluginChannelCalls.add(call);
+          if (call.method == 'createInAppWebView') {
+            await releaseCreation.future;
+            return 1;
+          }
+          return null;
+        });
+
+    await tester.pumpWidget(
+      Directionality(
+        textDirection: TextDirection.ltr,
+        child: CustomPlatformView(
+          onPlatformViewCreated: (_) => creationCallbackCount++,
+        ),
+      ),
+    );
+    await tester.pumpWidget(const SizedBox());
+
+    releaseCreation.complete();
+    await tester.pump();
+    await tester.pump();
+
+    expect(tester.takeException(), isNull);
+    expect(creationCallbackCount, 0);
   });
 }

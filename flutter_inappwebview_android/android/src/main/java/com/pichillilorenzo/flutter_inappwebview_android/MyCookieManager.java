@@ -59,7 +59,7 @@ public class MyCookieManager extends ChannelDelegateImpl {
           String domain = (String) call.argument("domain");
           String path = (String) call.argument("path");
           String expiresDateString = (String) call.argument("expiresDate");
-          Long expiresDate = (expiresDateString != null ? new Long(expiresDateString) : null);
+          Long expiresDate = (expiresDateString != null ? Long.parseLong(expiresDateString) : null);
           Integer maxAge = (Integer) call.argument("maxAge");
           Boolean isSecure = (Boolean) call.argument("isSecure");
           Boolean isHttpOnly = (Boolean) call.argument("isHttpOnly");
@@ -145,6 +145,7 @@ public class MyCookieManager extends ChannelDelegateImpl {
     return cookieManager;
   }
 
+  @SuppressWarnings("deprecation")
   public void setCookie(String url,
                                String name,
                                String value,
@@ -288,6 +289,7 @@ public class MyCookieManager extends ChannelDelegateImpl {
 
   }
 
+  @SuppressWarnings("deprecation")
   public void deleteCookie(String url, String name, String domain, String path, final MethodChannel.Result result) {
     cookieManager = getCookieManager();
     if (cookieManager == null) {
@@ -324,6 +326,7 @@ public class MyCookieManager extends ChannelDelegateImpl {
     }
   }
 
+  @SuppressWarnings("deprecation")
   public void deleteCookies(String url, String domain, String path, final MethodChannel.Result result) {
     cookieManager = getCookieManager();
     if (cookieManager == null) {
@@ -368,6 +371,7 @@ public class MyCookieManager extends ChannelDelegateImpl {
     result.success(true);
   }
 
+  @SuppressWarnings("deprecation")
   public void deleteAllCookies(final MethodChannel.Result result) {
     cookieManager = getCookieManager();
     if (cookieManager == null) {
@@ -397,6 +401,7 @@ public class MyCookieManager extends ChannelDelegateImpl {
     }
   }
 
+  @SuppressWarnings("deprecation")
   public void removeSessionCookies(final MethodChannel.Result result) {
     cookieManager = getCookieManager();
     if (cookieManager == null) {
@@ -426,6 +431,7 @@ public class MyCookieManager extends ChannelDelegateImpl {
     }
   }
 
+  @SuppressWarnings("deprecation")
   public void flush(MethodChannel.Result result) {
     cookieManager = getCookieManager();
     if (cookieManager == null) {

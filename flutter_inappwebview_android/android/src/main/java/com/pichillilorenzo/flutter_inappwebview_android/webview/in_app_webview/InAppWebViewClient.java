@@ -231,6 +231,7 @@ public class InAppWebViewClient extends WebViewClient {
     }
   }
 
+  @SuppressWarnings("deprecation")
   public void onPageFinished(WebView view, String url) {
     final InAppWebView webView = (InAppWebView) view;
     webView.isLoading = false;

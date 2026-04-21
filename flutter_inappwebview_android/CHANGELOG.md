@@ -1,5 +1,6 @@
 ## 1.2.0-beta.3
 
+- Fixed Java deprecation warnings in Android native code: replaced `new Long(String)` with `Long.parseLong`, `new Handler()` with `new Handler(Looper.getMainLooper())`, gated `CookieManager.removeSessionCookie()` behind pre-`LOLLIPOP` SDK check, and annotated methods retaining pre-`LOLLIPOP` `CookieSyncManager` / `CookieManager.removeAllCookie` / `removeSessionCookie` fallbacks with `@SuppressWarnings("deprecation")` [#2641](https://github.com/pichillilorenzo/flutter_inappwebview/issues/2641)
 - Updated flutter_inappwebview_platform_interface version to ^1.4.0-beta.3
 - Updated native dependencies:
   - implementation from `'androidx.webkit:webkit:1.12.0'` to `'androidx.webkit:webkit:1.14.0'`

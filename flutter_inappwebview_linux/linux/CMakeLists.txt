@@ -14,9 +14,6 @@ set(PLUGIN_NAME "flutter_inappwebview_linux_plugin")
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# nlohmann/json version for JSON parsing
-set(NLOHMANN_JSON_VERSION "3.11.3")
-
 # === WPE WebKit Backend ===
 # This plugin uses WPE WebKit for offscreen web rendering.
 # WPE WebKit is designed for embedded systems and provides excellent offscreen
@@ -154,18 +151,11 @@ elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64|AMD64|amd64")
 endif()
 
 # === nlohmann/json dependency for JSON parsing ===
-include(FetchContent)
-FetchContent_Declare(
-  nlohmann_json
-  URL https://github.com/nlohmann/json/releases/download/v${NLOHMANN_JSON_VERSION}/json.tar.xz
-  DOWNLOAD_EXTRACT_TIMESTAMP TRUE
-)
+find_package(nlohmann_json REQUIRED)
 # Don't build tests/examples
 set(JSON_BuildTests OFF CACHE INTERNAL "")
-FetchContent_MakeAvailable(nlohmann_json)
 # Suppress deprecated literal operator warnings from nlohmann_json
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-literal-operator")
-message(STATUS "flutter_inappwebview_linux: nlohmann/json ${NLOHMANN_JSON_VERSION} configured")
 
 # Plugin source files
 list(APPEND PLUGIN_SOURCES

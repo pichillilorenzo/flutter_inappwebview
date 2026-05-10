@@ -11,6 +11,66 @@ project(${PROJECT_NAME} LANGUAGES CXX C)
 # not be changed.
 set(PLUGIN_NAME "flutter_inappwebview_linux_plugin")
 
+# ============================================================
+# WebKitGTK Backend (replaces WPE WebKit)
+# Uses webkit2gtk-4.1 (standard desktop Linux WebKit)
+# ============================================================
+
+find_package(PkgConfig REQUIRED)
+
+pkg_check_modules(WEBKIT2GTK webkit2gtk-4.1)
+if(NOT WEBKIT2GTK_FOUND)
+  pkg_check_modules(WEBKIT2GTK REQUIRED webkit2gtk-4.0)
+  message(STATUS "flutter_inappwebview_linux: Using WebKitGTK 4.0")
+else()
+  message(STATUS "flutter_inappwebview_linux: Using WebKitGTK 4.1")
+endif()
+
+pkg_check_modules(GTK REQUIRED IMPORTED_TARGET gtk+-3.0)
+
+# Build the WebKitGTK-based plugin and return early — skip all WPE code below.
+set(WEBKITGTK_SOURCES
+  "${CMAKE_CURRENT_SOURCE_DIR}/flutter_inappwebview_linux_plugin_webkitgtk.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/webkitgtk/webkitgtk_view.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/webkitgtk/webkitgtk_manager.cc"
+)
+
+add_library(${PLUGIN_NAME} SHARED ${WEBKITGTK_SOURCES})
+
+target_compile_features(${PLUGIN_NAME} PUBLIC cxx_std_17)
+target_compile_options(${PLUGIN_NAME} PRIVATE -Wall
+  "$<$<NOT:$<CONFIG:Debug>>:-O2>")
+target_compile_definitions(${PLUGIN_NAME} PRIVATE
+  FLUTTER_PLUGIN_IMPL
+  "$<$<NOT:$<CONFIG:Debug>>:NDEBUG>")
+
+target_include_directories(${PLUGIN_NAME}
+  PUBLIC  "${CMAKE_CURRENT_SOURCE_DIR}/include"
+  PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}"
+  PRIVATE ${WEBKIT2GTK_INCLUDE_DIRS}
+)
+
+target_link_libraries(${PLUGIN_NAME} PRIVATE
+  flutter
+  PkgConfig::GTK
+  ${WEBKIT2GTK_LIBRARIES}
+)
+target_link_directories(${PLUGIN_NAME} PRIVATE ${WEBKIT2GTK_LIBRARY_DIRS})
+target_compile_options(${PLUGIN_NAME} PRIVATE ${WEBKIT2GTK_CFLAGS_OTHER})
+
+set_target_properties(${PLUGIN_NAME} PROPERTIES
+  CXX_VISIBILITY_PRESET hidden)
+
+set(flutter_inappwebview_linux_bundled_libraries "" PARENT_SCOPE)
+
+# Stop processing — the rest of this file is the original WPE implementation
+# which is not used when WebKitGTK is available.
+return()
+
+# ============================================================
+# ORIGINAL WPE-BASED IMPLEMENTATION (kept for reference only)
+# ============================================================
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 

@@ -151,6 +151,29 @@ abstract class PlatformWebAuthenticationSession extends PlatformInterface
     'callbackURLScheme is not implemented on the current platform',
   );
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformWebAuthenticationSession.additionalHeaderFields}
+  ///Additional HTTP header fields to send with the initial authentication request.
+  ///
+  ///These headers are applied by the native `ASWebAuthenticationSession`
+  ///when it loads the session's initial URL. On unsupported platform versions,
+  ///this setting is ignored.
+  ///
+  ///See Apple's
+  ///[ASWebAuthenticationSession.additionalHeaderFields](https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession/additionalheaderfields)
+  ///documentation.
+  ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebAuthenticationSession.additionalHeaderFields.supported_platforms}
+  @SupportedPlatforms(
+    platforms: [
+      IOSPlatform(available: '17.4'),
+      MacOSPlatform(available: '14.4'),
+    ],
+  )
+  Map<String, String>? get additionalHeaderFields => throw UnimplementedError(
+    'additionalHeaderFields is not implemented on the current platform',
+  );
+
   ///{@template flutter_inappwebview_platform_interface.PlatformWebAuthenticationSession.initialSettings}
   ///Initial settings.
   ///{@endtemplate}
@@ -180,6 +203,8 @@ abstract class PlatformWebAuthenticationSession extends PlatformInterface
   ///
   ///[callbackURLScheme] represents the custom URL scheme that the app expects in the callback URL.
   ///
+  ///[additionalHeaderFields] represents additional HTTP header fields to send with the initial authentication request.
+  ///
   ///[onComplete] represents a completion handler the session calls when it completes successfully, or when the user cancels the session.
   ///
   ///[initialSettings] represents initial settings.
@@ -190,6 +215,13 @@ abstract class PlatformWebAuthenticationSession extends PlatformInterface
   Future<PlatformWebAuthenticationSession> create({
     required WebUri url,
     String? callbackURLScheme,
+    @SupportedPlatforms(
+      platforms: [
+        IOSPlatform(available: '17.4'),
+        MacOSPlatform(available: '14.4'),
+      ],
+    )
+    Map<String, String>? additionalHeaderFields,
     WebAuthenticationSessionCompletionHandler onComplete,
     WebAuthenticationSessionSettings? initialSettings,
   }) {

@@ -21,6 +21,7 @@ namespace flutter_inappwebview_plugin
   constexpr auto kMethodSetPointerButton = "setPointerButton";
   constexpr auto kMethodSetScrollDelta = "setScrollDelta";
   constexpr auto kMethodSetFpsLimit = "setFpsLimit";
+  constexpr auto kMethodMoveFocus = "moveFocus";
 
   constexpr auto kEventType = "type";
   constexpr auto kEventValue = "value";
@@ -273,6 +274,15 @@ namespace flutter_inappwebview_plugin
       const auto delta = GetPointFromArgs(method_call.arguments());
       if (delta && view) {
         view->setScrollDelta(delta->first, delta->second);
+        return result->Success();
+      }
+      return result->Error(kErrorInvalidArgs);
+    }
+
+    // moveFocus: give WebView2 Win32 keyboard focus via MoveFocus(PROGRAMMATIC)
+    if (method_name.compare(kMethodMoveFocus) == 0) {
+      if (view) {
+        view->moveFocus();
         return result->Success();
       }
       return result->Error(kErrorInvalidArgs);

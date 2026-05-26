@@ -3797,6 +3797,14 @@ namespace flutter_inappwebview_plugin
     webViewCompositionController->SendMouseInput(eventKind, eventVirtualKeys_, mouseData, point);
   }
 
+  void InAppWebView::moveFocus()
+  {
+    if (!webViewController) {
+      return;
+    }
+    webViewController->MoveFocus(COREWEBVIEW2_MOVE_FOCUS_REASON_PROGRAMMATIC);
+  }
+
   void InAppWebView::sendScroll(double delta, bool horizontal)
   {
     if (!webViewCompositionController) {

@@ -229,6 +229,17 @@ class CustomPlatformViewController
     });
   }
 
+  /// Gives WebView2 Win32 keyboard focus via MoveFocus(PROGRAMMATIC).
+  /// Must be called whenever the Flutter FocusNode gains focus so that
+  /// keyboard events are routed to the composition controller.
+  Future<void> _moveFocus() async {
+    if (_isDisposed) {
+      return;
+    }
+    assert(value.isInitialized);
+    return _methodChannel.invokeMethod('moveFocus');
+  }
+
   /// Sets the horizontal and vertical scroll delta.
   Future<void> _setScrollDelta(double dx, double dy) async {
     if (_isDisposed) {
@@ -363,7 +374,14 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
       focusNode: _focusNode,
       canRequestFocus: true,
       debugLabel: "flutter_inappwebview_windows_custom_platform_view",
-      onFocusChange: (focused) {},
+      onFocusChange: (focused) {
+        // Forward Win32 keyboard focus to the WebView2 composition controller.
+        // Without MoveFocus(PROGRAMMATIC) the composition controller never
+        // receives keyboard events, so typing does nothing.
+        if (focused && _controller.value.isInitialized) {
+          _controller._moveFocus();
+        }
+      },
       child: SizedBox.expand(key: _key, child: _buildInner()),
     );
   }
@@ -391,13 +409,9 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
                   _reportSurfaceSize();
                   _reportWidgetPosition();
 
-                  if (!_focusNode.hasFocus) {
+                  final hadFocus = _focusNode.hasFocus;
+                  if (!hadFocus) {
                     _focusNode.requestFocus();
-                    Future.delayed(const Duration(milliseconds: 50), () {
-                      if (!_focusNode.hasFocus) {
-                        _focusNode.requestFocus();
-                      }
-                    });
                   }
 
                   _pointerKind = ev.kind;
@@ -413,10 +427,27 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
                   }
                   final button = _getButton(ev.buttons);
                   _downButtons[ev.pointer] = button;
-                  _controller._setPointerButtonState(
-                    InAppWebViewPointerEventKind.down,
-                    button,
-                  );
+
+                  if (hadFocus) {
+                    // WebView2 already has Win32 focus — deliver the click now.
+                    _controller._setPointerButtonState(
+                      InAppWebViewPointerEventKind.down,
+                      button,
+                    );
+                  } else {
+                    // Focus was just requested. Wait one post-frame so that
+                    // onFocusChange fires and MoveFocus(PROGRAMMATIC) runs
+                    // before WebView2 receives the mouse-down event.
+                    // Without this delay the click lands before the webview has
+                    // Win32 focus and is ignored for cursor placement / JS events.
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      _controller._moveFocus();
+                      _controller._setPointerButtonState(
+                        InAppWebViewPointerEventKind.down,
+                        button,
+                      );
+                    });
+                  }
                 },
                 onPointerUp: (ev) {
                   _pointerKind = ev.kind;

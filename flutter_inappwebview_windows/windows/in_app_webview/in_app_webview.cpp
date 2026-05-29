@@ -58,7 +58,7 @@ namespace flutter_inappwebview_plugin
   InAppWebView::InAppWebView(const FlutterInappwebviewWindowsPlugin* plugin, const InAppWebViewCreationParams& params, const HWND parentWindow, wil::com_ptr<ICoreWebView2Environment> webViewEnv,
     wil::com_ptr<ICoreWebView2Controller> webViewController,
     wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController)
-    : plugin(plugin), id(params.id),
+    : plugin(plugin), id(params.id), parentWindow_(parentWindow),
     webViewEnv(std::move(webViewEnv)), webViewController(std::move(webViewController)), webViewCompositionController(std::move(webViewCompositionController)),
     settings(params.initialSettings), userContentController(std::make_unique<UserContentController>(this))
   {
@@ -3634,9 +3634,22 @@ namespace flutter_inappwebview_plugin
       auto titleBarHeight = ((GetSystemMetrics(SM_CYCAPTION) + GetSystemMetrics(SM_CYFRAME)) * scale_factor) + GetSystemMetrics(SM_CXPADDEDBORDER);
       auto borderWidth = (GetSystemMetrics(SM_CXBORDER) + GetSystemMetrics(SM_CXPADDEDBORDER)) * scale_factor;
 
-      RECT flutterWindowRect;
-      HWND flutterWindowHWnd = plugin->registrar->GetView()->GetNativeWindow();
-      GetWindowRect(flutterWindowHWnd, &flutterWindowRect);
+      RECT flutterWindowRect = {};
+      // The cursor positioning is relative to the Flutter window. In
+      // single-window mode that's `registrar->GetView()->GetNativeWindow()`,
+      // but in multi-window mode registrar->GetView() may be null. Fall
+      // back to walking up from this webview's parent host HWND, which is
+      // a child of the Flutter window this webview was created against.
+      HWND flutterWindowHWnd = nullptr;
+      if (auto* view = plugin->registrar->GetView()) {
+        flutterWindowHWnd = view->GetNativeWindow();
+      } else if (parentWindow_) {
+        flutterWindowHWnd = ::GetParent(parentWindow_);
+        if (!flutterWindowHWnd) flutterWindowHWnd = parentWindow_;
+      }
+      if (flutterWindowHWnd) {
+        GetWindowRect(flutterWindowHWnd, &flutterWindowRect);
+      }
 
       HWND webViewHWnd;
       if (succeededOrLog(webViewController->get_ParentWindow(&webViewHWnd))) {

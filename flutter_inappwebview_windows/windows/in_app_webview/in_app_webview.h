@@ -245,6 +245,10 @@ namespace flutter_inappwebview_plugin
 
     static bool isSslError(const COREWEBVIEW2_WEB_ERROR_STATUS& webErrorStatus);
   private:
+    // The HWND of the Flutter window that hosts this webview. Captured at
+    // construction time so position computations don't have to re-resolve
+    // it from the registrar (which may have no view in multi-window mode).
+    HWND parentWindow_ = nullptr;
     // custom_platform_view
     winrt::com_ptr<ABI::Windows::UI::Composition::IVisual> surface_;
     SurfaceSizeChangedCallback surfaceSizeChangedCallback_;

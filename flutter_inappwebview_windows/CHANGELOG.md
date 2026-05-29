@@ -1,3 +1,16 @@
+## Unreleased build
+
+- Added multi-window support: webviews now parent to the hosting
+  `RegularWindowController`'s HWND when Dart supplies `flutterViewId` and
+  `flutterEngineId` in the channel arguments. Resolution goes through the
+  Flutter engine's `InternalFlutterWindows_WindowManager_GetTopLevelWindowHandle`
+  symbol via `GetProcAddress`, so single-window apps and older Flutter SDKs
+  without multi-window fall back transparently to `registrar->GetView()`.
+- Fixed startup crash on multi-window Flutter setups where
+  `WebViewEnvironmentManager`'s constructor dereferenced a null
+  `registrar->GetView()`.
+- Bumped minimum Flutter to 3.35.0 / Dart 3.9.0 for `PlatformDispatcher.engineId`.
+
 ## 0.7.0-beta.3
 
 - Updated flutter_inappwebview_platform_interface version to ^1.4.0-beta.3

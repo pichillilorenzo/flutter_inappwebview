@@ -121,6 +121,11 @@ namespace flutter_inappwebview_plugin
       frame;
     auto hr = frame_pool_->TryGetNextFrame(frame.put());
     if (SUCCEEDED(hr) && frame) {
+      ABI::Windows::Graphics::SizeInt32 content_size = {};
+      if (SUCCEEDED(frame->get_ContentSize(&content_size))) {
+        last_content_size_ = content_size;
+      }
+
       winrt::com_ptr<
         ABI::Windows::Graphics::DirectX::Direct3D11::IDirect3DSurface>
         frame_surface;
@@ -135,6 +140,8 @@ namespace flutter_inappwebview_plugin
     if (needs_update_) {
       ABI::Windows::Graphics::SizeInt32 size;
       capture_item_->get_Size(&size);
+      std::cerr << "TextureBridge recreating capture pool " << size.Width
+        << "x" << size.Height << std::endl;
       frame_pool_->Recreate(
         graphics_context_->device(),
         static_cast<ABI::Windows::Graphics::DirectX::DirectXPixelFormat>(
@@ -172,6 +179,24 @@ namespace flutter_inappwebview_plugin
   {
     const std::lock_guard<std::mutex> lock(mutex_);
     needs_update_ = true;
+    // Recreate the pool eagerly instead of waiting for the next
+    // FrameArrived: this runs synchronously on the platform thread (the
+    // same thread the capture DispatcherQueue delivers frames on), so it is
+    // guaranteed to happen before the frame WebView2 emits for the resize.
+    // Static content (e.g. a fully loaded webpage) produces no further
+    // frames after that one — with the lazy-only path, that frame would
+    // land in an old-sized buffer and stay on screen forever (stretched,
+    // with black padding).
+    if (is_running_ && frame_pool_ && capture_item_) {
+      ABI::Windows::Graphics::SizeInt32 size;
+      capture_item_->get_Size(&size);
+      frame_pool_->Recreate(
+        graphics_context_->device(),
+        static_cast<ABI::Windows::Graphics::DirectX::DirectXPixelFormat>(
+          kPixelFormat),
+        kNumBuffers, size);
+      needs_update_ = false;
+    }
   }
 
   void TextureBridge::SetFpsLimit(std::optional<int> max_fps)

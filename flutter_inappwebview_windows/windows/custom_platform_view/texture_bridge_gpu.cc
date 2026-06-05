@@ -1,5 +1,6 @@
 #include "texture_bridge_gpu.h"
 
+#include <algorithm>
 #include <iostream>
 
 #include "util/direct3d11.interop.h"
@@ -26,6 +27,20 @@ namespace flutter_inappwebview_plugin
     const auto height = desc.Height;
 
     EnsureSurface(width, height);
+
+    // The frame pool buffer is only recreated lazily on the next
+    // FrameArrived after a resize, so the captured content can be smaller
+    // than the buffer (the padding is undefined/black) — and for static
+    // content (e.g. a fully loaded webpage) the frame that would trigger
+    // the recreation may never come. Expose the actual content region
+    // through visible_width/visible_height so the engine samples only the
+    // valid area instead of stretching the padded buffer onto the widget.
+    const auto content_width = last_content_size_.Width > 0
+      ? static_cast<uint32_t>(last_content_size_.Width) : width;
+    const auto content_height = last_content_size_.Height > 0
+      ? static_cast<uint32_t>(last_content_size_.Height) : height;
+    surface_descriptor_.visible_width = (std::min)(content_width, width);
+    surface_descriptor_.visible_height = (std::min)(content_height, height);
 
     auto device_context = graphics_context_->d3d_device_context();
 

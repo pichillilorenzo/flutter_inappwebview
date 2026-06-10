@@ -4,6 +4,7 @@ import 'dart:ui';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 import '../platform_util.dart';
 import '_static_channel.dart';
@@ -49,6 +50,10 @@ const Map<String, SystemMouseCursor> _cursors = {
 
 SystemMouseCursor _getCursorByName(String name) =>
     _cursors[name] ?? SystemMouseCursors.basic;
+
+/// Converts trackpad pan pixels to WebView2 wheel units.
+/// Mouse-wheel deltas are already wheel-derived and are not scaled.
+double _panToWheelUnits(double pan) => (pan * 120.0) / 100.0;
 
 /// Pointer button type
 // Order must match InAppWebViewPointerEventKind (see in_app_webview.h)
@@ -294,11 +299,25 @@ class CustomPlatformView extends StatefulWidget {
 }
 
 class _CustomPlatformViewState extends State<CustomPlatformView>
-    with PlatformUtilListener {
+    with PlatformUtilListener, SingleTickerProviderStateMixin {
   final GlobalKey _key = GlobalKey();
   final _downButtons = <int, PointerButton>{};
 
   PointerDeviceKind _pointerKind = PointerDeviceKind.unknown;
+
+  // Accumulates fractional wheel deltas so sub-pixel trackpad movement is not
+  // lost when the native side truncates to short.
+  double _scrollRemainderX = 0;
+  double _scrollRemainderY = 0;
+  bool _scrollFlushScheduled = false;
+
+  // Synthetic trackpad inertia; this view bypasses Flutter Scrollable, so it
+  // must continue a fast pan after the fingers lift.
+  VelocityTracker? _panVelocityTracker;
+  Ticker? _flingTicker;
+  ClampingScrollSimulation? _flingSimulation;
+  Offset _flingDirection = Offset.zero;
+  double _flingLastDistance = 0;
 
   MouseCursor _cursor = SystemMouseCursors.basic;
 
@@ -388,6 +407,7 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
                   _controller._setCursorPos(ev.localPosition);
                 },
                 onPointerDown: (ev) {
+                  _stopFling();
                   _reportSurfaceSize();
                   _reportWidgetPosition();
 
@@ -464,14 +484,34 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
                 },
                 onPointerSignal: (signal) {
                   if (signal is PointerScrollEvent) {
-                    _controller._setScrollDelta(
+                    _stopFling();
+                    _sendScrollDelta(
                       -signal.scrollDelta.dx,
                       -signal.scrollDelta.dy,
                     );
                   }
                 },
+                onPointerPanZoomStart: (ev) {
+                  _stopFling();
+                  _scrollRemainderX = 0;
+                  _scrollRemainderY = 0;
+                  _panVelocityTracker = VelocityTracker.withKind(
+                    PointerDeviceKind.trackpad,
+                  );
+                },
                 onPointerPanZoomUpdate: (ev) {
-                  _controller._setScrollDelta(ev.panDelta.dx, ev.panDelta.dy);
+                  _panVelocityTracker?.addPosition(ev.timeStamp, ev.pan);
+                  _sendScrollDelta(
+                    _panToWheelUnits(ev.panDelta.dx),
+                    _panToWheelUnits(ev.panDelta.dy),
+                  );
+                },
+                onPointerPanZoomEnd: (ev) {
+                  final tracker = _panVelocityTracker;
+                  _panVelocityTracker = null;
+                  if (tracker != null) {
+                    _startFling(tracker.getVelocity());
+                  }
                 },
                 child: MouseRegion(
                   cursor: _cursor,
@@ -498,6 +538,81 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
             : const SizedBox(),
       ),
     );
+  }
+
+  /// Forwards scroll deltas, preserving fractional remainders.
+  /// Sends are coalesced to at most one platform message per frame.
+  void _sendScrollDelta(double dx, double dy) {
+    _scrollRemainderX += dx;
+    _scrollRemainderY += dy;
+    if (_scrollFlushScheduled) {
+      return;
+    }
+    _scrollFlushScheduled = true;
+    SchedulerBinding.instance.scheduleFrameCallback((_) {
+      _flushScrollDelta();
+    });
+    SchedulerBinding.instance.scheduleFrame();
+  }
+
+  /// Starts synthetic inertia after a fast lifted pan.
+  /// The decay follows Flutter's clamping scroll simulation.
+  void _startFling(Velocity velocity) {
+    final speed = velocity.pixelsPerSecond.distance.clamp(
+      0.0,
+      kMaxFlingVelocity,
+    );
+    if (speed < kMinFlingVelocity) {
+      return;
+    }
+    _flingDirection =
+        velocity.pixelsPerSecond / velocity.pixelsPerSecond.distance;
+    _flingSimulation = ClampingScrollSimulation(position: 0, velocity: speed);
+    _flingLastDistance = 0;
+    final ticker = _flingTicker ??= createTicker(_onFlingTick);
+    ticker.stop();
+    ticker.start();
+  }
+
+  void _stopFling() {
+    _flingSimulation = null;
+    _flingTicker?.stop();
+  }
+
+  void _onFlingTick(Duration elapsed) {
+    final simulation = _flingSimulation;
+    if (simulation == null) {
+      _flingTicker?.stop();
+      return;
+    }
+    final seconds = elapsed.inMicroseconds / Duration.microsecondsPerSecond;
+    final distance = simulation.x(seconds);
+    final step = distance - _flingLastDistance;
+    _flingLastDistance = distance;
+    if (simulation.isDone(seconds)) {
+      _stopFling();
+    }
+    if (step != 0) {
+      _sendScrollDelta(
+        _panToWheelUnits(_flingDirection.dx * step),
+        _panToWheelUnits(_flingDirection.dy * step),
+      );
+    }
+  }
+
+  void _flushScrollDelta() {
+    _scrollFlushScheduled = false;
+    if (!mounted) {
+      return;
+    }
+    final flushX = _scrollRemainderX.truncateToDouble();
+    final flushY = _scrollRemainderY.truncateToDouble();
+    if (flushX == 0 && flushY == 0) {
+      return;
+    }
+    _scrollRemainderX -= flushX;
+    _scrollRemainderY -= flushY;
+    _controller._setScrollDelta(flushX, flushY);
   }
 
   void _reportSurfaceSize() async {
@@ -530,6 +645,7 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
   @override
   void dispose() {
     super.dispose();
+    _flingTicker?.dispose();
     _platformUtil.removeListener(this);
     _cursorSubscription?.cancel();
     _controller.dispose();

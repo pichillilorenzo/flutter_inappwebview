@@ -3377,7 +3377,18 @@ if(window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)] 
     }
 
     public func requestFocus() -> Bool {
-        return self.scrollView.subviews.first?.becomeFirstResponder() ?? false
+        // becomeFirstResponder() on scrollView.subviews.first often returns false inside a
+        // Flutter platform view. Search the subtree for the focusable content view
+        // (WKContentView) and make that the first responder; fall back to the web view itself.
+        var stack: [UIView] = subviews
+        while !stack.isEmpty {
+            let v = stack.removeFirst()
+            if v.canBecomeFirstResponder, v.becomeFirstResponder() {
+                return true
+            }
+            stack.append(contentsOf: v.subviews)
+        }
+        return becomeFirstResponder()
     }
     
     public func getCertificate() -> SslCertificate? {

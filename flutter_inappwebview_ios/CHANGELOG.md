@@ -1,5 +1,6 @@
 ## 1.2.0-beta.3
 
+- Fixed `requestFocus` not focusing the WebView on iOS when embedded as a Flutter platform view [#1974](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1974)
 - Updated flutter_inappwebview_platform_interface version to ^1.4.0-beta.3
 - Implemented `saveState`, `restoreState` InAppWebViewController methods
 - Implemented `PlatformProxyController` class

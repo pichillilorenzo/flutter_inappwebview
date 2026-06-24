@@ -3,6 +3,7 @@
 #include "web_resource_response.h"
 
 #include <Shlwapi.h>
+#include <limits>
 
 namespace flutter_inappwebview_plugin
 {
@@ -49,9 +50,13 @@ namespace flutter_inappwebview_plugin
           reinterpret_cast<const BYTE*>(postData.data()), static_cast<UINT>(postData.length()));
       }
 
+      const auto rawStatusCode = statusCode.value_or(200);
       webViewEnvironment->CreateWebResourceResponse(
         postDataStream.get(),
-        statusCode.value_or(200), // Default to 200 if statusCode is not set
+        rawStatusCode >= static_cast<int64_t>(std::numeric_limits<int>::min()) &&
+          rawStatusCode <= static_cast<int64_t>(std::numeric_limits<int>::max())
+          ? static_cast<int>(rawStatusCode)
+          : 200, // Default to 200 if statusCode is not set or out of range
         reasonPhrase.has_value() ? utf8_to_wide(reasonPhrase.value()).c_str() : L"OK", // Default to "OK" if reasonPhrase is not set
         nullptr,
         &webResourceResponse);

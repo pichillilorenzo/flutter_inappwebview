@@ -29,6 +29,14 @@ void main() {
       )
       .toList();
 
+  List<List<double>> cursorPosCalls() => viewChannelCalls
+      .where((call) => call.method == 'setCursorPos')
+      .map(
+        (call) =>
+            (call.arguments as List).map((e) => (e as num).toDouble()).toList(),
+      )
+      .toList();
+
   setUp(() {
     viewChannelCalls = <MethodCall>[];
     final messenger =
@@ -76,8 +84,9 @@ void main() {
 
       final pointer = TestPointer(1, PointerDeviceKind.trackpad);
       await tester.sendEventToBinding(pointer.panZoomStart(center));
-      // Four 0.4px updates cross one wheel unit after calibration.
-      // Before accumulation, native short truncation lost each update.
+      // 0.4px updates become 0.72 wheel units after the 1.2×1.5 gain; they
+      // cross a whole unit on the 2nd and 3rd updates. Before accumulation,
+      // native short truncation lost each update entirely.
       for (var i = 1; i <= 4; i++) {
         await tester.sendEventToBinding(
           pointer.panZoomUpdate(center, pan: Offset(0, -0.4 * i)),
@@ -88,6 +97,7 @@ void main() {
 
       expect(scrollDeltaCalls(), [
         [0.0, -1.0],
+        [0.0, -1.0],
       ]);
     });
 
@@ -97,7 +107,7 @@ void main() {
       final pointer = TestPointer(1, PointerDeviceKind.trackpad);
       await tester.sendEventToBinding(pointer.panZoomStart(center));
       // 60 updates of 0.25px = 15px finger travel.
-      // With 120/100 calibration this becomes about 18 wheel units.
+      // With the 1.2×1.5 gain this becomes 27 wheel units.
       for (var i = 1; i <= 60; i++) {
         await tester.sendEventToBinding(
           pointer.panZoomUpdate(center, pan: Offset(0, -0.25 * i)),
@@ -111,11 +121,11 @@ void main() {
         (sum, args) => sum + args[1],
       );
       // Up to one unit may stay accumulated as a fractional remainder.
-      expect(totalDy, lessThanOrEqualTo(-17.0));
-      expect(totalDy, greaterThanOrEqualTo(-18.0));
+      expect(totalDy, lessThanOrEqualTo(-26.0));
+      expect(totalDy, greaterThanOrEqualTo(-27.0));
     });
 
-    testWidgets('integral deltas are flushed each frame, unchanged', (
+    testWidgets('integral deltas are forwarded with exact calibration', (
       tester,
     ) async {
       final center = await pumpView(tester);
@@ -137,39 +147,67 @@ void main() {
       await tester.sendEventToBinding(pointer.panZoomEnd());
       await tester.pump();
 
-      // Pan pixels × 120/100: -5px → -6 units, -10px → -12, +5px → +6.
+      // Pan pixels × 1.2 × 1.5: -5px → -9 units, -10px → -18, +5px → +9.
       expect(scrollDeltaCalls(), [
-        [0.0, -6.0],
-        [0.0, -12.0],
-        [0.0, 6.0],
+        [0.0, -9.0],
+        [0.0, -18.0],
+        [0.0, 9.0],
       ]);
     });
 
-    testWidgets('multiple updates within one frame coalesce to one message', (
+    testWidgets('updates are forwarded immediately, without waiting for a '
+        'Flutter frame', (tester) async {
+      final center = await pumpView(tester);
+
+      final pointer = TestPointer(1, PointerDeviceKind.trackpad);
+      await tester.sendEventToBinding(pointer.panZoomStart(center));
+      // No tester.pump() between the updates and the assertion: forwarding
+      // must not depend on Flutter's frame scheduling. Tying it to frames
+      // adds variable latency and lets a busy UI hold scroll input back and
+      // release it in bursts.
+      await tester.sendEventToBinding(
+        pointer.panZoomUpdate(center, pan: const Offset(0, -5)),
+      );
+      await tester.sendEventToBinding(
+        pointer.panZoomUpdate(center, pan: const Offset(0, -10)),
+      );
+
+      // -5px × 1.2 × 1.5 = -9 units per update, one message per event.
+      expect(scrollDeltaCalls(), [
+        [0.0, -9.0],
+        [0.0, -9.0],
+      ]);
+      await tester.sendEventToBinding(pointer.panZoomEnd());
+      await tester.pump();
+    });
+
+    testWidgets('pan zoom start updates cursor position before scrolling', (
       tester,
     ) async {
       final center = await pumpView(tester);
 
       final pointer = TestPointer(1, PointerDeviceKind.trackpad);
       await tester.sendEventToBinding(pointer.panZoomStart(center));
-      // A fast pan can deliver several pointer events between two frames;
-      // they must reach the native side as a single batched wheel event.
       await tester.sendEventToBinding(
-        pointer.panZoomUpdate(center, pan: const Offset(0, -4)),
+        pointer.panZoomUpdate(center, pan: const Offset(0, -5)),
       );
-      await tester.sendEventToBinding(
-        pointer.panZoomUpdate(center, pan: const Offset(0, -9)),
+
+      expect(cursorPosCalls(), [
+        [center.dx, center.dy],
+      ]);
+      expect(
+        viewChannelCalls
+            .where(
+              (call) =>
+                  call.method == 'setCursorPos' ||
+                  call.method == 'setScrollDelta',
+            )
+            .map((call) => call.method),
+        ['setCursorPos', 'setScrollDelta'],
       );
-      await tester.sendEventToBinding(
-        pointer.panZoomUpdate(center, pan: const Offset(0, -10)),
-      );
+
       await tester.sendEventToBinding(pointer.panZoomEnd());
       await tester.pump();
-
-      // 10px of finger travel × 120/100 = 12 wheel units, one message.
-      expect(scrollDeltaCalls(), [
-        [0.0, -12.0],
-      ]);
     });
 
     testWidgets('horizontal sub-pixel deltas accumulate too', (tester) async {
@@ -185,8 +223,31 @@ void main() {
       await tester.sendEventToBinding(pointer.panZoomEnd());
       await tester.pump();
 
+      // 0.5px × 1.2 × 1.5 = 0.9 units per update: whole units flush on the
+      // 2nd and 3rd updates.
       expect(scrollDeltaCalls(), [
         [-1.0, 0.0],
+        [-1.0, 0.0],
+      ]);
+    });
+
+    testWidgets('diagonal pans send only the dominant axis', (tester) async {
+      final center = await pumpView(tester);
+
+      final pointer = TestPointer(1, PointerDeviceKind.trackpad);
+      await tester.sendEventToBinding(pointer.panZoomStart(center));
+      await tester.sendEventToBinding(
+        pointer.panZoomUpdate(center, pan: const Offset(-10, -4)),
+      );
+      await tester.sendEventToBinding(
+        pointer.panZoomUpdate(center, pan: const Offset(-14, -14)),
+      );
+      await tester.sendEventToBinding(pointer.panZoomEnd());
+      await tester.pump();
+
+      expect(scrollDeltaCalls(), [
+        [-18.0, 0.0],
+        [0.0, -18.0],
       ]);
     });
 
@@ -198,18 +259,18 @@ void main() {
       final pointer = TestPointer(1, PointerDeviceKind.trackpad);
       await tester.sendEventToBinding(pointer.panZoomStart(center));
       await tester.sendEventToBinding(
-        pointer.panZoomUpdate(center, pan: const Offset(0, -0.7)),
+        pointer.panZoomUpdate(center, pan: const Offset(0, -0.5)),
       );
       await tester.sendEventToBinding(pointer.panZoomEnd());
 
       await tester.sendEventToBinding(pointer.panZoomStart(center));
       await tester.sendEventToBinding(
-        pointer.panZoomUpdate(center, pan: const Offset(0, -0.7)),
+        pointer.panZoomUpdate(center, pan: const Offset(0, -0.5)),
       );
       await tester.sendEventToBinding(pointer.panZoomEnd());
       await tester.pump();
 
-      // 0.7 + 0.7 crosses 1.0, but the remainder must not leak across
+      // 0.9 + 0.9 units cross 1.0, but the remainder must not leak across
       // separate gestures.
       expect(scrollDeltaCalls(), isEmpty);
     });
@@ -345,6 +406,35 @@ void main() {
   });
 
   group('mouse wheel (PointerScrollEvent)', () {
+    testWidgets('wheel updates cursor position before scrolling', (
+      tester,
+    ) async {
+      final center = await pumpView(tester);
+
+      final pointer = TestPointer(1, PointerDeviceKind.mouse);
+      await tester.sendEventToBinding(pointer.hover(center));
+      viewChannelCalls.clear();
+      await tester.sendEventToBinding(pointer.scroll(const Offset(0, 120)));
+      await tester.pump();
+
+      expect(cursorPosCalls(), [
+        [center.dx, center.dy],
+      ]);
+      expect(
+        viewChannelCalls
+            .where(
+              (call) =>
+                  call.method == 'setCursorPos' ||
+                  call.method == 'setScrollDelta',
+            )
+            .map((call) => call.method),
+        ['setCursorPos', 'setScrollDelta'],
+      );
+      expect(scrollDeltaCalls(), [
+        [0.0, -120.0],
+      ]);
+    });
+
     testWidgets('wheel deltas are still forwarded negated', (tester) async {
       final center = await pumpView(tester);
 

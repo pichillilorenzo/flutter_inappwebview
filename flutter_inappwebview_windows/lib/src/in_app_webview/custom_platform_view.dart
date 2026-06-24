@@ -51,9 +51,23 @@ const Map<String, SystemMouseCursor> _cursors = {
 SystemMouseCursor _getCursorByName(String name) =>
     _cursors[name] ?? SystemMouseCursors.basic;
 
+/// The trackpad scroll-speed knob: how far the page moves per pixel of
+/// finger travel. 1.0 is exact 1:1 tracking (measured); it was reported to
+/// feel sluggish next to native precision-touchpad scrolling, which applies
+/// gain plus inertia. Synthetic fling distances pass through this factor
+/// too, so the glide scales together with the drag.
+const double _kTrackpadGain = 1.5;
+
 /// Converts trackpad pan pixels to WebView2 wheel units.
 /// Mouse-wheel deltas are already wheel-derived and are not scaled.
-double _panToWheelUnits(double pan) => (pan * 120.0) / 100.0;
+///
+/// WHEEL_DELTA (120) is one wheel notch and Chromium scrolls ~100px per
+/// notch (measured against a real WebView2), so pan*120/100 gives exact 1:1
+/// finger-to-page tracking, multiplied by the felt [_kTrackpadGain].
+double _panToWheelUnits(double pan) => (pan * 120.0 / 100.0) * _kTrackpadGain;
+
+Offset _dominantAxis(Offset delta) =>
+    delta.dx.abs() > delta.dy.abs() ? Offset(delta.dx, 0) : Offset(0, delta.dy);
 
 /// Pointer button type
 // Order must match InAppWebViewPointerEventKind (see in_app_webview.h)
@@ -309,7 +323,6 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
   // lost when the native side truncates to short.
   double _scrollRemainderX = 0;
   double _scrollRemainderY = 0;
-  bool _scrollFlushScheduled = false;
 
   // Synthetic trackpad inertia; this view bypasses Flutter Scrollable, so it
   // must continue a fast pan after the fingers lift.
@@ -484,14 +497,21 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
                 },
                 onPointerSignal: (signal) {
                   if (signal is PointerScrollEvent) {
+                    _controller._setCursorPos(signal.localPosition);
                     _stopFling();
                     _sendScrollDelta(
                       -signal.scrollDelta.dx,
                       -signal.scrollDelta.dy,
                     );
+                  } else if (signal is PointerScrollInertiaCancelEvent) {
+                    // Sent by the engine when the user touches the trackpad
+                    // during inertia — that touch must also halt the
+                    // synthetic glide.
+                    _stopFling();
                   }
                 },
                 onPointerPanZoomStart: (ev) {
+                  _controller._setCursorPos(ev.localPosition);
                   _stopFling();
                   _scrollRemainderX = 0;
                   _scrollRemainderY = 0;
@@ -501,7 +521,7 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
                 },
                 onPointerPanZoomUpdate: (ev) {
                   _panVelocityTracker?.addPosition(ev.timeStamp, ev.pan);
-                  _sendScrollDelta(
+                  _sendTrackpadScrollDelta(
                     _panToWheelUnits(ev.panDelta.dx),
                     _panToWheelUnits(ev.panDelta.dy),
                   );
@@ -540,23 +560,26 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
     );
   }
 
-  /// Forwards scroll deltas, preserving fractional remainders.
-  /// Sends are coalesced to at most one platform message per frame.
+  /// Forwards scroll deltas immediately, preserving fractional remainders.
   void _sendScrollDelta(double dx, double dy) {
     _scrollRemainderX += dx;
     _scrollRemainderY += dy;
-    if (_scrollFlushScheduled) {
+    final flushX = _scrollRemainderX.truncateToDouble();
+    final flushY = _scrollRemainderY.truncateToDouble();
+    if (flushX == 0 && flushY == 0) {
       return;
     }
-    _scrollFlushScheduled = true;
-    SchedulerBinding.instance.scheduleFrameCallback((_) {
-      _flushScrollDelta();
-    });
-    SchedulerBinding.instance.scheduleFrame();
+    _scrollRemainderX -= flushX;
+    _scrollRemainderY -= flushY;
+    _controller._setScrollDelta(flushX, flushY);
+  }
+
+  void _sendTrackpadScrollDelta(double dx, double dy) {
+    final delta = _dominantAxis(Offset(dx, dy));
+    _sendScrollDelta(delta.dx, delta.dy);
   }
 
   /// Starts synthetic inertia after a fast lifted pan.
-  /// The decay follows Flutter's clamping scroll simulation.
   void _startFling(Velocity velocity) {
     final speed = velocity.pixelsPerSecond.distance.clamp(
       0.0,
@@ -593,26 +616,11 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
       _stopFling();
     }
     if (step != 0) {
-      _sendScrollDelta(
+      _sendTrackpadScrollDelta(
         _panToWheelUnits(_flingDirection.dx * step),
         _panToWheelUnits(_flingDirection.dy * step),
       );
     }
-  }
-
-  void _flushScrollDelta() {
-    _scrollFlushScheduled = false;
-    if (!mounted) {
-      return;
-    }
-    final flushX = _scrollRemainderX.truncateToDouble();
-    final flushY = _scrollRemainderY.truncateToDouble();
-    if (flushX == 0 && flushY == 0) {
-      return;
-    }
-    _scrollRemainderX -= flushX;
-    _scrollRemainderY -= flushY;
-    _controller._setScrollDelta(flushX, flushY);
   }
 
   void _reportSurfaceSize() async {

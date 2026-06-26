@@ -1386,7 +1386,7 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
           int? androidId = call.arguments["androidId"];
           String? iosId = call.arguments["iosId"];
           dynamic id = call.arguments["id"];
-          String title = call.arguments["title"];
+          String title = call.arguments["title"] ?? "";
 
           ContextMenuItem menuItemClicked = ContextMenuItem(
             id: id,

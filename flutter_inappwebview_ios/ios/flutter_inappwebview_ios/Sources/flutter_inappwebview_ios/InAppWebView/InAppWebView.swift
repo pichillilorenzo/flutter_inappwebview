@@ -143,6 +143,21 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
     }
     @objc func keyboardWillHide(notification: NSNotification) {
         _scrollViewContentInsetAdjusted = false
+        // keyboardWillShow set a negative contentInset to absorb the keyboard; restore
+        // the frame-setter compensation here or it stays negative and the page bounces
+        // before the bottom (iOS 17.2+). Async so the keyboard is gone and
+        // adjustedContentInset is accurate.
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            self.scrollView.contentInset = .zero
+            if #available(iOS 11, *) {
+                if self.scrollView.adjustedContentInset != .zero {
+                    let insetToAdjust = self.scrollView.adjustedContentInset
+                    self.scrollView.contentInset = UIEdgeInsets(top: -insetToAdjust.top, left: -insetToAdjust.left,
+                                                                bottom: -insetToAdjust.bottom, right: -insetToAdjust.right)
+                }
+            }
+        }
     }
     
     required public init(coder aDecoder: NSCoder) {

@@ -32,9 +32,29 @@ public class ConsoleLogJS {
         
             function _callHandler(logLevel, args) {
                 var message = '';
+                function _stringify(v) {
+                    try {
+                        if (v === null || typeof v !== 'object') return String(v);
+                        if (v instanceof Error) return v.name + ': ' + v.message + (v.stack ? '\\n' + v.stack : '');
+                        // Only stringify plain objects/arrays; leave DOM nodes, host objects and
+                        // proxies to String() so we don't trip their getters (e.g. .outerHTML).
+                        var proto = Object.getPrototypeOf(v);
+                        if (Array.isArray(v) || proto === Object.prototype || proto === null) {
+                            var s = JSON.stringify(v);
+                            if (typeof s === 'string') return s.length > 2000 ? s.slice(0, 2000) + '...(truncated)' : s;
+                        }
+                    } catch(_) {}
+                    var str;
+                    try { str = String(v); } catch(_) { return '[object]'; }
+                    // Upgrade the generic [object Object] to the constructor name.
+                    if (str === '[object Object]') {
+                        try { var cn = v.constructor && v.constructor.name; if (cn) return '[object ' + cn + ']'; } catch(_) {}
+                    }
+                    return str;
+                }
                 for (var i in args) {
                     try {
-                        message += message === '' ? args[i] : ' ' + args[i];
+                        message += (message === '' ? '' : ' ') + _stringify(args[i]);
                     } catch(_) {}
                 }
                 try {

@@ -273,10 +273,18 @@ else()
     "custom_platform_view/texture_bridge_fallback.h"
     "custom_platform_view/util/cpuid/cpuinfo.cc"
     "custom_platform_view/util/cpuid/cpuinfo.h"
+    "custom_platform_view/util/swizzle_avx2.cc"
   )
-  # Enable AVX2 for pixel buffer conversions
+  # Compile ONLY the AVX2 swizzle TU with /arch:AVX2 — never the whole plugin.
+  # A module-wide /arch:AVX2 lets MSVC emit AVX2 anywhere in the DLL, crashing
+  # pre-Haswell CPUs (e.g. Sandy Bridge i7-2700K) with STATUS_ILLEGAL_INSTRUCTION
+  # 0xc000001d. RGBA_to_BGRA_AVX2 is only reached after a runtime CPUID check, so
+  # capable CPUs keep the AVX2 fast path while the rest of the DLL stays baseline.
   if(MSVC)
-    target_compile_options(${PLUGIN_NAME} PRIVATE "/arch:AVX2")
+    set_source_files_properties(
+      "custom_platform_view/util/swizzle_avx2.cc"
+      PROPERTIES COMPILE_OPTIONS "/arch:AVX2"
+    )
   endif()
 endif()
 

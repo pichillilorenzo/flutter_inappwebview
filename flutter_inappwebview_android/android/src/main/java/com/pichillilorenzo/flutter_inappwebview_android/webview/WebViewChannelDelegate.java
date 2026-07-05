@@ -96,6 +96,16 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
       case getProgress:
         result.success((webView != null) ? webView.getProgress() : null);
         break;
+      case setBackgroundColor:
+        if (webView != null) {
+          // Flutter encodes an ARGB int (alpha 0xFF makes it > 2^31) as a Long, so read it as a Number
+          Number color = (Number) call.argument("color");
+          if (color != null) {
+            webView.setBackgroundColor(color.intValue());
+          }
+        }
+        result.success(true);
+        break;
       case loadUrl:
         if (webView != null) {
           Map<String, Object> urlRequest = (Map<String, Object>) call.argument("urlRequest");

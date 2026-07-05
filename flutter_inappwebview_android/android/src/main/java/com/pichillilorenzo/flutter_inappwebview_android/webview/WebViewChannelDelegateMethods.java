@@ -88,4 +88,5 @@ public enum WebViewChannelDelegateMethods {
   showInputMethod,
   saveState,
   restoreState,
+  setBackgroundColor,
 }

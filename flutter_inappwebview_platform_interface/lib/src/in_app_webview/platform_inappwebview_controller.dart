@@ -723,6 +723,14 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
     );
   }
 
+  ///Android-only: sets the native WebView container background color (ARGB int). Useful to override the
+  ///opaque white background the platform paints when transparentBackground is disabled.
+  Future<void> setBackgroundColor({required int color}) {
+    throw UnimplementedError(
+      'setBackgroundColor is not implemented on the current platform',
+    );
+  }
+
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.goBack}
   ///Goes back in the history of the WebView.
   ///{@endtemplate}

@@ -154,6 +154,10 @@ class InAppWebViewController {
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.reload.supported_platforms}
   Future<void> reload() => platform.reload();
 
+  ///Android-only: sets the native WebView container background color (ARGB int), to avoid the white flash
+  ///when transparentBackground is disabled. See [PlatformInAppWebViewController.setBackgroundColor].
+  Future<void> setBackgroundColor({required int color}) => platform.setBackgroundColor(color: color);
+
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.goBack}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.goBack.supported_platforms}

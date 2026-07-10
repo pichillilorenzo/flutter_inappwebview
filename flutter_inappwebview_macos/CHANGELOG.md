@@ -1,3 +1,7 @@
+## 1.2.0-beta.4
+
+- Implemented `NavigationActionPolicy.ALLOW_WITHOUT_TRYING_APP_LINK` for the `shouldOverrideUrlLoading` event, mapped to the raw value of the private but long-stable `_WKNavigationActionPolicyAllowWithoutTryingAppLink` WebKit policy (no private symbol is referenced)
+
 ## 1.2.0-beta.3
 
 - Updated flutter_inappwebview_platform_interface version to ^1.4.0-beta.3

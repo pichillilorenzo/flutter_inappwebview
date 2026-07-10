@@ -878,6 +878,14 @@ public class WebViewChannelDelegate: ChannelDelegate {
             super.init()
             self.decodeResult = { (obj: Any?) in
                 if let action = obj as? Int {
+                    if action == 3 {
+                        // NavigationActionPolicy.ALLOW_WITHOUT_TRYING_APP_LINK: maps to the private
+                        // but long-stable _WKNavigationActionPolicyAllowWithoutTryingAppLink
+                        // (allow + 2), which allows the navigation without offering it to a
+                        // universal-link-registered native app. Only the raw value is used,
+                        // no private symbol is referenced.
+                        return WKNavigationActionPolicy(rawValue: WKNavigationActionPolicy.allow.rawValue + 2) ?? .allow
+                    }
                     return WKNavigationActionPolicy.init(rawValue: action) ?? WKNavigationActionPolicy.cancel
                 }
                 return WKNavigationActionPolicy.cancel

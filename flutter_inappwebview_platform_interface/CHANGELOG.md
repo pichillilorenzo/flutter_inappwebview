@@ -1,3 +1,7 @@
+## 1.4.0-beta.4
+
+- Added `ALLOW_WITHOUT_TRYING_APP_LINK` value to `NavigationActionPolicy` to allow a navigation without opening the URL in a Universal Link / App Link registered native app (iOS and macOS; behaves like `ALLOW` on the other platforms)
+
 ## 1.4.0-beta.3
 
 - Updated `flutter_inappwebview_internal_annotations` dependency from `^1.2.0` to `^1.3.0`

@@ -272,7 +272,22 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
 
     if (javaScriptBridgeEnabled) {
       javaScriptBridgeInterface = new JavaScriptBridgeInterface(this, expectedBridgeSecret);
-      addJavascriptInterface(javaScriptBridgeInterface, JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME());
+      // Defer addJavascriptInterface to the next UI-thread message. Its binder
+      // IPC to the Chromium renderer process must not run while FlutterWebView
+      // is still synchronously building the platform view: doing so was observed
+      // to leave onWebViewCreated never fired on ~50% of release-build cold
+      // starts on real Android devices, with the failure toggling deterministically
+      // across kill-relaunch cycles. Debug builds were not affected.
+      // See UserContentController.addPluginScript for the equivalent defer applied
+      // to addDocumentStartJavaScript.
+      post(new Runnable() {
+        @Override
+        public void run() {
+          if (javaScriptBridgeInterface != null) {
+            addJavascriptInterface(javaScriptBridgeInterface, JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME());
+          }
+        }
+      });
     }
 
     inAppWebViewChromeClient = new InAppWebViewChromeClient(plugin, this, inAppBrowserDelegate);

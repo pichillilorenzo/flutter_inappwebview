@@ -94,7 +94,7 @@ public class FlutterWebView implements PlatformWebView {
     }
 
     Integer windowId = (Integer) params.get("windowId");
-    Map<String, Object> initialUrlRequest = (Map<String, Object>) params.get("initialUrlRequest");
+    final Map<String, Object> initialUrlRequest = (Map<String, Object>) params.get("initialUrlRequest");
     final String initialFile = (String) params.get("initialFile");
     final Map<String, String> initialData = (Map<String, String>) params.get("initialData");
 
@@ -124,27 +124,42 @@ public class FlutterWebView implements PlatformWebView {
         }
       }
     } else {
-      if (initialFile != null) {
-        try {
-          webView.loadFile(initialFile);
-        } catch (IOException e) {
-          Log.e(LOG_TAG, initialFile + " asset file cannot be found!", e);
+      // Defer the initial load to the next UI-thread message so the bridge
+      // native registrations posted from InAppWebView.prepare()
+      // (addJavascriptInterface and addDocumentStartJavaScript) run before the
+      // renderer receives the load IPC. Without this, the load IPC fires
+      // synchronously here, races ahead of the deferred bridge registrations,
+      // and pages cached or served fast enough can execute @document-start
+      // scripts before window.flutter_inappwebview is defined.
+      webView.post(new Runnable() {
+        @Override
+        public void run() {
+          if (webView == null) {
+            return;
+          }
+          if (initialFile != null) {
+            try {
+              webView.loadFile(initialFile);
+            } catch (IOException e) {
+              Log.e(LOG_TAG, initialFile + " asset file cannot be found!", e);
+            }
+          }
+          else if (initialData != null) {
+            String data = initialData.get("data");
+            String mimeType = initialData.get("mimeType");
+            String encoding = initialData.get("encoding");
+            String baseUrl = initialData.get("baseUrl");
+            String historyUrl = initialData.get("historyUrl");
+            webView.loadDataWithBaseURL(baseUrl, data, mimeType, encoding, historyUrl);
+          }
+          else if (initialUrlRequest != null) {
+            URLRequest urlRequest = URLRequest.fromMap(initialUrlRequest);
+            if (urlRequest != null) {
+              webView.loadUrl(urlRequest);
+            }
+          }
         }
-      }
-      else if (initialData != null) {
-        String data = initialData.get("data");
-        String mimeType = initialData.get("mimeType");
-        String encoding = initialData.get("encoding");
-        String baseUrl = initialData.get("baseUrl");
-        String historyUrl = initialData.get("historyUrl");
-        webView.loadDataWithBaseURL(baseUrl, data, mimeType, encoding, historyUrl);
-      }
-      else if (initialUrlRequest != null) {
-        URLRequest urlRequest = URLRequest.fromMap(initialUrlRequest);
-        if (urlRequest != null) {
-          webView.loadUrl(urlRequest);
-        }
-      }
+      });
     }
   }
 

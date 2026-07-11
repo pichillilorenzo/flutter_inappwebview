@@ -2,6 +2,7 @@ package com.pichillilorenzo.flutter_inappwebview_android.types;
 
 import android.annotation.SuppressLint;
 import android.text.TextUtils;
+import android.util.Log;
 import android.webkit.WebView;
 
 import androidx.annotation.NonNull;
@@ -210,12 +211,22 @@ public class UserContentController implements Disposable {
       }
       source = wrapSourceCodeAddChecks(source, userOnlyScript);
 
-      ScriptHandler scriptHandler = WebViewCompat.addDocumentStartJavaScript(
-              webView,
-              wrapSourceCodeInContentWorld(userOnlyScript.getContentWorld(), source),
-              userOnlyScript.getAllowedOriginRules()
-      );
-      this.scriptHandlerMap.put(userOnlyScript, scriptHandler);
+      try {
+        ScriptHandler scriptHandler = WebViewCompat.addDocumentStartJavaScript(
+                webView,
+                wrapSourceCodeInContentWorld(userOnlyScript.getContentWorld(), source),
+                userOnlyScript.getAllowedOriginRules()
+        );
+        this.scriptHandlerMap.put(userOnlyScript, scriptHandler);
+      } catch (RuntimeException e) {
+        // Chromium throws "Must be started before we block!" when this runs before the browser
+        // process finished starting (first webview of a cold process). Letting it propagate aborts
+        // the whole platform-view create, which is what leaves the webview blank and
+        // onWebViewCreated unfired (#2843): skip instead. The script is not stored in
+        // scriptHandlerMap, so a later re-add retries the native registration.
+        Log.e(LOG_TAG, "addDocumentStartJavaScript failed for " + userOnlyScript.getGroupName()
+                + " (browser process not started yet?): " + e);
+      }
     }
     return this.userOnlyScripts.get(userOnlyScript.getInjectionTime()).add(userOnlyScript);
   }
@@ -279,7 +290,7 @@ public class UserContentController implements Disposable {
     return pluginScriptsRequired;
   }
 
-  public boolean addPluginScript(PluginScript pluginScript) {
+  public boolean addPluginScript(final PluginScript pluginScript) {
     ContentWorld contentWorld = pluginScript.getContentWorld();
     if (contentWorld != null) {
       contentWorlds.add(contentWorld);
@@ -291,13 +302,39 @@ public class UserContentController implements Disposable {
         source = "if (document.readyState === 'complete') { " + source + "} else { window.addEventListener('load', function() { " + source + " }); }";
       }
       source = wrapSourceCodeAddChecks(source, pluginScript);
+      final String finalSource = wrapSourceCodeInContentWorld(pluginScript.getContentWorld(), source);
 
-      ScriptHandler scriptHandler = WebViewCompat.addDocumentStartJavaScript(
-              webView,
-              wrapSourceCodeInContentWorld(pluginScript.getContentWorld(), source),
-              pluginScript.getAllowedOriginRules()
-      );
-      this.scriptHandlerMap.put(pluginScript, scriptHandler);
+      // Defer WebViewCompat.addDocumentStartJavaScript to the next UI-thread
+      // message. Its binder IPC to the Chromium renderer process must not run
+      // while FlutterWebView is still synchronously building the platform view.
+      // InAppWebView.prepareAndAddUserScripts() issues 5 to 9 of these
+      // registrations synchronously when the JS bridge is enabled (PromisePolyfill,
+      // JS Bridge, Print, OnWindowBlur, OnWindowFocus, plus up to four more
+      // depending on settings); running them inline was observed to leave
+      // onWebViewCreated never fired on ~50% of release-build cold starts on real
+      // Android devices, with the failure toggling deterministically across kill-
+      // relaunch cycles. Debug builds were not affected.
+      webView.post(new Runnable() {
+        @Override
+        public void run() {
+          if (webView != null) {
+            try {
+              ScriptHandler scriptHandler = WebViewCompat.addDocumentStartJavaScript(
+                      webView,
+                      finalSource,
+                      pluginScript.getAllowedOriginRules()
+              );
+              scriptHandlerMap.put(pluginScript, scriptHandler);
+            } catch (RuntimeException e) {
+              // "Must be started before we block!" before browser startup completes. An uncaught
+              // throw here would kill the main thread (we are inside a posted runnable): log and
+              // skip instead; a later re-add retries the registration.
+              Log.e(LOG_TAG, "addDocumentStartJavaScript failed for plugin script "
+                      + pluginScript.getGroupName() + ": " + e);
+            }
+          }
+        }
+      });
     }
     return this.pluginScripts.get(pluginScript.getInjectionTime()).add(pluginScript);
   }

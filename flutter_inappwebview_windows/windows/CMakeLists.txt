@@ -4,8 +4,8 @@
 # customers of the plugin.
 cmake_minimum_required(VERSION 3.14)
 
-set(WIL_VERSION "1.0.250325.1")
-set(WEBVIEW_VERSION "1.0.3650.58")
+set(WIL_VERSION "1.0.260126.7")
+set(WEBVIEW_VERSION "1.0.4078.44")
 set(NLOHMANN_JSON_VERSION "3.12.0")
 set(CPP_WINRT_VERSION "2.0.250303.1")
 
@@ -296,6 +296,8 @@ function(FLUTTER_INAPPWEBVIEW_WINDOWS_APPLY_STANDARD_SETTINGS TARGET)
   target_compile_options(${TARGET} PRIVATE /bigobj)
   target_compile_definitions(${TARGET} PRIVATE "_HAS_EXCEPTIONS=0")
   target_compile_definitions(${TARGET} PRIVATE "$<$<CONFIG:Debug>:_DEBUG>")
+  target_compile_definitions(${TARGET} PRIVATE "_SILENCE_EXPERIMENTAL_COROUTINE_DEPRECATION_WARNINGS")
+  target_compile_options(${TARGET} PRIVATE /FS)
 endfunction()
 flutter_inappwebview_windows_apply_standard_settings(${PLUGIN_NAME})
 

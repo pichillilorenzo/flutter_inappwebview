@@ -432,19 +432,62 @@ public class WebViewChannelDelegate: ChannelDelegate {
             break
         case .callAsyncJavaScript:
             if let webView = webView, #available(iOS 10.3, *) {
-                if #available(iOS 14.3, *) { // on iOS 14.0, for some reason, it crashes
-                    let functionBody = arguments!["functionBody"] as! String
-                    let functionArguments = arguments!["arguments"] as! [String:Any]
+                let functionBody = arguments!["functionBody"] as! String
+                let functionArguments = arguments!["arguments"] as! [String:Any]
+                let contentWorldMap = arguments!["contentWorld"] as? [String:Any?]
+                let contentWorldName = contentWorldMap?["name"] as? String ?? "page"
+
+                if #available(iOS 18.0, *) {
                     var contentWorld = WKContentWorld.page
-                    if let contentWorldMap = arguments!["contentWorld"] as? [String:Any?] {
+                    if let contentWorldMap = contentWorldMap {
+                        contentWorld = WKContentWorld.fromMap(map: contentWorldMap, windowId: webView.windowId)!
+                    }
+                    webView.callAsyncJavaScript(functionBody: functionBody, arguments: functionArguments, contentWorld: contentWorld) { (value) in
+                        result(value)
+                    }
+                } else if #available(iOS 14.3, *), webView.windowId != nil {
+                    // Popup documents do not expose window.webkit, so the legacy result
+                    // handler cannot be used. Keep the PR #2776 behavior by forcing the
+                    // page world before custom-world bootstrap/cache generation.
+                    webView.callAsyncJavaScript(functionBody: functionBody, arguments: functionArguments, contentWorld: WKContentWorld.page) { (value) in
+                        result(value)
+                    }
+                } else if contentWorldName == "page" {
+                    // On iOS 14-17, the native content-world overload can
+                    // dereference a null pointer even when a nil frame correctly targets
+                    // the main frame. Use the existing Promise/evaluateJavaScript shim for
+                    // page-world calls in regular WebViews.
+                    webView.callAsyncJavaScript(functionBody: functionBody, arguments: functionArguments) { (value) in
+                        result(value)
+                    }
+                } else if #available(iOS 16.1, *) {
+                    // Preserve native isolation for custom worlds in regular WebViews.
+                    var contentWorld = WKContentWorld.page
+                    if let contentWorldMap = contentWorldMap {
+                        contentWorld = WKContentWorld.fromMap(map: contentWorldMap, windowId: webView.windowId)!
+                    }
+                    webView.callAsyncJavaScript(functionBody: functionBody, arguments: functionArguments, contentWorld: contentWorld) { (value) in
+                        result(value)
+                    }
+                } else if #available(iOS 16.0, *) {
+                    // The native overload can crash or never call its completion handler
+                    // on iOS 16.0.x. The legacy shim only supports the page world, so fail
+                    // explicitly instead of silently breaking custom-world isolation.
+                    result([
+                        "value": NSNull(),
+                        "error": "Custom content worlds are not supported by callAsyncJavaScript on iOS 16.0.x"
+                    ])
+                } else if #available(iOS 14.3, *) {
+                    // Preserve native isolation for custom worlds in regular WebViews.
+                    var contentWorld = WKContentWorld.page
+                    if let contentWorldMap = contentWorldMap {
                         contentWorld = WKContentWorld.fromMap(map: contentWorldMap, windowId: webView.windowId)!
                     }
                     webView.callAsyncJavaScript(functionBody: functionBody, arguments: functionArguments, contentWorld: contentWorld) { (value) in
                         result(value)
                     }
                 } else {
-                    let functionBody = arguments!["functionBody"] as! String
-                    let functionArguments = arguments!["arguments"] as! [String:Any]
+                    // The native async API crashes on iOS 14.0-14.2.
                     webView.callAsyncJavaScript(functionBody: functionBody, arguments: functionArguments) { (value) in
                         result(value)
                     }

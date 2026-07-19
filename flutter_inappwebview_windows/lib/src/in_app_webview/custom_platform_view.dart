@@ -499,6 +499,7 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
                     // focus from the app.
                     if (_touchSequenceIsTap) {
                       Future.delayed(const Duration(milliseconds: 100), () {
+                        if (!mounted) return;
                         _controller.requestFocus();
                       });
                     }

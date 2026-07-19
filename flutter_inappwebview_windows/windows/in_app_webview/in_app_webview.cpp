@@ -3735,6 +3735,22 @@ namespace flutter_inappwebview_plugin
     }
   }
 
+  void InAppWebView::requestFocus()
+  {
+    if (webViewController) {
+      webViewController->MoveFocus(COREWEBVIEW2_MOVE_FOCUS_REASON_PROGRAMMATIC);
+    }
+  }
+
+  void InAppWebView::clearFocus()
+  {
+    if (webView) {
+      webView->ExecuteScript(
+        L"if (document.activeElement) { document.activeElement.blur(); }",
+        nullptr);
+    }
+  }
+
   void InAppWebView::setPointerButtonState(InAppWebViewPointerEventKind kind, InAppWebViewPointerButton button)
   {
     if (!webViewCompositionController) {

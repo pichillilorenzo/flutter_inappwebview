@@ -199,6 +199,24 @@ class CustomPlatformViewController
     return _methodChannel.invokeMethod('setFpsLimit', maxFps);
   }
 
+  /// Requests focus for the underlying WebView2 control via MoveFocus.
+  Future<void> requestFocus() async {
+    if (_isDisposed) {
+      return;
+    }
+    assert(value.isInitialized);
+    return _methodChannel.invokeMethod('requestFocus');
+  }
+
+  /// Clears focus from the active element inside the WebView2 control.
+  Future<void> clearFocus() async {
+    if (_isDisposed) {
+      return;
+    }
+    assert(value.isInitialized);
+    return _methodChannel.invokeMethod('clearFocus');
+  }
+
   /// Sends a Pointer (Touch) update
   Future<void> _setPointerUpdate(
     InAppWebViewPointerEventKind kind,
@@ -319,6 +337,11 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
 
   PointerDeviceKind _pointerKind = PointerDeviceKind.unknown;
 
+  // Tracks whether the current touch sequence stayed within the tap slop —
+  // focus is granted only for taps, not for scroll/pan gestures.
+  Offset? _touchDownPosition;
+  bool _touchSequenceIsTap = false;
+
   // Accumulates fractional wheel deltas so sub-pixel trackpad movement is not
   // lost when the native side truncates to short.
   double _scrollRemainderX = 0;
@@ -395,7 +418,16 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
       focusNode: _focusNode,
       canRequestFocus: true,
       debugLabel: "flutter_inappwebview_windows_custom_platform_view",
-      onFocusChange: (focused) {},
+      onFocusChange: (focused) {
+        // Focus drops automatically during dispose — calling into a WebView
+        // that is being destroyed crashes.
+        if (!mounted || !_controller.value.isInitialized) return;
+        if (focused) {
+          _controller.requestFocus();
+        } else {
+          _controller.clearFocus();
+        }
+      },
       child: SizedBox.expand(key: _key, child: _buildInner()),
     );
   }
@@ -426,15 +458,12 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
 
                   if (!_focusNode.hasFocus) {
                     _focusNode.requestFocus();
-                    Future.delayed(const Duration(milliseconds: 50), () {
-                      if (!_focusNode.hasFocus) {
-                        _focusNode.requestFocus();
-                      }
-                    });
                   }
 
                   _pointerKind = ev.kind;
                   if (ev.kind == PointerDeviceKind.touch) {
+                    _touchDownPosition = ev.localPosition;
+                    _touchSequenceIsTap = true;
                     _controller._setPointerUpdate(
                       InAppWebViewPointerEventKind.down,
                       ev.pointer,
@@ -461,6 +490,19 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
                       ev.size,
                       ev.pressure,
                     );
+                    // SendMouseInput grants the renderer focus natively on
+                    // click, but SendPointerInput does not — without this a
+                    // touch tap reaches the DOM yet the input never shows a
+                    // caret and typing is impossible. Must run after Chromium
+                    // finished processing the tap; earlier it gets reverted.
+                    // Scroll/pan gestures are excluded so they don't steal
+                    // focus from the app.
+                    if (_touchSequenceIsTap) {
+                      Future.delayed(const Duration(milliseconds: 100), () {
+                        _controller.requestFocus();
+                      });
+                    }
+                    _touchDownPosition = null;
                     return;
                   }
                   final button = _downButtons.remove(ev.pointer);
@@ -484,6 +526,12 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
                 onPointerMove: (ev) {
                   _pointerKind = ev.kind;
                   if (ev.kind == PointerDeviceKind.touch) {
+                    final downPosition = _touchDownPosition;
+                    if (downPosition != null &&
+                        (ev.localPosition - downPosition).distance >
+                            kTouchSlop) {
+                      _touchSequenceIsTap = false;
+                    }
                     _controller._setPointerUpdate(
                       InAppWebViewPointerEventKind.update,
                       ev.pointer,

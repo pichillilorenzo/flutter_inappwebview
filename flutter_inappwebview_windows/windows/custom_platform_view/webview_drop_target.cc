@@ -1,16 +1,18 @@
 #include "webview_drop_target.h"
 
 #include <algorithm>
+#include <map>
 
 #include "../in_app_webview/in_app_webview.h"
 #include "../utils/log.h"
 
 namespace flutter_inappwebview_plugin
 {
-  static WebViewDropTarget* g_dropTarget = nullptr;
+  // One drop target per Flutter view window; all access is on the UI thread.
+  static std::map<HWND, WebViewDropTarget*> g_targets;
 
-  WebViewDropTarget::WebViewDropTarget(HWND flutterViewHwnd)
-    : flutterViewHwnd_(flutterViewHwnd)
+  WebViewDropTarget::WebViewDropTarget(HWND flutterViewHwnd, bool oleInitialized)
+    : flutterViewHwnd_(flutterViewHwnd), oleInitialized_(oleInitialized)
   {}
 
   void WebViewDropTarget::RegisterWebView(HWND flutterViewHwnd, InAppWebView* webView)
@@ -18,43 +20,59 @@ namespace flutter_inappwebview_plugin
     if (!flutterViewHwnd || !webView) {
       return;
     }
-    if (!g_dropTarget) {
-      // RegisterDragDrop requires OLE; S_FALSE (already initialized) is fine.
-      OleInitialize(nullptr);
-      auto target = new WebViewDropTarget(flutterViewHwnd);
+    auto it = g_targets.find(flutterViewHwnd);
+    if (it == g_targets.end()) {
+      // RegisterDragDrop needs an STA. OleInitialize returns S_FALSE when OLE
+      // is already initialized on this thread (still balanced by a matching
+      // OleUninitialize); RPC_E_CHANGED_MODE means an MTA is active and drag
+      // and drop cannot work here.
+      const auto oleHr = OleInitialize(nullptr);
+      const bool oleInitialized = SUCCEEDED(oleHr);
+      auto target = new WebViewDropTarget(flutterViewHwnd, oleInitialized);
       const auto hr = RegisterDragDrop(flutterViewHwnd, target);
       if (FAILED(hr)) {
         // Another plugin may already own the window's drop target
         // (DRAGDROP_E_ALREADYREGISTERED) - drag and drop into webviews is
         // unavailable then, but nothing else breaks.
         failedLog(hr);
+        if (oleInitialized) {
+          OleUninitialize();
+        }
         target->Release();
         return;
       }
-      g_dropTarget = target;
+      it = g_targets.emplace(flutterViewHwnd, target).first;
     }
-    g_dropTarget->webViews_.push_back(webView);
+    it->second->webViews_.push_back(webView);
   }
 
   void WebViewDropTarget::UnregisterWebView(InAppWebView* webView)
   {
-    if (!g_dropTarget) {
-      return;
-    }
-    auto& webViews = g_dropTarget->webViews_;
-    webViews.erase(std::remove(webViews.begin(), webViews.end(), webView),
-      webViews.end());
-    if (g_dropTarget->currentWebView_ == webView) {
-      g_dropTarget->currentWebView_ = nullptr;
-    }
-    if (webViews.empty()) {
-      RevokeDragDrop(g_dropTarget->flutterViewHwnd_);
-      if (g_dropTarget->currentDataObject_) {
-        g_dropTarget->currentDataObject_->Release();
-        g_dropTarget->currentDataObject_ = nullptr;
+    for (auto it = g_targets.begin(); it != g_targets.end(); ++it) {
+      auto target = it->second;
+      auto& webViews = target->webViews_;
+      const auto found = std::find(webViews.begin(), webViews.end(), webView);
+      if (found == webViews.end()) {
+        continue;
       }
-      g_dropTarget->Release();
-      g_dropTarget = nullptr;
+      webViews.erase(found);
+      if (target->currentWebView_ == webView) {
+        target->currentWebView_ = nullptr;
+      }
+      if (webViews.empty()) {
+        RevokeDragDrop(target->flutterViewHwnd_);
+        if (target->currentDataObject_) {
+          target->currentDataObject_->Release();
+          target->currentDataObject_ = nullptr;
+        }
+        const bool oleInitialized = target->oleInitialized_;
+        target->Release();
+        if (oleInitialized) {
+          OleUninitialize();
+        }
+        g_targets.erase(it);
+      }
+      return;
     }
   }
 

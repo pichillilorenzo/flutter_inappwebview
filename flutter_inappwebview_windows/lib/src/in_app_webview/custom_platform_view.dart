@@ -337,10 +337,16 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
 
   PointerDeviceKind _pointerKind = PointerDeviceKind.unknown;
 
-  // Tracks whether the current touch sequence stayed within the tap slop —
-  // focus is granted only for taps, not for scroll/pan gestures.
-  Offset? _touchDownPosition;
-  bool _touchSequenceIsTap = false;
+  // Per-pointer touch state: down position and whether the sequence has so far
+  // stayed within the tap slop. Focus is granted only for a single-finger tap,
+  // never for scroll/pan or any multi-touch gesture. Keyed by pointer so a
+  // second finger can't reset the first finger's sequence.
+  final _touchDownPositions = <int, Offset>{};
+  final _touchPointerIsTap = <int, bool>{};
+
+  // Pending post-tap focus request; cancelled on a new tap or on dispose so it
+  // can't fire after the user moved focus elsewhere or the view is gone.
+  Timer? _tapFocusTimer;
 
   // Accumulates fractional wheel deltas so sub-pixel trackpad movement is not
   // lost when the native side truncates to short.
@@ -462,8 +468,15 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
 
                   _pointerKind = ev.kind;
                   if (ev.kind == PointerDeviceKind.touch) {
-                    _touchDownPosition = ev.localPosition;
-                    _touchSequenceIsTap = true;
+                    _touchDownPositions[ev.pointer] = ev.localPosition;
+                    if (_touchDownPositions.length > 1) {
+                      // A second finger means a multi-touch gesture (pinch/
+                      // scroll) — no sequence may grant focus.
+                      _touchPointerIsTap.updateAll((_, __) => false);
+                      _touchPointerIsTap[ev.pointer] = false;
+                    } else {
+                      _touchPointerIsTap[ev.pointer] = true;
+                    }
                     _controller._setPointerUpdate(
                       InAppWebViewPointerEventKind.down,
                       ev.pointer,
@@ -497,13 +510,18 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
                     // finished processing the tap; earlier it gets reverted.
                     // Scroll/pan gestures are excluded so they don't steal
                     // focus from the app.
-                    if (_touchSequenceIsTap) {
-                      Future.delayed(const Duration(milliseconds: 100), () {
-                        if (!mounted) return;
-                        _controller.requestFocus();
-                      });
+                    final wasTap = _touchPointerIsTap.remove(ev.pointer) ?? false;
+                    _touchDownPositions.remove(ev.pointer);
+                    if (wasTap) {
+                      _tapFocusTimer?.cancel();
+                      _tapFocusTimer = Timer(
+                        const Duration(milliseconds: 100),
+                        () {
+                          if (!mounted) return;
+                          _controller.requestFocus();
+                        },
+                      );
                     }
-                    _touchDownPosition = null;
                     return;
                   }
                   final button = _downButtons.remove(ev.pointer);
@@ -516,6 +534,11 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
                 },
                 onPointerCancel: (ev) {
                   _pointerKind = ev.kind;
+                  if (ev.kind == PointerDeviceKind.touch) {
+                    _touchPointerIsTap.remove(ev.pointer);
+                    _touchDownPositions.remove(ev.pointer);
+                    return;
+                  }
                   final button = _downButtons.remove(ev.pointer);
                   if (button != null) {
                     _controller._setPointerButtonState(
@@ -527,11 +550,11 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
                 onPointerMove: (ev) {
                   _pointerKind = ev.kind;
                   if (ev.kind == PointerDeviceKind.touch) {
-                    final downPosition = _touchDownPosition;
+                    final downPosition = _touchDownPositions[ev.pointer];
                     if (downPosition != null &&
                         (ev.localPosition - downPosition).distance >
                             kTouchSlop) {
-                      _touchSequenceIsTap = false;
+                      _touchPointerIsTap[ev.pointer] = false;
                     }
                     _controller._setPointerUpdate(
                       InAppWebViewPointerEventKind.update,
@@ -702,6 +725,7 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
   @override
   void dispose() {
     super.dispose();
+    _tapFocusTimer?.cancel();
     _flingTicker?.dispose();
     _platformUtil.removeListener(this);
     _cursorSubscription?.cancel();

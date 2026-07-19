@@ -16,16 +16,18 @@ namespace flutter_inappwebview_plugin
   // the events to ICoreWebView2CompositionController3::DragEnter/DragOver/
   // DragLeave/Drop.
   //
-  // A single instance is registered per Flutter view window; the composition
-  // webviews register themselves and drag events are routed to the webview
-  // whose bounds contain the cursor.
+  // One instance is registered per Flutter view window (keyed by HWND), so
+  // multi-window / multi-engine apps each get their own drop target; drag
+  // events are routed to the webview whose bounds contain the cursor within
+  // that window.
   class WebViewDropTarget : public IDropTarget
   {
   public:
-    // Registers [webView] for drag routing, installing the drop target on
-    // [flutterViewHwnd] on first use.
+    // Registers [webView] for drag routing under [flutterViewHwnd], creating
+    // and installing a drop target for that window on first use.
     static void RegisterWebView(HWND flutterViewHwnd, InAppWebView* webView);
-    // Removes [webView]; revokes the drop target when none remain.
+    // Removes [webView] from whichever window owns it; revokes and destroys
+    // that window's drop target once it has no webviews left.
     static void UnregisterWebView(InAppWebView* webView);
 
     // IUnknown
@@ -43,13 +45,16 @@ namespace flutter_inappwebview_plugin
       POINTL point, DWORD* effect) override;
 
   private:
-    explicit WebViewDropTarget(HWND flutterViewHwnd);
+    explicit WebViewDropTarget(HWND flutterViewHwnd, bool oleInitialized);
     ~WebViewDropTarget() = default;
 
     InAppWebView* webViewAt(POINTL screenPoint, POINT* webViewPoint) const;
     void forwardLeave();
 
     HWND flutterViewHwnd_;
+    // Whether this target's own OleInitialize succeeded and must be balanced
+    // with OleUninitialize when the target is destroyed.
+    bool oleInitialized_;
     volatile LONG refCount_ = 1;
     std::vector<InAppWebView*> webViews_;
     InAppWebView* currentWebView_ = nullptr;

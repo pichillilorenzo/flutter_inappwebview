@@ -729,12 +729,12 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
   @override
   void dispose() {
     _tapFocusTimer?.cancel();
-    super.dispose();
     _flingTicker?.dispose();
     _platformUtil.removeListener(this);
     _cursorSubscription?.cancel();
     _controller.dispose();
     _focusNode.dispose();
     _listener.dispose();
+    super.dispose();
   }
 }

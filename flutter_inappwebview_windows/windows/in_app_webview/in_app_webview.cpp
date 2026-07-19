@@ -10,6 +10,7 @@
 #include <winrt/Windows.Foundation.h>
 
 #include "../custom_platform_view/util/composition.desktop.interop.h"
+#include "../custom_platform_view/webview_drop_target.h"
 #include "../plugin_scripts_js/javascript_bridge_js.h"
 #include "../plugin_scripts_js/web_message_channel_js.h"
 #include "../plugin_scripts_js/web_message_listener_js.h"
@@ -3604,6 +3605,8 @@ namespace flutter_inappwebview_plugin
       bounds.bottom = static_cast<LONG>(scaled_height);
 
       surface_->put_Size({ scaled_width, scaled_height });
+      surfaceSize_ = { static_cast<LONG>(scaled_width),
+        static_cast<LONG>(scaled_height) };
 
       wil::com_ptr<ICoreWebView2Controller3> webViewController3;
       if (SUCCEEDED(webViewController->QueryInterface(IID_PPV_ARGS(&webViewController3)))) {
@@ -3630,6 +3633,7 @@ namespace flutter_inappwebview_plugin
       scaleFactor_ = scale_factor;
       auto scaled_x = static_cast<int>(x * scale_factor);
       auto scaled_y = static_cast<int>(y * scale_factor);
+      widgetOffset_ = { scaled_x, scaled_y };
 
       auto titleBarHeight = ((GetSystemMetrics(SM_CYCAPTION) + GetSystemMetrics(SM_CYFRAME)) * scale_factor) + GetSystemMetrics(SM_CXPADDEDBORDER);
       auto borderWidth = (GetSystemMetrics(SM_CXBORDER) + GetSystemMetrics(SM_CXPADDEDBORDER)) * scale_factor;
@@ -3883,6 +3887,11 @@ namespace flutter_inappwebview_plugin
     webViewCompositionController->put_RootVisualTarget(webview_visual2.get());
 
     webViewController->put_IsVisible(true);
+
+    if (plugin && plugin->registrar) {
+      WebViewDropTarget::RegisterWebView(
+        plugin->registrar->GetView()->GetNativeWindow(), this);
+    }
 
     return true;
   }
@@ -4140,6 +4149,7 @@ namespace flutter_inappwebview_plugin
   InAppWebView::~InAppWebView()
   {
     debugLog("dealloc InAppWebView");
+    WebViewDropTarget::UnregisterWebView(this);
     userContentController = nullptr;
     if (webView) {
       failedLog(webView->Stop());

@@ -170,6 +170,8 @@ list(APPEND PLUGIN_SOURCES
   "types/accelerator_key_pressed_detail.cpp"
   "types/accelerator_key_pressed_detail.h"
   "custom_platform_view/custom_platform_view.cc"
+  "custom_platform_view/webview_drop_target.cc"
+  "custom_platform_view/webview_drop_target.h"
   "custom_platform_view/custom_platform_view.h"
   "custom_platform_view/texture_bridge.cc"
   "custom_platform_view/texture_bridge.h"
@@ -319,6 +321,8 @@ target_compile_definitions(${PLUGIN_NAME} PRIVATE FLUTTER_PLUGIN_IMPL)
 target_include_directories(${PLUGIN_NAME} INTERFACE
   "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_link_libraries(${PLUGIN_NAME} PRIVATE flutter flutter_wrapper_plugin)
+# OLE drag and drop (RegisterDragDrop/OleInitialize) for WebViewDropTarget.
+target_link_libraries(${PLUGIN_NAME} PRIVATE ole32)
 
 # List of absolute paths to libraries that should be bundled with the plugin.
 # This list could contain prebuilt libraries, or libraries created by an

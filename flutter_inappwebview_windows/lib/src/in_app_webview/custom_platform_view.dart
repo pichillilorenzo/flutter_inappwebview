@@ -431,6 +431,8 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
         if (focused) {
           _controller.requestFocus();
         } else {
+          // Focus left — a pending post-tap grab must not pull it back.
+          _tapFocusTimer?.cancel();
           _controller.clearFocus();
         }
       },
@@ -461,6 +463,8 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
                   _stopFling();
                   _reportSurfaceSize();
                   _reportWidgetPosition();
+                  // A new gesture supersedes any pending post-tap focus.
+                  _tapFocusTimer?.cancel();
 
                   if (!_focusNode.hasFocus) {
                     _focusNode.requestFocus();
@@ -724,8 +728,8 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
 
   @override
   void dispose() {
-    super.dispose();
     _tapFocusTimer?.cancel();
+    super.dispose();
     _flingTicker?.dispose();
     _platformUtil.removeListener(this);
     _cursorSubscription?.cancel();

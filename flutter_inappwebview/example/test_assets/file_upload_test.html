@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<body>
+  <h2>File Upload Test</h2>
+  <p><button onclick="document.getElementById('gallery').click()">Pick image from gallery</button></p>
+  <p><button onclick="document.getElementById('camera').click()">Capture photo with camera</button></p>
+  <p><button onclick="document.getElementById('video').click()">Record video with camera</button></p>
+
+  <input type="file" accept="image/*" id="gallery" style="display:none">
+  <input type="file" accept="image/*" capture="environment" id="camera" style="display:none">
+  <input type="file" accept="video/*" capture="environment" id="video" style="display:none">
+
+  <hr>
+  <p>Check the <strong>Events</strong> tab for <code>onShowFileChooser</code> logs.</p>
+</body>
+</html>
+

@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <paths xmlns:android="http://schemas.android.com/apk/res/android">
-    <external-path name="external_files" path="."/>
+    <external-files-path name="app_captures" path="Captures/"/>
+    <external-path name="pictures" path="Pictures/"/>
+    <external-path name="movies" path="Movies/"/>
 </paths>

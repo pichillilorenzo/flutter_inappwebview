@@ -425,16 +425,13 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
       canRequestFocus: true,
       debugLabel: "flutter_inappwebview_windows_custom_platform_view",
       onFocusChange: (focused) {
-        // Focus drops automatically during dispose — calling into a WebView
-        // that is being destroyed crashes.
+        // Deliberately no native MoveFocus/blur here. A mouse click already
+        // focuses the clicked element natively; a MoveFocus arriving after it
+        // toggles that focus away (#2736) and typing breaks. Touch is
+        // handled in onPointerUp, which is the only case that needs it.
         if (!mounted || !_controller.value.isInitialized) return;
-        if (focused) {
-          _controller.requestFocus();
-        } else {
-          // Focus left — a pending post-tap grab must not pull it back.
-          _tapFocusTimer?.cancel();
-          _controller.clearFocus();
-        }
+        // A pending post-tap grab must not pull focus back after it left.
+        if (!focused) _tapFocusTimer?.cancel();
       },
       child: SizedBox.expand(key: _key, child: _buildInner()),
     );
@@ -514,7 +511,8 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
                     // finished processing the tap; earlier it gets reverted.
                     // Scroll/pan gestures are excluded so they don't steal
                     // focus from the app.
-                    final wasTap = _touchPointerIsTap.remove(ev.pointer) ?? false;
+                    final wasTap =
+                        _touchPointerIsTap.remove(ev.pointer) ?? false;
                     _touchDownPositions.remove(ev.pointer);
                     if (wasTap) {
                       _tapFocusTimer?.cancel();

@@ -26,7 +26,7 @@ public class PrintJS {
         return """
         window.print = function() {
             window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME()).callHandler("onPrintRequest", window.location.href);
-        }
+        };
         """
     }
 }

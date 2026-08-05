@@ -146,10 +146,19 @@ class CustomPlatformViewController
     if (_isDisposed) {
       return;
     }
-    _textureId = (await _pluginChannel.invokeMethod<int>(
-      'createInAppWebView',
-      arguments,
-    ))!;
+    try {
+      _textureId = (await _pluginChannel.invokeMethod<int>(
+        'createInAppWebView',
+        arguments,
+      ))!;
+    } catch (_) {
+      // No native view exists; release waiters and prevent channel calls.
+      _isDisposed = true;
+      if (!_creatingCompleter.isCompleted) {
+        _creatingCompleter.complete();
+      }
+      rethrow;
+    }
 
     _methodChannel = MethodChannel(
       'com.pichillilorenzo/custom_platform_view_$_textureId',

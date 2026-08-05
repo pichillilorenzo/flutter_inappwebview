@@ -165,6 +165,10 @@ namespace flutter_inappwebview_plugin
           };
 
           auto inAppWebView = std::make_unique<InAppWebView>(plugin, params, hwnd, std::move(webViewEnv), std::move(webViewController), std::move(webViewCompositionController));
+          if (!inAppWebView->webView || !inAppWebView->surface()) {
+            result_->Error("0", "Cannot create the InAppWebView surface!");
+            return;
+          }
 
           std::optional<std::shared_ptr<URLRequest>> urlRequest = urlRequestMap.has_value() ? std::make_shared<URLRequest>(urlRequestMap.value()) : std::optional<std::shared_ptr<URLRequest>>{};
           if (urlRequest.has_value()) {
@@ -204,6 +208,7 @@ namespace flutter_inappwebview_plugin
           result_->Success(textureId);
         }
         else {
+          DestroyWindow(hwnd);
           result_->Error("0", "Cannot create the InAppWebView instance!");
         }
       }

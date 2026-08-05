@@ -132,6 +132,7 @@ namespace flutter_inappwebview_plugin
           result_->Success(true);
         }
         else {
+          DestroyWindow(hwnd);
           result_->Error("0", "Cannot create the HeadlessInAppWebView instance!");
         }
       }

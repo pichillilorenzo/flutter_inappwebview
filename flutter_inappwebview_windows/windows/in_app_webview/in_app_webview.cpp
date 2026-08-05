@@ -3860,37 +3860,52 @@ namespace flutter_inappwebview_plugin
     }
 
     winrt::com_ptr<ABI::Windows::UI::Composition::IContainerVisual> root;
-    if (FAILED(compositor->CreateContainerVisual(root.put()))) {
+    if (!compositor || failedAndLog(compositor->CreateContainerVisual(root.put()))) {
       return false;
     }
     surface_ = root.try_as<ABI::Windows::UI::Composition::IVisual>();
-    assert(surface_);
+    if (!surface_) {
+      return false;
+    }
 
     // initial size. doesn't matter as we resize the surface anyway.
-    surface_->put_Size({ 1280, 720 });
-    surface_->put_IsVisible(true);
+    if (failedAndLog(surface_->put_Size({ 1280, 720 })) ||
+      failedAndLog(surface_->put_IsVisible(true))) {
+      surface_ = nullptr;
+      return false;
+    }
 
     winrt::com_ptr<ABI::Windows::UI::Composition::IVisual> webview_visual;
-    compositor->CreateContainerVisual(
+    if (failedAndLog(compositor->CreateContainerVisual(
       reinterpret_cast<ABI::Windows::UI::Composition::IContainerVisual**>(
-        webview_visual.put()));
+        webview_visual.put())))) {
+      surface_ = nullptr;
+      return false;
+    }
 
     auto webview_visual2 =
       webview_visual.try_as<ABI::Windows::UI::Composition::IVisual2>();
-    if (webview_visual2) {
-      webview_visual2->put_RelativeSizeAdjustment({ 1.0f, 1.0f });
+    if (!webview_visual2 || failedAndLog(
+      webview_visual2->put_RelativeSizeAdjustment({ 1.0f, 1.0f }))) {
+      surface_ = nullptr;
+      return false;
     }
 
     winrt::com_ptr<ABI::Windows::UI::Composition::IVisualCollection> children;
-    root->get_Children(children.put());
-    children->InsertAtTop(webview_visual.get());
-    webViewCompositionController->put_RootVisualTarget(webview_visual2.get());
+    if (failedAndLog(root->get_Children(children.put())) || !children ||
+      failedAndLog(children->InsertAtTop(webview_visual.get())) ||
+      failedAndLog(webViewCompositionController->put_RootVisualTarget(
+        webview_visual2.get())) ||
+      failedAndLog(webViewController->put_IsVisible(true))) {
+      surface_ = nullptr;
+      return false;
+    }
 
-    webViewController->put_IsVisible(true);
-
+    // The Flutter view may detach while surface creation is still in flight.
     if (plugin && plugin->registrar) {
-      WebViewDropTarget::RegisterWebView(
-        plugin->registrar->GetView()->GetNativeWindow(), this);
+      if (auto* const view = plugin->registrar->GetView()) {
+        WebViewDropTarget::RegisterWebView(view->GetNativeWindow(), this);
+      }
     }
 
     return true;

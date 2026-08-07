@@ -65,6 +65,18 @@ namespace flutter_inappwebview_plugin
   {
     std::optional<LRESULT> result = std::nullopt;
 
+    // Handled before delegating: a host plugin that consumes WM_SIZE on
+    // minimize (window_manager does) must not keep WebView2's input window
+    // alive on the desktop. See InAppWebViewManager::setWindowMinimized.
+    if (message == WM_SIZE && inAppWebViewManager) {
+      if (wParam == SIZE_MINIMIZED) {
+        inAppWebViewManager->setWindowMinimized(true);
+      }
+      else if (wParam == SIZE_RESTORED || wParam == SIZE_MAXIMIZED) {
+        inAppWebViewManager->setWindowMinimized(false);
+      }
+    }
+
     if (platformUtil) {
       result = platformUtil->HandleWindowProc(hWnd, message, wParam, lParam);
     }

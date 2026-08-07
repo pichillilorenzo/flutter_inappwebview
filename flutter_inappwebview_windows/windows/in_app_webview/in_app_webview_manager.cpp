@@ -227,6 +227,65 @@ namespace flutter_inappwebview_plugin
     }
   }
 
+  // WebView2 keeps its own top-level input window (class Chrome_WidgetWin_1,
+  // owned by no window) over the widget area. It has no redirection bitmap, so
+  // it is invisible - but it still hit-tests, and minimizing the app leaves it
+  // on screen swallowing every mouse click over the region the app occupied.
+  // Hiding the controller hides that window. Only the WebViews hidden here are
+  // restored, so one the host deliberately hid stays hidden.
+  void InAppWebViewManager::setWindowMinimized(const bool& minimized)
+  {
+    const auto setVisible = [](const std::unique_ptr<CustomPlatformView>& platformView, const bool visible) -> bool
+      {
+        const auto webView = platformView ? platformView->view.get() : nullptr;
+        if (!webView || !webView->webViewController) {
+          return false;
+        }
+        BOOL isVisible = FALSE;
+        if (failedAndLog(webView->webViewController->get_IsVisible(&isVisible)) ||
+          (isVisible != FALSE) == visible) {
+          return false;
+        }
+        return succeededOrLog(webView->webViewController->put_IsVisible(visible ? TRUE : FALSE));
+      };
+
+    if (minimized) {
+      // A second SIZE_MINIMIZED without a restore in between must not discard
+      // the recorded set.
+      if (!hiddenOnMinimize_.empty() || !hiddenKeepAliveOnMinimize_.empty()) {
+        return;
+      }
+      for (const auto& [id, platformView] : webViews) {
+        if (setVisible(platformView, false)) {
+          hiddenOnMinimize_.push_back(id);
+        }
+      }
+      for (const auto& [keepAliveId, platformView] : keepAliveWebViews) {
+        if (setVisible(platformView, false)) {
+          hiddenKeepAliveOnMinimize_.push_back(keepAliveId);
+        }
+      }
+      return;
+    }
+
+    // Lookup by id, not by pointer: a WebView may have been disposed while the
+    // window was minimized.
+    for (const auto& id : hiddenOnMinimize_) {
+      const auto it = webViews.find(id);
+      if (it != webViews.end()) {
+        setVisible(it->second, true);
+      }
+    }
+    for (const auto& keepAliveId : hiddenKeepAliveOnMinimize_) {
+      const auto it = keepAliveWebViews.find(keepAliveId);
+      if (it != keepAliveWebViews.end()) {
+        setVisible(it->second, true);
+      }
+    }
+    hiddenOnMinimize_.clear();
+    hiddenKeepAliveOnMinimize_.clear();
+  }
+
   bool InAppWebViewManager::isGraphicsCaptureSessionSupported()
   {
     HSTRING className;

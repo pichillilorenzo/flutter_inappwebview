@@ -2,7 +2,8 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 
-String _readNativeSource(String path) => File(path).readAsStringSync();
+String _readNativeSource(String path) =>
+    File(path).readAsStringSync().replaceAll('\r\n', '\n');
 
 void main() {
   test('visible webview creation failure destroys its host window', () {

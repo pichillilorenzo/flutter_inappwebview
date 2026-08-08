@@ -21,6 +21,7 @@
 #include "../webview_environment/webview_environment.h"
 #include "in_app_webview_settings.h"
 #include "user_content_controller.h"
+#include "webview_visibility_state.h"
 #include "webview_channel_delegate.h"
 #include "../web_message/web_message_channel.h"
 #include "../web_message/web_message_listener.h"
@@ -116,11 +117,13 @@ namespace flutter_inappwebview_plugin
     InAppWebView(const FlutterInappwebviewWindowsPlugin* plugin, const InAppWebViewCreationParams& params, const HWND parentWindow,
       wil::com_ptr<ICoreWebView2Environment> webViewEnv,
       wil::com_ptr<ICoreWebView2Controller> webViewController,
-      wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController);
+      wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController,
+      bool hostWindowMinimized = false);
     InAppWebView(InAppBrowser* inAppBrowser, const FlutterInappwebviewWindowsPlugin* plugin, const InAppWebViewCreationParams& params, const HWND parentWindow,
       wil::com_ptr<ICoreWebView2Environment> webViewEnv,
       wil::com_ptr<ICoreWebView2Controller> webViewController,
-      wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController);
+      wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController,
+      bool hostWindowMinimized = false);
     ~InAppWebView();
 
     // On failure the completionHandler receives the failing HRESULT and null
@@ -199,8 +202,9 @@ namespace flutter_inappwebview_plugin
     void callDevToolsProtocolMethod(const std::string& methodName, const std::optional<std::string>& parametersAsJson, const std::function<void(const HRESULT& errorCode, const std::optional<std::string>&)> completionHandler) const;
     void addDevToolsProtocolEventListener(const std::string& eventName);
     void removeDevToolsProtocolEventListener(const std::string& eventName);
-    void pause() const;
-    void resume() const;
+    void pause();
+    void resume();
+    void setHostWindowMinimized(bool minimized);
     void getCertificate(const std::function<void(const std::optional<std::unique_ptr<SslCertificate>>)> completionHandler) const;
     void clearSslPreferences(const std::function<void()> completionHandler) const;
     bool isInterfaceSupported(const std::string& interfaceName) const;
@@ -263,6 +267,7 @@ namespace flutter_inappwebview_plugin
     POINT widgetOffset_ = { 0, 0 };
     SIZE surfaceSize_ = { 0, 0 };
     VirtualKeyState virtualKeys_;
+    WebViewVisibilityState visibilityState_;
 
     const std::string expectedBridgeSecret = get_uuid();
     bool javaScriptBridgeEnabled = true;
@@ -281,6 +286,7 @@ namespace flutter_inappwebview_plugin
 
     void registerEventHandlers();
     void registerSurfaceEventHandlers();
+    bool updateControllerVisibility() const;
     HRESULT onCallJsHandler(const bool& isMainFrame, ICoreWebView2WebMessageReceivedEventArgs* args);
   };
 }

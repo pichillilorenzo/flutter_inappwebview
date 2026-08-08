@@ -61,6 +61,7 @@ namespace flutter_inappwebview_plugin
     const HINSTANCE m_hInstance;
     HWND m_hWnd;
     bool destroyed_ = false;
+    bool hostWindowMinimized_ = false;
     static InAppBrowser* GetThisFromHandle(HWND window) noexcept;
     LRESULT MessageHandler(HWND window,
       UINT message,

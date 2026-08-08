@@ -226,6 +226,7 @@ list(APPEND PLUGIN_SOURCES
   "in_app_webview/in_app_webview_settings.h"
   "in_app_webview/in_app_webview.cpp"
   "in_app_webview/in_app_webview.h"
+  "in_app_webview/webview_visibility_state.h"
   "in_app_webview/in_app_webview_manager.cpp"
   "in_app_webview/in_app_webview_manager.h"
   "in_app_webview/webview_channel_delegate.cpp"
@@ -354,27 +355,12 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 set(INSTALL_GTEST OFF CACHE BOOL "Disable installation of googletest" FORCE)
 FetchContent_MakeAvailable(googletest)
 
-# The plugin's C API is not very useful for unit testing, so build the sources
-# directly into the test binary rather than using the DLL.
 add_executable(${TEST_RUNNER}
   test/flutter_inappwebview_windows_plugin_test.cpp
-  ${PLUGIN_SOURCES}
 )
 apply_standard_settings(${TEST_RUNNER})
-target_compile_options(${TEST_RUNNER} PRIVATE /bigobj)
-target_compile_options(${TEST_RUNNER} PRIVATE /WX-)
 target_include_directories(${TEST_RUNNER} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
-target_link_libraries(${TEST_RUNNER} PRIVATE flutter_wrapper_plugin)
-target_link_libraries(${TEST_RUNNER} PRIVATE gtest_main gmock)
-add_dependencies(${TEST_RUNNER} ${PROJECT_NAME}_DEPS)
-target_link_libraries(${TEST_RUNNER} PRIVATE ${CMAKE_BINARY_DIR}/packages/Microsoft.Web.WebView2/build/native/Microsoft.Web.WebView2.targets)
-target_link_libraries(${TEST_RUNNER} PRIVATE ${CMAKE_BINARY_DIR}/packages/Microsoft.Windows.ImplementationLibrary/build/native/Microsoft.Windows.ImplementationLibrary.targets)
-target_link_libraries(${TEST_RUNNER} PRIVATE ${CMAKE_BINARY_DIR}/packages/nlohmann.json/build/native/nlohmann.json.targets)
-# flutter_wrapper_plugin has link dependencies on the Flutter DLL.
-add_custom_command(TARGET ${TEST_RUNNER} POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -E copy_if_different
-  "${FLUTTER_LIBRARY}" $<TARGET_FILE_DIR:${TEST_RUNNER}>
-)
+target_link_libraries(${TEST_RUNNER} PRIVATE gtest_main)
 
 # Enable automatic test discovery. The default 5s DISCOVERY_TIMEOUT is
 # marginal on cold CI runners (antivirus scans the fresh executable) and

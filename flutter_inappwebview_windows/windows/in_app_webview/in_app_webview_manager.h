@@ -6,7 +6,6 @@
 #include <map>
 #include <string>
 #include <variant>
-#include <vector>
 #include <wil/com.h>
 #include <winrt/base.h>
 
@@ -52,7 +51,7 @@ namespace flutter_inappwebview_plugin
 
     void createInAppWebView(const flutter::EncodableMap* arguments, std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result);
     void disposeKeepAlive(const std::string& keepAliveId);
-    void setWindowMinimized(const bool& minimized);
+    void setWindowMinimized(bool minimized);
   private:
     inline static std::shared_ptr<rx::RoHelper> rohelper_ = nullptr;
     inline static winrt::com_ptr<ABI::Windows::System::IDispatcherQueueController>
@@ -60,8 +59,7 @@ namespace flutter_inappwebview_plugin
     inline static std::unique_ptr<GraphicsContext> graphics_context_ = nullptr;
     inline static winrt::com_ptr<ABI::Windows::UI::Composition::ICompositor> compositor_;
     WNDCLASS windowClass_ = {};
-    std::vector<uint64_t> hiddenOnMinimize_;
-    std::vector<std::string> hiddenKeepAliveOnMinimize_;
+    bool windowMinimized_ = false;
     inline static bool valid_ = false;
   };
 }

@@ -78,7 +78,9 @@ namespace flutter_inappwebview_plugin
       [this, params, webViewParams](HRESULT errorCode, wil::com_ptr<ICoreWebView2Environment> webViewEnv, wil::com_ptr<ICoreWebView2Controller> webViewController, wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController) -> void
       {
         if (webViewEnv && webViewController) {
-          webView = std::make_unique<InAppWebView>(this, this->plugin, webViewParams, m_hWnd, std::move(webViewEnv), std::move(webViewController), nullptr);
+          webView = std::make_unique<InAppWebView>(this, this->plugin, webViewParams,
+            m_hWnd, std::move(webViewEnv), std::move(webViewController), nullptr,
+            hostWindowMinimized_);
           webView->initChannel(std::nullopt, InAppBrowser::METHOD_CHANNEL_NAME_PREFIX + id);
 
           if (channelDelegate) {
@@ -228,9 +230,18 @@ namespace flutter_inappwebview_plugin
       return 0;
     }
     case WM_SIZE: {
-      RECT bounds;
-      GetClientRect(hwnd, &bounds);
+      if (wparam == SIZE_MINIMIZED) {
+        hostWindowMinimized_ = true;
+      }
+      else if (wparam == SIZE_RESTORED || wparam == SIZE_MAXIMIZED) {
+        hostWindowMinimized_ = false;
+      }
+
       if (webView) {
+        webView->setHostWindowMinimized(hostWindowMinimized_);
+
+        RECT bounds;
+        GetClientRect(hwnd, &bounds);
         webView->webViewController->put_Bounds(bounds);
       }
       return 0;

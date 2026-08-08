@@ -165,7 +165,9 @@ namespace flutter_inappwebview_plugin
             initialUserScripts
           };
 
-          auto inAppWebView = std::make_unique<InAppWebView>(plugin, params, hwnd, std::move(webViewEnv), std::move(webViewController), std::move(webViewCompositionController));
+          auto inAppWebView = std::make_unique<InAppWebView>(plugin, params, hwnd,
+            std::move(webViewEnv), std::move(webViewController),
+            std::move(webViewCompositionController), windowMinimized_);
           if (!inAppWebView->webView || !inAppWebView->surface()) {
             result_->Error("0", "Cannot create the InAppWebView surface!");
             return;
@@ -231,59 +233,27 @@ namespace flutter_inappwebview_plugin
   // owned by no window) over the widget area. It has no redirection bitmap, so
   // it is invisible - but it still hit-tests, and minimizing the app leaves it
   // on screen swallowing every mouse click over the region the app occupied.
-  // Hiding the controller hides that window. Only the WebViews hidden here are
-  // restored, so one the host deliberately hid stays hidden.
-  void InAppWebViewManager::setWindowMinimized(const bool& minimized)
+  // Hiding the controller hides that window. Each WebView keeps its requested
+  // pause state separate from this temporary host-window state, so resume()
+  // cannot expose it while minimized and restore cannot expose a paused view.
+  void InAppWebViewManager::setWindowMinimized(const bool minimized)
   {
-    const auto setVisible = [](const std::unique_ptr<CustomPlatformView>& platformView, const bool visible) -> bool
+    windowMinimized_ = minimized;
+
+    const auto applyWindowState = [minimized](const std::unique_ptr<CustomPlatformView>& platformView)
       {
         const auto webView = platformView ? platformView->view.get() : nullptr;
-        if (!webView || !webView->webViewController) {
-          return false;
+        if (webView) {
+          webView->setHostWindowMinimized(minimized);
         }
-        BOOL isVisible = FALSE;
-        if (failedAndLog(webView->webViewController->get_IsVisible(&isVisible)) ||
-          (isVisible != FALSE) == visible) {
-          return false;
-        }
-        return succeededOrLog(webView->webViewController->put_IsVisible(visible ? TRUE : FALSE));
       };
 
-    if (minimized) {
-      // A second SIZE_MINIMIZED without a restore in between must not discard
-      // the recorded set.
-      if (!hiddenOnMinimize_.empty() || !hiddenKeepAliveOnMinimize_.empty()) {
-        return;
-      }
-      for (const auto& [id, platformView] : webViews) {
-        if (setVisible(platformView, false)) {
-          hiddenOnMinimize_.push_back(id);
-        }
-      }
-      for (const auto& [keepAliveId, platformView] : keepAliveWebViews) {
-        if (setVisible(platformView, false)) {
-          hiddenKeepAliveOnMinimize_.push_back(keepAliveId);
-        }
-      }
-      return;
+    for (const auto& [id, platformView] : webViews) {
+      applyWindowState(platformView);
     }
-
-    // Lookup by id, not by pointer: a WebView may have been disposed while the
-    // window was minimized.
-    for (const auto& id : hiddenOnMinimize_) {
-      const auto it = webViews.find(id);
-      if (it != webViews.end()) {
-        setVisible(it->second, true);
-      }
+    for (const auto& [keepAliveId, platformView] : keepAliveWebViews) {
+      applyWindowState(platformView);
     }
-    for (const auto& keepAliveId : hiddenKeepAliveOnMinimize_) {
-      const auto it = keepAliveWebViews.find(keepAliveId);
-      if (it != keepAliveWebViews.end()) {
-        setVisible(it->second, true);
-      }
-    }
-    hiddenOnMinimize_.clear();
-    hiddenKeepAliveOnMinimize_.clear();
   }
 
   bool InAppWebViewManager::isGraphicsCaptureSessionSupported()

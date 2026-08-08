@@ -58,10 +58,12 @@ namespace flutter_inappwebview_plugin
 
   InAppWebView::InAppWebView(const FlutterInappwebviewWindowsPlugin* plugin, const InAppWebViewCreationParams& params, const HWND parentWindow, wil::com_ptr<ICoreWebView2Environment> webViewEnv,
     wil::com_ptr<ICoreWebView2Controller> webViewController,
-    wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController)
+    wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController,
+    const bool hostWindowMinimized)
     : plugin(plugin), id(params.id),
     webViewEnv(std::move(webViewEnv)), webViewController(std::move(webViewController)), webViewCompositionController(std::move(webViewCompositionController)),
-    settings(params.initialSettings), userContentController(std::make_unique<UserContentController>(this))
+    settings(params.initialSettings), userContentController(std::make_unique<UserContentController>(this)),
+    visibilityState_(hostWindowMinimized)
   {
     if (failedAndLog(this->webViewController->get_CoreWebView2(webView.put()))) {
       std::cerr << "Cannot create CoreWebView2." << std::endl;
@@ -74,7 +76,7 @@ namespace flutter_inappwebview_plugin
       registerSurfaceEventHandlers();
     }
     else {
-      this->webViewController->put_IsVisible(true);
+      updateControllerVisibility();
       // Resize WebView to fit the bounds of the parent window
       RECT bounds;
       GetClientRect(parentWindow, &bounds);
@@ -86,8 +88,9 @@ namespace flutter_inappwebview_plugin
 
   InAppWebView::InAppWebView(InAppBrowser* inAppBrowser, const FlutterInappwebviewWindowsPlugin* plugin, const InAppWebViewCreationParams& params, const HWND parentWindow, wil::com_ptr<ICoreWebView2Environment> webViewEnv,
     wil::com_ptr<ICoreWebView2Controller> webViewController,
-    wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController)
-    : InAppWebView(plugin, params, parentWindow, std::move(webViewEnv), std::move(webViewController), std::move(webViewCompositionController))
+    wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController,
+    const bool hostWindowMinimized)
+    : InAppWebView(plugin, params, parentWindow, std::move(webViewEnv), std::move(webViewController), std::move(webViewCompositionController), hostWindowMinimized)
   {
     this->inAppBrowser = inAppBrowser;
   }
@@ -3122,10 +3125,30 @@ namespace flutter_inappwebview_plugin
   }
 
 
-  void InAppWebView::pause() const
+  bool InAppWebView::updateControllerVisibility() const
   {
+    if (!webViewController) {
+      return false;
+    }
+    return succeededOrLog(webViewController->put_IsVisible(
+      visibilityState_.shouldBeVisible() ? TRUE : FALSE));
+  }
+
+  void InAppWebView::setHostWindowMinimized(const bool minimized)
+  {
+    visibilityState_.setHostWindowMinimized(minimized);
+    updateControllerVisibility();
+  }
+
+  void InAppWebView::pause()
+  {
+    visibilityState_.setPaused(true);
+    if (!updateControllerVisibility()) {
+      return;
+    }
+
     wil::com_ptr<ICoreWebView2_3> webView3;
-    if (SUCCEEDED(webView->QueryInterface(IID_PPV_ARGS(&webView3))) && succeededOrLog(webViewController->put_IsVisible(false))) {
+    if (webView && SUCCEEDED(webView->QueryInterface(IID_PPV_ARGS(&webView3)))) {
       failedLog(webView3->TrySuspend(Callback<ICoreWebView2TrySuspendCompletedHandler>(
         [this](HRESULT errorCode, BOOL isSuccessful) -> HRESULT
         {
@@ -3136,12 +3159,15 @@ namespace flutter_inappwebview_plugin
     }
   }
 
-  void InAppWebView::resume() const
+  void InAppWebView::resume()
   {
+    visibilityState_.setPaused(false);
+
     wil::com_ptr<ICoreWebView2_3> webView3;
-    if (SUCCEEDED(webView->QueryInterface(IID_PPV_ARGS(&webView3))) && succeededOrLog(webViewController->put_IsVisible(true))) {
+    if (webView && SUCCEEDED(webView->QueryInterface(IID_PPV_ARGS(&webView3)))) {
       failedLog(webView3->Resume());
     }
+    updateControllerVisibility();
   }
 
 
@@ -3870,7 +3896,8 @@ namespace flutter_inappwebview_plugin
       failedAndLog(children->InsertAtTop(webview_visual.get())) ||
       failedAndLog(webViewCompositionController->put_RootVisualTarget(
         webview_visual2.get())) ||
-      failedAndLog(webViewController->put_IsVisible(true))) {
+      failedAndLog(webViewController->put_IsVisible(
+        visibilityState_.shouldBeVisible() ? TRUE : FALSE))) {
       surface_ = nullptr;
       return false;
     }

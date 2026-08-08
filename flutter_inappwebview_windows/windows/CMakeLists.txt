@@ -255,7 +255,6 @@ add_library(${PLUGIN_NAME} SHARED
   "flutter_inappwebview_windows_plugin_c_api.cpp"
   ${PLUGIN_SOURCES}
 )
-add_dependencies(${PLUGIN_NAME} ${PROJECT_NAME}_DEPS)
 
 if(NOT FLUTTER_WEBVIEW_WINDOWS_USE_TEXTURE_FALLBACK)
   message(STATUS "Building with D3D texture support.")

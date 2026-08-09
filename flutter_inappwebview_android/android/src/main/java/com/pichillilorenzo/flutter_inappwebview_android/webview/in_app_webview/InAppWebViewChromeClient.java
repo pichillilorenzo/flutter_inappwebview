@@ -921,6 +921,12 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
         Uri result = null;
         if (resultCode == RESULT_OK) {
           result = data != null ? data.getData() : getCapturedMediaFile();
+          // Reject file:// URIs that resolve into the app's private sandbox, which a
+          // malicious file picker can hand back to read files it cannot access itself.
+          // Fixes CVE-2020-6563.
+          if (isPrivateSandboxFileUri(result)) {
+            result = null;
+          }
         }
         if (filePathCallbackLegacy != null) {
           filePathCallbackLegacy.onReceiveValue(result);
@@ -940,7 +946,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     // we have one file selected
     if (data != null && data.getData() != null) {
       if (resultCode == RESULT_OK && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-        return WebChromeClient.FileChooserParams.parseResult(resultCode, data);
+        return filterSandboxFileUris(WebChromeClient.FileChooserParams.parseResult(resultCode, data));
       } else {
         return null;
       }
@@ -953,7 +959,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
       for (int i = 0; i < numSelectedFiles; i++) {
         result[i] = data.getClipData().getItemAt(i).getUri();
       }
-      return result;
+      return filterSandboxFileUris(result);
     }
 
     // we have a captured image or video file
@@ -963,6 +969,76 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     }
 
     return null;
+  }
+
+  /**
+   * Returns {@code true} if the given {@code file://} URI resolves into the app's own
+   * private data directory. A malicious file picker can return such URIs so that the
+   * WebView host reads a sandbox file it has access to (but the picker does not) and
+   * hands its contents to the web page (CVE-2020-6563).
+   *
+   * <p>Legitimate picks are {@code content://} URIs, and camera captures use the app's
+   * own FileProvider {@code content://} URI (or external-storage {@code file://} URIs),
+   * none of which live under the private data dir, so normal selection and capture are
+   * unaffected.
+   *
+   * <p>{@code content://} URIs are intentionally out of scope: a legitimate content
+   * provider is the normal selection path, and validating it requires resolving the
+   * backing file rather than the URI path.
+   */
+  private boolean isPrivateSandboxFileUri(@Nullable Uri uri) {
+    if (uri == null || !"file".equals(uri.getScheme())) {
+      return false;
+    }
+    String path = uri.getPath();
+    if (path == null) {
+      return false;
+    }
+    final String normalized = canonicalizePath(path);
+
+    // Primary anchor: the app's own private data directory (e.g. /data/user/0/<package>).
+    final Activity activity = getActivity();
+    if (activity != null) {
+      final String dataDir = activity.getApplicationInfo().dataDir;
+      if (dataDir != null) {
+        String normalizedDataDir = canonicalizePath(dataDir);
+        String dirPrefix = normalizedDataDir.endsWith("/")
+                ? normalizedDataDir : normalizedDataDir + "/";
+        if (normalized.startsWith(dirPrefix)) {
+          return true;
+        }
+      }
+    }
+    // Defense-in-depth: legitimate pickers never return file:// URIs that resolve under
+    // /data, where every app sandbox lives.
+    return normalized.startsWith("/data/");
+  }
+
+  private static String canonicalizePath(@NonNull String path) {
+    try {
+      return new File(path).getCanonicalPath();
+    } catch (IOException e) {
+      return path;
+    }
+  }
+
+  /**
+   * Removes any {@code file://} URI that points into the app's private sandbox. Preserves
+   * {@code null}; returns {@code null} only when every URI was rejected so the chooser
+   * reports "no valid selection" instead of leaking the rejected entry.
+   */
+  @Nullable
+  private Uri[] filterSandboxFileUris(@Nullable Uri[] uris) {
+    if (uris == null) {
+      return null;
+    }
+    List<Uri> safe = new ArrayList<>();
+    for (Uri uri : uris) {
+      if (!isPrivateSandboxFileUri(uri)) {
+        safe.add(uri);
+      }
+    }
+    return safe.size() == uris.length ? uris : (safe.isEmpty() ? null : safe.toArray(new Uri[0]));
   }
 
   private boolean isFileNotEmpty(Uri uri) {

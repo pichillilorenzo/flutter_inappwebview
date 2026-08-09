@@ -9,6 +9,7 @@
 - Updated android native `compileOptions` to `JavaVersion.VERSION_17`
 - Implemented `saveState`, `restoreState` InAppWebViewController methods
 - Implemented `onShowFileChooser` WebView event
+- Fixed CVE-2020-6563: reject `file://` URIs that resolve into the app's private data directory when a malicious file picker hands them back via the `<input type="file">` chooser (thanks to [AlexV525](https://github.com/AlexV525))
 - Updated InAppBrowser toolbar top
 - Merged "Android: implemented PlatformPrintJobController.onComplete" [#2216](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2216) (thanks to [Doflatango](https://github.com/Doflatango))
 - Fixed "When useShouldInterceptAjaxRequest is true, some ajax requests doesn't work" [#2197](https://github.com/pichillilorenzo/flutter_inappwebview/issues/2197)

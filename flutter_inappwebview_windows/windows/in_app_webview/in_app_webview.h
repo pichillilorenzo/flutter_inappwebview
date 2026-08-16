@@ -2,6 +2,7 @@
 #define FLUTTER_INAPPWEBVIEW_PLUGIN_IN_APP_WEBVIEW_H_
 
 #include <functional>
+#include <memory>
 #include <WebView2.h>
 #include <wil/com.h>
 #include <windows.ui.composition.desktop.h>
@@ -256,6 +257,13 @@ namespace flutter_inappwebview_plugin
       return pageFrameId_;
     }
 
+    // Lifetime token for callbacks that round-trip through Dart: they outlive
+    // this webview when a tab closes mid-call, and must not touch it afterwards.
+    std::weak_ptr<void> aliveToken() const
+    {
+      return aliveToken_;
+    }
+
     static bool isSslError(const COREWEBVIEW2_WEB_ERROR_STATUS& webErrorStatus);
   private:
     // custom_platform_view
@@ -283,6 +291,7 @@ namespace flutter_inappwebview_plugin
     std::map<std::string, std::unique_ptr<WebMessageListener>> webMessageListeners_;
     std::map<std::string, std::shared_ptr<WebNotificationController>> webNotificationControllers_;
     std::map<std::string, std::shared_ptr<PrintJobController>> printJobControllers_;
+    std::shared_ptr<int> aliveToken_ = std::make_shared<int>(0);
 
     void registerEventHandlers();
     void registerSurfaceEventHandlers();

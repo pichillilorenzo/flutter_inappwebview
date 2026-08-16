@@ -360,7 +360,7 @@ add_executable(${TEST_RUNNER}
 )
 apply_standard_settings(${TEST_RUNNER})
 target_include_directories(${TEST_RUNNER} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
-target_link_libraries(${TEST_RUNNER} PRIVATE gtest_main)
+target_link_libraries(${TEST_RUNNER} PRIVATE flutter flutter_wrapper_plugin gtest_main)
 
 # Enable automatic test discovery. The default 5s DISCOVERY_TIMEOUT is
 # marginal on cold CI runners (antivirus scans the fresh executable) and

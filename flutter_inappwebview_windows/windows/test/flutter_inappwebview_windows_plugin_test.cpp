@@ -1,8 +1,67 @@
 #include <gtest/gtest.h>
 
+#include <memory>
+
 #include "in_app_webview/webview_visibility_state.h"
+#include "types/base_callback_result.h"
 
 namespace flutter_inappwebview_plugin::test {
+
+namespace {
+
+std::unique_ptr<BaseCallbackResult<bool>> makeCallback(bool* ran) {
+  auto callback = std::make_unique<BaseCallbackResult<bool>>();
+  callback->decodeResult = [](const flutter::EncodableValue* value) {
+    return std::make_optional(std::get<bool>(*value));
+  };
+  callback->defaultBehaviour = [ran](const std::optional<bool>) {
+    *ran = true;
+  };
+  callback->error = [ran](const std::string&, const std::string&,
+                          const flutter::EncodableValue*) { *ran = true; };
+  return callback;
+}
+
+}  // namespace
+
+TEST(BaseCallbackResult, RunsHandlersWithoutOwner) {
+  auto ran = false;
+  auto callback = makeCallback(&ran);
+  callback->Success(flutter::EncodableValue(true));
+  EXPECT_TRUE(ran);
+}
+
+TEST(BaseCallbackResult, RunsHandlersWhileOwnerIsAlive) {
+  auto ran = false;
+  auto owner = std::make_shared<int>(0);
+  auto callback = makeCallback(&ran);
+  callback->owner = owner;
+  callback->Success(flutter::EncodableValue(true));
+  EXPECT_TRUE(ran);
+}
+
+TEST(BaseCallbackResult, DropsHandlersOnceOwnerIsGone) {
+  auto ran = false;
+  auto owner = std::make_shared<int>(0);
+  auto callback = makeCallback(&ran);
+  callback->owner = owner;
+  owner.reset();
+  callback->Success(flutter::EncodableValue(true));
+  EXPECT_FALSE(ran);
+}
+
+TEST(BaseCallbackResult, DropsErrorAndNotImplementedOnceOwnerIsGone) {
+  auto ran = false;
+  auto owner = std::make_shared<int>(0);
+  auto errorCallback = makeCallback(&ran);
+  errorCallback->owner = owner;
+  auto notImplementedCallback = makeCallback(&ran);
+  notImplementedCallback->owner = owner;
+  owner.reset();
+  errorCallback->Error("code", "message");
+  notImplementedCallback->NotImplemented();
+  EXPECT_FALSE(ran);
+}
 
 TEST(WebViewVisibilityState, StartsVisible) {
   WebViewVisibilityState state;

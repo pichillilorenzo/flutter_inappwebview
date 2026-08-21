@@ -5,6 +5,7 @@
 #include <flutter/standard_method_codec.h>
 #include <memory>
 #include <optional>
+#include <utility>
 
 #include "../utils/log.h"
 
@@ -26,12 +27,20 @@ namespace flutter_inappwebview_plugin
     // expired token makes every handler a no-op instead of a use-after-free.
     std::optional<std::weak_ptr<void>> owner;
 
-    bool isOwnerGone() const
+    // Cleanup that is safe after owner destruction, for example completing a
+    // WebView2 deferral. It runs at most once when a late reply is dropped.
+    std::function<void()> onOwnerGone;
+
+    bool isOwnerGone()
     {
       if (!owner.has_value() || !owner.value().expired()) {
         return false;
       }
       debugLog("dropping a Dart reply that outlived its owner");
+      if (onOwnerGone) {
+        auto cleanup = std::move(onOwnerGone);
+        cleanup();
+      }
       return true;
     }
 

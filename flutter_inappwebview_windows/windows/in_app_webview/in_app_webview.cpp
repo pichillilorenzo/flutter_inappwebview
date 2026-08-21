@@ -819,6 +819,16 @@ namespace flutter_inappwebview_plugin
 
             auto callback = std::make_unique<WebViewChannelDelegate::CreateWindowCallback>();
             callback->owner = aliveToken();
+            auto* inAppWebViewManager = plugin ? plugin->inAppWebViewManager.get() : nullptr;
+            callback->onOwnerGone = [inAppWebViewManager, windowId, deferral]()
+              {
+                if (inAppWebViewManager && map_contains(inAppWebViewManager->windowWebViews, windowId)) {
+                  inAppWebViewManager->windowWebViews.erase(windowId);
+                }
+                if (deferral) {
+                  failedLog(deferral->Complete());
+                }
+              };
             auto defaultBehaviour = [this, windowId, urlRequest, deferral, args](const std::optional<const bool> handledByClient)
               {
                 if (plugin && plugin->inAppWebViewManager && map_contains(plugin->inAppWebViewManager->windowWebViews, windowId)) {
@@ -869,6 +879,12 @@ namespace flutter_inappwebview_plugin
 
           auto callback = std::make_unique<WebViewChannelDelegate::PermissionRequestCallback>();
           callback->owner = aliveToken();
+          callback->onOwnerGone = [deferral]()
+            {
+              if (deferral) {
+                failedLog(deferral->Complete());
+              }
+            };
           auto defaultBehaviour = [this, deferral, args](const std::optional<const std::shared_ptr<PermissionResponse>> permissionResponse)
             {
               failedLog(args->put_State(COREWEBVIEW2_PERMISSION_STATE_DENY));
@@ -937,6 +953,12 @@ namespace flutter_inappwebview_plugin
                 if (channelDelegate) {
                   auto callback = std::make_unique<WebViewChannelDelegate::LoadResourceWithCustomSchemeCallback>();
                   callback->owner = aliveToken();
+                  callback->onOwnerGone = [deferral]()
+                    {
+                      if (deferral) {
+                        failedLog(deferral->Complete());
+                      }
+                    };
                   auto defaultBehaviour = [this, deferral, args](const std::optional<std::shared_ptr<CustomSchemeResponse>> response)
                     {
                       failedLog(deferral->Complete());
@@ -963,6 +985,12 @@ namespace flutter_inappwebview_plugin
             if (settings->useShouldInterceptRequest) {
               auto callback = std::make_unique<WebViewChannelDelegate::ShouldInterceptRequestCallback>();
               callback->owner = aliveToken();
+              callback->onOwnerGone = [deferral]()
+                {
+                  if (deferral) {
+                    failedLog(deferral->Complete());
+                  }
+                };
               auto defaultBehaviour = [this, deferral, args](const std::optional<std::shared_ptr<WebResourceResponse>> response)
                 {
                   failedLog(deferral->Complete());
@@ -1144,6 +1172,12 @@ namespace flutter_inappwebview_plugin
 
               auto callback = std::make_unique<WebViewChannelDelegate::DownloadStartRequestCallback>();
               callback->owner = aliveToken();
+              callback->onOwnerGone = [deferral]()
+                {
+                  if (deferral) {
+                    failedLog(deferral->Complete());
+                  }
+                };
               auto defaultBehaviour = [this, deferral, args](const std::optional<const std::shared_ptr<DownloadStartResponse>> response)
                 {
                   failedLog(deferral->Complete());
@@ -1252,6 +1286,12 @@ namespace flutter_inappwebview_plugin
 
               auto callback = std::make_unique<WebViewChannelDelegate::ReceivedClientCertRequestCallback>();
               callback->owner = aliveToken();
+              callback->onOwnerGone = [deferral]()
+                {
+                  if (deferral) {
+                    failedLog(deferral->Complete());
+                  }
+                };
               auto defaultBehaviour = [this, deferral, args](const std::optional<std::shared_ptr<ClientCertResponse>> response)
                 {
                   failedLog(deferral->Complete());
@@ -1344,6 +1384,12 @@ namespace flutter_inappwebview_plugin
 
                 auto callback = std::make_unique<WebViewChannelDelegate::ReceivedHttpAuthRequestCallback>();
                 callback->owner = aliveToken();
+                callback->onOwnerGone = [deferral]()
+                  {
+                    if (deferral) {
+                      failedLog(deferral->Complete());
+                    }
+                  };
                 auto defaultBehaviour = [this, deferral, args](const std::optional<std::shared_ptr<HttpAuthResponse>> response)
                   {
                     failedLog(deferral->Complete());
@@ -1432,6 +1478,12 @@ namespace flutter_inappwebview_plugin
 
                 auto callback = std::make_unique<WebViewChannelDelegate::ReceivedServerTrustAuthRequestCallback>();
                 callback->owner = aliveToken();
+                callback->onOwnerGone = [deferral]()
+                  {
+                    if (deferral) {
+                      failedLog(deferral->Complete());
+                    }
+                  };
                 auto defaultBehaviour = [this, deferral, args](const std::optional<std::shared_ptr<ServerTrustAuthResponse>> response)
                   {
                     failedLog(deferral->Complete());
@@ -1549,6 +1601,12 @@ namespace flutter_inappwebview_plugin
 
             auto callback = std::make_unique<WebViewChannelDelegate::LaunchingExternalUriSchemeCallback>();
             callback->owner = aliveToken();
+            callback->onOwnerGone = [deferral]()
+              {
+                if (deferral) {
+                  failedLog(deferral->Complete());
+                }
+              };
             auto defaultBehaviour = [deferral, args](const std::optional<std::shared_ptr<LaunchingExternalUriSchemeResponse>> response)
               {
                 failedLog(args->put_Cancel(FALSE));
@@ -1669,6 +1727,12 @@ namespace flutter_inappwebview_plugin
 
             auto callback = std::make_unique<WebViewChannelDelegate::NotificationReceivedCallback>();
             callback->owner = aliveToken();
+            callback->onOwnerGone = [deferral]()
+              {
+                if (deferral) {
+                  failedLog(deferral->Complete());
+                }
+              };
             auto defaultBehaviour = [deferral, args, notificationController](const std::optional<std::shared_ptr<NotificationReceivedResponse>> response)
               {
                 failedLog(args->put_Handled(FALSE));
@@ -1736,6 +1800,12 @@ namespace flutter_inappwebview_plugin
 
             auto callback = std::make_unique<WebViewChannelDelegate::SaveAsUIShowingCallback>();
             callback->owner = aliveToken();
+            callback->onOwnerGone = [deferral]()
+              {
+                if (deferral) {
+                  failedLog(deferral->Complete());
+                }
+              };
             auto defaultBehaviour = [deferral](const std::optional<std::shared_ptr<SaveAsUIShowingResponse>> response)
               {
                 if (deferral) {
@@ -1813,6 +1883,12 @@ namespace flutter_inappwebview_plugin
 
             auto callback = std::make_unique<WebViewChannelDelegate::SaveFileSecurityCheckStartingCallback>();
             callback->owner = aliveToken();
+            callback->onOwnerGone = [deferral]()
+              {
+                if (deferral) {
+                  failedLog(deferral->Complete());
+                }
+              };
             auto defaultBehaviour = [deferral](const std::optional<std::shared_ptr<SaveFileSecurityCheckStartingResponse>> response)
               {
                 if (deferral) {
@@ -1881,6 +1957,12 @@ namespace flutter_inappwebview_plugin
 
             auto callback = std::make_unique<WebViewChannelDelegate::ScreenCaptureStartingCallback>();
             callback->owner = aliveToken();
+            callback->onOwnerGone = [deferral]()
+              {
+                if (deferral) {
+                  failedLog(deferral->Complete());
+                }
+              };
             auto defaultBehaviour = [deferral](const std::optional<std::shared_ptr<ScreenCaptureStartingResponse>> response)
               {
                 if (deferral) {

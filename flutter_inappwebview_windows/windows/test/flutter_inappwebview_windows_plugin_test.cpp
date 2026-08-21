@@ -63,6 +63,33 @@ TEST(BaseCallbackResult, DropsErrorAndNotImplementedOnceOwnerIsGone) {
   EXPECT_FALSE(ran);
 }
 
+TEST(BaseCallbackResult, RunsOwnerGoneCleanupExactlyOnce) {
+  auto owner = std::make_shared<int>(0);
+  auto callback = std::make_unique<BaseCallbackResult<bool>>();
+  auto cleanupCount = 0;
+  callback->owner = owner;
+  callback->onOwnerGone = [&cleanupCount] { ++cleanupCount; };
+  owner.reset();
+
+  callback->Success(flutter::EncodableValue(true));
+  callback->Error("code", "message");
+  callback->NotImplemented();
+
+  EXPECT_EQ(cleanupCount, 1);
+}
+
+TEST(BaseCallbackResult, DoesNotRunOwnerGoneCleanupWhileOwnerIsAlive) {
+  auto owner = std::make_shared<int>(0);
+  auto callback = std::make_unique<BaseCallbackResult<bool>>();
+  auto cleanupCount = 0;
+  callback->owner = owner;
+  callback->onOwnerGone = [&cleanupCount] { ++cleanupCount; };
+
+  callback->Success(flutter::EncodableValue(true));
+
+  EXPECT_EQ(cleanupCount, 0);
+}
+
 TEST(WebViewVisibilityState, StartsVisible) {
   WebViewVisibilityState state;
   EXPECT_TRUE(state.shouldBeVisible());

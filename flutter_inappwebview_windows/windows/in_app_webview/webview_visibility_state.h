@@ -1,6 +1,8 @@
 #ifndef FLUTTER_INAPPWEBVIEW_PLUGIN_WEBVIEW_VISIBILITY_STATE_H_
 #define FLUTTER_INAPPWEBVIEW_PLUGIN_WEBVIEW_VISIBILITY_STATE_H_
 
+#include <optional>
+
 namespace flutter_inappwebview_plugin
 {
   // Separates the visibility requested by the WebView API from temporary
@@ -27,9 +29,18 @@ namespace flutter_inappwebview_plugin
       hostWindowMinimized_ = minimized;
     }
 
+    // Delivery of put_IsVisible can be deferred while the browser process is
+    // unresponsive; these track what the controller last actually received.
+    bool needsApply() const
+    {
+      return !applied_.has_value() || applied_.value() != shouldBeVisible();
+    }
+    void markApplied() { applied_ = shouldBeVisible(); }
+
   private:
     bool paused_ = false;
     bool hostWindowMinimized_ = false;
+    std::optional<bool> applied_;
   };
 }
 

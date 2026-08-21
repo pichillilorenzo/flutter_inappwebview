@@ -293,9 +293,24 @@ namespace flutter_inappwebview_plugin
     std::map<std::string, std::shared_ptr<PrintJobController>> printJobControllers_;
     std::shared_ptr<int> aliveToken_ = std::make_shared<int>(0);
 
+    // put_IsVisible and Resume are synchronous IPC served by the browser
+    // process UI thread; issuing them while it is not pumping (suspended,
+    // starved after long backgrounding) blocks the host platform thread for
+    // as long as that thread takes to wake. Pending state is applied only
+    // when a cheap WM_NULL probe confirms the thread responds, and retried
+    // on a timer otherwise.
+    bool pendingSuspend_ = false;
+    bool pendingResume_ = false;
+    UINT_PTR browserStateRetryTimer_ = 0;
+    mutable HWND browserUiWindow_ = nullptr;
+
     void registerEventHandlers();
     void registerSurfaceEventHandlers();
-    bool updateControllerVisibility() const;
+    bool browserUiThreadResponsive() const;
+    void applyPendingBrowserState();
+    void scheduleBrowserStateRetry();
+    void cancelBrowserStateRetry();
+    static void CALLBACK BrowserStateRetryTimerProc(HWND hwnd, UINT message, UINT_PTR timerId, DWORD tickCount);
     HRESULT onCallJsHandler(const bool& isMainFrame, ICoreWebView2WebMessageReceivedEventArgs* args);
   };
 }

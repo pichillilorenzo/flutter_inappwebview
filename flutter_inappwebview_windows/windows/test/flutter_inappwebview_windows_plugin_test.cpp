@@ -146,4 +146,34 @@ TEST(WebViewVisibilityState, DuplicateWindowTransitionsAreIdempotent) {
   EXPECT_TRUE(state.shouldBeVisible());
 }
 
+TEST(WebViewVisibilityState, NeedsApplyUntilFirstDelivery) {
+  WebViewVisibilityState state;
+  EXPECT_TRUE(state.needsApply());
+  state.markApplied();
+  EXPECT_FALSE(state.needsApply());
+}
+
+TEST(WebViewVisibilityState, RedundantTransitionNeedsNoDelivery) {
+  WebViewVisibilityState state;
+  state.markApplied();
+  state.setPaused(true);
+  state.markApplied();
+  state.setPaused(true);
+  EXPECT_FALSE(state.needsApply());
+}
+
+TEST(WebViewVisibilityState, DeferredDeliveryCoalescesToLatestState) {
+  WebViewVisibilityState state;
+  state.markApplied();
+  // Visible -> paused -> resumed while delivery was deferred: nothing to send.
+  state.setPaused(true);
+  state.setPaused(false);
+  EXPECT_FALSE(state.needsApply());
+  // A net state change still needs one delivery.
+  state.setHostWindowMinimized(true);
+  EXPECT_TRUE(state.needsApply());
+  state.markApplied();
+  EXPECT_FALSE(state.needsApply());
+}
+
 }  // namespace flutter_inappwebview_plugin::test

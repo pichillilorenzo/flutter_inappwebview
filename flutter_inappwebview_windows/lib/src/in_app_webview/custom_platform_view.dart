@@ -335,6 +335,11 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
   final GlobalKey _key = GlobalKey();
   final _downButtons = <int, PointerButton>{};
 
+  // Set when the cursor left the view while a mouse button was still held and
+  // the LEAVE was therefore withheld, so it can be delivered once the button
+  // comes back up. See [MouseRegion.onExit] below for why it is withheld.
+  bool _leaveDeferred = false;
+
   PointerDeviceKind _pointerKind = PointerDeviceKind.unknown;
 
   // Per-pointer touch state: down position and whether the sequence has so far
@@ -533,6 +538,7 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
                       button,
                     );
                   }
+                  _flushDeferredLeave();
                 },
                 onPointerCancel: (ev) {
                   _pointerKind = ev.kind;
@@ -543,11 +549,15 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
                   }
                   final button = _downButtons.remove(ev.pointer);
                   if (button != null) {
+                    // WebView2 has no mouse-cancel event. Its native state
+                    // must still be released, otherwise later pointer moves
+                    // continue to carry a button-down virtual key.
                     _controller._setPointerButtonState(
-                      InAppWebViewPointerEventKind.cancel,
+                      InAppWebViewPointerEventKind.up,
                       button,
                     );
                   }
+                  _flushDeferredLeave();
                 },
                 onPointerMove: (ev) {
                   _pointerKind = ev.kind;
@@ -610,6 +620,13 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
                 child: MouseRegion(
                   cursor: _cursor,
                   onEnter: (ev) {
+                    // The cursor may be coming back from a drag whose LEAVE was
+                    // withheld; WebView2 was never told it left, so it must not
+                    // be told it entered either.
+                    if (_leaveDeferred) {
+                      _leaveDeferred = false;
+                      return;
+                    }
                     final button = _getButton(ev.buttons);
                     _controller._setPointerButtonState(
                       InAppWebViewPointerEventKind.enter,
@@ -617,6 +634,17 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
                     );
                   },
                   onExit: (ev) {
+                    // A drag that leaves the view is still live: Flutter keeps
+                    // routing its moves here until the button comes up, and
+                    // dragging past the edge is how every platform extends a
+                    // selection. Forwarding LEAVE now ends the gesture instead
+                    // -- WebView2 turns it into WM_MOUSELEAVE and Chromium
+                    // drops the drag, so the user releases the button to find
+                    // the selection gone. Withhold it until the release.
+                    if (_downButtons.isNotEmpty) {
+                      _leaveDeferred = true;
+                      return;
+                    }
                     final button = _getButton(ev.buttons);
                     _controller._setPointerButtonState(
                       InAppWebViewPointerEventKind.leave,
@@ -631,6 +659,22 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
               )
             : const SizedBox(),
       ),
+    );
+  }
+
+  /// Delivers the LEAVE that [MouseRegion.onExit] withheld because a button
+  /// was still down. Called on button-up and on cancel; a no-op while any
+  /// button remains held, so a multi-button drag keeps the view "entered"
+  /// until the last one is released, and a no-op when the cursor came back
+  /// inside, because [MouseRegion.onEnter] already cleared the deferral.
+  void _flushDeferredLeave() {
+    if (!_leaveDeferred || _downButtons.isNotEmpty) {
+      return;
+    }
+    _leaveDeferred = false;
+    _controller._setPointerButtonState(
+      InAppWebViewPointerEventKind.leave,
+      PointerButton.none,
     );
   }
 

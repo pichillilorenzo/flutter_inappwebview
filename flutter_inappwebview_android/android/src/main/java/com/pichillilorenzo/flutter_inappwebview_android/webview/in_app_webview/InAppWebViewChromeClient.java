@@ -1280,7 +1280,13 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     if (activity == null) {
       return null;
     }
-    File storageDir = activity.getApplicationContext().getExternalFilesDir(null);
+    File storageDir = activity.getApplicationContext().getExternalFilesDir("Captures");
+    if (storageDir == null) {
+      throw new IOException("External capture storage is unavailable");
+    }
+    if (!storageDir.exists() && !storageDir.mkdirs()) {
+      throw new IOException("Cannot create external capture storage");
+    }
     return File.createTempFile(prefix, suffix, storageDir);
   }
 

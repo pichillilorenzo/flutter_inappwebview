@@ -123,17 +123,81 @@ void webViewWindows() {
 
       if (Platform.isIOS) {
         final popupWorld = ContentWorld.world(name: 'popup-evaluation');
-        var value = await windowController.evaluateJavascript(
-          source: 'window.popupValue = 49; window.popupValue;',
-          contentWorld: popupWorld,
+        expect(
+          await windowController.evaluateJavascript(
+            source: 'window.popupPageValue = 7; window.popupPageValue;',
+          ),
+          7,
         );
-        expect(value, 49);
 
-        value = await windowController.evaluateJavascript(
-          source: 'window.popupValue;',
+        final namedWorldValue = await windowController.evaluateJavascript(
+          source: 'window.popupPageValue = 49; window.popupPageValue;',
           contentWorld: popupWorld,
         );
-        expect(value, 49);
+        // iOS 18+ preserves the named world; iOS 14-17 fails closed because
+        // WebKit can crash when that overload is used by a popup WebView.
+        expect(namedWorldValue, anyOf(isNull, 49));
+
+        // A named-world request must never fall back to the page world.
+        expect(
+          await windowController.evaluateJavascript(
+            source: 'window.popupPageValue;',
+          ),
+          7,
+        );
+
+        final persistedNamedWorldValue = await windowController
+            .evaluateJavascript(
+              source: 'window.popupPageValue;',
+              contentWorld: popupWorld,
+            );
+        if (namedWorldValue == null) {
+          expect(persistedNamedWorldValue, isNull);
+        } else {
+          expect(persistedNamedWorldValue, 49);
+          expect(
+            await windowController.evaluateJavascript(
+              source: 'typeof window.popupOnlyValue;',
+            ),
+            'undefined',
+          );
+          expect(
+            await windowController.evaluateJavascript(
+              source: 'window.popupOnlyValue = 11;',
+              contentWorld: popupWorld,
+            ),
+            11,
+          );
+          expect(
+            await windowController.evaluateJavascript(
+              source: 'typeof window.popupOnlyValue;',
+            ),
+            'undefined',
+          );
+        }
+
+        final asyncNamedWorldResult = await windowController
+            .callAsyncJavaScript(
+              functionBody:
+                  'window.popupAsyncOnlyValue = 23; '
+                  'return window.popupAsyncOnlyValue;',
+              contentWorld: popupWorld,
+            );
+        expect(asyncNamedWorldResult, isNotNull);
+        if (namedWorldValue == null) {
+          expect(asyncNamedWorldResult!.value, isNull);
+          expect(asyncNamedWorldResult.error, isNotNull);
+        } else {
+          expect(asyncNamedWorldResult!.value, 23);
+          expect(asyncNamedWorldResult.error, isNull);
+        }
+        expect(
+          await windowController.evaluateJavascript(
+            source: 'typeof window.popupAsyncOnlyValue;',
+          ),
+          'undefined',
+        );
+
         expect(
           await windowController.evaluateJavascript(
             source: 'null;',

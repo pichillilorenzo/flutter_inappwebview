@@ -1509,6 +1509,11 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
     
     @available(iOS 14.0, *)
     public func injectDeferredObject(source: String, contentWorld: WKContentWorld, withWrapper jsWrapper: String?, completionHandler: ((Any?) -> Void)? = nil) {
+        if #unavailable(iOS 18.0), windowId != nil, contentWorld != WKContentWorld.page {
+            channelDelegate?.onConsoleMessage(message: popupContentWorldUnavailableError().localizedDescription, messageLevel: 3)
+            completionHandler?(nil)
+            return
+        }
         var jsToInject = source
         if let wrapper = jsWrapper {
             let jsonData: Data? = try? JSONSerialization.data(withJSONObject: [source], options: [])
@@ -1569,17 +1574,22 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
             return
         }
         // Popup WebViews share their parent's configuration. On iOS 14-17 the
-        // content-world overload can crash for those WebViews, so use page-world
-        // evaluation. Public callers are routed before content-world bootstrap too.
+        // content-world overload can crash for those WebViews. The legacy overload
+        // is equivalent only for the top-level page world; named worlds and frames
+        // must fail closed instead of leaking evaluation into the page world.
         if #unavailable(iOS 18.0), windowId != nil {
-            super.evaluateJavaScript(javaScript) { result, error in
-                if let error = error {
-                    completionHandler?(.failure(error))
-                } else if let result = result {
-                    completionHandler?(.success(result))
-                } else {
-                    completionHandler?(.success(NSNull()))
+            if contentWorld == WKContentWorld.page, frame == nil {
+                super.evaluateJavaScript(javaScript) { result, error in
+                    if let error = error {
+                        completionHandler?(.failure(error))
+                    } else if let result = result {
+                        completionHandler?(.success(result))
+                    } else {
+                        completionHandler?(.success(NSNull()))
+                    }
                 }
+            } else {
+                completionHandler?(.failure(popupContentWorldUnavailableError()))
             }
             return
         }
@@ -1593,6 +1603,11 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
     @available(iOS 14.0, *)
     public func evaluateJavascript(source: String, contentWorld: WKContentWorld, completionHandler: ((Any?) -> Void)? = nil) {
         if #unavailable(iOS 18.0), windowId != nil {
+            guard contentWorld == WKContentWorld.page else {
+                channelDelegate?.onConsoleMessage(message: popupContentWorldUnavailableError().localizedDescription, messageLevel: 3)
+                completionHandler?(nil)
+                return
+            }
             injectDeferredObject(source: source, withWrapper: nil, completionHandler: completionHandler)
             return
         }
@@ -1604,11 +1619,24 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         if let applePayAPIEnabled = settings?.applePayAPIEnabled, applePayAPIEnabled {
             return
         }
+        if #unavailable(iOS 18.0), windowId != nil {
+            completionHandler?(.failure(popupContentWorldUnavailableError()))
+            return
+        }
         super.callAsyncJavaScript(functionBody, arguments: arguments, in: frame, in: contentWorld, completionHandler: completionHandler)
     }
     
     @available(iOS 14.0, *)
     public func callAsyncJavaScript(functionBody: String, arguments: [String:Any], contentWorld: WKContentWorld, completionHandler: ((Any?) -> Void)? = nil) {
+        if #unavailable(iOS 18.0), windowId != nil {
+            let error = popupContentWorldUnavailableError()
+            channelDelegate?.onConsoleMessage(message: error.localizedDescription, messageLevel: 3)
+            completionHandler?([
+                "value": nil,
+                "error": error.localizedDescription
+            ])
+            return
+        }
         let jsToInject = configuration.userContentController.generateCodeForScriptEvaluation(scriptMessageHandler: self, source: functionBody, contentWorld: contentWorld)
         
         callAsyncJavaScript(jsToInject, arguments: arguments, frame: nil, contentWorld: contentWorld) { (evalResult) in
@@ -1636,6 +1664,16 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
             
             completionHandler(body)
         }
+    }
+
+    private func popupContentWorldUnavailableError() -> NSError {
+        return NSError(
+            domain: "flutter_inappwebview",
+            code: 1,
+            userInfo: [
+                NSLocalizedDescriptionKey: "Content-world JavaScript evaluation is unavailable in popup WebViews on iOS 14 through 17."
+            ]
+        )
     }
     
     @available(iOS 10.3, *)

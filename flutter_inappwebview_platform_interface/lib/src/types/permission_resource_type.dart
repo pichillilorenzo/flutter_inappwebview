@@ -305,4 +305,20 @@ class PermissionResourceType_ {
   static const WINDOW_MANAGEMENT = PermissionResourceType_._internal(
     'WINDOW_MANAGEMENT',
   );
+
+  ///Indicates permission to persist storage created by Storage APIs and service workers.
+  ///When granted, the browser will not evict the origin's data because of low disk space.
+  @EnumSupportedPlatforms(
+    platforms: [
+      EnumWindowsPlatform(
+        apiName: 'COREWEBVIEW2_PERMISSION_KIND_PERSISTENT_STORAGE',
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.4078.44#corewebview2_permission_kind',
+        value: 13,
+      ),
+    ],
+  )
+  static const PERSISTENT_STORAGE = PermissionResourceType_._internal(
+    'PERSISTENT_STORAGE',
+  );
 }

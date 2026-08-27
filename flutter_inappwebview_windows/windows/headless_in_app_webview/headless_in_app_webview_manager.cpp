@@ -81,7 +81,8 @@ namespace flutter_inappwebview_plugin
     auto initialSettings = std::make_shared<InAppWebViewSettings>(settingsMap);
 
     InAppWebView::createInAppWebViewEnv(hwnd, false, webViewEnvironment, initialSettings,
-      [=](wil::com_ptr<ICoreWebView2Environment> webViewEnv,
+      [=](HRESULT errorCode,
+        wil::com_ptr<ICoreWebView2Environment> webViewEnv,
         wil::com_ptr<ICoreWebView2Controller> webViewController,
         wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController)
       {
@@ -133,7 +134,7 @@ namespace flutter_inappwebview_plugin
         }
         else {
           DestroyWindow(hwnd);
-          result_->Error("0", "Cannot create the HeadlessInAppWebView instance!");
+          result_->Error("0", "Cannot create the HeadlessInAppWebView instance! HRESULT " + getHRErrorString(errorCode));
         }
       }
     );

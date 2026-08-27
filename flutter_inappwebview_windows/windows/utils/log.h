@@ -2,6 +2,7 @@
 #define FLUTTER_INAPPWEBVIEW_PLUGIN_LOG_UTIL_H_
 
 #include <comdef.h>
+#include <cstdio>
 #include <iostream>
 #include <string>
 #include <type_traits>
@@ -58,6 +59,15 @@ namespace flutter_inappwebview_plugin
   static inline std::string getHRMessage(const HRESULT& error)
   {
     return wide_to_utf8(_com_error(error).ErrorMessage());
+  }
+
+  // Hex code + system message, e.g. "0x80070005 Access is denied." — the hex
+  // code survives message localization and is what field diagnostics need.
+  static inline std::string getHRErrorString(const HRESULT& error)
+  {
+    char code[11];
+    std::snprintf(code, sizeof(code), "0x%08X", static_cast<unsigned int>(error));
+    return std::string(code) + " " + getHRMessage(error);
   }
 
   static inline void debugLog(const HRESULT& hr, const std::string& filename = "", const int& line = 0)

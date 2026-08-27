@@ -15,7 +15,8 @@ void main() {
       source,
       contains(
         'DestroyWindow(hwnd);\n'
-        '          result_->Error("0", "Cannot create the InAppWebView instance!");',
+        '          result_->Error("0", "Cannot create the InAppWebView instance! '
+        'HRESULT " + getHRErrorString(errorCode));',
       ),
     );
   });
@@ -29,7 +30,8 @@ void main() {
       source,
       contains(
         'DestroyWindow(hwnd);\n'
-        '          result_->Error("0", "Cannot create the HeadlessInAppWebView instance!");',
+        '          result_->Error("0", "Cannot create the HeadlessInAppWebView instance! '
+        'HRESULT " + getHRErrorString(errorCode));',
       ),
     );
   });

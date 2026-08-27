@@ -8,6 +8,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 import '../platform_util.dart';
 import '_static_channel.dart';
+import 'webview_creation_failure.dart';
 
 const Map<String, SystemMouseCursor> _cursors = {
   'none': SystemMouseCursors.none,
@@ -151,12 +152,13 @@ class CustomPlatformViewController
         'createInAppWebView',
         arguments,
       ))!;
-    } catch (_) {
+    } catch (error, stackTrace) {
       // No native view exists; release waiters and prevent channel calls.
       _isDisposed = true;
       if (!_creatingCompleter.isCompleted) {
         _creatingCompleter.complete();
       }
+      WindowsWebViewCreationFailures.report(error, stackTrace);
       rethrow;
     }
 

@@ -305,6 +305,19 @@ class InAppWebView {
   // The EGL image is owned by WPE and remains valid until the next frame.
   void* GetCurrentEglImage(uint32_t* out_width, uint32_t* out_height) const;
 
+  // Re-import the current frame's DMA-BUF planes directly into
+  // target_display (Flutter's EGLDisplay), instead of reusing the
+  // EGLImageKHR WPE created against its own headless EGLDisplay. A DMA-BUF
+  // itself is display-agnostic; the EGLImageKHR wrapping it is not, so an
+  // image created in WPE's display cannot be bound to a texture while a
+  // different EGLDisplay is current (glEGLImageTargetTexture2DOES fails
+  // with GL_INVALID_VALUE). Caller owns the returned EGLImageKHR and must
+  // eglDestroyImageKHR it — safe to do immediately after binding the image
+  // to a texture via glEGLImageTargetTexture2DOES. Returns nullptr if the
+  // current frame is not a DMA-BUF buffer (e.g. SHM/software mode).
+  void* ImportCurrentBufferToEglImage(void* target_display, uint32_t* out_width,
+                                      uint32_t* out_height) const;
+
   // Skip pixel readback - when using zero-copy EGL texture mode, we don't need
   // to read pixels back to CPU. This improves performance and avoids GL context issues.
   void SetSkipPixelReadback(bool skip) { skip_pixel_readback_ = skip; }

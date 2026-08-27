@@ -1279,11 +1279,18 @@ void InAppWebView::OnWpePlatformBufferRendered(WPEBuffer* buffer) {
     // Check buffer type to determine best rendering path
     bool is_dma_buf = WPE_IS_BUFFER_DMA_BUF(buffer);
     bool is_shm = WPE_IS_BUFFER_SHM(buffer);
-    
+
     // === Priority 1: Try EGL image import (zero-copy, best performance) ===
-    // Only attempt EGL for DMA-BUF buffers (SHM buffers cannot be imported via EGL)
-    // Skip if previous EGL attempts failed
-    if (egl_display_ != nullptr && 
+    // Only attempt EGL for DMA-BUF buffers (SHM buffers cannot be imported via EGL).
+    // Only worth attempting when the texture consumer is actually in zero-copy
+    // GL mode (skip_pixel_readback_) — the resulting current_egl_image_/
+    // current_buffer_width_/height_ feed GetCurrentEglImage()/HasDmaBufExport(),
+    // not the pixel_buffers_ the software/pixel-buffer texture reads from. If we
+    // always attempted it, buffer_handled would be set true here even in
+    // software mode, and pixel_buffers_ would never get filled — the texture
+    // stays a blank default (see upstream #2861).
+    // Skip if previous EGL attempts failed.
+    if (skip_pixel_readback_ && egl_display_ != nullptr &&
         is_dma_buf && !egl_import_failed_permanently) {
       GError* error = nullptr;
       void* egl_image = wpe_buffer_import_to_egl_image(buffer, &error);
@@ -3693,6 +3700,105 @@ void* InAppWebView::GetCurrentEglImage(uint32_t* out_width, uint32_t* out_height
     *out_width = 0;
   if (out_height)
     *out_height = 0;
+  return nullptr;
+#endif
+}
+
+void* InAppWebView::ImportCurrentBufferToEglImage(void* target_display, uint32_t* out_width,
+                                                   uint32_t* out_height) const {
+  if (out_width)
+    *out_width = 0;
+  if (out_height)
+    *out_height = 0;
+
+#ifdef HAVE_WPE_PLATFORM
+  if (target_display == nullptr) {
+    return nullptr;
+  }
+
+  std::lock_guard<std::mutex> lock(wpe_buffer_mutex_);
+
+  if (current_buffer_ == nullptr || !WPE_IS_BUFFER_DMA_BUF(current_buffer_)) {
+    return nullptr;
+  }
+
+  WPEBufferDMABuf* dmabuf = WPE_BUFFER_DMA_BUF(current_buffer_);
+  guint32 format = wpe_buffer_dma_buf_get_format(dmabuf);
+  guint32 n_planes = wpe_buffer_dma_buf_get_n_planes(dmabuf);
+  guint64 modifier = wpe_buffer_dma_buf_get_modifier(dmabuf);
+
+  static constexpr guint32 kMaxPlanes = 4;
+  if (n_planes == 0 || n_planes > kMaxPlanes) {
+    return nullptr;
+  }
+
+  static const EGLint kFdAttrs[kMaxPlanes] = {
+      EGL_DMA_BUF_PLANE0_FD_EXT, EGL_DMA_BUF_PLANE1_FD_EXT,
+      EGL_DMA_BUF_PLANE2_FD_EXT, EGL_DMA_BUF_PLANE3_FD_EXT};
+  static const EGLint kOffsetAttrs[kMaxPlanes] = {
+      EGL_DMA_BUF_PLANE0_OFFSET_EXT, EGL_DMA_BUF_PLANE1_OFFSET_EXT,
+      EGL_DMA_BUF_PLANE2_OFFSET_EXT, EGL_DMA_BUF_PLANE3_OFFSET_EXT};
+  static const EGLint kPitchAttrs[kMaxPlanes] = {
+      EGL_DMA_BUF_PLANE0_PITCH_EXT, EGL_DMA_BUF_PLANE1_PITCH_EXT,
+      EGL_DMA_BUF_PLANE2_PITCH_EXT, EGL_DMA_BUF_PLANE3_PITCH_EXT};
+  static const EGLint kModifierLoAttrs[kMaxPlanes] = {
+      EGL_DMA_BUF_PLANE0_MODIFIER_LO_EXT, EGL_DMA_BUF_PLANE1_MODIFIER_LO_EXT,
+      EGL_DMA_BUF_PLANE2_MODIFIER_LO_EXT, EGL_DMA_BUF_PLANE3_MODIFIER_LO_EXT};
+  static const EGLint kModifierHiAttrs[kMaxPlanes] = {
+      EGL_DMA_BUF_PLANE0_MODIFIER_HI_EXT, EGL_DMA_BUF_PLANE1_MODIFIER_HI_EXT,
+      EGL_DMA_BUF_PLANE2_MODIFIER_HI_EXT, EGL_DMA_BUF_PLANE3_MODIFIER_HI_EXT};
+
+  // DRM_FORMAT_MOD_INVALID is defined by libdrm as all bits set. Keep this
+  // local so the Linux plugin does not gain a direct libdrm header dependency.
+  const bool has_modifier = (modifier != std::numeric_limits<guint64>::max());
+
+  std::vector<EGLint> attribs;
+  attribs.push_back(EGL_WIDTH);
+  attribs.push_back(static_cast<EGLint>(current_buffer_width_));
+  attribs.push_back(EGL_HEIGHT);
+  attribs.push_back(static_cast<EGLint>(current_buffer_height_));
+  attribs.push_back(EGL_LINUX_DRM_FOURCC_EXT);
+  attribs.push_back(static_cast<EGLint>(format));
+
+  for (guint32 plane = 0; plane < n_planes; ++plane) {
+    attribs.push_back(kFdAttrs[plane]);
+    attribs.push_back(wpe_buffer_dma_buf_get_fd(dmabuf, plane));
+    attribs.push_back(kOffsetAttrs[plane]);
+    attribs.push_back(static_cast<EGLint>(wpe_buffer_dma_buf_get_offset(dmabuf, plane)));
+    attribs.push_back(kPitchAttrs[plane]);
+    attribs.push_back(static_cast<EGLint>(wpe_buffer_dma_buf_get_stride(dmabuf, plane)));
+    if (has_modifier) {
+      attribs.push_back(kModifierLoAttrs[plane]);
+      attribs.push_back(static_cast<EGLint>(modifier & 0xffffffff));
+      attribs.push_back(kModifierHiAttrs[plane]);
+      attribs.push_back(static_cast<EGLint>(modifier >> 32));
+    }
+  }
+  attribs.push_back(EGL_NONE);
+
+  static PFNEGLCREATEIMAGEKHRPROC eglCreateImageKHR = nullptr;
+  if (eglCreateImageKHR == nullptr) {
+    eglCreateImageKHR = (PFNEGLCREATEIMAGEKHRPROC)eglGetProcAddress("eglCreateImageKHR");
+  }
+  if (eglCreateImageKHR == nullptr) {
+    return nullptr;
+  }
+
+  EGLImageKHR image = eglCreateImageKHR(static_cast<EGLDisplay>(target_display), EGL_NO_CONTEXT,
+                                        EGL_LINUX_DMA_BUF_EXT, static_cast<EGLClientBuffer>(nullptr),
+                                        attribs.data());
+  if (image == EGL_NO_IMAGE_KHR) {
+    return nullptr;
+  }
+
+  if (out_width)
+    *out_width = current_buffer_width_;
+  if (out_height)
+    *out_height = current_buffer_height_;
+
+  return image;
+#else
+  (void)target_display;
   return nullptr;
 #endif
 }

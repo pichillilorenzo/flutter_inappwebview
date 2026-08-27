@@ -3065,13 +3065,20 @@ namespace flutter_inappwebview_plugin
       }
     }
 
-    // Updating one WebView changes every WebView that shares this profile.
-    if (auto webView13 = webView.try_query<ICoreWebView2_13>()) {
-      if (fl_map_contains_not_null(newSettingsMap, "preferredColorScheme") && settings->preferredColorScheme != newSettings->preferredColorScheme) {
+    // Updating one WebView changes every WebView that shares this profile, so
+    // compare with the profile itself rather than this WebView's cached setting.
+    if (fl_map_contains_not_null(newSettingsMap, "preferredColorScheme")) {
+      if (auto webView13 = webView.try_query<ICoreWebView2_13>()) {
         wil::com_ptr<ICoreWebView2Profile> profile;
-        if (succeededOrLog(webView13->get_Profile(&profile)) && profile) {
-          if (newSettings->preferredColorScheme.has_value()) {
-            failedLog(profile->put_PreferredColorScheme(static_cast<COREWEBVIEW2_PREFERRED_COLOR_SCHEME>(newSettings->preferredColorScheme.value())));
+        if (succeededOrLog(webView13->get_Profile(&profile)) && profile && newSettings->preferredColorScheme.has_value()) {
+          const auto desiredColorScheme = static_cast<COREWEBVIEW2_PREFERRED_COLOR_SCHEME>(newSettings->preferredColorScheme.value());
+          COREWEBVIEW2_PREFERRED_COLOR_SCHEME actualColorScheme;
+          const auto getColorSchemeResult = profile->get_PreferredColorScheme(&actualColorScheme);
+          if (FAILED(getColorSchemeResult)) {
+            failedLog(getColorSchemeResult);
+          }
+          if (FAILED(getColorSchemeResult) || actualColorScheme != desiredColorScheme) {
+            failedLog(profile->put_PreferredColorScheme(desiredColorScheme));
           }
         }
       }

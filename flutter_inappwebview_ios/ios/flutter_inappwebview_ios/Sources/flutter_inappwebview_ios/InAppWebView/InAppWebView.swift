@@ -1629,12 +1629,16 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
     @available(iOS 14.0, *)
     public func callAsyncJavaScript(functionBody: String, arguments: [String:Any], contentWorld: WKContentWorld, completionHandler: ((Any?) -> Void)? = nil) {
         if #unavailable(iOS 18.0), windowId != nil {
-            let error = popupContentWorldUnavailableError()
-            channelDelegate?.onConsoleMessage(message: error.localizedDescription, messageLevel: 3)
-            completionHandler?([
-                "value": nil,
-                "error": error.localizedDescription
-            ])
+            if contentWorld == WKContentWorld.page {
+                callAsyncJavaScript(functionBody: functionBody, arguments: arguments, completionHandler: completionHandler)
+            } else {
+                let error = popupContentWorldUnavailableError()
+                channelDelegate?.onConsoleMessage(message: error.localizedDescription, messageLevel: 3)
+                completionHandler?([
+                    "value": nil,
+                    "error": error.localizedDescription
+                ])
+            }
             return
         }
         let jsToInject = configuration.userContentController.generateCodeForScriptEvaluation(scriptMessageHandler: self, source: functionBody, contentWorld: contentWorld)

@@ -1049,6 +1049,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///Instead, on Android, it will run the [source] code into an iframe, using `eval(source);` to get and return the result.
   ///This parameter doesn’t apply to changes you make to the underlying web content, such as the document’s DOM structure.
   ///Those changes remain visible to all scripts, regardless of which content world you specify.
+  ///On iOS 14 through 17, named content worlds are unavailable in popup WebViews; the page world remains supported.
   ///For more information about content worlds, see [ContentWorld].
   ///
   ///**NOTE**: This method shouldn't be called in the [PlatformWebViewCreationParams.onWebViewCreated] or [PlatformWebViewCreationParams.onLoadStart] events,
@@ -2476,6 +2477,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///Instead, on Android, it will run the [source] code into an iframe.
   ///This parameter doesn’t apply to changes you make to the underlying web content, such as the document’s DOM structure.
   ///Those changes remain visible to all scripts, regardless of which content world you specify.
+  ///On iOS 14 through 17, named content worlds are unavailable in popup WebViews; the page world remains supported.
   ///For more information about content worlds, see [ContentWorld].
   ///
   ///**NOTE**: This method shouldn't be called in the [PlatformWebViewCreationParams.onWebViewCreated] or [PlatformWebViewCreationParams.onLoadStart] events,

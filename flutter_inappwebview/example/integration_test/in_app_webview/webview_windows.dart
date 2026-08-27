@@ -176,6 +176,39 @@ void webViewWindows() {
           );
         }
 
+        final asyncPageWorldResult = await windowController.callAsyncJavaScript(
+          functionBody:
+              'await Promise.resolve(); '
+              'window.popupPageAsyncValue = n + 2; '
+              'return window.popupPageAsyncValue;',
+          arguments: {'n': 40},
+        );
+        expect(asyncPageWorldResult, isNotNull);
+        expect(asyncPageWorldResult!.value, 42);
+        expect(asyncPageWorldResult.error, isNull);
+        expect(
+          await windowController.evaluateJavascript(
+            source: 'window.popupPageAsyncValue;',
+          ),
+          42,
+        );
+        final explicitPageWorldResult = await windowController
+            .callAsyncJavaScript(
+              functionBody: 'return n + 3;',
+              arguments: {'n': 39},
+              contentWorld: ContentWorld.PAGE,
+            );
+        expect(explicitPageWorldResult, isNotNull);
+        expect(explicitPageWorldResult!.value, 42);
+        expect(explicitPageWorldResult.error, isNull);
+
+        final asyncPageWorldError = await windowController.callAsyncJavaScript(
+          functionBody: "throw new Error('popup-page-async-error');",
+        );
+        expect(asyncPageWorldError, isNotNull);
+        expect(asyncPageWorldError!.value, isNull);
+        expect(asyncPageWorldError.error, contains('popup-page-async-error'));
+
         final asyncNamedWorldResult = await windowController
             .callAsyncJavaScript(
               functionBody:

@@ -79,7 +79,7 @@ void main() {
     );
   });
 
-  test('old popup async evaluation fails before content-world bootstrap', () {
+  test('old popup async routes page through compatibility path', () {
     final section = _section(
       source,
       'public func callAsyncJavaScript(functionBody: String, arguments:',
@@ -87,12 +87,36 @@ void main() {
     );
 
     expect(section, contains('if #unavailable(iOS 18.0), windowId != nil'));
+    expect(section, contains('if contentWorld == WKContentWorld.page'));
+    expect(
+      section,
+      contains(
+        'callAsyncJavaScript(functionBody: functionBody, arguments: arguments, '
+        'completionHandler: completionHandler)',
+      ),
+    );
     expect(
       section.indexOf('completionHandler?(['),
       lessThan(
         section.indexOf(
           'generateCodeForScriptEvaluation(scriptMessageHandler: self',
         ),
+      ),
+    );
+  });
+
+  test('low-level old popup async content-world overload stays disabled', () {
+    final section = _section(
+      source,
+      'public func callAsyncJavaScript(_ functionBody:',
+      'public func callAsyncJavaScript(functionBody: String, arguments:',
+    );
+
+    expect(section, contains('if #unavailable(iOS 18.0), windowId != nil'));
+    expect(
+      section,
+      contains(
+        'completionHandler?(.failure(popupContentWorldUnavailableError()))',
       ),
     );
   });

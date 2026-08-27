@@ -881,6 +881,11 @@ namespace flutter_inappwebview_plugin
       {
         wil::com_ptr<ICoreWebView2Deferral> deferral;
         if (channelDelegate && succeededOrLog(args->GetDeferral(&deferral))) {
+          wil::com_ptr<ICoreWebView2PermissionRequestedEventArgs> permissionArgs = args;
+          if (auto args3 = permissionArgs.try_query<ICoreWebView2PermissionRequestedEventArgs3>()) {
+            // Permission decisions are enforced by the host on every request.
+            failedLog(args3->put_SavesInProfile(FALSE));
+          }
           wil::unique_cotaskmem_string uri;
           std::string url = SUCCEEDED(args->get_Uri(&uri)) ? wide_to_utf8(uri.get()) : "";
 

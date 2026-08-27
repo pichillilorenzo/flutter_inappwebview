@@ -1568,6 +1568,21 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         if let applePayAPIEnabled = settings?.applePayAPIEnabled, applePayAPIEnabled {
             return
         }
+        // Popup WebViews share their parent's configuration. On iOS 14-17 the
+        // content-world overload can crash for those WebViews, so use page-world
+        // evaluation. Public callers are routed before content-world bootstrap too.
+        if #unavailable(iOS 18.0), windowId != nil {
+            super.evaluateJavaScript(javaScript) { result, error in
+                if let error = error {
+                    completionHandler?(.failure(error))
+                } else if let result = result {
+                    completionHandler?(.success(result))
+                } else {
+                    completionHandler?(.success(NSNull()))
+                }
+            }
+            return
+        }
         super.evaluateJavaScript(javaScript, in: frame, in: contentWorld, completionHandler: completionHandler)
     }
     
@@ -1577,6 +1592,10 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
     
     @available(iOS 14.0, *)
     public func evaluateJavascript(source: String, contentWorld: WKContentWorld, completionHandler: ((Any?) -> Void)? = nil) {
+        if #unavailable(iOS 18.0), windowId != nil {
+            injectDeferredObject(source: source, withWrapper: nil, completionHandler: completionHandler)
+            return
+        }
         injectDeferredObject(source: source, contentWorld: contentWorld, withWrapper: nil, completionHandler: completionHandler)
     }
     

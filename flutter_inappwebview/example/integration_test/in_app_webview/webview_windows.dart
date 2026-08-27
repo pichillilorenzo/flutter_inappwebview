@@ -87,7 +87,7 @@ void webViewWindows() {
 
       var windowId = await onCreateWindowCompleter.future;
 
-      final Completer windowControllerCompleter =
+      final Completer<InAppWebViewController> windowControllerCompleter =
           Completer<InAppWebViewController>();
       final Completer<String> windowPageLoaded = Completer<String>();
       final Completer<void> onCloseWindowCompleter = Completer<void>();
@@ -105,7 +105,6 @@ void webViewWindows() {
             onLoadStop: (controller, url) async {
               if (url!.scheme != "about" && !windowPageLoaded.isCompleted) {
                 windowPageLoaded.complete(url.toString());
-                await controller.evaluateJavascript(source: "window.close();");
               }
             },
             onCloseWindow: (controller) {
@@ -118,8 +117,47 @@ void webViewWindows() {
       await tester.pump();
 
       final String windowUrlLoaded = await windowPageLoaded.future;
+      final windowController = await windowControllerCompleter.future;
 
       expect(windowUrlLoaded, TEST_URL_EXAMPLE.toString());
+
+      if (Platform.isIOS) {
+        final popupWorld = ContentWorld.world(name: 'popup-evaluation');
+        var value = await windowController.evaluateJavascript(
+          source: 'window.popupValue = 49; window.popupValue;',
+          contentWorld: popupWorld,
+        );
+        expect(value, 49);
+
+        value = await windowController.evaluateJavascript(
+          source: 'window.popupValue;',
+          contentWorld: popupWorld,
+        );
+        expect(value, 49);
+        expect(
+          await windowController.evaluateJavascript(
+            source: 'null;',
+            contentWorld: popupWorld,
+          ),
+          isNull,
+        );
+        expect(
+          await windowController.evaluateJavascript(
+            source: 'undefined;',
+            contentWorld: popupWorld,
+          ),
+          isNull,
+        );
+        expect(
+          await windowController.evaluateJavascript(
+            source: "throw new Error('popup-eval-error');",
+            contentWorld: popupWorld,
+          ),
+          isNull,
+        );
+      }
+
+      await windowController.evaluateJavascript(source: 'window.close();');
       await expectLater(onCloseWindowCompleter.future, completes);
     }, skip: shouldSkipTest2);
 

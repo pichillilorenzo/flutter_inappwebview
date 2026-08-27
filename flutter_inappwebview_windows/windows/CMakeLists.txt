@@ -4,8 +4,8 @@
 # customers of the plugin.
 cmake_minimum_required(VERSION 3.14)
 
-set(WIL_VERSION "1.0.250325.1")
-set(WEBVIEW_VERSION "1.0.3650.58")
+set(WIL_VERSION "1.0.260126.7")
+set(WEBVIEW_VERSION "1.0.4078.44")
 set(NLOHMANN_JSON_VERSION "3.12.0")
 set(CPP_WINRT_VERSION "2.0.250303.1")
 

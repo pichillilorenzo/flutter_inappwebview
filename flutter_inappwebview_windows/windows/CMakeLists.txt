@@ -376,7 +376,9 @@ add_custom_command(TARGET ${TEST_RUNNER} POST_BUILD
   "${FLUTTER_LIBRARY}" $<TARGET_FILE_DIR:${TEST_RUNNER}>
 )
 
-# Enable automatic test discovery.
+# Enable automatic test discovery. The default 5s DISCOVERY_TIMEOUT is
+# marginal on cold CI runners (antivirus scans the fresh executable) and
+# was observed killing --gtest_list_tests mid-print.
 include(GoogleTest)
-gtest_discover_tests(${TEST_RUNNER})
+gtest_discover_tests(${TEST_RUNNER} DISCOVERY_TIMEOUT 60)
 endif()

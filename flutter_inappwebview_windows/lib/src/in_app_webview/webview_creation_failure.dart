@@ -42,14 +42,18 @@ class WindowsWebViewCreationFailures {
     StackTrace stackTrace, {
     String? requestedUrl,
   }) {
+    reportFailure(
+      WindowsWebViewCreationFailure(
+        error,
+        stackTrace,
+        requestedUrl: requestedUrl,
+      ),
+    );
+  }
+
+  static void reportFailure(WindowsWebViewCreationFailure failure) {
     if (_controller.hasListener) {
-      _controller.add(
-        WindowsWebViewCreationFailure(
-          error,
-          stackTrace,
-          requestedUrl: requestedUrl,
-        ),
-      );
+      _controller.add(failure);
     }
   }
 }

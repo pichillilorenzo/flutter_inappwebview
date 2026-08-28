@@ -205,4 +205,55 @@ void main() {
       expect(tester.takeException(), isNull);
     },
   );
+
+  testWidgets('creation errors are delivered only to the failed widget', (
+    tester,
+  ) async {
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(IN_APP_WEBVIEW_STATIC_CHANNEL, (call) async {
+          pluginChannelCalls.add(call);
+          final arguments = call.arguments! as Map<dynamic, dynamic>;
+          if (arguments['creation'] == 'fails') {
+            throw PlatformException(code: '0', message: 'creation failed');
+          }
+          return 1;
+        });
+    final failed = <WindowsWebViewCreationFailure>[];
+    final succeeded = <WindowsWebViewCreationFailure>[];
+
+    await tester.pumpWidget(
+      Directionality(
+        textDirection: TextDirection.ltr,
+        child: Row(
+          children: [
+            Expanded(
+              child: CustomPlatformView(
+                creationParams: const {
+                  'creation': 'fails',
+                  'initialUrlRequest': {'url': 'file:///plugins/a/index.html'},
+                },
+                onCreationFailure: failed.add,
+              ),
+            ),
+            Expanded(
+              child: CustomPlatformView(
+                creationParams: const {
+                  'creation': 'succeeds',
+                  'initialUrlRequest': {'url': 'file:///plugins/a/index.html'},
+                },
+                onCreationFailure: succeeded.add,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.pump();
+
+    expect(failed, hasLength(1));
+    expect(failed.single.requestedUrl, 'file:///plugins/a/index.html');
+    expect(succeeded, isEmpty);
+    expect(tester.takeException(), isNull);
+  });
 }

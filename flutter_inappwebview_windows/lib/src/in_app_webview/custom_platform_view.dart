@@ -156,6 +156,7 @@ class CustomPlatformViewController
   /// Initializes the underlying platform view.
   Future<void> initialize({
     Function(int id)? onPlatformViewCreated,
+    ValueChanged<WindowsWebViewCreationFailure>? onCreationFailure,
     dynamic arguments,
   }) async {
     if (_isDisposed) {
@@ -172,11 +173,13 @@ class CustomPlatformViewController
       if (!_creatingCompleter.isCompleted) {
         _creatingCompleter.complete();
       }
-      WindowsWebViewCreationFailures.report(
+      final failure = WindowsWebViewCreationFailure(
         error,
         stackTrace,
         requestedUrl: _requestedUrlOf(arguments),
       );
+      onCreationFailure?.call(failure);
+      WindowsWebViewCreationFailures.reportFailure(failure);
       rethrow;
     }
 
@@ -348,9 +351,17 @@ class CustomPlatformView extends StatefulWidget {
 
   final Function(int id)? onPlatformViewCreated;
 
+  /// Called only for this widget when its native WebView cannot be created.
+  ///
+  /// Prefer this callback over [WindowsWebViewCreationFailures.stream] when
+  /// several WebViews may be created at the same time: an URL is not a unique
+  /// instance identifier.
+  final ValueChanged<WindowsWebViewCreationFailure>? onCreationFailure;
+
   const CustomPlatformView({
     this.creationParams,
     this.onPlatformViewCreated,
+    this.onCreationFailure,
     this.scaleFactor,
     this.filterQuality = FilterQuality.none,
   });
@@ -422,6 +433,11 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
             if (!mounted) return;
             widget.onPlatformViewCreated?.call(id);
             setState(() {});
+          },
+          onCreationFailure: (failure) {
+            if (mounted) {
+              widget.onCreationFailure?.call(failure);
+            }
           },
           arguments: widget.creationParams,
         )

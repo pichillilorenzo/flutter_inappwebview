@@ -25,6 +25,7 @@ class WindowsInAppWebViewWidgetCreationParams
     super.preventGestureDelay,
     super.windowId,
     this.webViewEnvironment,
+    super.onWebViewCreationError,
     super.onWebViewCreated,
     super.onLoadStart,
     super.onLoadStop,
@@ -159,6 +160,7 @@ class WindowsInAppWebViewWidgetCreationParams
         windowId: params.windowId,
         webViewEnvironment:
             params.webViewEnvironment as WindowsWebViewEnvironment?,
+        onWebViewCreationError: params.onWebViewCreationError,
         onWebViewCreated: params.onWebViewCreated,
         onLoadStart: params.onLoadStart,
         onLoadStop: params.onLoadStop,
@@ -330,6 +332,10 @@ class WindowsInAppWebViewWidget extends PlatformInAppWebViewWidget {
 
     return CustomPlatformView(
       onPlatformViewCreated: _onPlatformViewCreated,
+      onCreationFailure: (failure) => params.onWebViewCreationError?.call(
+        failure.error,
+        failure.stackTrace,
+      ),
       creationParams: <String, dynamic>{
         'initialUrlRequest': params.initialUrlRequest?.toMap(),
         'initialFile': params.initialFile,

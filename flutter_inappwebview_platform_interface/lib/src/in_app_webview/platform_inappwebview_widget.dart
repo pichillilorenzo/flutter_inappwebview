@@ -45,6 +45,7 @@ class PlatformInAppWebViewWidgetCreationParams
     this.keepAlive,
     this.preventGestureDelay,
     this.webViewEnvironment,
+    this.onWebViewCreationError,
     super.controllerFromPlatform,
     super.windowId,
     super.onWebViewCreated,
@@ -250,6 +251,14 @@ class PlatformInAppWebViewWidgetCreationParams
     ],
   )
   final PlatformWebViewEnvironment? webViewEnvironment;
+
+  /// Called when the native WebView cannot be created.
+  ///
+  /// This currently applies to Windows, where the failure happens before a
+  /// WebView controller exists. Unlike a global failure stream, this callback
+  /// belongs to the exact widget whose creation failed.
+  final void Function(Object error, StackTrace stackTrace)?
+  onWebViewCreationError;
 
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewWidgetCreationParams.isClassSupported}
   ///Check if the current class is supported by the [defaultTargetPlatform] or a specific [platform].

@@ -206,9 +206,7 @@ void main() {
     },
   );
 
-  testWidgets('creation errors are delivered only to the failed widget', (
-    tester,
-  ) async {
+  testWidgets('creation failures carry the failed widget key', (tester) async {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(IN_APP_WEBVIEW_STATIC_CHANNEL, (call) async {
           pluginChannelCalls.add(call);
@@ -218,8 +216,13 @@ void main() {
           }
           return 1;
         });
-    final failed = <WindowsWebViewCreationFailure>[];
-    final succeeded = <WindowsWebViewCreationFailure>[];
+    final failures = <WindowsWebViewCreationFailure>[];
+    final subscription = WindowsWebViewCreationFailures.stream.listen(
+      failures.add,
+    );
+    addTearDown(subscription.cancel);
+    const failedKey = ValueKey<String>('failed');
+    const succeededKey = ValueKey<String>('succeeded');
 
     await tester.pumpWidget(
       Directionality(
@@ -228,20 +231,20 @@ void main() {
           children: [
             Expanded(
               child: CustomPlatformView(
+                creationKey: failedKey,
                 creationParams: const {
                   'creation': 'fails',
                   'initialUrlRequest': {'url': 'file:///plugins/a/index.html'},
                 },
-                onCreationFailure: failed.add,
               ),
             ),
             Expanded(
               child: CustomPlatformView(
+                creationKey: succeededKey,
                 creationParams: const {
                   'creation': 'succeeds',
                   'initialUrlRequest': {'url': 'file:///plugins/a/index.html'},
                 },
-                onCreationFailure: succeeded.add,
               ),
             ),
           ],
@@ -251,9 +254,9 @@ void main() {
     await tester.pump();
     await tester.pump();
 
-    expect(failed, hasLength(1));
-    expect(failed.single.requestedUrl, 'file:///plugins/a/index.html');
-    expect(succeeded, isEmpty);
+    expect(failures, hasLength(1));
+    expect(failures.single.requestedUrl, 'file:///plugins/a/index.html');
+    expect(failures.single.creationKey, failedKey);
     expect(tester.takeException(), isNull);
   });
 }

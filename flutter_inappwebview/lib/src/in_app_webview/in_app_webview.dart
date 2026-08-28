@@ -257,12 +257,6 @@ class InAppWebView extends StatefulWidget {
     )?
     onUpdateVisitedHistory,
     void Function(InAppWebViewController controller)? onWebViewCreated,
-    /// Called on Windows when the native WebView cannot be created.
-    ///
-    /// It belongs to this [InAppWebView] instance, unlike a global creation
-    /// failure stream, so it remains correct when multiple WebViews start at
-    /// the same time.
-    void Function(Object error, StackTrace stackTrace)? onWebViewCreationError,
     FutureOr<AjaxRequest?> Function(
       InAppWebViewController controller,
       AjaxRequest ajaxRequest,
@@ -485,6 +479,7 @@ class InAppWebView extends StatefulWidget {
   }) : this.fromPlatformCreationParams(
          key: key,
          params: PlatformInAppWebViewWidgetCreationParams(
+           key: key,
            controllerFromPlatform:
                (PlatformInAppWebViewController controller) =>
                    InAppWebViewController.fromPlatform(platform: controller),
@@ -501,7 +496,6 @@ class InAppWebView extends StatefulWidget {
            contextMenu: contextMenu,
            layoutDirection: layoutDirection,
            webViewEnvironment: webViewEnvironment?.platform,
-           onWebViewCreationError: onWebViewCreationError,
            onWebViewCreated: onWebViewCreated != null
                ? (controller) => onWebViewCreated.call(controller)
                : null,

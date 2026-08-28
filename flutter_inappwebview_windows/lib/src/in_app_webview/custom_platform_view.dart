@@ -156,7 +156,7 @@ class CustomPlatformViewController
   /// Initializes the underlying platform view.
   Future<void> initialize({
     Function(int id)? onPlatformViewCreated,
-    ValueChanged<WindowsWebViewCreationFailure>? onCreationFailure,
+    Key? creationKey,
     dynamic arguments,
   }) async {
     if (_isDisposed) {
@@ -177,8 +177,8 @@ class CustomPlatformViewController
         error,
         stackTrace,
         requestedUrl: _requestedUrlOf(arguments),
+        creationKey: creationKey,
       );
-      onCreationFailure?.call(failure);
       WindowsWebViewCreationFailures.reportFailure(failure);
       rethrow;
     }
@@ -351,17 +351,17 @@ class CustomPlatformView extends StatefulWidget {
 
   final Function(int id)? onPlatformViewCreated;
 
-  /// Called only for this widget when its native WebView cannot be created.
+  /// The caller-supplied key that identifies this creation attempt.
   ///
-  /// Prefer this callback over [WindowsWebViewCreationFailures.stream] when
-  /// several WebViews may be created at the same time: an URL is not a unique
-  /// instance identifier.
-  final ValueChanged<WindowsWebViewCreationFailure>? onCreationFailure;
+  /// It is carried on [WindowsWebViewCreationFailure] so listeners on the
+  /// global failure stream can identify the failed widget even when multiple
+  /// WebViews request the same URL.
+  final Key? creationKey;
 
   const CustomPlatformView({
     this.creationParams,
     this.onPlatformViewCreated,
-    this.onCreationFailure,
+    this.creationKey,
     this.scaleFactor,
     this.filterQuality = FilterQuality.none,
   });
@@ -434,11 +434,7 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
             widget.onPlatformViewCreated?.call(id);
             setState(() {});
           },
-          onCreationFailure: (failure) {
-            if (mounted) {
-              widget.onCreationFailure?.call(failure);
-            }
-          },
+          creationKey: widget.creationKey,
           arguments: widget.creationParams,
         )
         .ignore();

@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:flutter_inappwebview_windows/src/in_app_webview/_static_channel.dart';
 import 'package:flutter_inappwebview_windows/src/in_app_webview/custom_platform_view.dart';
+import 'package:flutter_inappwebview_windows/src/in_app_webview/webview_creation_failure.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -179,4 +180,29 @@ void main() {
     expect(tester.takeException(), isNull);
     expect(creationCallbackCount, 0);
   });
+
+  testWidgets(
+    'widget reports a creation failure without an unhandled async error',
+    (tester) async {
+      mockCreation(succeeds: false);
+      final failures = <WindowsWebViewCreationFailure>[];
+      final subscription = WindowsWebViewCreationFailures.stream.listen(
+        failures.add,
+      );
+      addTearDown(subscription.cancel);
+
+      await tester.pumpWidget(
+        const Directionality(
+          textDirection: TextDirection.ltr,
+          child: CustomPlatformView(),
+        ),
+      );
+      await tester.pump();
+      await tester.pump();
+
+      expect(failures, hasLength(1));
+      expect(failures.single.error, isA<PlatformException>());
+      expect(tester.takeException(), isNull);
+    },
+  );
 }

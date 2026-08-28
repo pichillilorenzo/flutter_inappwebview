@@ -394,14 +394,20 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
 
     _platformUtil.addListener(this);
 
-    _controller.initialize(
-      onPlatformViewCreated: (id) {
-        if (!mounted) return;
-        widget.onPlatformViewCreated?.call(id);
-        setState(() {});
-      },
-      arguments: widget.creationParams,
-    );
+    // `initialize` reports native creation failures through
+    // WindowsWebViewCreationFailures, then rethrows for direct callers. This
+    // widget has no per-instance creation-error callback, so consume that
+    // rethrown Future here instead of producing an unhandled async error.
+    _controller
+        .initialize(
+          onPlatformViewCreated: (id) {
+            if (!mounted) return;
+            widget.onPlatformViewCreated?.call(id);
+            setState(() {});
+          },
+          arguments: widget.creationParams,
+        )
+        .ignore();
 
     _listener = AppLifecycleListener(
       onStateChange: (state) {

@@ -15,6 +15,24 @@ void main() {
     expect(received.single.error, same(error));
   });
 
+  test(
+    'the requested URL is carried so hosts can tell whose creation failed',
+    () async {
+      final received = <WindowsWebViewCreationFailure>[];
+      final sub = WindowsWebViewCreationFailures.stream.listen(received.add);
+      addTearDown(sub.cancel);
+
+      WindowsWebViewCreationFailures.report(
+        Exception('boom'),
+        StackTrace.current,
+        requestedUrl: 'file:///plugins/a/index.html',
+      );
+      await Future<void>.delayed(Duration.zero);
+
+      expect(received.single.requestedUrl, 'file:///plugins/a/index.html');
+    },
+  );
+
   test('reporting without listeners does not throw', () {
     expect(
       () => WindowsWebViewCreationFailures.report(

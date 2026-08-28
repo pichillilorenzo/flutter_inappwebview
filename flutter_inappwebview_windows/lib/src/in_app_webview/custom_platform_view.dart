@@ -117,6 +117,20 @@ class CustomFlutterViewControllerValue {
   CustomFlutterViewControllerValue.uninitialized() : this(isInitialized: false);
 }
 
+/// The URL a creation request was going to load, read back from its creation
+/// params. It is the only identifier both sides share before the webview
+/// exists, so it is what lets a host match a failure to its own request.
+String? _requestedUrlOf(dynamic arguments) {
+  if (arguments is! Map) return null;
+  final urlRequest = arguments['initialUrlRequest'];
+  if (urlRequest is Map) {
+    final url = urlRequest['url'];
+    if (url != null) return url.toString();
+  }
+  final file = arguments['initialFile'];
+  return file?.toString();
+}
+
 /// Controls a WebView and provides streams for various change events.
 class CustomPlatformViewController
     extends ValueNotifier<CustomFlutterViewControllerValue> {
@@ -158,7 +172,11 @@ class CustomPlatformViewController
       if (!_creatingCompleter.isCompleted) {
         _creatingCompleter.complete();
       }
-      WindowsWebViewCreationFailures.report(error, stackTrace);
+      WindowsWebViewCreationFailures.report(
+        error,
+        stackTrace,
+        requestedUrl: _requestedUrlOf(arguments),
+      );
       rethrow;
     }
 

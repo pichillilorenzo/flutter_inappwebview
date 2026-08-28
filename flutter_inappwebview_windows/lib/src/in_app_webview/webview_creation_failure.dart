@@ -8,10 +8,20 @@ class WindowsWebViewCreationFailure {
 
   final StackTrace stackTrace;
 
-  const WindowsWebViewCreationFailure(this.error, this.stackTrace);
+  /// The URL (or file path) the failed webview was asked to load, taken from
+  /// its creation params. Hosts use it to tell whose creation failed: several
+  /// webviews can be created concurrently and this stream is global.
+  final String? requestedUrl;
+
+  const WindowsWebViewCreationFailure(
+    this.error,
+    this.stackTrace, {
+    this.requestedUrl,
+  });
 
   @override
-  String toString() => 'WindowsWebViewCreationFailure($error)';
+  String toString() =>
+      'WindowsWebViewCreationFailure($error, requestedUrl: $requestedUrl)';
 }
 
 /// Broadcasts native WebView creation failures to the host application.
@@ -27,9 +37,19 @@ class WindowsWebViewCreationFailures {
 
   static Stream<WindowsWebViewCreationFailure> get stream => _controller.stream;
 
-  static void report(Object error, StackTrace stackTrace) {
+  static void report(
+    Object error,
+    StackTrace stackTrace, {
+    String? requestedUrl,
+  }) {
     if (_controller.hasListener) {
-      _controller.add(WindowsWebViewCreationFailure(error, stackTrace));
+      _controller.add(
+        WindowsWebViewCreationFailure(
+          error,
+          stackTrace,
+          requestedUrl: requestedUrl,
+        ),
+      );
     }
   }
 }

@@ -584,7 +584,7 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
                     _controller._setCursorPos(signal.localPosition);
                     _stopFling();
                     _sendScrollDelta(
-                      -signal.scrollDelta.dx,
+                      signal.scrollDelta.dx,
                       -signal.scrollDelta.dy,
                     );
                   } else if (signal is PointerScrollInertiaCancelEvent) {
@@ -678,7 +678,8 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
     );
   }
 
-  /// Forwards scroll deltas immediately, preserving fractional remainders.
+  /// Forwards raw WM wheel data immediately, preserving fractional
+  /// remainders. WM sign asymmetry: positive dy = up, positive dx = right.
   void _sendScrollDelta(double dx, double dy) {
     _scrollRemainderX += dx;
     _scrollRemainderY += dy;
@@ -694,7 +695,9 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
 
   void _sendTrackpadScrollDelta(double dx, double dy) {
     final delta = _dominantAxis(Offset(dx, dy));
-    _sendScrollDelta(delta.dx, delta.dy);
+    // Content follows the fingers: fingers right = scroll left = negative
+    // hwheel (WM_MOUSEHWHEEL positive means right, unlike the vertical axis).
+    _sendScrollDelta(-delta.dx, delta.dy);
   }
 
   /// Starts synthetic inertia after a fast lifted pan.

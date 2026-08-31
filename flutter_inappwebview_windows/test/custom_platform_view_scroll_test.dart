@@ -224,10 +224,31 @@ void main() {
       await tester.pump();
 
       // 0.5px × 1.2 × 1.5 = 0.9 units per update: whole units flush on the
-      // 2nd and 3rd updates.
+      // 2nd and 3rd updates. Fingers left → positive hwheel (scroll right is
+      // negative in WM terms only for the vertical axis).
       expect(scrollDeltaCalls(), [
-        [-1.0, 0.0],
-        [-1.0, 0.0],
+        [1.0, 0.0],
+        [1.0, 0.0],
+      ]);
+    });
+
+    testWidgets('horizontal pan follows the fingers (hwheel sign is inverted '
+        'relative to the vertical axis)', (tester) async {
+      final center = await pumpView(tester);
+
+      final pointer = TestPointer(1, PointerDeviceKind.trackpad);
+      await tester.sendEventToBinding(pointer.panZoomStart(center));
+      // Fingers move right 10px: content must follow them, i.e. scroll left,
+      // which is a NEGATIVE WM_MOUSEHWHEEL delta (positive hwheel = right).
+      await tester.sendEventToBinding(
+        pointer.panZoomUpdate(center, pan: const Offset(10, 0)),
+      );
+      await tester.sendEventToBinding(pointer.panZoomEnd());
+      await tester.pump();
+
+      // 10px × 1.2 × 1.5 = 18 units, negated for the horizontal axis.
+      expect(scrollDeltaCalls(), [
+        [-18.0, 0.0],
       ]);
     });
 
@@ -246,7 +267,7 @@ void main() {
       await tester.pump();
 
       expect(scrollDeltaCalls(), [
-        [-18.0, 0.0],
+        [18.0, 0.0],
         [0.0, -18.0],
       ]);
     });
@@ -432,6 +453,27 @@ void main() {
       );
       expect(scrollDeltaCalls(), [
         [0.0, -120.0],
+      ]);
+    });
+
+    testWidgets('horizontal wheel deltas are forwarded unnegated '
+        '(WM_MOUSEHWHEEL positive = right, unlike the vertical axis)', (
+      tester,
+    ) async {
+      final center = await pumpView(tester);
+
+      final pointer = TestPointer(1, PointerDeviceKind.mouse);
+      await tester.sendEventToBinding(pointer.hover(center));
+      // The engine maps WM_MOUSEHWHEEL without negation, so reproducing the
+      // original native delta means forwarding dx as-is.
+      await tester.sendEventToBinding(pointer.scroll(const Offset(120, 0)));
+      await tester.pump();
+      await tester.sendEventToBinding(pointer.scroll(const Offset(-120, 0)));
+      await tester.pump();
+
+      expect(scrollDeltaCalls(), [
+        [120.0, 0.0],
+        [-120.0, 0.0],
       ]);
     });
 

@@ -152,6 +152,13 @@ class InAppWebViewSettings {
   // Note: This is a session-level setting applied during WebView creation
   bool itpEnabled = false;
 
+  // === Third party cookies ===
+  // WPE WebKit only accepts cookies of the main document by default, which
+  // breaks sign-in flows that hand the session over across origins (google's
+  // for instance). Chromium based webviews accept them, so match that.
+  // Note: This is a session-level setting applied during WebView creation
+  bool thirdPartyCookiesEnabled = true;
+
   // === Content Blockers ===
   // Raw FlValue* list of content blocker rules (stored for later application)
   // Each rule is a map with "trigger" and "action" keys

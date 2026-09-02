@@ -650,6 +650,19 @@ void InAppWebView::InitWpeBackend() {
 #endif
 }
 
+// WPE WebKit defaults to WEBKIT_COOKIE_POLICY_ACCEPT_NO_THIRD_PARTY, unlike the
+// chromium based ports, which breaks sign-in flows relying on cross site cookies.
+static void ApplyCookieAcceptPolicy(WebKitNetworkSession* session, bool allowThirdParty) {
+  WebKitCookieManager* cookieManager = webkit_network_session_get_cookie_manager(session);
+  if (cookieManager == nullptr) {
+    return;
+  }
+  webkit_cookie_manager_set_accept_policy(cookieManager,
+                                          allowThirdParty
+                                              ? WEBKIT_COOKIE_POLICY_ACCEPT_ALWAYS
+                                              : WEBKIT_COOKIE_POLICY_ACCEPT_NO_THIRD_PARTY);
+}
+
 void InAppWebView::InitWebView(const InAppWebViewCreationParams& params) {
 #ifdef HAVE_WPE_PLATFORM
   // === WPEPlatform API ===
@@ -792,11 +805,14 @@ void InAppWebView::InitWebView(const InAppWebViewCreationParams& params) {
     wpe_toplevel_resize(wpe_toplevel_, width_, height_);
   }
   
-  // Apply ITP setting if configured
+  // Apply session level settings if configured
   if (params.initialSettings != nullptr) {
     WebKitNetworkSession* session = webkit_web_view_get_network_session(webview_);
-    if (session != nullptr && params.initialSettings->itpEnabled) {
-      webkit_network_session_set_itp_enabled(session, TRUE);
+    if (session != nullptr) {
+      if (params.initialSettings->itpEnabled) {
+        webkit_network_session_set_itp_enabled(session, TRUE);
+      }
+      ApplyCookieAcceptPolicy(session, params.initialSettings->thirdPartyCookiesEnabled);
     }
   }
   
@@ -874,9 +890,12 @@ void InAppWebView::InitWebView(const InAppWebViewCreationParams& params) {
 
     if (params.initialSettings != nullptr) {
       WebKitNetworkSession* session = webkit_web_view_get_network_session(webview_);
-      if (session != nullptr && params.initialSettings->itpEnabled) {
-        webkit_network_session_set_itp_enabled(session, TRUE);
-        debugLog("InAppWebView: ITP enabled");
+      if (session != nullptr) {
+        if (params.initialSettings->itpEnabled) {
+          webkit_network_session_set_itp_enabled(session, TRUE);
+          debugLog("InAppWebView: ITP enabled");
+        }
+        ApplyCookieAcceptPolicy(session, params.initialSettings->thirdPartyCookiesEnabled);
       }
     }
 

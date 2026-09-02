@@ -16,6 +16,7 @@
 #include "in_app_browser/in_app_browser_manager.h"
 #include "in_app_webview/in_app_webview_manager.h"
 #include "proxy_manager.h"
+#include "utils/drm_device.h"
 #include "utils/software_rendering.h"
 #include "web_storage_manager.h"
 #include "webview_environment.h"
@@ -80,6 +81,12 @@ void flutter_inappwebview_linux_plugin_register_with_registrar(FlPluginRegistrar
   // inherits environment variables at spawn time. Setting LIBGL_ALWAYS_SOFTWARE
   // after WebProcess starts has no effect.
   flutter_inappwebview_plugin::ApplySoftwareRenderingIfNeeded();
+
+  // === CRITICAL: Pin WPE to Flutter's GPU BEFORE any WebKit initialization ===
+  // WPE picks its own DRM device otherwise, and a frame exported by one GPU
+  // cannot be imported into a GL context living on another one, leaving the
+  // webview black on hybrid graphics setups.
+  flutter_inappwebview_plugin::ApplyWpeDrmDeviceIfNeeded();
 
   FlutterInappwebviewLinuxPlugin* plugin = FLUTTER_INAPPWEBVIEW_LINUX_PLUGIN(
       g_object_new(flutter_inappwebview_linux_plugin_get_type(), nullptr));

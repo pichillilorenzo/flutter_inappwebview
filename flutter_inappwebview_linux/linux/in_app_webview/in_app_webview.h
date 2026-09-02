@@ -74,6 +74,11 @@ struct wpe_fdo_egl_exported_image;
 
 namespace flutter_inappwebview_plugin {
 
+// Gives the (non ephemeral) session a cookie file, WPE WebKit keeps cookies in
+// memory otherwise. Applied once, subsequent calls are no-ops.
+void EnsurePersistentCookieStorage(WebKitNetworkSession* session);
+
+
 class InAppBrowser;
 class InAppWebViewManager;
 class PluginInstance;

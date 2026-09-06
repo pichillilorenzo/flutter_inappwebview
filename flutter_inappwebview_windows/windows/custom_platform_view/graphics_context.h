@@ -5,6 +5,8 @@
 #include <windows.ui.composition.h>
 #include <winrt/Windows.Foundation.h>
 
+#include <mutex>
+
 #include "util/rohelper.h"
 
 namespace flutter_inappwebview_plugin
@@ -24,6 +26,10 @@ namespace flutter_inappwebview_plugin
     {
       return device_context_.get();
     }
+    // The immediate context is shared by every WebView of the plugin and is
+    // not thread-safe. Hold this while issuing a sequence of calls on it from
+    // a thread other than the one that created it (capture threads).
+    std::mutex& device_context_mutex() const { return device_context_mutex_; }
 
     winrt::com_ptr<ABI::Windows::UI::Composition::ICompositor> CreateCompositor();
 
@@ -50,5 +56,6 @@ namespace flutter_inappwebview_plugin
       device_winrt_;
     winrt::com_ptr<ID3D11Device> device_{ nullptr };
     winrt::com_ptr<ID3D11DeviceContext> device_context_{ nullptr };
+    mutable std::mutex device_context_mutex_;
   };
 }

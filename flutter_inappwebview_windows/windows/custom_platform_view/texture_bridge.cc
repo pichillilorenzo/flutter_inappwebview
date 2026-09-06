@@ -128,7 +128,7 @@ namespace flutter_inappwebview_plugin
       if (SUCCEEDED(frame->get_Surface(frame_surface.put()))) {
         last_frame_ =
           TryGetDXGIInterfaceFromObject<ID3D11Texture2D>(frame_surface);
-        has_frame = !ShouldDropFrame();
+        has_frame = last_frame_ && !ShouldDropFrame() && AcceptFrame(last_frame_);
       }
     }
 
@@ -146,6 +146,11 @@ namespace flutter_inappwebview_plugin
     if (has_frame && frame_available_) {
       frame_available_();
     }
+  }
+
+  bool TextureBridge::AcceptFrame(const winrt::com_ptr<ID3D11Texture2D>& frame)
+  {
+    return true;
   }
 
   bool TextureBridge::ShouldDropFrame()

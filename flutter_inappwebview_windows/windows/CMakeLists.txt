@@ -57,6 +57,7 @@ list(APPEND PLUGIN_SOURCES
   "types/channel_delegate.cpp"
   "types/channel_delegate.h"
   "types/base_callback_result.h"
+  "types/lifetime_token.h"
   "types/url_request.cpp"
   "types/url_request.h"
   "types/navigation_action.cpp"

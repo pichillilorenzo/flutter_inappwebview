@@ -14,6 +14,7 @@
 #include "../custom_platform_view/util/rohelper.h"
 #include "../flutter_inappwebview_windows_plugin.h"
 #include "../types/channel_delegate.h"
+#include "../types/lifetime_token.h"
 #include "../types/new_window_requested_args.h"
 #include "windows.ui.composition.h"
 
@@ -60,6 +61,7 @@ namespace flutter_inappwebview_plugin
     inline static winrt::com_ptr<ABI::Windows::UI::Composition::ICompositor> compositor_;
     WNDCLASS windowClass_ = {};
     bool windowMinimized_ = false;
+    LifetimeToken alive_;
     inline static bool valid_ = false;
   };
 }

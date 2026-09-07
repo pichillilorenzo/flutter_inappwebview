@@ -8,6 +8,7 @@
 #include <wil/com.h>
 
 #include "../flutter_inappwebview_windows_plugin.h"
+#include "../types/lifetime_token.h"
 #include "webview_environment_channel_delegate.h"
 #include "webview_environment_settings.h"
 
@@ -44,6 +45,7 @@ namespace flutter_inappwebview_plugin
     EventRegistrationToken browserProcessExitedToken_ = { 0 };
     EventRegistrationToken newBrowserVersionAvailableToken_ = { 0 };
     WNDCLASS windowClass_ = {};
+    LifetimeToken alive_;
   };
 }
 #endif //FLUTTER_INAPPWEBVIEW_PLUGIN_WEBVIEW_ENVIRONMENT_H_

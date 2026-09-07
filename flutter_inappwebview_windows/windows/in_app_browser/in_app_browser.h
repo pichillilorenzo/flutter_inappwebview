@@ -8,6 +8,7 @@
 #include "../flutter_inappwebview_windows_plugin.h"
 #include "../in_app_webview/in_app_webview.h"
 #include "../in_app_webview/in_app_webview_settings.h"
+#include "../types/lifetime_token.h"
 #include "../types/url_request.h"
 #include "in_app_browser_channel_delegate.h"
 #include "in_app_browser_settings.h"
@@ -62,6 +63,7 @@ namespace flutter_inappwebview_plugin
     HWND m_hWnd;
     bool destroyed_ = false;
     bool hostWindowMinimized_ = false;
+    LifetimeToken alive_;
     static InAppBrowser* GetThisFromHandle(HWND window) noexcept;
     LRESULT MessageHandler(HWND window,
       UINT message,

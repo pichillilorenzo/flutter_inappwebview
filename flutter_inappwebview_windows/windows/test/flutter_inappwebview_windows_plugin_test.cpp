@@ -5,6 +5,7 @@
 #include "in_app_webview/browser_process_gate.h"
 #include "in_app_webview/webview_visibility_state.h"
 #include "types/base_callback_result.h"
+#include "types/lifetime_token.h"
 
 namespace flutter_inappwebview_plugin::test {
 
@@ -284,6 +285,25 @@ TEST(WebViewVisibilityState, DeferredDeliveryCoalescesToLatestState) {
   EXPECT_TRUE(state.needsApply());
   state.markApplied();
   EXPECT_FALSE(state.needsApply());
+}
+
+TEST(LifetimeToken, WeakHandleTracksOwnerLifetime) {
+  std::weak_ptr<void> alive;
+  {
+    LifetimeToken token;
+    alive = token.weak();
+    EXPECT_FALSE(alive.expired());
+    EXPECT_FALSE(token.expired());
+  }
+  EXPECT_TRUE(alive.expired());
+}
+
+TEST(LifetimeToken, ExpireInvalidatesHandlesBeforeDestruction) {
+  LifetimeToken token;
+  const auto alive = token.weak();
+  token.expire();
+  EXPECT_TRUE(alive.expired());
+  EXPECT_TRUE(token.expired());
 }
 
 }  // namespace flutter_inappwebview_plugin::test

@@ -81,11 +81,19 @@ namespace flutter_inappwebview_plugin
     auto initialSettings = std::make_shared<InAppWebViewSettings>(settingsMap);
 
     InAppWebView::createInAppWebViewEnv(hwnd, false, webViewEnvironment, initialSettings,
-      [=](HRESULT errorCode,
+      [=, alive = alive_.weak()](HRESULT errorCode,
         wil::com_ptr<ICoreWebView2Environment> webViewEnv,
         wil::com_ptr<ICoreWebView2Controller> webViewController,
         wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController)
       {
+        if (alive.expired()) {
+          // The engine was torn down while WebView2 was still creating the
+          // controller: this object, the registrar and result_ are all gone.
+          if (webViewController) {
+            failedLog(webViewController->Close());
+          }
+          return;
+        }
         if (plugin && webViewEnv && webViewController) {
           std::optional<std::vector<std::shared_ptr<UserScript>>> initialUserScripts = initialUserScriptList.has_value() ?
             functional_map(initialUserScriptList.value(), [](const flutter::EncodableValue& map) { return std::make_shared<UserScript>(std::get<flutter::EncodableMap>(map)); }) :

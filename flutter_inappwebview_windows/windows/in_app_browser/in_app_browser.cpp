@@ -75,8 +75,16 @@ namespace flutter_inappwebview_plugin
       ? plugin->webViewEnvironmentManager->webViewEnvironments.at(params.webViewEnvironmentId.value()).get() : nullptr;
 
     InAppWebView::createInAppWebViewEnv(m_hWnd, false, webViewEnvironment, params.initialWebViewSettings,
-      [this, params, webViewParams](HRESULT errorCode, wil::com_ptr<ICoreWebView2Environment> webViewEnv, wil::com_ptr<ICoreWebView2Controller> webViewController, wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController) -> void
+      [this, params, webViewParams, alive = alive_.weak()](HRESULT errorCode, wil::com_ptr<ICoreWebView2Environment> webViewEnv, wil::com_ptr<ICoreWebView2Controller> webViewController, wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController) -> void
       {
+        if (alive.expired()) {
+          // The engine was torn down while WebView2 was still creating the
+          // controller: this object, the registrar and result_ are all gone.
+          if (webViewController) {
+            failedLog(webViewController->Close());
+          }
+          return;
+        }
         if (webViewEnv && webViewController) {
           webView = std::make_unique<InAppWebView>(this, this->plugin, webViewParams,
             m_hWnd, std::move(webViewEnv), std::move(webViewController), nullptr,
@@ -263,6 +271,7 @@ namespace flutter_inappwebview_plugin
   InAppBrowser::~InAppBrowser()
   {
     debugLog("dealloc InAppBrowser");
+    alive_.expire();
     webView.reset();
     SetWindowLongPtr(m_hWnd, GWLP_USERDATA, 0);
     plugin = nullptr;

@@ -90,8 +90,13 @@ namespace flutter_inappwebview_plugin
       settings && settings->userDataFolder.has_value() ? utf8_to_wide(settings->userDataFolder.value()).c_str() : nullptr,
       options.Get(),
       Callback<ICoreWebView2CreateCoreWebView2EnvironmentCompletedHandler>(
-        [this, hwnd, completionHandler](HRESULT result, wil::com_ptr<ICoreWebView2Environment> environment) -> HRESULT
+        [this, hwnd, completionHandler, alive = alive_.weak()](HRESULT result, wil::com_ptr<ICoreWebView2Environment> environment) -> HRESULT
         {
+          if (alive.expired()) {
+            // Torn down mid-creation; completionHandler captures the owning
+            // manager, which is gone as well.
+            return S_OK;
+          }
           if (succeededOrLog(result)) {
             environment_ = std::move(environment);
 
@@ -311,6 +316,7 @@ namespace flutter_inappwebview_plugin
   WebViewEnvironment::~WebViewEnvironment()
   {
     debugLog("dealloc WebViewEnvironment");
+    alive_.expire();
     if (environment_) {
       environment_->remove_NewBrowserVersionAvailable(newBrowserVersionAvailableToken_);
       if (auto environment5 = environment_.try_query<ICoreWebView2Environment5>()) {

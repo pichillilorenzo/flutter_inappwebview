@@ -5,7 +5,9 @@
 #include <cassert>
 #include <cstdint>
 #include <iostream>
+#include <memory>
 #include <mutex>
+#include <vector>
 
 #include "util/direct3d11.interop.h"
 
@@ -39,16 +41,34 @@ void main(uint3 id : SV_DispatchThreadID) {
       ID3DBlob**, ID3DBlob**);
 
     constexpr UINT kCompareResultBytes = 16;
+    constexpr size_t kSurfacePoolSize = 2;
   }
+
+  struct TextureBridgeGpu::SurfacePool {
+    struct Surface {
+      winrt::com_ptr<ID3D11Texture2D> texture;
+      HANDLE shared_handle = nullptr;
+      bool is_leased = false;
+    };
+
+    std::mutex mutex;
+    Size size = { 0, 0 };
+    std::vector<Surface> surfaces;
+    size_t published_surface = 0;
+    bool has_published_surface = false;
+  };
+
+  struct TextureBridgeGpu::FrameLease {
+    std::shared_ptr<SurfacePool> pool;
+    size_t surface_index = 0;
+    FlutterDesktopGpuSurfaceDescriptor descriptor = {};
+  };
 
   TextureBridgeGpu::TextureBridgeGpu(
     GraphicsContext* graphics_context,
     ABI::Windows::UI::Composition::IVisual* visual)
     : TextureBridge(graphics_context, visual)
   {
-    surface_descriptor_.struct_size = sizeof(FlutterDesktopGpuSurfaceDescriptor);
-    surface_descriptor_.format =
-      kFlutterDesktopPixelFormatNone;  // no format required for DXGI surfaces
     if (!InitComparer()) {
       std::cerr << "WebView frame compare unavailable; every captured frame "
         "is forwarded to Flutter." << std::endl;
@@ -79,9 +99,10 @@ void main(uint3 id : SV_DispatchThreadID) {
     FreeLibrary(compiler);
     if (FAILED(compiled) || !code) {
       if (errors) {
-        std::cerr << "frame compare shader: "
-          << static_cast<const char*>(errors->GetBufferPointer())
-          << std::endl;
+        std::cerr << "frame compare shader: ";
+        std::cerr.write(static_cast<const char*>(errors->GetBufferPointer()),
+          static_cast<std::streamsize>(errors->GetBufferSize()));
+        std::cerr << std::endl;
       }
       return false;
     }
@@ -153,13 +174,13 @@ void main(uint3 id : SV_DispatchThreadID) {
     context->CSSetUnorderedAccessViews(0, 1, no_uavs, nullptr);
     context->CSSetShader(nullptr, nullptr, 0);
 
-    // Reading the 4-byte flag waits for the compare to finish on the GPU.
-    // The work is tiny; this is well under a millisecond and runs on the
-    // capture thread, not on Flutter's threads.
+    // Never block the capture dispatcher waiting for the GPU. When the flag
+    // is not ready, fail open and forward the frame, which is the previous
+    // behaviour and preserves correctness under GPU pressure.
     context->CopyResource(compare_staging_.get(), compare_result_.get());
     D3D11_MAPPED_SUBRESOURCE mapped;
-    if (FAILED(context->Map(compare_staging_.get(), 0, D3D11_MAP_READ, 0,
-      &mapped))) {
+    if (FAILED(context->Map(compare_staging_.get(), 0, D3D11_MAP_READ,
+      D3D11_MAP_FLAG_DO_NOT_WAIT, &mapped))) {
       return true;
     }
     const bool differ = *static_cast<const uint32_t*>(mapped.pData) != 0;
@@ -172,8 +193,11 @@ void main(uint3 id : SV_DispatchThreadID) {
   {
     D3D11_TEXTURE2D_DESC desc;
     frame->GetDesc(&desc);
-    const bool surface_created = EnsureSurface(desc.Width, desc.Height);
-    if (!surface_) {
+    const bool reference_created = !reference_ ||
+      reference_size_.width != desc.Width ||
+      reference_size_.height != desc.Height;
+    if (!EnsureSurfacePool(desc.Width, desc.Height) ||
+      (compare_shader_ && !EnsureReference(desc.Width, desc.Height))) {
       return false;
     }
     // Several WebViews share one immediate context, and with the free-threaded
@@ -182,31 +206,58 @@ void main(uint3 id : SV_DispatchThreadID) {
       graphics_context_->device_context_mutex());
     auto context = graphics_context_->d3d_device_context();
 
+    std::shared_ptr<SurfacePool> pool = surface_pool_;
+    size_t writable_surface;
+    {
+      const std::lock_guard<std::mutex> pool_lock(pool->mutex);
+      writable_surface = pool->surfaces.size();
+      for (size_t i = 0; i < pool->surfaces.size(); ++i) {
+        if (!pool->surfaces[i].is_leased) {
+          writable_surface = i;
+          break;
+        }
+      }
+    }
+    // Flutter is still using every shared texture. Keep the reference frame
+    // unchanged so the next capture can publish the newest frame once a
+    // buffer is released.
+    if (writable_surface == pool->surfaces.size()) {
+      return false;
+    }
+
     bool changed = true;
-    if (!surface_created && compare_shader_ &&
-      EnsureIncoming(desc.Width, desc.Height)) {
+    if (compare_shader_ && EnsureIncoming(desc.Width, desc.Height)) {
       context->CopyResource(incoming_.get(), frame.get());
-      changed = FramesDiffer(incoming_.get(), surface_.get(), desc.Width,
-        desc.Height);
+      changed = !reference_created && FramesDiffer(incoming_.get(),
+        reference_.get(), desc.Width, desc.Height);
       if (changed) {
-        context->CopyResource(surface_.get(), incoming_.get());
+        context->CopyResource(reference_.get(), incoming_.get());
+        context->CopyResource(pool->surfaces[writable_surface].texture.get(),
+          incoming_.get());
       }
     }
     else {
-      // First frame for this surface, or no compare available.
-      context->CopyResource(surface_.get(), frame.get());
+      // First frame, or no compare available.
+      if (compare_shader_) {
+        context->CopyResource(reference_.get(), frame.get());
+      }
+      context->CopyResource(pool->surfaces[writable_surface].texture.get(),
+        frame.get());
     }
     if (changed) {
       context->Flush();
+      const std::lock_guard<std::mutex> pool_lock(pool->mutex);
+      pool->published_surface = writable_surface;
+      pool->has_published_surface = true;
     }
     return changed;
   }
 
-  bool TextureBridgeGpu::EnsureSurface(uint32_t width, uint32_t height)
+  bool TextureBridgeGpu::EnsureSurfacePool(uint32_t width, uint32_t height)
   {
-    if (surface_ && surface_size_.width == width &&
-      surface_size_.height == height) {
-      return false;
+    if (surface_pool_ && surface_pool_->size.width == width &&
+      surface_pool_->size.height == height) {
+      return true;
     }
     D3D11_TEXTURE2D_DESC dstDesc = {};
     dstDesc.ArraySize = 1;
@@ -221,30 +272,51 @@ void main(uint3 id : SV_DispatchThreadID) {
     dstDesc.SampleDesc.Quality = 0;
     dstDesc.Usage = D3D11_USAGE_DEFAULT;
 
-    surface_ = nullptr;
-    dxgi_surface_ = nullptr;
-    surface_size_ = { 0, 0 };
-    if (!SUCCEEDED(graphics_context_->d3d_device()->CreateTexture2D(
-      &dstDesc, nullptr, surface_.put()))) {
-      std::cerr << "Creating intermediate texture failed" << std::endl;
+    auto pool = std::make_shared<SurfacePool>();
+    pool->size = { width, height };
+    pool->surfaces.resize(kSurfacePoolSize);
+    for (auto& surface : pool->surfaces) {
+      if (FAILED(graphics_context_->d3d_device()->CreateTexture2D(
+        &dstDesc, nullptr, surface.texture.put()))) {
+        std::cerr << "Creating intermediate texture failed" << std::endl;
+        return false;
+      }
+      winrt::com_ptr<IDXGIResource> dxgi_surface;
+      surface.texture.try_as(dxgi_surface);
+      assert(dxgi_surface);
+      if (FAILED(dxgi_surface->GetSharedHandle(&surface.shared_handle)) ||
+        !surface.shared_handle) {
+        std::cerr << "Creating shared texture handle failed" << std::endl;
+        return false;
+      }
+    }
+    surface_pool_ = std::move(pool);
+    return true;
+  }
+
+  bool TextureBridgeGpu::EnsureReference(uint32_t width, uint32_t height)
+  {
+    if (reference_ && reference_size_.width == width &&
+      reference_size_.height == height) {
+      return true;
+    }
+    D3D11_TEXTURE2D_DESC desc = {};
+    desc.ArraySize = 1;
+    desc.MipLevels = 1;
+    desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+    desc.Format = static_cast<DXGI_FORMAT>(kPixelFormat);
+    desc.Width = width;
+    desc.Height = height;
+    desc.SampleDesc.Count = 1;
+    desc.Usage = D3D11_USAGE_DEFAULT;
+    reference_ = nullptr;
+    reference_size_ = { 0, 0 };
+    if (FAILED(graphics_context_->d3d_device()->CreateTexture2D(
+      &desc, nullptr, reference_.put()))) {
+      std::cerr << "Creating frame reference texture failed" << std::endl;
       return false;
     }
-
-    HANDLE shared_handle;
-    surface_.try_as(dxgi_surface_);
-    assert(dxgi_surface_);
-    dxgi_surface_->GetSharedHandle(&shared_handle);
-
-    surface_descriptor_.handle = shared_handle;
-    surface_descriptor_.width = surface_descriptor_.visible_width = width;
-    surface_descriptor_.height = surface_descriptor_.visible_height = height;
-    surface_descriptor_.release_context = surface_.get();
-    surface_descriptor_.release_callback = [](void* release_context)
-      {
-        auto texture = reinterpret_cast<ID3D11Texture2D*>(release_context);
-        texture->Release();
-      };
-    surface_size_ = { width, height };
+    reference_size_ = { width, height };
     return true;
   }
 
@@ -274,25 +346,52 @@ void main(uint3 id : SV_DispatchThreadID) {
   }
 
   const FlutterDesktopGpuSurfaceDescriptor*
-    TextureBridgeGpu::GetSurfaceDescriptor(size_t width, size_t height)
+    TextureBridgeGpu::GetSurfaceDescriptor(size_t, size_t)
   {
     const std::lock_guard<std::mutex> lock(mutex_);
-    if (!is_running_ || !surface_) {
+    if (!is_running_ || !surface_pool_) {
       return nullptr;
     }
-    // Gets released in the SurfaceDescriptor's release callback.
-    surface_->AddRef();
-    return &surface_descriptor_;
+    auto pool = surface_pool_;
+    const std::lock_guard<std::mutex> pool_lock(pool->mutex);
+    if (!pool->has_published_surface ||
+      pool->surfaces[pool->published_surface].is_leased) {
+      return nullptr;
+    }
+
+    auto* lease = new FrameLease();
+    lease->pool = std::move(pool);
+    lease->surface_index = lease->pool->published_surface;
+    const auto& surface = lease->pool->surfaces[lease->surface_index];
+    lease->descriptor.struct_size = sizeof(FlutterDesktopGpuSurfaceDescriptor);
+    lease->descriptor.handle = surface.shared_handle;
+    lease->descriptor.width = lease->descriptor.visible_width =
+      lease->pool->size.width;
+    lease->descriptor.height = lease->descriptor.visible_height =
+      lease->pool->size.height;
+    lease->descriptor.format = kFlutterDesktopPixelFormatNone;
+    lease->descriptor.release_context = lease;
+    lease->descriptor.release_callback = ReleaseSurface;
+    lease->pool->surfaces[lease->surface_index].is_leased = true;
+    return &lease->descriptor;
+  }
+
+  void TextureBridgeGpu::ReleaseSurface(void* release_context)
+  {
+    std::unique_ptr<FrameLease> lease(
+      static_cast<FrameLease*>(release_context));
+    const std::lock_guard<std::mutex> pool_lock(lease->pool->mutex);
+    lease->pool->surfaces[lease->surface_index].is_leased = false;
   }
 
   void TextureBridgeGpu::StopInternal()
   {
     TextureBridge::StopInternal();
-    // For some reason, the destination surface needs to be recreated upon
-    // resuming. Force |EnsureSurface| to create a new one by resetting it here.
-    surface_ = nullptr;
-    dxgi_surface_ = nullptr;
-    surface_size_ = { 0, 0 };
+    // Outstanding Flutter leases retain the old pool until their release
+    // callbacks run; a resumed capture creates a new pool.
+    surface_pool_.reset();
+    reference_ = nullptr;
+    reference_size_ = { 0, 0 };
     incoming_ = nullptr;
     incoming_size_ = { 0, 0 };
   }

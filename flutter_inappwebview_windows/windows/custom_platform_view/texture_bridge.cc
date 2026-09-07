@@ -148,7 +148,7 @@ namespace flutter_inappwebview_plugin
     }
   }
 
-  bool TextureBridge::AcceptFrame(const winrt::com_ptr<ID3D11Texture2D>& frame)
+  bool TextureBridge::AcceptFrame(const winrt::com_ptr<ID3D11Texture2D>&)
   {
     return true;
   }

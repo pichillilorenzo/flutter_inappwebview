@@ -3,6 +3,8 @@
 #include <d3d11.h>
 #include <flutter/texture_registrar.h>
 
+#include <memory>
+
 #include "texture_bridge.h"
 
 namespace flutter_inappwebview_plugin
@@ -21,8 +23,9 @@ namespace flutter_inappwebview_plugin
     TextureBridgeGpu(GraphicsContext* graphics_context,
       ABI::Windows::UI::Composition::IVisual* visual);
 
-    // Called by Flutter on its raster thread. |surface_| already holds the
-    // latest accepted frame, so no copy happens here.
+    // Called by Flutter on its raster thread. The returned buffer is leased
+    // until Flutter invokes its release callback, so capture never writes a
+    // texture that Flutter may still be sampling.
     const FlutterDesktopGpuSurfaceDescriptor* GetSurfaceDescriptor(size_t width,
       size_t height);
 
@@ -31,12 +34,17 @@ namespace flutter_inappwebview_plugin
     bool AcceptFrame(const winrt::com_ptr<ID3D11Texture2D>& frame) override;
 
   private:
-    FlutterDesktopGpuSurfaceDescriptor surface_descriptor_ = {};
-    Size surface_size_ = { 0, 0 };
-    // The texture Flutter samples (shared handle). Only written for frames
-    // that differ from its current content.
-    winrt::com_ptr<ID3D11Texture2D> surface_{ nullptr };
-    winrt::com_ptr<IDXGIResource> dxgi_surface_;
+    struct SurfacePool;
+    struct FrameLease;
+
+    // Flutter samples a buffer from this pool. A buffer is selected only when
+    // it is not leased to Flutter; leases retain the pool through shutdown.
+    std::shared_ptr<SurfacePool> surface_pool_;
+    // Private copy of the last accepted frame. It is deliberately separate
+    // from |surface_pool_| so it remains safe to compare while Flutter owns
+    // the last published shared texture.
+    winrt::com_ptr<ID3D11Texture2D> reference_{ nullptr };
+    Size reference_size_ = { 0, 0 };
     // Our own copy of the incoming frame: the capture pool's textures may not
     // be bindable as shader resources, and copying releases the pool buffer
     // early.
@@ -49,10 +57,11 @@ namespace flutter_inappwebview_plugin
     winrt::com_ptr<ID3D11UnorderedAccessView> compare_result_uav_;
     winrt::com_ptr<ID3D11Buffer> compare_staging_;
 
-    // Returns true when |surface_| was (re)created for this size.
-    bool EnsureSurface(uint32_t width, uint32_t height);
+    bool EnsureSurfacePool(uint32_t width, uint32_t height);
+    bool EnsureReference(uint32_t width, uint32_t height);
     bool EnsureIncoming(uint32_t width, uint32_t height);
     bool InitComparer();
+    static void ReleaseSurface(void* release_context);
     // GPU compare of two same-sized B8G8R8A8 textures. Returns true when any
     // pixel differs, and also when the compare itself could not run.
     bool FramesDiffer(ID3D11Texture2D* a, ID3D11Texture2D* b, uint32_t width,

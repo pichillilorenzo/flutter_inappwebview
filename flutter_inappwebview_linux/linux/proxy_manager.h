@@ -2,7 +2,7 @@
 #define FLUTTER_INAPPWEBVIEW_PLUGIN_PROXY_MANAGER_H_
 
 #include <flutter_linux/flutter_linux.h>
-#include <wpe/webkit.h>
+#include "webkit_compat.h"
 
 #include <memory>
 #include <optional>

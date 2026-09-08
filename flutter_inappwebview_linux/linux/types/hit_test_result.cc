@@ -1,6 +1,6 @@
 #include "hit_test_result.h"
 
-#include <wpe/webkit.h>
+#include "../webkit_compat.h"
 
 #include "../utils/flutter.h"
 

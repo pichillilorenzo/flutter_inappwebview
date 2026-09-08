@@ -1,6 +1,70 @@
-# WPE WebKit Backend for flutter_inappwebview_linux
+# WebKit Backends for flutter_inappwebview_linux
 
-This document describes how to install and configure WPE WebKit for the flutter_inappwebview Linux plugin.
+This document describes the two WebKit backends of the flutter_inappwebview Linux
+plugin, how the build selects between them, and how to install or build WPE WebKit.
+
+## Backend Selection: WPE WebKit vs WebKitGTK
+
+The plugin can render with either of the two Linux WebKit ports. CMake picks one
+automatically when the Flutter app is built:
+
+| Backend | pkg-config module | When it is used | Rendering path |
+|---------|-------------------|-----------------|----------------|
+| **WPE WebKit** | `wpe-webkit-2.0` | Whenever it is installed (preferred) | Offscreen WPE view, frames exported as DMA-BUF/EGL images (zero-copy) or SHM buffers |
+| **WebKitGTK** | `webkit2gtk-4.1` | Fallback when WPE WebKit is not installed | `WebKitWebView` widget hosted in a `GtkOffscreenWindow`; each repaint is copied (cairo, ~2 ms at 1280x720) into the Flutter texture |
+
+> **Ubuntu / Debian users:** Ubuntu stopped shipping WPE WebKit packages after
+> 22.04 (there is no `libwpewebkit-*-dev` on 24.04 or 26.04) and Debian only
+> ships it in unstable. WebKitGTK, on the other hand, is available everywhere:
+>
+> ```bash
+> sudo apt install libwebkit2gtk-4.1-dev libgtk-3-dev libsecret-1-dev
+> ```
+>
+> With that installed the plugin builds out of the box using the WebKitGTK
+> backend. Build WPE WebKit from source (below) only if you want the zero-copy
+> rendering path.
+
+Force a backend with the `FLUTTER_INAPPWEBVIEW_LINUX_BACKEND` environment
+variable (or CMake cache variable) set to `wpe`, `webkitgtk` or `auto`
+(default):
+
+```bash
+FLUTTER_INAPPWEBVIEW_LINUX_BACKEND=webkitgtk flutter build linux
+```
+
+The selected backend is printed during the build:
+
+```
+-- flutter_inappwebview_linux: Using WebKitGTK backend (webkit2gtk-4.1 2.52.6)
+```
+
+### WebKitGTK backend notes
+
+- Requires webkit2gtk-4.1 (the GTK3 API; Flutter's Linux embedder is GTK3, so
+  the GTK4 `webkitgtk-6.0` port cannot be used in the same process).
+- Nothing is bundled with the app; the system WebKitGTK library is used at
+  runtime, so end users need the `libwebkit2gtk-4.1-0` runtime package that
+  every desktop Debian/Ubuntu release installs by default.
+- Input is delivered to the widget as synthesized GDK events, so keyboard,
+  mouse, wheel and touch events work like in a native GTK application.
+- `InAppBrowser` windows embed the `WebKitWebView` widget directly and render
+  natively (no texture copy).
+- Incognito (`incognito: true`) uses an ephemeral `WebKitWebContext`. When a
+  custom `WebViewEnvironment` is also given, WebKitGTK cannot combine both, so
+  the environment's cache model, spell-checking and automation settings are
+  copied to the ephemeral context.
+- WPE-specific APIs have no effect: `setTargetRefreshRate`, `setScreenScale`,
+  pointer lock, WPE platform settings (dark mode, font hinting, etc.).
+- The HiDPI scale follows GDK (`GDK_SCALE` / the display's scale factor) rather
+  than the per-view scale factor requested from Dart.
+- Known upstream issue: WebKitGTK 2.52.6 (Ubuntu 26.04) segfaults in
+  `AcceleratedBackingStore::update()` when a view that showed a YouTube video
+  page navigates away and then back to it. It reproduces with a plain
+  `WebKitWebView` in a regular `GtkWindow` (no plugin code involved), so it is a
+  WebKit bug rather than a plugin bug.
+
+The rest of this document covers the WPE WebKit backend.
 
 ## Overview
 
@@ -522,9 +586,16 @@ InAppWebView (C++)
 
 ## Troubleshooting
 
-### "WPE WebKit not found"
+### "no WebKit port found" / "WPE WebKit not found"
 
-Ensure pkg-config can find the libraries:
+If neither WPE WebKit nor WebKitGTK is found the build fails. On Debian/Ubuntu
+the quickest fix is the WebKitGTK backend:
+
+```bash
+sudo apt install libwebkit2gtk-4.1-dev
+```
+
+For the WPE backend, ensure pkg-config can find the libraries:
 
 ```bash
 # Core WPE WebKit library (required)

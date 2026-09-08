@@ -1,7 +1,7 @@
 #ifndef FLUTTER_INAPPWEBVIEW_PLUGIN_WEB_VIEW_TRANSPORT_H_
 #define FLUTTER_INAPPWEBVIEW_PLUGIN_WEB_VIEW_TRANSPORT_H_
 
-#include <wpe/webkit.h>
+#include "../webkit_compat.h"
 
 #include <memory>
 #include <optional>

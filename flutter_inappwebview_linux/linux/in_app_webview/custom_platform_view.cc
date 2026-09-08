@@ -12,6 +12,7 @@
 namespace flutter_inappwebview_plugin {
 
 namespace {
+#ifndef HAVE_WEBKITGTK
 // Check if GL textures should be used (enabled by default, can be disabled)
 // Disable with FLUTTER_INAPPWEBVIEW_LINUX_DISABLE_GL=1 to force software rendering.
 bool UseGLTextureEnvOverride() {
@@ -70,12 +71,19 @@ bool IsOpenGLAvailable() {
 
   return available;
 }
+#endif  // !HAVE_WEBKITGTK
 
 bool UseGLTexture() {
+#ifdef HAVE_WEBKITGTK
+  // The WebKitGTK backend captures frames on the CPU (cairo), so the zero-copy
+  // EGL texture path does not apply; always use the pixel buffer texture.
+  return false;
+#else
   if (!UseGLTextureEnvOverride()) {
     return false;
   }
   return IsOpenGLAvailable();
+#endif
 }
 }  // namespace
 

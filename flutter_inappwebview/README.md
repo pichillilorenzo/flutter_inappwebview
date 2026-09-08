@@ -59,7 +59,7 @@ Send a submission request to the [Submit App](https://inappwebview.dev/submit-ap
 - iOS 12.0+, Xcode version `>= 15.0`
 - MacOS 10.14+: Xcode version `>= 15.0`
 - Windows: [NuGet CLI](https://learn.microsoft.com/en-us/nuget/install-nuget-client-tools?tabs=windows#nugetexe-cli) available on your PATH environment variable
-- Linux: WPE 2.0 WebKit built
+- Linux: WebKitGTK (`libwebkit2gtk-4.1-dev`, available on every Debian/Ubuntu release) or WPE WebKit 2.0 built from source (preferred, zero-copy rendering). See the [Linux backend notes](flutter_inappwebview_linux/WPE_BACKEND.md).
 
 ## Installation
 

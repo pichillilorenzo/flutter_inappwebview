@@ -78,7 +78,10 @@ InAppBrowser::InAppBrowser(InAppBrowserManager* manager, FlBinaryMessenger* mess
   // Setup the window and components
   setupWindow(params);
   setupToolbar();
+#ifndef HAVE_WEBKITGTK
+  // WPE renders offscreen; blit its frames into a GtkGLArea/GtkDrawingArea.
   setupDrawingArea();
+#endif
   setupWebView(params);
   applySettings();
 
@@ -447,11 +450,28 @@ void InAppBrowser::setupWebView(const InAppBrowserCreationParams& params) {
   // Create the InAppWebView - pass nullptr for registrar since we have messenger directly
   webView_ = std::make_shared<InAppWebView>(nullptr, messenger_, 0, webViewParams);
 
-  // Attach channel with browser-specific ID
+  // Attach channel with browser-specific ID. The WebView's channel delegate shares
+  // this channel with the browser and forwards browser-specific methods
+  // (show/hide/close/isHidden/settings) to us through the delegate pointer.
+  webView_->setInAppBrowserDelegate(this);
   webView_->AttachChannel(messenger_, METHOD_CHANNEL_NAME_PREFIX + id_, true);
 
+#ifdef HAVE_WEBKITGTK
+  // WebKitGTK: the WebKitWebView is a real GTK widget. Move it out of its
+  // offscreen host and pack it directly into the browser window, where it
+  // renders and receives input natively (no texture round trip needed).
+  GtkWidget* webviewWidget = webView_->DetachWidgetForEmbedding();
+  if (webviewWidget != nullptr && contentBox_ != nullptr) {
+    gtk_widget_set_hexpand(webviewWidget, TRUE);
+    gtk_widget_set_vexpand(webviewWidget, TRUE);
+    gtk_widget_set_can_focus(webviewWidget, TRUE);
+    gtk_box_pack_start(GTK_BOX(contentBox_), webviewWidget, TRUE, TRUE, 0);
+    gtk_widget_show(webviewWidget);
+  }
+#else
   // Set initial size (will be updated on realize)
   webView_->setSize(800, 600);
+#endif
 
   // Set up frame callback - uses GL queue_render for GPU path, scheduleFrame for CPU path
   webView_->SetOnFrameAvailable([this]() {

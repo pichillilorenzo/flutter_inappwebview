@@ -1,9 +1,10 @@
-// WPE WebKit-based InAppWebView implementation
+// WebKit-based InAppWebView implementation
 //
-// This file provides offscreen web rendering using WPE WebKit.
-// Supports two backend APIs:
+// This file provides offscreen web rendering using WebKit.
+// Supports three backends:
 // - WPEPlatform (HAVE_WPE_PLATFORM): New modern API for WPE WebKit 2.40+
 // - WPEBackend-FDO (HAVE_WPE_BACKEND_LEGACY): Legacy API for older systems
+// - WebKitGTK (HAVE_WEBKITGTK): webkit2gtk-4.1 fallback, see in_app_webview_gtk.cc
 
 #include "in_app_webview.h"
 
@@ -213,8 +214,12 @@ bool InAppWebView::IsWpeWebKitAvailable() {
   if (available) {
     debugLog("InAppWebView: Using WPEBackend-FDO API (legacy)");
   }
+#elif defined(HAVE_WEBKITGTK)
+  // WebKitGTK: linked directly, always available
+  debugLog("InAppWebView: Using WebKitGTK backend (webkit2gtk-4.1)");
+  available = true;
 #else
-  #error "Neither HAVE_WPE_PLATFORM nor HAVE_WPE_BACKEND_LEGACY is defined"
+  #error "Neither HAVE_WPE_PLATFORM, HAVE_WPE_BACKEND_LEGACY nor HAVE_WEBKITGTK is defined"
 #endif
 
   return available;
@@ -501,6 +506,8 @@ InAppWebView::~InAppWebView() {
     g_object_unref(webview_);
     webview_ = nullptr;
   }
+#elif defined(HAVE_WEBKITGTK)
+  GtkDestroy();
 #endif
 }
 
@@ -647,6 +654,9 @@ void InAppWebView::InitWpeBackend() {
         return self->OnPointerLockRequest(lock);
       },
       this);
+#elif defined(HAVE_WEBKITGTK)
+  // === WebKitGTK ===
+  GtkInitBackend();
 #endif
 }
 
@@ -883,9 +893,15 @@ void InAppWebView::InitWebView(const InAppWebViewCreationParams& params) {
     webkit_web_view_set_settings(webview_, settings);
     g_object_unref(settings);
   }
+#elif defined(HAVE_WEBKITGTK)
+  // === WebKitGTK ===
+  GtkInitWebView(params);
+  if (webview_ == nullptr) {
+    return;
+  }
 #endif
 
-  // === Common initialization (both APIs) ===
+  // === Common initialization (all backends) ===
   
   WebKitColor bg = {1.0, 1.0, 1.0, 1.0};
   webkit_web_view_set_background_color(webview_, &bg);
@@ -934,7 +950,11 @@ void InAppWebView::RegisterEventHandlers() {
   g_signal_connect(webview_, "script-dialog", G_CALLBACK(OnScriptDialog), this);
   g_signal_connect(webview_, "permission-request", G_CALLBACK(OnPermissionRequest), this);
   g_signal_connect(webview_, "authenticate", G_CALLBACK(OnAuthenticate), this);
+#ifdef HAVE_WEBKITGTK
+  g_signal_connect(webview_, "context-menu", G_CALLBACK(OnContextMenuGtk), this);
+#else
   g_signal_connect(webview_, "context-menu", G_CALLBACK(OnContextMenu), this);
+#endif
   g_signal_connect(webview_, "context-menu-dismissed", G_CALLBACK(OnContextMenuDismissed), this);
   g_signal_connect(webview_, "enter-fullscreen", G_CALLBACK(OnEnterFullscreen), this);
   g_signal_connect(webview_, "leave-fullscreen", G_CALLBACK(OnLeaveFullscreen), this);
@@ -942,7 +962,13 @@ void InAppWebView::RegisterEventHandlers() {
   g_signal_connect(webview_, "create", G_CALLBACK(OnCreateWebView), this);
   g_signal_connect(webview_, "web-process-terminated", G_CALLBACK(OnWebProcessTerminated), this);
   g_signal_connect(webview_, "run-file-chooser", G_CALLBACK(OnRunFileChooser), this);
+#ifdef HAVE_WEBKITGTK
+  g_signal_connect(webview_, "show-option-menu", G_CALLBACK(OnShowOptionMenuGtk), this);
+  g_signal_connect(webview_, "run-color-chooser", G_CALLBACK(OnRunColorChooserGtk), this);
+  g_signal_connect(webview_, "print", G_CALLBACK(OnPrintGtk), this);
+#else
   g_signal_connect(webview_, "show-option-menu", G_CALLBACK(OnShowOptionMenu), this);
+#endif
 
   // Connect to download-started signal on NetworkSession (WPE WebKit 2.40+ API)
   // Note: In WPE WebKit, download-started is on NetworkSession, not WebView
@@ -968,6 +994,9 @@ void InAppWebView::RegisterEventHandlers() {
   g_signal_connect(webview_, "notify::microphone-capture-state",
                    G_CALLBACK(OnNotifyMicrophoneCaptureState), this);
 
+#ifndef HAVE_WEBKITGTK
+  // WPE only: WebKitGTK frames are captured from the offscreen window's
+  // damage-event instead (see in_app_webview_gtk.cc).
   webkit_web_view_add_frame_displayed_callback(
       webview_,
       [](WebKitWebView*, gpointer data) {
@@ -975,6 +1004,7 @@ void InAppWebView::RegisterEventHandlers() {
         self->OnFrameDisplayed(data);
       },
       this, nullptr);
+#endif
 }
 
 void InAppWebView::PrepareAndAddUserScripts() {
@@ -2388,6 +2418,11 @@ void InAppWebView::takeScreenshot(std::function<void(const std::optional<std::ve
     return;
   }
 
+#ifdef HAVE_WEBKITGTK
+  // Make sure the pixel buffer reflects the current widget contents.
+  GtkCaptureFrame();
+#endif
+
   // Get the current pixel buffer dimensions
   uint32_t width = 0;
   uint32_t height = 0;
@@ -2743,6 +2778,8 @@ void InAppWebView::setSize(int width, int height) {
   if (wpe_backend_ != nullptr) {
     wpe_view_backend_dispatch_set_size(wpe_backend_, width_, height_);
   }
+#elif defined(HAVE_WEBKITGTK)
+  GtkSetSize(width_, height_);
 #endif
 }
 
@@ -2800,6 +2837,8 @@ void InAppWebView::setFocused(bool focused) {
       wpe_view_backend_remove_activity_state(wpe_backend_, wpe_view_activity_state_focused);
     }
   }
+#elif defined(HAVE_WEBKITGTK)
+  GtkSetFocused(focused);
 #endif
 }
 
@@ -2828,6 +2867,8 @@ void InAppWebView::setVisible(bool visible) {
       wpe_view_backend_remove_activity_state(wpe_backend_, wpe_view_activity_state_in_window);
     }
   }
+#elif defined(HAVE_WEBKITGTK)
+  GtkSetVisible(visible);
 #endif
 }
 
@@ -2836,6 +2877,13 @@ uint32_t InAppWebView::getActivityState() const {
   if (wpe_backend_ != nullptr) {
     return wpe_view_backend_get_activity_state(wpe_backend_);
   }
+#endif
+#ifdef HAVE_WEBKITGTK
+  // Mirror the wpe_view_activity_state bit layout: visible=1, focused=2, in_window=4
+  uint32_t state = 0;
+  if (is_visible_) state |= (1u << 0) | (1u << 2);
+  if (is_focused_) state |= (1u << 1);
+  return state;
 #endif
   // WPEPlatform doesn't expose activity state in the same way
   return 0;
@@ -2889,6 +2937,11 @@ double InAppWebView::getScreenScale() const {
     if (screen != nullptr) {
       return wpe_screen_get_scale(screen);
     }
+  }
+#endif
+#ifdef HAVE_WEBKITGTK
+  if (webview_ != nullptr) {
+    return static_cast<double>(gtk_widget_get_scale_factor(GTK_WIDGET(webview_)));
   }
 #endif
   // Legacy backend doesn't have screen scale API
@@ -3113,6 +3166,8 @@ void InAppWebView::SetCursorPos(double x, double y) {
     event.modifiers = current_modifiers_ | button_state_;  // Include pressed button modifiers
     wpe_view_backend_dispatch_pointer_event(wpe_backend_, &event);
   }
+#elif defined(HAVE_WEBKITGTK)
+  GtkSendMotion(x, y);
 #endif
 }
 
@@ -3287,6 +3342,8 @@ void InAppWebView::SetPointerButton(int kind, int button, int clickCount) {
   }
 
   wpe_view_backend_dispatch_pointer_event(wpe_backend_, &event);
+#elif defined(HAVE_WEBKITGTK)
+  GtkSendButton(kind, button, clickCount);
 #endif
 }
 
@@ -3352,6 +3409,8 @@ void InAppWebView::SetScrollDelta(double dx, double dy) {
   event.y_axis = dy * scale_factor_;
 
   wpe_view_backend_dispatch_axis_event(wpe_backend_, &event.base);
+#elif defined(HAVE_WEBKITGTK)
+  GtkSendScroll(dx, dy);
 #endif
 }
 
@@ -3447,6 +3506,8 @@ void InAppWebView::SendKeyEvent(int type, int64_t keyCode, int scanCode, int mod
   event.modifiers = current_modifiers_;
 
   wpe_view_backend_dispatch_keyboard_event(wpe_backend_, &event);
+#elif defined(HAVE_WEBKITGTK)
+  GtkSendKey(type, keyCode, scanCode, modifiers, characters);
 #endif
 }
 
@@ -3563,6 +3624,8 @@ void InAppWebView::SendTouchEvent(
   event.modifiers = current_modifiers_;
 
   wpe_view_backend_dispatch_touch_event(wpe_backend_, &event);
+#elif defined(HAVE_WEBKITGTK)
+  GtkSendTouch(type, id, x, y, touchPoints);
 #endif
 }
 
@@ -3726,6 +3789,11 @@ void InAppWebView::SetOnFrameAvailable(std::function<void()> callback) {
       delete data;
       return G_SOURCE_REMOVE;
     }, new std::tuple<WPEToplevel*, int, int>(toplevel, w, h), nullptr);
+  }
+#elif defined(HAVE_WEBKITGTK)
+  // Deliver whatever WebKit has already painted to the freshly registered texture.
+  if (on_frame_available_) {
+    GtkScheduleCapture();
   }
 #endif
 }

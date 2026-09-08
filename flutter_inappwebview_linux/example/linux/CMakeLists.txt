@@ -144,9 +144,10 @@ install(CODE "
     create_lib_symlinks(\"libwpe-1.0.so.*.*.*\" \"libwpe-1.0\")
     create_lib_symlinks(\"libWPEBackend-fdo-1.0.so.*.*.*\" \"libWPEBackend-fdo-1.0\")
     
-    # Create the default backend symlink that WPE expects
+    # Create the default backend symlink that WPE expects (only when the FDO
+    # backend was bundled, i.e. not for the WebKitGTK backend)
     set(DEFAULT_BACKEND_LINK \"\${LIB_DIR}/libWPEBackend-default.so\")
-    if(NOT EXISTS \"\${DEFAULT_BACKEND_LINK}\")
+    if(EXISTS \"\${LIB_DIR}/libWPEBackend-fdo-1.0.so.1\" AND NOT EXISTS \"\${DEFAULT_BACKEND_LINK}\")
       execute_process(COMMAND \${CMAKE_COMMAND} -E create_symlink
         \"libWPEBackend-fdo-1.0.so.1\" \"\${DEFAULT_BACKEND_LINK}\")
       message(STATUS \"Created symlink: \${DEFAULT_BACKEND_LINK} -> libWPEBackend-fdo-1.0.so.1\")
@@ -154,10 +155,13 @@ install(CODE "
   " COMPONENT Runtime)
 
 # Copy the native assets provided by the build.dart from all packages.
+# (Newer Flutter versions only create this directory when native assets exist.)
 set(NATIVE_ASSETS_DIR "${PROJECT_BUILD_DIR}native_assets/linux/")
-install(DIRECTORY "${NATIVE_ASSETS_DIR}"
-   DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
-   COMPONENT Runtime)
+install(CODE "
+  if(EXISTS \"${NATIVE_ASSETS_DIR}\")
+    file(INSTALL DESTINATION \"${INSTALL_BUNDLE_LIB_DIR}\" TYPE DIRECTORY FILES \"${NATIVE_ASSETS_DIR}\")
+  endif()
+" COMPONENT Runtime)
 
 # Fully re-copy the assets directory on each build to avoid having stale files
 # from a previous install.

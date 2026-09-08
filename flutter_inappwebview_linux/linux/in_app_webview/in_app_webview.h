@@ -1,12 +1,14 @@
 #ifndef FLUTTER_INAPPWEBVIEW_PLUGIN_IN_APP_WEBVIEW_H_
 #define FLUTTER_INAPPWEBVIEW_PLUGIN_IN_APP_WEBVIEW_H_
 
-// WPE WebKit-based InAppWebView implementation
+// WebKit-based InAppWebView implementation
 //
-// Uses WPE WebKit for offscreen web rendering.
-// Supports two APIs:
-// - WPEPlatform (HAVE_WPE_PLATFORM): New modern API for WPE WebKit 2.40+
-// - WPEBackend-FDO (HAVE_WPE_BACKEND_LEGACY): Legacy API for older systems
+// Renders web content offscreen into a Flutter texture using one of:
+// - WPEPlatform (HAVE_WPE_PLATFORM): New modern WPE WebKit API (2.40+)
+// - WPEBackend-FDO (HAVE_WPE_BACKEND_LEGACY): Legacy WPE WebKit API
+// - WebKitGTK (HAVE_WEBKITGTK): webkit2gtk-4.1 hosted in a GtkOffscreenWindow.
+//   Used when WPE WebKit is not available (e.g. Ubuntu 24.04/26.04, which ship
+//   no WPE packages). See in_app_webview_gtk.cc.
 //
 // WPE WebKit is designed for embedded systems and offers excellent offscreen rendering
 // capabilities through its backend system.
@@ -27,9 +29,14 @@
 
 #include <flutter_linux/flutter_linux.h>
 
-// WPE WebKit core includes (always available)
-#include <wpe/webkit.h>
+// WebKit core includes (WPE or WebKitGTK, selected by webkit_compat.h)
+#include "../webkit_compat.h"
 #include <jsc/jsc.h>
+
+#ifdef HAVE_WEBKITGTK
+#include <cairo.h>
+#include <gtk/gtk.h>
+#endif
 
 // WPEPlatform API (new modern API - default)
 #ifdef HAVE_WPE_PLATFORM
@@ -447,6 +454,26 @@ class InAppWebView {
   // Get the FlView (for focus restoration after popup dialogs)
   FlView* getFlView() const { return fl_view_; }
 
+#ifdef HAVE_WEBKITGTK
+  // === WebKitGTK backend API ===
+
+  // The WebKitWebView GTK widget (hosted in a GtkOffscreenWindow by default).
+  GtkWidget* gtkWidget() const { return webview_ != nullptr ? GTK_WIDGET(webview_) : nullptr; }
+
+  // Removes the widget from the offscreen host so that it can be packed into a
+  // real GTK window (used by InAppBrowser). After this call the widget renders
+  // and receives input natively; offscreen frame capture is disabled.
+  GtkWidget* DetachWidgetForEmbedding();
+
+  // True when the widget was reparented into a native window.
+  bool IsEmbeddedInNativeWindow() const { return gtk_widget_embedded_; }
+
+  // Copies the current widget contents into the pixel buffer and notifies the
+  // frame-available callback. Normally driven by the offscreen window's
+  // damage-event signal.
+  void GtkCaptureFrame();
+#endif
+
  private:
   PluginInstance* plugin_ = nullptr;  // Plugin instance for accessing managers
   FlPluginRegistrar* registrar_ = nullptr;
@@ -500,6 +527,17 @@ class InAppWebView {
   // Flag to indicate the WebProcess has crashed and EGL resources are invalid
   // This prevents using stale EGL images after a crash
   std::atomic<bool> web_process_crashed_{false};
+#endif
+
+#ifdef HAVE_WEBKITGTK
+  // === WebKitGTK backend members ===
+  GtkWidget* gtk_offscreen_window_ = nullptr;   // GtkOffscreenWindow hosting the widget
+  gulong gtk_damage_handler_id_ = 0;            // damage-event handler on the offscreen window
+  cairo_surface_t* gtk_capture_surface_ = nullptr;  // Reused ARGB32 surface for captures
+  bool gtk_widget_embedded_ = false;            // Widget reparented into a native window
+  guint gtk_button_mask_ = 0;                   // GDK_BUTTONn_MASK bits currently pressed
+  guint gtk_modifier_state_ = 0;                // GDK modifier state from the last key event
+  guint gtk_pending_capture_idle_ = 0;          // Idle source for a deferred capture
 #endif
 
   // EGL context for reading back pixels (both APIs)
@@ -652,6 +690,42 @@ class InAppWebView {
   // Pointer lock handler
   std::function<bool(bool)> pointer_lock_handler_;
   bool pointer_locked_ = false;
+
+#ifdef HAVE_WEBKITGTK
+  // === WebKitGTK backend internals (in_app_webview_gtk.cc) ===
+  void GtkInitBackend();
+  void GtkInitWebView(const InAppWebViewCreationParams& params);
+  void GtkDestroy();
+  void GtkSetSize(int width, int height);
+  void GtkSetFocused(bool focused);
+  void GtkSetVisible(bool visible);
+  void GtkEnsureFocused();
+  void GtkScheduleCapture();
+  GdkDevice* GtkPointerDevice() const;
+  GdkDevice* GtkKeyboardDevice() const;
+  GdkDevice* GtkPreciseScrollDevice() const;
+  GdkWindow* GtkEventWindow();
+  void GtkSendMotion(double x, double y);
+  void GtkSendButton(int kind, int button, int clickCount);
+  void GtkSendScroll(double dx, double dy);
+  void GtkSendKey(int type, int64_t keyCode, int scanCode, int modifiers,
+                  const std::string& characters);
+  void GtkSendTouch(int type, int id, double x, double y,
+                    const std::vector<std::tuple<int, double, double, int>>& touchPoints);
+  static gboolean GtkOnDamageEvent(GtkWidget* widget, GdkEventExpose* event, gpointer user_data);
+  static gboolean GtkOnCaptureIdle(gpointer user_data);
+  // 4.1 API signal signatures differ from the 2.0 API; these adapt and forward.
+  static gboolean OnContextMenuGtk(WebKitWebView* web_view, WebKitContextMenu* context_menu,
+                                   GdkEvent* event, WebKitHitTestResult* hit_test_result,
+                                   gpointer user_data);
+  static gboolean OnShowOptionMenuGtk(WebKitWebView* web_view, WebKitOptionMenu* menu,
+                                      GdkEvent* event, GdkRectangle* rectangle,
+                                      gpointer user_data);
+  static gboolean OnRunColorChooserGtk(WebKitWebView* web_view,
+                                       WebKitColorChooserRequest* request, gpointer user_data);
+  static gboolean OnPrintGtk(WebKitWebView* web_view, WebKitPrintOperation* print_operation,
+                             gpointer user_data);
+#endif
 
   // === Initialization ===
   void InitWpeBackend();

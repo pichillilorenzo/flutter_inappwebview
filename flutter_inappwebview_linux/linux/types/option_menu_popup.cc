@@ -1,6 +1,6 @@
 #include "option_menu_popup.h"
 
-#include <wpe/webkit.h>
+#include "../webkit_compat.h"
 
 #include <algorithm>
 #include <cmath>

@@ -161,7 +161,12 @@ void UserContentController::registerScriptMessageHandler(const std::string& name
   std::string signalName = "script-message-received::" + name;
 
   // Connect the signal
+#ifdef HAVE_WEBKITGTK
+  g_signal_connect(content_manager_, signalName.c_str(), G_CALLBACK(onScriptMessageReceivedGtk),
+                   this);
+#else
   g_signal_connect(content_manager_, signalName.c_str(), G_CALLBACK(onScriptMessageReceived), this);
+#endif
 
   // Register the handler with WebKit (WPE API since 2.40)
   gboolean success = webkit_user_content_manager_register_script_message_handler(
@@ -195,7 +200,8 @@ void UserContentController::registerScriptMessageHandlerWithReply(const std::str
   // Build the signal name: "script-message-with-reply-received::<name>"
   std::string signalName = "script-message-with-reply-received::" + name;
 
-  // Connect the signal
+  // Connect the signal. Unlike "script-message-received", the with-reply signal
+  // delivers a JSCValue on every WebKit port (WPE 2.0 and webkit2gtk-4.1 alike).
   g_signal_connect(content_manager_, signalName.c_str(),
                    G_CALLBACK(onScriptMessageWithReplyReceived), this);
 
@@ -447,5 +453,14 @@ gboolean UserContentController::onScriptMessageWithReplyReceived(
   errorLog("UserContentController: No handler found for with_reply message");
   return FALSE;
 }
+
+#ifdef HAVE_WEBKITGTK
+void UserContentController::onScriptMessageReceivedGtk(WebKitUserContentManager* manager,
+                                                       WebKitJavascriptResult* result,
+                                                       gpointer user_data) {
+  JSCValue* value = result != nullptr ? webkit_javascript_result_get_js_value(result) : nullptr;
+  onScriptMessageReceived(manager, value, user_data);
+}
+#endif  // HAVE_WEBKITGTK
 
 }  // namespace flutter_inappwebview_plugin

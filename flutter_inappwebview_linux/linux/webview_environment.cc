@@ -1,6 +1,6 @@
 #include "webview_environment.h"
 
-#include <wpe/webkit.h>
+#include "webkit_compat.h"
 
 #include <cstring>
 #include <sstream>

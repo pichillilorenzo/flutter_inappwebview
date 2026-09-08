@@ -6,7 +6,7 @@
 // Manages user scripts and plugin scripts for a WebKitWebView.
 // This is analogous to WKUserContentController in WKWebView.
 
-#include <wpe/webkit.h>
+#include "../webkit_compat.h"
 
 #include <functional>
 #include <map>
@@ -86,6 +86,15 @@ class UserContentController {
                                                    JSCValue* value,
                                                    WebKitScriptMessageReply* reply,
                                                    gpointer user_data);
+
+#ifdef HAVE_WEBKITGTK
+  // webkit2gtk-4.1 delivers "script-message-received" as a WebKitJavascriptResult
+  // instead of a JSCValue; this adapter unwraps the value and forwards to
+  // onScriptMessageReceived(). ("script-message-with-reply-received" already
+  // passes a JSCValue on both ports.)
+  static void onScriptMessageReceivedGtk(WebKitUserContentManager* manager,
+                                         WebKitJavascriptResult* result, gpointer user_data);
+#endif
 };
 
 }  // namespace flutter_inappwebview_plugin

@@ -522,6 +522,31 @@ InAppWebView (C++)
 
 ## Troubleshooting
 
+### Blank texture with otherwise working WebKit
+
+DMA-BUF import depends on the EGL display and driver used by Flutter, as well as
+the WPE producer. Keep the default zero-copy path when it works. If a Linux/WPE
+combination still displays a blank texture, start the application with:
+
+```bash
+FLUTTER_INAPPWEBVIEW_LINUX_DISABLE_ZERO_COPY=1 your_application
+```
+
+This enables WPE pixel readback and uploads those pixels through the existing GL
+texture. It does not disable OpenGL or change touch, mouse, or keyboard input.
+The extra GPU/CPU transfer can increase CPU usage and memory bandwidth. Like
+`FLUTTER_INAPPWEBVIEW_LINUX_DISABLE_GL`, presence of the variable enables the
+override, including an empty value or `0`. Unset it and restart to restore
+zero-copy. Set it before creating any WebViews; changing it at runtime is unsupported.
+
+The native regression test exercises pixel upload and subsequent frame updates
+using Mesa's surfaceless EGL display, without opening an application window:
+
+```bash
+flutter precache --linux
+FLUTTER_ROOT=/path/to/flutter bash linux/test/run_egl_texture_fallback_test.sh
+```
+
 ### "WPE WebKit not found"
 
 Ensure pkg-config can find the libraries:

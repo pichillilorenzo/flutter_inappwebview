@@ -102,9 +102,9 @@ CustomPlatformView::CustomPlatformView(FlBinaryMessenger* messenger,
   // performance for each environment.
   if (UseGLTexture()) {
     texture_ = FL_TEXTURE(inappwebview_egl_texture_new(webview_.get()));
-    // In zero-copy EGL mode, we don't need pixel readback. The texture re-imports
-    // the DMA-BUF into Flutter's current EGLDisplay during populate().
-    webview_->SetSkipPixelReadback(true);
+    // The pixel-upload fallback needs producer-side readback even with a GL texture.
+    webview_->SetSkipPixelReadback(
+        g_getenv("FLUTTER_INAPPWEBVIEW_LINUX_DISABLE_ZERO_COPY") == nullptr);
     debugLog("CustomPlatformView: using GL texture (hardware accelerated)");
   } else {
     texture_ = FL_TEXTURE(inappwebview_texture_new(webview_.get()));

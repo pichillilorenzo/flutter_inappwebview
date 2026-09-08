@@ -71,6 +71,11 @@ static gboolean check_egl_image_extension(InAppWebViewEGLTexture* self) {
 
   self->extension_checked = TRUE;
 
+  // Match the producer's readback mode; keep GL uploads available without EGL sharing.
+  if (g_getenv("FLUTTER_INAPPWEBVIEW_LINUX_DISABLE_ZERO_COPY") != nullptr) {
+    return FALSE;
+  }
+
   // Check for the extension
   const char* extensions = (const char*)glGetString(GL_EXTENSIONS);
   

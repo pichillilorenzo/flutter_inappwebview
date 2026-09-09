@@ -151,6 +151,7 @@ namespace flutter_inappwebview_plugin
   HeadlessInAppWebViewManager::~HeadlessInAppWebViewManager()
   {
     debugLog("dealloc HeadlessInAppWebViewManager");
+    alive_.expire();
     webViews.clear();
     UnregisterClass(windowClass_.lpszClassName, nullptr);
     plugin = nullptr;

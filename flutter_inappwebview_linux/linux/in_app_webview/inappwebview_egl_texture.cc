@@ -6,6 +6,7 @@
 #include "../utils/gl_context.h"
 #include "../utils/log.h"
 #include "in_app_webview.h"
+#include "zero_copy.h"
 
 // Use the shared HasCurrentGLContext from gl_context.h
 static gboolean has_current_gl_context() {
@@ -72,7 +73,7 @@ static gboolean check_egl_image_extension(InAppWebViewEGLTexture* self) {
   self->extension_checked = TRUE;
 
   // Match the producer's readback mode; keep GL uploads available without EGL sharing.
-  if (g_getenv("FLUTTER_INAPPWEBVIEW_LINUX_DISABLE_ZERO_COPY") != nullptr) {
+  if (flutter_inappwebview_plugin::IsZeroCopyDisabled()) {
     return FALSE;
   }
 

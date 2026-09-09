@@ -8,6 +8,7 @@
 #include "../utils/log.h"
 #include "inappwebview_egl_texture.h"
 #include "inappwebview_texture.h"
+#include "zero_copy.h"
 
 namespace flutter_inappwebview_plugin {
 
@@ -101,10 +102,11 @@ CustomPlatformView::CustomPlatformView(FlBinaryMessenger* messenger,
   // The EGL texture handles both EGL and SHM modes internally, providing the best
   // performance for each environment.
   if (UseGLTexture()) {
+    // Keep the producer and consumer on the same rendering path. Set this
+    // before constructing the texture so the first WPE frame is eligible for
+    // pixel upload when zero-copy has been explicitly disabled.
+    webview_->SetSkipPixelReadback(!IsZeroCopyDisabled());
     texture_ = FL_TEXTURE(inappwebview_egl_texture_new(webview_.get()));
-    // The pixel-upload fallback needs producer-side readback even with a GL texture.
-    webview_->SetSkipPixelReadback(
-        g_getenv("FLUTTER_INAPPWEBVIEW_LINUX_DISABLE_ZERO_COPY") == nullptr);
     debugLog("CustomPlatformView: using GL texture (hardware accelerated)");
   } else {
     texture_ = FL_TEXTURE(inappwebview_texture_new(webview_.get()));

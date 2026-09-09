@@ -3,6 +3,8 @@
 #include <epoxy/egl.h>
 #include <epoxy/gl.h>
 
+#include "../in_app_webview/zero_copy.h"
+
 // Exercise the real texture consumer with a deterministic frame producer.
 #define FLUTTER_INAPPWEBVIEW_PLUGIN_IN_APP_WEBVIEW_H_
 namespace flutter_inappwebview_plugin {
@@ -58,6 +60,8 @@ int main() {
   for (const char* value : std::array<const char*, 4>{nullptr, "1", "0", ""}) {
     if (value) g_setenv(option, value, TRUE);
     else g_unsetenv(option);
+    g_assert_cmpint(flutter_inappwebview_plugin::IsZeroCopyDisabled(), ==,
+                    value != nullptr);
     flutter_inappwebview_plugin::InAppWebView webview;
     auto* texture = inappwebview_egl_texture_new(&webview);
     for (int frame = 0; frame < 2; ++frame) {

@@ -240,6 +240,14 @@ namespace flutter_inappwebview_plugin
         if (!settings->userAgent.empty()) {
           webView2Settings2->put_UserAgent(utf8_to_wide(settings->userAgent).c_str());
         }
+        else if (!settings->applicationNameForUserAgent.empty()) {
+          // WebView2 has no application-name slot: append the name to the default User-Agent,
+          // as WKWebView does with applicationNameForUserAgent.
+          wil::unique_cotaskmem_string defaultUserAgent;
+          if (succeededOrLog(webView2Settings2->get_UserAgent(&defaultUserAgent))) {
+            webView2Settings2->put_UserAgent((std::wstring(defaultUserAgent.get()) + L" " + utf8_to_wide(settings->applicationNameForUserAgent)).c_str());
+          }
+        }
       }
 
       if (auto webView2Settings3 = webView2Settings.try_query<ICoreWebView2Settings3>()) {

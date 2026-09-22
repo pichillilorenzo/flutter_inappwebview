@@ -68,6 +68,7 @@
 #include "../flutter_inappwebview_linux_plugin_private.h"
 #include "../plugin_instance.h"
 #include "../utils/flutter.h"
+#include "../utils/gdk_scale.h"
 #include "../utils/gl_context.h"
 #include "../utils/log.h"
 #include "../utils/uri.h"
@@ -2760,13 +2761,7 @@ void InAppWebView::setScaleFactor(double scale_factor) {
   // backing buffer to use the same scale, otherwise the compositor upscales a
   // low-resolution texture. Respect an explicit GDK_SCALE when it is larger
   // than the scale reported by Flutter.
-  if (const char* gdk_scale = std::getenv("GDK_SCALE")) {
-    char* end = nullptr;
-    const double parsed_scale = std::strtod(gdk_scale, &end);
-    if (end != gdk_scale && parsed_scale >= 1.0 && parsed_scale <= 4.0) {
-      scale_factor = std::max(scale_factor, parsed_scale);
-    }
-  }
+  scale_factor = EffectiveWpeScale(scale_factor, std::getenv("GDK_SCALE"));
 
   if (scale_factor == scale_factor_)
     return;

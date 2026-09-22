@@ -163,8 +163,15 @@ FetchContent_Declare(
 # Don't build tests/examples
 set(JSON_BuildTests OFF CACHE INTERNAL "")
 FetchContent_MakeAvailable(nlohmann_json)
-# Suppress deprecated literal operator warnings from nlohmann_json
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-literal-operator")
+# Suppress this nlohmann/json warning only when the active compiler knows the
+# option. Older Clang releases reject unknown warning options as errors when
+# the host project enables -Werror.
+check_cxx_compiler_flag("-Wno-deprecated-literal-operator"
+  COMPILER_SUPPORTS_NO_DEPRECATED_LITERAL_OPERATOR)
+if(COMPILER_SUPPORTS_NO_DEPRECATED_LITERAL_OPERATOR)
+  target_compile_options(nlohmann_json INTERFACE
+    -Wno-deprecated-literal-operator)
+endif()
 message(STATUS "flutter_inappwebview_linux: nlohmann/json ${NLOHMANN_JSON_VERSION} configured")
 
 # Plugin source files

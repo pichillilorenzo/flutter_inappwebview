@@ -3028,6 +3028,31 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
     );
   }
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.setVirtualHostNameToFolderMapping}
+  ///Maps [hostName] to the local [folderPath] so the WebView serves requests
+  ///to `https://<hostName>/...` from that folder without hitting the network.
+  ///The document loaded from a mapped host gets a regular `https` origin of
+  ///that host name.
+  ///
+  ///Call it before navigating to the mapped host. [accessKind] controls
+  ///cross-origin access to the mapped resources.
+  ///
+  ///Returns `true` when the mapping has been applied.
+  ///
+  ///Officially Supported Platforms/Implementations:
+  ///- Windows ([ICoreWebView2_3.SetVirtualHostNameToFolderMapping](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_3#setvirtualhostnametofoldermapping))
+  ///{@endtemplate}
+  Future<bool> setVirtualHostNameToFolderMapping({
+    required String hostName,
+    required String folderPath,
+    VirtualHostResourceAccessKind accessKind =
+        VirtualHostResourceAccessKind.DENY,
+  }) {
+    throw UnimplementedError(
+      'setVirtualHostNameToFolderMapping is not implemented on the current platform',
+    );
+  }
+
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.pageDown}
   ///Scrolls the contents of this WebView down by half the page size.
   ///Returns `true` if the page was scrolled.

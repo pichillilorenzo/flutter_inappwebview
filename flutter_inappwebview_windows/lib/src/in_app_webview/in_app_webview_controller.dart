@@ -3402,6 +3402,24 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
   }
 
   @override
+  Future<bool> setVirtualHostNameToFolderMapping({
+    required String hostName,
+    required String folderPath,
+    VirtualHostResourceAccessKind accessKind =
+        VirtualHostResourceAccessKind.DENY,
+  }) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('hostName', () => hostName);
+    args.putIfAbsent('folderPath', () => folderPath);
+    args.putIfAbsent('accessKind', () => accessKind.toNativeValue());
+    return await channel?.invokeMethod<bool>(
+          'setVirtualHostNameToFolderMapping',
+          args,
+        ) ??
+        false;
+  }
+
+  @override
   Future<bool> isInterfaceSupported(WebViewInterface interface) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('interface', () => interface.toNativeValue());

@@ -7,6 +7,7 @@
 #include "in_app_browser/in_app_browser_manager.h"
 #include "in_app_webview/in_app_webview_manager.h"
 #include "platform_util.h"
+#include "proxy_manager.h"
 #include "webview_environment/webview_environment_manager.h"
 
 
@@ -35,6 +36,7 @@ namespace flutter_inappwebview_plugin
     headlessInAppWebViewManager = std::make_unique<HeadlessInAppWebViewManager>(this);
     cookieManager = std::make_unique<CookieManager>(this);
     platformUtil = std::make_unique<PlatformUtil>(this);
+    proxyManager = std::make_unique<ProxyManager>(this);
 
     window_proc_id = registrar->RegisterTopLevelWindowProcDelegate(
       [this](HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -54,6 +56,7 @@ namespace flutter_inappwebview_plugin
     headlessInAppWebViewManager = nullptr;
     cookieManager = nullptr;
     platformUtil = nullptr;
+    proxyManager = nullptr;
   }
 
 

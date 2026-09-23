@@ -388,6 +388,12 @@ namespace flutter_inappwebview_plugin
       webView->resume();
       result->Success(true);
     }
+    else if (string_equals(methodName, "setVirtualHostNameToFolderMapping")) {
+      auto hostName = get_fl_map_value<std::string>(arguments, "hostName");
+      auto folderPath = get_fl_map_value<std::string>(arguments, "folderPath");
+      auto accessKind = get_fl_map_value<int64_t>(arguments, "accessKind");
+      result->Success(webView->setVirtualHostNameToFolderMapping(hostName, folderPath, accessKind));
+    }
     else if (string_equals(methodName, "getCertificate")) {
       auto result_ = std::shared_ptr<flutter::MethodResult<flutter::EncodableValue>>(std::move(result));
       webView->getCertificate([result_ = std::move(result_)](const std::optional<std::unique_ptr<SslCertificate>> data)

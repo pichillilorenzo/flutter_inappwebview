@@ -648,6 +648,18 @@ class InAppWebViewController {
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.resume.supported_platforms}
   Future<void> resume() => platform.resume();
 
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.setVirtualHostNameToFolderMapping}
+  Future<bool> setVirtualHostNameToFolderMapping({
+    required String hostName,
+    required String folderPath,
+    VirtualHostResourceAccessKind accessKind =
+        VirtualHostResourceAccessKind.DENY,
+  }) => platform.setVirtualHostNameToFolderMapping(
+    hostName: hostName,
+    folderPath: folderPath,
+    accessKind: accessKind,
+  );
+
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.pageDown}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.pageDown.supported_platforms}

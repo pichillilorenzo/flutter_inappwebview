@@ -123,7 +123,7 @@ namespace flutter_inappwebview_plugin
       wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController);
     ~InAppWebView();
 
-    static void createInAppWebViewEnv(const HWND parentWindow, const bool& willBeSurface, WebViewEnvironment* webViewEnvironment, const std::shared_ptr<InAppWebViewSettings> initialSettings, std::function<void(wil::com_ptr<ICoreWebView2Environment> webViewEnv,
+    static void createInAppWebViewEnv(const FlutterInappwebviewWindowsPlugin* plugin, const HWND parentWindow, const bool& willBeSurface, WebViewEnvironment* webViewEnvironment, const std::shared_ptr<InAppWebViewSettings> initialSettings, std::function<void(wil::com_ptr<ICoreWebView2Environment> webViewEnv,
       wil::com_ptr<ICoreWebView2Controller> webViewController,
       wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController)> completionHandler);
 
@@ -192,6 +192,7 @@ namespace flutter_inappwebview_plugin
     void removeDevToolsProtocolEventListener(const std::string& eventName);
     void pause() const;
     void resume() const;
+    bool setVirtualHostNameToFolderMapping(const std::string& hostName, const std::string& folderPath, const int64_t& accessKind) const;
     void getCertificate(const std::function<void(const std::optional<std::unique_ptr<SslCertificate>>)> completionHandler) const;
     void clearSslPreferences(const std::function<void()> completionHandler) const;
     bool isInterfaceSupported(const std::string& interfaceName) const;
@@ -222,20 +223,20 @@ namespace flutter_inappwebview_plugin
     void closeWebMessagePort(const std::string& channelId, int portIndex);
     void disposeWebMessageChannel(const std::string& channelId);
 
-    void addWebNotificationController(const std::string& id, std::shared_ptr<WebNotificationController> controller);
-    WebNotificationController* getWebNotificationController(const std::string& id) const;
-    void eraseWebNotificationController(const std::string& id);
+    void addWebNotificationController(const std::string& notificationId, std::shared_ptr<WebNotificationController> controller);
+    WebNotificationController* getWebNotificationController(const std::string& notificationId) const;
+    void eraseWebNotificationController(const std::string& notificationId);
     void disposeAllWebNotificationControllers();
 
-    void addPrintJobController(const std::string& id, std::shared_ptr<PrintJobController> controller);
-    PrintJobController* getPrintJobController(const std::string& id) const;
-    void erasePrintJobController(const std::string& id);
+    void addPrintJobController(const std::string& printJobId, std::shared_ptr<PrintJobController> controller);
+    PrintJobController* getPrintJobController(const std::string& printJobId) const;
+    void erasePrintJobController(const std::string& printJobId);
     void disposeAllPrintJobControllers();
 
-    void printCurrentPage(std::shared_ptr<PrintJobSettings> settings,
+    void printCurrentPage(std::shared_ptr<PrintJobSettings> printJobSettings,
       const std::function<void(const std::optional<std::string>&)> completionHandler);
 
-    void createPdf(std::shared_ptr<PrintJobSettings> settings,
+    void createPdf(std::shared_ptr<PrintJobSettings> printJobSettings,
       const std::function<void(const std::optional<std::vector<uint8_t>>&)> completionHandler);
 
     std::string pageFrameId() const

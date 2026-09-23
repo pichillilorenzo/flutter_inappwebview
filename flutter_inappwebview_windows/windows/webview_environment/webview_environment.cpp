@@ -1,6 +1,7 @@
 #include <WebView2EnvironmentOptions.h>
 #include <wil/wrl.h>
 
+#include "../proxy_manager.h"
 #include "../utils/log.h"
 #include "webview_environment.h"
 
@@ -33,10 +34,37 @@ namespace flutter_inappwebview_plugin
     }
 
     auto options = Make<CoreWebView2EnvironmentOptions>();
-    if (settings) {
-      if (settings->additionalBrowserArguments.has_value()) {
-        options->put_AdditionalBrowserArguments(utf8_to_wide(settings->additionalBrowserArguments.value()).c_str());
+
+    // Inject proxy args from ProxyManager if set
+    {
+      std::wstring browserArgs;
+      if (settings && settings->additionalBrowserArguments.has_value()) {
+        browserArgs = utf8_to_wide(settings->additionalBrowserArguments.value());
       }
+
+      if (plugin->proxyManager) {
+        auto proxyServer = plugin->proxyManager->getProxyServerArg();
+        if (proxyServer.has_value()) {
+          if (!browserArgs.empty()) {
+            browserArgs += L" ";
+          }
+          browserArgs += L"--proxy-server=" + utf8_to_wide(proxyServer.value());
+        }
+        auto proxyBypass = plugin->proxyManager->getProxyBypassListArg();
+        if (proxyBypass.has_value()) {
+          if (!browserArgs.empty()) {
+            browserArgs += L" ";
+          }
+          browserArgs += L"--proxy-bypass-list=" + utf8_to_wide(proxyBypass.value());
+        }
+      }
+
+      if (!browserArgs.empty()) {
+        options->put_AdditionalBrowserArguments(browserArgs.c_str());
+      }
+    }
+
+    if (settings) {
       if (settings->allowSingleSignOnUsingOSPrimaryAccount.has_value()) {
         options->put_AllowSingleSignOnUsingOSPrimaryAccount(settings->allowSingleSignOnUsingOSPrimaryAccount.value());
       }

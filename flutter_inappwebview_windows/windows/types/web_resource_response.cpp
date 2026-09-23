@@ -51,7 +51,7 @@ namespace flutter_inappwebview_plugin
 
       webViewEnvironment->CreateWebResourceResponse(
         postDataStream.get(),
-        statusCode.value_or(200), // Default to 200 if statusCode is not set
+        static_cast<int>(statusCode.value_or(200)), // Default to 200 if statusCode is not set
         reasonPhrase.has_value() ? utf8_to_wide(reasonPhrase.value()).c_str() : L"OK", // Default to "OK" if reasonPhrase is not set
         nullptr,
         &webResourceResponse);

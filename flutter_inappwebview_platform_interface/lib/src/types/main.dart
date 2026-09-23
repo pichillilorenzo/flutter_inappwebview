@@ -286,3 +286,5 @@ export 'show_file_chooser_response.dart' show ShowFileChooserResponse;
 export 'cache_model.dart' show CacheModel;
 export 'font_hinting_style.dart' show FontHintingStyle;
 export 'font_subpixel_layout.dart' show FontSubpixelLayout;
+export 'virtual_host_resource_access_kind.dart'
+    show VirtualHostResourceAccessKind;

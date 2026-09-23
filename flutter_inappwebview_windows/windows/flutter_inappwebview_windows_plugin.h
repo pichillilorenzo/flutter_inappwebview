@@ -11,6 +11,7 @@ namespace flutter_inappwebview_plugin
   class HeadlessInAppWebViewManager;
   class CookieManager;
   class PlatformUtil;
+  class ProxyManager;
 
   class FlutterInappwebviewWindowsPlugin : public flutter::Plugin {
   public:
@@ -21,6 +22,7 @@ namespace flutter_inappwebview_plugin
     std::unique_ptr<HeadlessInAppWebViewManager> headlessInAppWebViewManager;
     std::unique_ptr<CookieManager> cookieManager;
     std::unique_ptr<PlatformUtil> platformUtil;
+    std::unique_ptr<ProxyManager> proxyManager;
 
     static void RegisterWithRegistrar(flutter::PluginRegistrarWindows* registrar);
 

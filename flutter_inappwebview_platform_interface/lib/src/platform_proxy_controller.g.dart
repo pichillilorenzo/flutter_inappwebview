@@ -211,6 +211,7 @@ extension _PlatformProxyControllerCreationParamsClassSupported
           TargetPlatform.iOS,
           TargetPlatform.macOS,
           TargetPlatform.linux,
+          TargetPlatform.windows,
         ].contains(platform ?? defaultTargetPlatform);
   }
 }
@@ -233,6 +234,7 @@ extension _PlatformProxyControllerClassSupported on PlatformProxyController {
           TargetPlatform.iOS,
           TargetPlatform.macOS,
           TargetPlatform.linux,
+          TargetPlatform.windows,
         ].contains(platform ?? defaultTargetPlatform);
   }
 }
@@ -315,6 +317,7 @@ extension _ProxySettingsClassSupported on ProxySettings {
           TargetPlatform.iOS,
           TargetPlatform.macOS,
           TargetPlatform.linux,
+          TargetPlatform.windows,
         ].contains(platform ?? defaultTargetPlatform);
   }
 }
@@ -404,6 +407,7 @@ extension _ProxySettingsPropertySupported on ProxySettings {
             [
               TargetPlatform.android,
               TargetPlatform.linux,
+              TargetPlatform.windows,
             ].contains(platform ?? defaultTargetPlatform);
       case ProxySettingsProperty.bypassSimpleHostnames:
         return ((kIsWeb && platform != null) || !kIsWeb) &&

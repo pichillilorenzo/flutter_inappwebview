@@ -25,6 +25,7 @@ part 'platform_proxy_controller.g.dart';
     IOSPlatform(),
     MacOSPlatform(),
     LinuxPlatform(),
+    WindowsPlatform(),
   ],
 )
 @immutable
@@ -75,6 +76,14 @@ class PlatformProxyControllerCreationParams {
       apiName: 'WebKitNetworkProxySettings',
       apiUrl:
           'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/struct.NetworkProxySettings.html',
+    ),
+    WindowsPlatform(
+      apiName: 'WebView2 --proxy-server',
+      apiUrl:
+          'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions',
+      note:
+          'Proxy is set via --proxy-server browser argument when creating WebView2 environment. '
+          'Must be set before WebView creation; runtime changes require recreating the environment.',
     ),
   ],
 )
@@ -158,6 +167,13 @@ abstract class PlatformProxyController extends PlatformInterface {
         apiUrl:
             'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.NetworkSession.set_proxy_settings.html',
       ),
+      WindowsPlatform(
+        apiName: 'WebView2 --proxy-server',
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions',
+        note:
+            'Stores proxy settings for subsequent WebView2 environment creation via --proxy-server argument.',
+      ),
     ],
   )
   Future<void> setProxyOverride({required ProxySettings settings}) {
@@ -196,6 +212,12 @@ abstract class PlatformProxyController extends PlatformInterface {
         apiName: 'webkit_network_session_set_proxy_settings',
         apiUrl:
             'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.NetworkSession.set_proxy_settings.html',
+      ),
+      WindowsPlatform(
+        apiName: 'WebView2 --proxy-server',
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions',
+        note: 'Clears stored proxy settings.',
       ),
     ],
   )
@@ -250,6 +272,7 @@ abstract class PlatformProxyController extends PlatformInterface {
       apiUrl:
           'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/struct.NetworkProxySettings.html',
     ),
+    WindowsPlatform(),
   ],
 )
 @ExchangeableObject(copyMethod: true)
@@ -268,6 +291,10 @@ class ProxySettings_ {
             'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/ctor.NetworkProxySettings.new.html',
         note:
             'Mapped to ignore_hosts; bypass rules are passed as host patterns to WebKitNetworkProxySettings.',
+      ),
+      WindowsPlatform(
+        note:
+            'Mapped to --proxy-bypass-list browser argument.',
       ),
     ],
   )
@@ -293,6 +320,7 @@ class ProxySettings_ {
       IOSPlatform(),
       MacOSPlatform(),
       LinuxPlatform(),
+      WindowsPlatform(),
     ],
   )
   List<ProxyRule_> proxyRules;

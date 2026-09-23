@@ -39,6 +39,7 @@
 #include "../types/web_resource_request.h"
 #include "../utils/base64.h"
 #include "../utils/log.h"
+#include "../webview_environment/webview_environment_manager.h"
 #include "../utils/map.h"
 #include "../utils/strconv.h"
 #include "../utils/string.h"
@@ -91,7 +92,7 @@ namespace flutter_inappwebview_plugin
     this->inAppBrowser = inAppBrowser;
   }
 
-  void InAppWebView::createInAppWebViewEnv(const HWND parentWindow, const bool& willBeSurface, WebViewEnvironment* webViewEnvironment, const std::shared_ptr<InAppWebViewSettings> initialSettings, std::function<void(wil::com_ptr<ICoreWebView2Environment> webViewEnv,
+  void InAppWebView::createInAppWebViewEnv(const FlutterInappwebviewWindowsPlugin* plugin, const HWND parentWindow, const bool& willBeSurface, WebViewEnvironment* webViewEnvironment, const std::shared_ptr<InAppWebViewSettings> initialSettings, std::function<void(wil::com_ptr<ICoreWebView2Environment> webViewEnv,
     wil::com_ptr<ICoreWebView2Controller> webViewController,
     wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController)> completionHandler)
   {
@@ -192,17 +193,28 @@ namespace flutter_inappwebview_plugin
         return S_OK;
       };
 
-    HRESULT hr;
     if (webViewEnvironment && webViewEnvironment->getEnvironment()) {
-      hr = callback(S_OK, webViewEnvironment->getEnvironment());
+      auto hr = callback(S_OK, webViewEnvironment->getEnvironment());
+      if (failedAndLog(hr)) {
+        completionHandler(nullptr, nullptr, nullptr);
+      }
+    }
+    else if (plugin && plugin->webViewEnvironmentManager) {
+      // Через defaultEnvironment_ - подхватывает proxy args из ProxyManager
+      plugin->webViewEnvironmentManager->createOrGetDefaultWebViewEnvironment([callback, completionHandler](WebViewEnvironment* defaultEnv)
+        {
+          if (defaultEnv && defaultEnv->getEnvironment()) {
+            auto hr = callback(S_OK, defaultEnv->getEnvironment());
+            if (failedAndLog(hr)) {
+              completionHandler(nullptr, nullptr, nullptr);
+            }
+          }
+          else {
+            completionHandler(nullptr, nullptr, nullptr);
+          }
+        });
     }
     else {
-      hr = CreateCoreWebView2EnvironmentWithOptions(
-        nullptr, nullptr, nullptr,
-        Callback<ICoreWebView2CreateCoreWebView2EnvironmentCompletedHandler>(callback).Get());
-    }
-
-    if (failedAndLog(hr)) {
       completionHandler(nullptr, nullptr, nullptr);
     }
   }
@@ -2653,21 +2665,21 @@ namespace flutter_inappwebview_plugin
     webMessageChannels_.erase(channelId);
   }
 
-  void InAppWebView::addWebNotificationController(const std::string& id, std::shared_ptr<WebNotificationController> controller)
+  void InAppWebView::addWebNotificationController(const std::string& notificationId, std::shared_ptr<WebNotificationController> controller)
   {
-    if (id.empty() || !controller) return;
-    webNotificationControllers_[id] = std::move(controller);
+    if (notificationId.empty() || !controller) return;
+    webNotificationControllers_[notificationId] = std::move(controller);
   }
 
-  WebNotificationController* InAppWebView::getWebNotificationController(const std::string& id) const
+  WebNotificationController* InAppWebView::getWebNotificationController(const std::string& notificationId) const
   {
-    auto it = webNotificationControllers_.find(id);
+    auto it = webNotificationControllers_.find(notificationId);
     return it != webNotificationControllers_.end() ? it->second.get() : nullptr;
   }
 
-  void InAppWebView::eraseWebNotificationController(const std::string& id)
+  void InAppWebView::eraseWebNotificationController(const std::string& notificationId)
   {
-    webNotificationControllers_.erase(id);
+    webNotificationControllers_.erase(notificationId);
   }
 
   void InAppWebView::disposeAllWebNotificationControllers()
@@ -2688,21 +2700,21 @@ namespace flutter_inappwebview_plugin
     webNotificationControllers_.clear();
   }
 
-  void InAppWebView::addPrintJobController(const std::string& id, std::shared_ptr<PrintJobController> controller)
+  void InAppWebView::addPrintJobController(const std::string& printJobId, std::shared_ptr<PrintJobController> controller)
   {
-    if (id.empty() || !controller) return;
-    printJobControllers_[id] = std::move(controller);
+    if (printJobId.empty() || !controller) return;
+    printJobControllers_[printJobId] = std::move(controller);
   }
 
-  PrintJobController* InAppWebView::getPrintJobController(const std::string& id) const
+  PrintJobController* InAppWebView::getPrintJobController(const std::string& printJobId) const
   {
-    auto it = printJobControllers_.find(id);
+    auto it = printJobControllers_.find(printJobId);
     return it != printJobControllers_.end() ? it->second.get() : nullptr;
   }
 
-  void InAppWebView::erasePrintJobController(const std::string& id)
+  void InAppWebView::erasePrintJobController(const std::string& printJobId)
   {
-    printJobControllers_.erase(id);
+    printJobControllers_.erase(printJobId);
   }
 
   void InAppWebView::disposeAllPrintJobControllers()
@@ -2723,7 +2735,7 @@ namespace flutter_inappwebview_plugin
     printJobControllers_.clear();
   }
 
-  void InAppWebView::printCurrentPage(std::shared_ptr<PrintJobSettings> settings,
+  void InAppWebView::printCurrentPage(std::shared_ptr<PrintJobSettings> printJobSettings,
     const std::function<void(const std::optional<std::string>&)> completionHandler)
   {
     if (!webView || !webViewEnv) {
@@ -2742,13 +2754,13 @@ namespace flutter_inappwebview_plugin
     }
 
     // Check if showUI is true - use ShowPrintUI instead of Print
-    bool showUI = settings && settings->showUI.value_or(true);
+    bool showUI = printJobSettings && printJobSettings->showUI.value_or(true);
     
     if (showUI) {
       // Use ShowPrintUI to display the print dialog
       COREWEBVIEW2_PRINT_DIALOG_KIND dialogKind = COREWEBVIEW2_PRINT_DIALOG_KIND_BROWSER;
-      if (settings && settings->printDialogKind.has_value()) {
-        dialogKind = static_cast<COREWEBVIEW2_PRINT_DIALOG_KIND>(settings->printDialogKind.value());
+      if (printJobSettings && printJobSettings->printDialogKind.has_value()) {
+        dialogKind = static_cast<COREWEBVIEW2_PRINT_DIALOG_KIND>(printJobSettings->printDialogKind.value());
       }
       
       if (failedAndLog(webView16->ShowPrintUI(dialogKind))) {
@@ -2767,7 +2779,7 @@ namespace flutter_inappwebview_plugin
 
     // Generate print job ID if handledByClient is true
     std::optional<std::string> printJobId = std::nullopt;
-    if (settings && settings->handledByClient.value_or(false)) {
+    if (printJobSettings && printJobSettings->handledByClient.value_or(false)) {
       printJobId = get_uuid();
     }
 
@@ -2781,8 +2793,8 @@ namespace flutter_inappwebview_plugin
     }
 
     wil::com_ptr<ICoreWebView2PrintSettings> printSettings;
-    if (settings) {
-      printSettings = settings->createPrintSettings(environment6.get());
+    if (printJobSettings) {
+      printSettings = printJobSettings->createPrintSettings(environment6.get());
     }
     else {
       // Create default print settings if no settings provided
@@ -2801,7 +2813,7 @@ namespace flutter_inappwebview_plugin
     // Create PrintJobController if handledByClient
     std::shared_ptr<PrintJobController> printJobController = nullptr;
     if (printJobId.has_value() && printJobManager) {
-      printJobController = printJobManager->createPrintJobController(printJobId.value(), settings);
+      printJobController = printJobManager->createPrintJobController(printJobId.value(), printJobSettings);
       if (printJobController) {
         addPrintJobController(printJobId.value(), printJobController);
       }
@@ -2852,7 +2864,7 @@ namespace flutter_inappwebview_plugin
     }
   }
 
-  void InAppWebView::createPdf(std::shared_ptr<PrintJobSettings> settings,
+  void InAppWebView::createPdf(std::shared_ptr<PrintJobSettings> printJobSettings,
     const std::function<void(const std::optional<std::vector<uint8_t>>&)> completionHandler)
   {
     if (!webView || !webViewEnv) {
@@ -2880,8 +2892,8 @@ namespace flutter_inappwebview_plugin
     }
 
     wil::com_ptr<ICoreWebView2PrintSettings> printSettings;
-    if (settings) {
-      printSettings = settings->createPrintSettings(environment6.get());
+    if (printJobSettings) {
+      printSettings = printJobSettings->createPrintSettings(environment6.get());
     }
     else {
       // Create default print settings if no settings provided
@@ -3167,6 +3179,21 @@ namespace flutter_inappwebview_plugin
     if (SUCCEEDED(webView->QueryInterface(IID_PPV_ARGS(&webView3))) && succeededOrLog(webViewController->put_IsVisible(true))) {
       failedLog(webView3->Resume());
     }
+  }
+
+  bool InAppWebView::setVirtualHostNameToFolderMapping(const std::string& hostName, const std::string& folderPath, const int64_t& accessKind) const
+  {
+    if (!webView) {
+      return false;
+    }
+    wil::com_ptr<ICoreWebView2_3> webView3;
+    if (FAILED(webView->QueryInterface(IID_PPV_ARGS(&webView3)))) {
+      return false;
+    }
+    return succeededOrLog(webView3->SetVirtualHostNameToFolderMapping(
+      utf8_to_wide(hostName).c_str(),
+      utf8_to_wide(folderPath).c_str(),
+      static_cast<COREWEBVIEW2_HOST_RESOURCE_ACCESS_KIND>(accessKind)));
   }
 
 
@@ -4136,7 +4163,7 @@ namespace flutter_inappwebview_plugin
     if (webViewController) {
       failedLog(webViewController->Close());
     }
-    for (auto& [id, channel] : webMessageChannels_) {
+    for (auto& [channelId, channel] : webMessageChannels_) {
       if (channel) {
         channel->dispose();
       }

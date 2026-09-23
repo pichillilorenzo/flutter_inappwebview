@@ -148,7 +148,7 @@ namespace flutter_inappwebview_plugin
 
     auto initialSettings = std::make_shared<InAppWebViewSettings>(settingsMap);
 
-    InAppWebView::createInAppWebViewEnv(hwnd, true, webViewEnvironment, initialSettings,
+    InAppWebView::createInAppWebViewEnv(plugin, hwnd, true, webViewEnvironment, initialSettings,
       [=](wil::com_ptr<ICoreWebView2Environment> webViewEnv,
         wil::com_ptr<ICoreWebView2Controller> webViewController,
         wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController)

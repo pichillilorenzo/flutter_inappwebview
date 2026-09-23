@@ -6,6 +6,7 @@ import 'in_app_browser/in_app_browser.dart';
 import 'in_app_webview/headless_in_app_webview.dart';
 import 'in_app_webview/in_app_webview.dart';
 import 'in_app_webview/in_app_webview_controller.dart';
+import 'proxy_controller.dart';
 import 'web_message/web_message_channel.dart';
 import 'web_message/web_message_listener.dart';
 import 'web_message/web_message_port.dart';
@@ -352,13 +353,24 @@ class WindowsInAppWebViewPlatform extends InAppWebViewPlatform {
     return _PlatformProcessGlobalConfig.static();
   }
 
-  /// Creates a new empty [PlatformProxyController] to access static methods.
+  /// Creates a new [WindowsProxyController].
   ///
   /// This function should only be called by the app-facing package.
   /// Look at using [ProxyController] in `flutter_inappwebview` instead.
   @override
-  PlatformProxyController createPlatformProxyControllerStatic() {
-    return _PlatformProxyController.static();
+  WindowsProxyController createPlatformProxyController(
+    PlatformProxyControllerCreationParams params,
+  ) {
+    return WindowsProxyController(params);
+  }
+
+  /// Creates a new empty [WindowsProxyController] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [ProxyController] in `flutter_inappwebview` instead.
+  @override
+  WindowsProxyController createPlatformProxyControllerStatic() {
+    return WindowsProxyController.static();
   }
 
   /// Creates a new empty [PlatformServiceWorkerController] to access static methods.
@@ -511,15 +523,6 @@ class _PlatformProcessGlobalConfig extends PlatformProcessGlobalConfig {
   factory _PlatformProcessGlobalConfig.static() => _staticValue;
 }
 
-class _PlatformProxyController extends PlatformProxyController {
-  _PlatformProxyController(PlatformProxyControllerCreationParams params)
-    : super.implementation(params);
-  static final _PlatformProxyController _staticValue = _PlatformProxyController(
-    const PlatformProxyControllerCreationParams(),
-  );
-
-  factory _PlatformProxyController.static() => _staticValue;
-}
 
 class _PlatformServiceWorkerController extends PlatformServiceWorkerController {
   _PlatformServiceWorkerController(

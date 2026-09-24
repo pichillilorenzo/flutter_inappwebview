@@ -79,12 +79,15 @@ class SslErrorType {
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView ([Official API - SslError.SSL_EXPIRED](https://developer.android.com/reference/android/net/http/SslError#SSL_EXPIRED))
   ///- Windows WebView2 ([Official API - COREWEBVIEW2_WEB_ERROR_STATUS_CERTIFICATE_EXPIRED](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_web_error_status))
+  ///- Linux WPE WebKit ([Official API - G_TLS_CERTIFICATE_EXPIRED](https://docs.gtk.org/gio/flags.TlsCertificateFlags.html))
   static final EXPIRED = SslErrorType._internalMultiPlatform('EXPIRED', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return 1;
       case TargetPlatform.windows:
         return 2;
+      case TargetPlatform.linux:
+        return 8;
       default:
         break;
     }
@@ -120,11 +123,14 @@ class SslErrorType {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView ([Official API - SslError.SSL_IDMISMATCH](https://developer.android.com/reference/android/net/http/SslError#SSL_IDMISMATCH))
+  ///- Linux WPE WebKit ([Official API - G_TLS_CERTIFICATE_BAD_IDENTITY](https://docs.gtk.org/gio/flags.TlsCertificateFlags.html))
   static final IDMISMATCH = SslErrorType._internalMultiPlatform(
     'IDMISMATCH',
     () {
       switch (defaultTargetPlatform) {
         case TargetPlatform.android:
+          return 2;
+        case TargetPlatform.linux:
           return 2;
         default:
           break;
@@ -140,6 +146,7 @@ class SslErrorType {
   ///- iOS WKWebView ([Official API - SecTrustResultType.invalid](https://developer.apple.com/documentation/security/sectrustresulttype/invalid))
   ///- macOS WKWebView ([Official API - SecTrustResultType.invalid](https://developer.apple.com/documentation/security/sectrustresulttype/invalid))
   ///- Windows WebView2 ([Official API - COREWEBVIEW2_WEB_ERROR_STATUS_CERTIFICATE_IS_INVALID](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_web_error_status))
+  ///- Linux WPE WebKit ([Official API - G_TLS_CERTIFICATE_GENERIC_ERROR](https://docs.gtk.org/gio/flags.TlsCertificateFlags.html))
   static final INVALID = SslErrorType._internalMultiPlatform('INVALID', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -150,6 +157,8 @@ class SslErrorType {
         return 0;
       case TargetPlatform.windows:
         return 5;
+      case TargetPlatform.linux:
+        return 64;
       default:
         break;
     }
@@ -160,12 +169,15 @@ class SslErrorType {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView ([Official API - SslError.SSL_NOTYETVALID](https://developer.android.com/reference/android/net/http/SslError#SSL_NOTYETVALID))
+  ///- Linux WPE WebKit ([Official API - G_TLS_CERTIFICATE_NOT_ACTIVATED](https://docs.gtk.org/gio/flags.TlsCertificateFlags.html))
   static final NOT_YET_VALID = SslErrorType._internalMultiPlatform(
     'NOT_YET_VALID',
     () {
       switch (defaultTargetPlatform) {
         case TargetPlatform.android:
           return 0;
+        case TargetPlatform.linux:
+          return 4;
         default:
           break;
       }
@@ -233,10 +245,13 @@ class SslErrorType {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Windows WebView2 ([Official API - COREWEBVIEW2_WEB_ERROR_STATUS_CERTIFICATE_REVOKED](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_web_error_status))
+  ///- Linux WPE WebKit ([Official API - G_TLS_CERTIFICATE_REVOKED](https://docs.gtk.org/gio/flags.TlsCertificateFlags.html))
   static final REVOKED = SslErrorType._internalMultiPlatform('REVOKED', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.windows:
         return 4;
+      case TargetPlatform.linux:
+        return 16;
       default:
         break;
     }
@@ -274,10 +289,13 @@ class SslErrorType {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView ([Official API - SslError.SSL_UNTRUSTED](https://developer.android.com/reference/android/net/http/SslError#SSL_UNTRUSTED))
+  ///- Linux WPE WebKit ([Official API - G_TLS_CERTIFICATE_UNKNOWN_CA](https://docs.gtk.org/gio/flags.TlsCertificateFlags.html))
   static final UNTRUSTED = SslErrorType._internalMultiPlatform('UNTRUSTED', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return 3;
+      case TargetPlatform.linux:
+        return 1;
       default:
         break;
     }

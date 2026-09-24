@@ -21,7 +21,11 @@ void sslRequest() {
             controllerCompleter.complete(controller);
           },
           onLoadStop: (controller, url) {
-            pageLoaded.complete();
+            // On Linux, onLoadStop also fires for the load that failed the
+            // server trust check, before it is retried.
+            if (url?.scheme == "https" && !pageLoaded.isCompleted) {
+              pageLoaded.complete();
+            }
           },
           onReceivedServerTrustAuthRequest: (controller, challenge) async {
             return new ServerTrustAuthResponse(

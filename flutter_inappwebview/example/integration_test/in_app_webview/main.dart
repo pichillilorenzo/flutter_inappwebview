@@ -56,6 +56,7 @@ part 'on_content_size_changed.dart';
 part 'on_download_start_request.dart';
 part 'on_js_before_unload.dart';
 part 'on_received_error.dart';
+part 'on_received_http_auth_request.dart';
 part 'on_received_http_error.dart';
 part 'on_load_resource.dart';
 part 'on_load_resource_with_custom_scheme.dart';
@@ -133,6 +134,7 @@ void main() {
     interceptAjaxRequest();
     interceptFetchRequest();
     contentBlocker();
+    onReceivedHttpAuthRequest();
     httpAuthCredentialDatabase();
     onConsoleMessage();
     onDownloadStarting();

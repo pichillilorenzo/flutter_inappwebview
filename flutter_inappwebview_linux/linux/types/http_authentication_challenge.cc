@@ -11,7 +11,8 @@ HttpAuthenticationChallenge::HttpAuthenticationChallenge(const URLProtectionSpac
 FlValue* HttpAuthenticationChallenge::toFlValue() const {
   return to_fl_map({
       {"protectionSpace", protectionSpace.toFlValue()},
-      {"previousFailureCount", make_fl_value(previousFailureCount)},
+      // Dart declares previousFailureCount as a non-nullable int.
+      {"previousFailureCount", make_fl_value(static_cast<int64_t>(isRetry ? 1 : 0))},
       {"proposedCredential", make_fl_value()},
       {"failureResponse", make_fl_value()},
       {"error", make_fl_value()},

@@ -24,6 +24,7 @@ class HttpAuthResponseAction {
   ///- iOS WKWebView
   ///- macOS WKWebView
   ///- Windows WebView2
+  ///- Linux WPE WebKit
   static final CANCEL = HttpAuthResponseAction._internalMultiPlatform(0, () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -33,6 +34,8 @@ class HttpAuthResponseAction {
       case TargetPlatform.macOS:
         return 0;
       case TargetPlatform.windows:
+        return 0;
+      case TargetPlatform.linux:
         return 0;
       default:
         break;
@@ -47,6 +50,7 @@ class HttpAuthResponseAction {
   ///- iOS WKWebView
   ///- macOS WKWebView
   ///- Windows WebView2
+  ///- Linux WPE WebKit
   static final PROCEED = HttpAuthResponseAction._internalMultiPlatform(1, () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -56,6 +60,8 @@ class HttpAuthResponseAction {
       case TargetPlatform.macOS:
         return 1;
       case TargetPlatform.windows:
+        return 1;
+      case TargetPlatform.linux:
         return 1;
       default:
         break;
@@ -69,6 +75,7 @@ class HttpAuthResponseAction {
   ///- Android WebView
   ///- iOS WKWebView
   ///- macOS WKWebView
+  ///- Linux WPE WebKit
   static final USE_SAVED_HTTP_AUTH_CREDENTIALS =
       HttpAuthResponseAction._internalMultiPlatform(2, () {
         switch (defaultTargetPlatform) {
@@ -77,6 +84,8 @@ class HttpAuthResponseAction {
           case TargetPlatform.iOS:
             return 2;
           case TargetPlatform.macOS:
+            return 2;
+          case TargetPlatform.linux:
             return 2;
           default:
             break;

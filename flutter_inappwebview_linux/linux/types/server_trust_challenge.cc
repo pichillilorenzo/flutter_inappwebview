@@ -14,34 +14,35 @@ SslError::SslError(SslErrorType code, const std::optional<std::string>& message)
     : code(code), message(message) {}
 
 FlValue* SslError::toFlValue() const {
-  std::string codeStr;
+  // Dart decodes `code` with SslErrorType.fromNativeValue(int), whose Linux
+  // values are the GTlsCertificateFlags bits. INSECURE has no Dart equivalent
+  // and is reported as a generic error.
+  GTlsCertificateFlags flag;
   switch (code) {
     case SslErrorType::NOT_YET_VALID:
-      codeStr = "NOT_YET_VALID";
+      flag = G_TLS_CERTIFICATE_NOT_ACTIVATED;
       break;
     case SslErrorType::EXPIRED:
-      codeStr = "EXPIRED";
+      flag = G_TLS_CERTIFICATE_EXPIRED;
       break;
     case SslErrorType::IDMISMATCH:
-      codeStr = "IDMISMATCH";
+      flag = G_TLS_CERTIFICATE_BAD_IDENTITY;
       break;
     case SslErrorType::UNTRUSTED:
-      codeStr = "UNTRUSTED";
+      flag = G_TLS_CERTIFICATE_UNKNOWN_CA;
       break;
     case SslErrorType::REVOKED:
-      codeStr = "REVOKED";
+      flag = G_TLS_CERTIFICATE_REVOKED;
       break;
     case SslErrorType::INSECURE:
-      codeStr = "INSECURE";
-      break;
     case SslErrorType::INVALID:
     default:
-      codeStr = "INVALID";
+      flag = G_TLS_CERTIFICATE_GENERIC_ERROR;
       break;
   }
 
   return to_fl_map({
-      {"code", make_fl_value(codeStr)},
+      {"code", make_fl_value(static_cast<int64_t>(flag))},
       {"message", make_fl_value(message)},
   });
 }

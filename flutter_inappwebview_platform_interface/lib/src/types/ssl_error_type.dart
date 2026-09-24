@@ -25,6 +25,11 @@ class SslErrorType_ {
             'https://developer.android.com/reference/android/net/http/SslError#SSL_NOTYETVALID',
         value: 0,
       ),
+      EnumLinuxPlatform(
+        apiName: 'G_TLS_CERTIFICATE_NOT_ACTIVATED',
+        apiUrl: 'https://docs.gtk.org/gio/flags.TlsCertificateFlags.html',
+        value: 4,
+      ),
     ],
   )
   static const NOT_YET_VALID = SslErrorType_._internal('NOT_YET_VALID');
@@ -44,6 +49,11 @@ class SslErrorType_ {
             'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_web_error_status',
         value: 2,
       ),
+      EnumLinuxPlatform(
+        apiName: 'G_TLS_CERTIFICATE_EXPIRED',
+        apiUrl: 'https://docs.gtk.org/gio/flags.TlsCertificateFlags.html',
+        value: 8,
+      ),
     ],
   )
   static const EXPIRED = SslErrorType_._internal('EXPIRED');
@@ -55,6 +65,11 @@ class SslErrorType_ {
         apiName: 'SslError.SSL_IDMISMATCH',
         apiUrl:
             'https://developer.android.com/reference/android/net/http/SslError#SSL_IDMISMATCH',
+        value: 2,
+      ),
+      EnumLinuxPlatform(
+        apiName: 'G_TLS_CERTIFICATE_BAD_IDENTITY',
+        apiUrl: 'https://docs.gtk.org/gio/flags.TlsCertificateFlags.html',
         value: 2,
       ),
     ],
@@ -69,6 +84,11 @@ class SslErrorType_ {
         apiUrl:
             'https://developer.android.com/reference/android/net/http/SslError#SSL_UNTRUSTED',
         value: 3,
+      ),
+      EnumLinuxPlatform(
+        apiName: 'G_TLS_CERTIFICATE_UNKNOWN_CA',
+        apiUrl: 'https://docs.gtk.org/gio/flags.TlsCertificateFlags.html',
+        value: 1,
       ),
     ],
   )
@@ -113,6 +133,11 @@ class SslErrorType_ {
         apiUrl:
             'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_web_error_status',
         value: 5,
+      ),
+      EnumLinuxPlatform(
+        apiName: 'G_TLS_CERTIFICATE_GENERIC_ERROR',
+        apiUrl: 'https://docs.gtk.org/gio/flags.TlsCertificateFlags.html',
+        value: 64,
       ),
     ],
   )
@@ -278,6 +303,11 @@ class SslErrorType_ {
         apiUrl:
             'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_web_error_status',
         value: 4,
+      ),
+      EnumLinuxPlatform(
+        apiName: 'G_TLS_CERTIFICATE_REVOKED',
+        apiUrl: 'https://docs.gtk.org/gio/flags.TlsCertificateFlags.html',
+        value: 16,
       ),
     ],
   )

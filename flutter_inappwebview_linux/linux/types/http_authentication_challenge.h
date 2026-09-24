@@ -16,7 +16,8 @@ namespace flutter_inappwebview_plugin {
 class HttpAuthenticationChallenge {
  public:
   URLProtectionSpace protectionSpace;
-  std::optional<std::string> previousFailureCount;  // Number of retry attempts
+  // WPE WebKit only reports whether this is a retry, so it is the single source
+  // of previousFailureCount (0 or 1).
   bool isRetry;
 
   HttpAuthenticationChallenge(const URLProtectionSpace& protectionSpace, bool isRetry);

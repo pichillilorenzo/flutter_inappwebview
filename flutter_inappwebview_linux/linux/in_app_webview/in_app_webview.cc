@@ -4051,28 +4051,31 @@ gboolean InAppWebView::OnLoadFailedWithTlsErrors(WebKitWebView* web_view, gchar*
     return FALSE;
   }
 
+  // failing_uri is only valid during this signal emission, but the response
+  // arrives asynchronously, so keep a copy.
+  std::string failingUri(failing_uri != nullptr ? failing_uri : "");
+
   // Create the challenge from TLS error info
-  auto challenge = ServerTrustChallenge::fromTlsError(
-      std::string(failing_uri != nullptr ? failing_uri : ""),
-      certificate, errors);
+  auto challenge = ServerTrustChallenge::fromTlsError(failingUri, certificate, errors);
 
   // Keep a reference to the certificate and web view for later use
   g_object_ref(certificate);
   g_object_ref(web_view);
 
   auto callback = std::make_unique<WebViewChannelDelegate::ServerTrustAuthRequestCallback>();
-  callback->nonNullSuccess = [web_view, failing_uri, certificate](
+  callback->nonNullSuccess = [web_view, failingUri, certificate](
       const ServerTrustAuthResponse& response) -> bool {
     if (response.action == ServerTrustAuthResponseAction::PROCEED) {
       // Allow the certificate for this host
       // Extract host from failing_uri
-      std::string host = get_host_from_url(std::string(failing_uri != nullptr ? failing_uri : ""));
+      std::string host = get_host_from_url(failingUri);
       if (!host.empty()) {
         // Get the network session from the web view
         WebKitNetworkSession* network_session = webkit_web_view_get_network_session(web_view);
         webkit_network_session_allow_tls_certificate_for_host(network_session, certificate, host.c_str());
-        // Reload the page to retry with the allowed certificate
-        webkit_web_view_reload(web_view);
+        // Retry with the allowed certificate. The failed load was never
+        // committed, so there is nothing for webkit_web_view_reload to reload.
+        webkit_web_view_load_uri(web_view, failingUri.c_str());
       }
     }
     g_object_unref(certificate);

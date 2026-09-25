@@ -320,7 +320,10 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
     _controller.initialize(
       onPlatformViewCreated: (id) {
         widget.onPlatformViewCreated?.call(id);
-        setState(() {});
+        // initialize() can complete after the widget has been disposed
+        if (mounted) {
+          setState(() {});
+        }
       },
       arguments: widget.creationParams,
     );
@@ -504,6 +507,10 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
     final box = _key.currentContext?.findRenderObject() as RenderBox?;
     if (box != null) {
       await _controller.ready;
+      // The widget can be disposed or detached while waiting for the controller
+      if (!mounted || !box.attached) {
+        return;
+      }
       unawaited(
         _controller._setSize(
           box.size,
@@ -517,6 +524,10 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
     final box = _key.currentContext?.findRenderObject() as RenderBox?;
     if (box != null) {
       await _controller.ready;
+      // The widget can be disposed or detached while waiting for the controller
+      if (!mounted || !box.attached) {
+        return;
+      }
       final position = box.localToGlobal(Offset.zero);
       unawaited(
         _controller._setPosition(

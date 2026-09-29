@@ -537,10 +537,13 @@ class MockPlatformProxyController extends PlatformProxyController
   }) => true;
 
   @override
-  Future<void> setProxyOverride({required ProxySettings settings}) async {}
+  Future<void> setProxyOverride({
+    required ProxySettings settings,
+    String? containerId,
+  }) async {}
 
   @override
-  Future<void> clearProxyOverride() async {}
+  Future<void> clearProxyOverride({String? containerId}) async {}
 }
 
 class MockPlatformTracingController extends PlatformTracingController

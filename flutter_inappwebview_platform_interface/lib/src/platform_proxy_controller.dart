@@ -131,6 +131,13 @@ abstract class PlatformProxyController extends PlatformInterface {
   ///URLs that match patterns in the bypass list will not be directed to any proxy.
   ///Instead, the request will be made directly to the origin specified by the URL.
   ///Network connections are not guaranteed to immediately use the new proxy setting; wait for the method to return before loading a page.
+  ///
+  ///With [containerId], the settings apply to the `WebView`s of that container
+  ///instead, those already open included, and replace the app-wide override
+  ///for them: the container keeps them until [clearProxyOverride] is called
+  ///with the same [containerId]. This is the same setting as
+  ///[InAppWebViewSettings.proxySettings] of a `WebView` in that container, so
+  ///each replaces what the other set.
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformProxyController.setProxyOverride.supported_platforms}
@@ -160,7 +167,17 @@ abstract class PlatformProxyController extends PlatformInterface {
       ),
     ],
   )
-  Future<void> setProxyOverride({required ProxySettings settings}) {
+  Future<void> setProxyOverride({
+    required ProxySettings settings,
+    @SupportedPlatforms(
+      platforms: [
+        IOSPlatform(available: '17.0'),
+        MacOSPlatform(available: '14.0'),
+        LinuxPlatform(),
+      ],
+    )
+    String? containerId,
+  }) {
     throw UnimplementedError(
       'setProxyOverride is not implemented on the current platform',
     );
@@ -170,6 +187,11 @@ abstract class PlatformProxyController extends PlatformInterface {
   ///Clears the proxy settings.
   ///Network connections are not guaranteed to immediately use the new proxy setting;
   ///wait for the method to return before loading a page.
+  ///
+  ///With [containerId], clears only that container's settings: its `WebView`s
+  ///go back to the app-wide override, or to no proxy when none is set. Without
+  ///it, clears the app-wide override, which leaves containers with settings
+  ///of their own as they are.
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformProxyController.clearProxyOverride.supported_platforms}
@@ -199,7 +221,16 @@ abstract class PlatformProxyController extends PlatformInterface {
       ),
     ],
   )
-  Future<void> clearProxyOverride() {
+  Future<void> clearProxyOverride({
+    @SupportedPlatforms(
+      platforms: [
+        IOSPlatform(available: '17.0'),
+        MacOSPlatform(available: '14.0'),
+        LinuxPlatform(),
+      ],
+    )
+    String? containerId,
+  }) {
     throw UnimplementedError(
       'clearProxyOverride is not implemented on the current platform',
     );

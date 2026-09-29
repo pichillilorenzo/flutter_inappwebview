@@ -75,15 +75,20 @@ class MacOSProxyController extends PlatformProxyController
   Future<dynamic> _handleMethod(MethodCall call) async {}
 
   @override
-  Future<void> setProxyOverride({required ProxySettings settings}) async {
+  Future<void> setProxyOverride({
+    required ProxySettings settings,
+    String? containerId,
+  }) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent("settings", () => settings.toMap());
+    args.putIfAbsent("containerId", () => containerId);
     await channel?.invokeMethod('setProxyOverride', args);
   }
 
   @override
-  Future<void> clearProxyOverride() async {
+  Future<void> clearProxyOverride({String? containerId}) async {
     Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent("containerId", () => containerId);
     await channel?.invokeMethod('clearProxyOverride', args);
   }
 

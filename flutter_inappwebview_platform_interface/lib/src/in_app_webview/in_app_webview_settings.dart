@@ -23,6 +23,7 @@ import '../types/scrollview_deceleration_rate.dart';
 import '../types/selection_granularity.dart';
 import '../types/user_preferred_content_mode.dart';
 import '../types/vertical_scrollbar_position.dart';
+import '../platform_proxy_controller.dart' show ProxySettings_;
 
 part 'in_app_webview_settings.g.dart';
 
@@ -413,7 +414,7 @@ class InAppWebViewSettings_ {
     platforms: [
       AndroidPlatform(
         note:
-            """setting this to `true`, it will clear all the cookies of all WebView instances, 
+            """setting this to `true`, it will clear all the cookies of all WebView instances,
 because there isn't any way to make the website data store non-persistent for the specific WebView instance such as on iOS.""",
       ),
       IOSPlatform(),
@@ -431,6 +432,106 @@ because there isn't any way to make the website data store non-persistent for th
     ],
   )
   bool? incognito;
+
+  ///Persistent per-WebView profile identifier. When set, this WebView is
+  ///bound at construction time to a named, isolated data store: cookies,
+  ///`localStorage`, IndexedDB, ServiceWorkers and the HTTP cache live in
+  ///their own partition rather than the shared default store. The same
+  ///identifier reused across app launches re-attaches to the same data
+  ///on disk; reused across multiple WebView instances they share state
+  ///with each other while staying isolated from other profiles.
+  ///
+  ///The data-store binding happens before the underlying native WebView
+  ///is created; mutating this field after construction has no effect.
+  ///Calls through [PlatformInAppWebViewController.setSettings] will
+  ///silently ignore the new value for this property.
+  ///
+  ///[incognito] always wins: when [incognito] is `true`, this field is
+  ///ignored and a non-persistent (in-memory) store is used instead.
+  ///
+  ///Cookie operations performed through [PlatformCookieManager] on a
+  ///profile-bound WebView are automatically routed to that profile's
+  ///cookie jar; pass the [PlatformInAppWebViewController] via
+  ///`webViewController:` so the platform can resolve the right store.
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(
+        apiName: 'WebViewCompat.setProfile',
+        apiUrl:
+            'https://developer.android.com/reference/androidx/webkit/WebViewCompat#setProfile(android.webkit.WebView,java.lang.String)',
+        note:
+            "Honored only when WebViewFeature.MULTI_PROFILE is supported (System WebView 119+). On unsupported devices the field is ignored and the WebView falls back to the default profile.",
+      ),
+      IOSPlatform(
+        apiName: 'WKWebsiteDataStore(forIdentifier:)',
+        apiUrl:
+            'https://developer.apple.com/documentation/webkit/wkwebsitedatastore/4188694-init',
+        available: '17.0',
+        note:
+            "Apple's API requires a UUID; the supplied identifier is hashed (SHA-256, first 16 bytes) to derive a stable UUID. Ignored on iOS <17.",
+      ),
+      MacOSPlatform(
+        apiName: 'WKWebsiteDataStore(forIdentifier:)',
+        apiUrl:
+            'https://developer.apple.com/documentation/webkit/wkwebsitedatastore/4188694-init',
+        available: '14.0',
+        note:
+            "Apple's API requires a UUID; the supplied identifier is hashed (SHA-256, first 16 bytes) to derive a stable UUID. Ignored on macOS <14.",
+      ),
+      LinuxPlatform(
+        apiName: 'WebKitNetworkSession',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/class.NetworkSession.html',
+        note:
+            "Requires WPE WebKit 2.40+. The session's data and cache directories are derived from XDG_DATA_HOME and XDG_CACHE_HOME (`<XDG_DATA_HOME>/flutter_inappwebview/containers/<id>/data` and `<XDG_CACHE_HOME>/flutter_inappwebview/containers/<id>/cache`). Sessions are cached process-wide by id so multiple WebViews joining the same container share state. Ignored on WPE WebKit <2.40.",
+      ),
+    ],
+  )
+  String? containerId;
+
+  ///The proxy of this WebView's container, or of this WebView alone when
+  ///[incognito] gives it a private data store.
+  ///
+  ///With [containerId], this is the same setting as
+  ///[PlatformProxyController.setProxyOverride] with that `containerId`, made
+  ///just before the WebView is created: it becomes the proxy of every WebView
+  ///in the container, those already open included, until another WebView of
+  ///the container sets one or [PlatformProxyController.clearProxyOverride]
+  ///clears it. A WebView that leaves this unset does not change its
+  ///container's proxy.
+  ///
+  ///With [incognito], it applies to this WebView's private data store only.
+  ///
+  ///Without either, the WebView shares the default data store with every
+  ///other such WebView, and this is ignored; use
+  ///[PlatformProxyController.setProxyOverride] without a `containerId` for
+  ///those.
+  ///
+  ///A rule set with no usable proxy is refused and leaves the current proxy
+  ///in place.
+  @SupportedPlatforms(
+    platforms: [
+      IOSPlatform(
+        apiName: 'WKWebsiteDataStore.proxyConfigurations',
+        apiUrl:
+            'https://developer.apple.com/documentation/webkit/wkwebsitedatastore/4264546-proxyconfigurations',
+        available: '17.0',
+      ),
+      MacOSPlatform(
+        apiName: 'WKWebsiteDataStore.proxyConfigurations',
+        apiUrl:
+            'https://developer.apple.com/documentation/webkit/wkwebsitedatastore/4264546-proxyconfigurations',
+        available: '14.0',
+      ),
+      LinuxPlatform(
+        apiName: 'webkit_network_session_set_proxy_settings',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.NetworkSession.set_proxy_settings.html',
+        note: 'Requires WPE WebKit 2.40+.',
+      ),
+    ],
+  )
+  ProxySettings_? proxySettings;
 
   ///Sets whether WebView should use browser caching. The default value is `true`.
   @SupportedPlatforms(
@@ -3300,6 +3401,8 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
     this.interceptOnlyAsyncAjaxRequests = true,
     this.useShouldInterceptFetchRequest,
     this.incognito = false,
+    this.containerId,
+    this.proxySettings,
     this.cacheEnabled = true,
     this.transparentBackground = false,
     this.disableVerticalScroll = false,

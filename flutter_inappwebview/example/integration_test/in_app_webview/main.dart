@@ -87,6 +87,9 @@ part 'resize_webview.dart';
 part 'web_archive.dart';
 part 'set_custom_useragent.dart';
 part 'set_get_settings.dart';
+part 'container_isolation.dart';
+part 'per_webview_proxy.dart';
+part 'container_proxy_change.dart';
 part 'set_web_contents_debugging_enabled.dart';
 part 'should_intercept_request.dart';
 part 'should_override_url_loading.dart';
@@ -200,5 +203,9 @@ void main() {
     webViewAssetLoader();
     onContentSizeChanged();
     keepAlive();
+    containerIsolation();
+    perWebViewProxy();
+    perWebViewProxyIsolation();
+    containerProxyChange();
   }, skip: shouldSkip);
 }

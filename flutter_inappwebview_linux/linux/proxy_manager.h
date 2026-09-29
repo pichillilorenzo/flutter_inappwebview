@@ -7,6 +7,7 @@
 #include <memory>
 #include <optional>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include "types/channel_delegate.h"
@@ -70,6 +71,64 @@ class ProxyManager : public ChannelDelegate {
  private:
   PluginInstance* plugin_ = nullptr;
 };
+
+/**
+ * Applies the active process-wide proxy override, if any, to a single
+ * network session.
+ *
+ * setProxyOverride can only reach the sessions that exist when it runs, but
+ * a container session is created lazily, the first time a WebView joins
+ * that container. A session created afterwards starts in
+ * WEBKIT_NETWORK_PROXY_MODE_DEFAULT (system proxy), so without this hook the
+ * contained WebView would silently bypass the proxy the caller asked the
+ * platform to apply process-wide. Called by get_or_create_container_session.
+ */
+void apply_active_proxy_override(WebKitNetworkSession* session);
+
+/**
+ * Per-container proxies ("pins"), keyed by containerId.
+ *
+ * WPE applies a proxy to one `WebKitNetworkSession`, and every container owns
+ * one, so two containers really can hold two different proxies at the same
+ * time. ProxyController.setProxyOverride(containerId:) and a WebView's
+ * proxySettings both set a container's pin; the process-wide override leaves
+ * pinned containers alone. A pin ends only with
+ * clearProxyOverride(containerId:), which hands the session back to the
+ * process-wide override; a WebView naming no proxy does not change it.
+ */
+std::unordered_map<std::string, ProxySettings>& container_proxy_pins();
+
+/**
+ * Pin `id`'s session to `settings` and apply it if that session already
+ * exists. A rule set with no usable proxy is not pinned; returns whether it
+ * was. Called by setProxyOverride with a containerId, and at WebView
+ * construction, before the session is created, so the proxy is in place
+ * before the container's first request.
+ */
+bool pin_container_proxy(const std::string& id, const ProxySettings& settings);
+
+/**
+ * Drop `id`'s pin and hand its session back to whatever it would follow
+ * without one: the process-wide override, or the system proxy when none is
+ * active. Called by clearProxyOverride with a containerId.
+ */
+void unpin_container_proxy(const std::string& id);
+
+/**
+ * An incognito WebView's ephemeral session, which has no id to address it
+ * by. With `own` naming a usable proxy it keeps that one; otherwise it
+ * follows the process-wide override, changes included. Called at WebView
+ * construction; the session is forgotten when it is finalized.
+ */
+void bind_private_session(WebKitNetworkSession* session,
+                          const std::optional<ProxySettings>& own);
+
+/**
+ * Apply whichever proxy `id` should be on: its own pin if it has one, else
+ * the process-wide override. Called by get_or_create_container_session.
+ */
+void apply_container_proxy(const std::string& id,
+                           WebKitNetworkSession* session);
 
 }  // namespace flutter_inappwebview_plugin
 

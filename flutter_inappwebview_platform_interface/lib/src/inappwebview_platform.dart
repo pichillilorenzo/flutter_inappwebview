@@ -12,6 +12,7 @@ import 'platform_cookie_manager.dart';
 import 'platform_http_auth_credentials_database.dart';
 import 'platform_in_app_localhost_server.dart';
 import 'platform_process_global_config.dart';
+import 'platform_container_controller.dart';
 import 'platform_proxy_controller.dart';
 import 'platform_service_worker_controller.dart';
 import 'platform_tracing_controller.dart';
@@ -488,6 +489,28 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
   PlatformProxyController createPlatformProxyControllerStatic() {
     throw UnimplementedError(
       'createPlatformProxyControllerStatic is not implemented on the current platform.',
+    );
+  }
+
+  /// Creates a new [PlatformContainerController].
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [ContainerController] in `flutter_inappwebview` instead.
+  PlatformContainerController createPlatformContainerController(
+    PlatformContainerControllerCreationParams params,
+  ) {
+    throw UnimplementedError(
+      'createPlatformContainerController is not implemented on the current platform.',
+    );
+  }
+
+  /// Creates a new empty [PlatformContainerController] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [ContainerController] in `flutter_inappwebview` instead.
+  PlatformContainerController createPlatformContainerControllerStatic() {
+    throw UnimplementedError(
+      'createPlatformContainerControllerStatic is not implemented on the current platform.',
     );
   }
 

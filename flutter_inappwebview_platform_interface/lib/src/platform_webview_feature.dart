@@ -405,6 +405,9 @@ class WebViewFeature_ {
     "WEB_MESSAGE_ARRAY_BUFFER",
   );
 
+  ///Feature for [isFeatureSupported]. This feature covers [InAppWebViewSettings.containerId] and [ContainerController].
+  static const MULTI_PROFILE = const WebViewFeature_._internal("MULTI_PROFILE");
+
   ///Feature for [isStartupFeatureSupported]. This feature covers [ProcessGlobalConfigSettings.dataDirectorySuffix].
   static const STARTUP_FEATURE_SET_DATA_DIRECTORY_SUFFIX =
       const WebViewFeature_._internal(

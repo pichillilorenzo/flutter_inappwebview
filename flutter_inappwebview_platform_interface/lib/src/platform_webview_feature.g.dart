@@ -96,6 +96,12 @@ class WebViewFeature {
     'MULTI_PROCESS',
   );
 
+  ///Feature for [isFeatureSupported]. This feature covers [InAppWebViewSettings.containerId] and [ContainerController].
+  static const MULTI_PROFILE = WebViewFeature._internal(
+    'MULTI_PROFILE',
+    'MULTI_PROFILE',
+  );
+
   ///Feature for [isFeatureSupported]. This feature covers [InAppWebViewSettings.offscreenPreRaster].
   static const OFF_SCREEN_PRERASTER = WebViewFeature._internal(
     'OFF_SCREEN_PRERASTER',
@@ -344,6 +350,7 @@ class WebViewFeature {
     WebViewFeature.GET_WEB_VIEW_CLIENT,
     WebViewFeature.GET_WEB_VIEW_RENDERER,
     WebViewFeature.MULTI_PROCESS,
+    WebViewFeature.MULTI_PROFILE,
     WebViewFeature.OFF_SCREEN_PRERASTER,
     WebViewFeature.POST_WEB_MESSAGE,
     WebViewFeature.PROXY_OVERRIDE,
@@ -487,6 +494,8 @@ class WebViewFeature {
         return 'GET_WEB_VIEW_RENDERER';
       case 'MULTI_PROCESS':
         return 'MULTI_PROCESS';
+      case 'MULTI_PROFILE':
+        return 'MULTI_PROFILE';
       case 'OFF_SCREEN_PRERASTER':
         return 'OFF_SCREEN_PRERASTER';
       case 'POST_WEB_MESSAGE':

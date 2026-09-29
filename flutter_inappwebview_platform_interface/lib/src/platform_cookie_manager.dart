@@ -658,6 +658,11 @@ In this case, this method will return always `true`.""",
   ///{@template flutter_inappwebview_platform_interface.PlatformCookieManager.flush}
   ///Ensures all cookies currently accessible through the getCookie API are written to persistent storage.
   ///This call will block the caller until it is done and may perform I/O.
+  ///
+  ///Cookies are committed to disk lazily by the platform, so calling
+  ///this from an on-pause / going-to-background lifecycle hook is the
+  ///reliable way to make freshly-set session cookies survive the OS
+  ///killing the process.
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformCookieManager.flush.supported_platforms}
@@ -667,6 +672,8 @@ In this case, this method will return always `true`.""",
         apiName: 'CookieManager.flush',
         apiUrl:
             'https://developer.android.com/reference/android/webkit/CookieManager#flush()',
+        note:
+            "Flushes the default profile's cookie jar and, when WebViewFeature.MULTI_PROFILE is supported, fans out to the CookieManager of every container created via InAppWebViewSettings.containerId — a container's session cookies are not reachable from the global CookieManager, so without the fan-out an on-pause flush would silently skip them and their sessions could be lost on process kill.",
       ),
     ],
   )

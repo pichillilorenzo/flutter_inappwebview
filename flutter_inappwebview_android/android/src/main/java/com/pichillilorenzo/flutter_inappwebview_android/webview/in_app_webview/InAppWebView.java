@@ -62,6 +62,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.webkit.ProfileStore;
 import androidx.webkit.WebSettingsCompat;
 import androidx.webkit.WebViewCompat;
 import androidx.webkit.WebViewFeature;
@@ -119,6 +120,27 @@ import io.flutter.plugin.common.MethodChannel;
 final public class InAppWebView extends InputAwareWebView implements InAppWebViewInterface {
   private static final String LOG_TAG = "InAppWebView";
   public static final String METHOD_CHANNEL_NAME_PREFIX = "com.pichillilorenzo/flutter_inappwebview_";
+
+  // Registry of live InAppWebView instances keyed by their platform-view id,
+  // weak-referenced so dispose() removes them automatically. Used by
+  // MyCookieManager to resolve the per-profile CookieManager when a cookie
+  // op is scoped to a particular WebView. We can't walk the view tree
+  // reliably — DevTools and other navigators detach WebViews from the
+  // visible hierarchy.
+  private static final java.util.Map<Object, java.lang.ref.WeakReference<InAppWebView>>
+      LIVE_WEB_VIEWS = new java.util.concurrent.ConcurrentHashMap<>();
+
+  @Nullable
+  public static InAppWebView findById(@Nullable Object id) {
+    if (id == null) return null;
+    java.lang.ref.WeakReference<InAppWebView> ref = LIVE_WEB_VIEWS.get(id);
+    if (ref == null) return null;
+    InAppWebView view = ref.get();
+    if (view == null) {
+      LIVE_WEB_VIEWS.remove(id);
+    }
+    return view;
+  }
 
   @Nullable
   public InAppWebViewFlutterPlugin plugin;
@@ -202,6 +224,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     super(context, containerView, customSettings.useHybridComposition);
     this.plugin = plugin;
     this.id = id;
+    LIVE_WEB_VIEWS.put(id, new java.lang.ref.WeakReference<>(this));
     final MethodChannel channel = new MethodChannel(plugin.messenger, METHOD_CHANNEL_NAME_PREFIX + id);
     this.channelDelegate = new WebViewChannelDelegate(this, channel);
     this.windowId = windowId;
@@ -256,6 +279,25 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
 
   @SuppressLint("RestrictedApi")
   public void prepare() {
+    // Bind to a per-WebView profile *before* anything session-bound runs.
+    // addJavascriptInterface, addDocumentStartJavaScript and
+    // CookieManager.setAcceptThirdPartyCookies (all called below in this
+    // method) lock the WebView to whichever profile is current — and there
+    // is no API to rebind a live WebView. So setProfile() has to be the
+    // first thing that touches `this`. Falls back silently when
+    // MULTI_PROFILE is unsupported (System WebView <119) or the call
+    // throws (e.g. profile name is invalid).
+    if (customSettings.containerId != null
+        && WebViewFeature.isFeatureSupported(WebViewFeature.MULTI_PROFILE)) {
+      try {
+        ProfileStore.getInstance().getOrCreateProfile(customSettings.containerId);
+        WebViewCompat.setProfile(this, customSettings.containerId);
+      } catch (Throwable t) {
+        Log.w(LOG_TAG,
+            "setProfile(" + customSettings.containerId + ") failed: " + t);
+      }
+    }
+
     if (customSettings.alpha != null) {
       setAlpha(customSettings.alpha.floatValue());
     }
@@ -2175,6 +2217,9 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
 
   @Override
   public void dispose() {
+    if (id != null) {
+      LIVE_WEB_VIEWS.remove(id);
+    }
     if (channelDelegate != null) {
       channelDelegate.dispose();
       channelDelegate = null;

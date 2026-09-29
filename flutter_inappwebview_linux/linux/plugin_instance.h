@@ -7,6 +7,7 @@
 namespace flutter_inappwebview_plugin {
 
 // Forward declarations
+class ContainerManager;
 class InAppWebViewManager;
 class HeadlessInAppWebViewManager;
 class InAppBrowserManager;
@@ -53,6 +54,7 @@ public:
   CookieManager* cookieManager = nullptr;
   CredentialDatabase* credentialDatabase = nullptr;
   ProxyManager* proxyManager = nullptr;
+  ContainerManager* containerManager = nullptr;
   WebStorageManager* webStorageManager = nullptr;
   WebViewEnvironment* webViewEnvironment = nullptr;
 

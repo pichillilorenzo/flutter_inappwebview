@@ -14,6 +14,7 @@ import com.pichillilorenzo.flutter_inappwebview_android.headless_in_app_webview.
 import com.pichillilorenzo.flutter_inappwebview_android.in_app_browser.InAppBrowserManager;
 import com.pichillilorenzo.flutter_inappwebview_android.print_job.PrintJobManager;
 import com.pichillilorenzo.flutter_inappwebview_android.process_global_config.ProcessGlobalConfigManager;
+import com.pichillilorenzo.flutter_inappwebview_android.container.ContainerManager;
 import com.pichillilorenzo.flutter_inappwebview_android.proxy.ProxyManager;
 import com.pichillilorenzo.flutter_inappwebview_android.service_worker.ServiceWorkerManager;
 import com.pichillilorenzo.flutter_inappwebview_android.tracing.TracingControllerManager;
@@ -55,6 +56,7 @@ public class InAppWebViewFlutterPlugin implements FlutterPlugin, ActivityAware {
   public WebViewFeatureManager webViewFeatureManager;
   @Nullable
   public ProxyManager proxyManager;
+  public ContainerManager containerManager;
   @Nullable
   public PrintJobManager printJobManager;
   @Nullable
@@ -111,6 +113,7 @@ public class InAppWebViewFlutterPlugin implements FlutterPlugin, ActivityAware {
     }
     webViewFeatureManager = new WebViewFeatureManager(this);
     proxyManager = new ProxyManager(this);
+    containerManager = new ContainerManager(this);
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
       printJobManager = new PrintJobManager(this);
     }
@@ -167,6 +170,10 @@ public class InAppWebViewFlutterPlugin implements FlutterPlugin, ActivityAware {
     if (proxyManager != null) {
       proxyManager.dispose();
       proxyManager = null;
+    }
+    if (containerManager != null) {
+      containerManager.dispose();
+      containerManager = null;
     }
     if (printJobManager != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
       printJobManager.dispose();

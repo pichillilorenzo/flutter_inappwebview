@@ -130,6 +130,14 @@ class InAppWebView {
                const InAppWebViewCreationParams& params);
   ~InAppWebView();
 
+  // Process-wide lookup of live InAppWebView by its platform-view id.
+  // Used by MyCookieManager to resolve the per-container WebKitNetwork
+  // Session from a webViewController-scoped cookie op. The map is
+  // populated in the constructor and cleared in the destructor; entries
+  // returned by FindById are owned by their caller's framework
+  // lifetime, never by this map.
+  static InAppWebView* FindById(int64_t id);
+
   int64_t id() const { return id_; }
   WebKitWebView* webview() const { return webview_; }
   WebViewChannelDelegate* channel_delegate() const { return channel_delegate_.get(); }

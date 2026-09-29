@@ -72,15 +72,20 @@ class LinuxProxyController extends PlatformProxyController {
   }
 
   @override
-  Future<void> setProxyOverride({required ProxySettings settings}) async {
+  Future<void> setProxyOverride({
+    required ProxySettings settings,
+    String? containerId,
+  }) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent("settings", () => settings.toMap());
+    args.putIfAbsent("containerId", () => containerId);
     await _channel.invokeMethod('setProxyOverride', args);
   }
 
   @override
-  Future<void> clearProxyOverride() async {
+  Future<void> clearProxyOverride({String? containerId}) async {
     Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent("containerId", () => containerId);
     await _channel.invokeMethod('clearProxyOverride', args);
   }
 }

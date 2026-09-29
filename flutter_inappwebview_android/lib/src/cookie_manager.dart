@@ -120,6 +120,13 @@ class AndroidCookieManager extends PlatformCookieManager
 
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('url', () => url.toString());
+    // Forwarding the controller id lets the native side route through
+    // the bound profile's CookieManager when the WebView has a non-default
+    // containerId set; without it, reads land in the global jar regardless
+    // of the WebView's profile.
+    if (webViewController?.id != null) {
+      args.putIfAbsent('webViewId', () => webViewController!.id);
+    }
     List<dynamic> cookieListMap =
         await channel?.invokeMethod<List>('getCookies', args) ?? [];
     cookieListMap = cookieListMap.cast<Map<dynamic, dynamic>>();
@@ -157,6 +164,9 @@ class AndroidCookieManager extends PlatformCookieManager
 
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('url', () => url.toString());
+    if (webViewController?.id != null) {
+      args.putIfAbsent('webViewId', () => webViewController!.id);
+    }
     List<dynamic> cookies =
         await channel?.invokeMethod<List>('getCookies', args) ?? [];
     cookies = cookies.cast<Map<dynamic, dynamic>>();
@@ -198,6 +208,9 @@ class AndroidCookieManager extends PlatformCookieManager
     args.putIfAbsent('name', () => name);
     args.putIfAbsent('domain', () => domain);
     args.putIfAbsent('path', () => path);
+    if (webViewController?.id != null) {
+      args.putIfAbsent('webViewId', () => webViewController!.id);
+    }
     return await channel?.invokeMethod<bool>('deleteCookie', args) ?? false;
   }
 

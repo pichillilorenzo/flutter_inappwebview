@@ -8,6 +8,7 @@ import 'in_app_browser/in_app_browser.dart';
 import 'in_app_webview/main.dart';
 import 'print_job/main.dart';
 import 'process_global_config.dart';
+import 'container_controller.dart';
 import 'proxy_controller.dart';
 import 'pull_to_refresh/main.dart';
 import 'service_worker_controller.dart';
@@ -371,6 +372,26 @@ class AndroidInAppWebViewPlatform extends InAppWebViewPlatform {
   @override
   AndroidProxyController createPlatformProxyControllerStatic() {
     return AndroidProxyController.static();
+  }
+
+  /// Creates a new [AndroidContainerController].
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [ContainerController] in `flutter_inappwebview` instead.
+  @override
+  AndroidContainerController createPlatformContainerController(
+    PlatformContainerControllerCreationParams params,
+  ) {
+    return AndroidContainerController(params);
+  }
+
+  /// Creates a new empty [AndroidContainerController] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [ContainerController] in `flutter_inappwebview` instead.
+  @override
+  AndroidContainerController createPlatformContainerControllerStatic() {
+    return AndroidContainerController.static();
   }
 
   /// Creates a new [AndroidServiceWorkerController].

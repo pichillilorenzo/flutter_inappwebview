@@ -39,13 +39,16 @@ class ProxyController {
   ///{@macro flutter_inappwebview_platform_interface.PlatformProxyController.setProxyOverride}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformProxyController.setProxyOverride.supported_platforms}
-  Future<void> setProxyOverride({required ProxySettings settings}) =>
-      platform.setProxyOverride(settings: settings);
+  Future<void> setProxyOverride({
+    required ProxySettings settings,
+    String? containerId,
+  }) => platform.setProxyOverride(settings: settings, containerId: containerId);
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformProxyController.clearProxyOverride}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformProxyController.clearProxyOverride.supported_platforms}
-  Future<void> clearProxyOverride() => platform.clearProxyOverride();
+  Future<void> clearProxyOverride({String? containerId}) =>
+      platform.clearProxyOverride(containerId: containerId);
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformProxyControllerCreationParams.isClassSupported}
   static bool isClassSupported({TargetPlatform? platform}) =>

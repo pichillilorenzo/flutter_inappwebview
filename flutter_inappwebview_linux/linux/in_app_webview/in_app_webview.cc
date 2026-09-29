@@ -7,6 +7,9 @@
 
 #include "in_app_webview.h"
 
+#include "../container_session_cache.h"
+#include "../proxy_manager.h"
+
 #include <dlfcn.h>
 #include <linux/limits.h>
 #include <unistd.h>
@@ -19,6 +22,7 @@
 #include <nlohmann/json.hpp>
 #include <random>
 #include <set>
+#include <unordered_map>
 #include <unordered_set>
 
 // Use epoxy for OpenGL/EGL instead of direct headers to avoid conflicts
@@ -234,10 +238,33 @@ bool InAppWebView::PreflightDmaBufSupport() {
 }
 #endif
 
+// Process-wide registry of live InAppWebView instances, keyed by their
+// platform-view id. Populated by the constructor and cleared by the
+// destructor. cookie_manager.cc uses FindById to resolve a webViewId
+// from a Dart-side cookie op back to the WebView's
+// WebKitNetworkSession, so cookie reads/writes target the right
+// container's jar instead of the global default. We don't take any
+// extra reference here — ownership stays with the framework; the
+// destructor removes the entry before any of the underlying GObjects
+// are destroyed.
+namespace {
+std::unordered_map<int64_t, InAppWebView*>& live_webviews_by_id() {
+  static std::unordered_map<int64_t, InAppWebView*> map;
+  return map;
+}
+}  // namespace
+
+InAppWebView* InAppWebView::FindById(int64_t id) {
+  auto& map = live_webviews_by_id();
+  auto it = map.find(id);
+  return it != map.end() ? it->second : nullptr;
+}
+
 InAppWebView::InAppWebView(FlPluginRegistrar* registrar, FlBinaryMessenger* messenger, int64_t id,
                            const InAppWebViewCreationParams& params)
     : plugin_(params.plugin), registrar_(registrar), messenger_(messenger), gtk_window_(params.gtkWindow), fl_view_(params.flView), manager_(params.manager), id_(id), settings_(params.initialSettings),
       initial_user_scripts_(params.initialUserScripts) {
+  live_webviews_by_id()[id_] = this;
   js_bridge_secret_ = GenerateRandomSecret();
   
   if (params.windowId.has_value()) {
@@ -357,6 +384,8 @@ void InAppWebView::AttachChannel(FlBinaryMessenger* messenger, const std::string
 
 InAppWebView::~InAppWebView() {
   debugLog("dealloc InAppWebView");
+
+  live_webviews_by_id().erase(id_);
 
   CleanupMonitorChangeHandlers();
 
@@ -666,14 +695,40 @@ void InAppWebView::InitWebView(const InAppWebViewCreationParams& params) {
   
   bool useIncognito = params.initialSettings && params.initialSettings->incognito;
   WebKitNetworkSession* networkSession = nullptr;
-  
+
   if (useIncognito) {
     networkSession = webkit_network_session_new_ephemeral();
     debugLog("InAppWebView: Creating WebView with ephemeral (incognito) network session");
+    // Its own proxySettings, or the process-wide override.
+    bind_private_session(networkSession, params.initialSettings->proxySettings);
+  } else if (params.initialSettings &&
+             !params.initialSettings->containerId.empty()) {
+    // Container join: use a process-wide cached WebKitNetworkSession with
+    // its own data + cache directories. Multiple WebViews joining the
+    // same container share storage. incognito always wins.
+    //
+    // Pin the site's proxy first: the session may not exist yet, and its
+    // proxy has to be in place before the container's first request rather
+    // than after it. WPE binds a proxy per session, so two containers hold
+    // two different proxies at once.
+    // Naming no proxy leaves the container's as it is.
+    if (params.initialSettings->proxySettings.has_value()) {
+      pin_container_proxy(params.initialSettings->containerId,
+                          params.initialSettings->proxySettings.value());
+    }
+    networkSession = get_or_create_container_session(
+        params.initialSettings->containerId);
+    if (networkSession != nullptr) {
+      debugLog("InAppWebView: Joining container '" +
+               params.initialSettings->containerId + "'");
+    } else {
+      errorLog("InAppWebView: Failed to create network session for container '" +
+               params.initialSettings->containerId + "'; falling back to default");
+    }
   }
-  
+
   WebKitWebContext* webContext = params.webContext;
-  
+
   // Check if we're creating a related webview (for multi-window support)
   if (params.relatedWebView != nullptr) {
     webview_ = WEBKIT_WEB_VIEW(g_object_new(WEBKIT_TYPE_WEB_VIEW,
@@ -832,6 +887,24 @@ void InAppWebView::InitWebView(const InAppWebViewCreationParams& params) {
     if (useIncognito) {
       networkSession = webkit_network_session_new_ephemeral();
       debugLog("InAppWebView: Creating WebView with ephemeral (incognito) network session");
+      bind_private_session(networkSession, params.initialSettings->proxySettings);
+    } else if (params.initialSettings &&
+               !params.initialSettings->containerId.empty()) {
+      // Container join: see the WPEPlatform branch above for details,
+      // including why the proxy is pinned before the session is fetched.
+      if (params.initialSettings->proxySettings.has_value()) {
+        pin_container_proxy(params.initialSettings->containerId,
+                            params.initialSettings->proxySettings.value());
+      }
+      networkSession = get_or_create_container_session(
+          params.initialSettings->containerId);
+      if (networkSession != nullptr) {
+        debugLog("InAppWebView: Joining container '" +
+                 params.initialSettings->containerId + "'");
+      } else {
+        errorLog("InAppWebView: Failed to create network session for container '" +
+                 params.initialSettings->containerId + "'; falling back to default");
+      }
     }
 
     // Check if a custom WebKitWebContext is provided

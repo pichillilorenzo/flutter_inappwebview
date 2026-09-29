@@ -1,5 +1,11 @@
 ## 1.2.0-beta.3
 
+- Implemented `PlatformContainerController` (`getAllContainerNames`, `hasContainer`, `deleteContainer`, `clearContainerData`) on macOS 14+ via `WKWebsiteDataStore(forIdentifier:)`, with a `UserDefaults` registry mapping container ids to data store identifiers
+- Implemented `InAppWebViewSettings.containerId` and `InAppWebViewSettings.proxySettings` on macOS 14+
+- `MyCookieManager` methods taking a `webViewId` use the cookie store of that WebView's container
+- `ProxyController.setProxyOverride` and `clearProxyOverride` also apply to container and incognito data stores, and with a `containerId` set or clear that container's proxy, the same setting as `InAppWebViewSettings.proxySettings`; a rule set that is empty or does not fully convert is refused
+- A proxy change on a data store closes the connections it opened through the previous proxy
+- `deleteContainer` also drops the proxy set for that container
 - Updated flutter_inappwebview_platform_interface version to ^1.4.0-beta.3
 - Implemented `saveState`, `restoreState` InAppWebViewController methods
 - Implemented `PlatformProxyController` class

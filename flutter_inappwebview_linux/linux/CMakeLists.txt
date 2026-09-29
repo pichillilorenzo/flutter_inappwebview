@@ -171,6 +171,8 @@ message(STATUS "flutter_inappwebview_linux: nlohmann/json ${NLOHMANN_JSON_VERSIO
 list(APPEND PLUGIN_SOURCES
   "flutter_inappwebview_linux_plugin.cc"
   "plugin_instance.cc"
+  "container_manager.cc"
+  "container_session_cache.cc"
   "cookie_manager.cc"
   "credential_database.cc"
   "proxy_manager.cc"

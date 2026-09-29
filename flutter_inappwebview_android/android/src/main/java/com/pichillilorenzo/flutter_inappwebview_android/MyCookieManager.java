@@ -9,9 +9,13 @@ import android.webkit.ValueCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.webkit.CookieManagerCompat;
+import androidx.webkit.Profile;
+import androidx.webkit.ProfileStore;
+import androidx.webkit.WebViewCompat;
 import androidx.webkit.WebViewFeature;
 
 import com.pichillilorenzo.flutter_inappwebview_android.types.ChannelDelegateImpl;
+import com.pichillilorenzo.flutter_inappwebview_android.webview.in_app_webview.InAppWebView;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -30,6 +34,16 @@ import io.flutter.plugin.common.MethodChannel;
 public class MyCookieManager extends ChannelDelegateImpl {
   protected static final String LOG_TAG = "MyCookieManager";
   public static final String METHOD_CHANNEL_NAME = "com.pichillilorenzo/flutter_inappwebview_cookiemanager";
+  // INVARIANT: this memo holds the DEFAULT profile's CookieManager and
+  // nothing else — see getCookieManager(), whose null-only check makes
+  // whatever lands here sticky until process death. Container-scoped
+  // lookups (cookieManagerForContainerOf) must stay in method locals:
+  // one write of a profile's manager into this field silently
+  // redirects every unscoped op in this class (setCookie,
+  // deleteCookies, deleteAllCookies, removeSessionCookies, flush,
+  // getAllCookies) to that container's jar — deleteAllCookies then
+  // wipes a live container instead of the default jar, which
+  // surfaces a launch later as sporadic logouts.
   @Nullable
   public static CookieManager cookieManager;
   @Nullable
@@ -78,7 +92,9 @@ public class MyCookieManager extends ChannelDelegateImpl {
         }
         break;
       case "getCookies":
-        result.success(getCookies((String) call.argument("url")));
+        result.success(getCookies(
+            (String) call.argument("url"),
+            call.argument("webViewId")));
         break;
       case "deleteCookie":
         {
@@ -86,7 +102,8 @@ public class MyCookieManager extends ChannelDelegateImpl {
           String name = (String) call.argument("name");
           String domain = (String) call.argument("domain");
           String path = (String) call.argument("path");
-          deleteCookie(url, name, domain, path, result);
+          Object webViewId = call.argument("webViewId");
+          deleteCookie(url, name, domain, path, webViewId, result);
         }
         break;
       case "deleteCookies":
@@ -143,6 +160,42 @@ public class MyCookieManager extends ChannelDelegateImpl {
     }
 
     return cookieManager;
+  }
+
+  // Resolve the CookieManager for the androidx.webkit.Profile that the
+  // WebView identified by [webViewId] is bound to. The store is keyed by
+  // *profile*, not by WebView — two WebViews sharing a containerId share
+  // their cookies, and this lookup returns the same manager for both.
+  // The webViewId is only the lookup vehicle to find which profile is
+  // bound. Falls back to the global CookieManager when:
+  //   - webViewId is null (caller didn't scope the op)
+  //   - MULTI_PROFILE feature is unsupported (System WebView <119)
+  //   - no live InAppWebView with that id is registered
+  //   - the bound profile is the default
+  // Behavior is byte-identical to the stock global path when the fallback
+  // triggers, so unscoped callers (cookie inspector during legacy flows,
+  // settings-import paths) keep working unchanged.
+  //
+  // Callers: keep the returned manager in a LOCAL. Never assign it to
+  // the `cookieManager` static — see the invariant on that field.
+  static private @Nullable CookieManager cookieManagerForContainerOf(@Nullable Object webViewId) {
+    if (webViewId == null
+        || !WebViewFeature.isFeatureSupported(WebViewFeature.MULTI_PROFILE)) {
+      return getCookieManager();
+    }
+    InAppWebView webView = InAppWebView.findById(webViewId);
+    if (webView == null) return getCookieManager();
+    Profile profile;
+    try {
+      profile = WebViewCompat.getProfile(webView);
+    } catch (Throwable t) {
+      return getCookieManager();
+    }
+    if (profile == null
+        || Profile.DEFAULT_PROFILE_NAME.equals(profile.getName())) {
+      return getCookieManager();
+    }
+    return profile.getCookieManager();
   }
 
   public void setCookie(String url,
@@ -207,17 +260,27 @@ public class MyCookieManager extends ChannelDelegateImpl {
   }
 
   public List<Map<String, Object>> getCookies(final String url) {
+    return getCookies(url, null);
+  }
+
+  // webViewId-scoped overload: routes through the bound profile's
+  // CookieManager when webViewId resolves to a profile-bound WebView;
+  // identical to the stock global-jar path when it doesn't.
+  public List<Map<String, Object>> getCookies(final String url, @Nullable Object webViewId) {
 
     final List<Map<String, Object>> cookieListMap = new ArrayList<>();
 
-    cookieManager = getCookieManager();
-    if (cookieManager == null) return cookieListMap;
+    // LOCAL on purpose — see the invariant on the `cookieManager`
+    // static. Assigning a container's manager into the static poisons
+    // the memo for every unscoped method in this class.
+    CookieManager manager = cookieManagerForContainerOf(webViewId);
+    if (manager == null) return cookieListMap;
 
     List<String> cookies = new ArrayList<>();
     if (WebViewFeature.isFeatureSupported(WebViewFeature.GET_COOKIE_INFO)) {
-      cookies = CookieManagerCompat.getCookieInfo(cookieManager, url);
+      cookies = CookieManagerCompat.getCookieInfo(manager, url);
     } else {
-      String cookiesString = cookieManager.getCookie(url);
+      String cookiesString = manager.getCookie(url);
       if (cookiesString != null) {
         cookies = Arrays.asList(cookiesString.split(";"));
       }
@@ -289,8 +352,19 @@ public class MyCookieManager extends ChannelDelegateImpl {
   }
 
   public void deleteCookie(String url, String name, String domain, String path, final MethodChannel.Result result) {
-    cookieManager = getCookieManager();
-    if (cookieManager == null) {
+    deleteCookie(url, name, domain, path, null, result);
+  }
+
+  // webViewId-scoped overload: routes through the bound profile's
+  // CookieManager when webViewId resolves to a profile-bound WebView;
+  // identical to the stock global-jar path when it doesn't.
+  public void deleteCookie(String url, String name, String domain, String path,
+                           @Nullable Object webViewId, final MethodChannel.Result result) {
+    // LOCAL on purpose — see the invariant on the `cookieManager`
+    // static. Assigning a container's manager into the static poisons
+    // the memo for every unscoped method in this class.
+    final CookieManager manager = cookieManagerForContainerOf(webViewId);
+    if (manager == null) {
       result.success(false);
       return;
     }
@@ -303,23 +377,23 @@ public class MyCookieManager extends ChannelDelegateImpl {
     cookieValue += ";";
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-      cookieManager.setCookie(url, cookieValue, new ValueCallback<Boolean>() {
+      manager.setCookie(url, cookieValue, new ValueCallback<Boolean>() {
         @Override
         public void onReceiveValue(Boolean successful) {
           result.success(successful);
         }
       });
-      cookieManager.flush();
+      manager.flush();
     }
     else if (plugin != null) {
       CookieSyncManager cookieSyncMngr = CookieSyncManager.createInstance(plugin.applicationContext);
       cookieSyncMngr.startSync();
-      cookieManager.setCookie(url, cookieValue);
+      manager.setCookie(url, cookieValue);
       cookieSyncMngr.stopSync();
       cookieSyncMngr.sync();
       result.success(true);
     } else {
-      cookieManager.setCookie(url, cookieValue);
+      manager.setCookie(url, cookieValue);
       result.success(true);
     }
   }
@@ -434,9 +508,52 @@ public class MyCookieManager extends ChannelDelegateImpl {
     }
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
       cookieManager.flush();
+      flushContainerCookieManagers();
     } else if (plugin != null) {
       CookieSyncManager cookieSyncMngr = CookieSyncManager.createInstance(plugin.applicationContext);
       cookieSyncMngr.sync();
+    }
+    // Resolve the channel result on the happy path too — without this
+    // the Dart-side `await CookieManager.flush()` never completes,
+    // which turns an on-pause "make cookies durable" hook into a hang.
+    result.success(true);
+  }
+
+  // Chromium commits cookies to disk lazily; flush() forces the write.
+  // But CookieManager.getInstance() — what getCookieManager() returns —
+  // is the *default* profile's manager. Cookies living in a container's
+  // jar (androidx.webkit.Profile, joined via
+  // InAppWebViewSettings.containerId) are not touched by it. An app
+  // calling flush() as a "make everything durable before the OS kills
+  // us" lifecycle hook would silently leave every container's session
+  // cookies unwritten; a swipe-kill shortly after login then loses the
+  // session, surfacing downstream as "cookies don't persist across
+  // restart" even with incognito off. So flush fans out: default jar
+  // first (above), then every profile the ProfileStore knows about.
+  // Per-profile failures are logged and skipped — one broken profile
+  // must not stop the rest from reaching disk.
+  private void flushContainerCookieManagers() {
+    if (!WebViewFeature.isFeatureSupported(WebViewFeature.MULTI_PROFILE)) {
+      return;
+    }
+    try {
+      ProfileStore store = ProfileStore.getInstance();
+      for (String name : store.getAllProfileNames()) {
+        if (Profile.DEFAULT_PROFILE_NAME.equals(name)) {
+          // Already flushed via the global CookieManager above.
+          continue;
+        }
+        try {
+          Profile profile = store.getProfile(name);
+          if (profile != null) {
+            profile.getCookieManager().flush();
+          }
+        } catch (Throwable t) {
+          Log.w(LOG_TAG, "flush for container '" + name + "' failed: " + t);
+        }
+      }
+    } catch (Throwable t) {
+      Log.w(LOG_TAG, "container flush fan-out failed: " + t);
     }
   }
 

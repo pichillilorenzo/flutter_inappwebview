@@ -5,9 +5,39 @@
 //  Created by Lorenzo on 21/10/18.
 //
 
+import CryptoKit
 import Flutter
 import Foundation
 @preconcurrency import WebKit
+
+// Derive a stable UUID for `WKWebsiteDataStore(forIdentifier:)` from an
+// arbitrary profile-id string. Apple's API requires a UUID, but our
+// public Dart API accepts a free-form String. We hash the UTF-8 bytes of
+// the profile-id with SHA-256 and take the first 16 bytes, formatted as
+// a UUID. Properties:
+//   - Stable across launches: same id → same UUID → same on-disk store
+//     re-attaches after restart, instead of being recreated.
+//   - Stable across builds: reinstalling the app keeps the user's
+//     logged-in session.
+//   - No device-identifier leak: the UUID derives from the id only.
+// Not RFC 4122 v5 (we don't bother setting version/variant bits — Apple's
+// API doesn't validate them and every value we produce is a valid UUID
+// byte pattern). Collision probability is the same as any 128-bit hash
+// digest: cryptographically negligible for any plausible profile count.
+// Module-internal so ContainerManager.swift can call it from the same
+// Swift module — Swift's `internal` (the default) makes the symbol
+// visible across files in the same target, which is what we need.
+@available(iOS 13.0, *)
+func containerIdToUUID(_ containerId: String) -> UUID {
+    let digest = SHA256.hash(data: Data(containerId.utf8))
+    let bytes = Array(digest.prefix(16))
+    return UUID(uuid: (
+        bytes[0], bytes[1], bytes[2], bytes[3],
+        bytes[4], bytes[5], bytes[6], bytes[7],
+        bytes[8], bytes[9], bytes[10], bytes[11],
+        bytes[12], bytes[13], bytes[14], bytes[15]
+    ))
+}
 
 public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                             WKNavigationDelegate, WKScriptMessageHandler, UIGestureRecognizerDelegate,
@@ -15,6 +45,32 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                             PullToRefreshDelegate,
                             Disposable {
     static let METHOD_CHANNEL_NAME_PREFIX = "com.pichillilorenzo/flutter_inappwebview_"
+
+    // Registry of live InAppWebView instances. Used by MyCookieManager to
+    // resolve the per-profile WKHTTPCookieStore for cookie ops scoped to a
+    // specific WebView. NSHashTable.weakObjects holds entries weakly so
+    // dealloc removes them automatically — no explicit deregister needed.
+    // We can't walk `UIApplication.shared.connectedScenes`'s view tree
+    // reliably: WebViews can be detached from the visible hierarchy
+    // (e.g. an IndexedStack-hosted platform view with another route on top).
+    static let liveWebViews = NSHashTable<InAppWebView>.weakObjects()
+
+    static func findById(_ webViewId: Any) -> InAppWebView? {
+        for view in liveWebViews.allObjects {
+            if let viewId = view.id, anyIdsEqual(viewId, webViewId) {
+                return view
+            }
+        }
+        return nil
+    }
+
+    private static func anyIdsEqual(_ a: Any, _ b: Any) -> Bool {
+        if let an = a as? NSNumber, let bn = b as? NSNumber {
+            return an.isEqual(bn)
+        }
+        if let as_ = a as? String, let bs = b as? String { return as_ == bs }
+        return false
+    }
 
     var id: Any? // viewId
     var plugin: InAppWebViewFlutterPlugin?
@@ -78,6 +134,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         super.init(frame: frame, configuration: configuration)
         self.id = id
         self.plugin = plugin
+        InAppWebView.liveWebViews.add(self)
         if let id = id, let registrar = plugin?.registrar {
             let channel = FlutterMethodChannel(name: InAppWebView.METHOD_CHANNEL_NAME_PREFIX + String(describing: id),
                                                binaryMessenger: registrar.messenger())
@@ -676,6 +733,42 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                     configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
                 } else if settings.cacheEnabled {
                     configuration.websiteDataStore = WKWebsiteDataStore.default()
+                }
+                // Persistent per-WebView partitioning via
+                // WKWebsiteDataStore(forIdentifier:). Overrides the default /
+                // nonPersistent store assigned just above when a containerId is
+                // supplied AND the runtime supports identifier-based stores
+                // (iOS 17+). incognito wins — we don't materialize a
+                // persistent profile for an incognito WebView.
+                var boundContainerId: String? = nil
+                if !settings.incognito,
+                   let containerId = settings.containerId, !containerId.isEmpty,
+                   #available(iOS 17.0, *) {
+                    boundContainerId = containerId
+                    // Get the WKWebsiteDataStore from
+                    // ContainerManager's shared cache so this WebView,
+                    // sibling WebViews in the same container, and any
+                    // ContainerController op all hold the *same*
+                    // wrapper. Mirrors the Linux
+                    // container_session_cache pattern. The helper also
+                    // records the id ↔ UUID mapping so
+                    // getAllContainerNames can later recover the
+                    // string.
+                    configuration.websiteDataStore =
+                        ContainerManager.getOrCreateDataStore(forContainer: containerId)
+                }
+                // The store's proxy comes from ProxyManager's table, which
+                // ProxyController writes too. proxySettings is a write to it:
+                // to the container's entry, or to this WebView's own for an
+                // incognito store. Left unset it changes nothing, and the store
+                // still gets what the table resolves it to before the first
+                // request.
+                if #available(iOS 17.0, *) {
+                    ProxyManager.bind(
+                        store: configuration.websiteDataStore,
+                        containerId: boundContainerId,
+                        incognito: settings.incognito,
+                        proxySettings: settings.proxySettings.flatMap { ProxySettings.fromMap(map: $0) })
                 }
                 if !settings.applicationNameForUserAgent.isEmpty {
                     if let applicationNameForUserAgent = configuration.applicationNameForUserAgent {

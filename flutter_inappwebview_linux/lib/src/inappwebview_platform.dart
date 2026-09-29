@@ -1,5 +1,6 @@
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
+import 'container_controller/container_controller.dart';
 import 'cookie_manager/cookie_manager.dart';
 import 'find_interaction/find_interaction_controller.dart';
 import 'http_auth_credentials_database.dart';
@@ -164,6 +165,20 @@ class LinuxInAppWebViewPlatform extends InAppWebViewPlatform {
     PlatformProxyControllerCreationParams params,
   ) {
     return LinuxProxyController(params);
+  }
+
+  /// Creates a new empty [PlatformContainerController] to access static methods.
+  @override
+  PlatformContainerController createPlatformContainerControllerStatic() {
+    return LinuxContainerController.static();
+  }
+
+  /// Creates a new [LinuxContainerController].
+  @override
+  LinuxContainerController createPlatformContainerController(
+    PlatformContainerControllerCreationParams params,
+  ) {
+    return LinuxContainerController(params);
   }
 
   /// Creates a new empty [PlatformServiceWorkerController] to access static methods.

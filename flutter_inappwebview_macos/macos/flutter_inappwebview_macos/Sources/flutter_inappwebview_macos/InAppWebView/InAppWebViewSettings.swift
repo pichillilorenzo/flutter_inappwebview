@@ -30,6 +30,18 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
     var interceptOnlyAsyncAjaxRequests = true
     var useShouldInterceptFetchRequest = false
     var incognito = false
+    // Persistent per-WebView profile identifier. Honored on macOS 14+ — the
+    // string is hashed (SHA-256) into a stable UUID and used as the
+    // identifier for `WKWebsiteDataStore(forIdentifier:)`, which becomes
+    // this WebView's `configuration.websiteDataStore`. The data store
+    // decision is frozen at WKWebView init, so binding has to happen in
+    // `preWKWebViewConfiguration(settings:)` before construction.
+    // Ignored on macOS <14 (no API to scope a persistent store).
+    var containerId: String? = nil
+    // Per-WebView proxy. Carried as the raw Dart map and converted into a
+    // `[ProxyConfiguration]` inside macOS 14+ availability blocks.
+    // Honored only on macOS 14+. Ignored otherwise.
+    var proxySettings: [String: Any?]? = nil
     var cacheEnabled = true
     var transparentBackground = false
     var supportZoom = true
@@ -75,6 +87,14 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
         if let alphaValue = settings["alpha"] as? Double {
             alpha = alphaValue
             settings.removeValue(forKey: "alpha")
+        }
+        // `proxySettings` is typed `[String: Any?]?`, which Objective-C cannot
+        // represent, so @objcMembers never exposes it and super.parse, which asks
+        // `responds(to:)` first, would skip the key without a word. Handled here
+        // for the same reason as the nullable primitives above.
+        if let proxySettingsMap = settings["proxySettings"] as? [String: Any?] {
+            proxySettings = proxySettingsMap
+            settings.removeValue(forKey: "proxySettings")
         }
         let _ = super.parse(settings: settings)
         return self

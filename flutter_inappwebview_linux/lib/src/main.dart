@@ -4,6 +4,7 @@ export 'find_interaction/main.dart';
 export 'http_auth_credentials_database.dart';
 export 'in_app_browser/main.dart';
 export 'in_app_webview/main.dart';
+export 'container_controller/container_controller.dart';
 export 'proxy_controller/proxy_controller.dart';
 export 'web_message/main.dart';
 export 'web_storage/main.dart';

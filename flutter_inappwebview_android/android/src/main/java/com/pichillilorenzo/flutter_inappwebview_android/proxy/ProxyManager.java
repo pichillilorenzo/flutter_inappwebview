@@ -1,5 +1,7 @@
 package com.pichillilorenzo.flutter_inappwebview_android.proxy;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.webkit.ProxyConfig;
@@ -68,6 +70,14 @@ public class ProxyManager extends ChannelDelegateImpl {
   
   private void setProxyOverride(ProxySettings settings, final MethodChannel.Result result) {
     if (proxyController != null) {
+      // A ProxyConfig with no proxy and no direct rule is not a no-op: WebView
+      // sends every request direct. Refuse it and leave the current proxy in
+      // place; clearProxyOverride is how a caller asks for no proxy.
+      if (settings.proxyRules.isEmpty() && settings.directs.isEmpty()) {
+        Log.w(LOG_TAG, "setProxyOverride: no proxy or direct rule; leaving the current proxy alone");
+        result.success(false);
+        return;
+      }
       ProxyConfig.Builder proxyConfigBuilder = new ProxyConfig.Builder();
       for (String bypassRule : settings.bypassRules) {
         proxyConfigBuilder.addBypassRule(bypassRule);

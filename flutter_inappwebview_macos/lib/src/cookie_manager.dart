@@ -206,6 +206,13 @@ class MacOSCookieManager extends PlatformCookieManager with ChannelController {
 
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('url', () => url.toString());
+    // Forwarding the controller id lets the native side route through the
+    // WebView's per-profile WKHTTPCookieStore when one is bound; without
+    // it, reads land in the global default store regardless of the
+    // WebView's containerId.
+    if (webViewController?.id != null) {
+      args.putIfAbsent('webViewId', () => webViewController!.id);
+    }
     List<dynamic> cookieListMap =
         await channel?.invokeMethod<List>('getCookies', args) ?? [];
     cookieListMap = cookieListMap.cast<Map<dynamic, dynamic>>();
@@ -316,6 +323,9 @@ class MacOSCookieManager extends PlatformCookieManager with ChannelController {
 
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('url', () => url.toString());
+    if (webViewController?.id != null) {
+      args.putIfAbsent('webViewId', () => webViewController!.id);
+    }
     List<dynamic> cookies =
         await channel?.invokeMethod<List>('getCookies', args) ?? [];
     cookies = cookies.cast<Map<dynamic, dynamic>>();
@@ -372,6 +382,9 @@ class MacOSCookieManager extends PlatformCookieManager with ChannelController {
     args.putIfAbsent('name', () => name);
     args.putIfAbsent('domain', () => domain);
     args.putIfAbsent('path', () => path);
+    if (webViewController?.id != null) {
+      args.putIfAbsent('webViewId', () => webViewController!.id);
+    }
     return await channel?.invokeMethod<bool>('deleteCookie', args) ?? false;
   }
 

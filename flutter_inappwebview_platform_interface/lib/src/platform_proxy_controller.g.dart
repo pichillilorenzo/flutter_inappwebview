@@ -249,6 +249,12 @@ enum PlatformProxyControllerMethod {
   ///- macOS WKWebView 14.0+ ([Official API - WKWebsiteDataStore.proxyConfigurations](https://developer.apple.com/documentation/webkit/wkwebsitedatastore/4264546-proxyconfigurations))
   ///- Linux WPE WebKit ([Official API - webkit_network_session_set_proxy_settings](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.NetworkSession.set_proxy_settings.html))
   ///
+  ///**Parameters - Officially Supported Platforms/Implementations**:
+  ///- [containerId]:
+  ///    - iOS WKWebView 17.0+
+  ///    - macOS WKWebView 14.0+
+  ///    - Linux WPE WebKit
+  ///
   ///Use the [PlatformProxyController.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
   clearProxyOverride,
@@ -265,6 +271,10 @@ enum PlatformProxyControllerMethod {
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [settings]: all platforms
+  ///- [containerId]:
+  ///    - iOS WKWebView 17.0+
+  ///    - macOS WKWebView 14.0+
+  ///    - Linux WPE WebKit
   ///
   ///Use the [PlatformProxyController.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}

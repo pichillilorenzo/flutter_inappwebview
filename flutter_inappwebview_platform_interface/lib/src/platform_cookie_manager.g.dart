@@ -182,7 +182,8 @@ enum PlatformCookieManagerMethod {
   ///{@template flutter_inappwebview_platform_interface.PlatformCookieManager.flush.supported_platforms}
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android WebView ([Official API - CookieManager.flush](https://developer.android.com/reference/android/webkit/CookieManager#flush()))
+  ///- Android WebView ([Official API - CookieManager.flush](https://developer.android.com/reference/android/webkit/CookieManager#flush())):
+  ///    - Flushes the default profile's cookie jar and, when WebViewFeature.MULTI_PROFILE is supported, fans out to the CookieManager of every container created via InAppWebViewSettings.containerId — a container's session cookies are not reachable from the global CookieManager, so without the fan-out an on-pause flush would silently skip them and their sessions could be lost on process kill.
   ///
   ///Use the [PlatformCookieManager.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}

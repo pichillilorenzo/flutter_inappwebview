@@ -2982,13 +2982,13 @@ class SupportChecker {
         ApiMethodDefinition(
           name: PlatformProxyControllerMethod.setProxyOverride.name,
           signature:
-              'Future<void> setProxyOverride({required ProxySettings settings})',
+              'Future<void> setProxyOverride({required ProxySettings settings, String? containerId})',
           description: 'Sets the proxy override.',
           className: className,
         ),
         ApiMethodDefinition(
           name: PlatformProxyControllerMethod.clearProxyOverride.name,
-          signature: 'Future<void> clearProxyOverride()',
+          signature: 'Future<void> clearProxyOverride({String? containerId})',
           description: 'Clears the proxy override.',
           className: className,
         ),

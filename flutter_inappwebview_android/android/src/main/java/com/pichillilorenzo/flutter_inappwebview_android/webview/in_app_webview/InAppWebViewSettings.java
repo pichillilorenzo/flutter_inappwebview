@@ -54,6 +54,16 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
   public Boolean interceptOnlyAsyncAjaxRequests = true;
   public Boolean useShouldInterceptFetchRequest = false;
   public Boolean incognito = false;
+  // Persistent per-WebView profile identifier. When non-null and the device's
+  // System WebView supports MULTI_PROFILE (version 119+), InAppWebView.prepare()
+  // binds the WebView to this androidx.webkit.Profile via WebViewCompat.setProfile
+  // before any session-bound operation runs. The bind has to happen up front:
+  // addJavascriptInterface, addDocumentStartJavaScript and
+  // CookieManager.setAcceptThirdPartyCookies pin the WebView to whichever
+  // profile is current, and there is no API to rebind a live WebView.
+  // Ignored on devices without MULTI_PROFILE.
+  @Nullable
+  public String containerId;
   public Boolean cacheEnabled = true;
   public Boolean transparentBackground = false;
   public Boolean disableVerticalScroll = false;
@@ -236,6 +246,9 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
           break;
         case "incognito":
           incognito = (Boolean) value;
+          break;
+        case "containerId":
+          containerId = (String) value;
           break;
         case "cacheEnabled":
           cacheEnabled = (Boolean) value;
@@ -514,6 +527,7 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
     settings.put("interceptOnlyAsyncAjaxRequests", interceptOnlyAsyncAjaxRequests);
     settings.put("useShouldInterceptFetchRequest", useShouldInterceptFetchRequest);
     settings.put("incognito", incognito);
+    settings.put("containerId", containerId);
     settings.put("cacheEnabled", cacheEnabled);
     settings.put("transparentBackground", transparentBackground);
     settings.put("disableVerticalScroll", disableVerticalScroll);

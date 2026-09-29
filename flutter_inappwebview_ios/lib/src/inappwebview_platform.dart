@@ -7,6 +7,7 @@ import 'http_auth_credentials_database.dart';
 import 'in_app_browser/in_app_browser.dart';
 import 'in_app_webview/main.dart';
 import 'print_job/main.dart';
+import 'container_controller.dart';
 import 'proxy_controller.dart';
 import 'pull_to_refresh/main.dart';
 import 'web_authentication_session/main.dart';
@@ -406,6 +407,26 @@ class IOSInAppWebViewPlatform extends InAppWebViewPlatform {
   @override
   IOSProxyController createPlatformProxyControllerStatic() {
     return IOSProxyController.static();
+  }
+
+  /// Creates a new [IOSContainerController].
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [ContainerController] in `flutter_inappwebview` instead.
+  @override
+  IOSContainerController createPlatformContainerController(
+    PlatformContainerControllerCreationParams params,
+  ) {
+    return IOSContainerController(params);
+  }
+
+  /// Creates a new empty [IOSContainerController] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [ContainerController] in `flutter_inappwebview` instead.
+  @override
+  IOSContainerController createPlatformContainerControllerStatic() {
+    return IOSContainerController.static();
   }
 
   // ************************************************************************ //

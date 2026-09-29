@@ -14,6 +14,21 @@ public class MyCookieManager: ChannelDelegate {
     static let METHOD_CHANNEL_NAME = "com.pichillilorenzo/flutter_inappwebview_cookiemanager"
     static let httpCookieStore = WKWebsiteDataStore.default().httpCookieStore
 
+    // Resolves the WKHTTPCookieStore for the WKWebsiteDataStore that the
+    // WebView identified by `webViewId` is bound to. The store is keyed
+    // by *profile*, not by WebView — two WebViews sharing a containerId
+    // share their cookies, and this lookup returns the same store for
+    // both. The webViewId is only the lookup vehicle to find which
+    // profile is bound. Falls back to the default store on a miss
+    // (byte-identical to upstream behavior).
+    static func httpCookieStore(forContainerOf webViewId: Any?) -> WKHTTPCookieStore {
+        if let webViewId = webViewId,
+           let webView = InAppWebView.findById(webViewId) {
+            return webView.configuration.websiteDataStore.httpCookieStore
+        }
+        return WKWebsiteDataStore.default().httpCookieStore
+    }
+
     private var plugin: InAppWebViewFlutterPlugin?
     
     init(plugin: InAppWebViewFlutterPlugin) {
@@ -55,7 +70,10 @@ public class MyCookieManager: ChannelDelegate {
                 break
             case "getCookies":
                 let url = arguments!["url"] as! String
-                MyCookieManager.getCookies(url: url, result: result)
+                MyCookieManager.getCookies(
+                    url: url,
+                    webViewId: arguments?["webViewId"],
+                    result: result)
                 break
             case "getAllCookies":
                 MyCookieManager.getAllCookies(result: result)
@@ -65,7 +83,10 @@ public class MyCookieManager: ChannelDelegate {
                 let name = arguments!["name"] as! String
                 let path = arguments!["path"] as! String
                 let domain = arguments!["domain"] as? String
-                MyCookieManager.deleteCookie(url: url, name: name, path: path, domain: domain, result: result)
+                MyCookieManager.deleteCookie(
+                    url: url, name: name, path: path, domain: domain,
+                    webViewId: arguments?["webViewId"],
+                    result: result)
                 break
             case "deleteCookies":
                 let url = arguments!["url"] as! String
@@ -144,10 +165,17 @@ public class MyCookieManager: ChannelDelegate {
     }
     
     public static func getCookies(url: String, result: @escaping FlutterResult) {
+        getCookies(url: url, webViewId: nil, result: result)
+    }
+
+    // webViewId-scoped overload: routes through the bound profile's
+    // WKHTTPCookieStore when webViewId resolves to a profile-bound
+    // WebView; identical to the stock default-store path otherwise.
+    public static func getCookies(url: String, webViewId: Any?, result: @escaping FlutterResult) {
         var cookieList: [[String: Any?]] = []
-        
+
         if let urlHost = URL(string: url)?.host {
-            MyCookieManager.httpCookieStore.getAllCookies { (cookies) in
+            httpCookieStore(forContainerOf: webViewId).getAllCookies { (cookies) in
                 for cookie in cookies {
                     if urlHost.hasSuffix(cookie.domain) || ".\(urlHost)".hasSuffix(cookie.domain) {
                         var sameSite: String? = nil
@@ -221,8 +249,22 @@ public class MyCookieManager: ChannelDelegate {
     }
     
     public static func deleteCookie(url: String, name: String, path: String, domain: String?, result: @escaping FlutterResult) {
+        deleteCookie(url: url, name: name, path: path, domain: domain, webViewId: nil, result: result)
+    }
+
+    // webViewId-scoped overload: routes through the bound profile's
+    // WKHTTPCookieStore when webViewId resolves to a profile-bound
+    // WebView; identical to the stock default-store path otherwise.
+    public static func deleteCookie(url: String, name: String, path: String, domain: String?,
+                                    webViewId: Any?,
+                                    result: @escaping FlutterResult) {
         var domain = domain
-        MyCookieManager.httpCookieStore.getAllCookies { (cookies) in
+        // Capture the resolved store once so the inner `.delete(...)`
+        // targets the SAME jar we enumerated. Otherwise the delete would
+        // land on the default store while the read came from the per-
+        // profile one.
+        let store = httpCookieStore(forContainerOf: webViewId)
+        store.getAllCookies { (cookies) in
             for cookie in cookies {
                 var originURL = url
                 if cookie.properties![.originURL] is String {
@@ -239,7 +281,7 @@ public class MyCookieManager: ChannelDelegate {
                     }
                 }
                 if let domain = domain, cookie.domain == domain, cookie.name == name, cookie.path == path {
-                    MyCookieManager.httpCookieStore.delete(cookie, completionHandler: {
+                    store.delete(cookie, completionHandler: {
                         result(true)
                     })
                     return

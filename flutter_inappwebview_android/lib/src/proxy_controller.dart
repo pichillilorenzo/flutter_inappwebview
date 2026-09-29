@@ -76,14 +76,29 @@ class AndroidProxyController extends PlatformProxyController
   Future<dynamic> _handleMethod(MethodCall call) async {}
 
   @override
-  Future<void> setProxyOverride({required ProxySettings settings}) async {
+  Future<void> setProxyOverride({
+    required ProxySettings settings,
+    String? containerId,
+  }) async {
+    if (containerId != null) {
+      throw UnsupportedError(
+        'setProxyOverride with a containerId is not supported on Android, '
+        'where a proxy applies to every WebView',
+      );
+    }
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent("settings", () => settings.toMap());
     await channel?.invokeMethod('setProxyOverride', args);
   }
 
   @override
-  Future<void> clearProxyOverride() async {
+  Future<void> clearProxyOverride({String? containerId}) async {
+    if (containerId != null) {
+      throw UnsupportedError(
+        'clearProxyOverride with a containerId is not supported on Android, '
+        'where a proxy applies to every WebView',
+      );
+    }
     Map<String, dynamic> args = <String, dynamic>{};
     await channel?.invokeMethod('clearProxyOverride', args);
   }

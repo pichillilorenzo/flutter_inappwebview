@@ -8,6 +8,8 @@
 #include <string>
 #include <vector>
 
+#include "../proxy_manager.h"
+
 namespace flutter_inappwebview_plugin {
 
 class InAppWebView;
@@ -140,6 +142,27 @@ class InAppWebViewSettings {
   // === Incognito mode ===
   // When true, creates an ephemeral network session (no persistent storage)
   bool incognito = false;
+
+  // === Container join ===
+  // When non-empty (and incognito is false), the WebView joins a named,
+  // persistent storage container at construction. Cookies, localStorage,
+  // IndexedDB, ServiceWorkers and the HTTP cache live in
+  //   <XDG_DATA_HOME>/flutter_inappwebview/containers/<containerId>/data
+  //   <XDG_CACHE_HOME>/flutter_inappwebview/containers/<containerId>/cache
+  // Multiple WebViews joining the same container share storage.
+  // Honored on WPE WebKit 2.40+. Ignored on older runtimes (the
+  // network-session API isn't there).
+  std::string containerId;
+
+  // === Proxy ===
+  // With a containerId, the container's proxy: the same entry
+  // ProxyController.setProxyOverride(containerId:) writes, set at
+  // construction because a session's proxy has to be in place before the
+  // first request leaves it. With incognito, the proxy of this WebView's
+  // own ephemeral session. Otherwise ignored: the WebView shares the
+  // default session, and a proxy there would change every other WebView on
+  // it. Unset, it changes nothing.
+  std::optional<ProxySettings> proxySettings;
 
   // === CORS allowlist ===
   // List of URI patterns for which CORS checks are disabled

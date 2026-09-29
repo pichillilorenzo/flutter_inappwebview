@@ -73,9 +73,14 @@ class LinuxCookieManager extends PlatformCookieManager {
       if (sameSite != null) 'sameSite': sameSite.toString().split('.').last,
     };
 
+    // Forwarding the controller id lets the native side route through
+    // the WebKitNetworkSession of whichever container the WebView has
+    // joined; without it, every cookie op would land in the default
+    // jar regardless of the WebView's containerId.
     final result = await _channel.invokeMethod<bool>('setCookie', {
       'url': url.toString(),
       'cookie': cookie,
+      if (webViewController?.id != null) 'webViewId': webViewController!.id,
     });
 
     return result ?? false;
@@ -90,6 +95,7 @@ class LinuxCookieManager extends PlatformCookieManager {
   }) async {
     final result = await _channel.invokeMethod<List<dynamic>>('getCookies', {
       'url': url.toString(),
+      if (webViewController?.id != null) 'webViewId': webViewController!.id,
     });
 
     if (result == null) {
@@ -112,7 +118,11 @@ class LinuxCookieManager extends PlatformCookieManager {
   }) async {
     final result = await _channel.invokeMethod<Map<dynamic, dynamic>?>(
       'getCookie',
-      {'url': url.toString(), 'name': name},
+      {
+        'url': url.toString(),
+        'name': name,
+        if (webViewController?.id != null) 'webViewId': webViewController!.id,
+      },
     );
 
     if (result == null) {
@@ -137,6 +147,7 @@ class LinuxCookieManager extends PlatformCookieManager {
       'name': name,
       'path': path,
       'domain': domain ?? '',
+      if (webViewController?.id != null) 'webViewId': webViewController!.id,
     });
 
     return result ?? false;
@@ -155,6 +166,7 @@ class LinuxCookieManager extends PlatformCookieManager {
       'url': url.toString(),
       'path': path,
       'domain': domain ?? '',
+      if (webViewController?.id != null) 'webViewId': webViewController!.id,
     });
 
     return result ?? false;

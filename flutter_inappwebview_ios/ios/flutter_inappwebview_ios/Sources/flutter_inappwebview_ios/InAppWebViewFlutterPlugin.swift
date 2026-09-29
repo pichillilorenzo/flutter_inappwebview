@@ -36,6 +36,7 @@ public class InAppWebViewFlutterPlugin: NSObject, FlutterPlugin {
     var webAuthenticationSessionManager: WebAuthenticationSessionManager?
     var printJobManager: PrintJobManager?
     var proxyManager: Any?
+    var containerManager: Any?
     
     var webViewControllers: [String: InAppBrowserWebViewController?] = [:]
     var safariViewControllers: [String: Any?] = [:]
@@ -63,6 +64,7 @@ public class InAppWebViewFlutterPlugin: NSObject, FlutterPlugin {
         printJobManager = PrintJobManager(plugin: self)
         if #available(iOS 17.0, *) {
             proxyManager = ProxyManager(plugin: self)
+            containerManager = ContainerManager(plugin: self)
         }
     }
     
@@ -98,6 +100,8 @@ public class InAppWebViewFlutterPlugin: NSObject, FlutterPlugin {
         if #available(iOS 17.0, *) {
             (proxyManager as? ProxyManager)?.dispose()
             proxyManager = nil
+            (containerManager as? ContainerManager)?.dispose()
+            containerManager = nil
         }
     }
 }

@@ -57,18 +57,33 @@ class CookieManager : public ChannelDelegate {
 
   void HandleMethodCall(FlMethodCall* method_call) override;
 
-  // Cookie operations
-  void setCookie(const std::string& url, const Cookie& cookie, std::function<void(bool)> callback);
+  // Cookie operations.
+  //
+  // The optional `webViewId` argument scopes the cookie op to the
+  // container the WebView identified by that id has joined: looking
+  // it up via InAppWebView::FindById, walking to its
+  // WebKitNetworkSession, and reading the session's WebKitCookieManager.
+  // When the id is missing, doesn't resolve, or the WebView is in the
+  // default session, callers fall back to the global cookie manager
+  // (byte-identical to the historical Linux behaviour).
+  void setCookie(const std::string& url, const Cookie& cookie,
+                 std::optional<int64_t> webViewId,
+                 std::function<void(bool)> callback);
 
-  void getCookies(const std::string& url, std::function<void(std::vector<Cookie>)> callback);
+  void getCookies(const std::string& url,
+                  std::optional<int64_t> webViewId,
+                  std::function<void(std::vector<Cookie>)> callback);
 
   void getCookie(const std::string& url, const std::string& name,
+                 std::optional<int64_t> webViewId,
                  std::function<void(std::optional<Cookie>)> callback);
 
   void deleteCookie(const std::string& url, const std::string& name, const std::string& domain,
-                    const std::string& path, std::function<void(bool)> callback);
+                    const std::string& path, std::optional<int64_t> webViewId,
+                    std::function<void(bool)> callback);
 
   void deleteCookies(const std::string& url, const std::string& domain, const std::string& path,
+                     std::optional<int64_t> webViewId,
                      std::function<void(bool)> callback);
 
   void deleteAllCookies(std::function<void(bool)> callback);
@@ -77,9 +92,23 @@ class CookieManager : public ChannelDelegate {
 
  private:
   PluginInstance* plugin_ = nullptr;
+  // Cached default-session cookie manager. The per-container path
+  // resolves its WebKitCookieManager freshly on each call (it's owned
+  // by the session and cheap to fetch), so only the default sits in
+  // this slot.
   WebKitCookieManager* cookie_manager_;
 
   WebKitCookieManager* getCookieManager();
+
+  // Resolve the WebKitCookieManager for the WebKitNetworkSession the
+  // WebView identified by `webViewId` joined. The store is keyed by
+  // *container*, not by WebView — two WebViews sharing a containerId
+  // resolve to the same manager. Falls back to the global cookie
+  // manager when:
+  //   - webViewId is std::nullopt
+  //   - InAppWebView::FindById doesn't find the WebView
+  //   - the WebView's session is the default session (no container)
+  WebKitCookieManager* cookieManagerForContainerOf(std::optional<int64_t> webViewId);
 };
 
 }  // namespace flutter_inappwebview_plugin

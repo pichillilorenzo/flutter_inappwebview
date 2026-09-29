@@ -361,6 +361,15 @@ class WindowsInAppWebViewPlatform extends InAppWebViewPlatform {
     return _PlatformProxyController.static();
   }
 
+  /// Creates a new empty [PlatformContainerController] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [ContainerController] in `flutter_inappwebview` instead.
+  @override
+  PlatformContainerController createPlatformContainerControllerStatic() {
+    return _PlatformContainerController.static();
+  }
+
   /// Creates a new empty [PlatformServiceWorkerController] to access static methods.
   ///
   /// This function should only be called by the app-facing package.
@@ -519,6 +528,17 @@ class _PlatformProxyController extends PlatformProxyController {
   );
 
   factory _PlatformProxyController.static() => _staticValue;
+}
+
+class _PlatformContainerController extends PlatformContainerController {
+  _PlatformContainerController(PlatformContainerControllerCreationParams params)
+    : super.implementation(params);
+  static final _PlatformContainerController _staticValue =
+      _PlatformContainerController(
+        const PlatformContainerControllerCreationParams(),
+      );
+
+  factory _PlatformContainerController.static() => _staticValue;
 }
 
 class _PlatformServiceWorkerController extends PlatformServiceWorkerController {

@@ -181,6 +181,15 @@ class InAppWebViewSettings_ {
   )
   bool? javaScriptEnabled;
 
+  ///Whether to show the native JavaScript prompt dialog. The default is `true`.
+  ///When `false`, prompts not handled by the Flutter callback are cancelled,
+  ///returning `null` to JavaScript. The Flutter onJsPrompt callback still runs.
+  ///Alert, confirm, and before-unload dialogs are unaffected.
+  ///This does not dismiss dialogs already visible. Pending prompts are cancelled
+  ///when the WebView is disposed, regardless of this setting.
+  @SupportedPlatforms(platforms: [AndroidPlatform(), IOSPlatform()])
+  bool? enableNativePromptDialog;
+
   ///Set to `true` to allow JavaScript open windows without user interaction. The default value is `false`.
   @SupportedPlatforms(
     platforms: [
@@ -3286,6 +3295,7 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
     this.userAgent = "",
     this.applicationNameForUserAgent = "",
     this.javaScriptEnabled = true,
+    this.enableNativePromptDialog = true,
     this.javaScriptCanOpenWindowsAutomatically = false,
     this.mediaPlaybackRequiresUserGesture = true,
     this.minimumFontSize,

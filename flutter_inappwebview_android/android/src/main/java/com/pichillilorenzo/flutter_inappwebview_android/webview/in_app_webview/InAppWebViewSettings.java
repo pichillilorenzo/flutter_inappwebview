@@ -40,6 +40,8 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
   public String userAgent = "";
   public String applicationNameForUserAgent = "";
   public Boolean javaScriptEnabled = true;
+  // Preserve default prompt UI unless Flutter explicitly disables the native fallback.
+  public Boolean enableNativePromptDialog = true;
   public Boolean javaScriptCanOpenWindowsAutomatically = false;
   public Boolean mediaPlaybackRequiresUserGesture = true;
   public Integer minimumFontSize = 8;
@@ -194,6 +196,10 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
           break;
         case "javaScriptEnabled":
           javaScriptEnabled = (Boolean) value;
+          break;
+        // The same channel key is used for initial settings and runtime setSettings.
+        case "enableNativePromptDialog":
+          enableNativePromptDialog = (Boolean) value;
           break;
         case "javaScriptCanOpenWindowsAutomatically":
           javaScriptCanOpenWindowsAutomatically = (Boolean) value;
@@ -500,6 +506,8 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
     settings.put("userAgent", userAgent);
     settings.put("applicationNameForUserAgent", applicationNameForUserAgent);
     settings.put("javaScriptEnabled", javaScriptEnabled);
+    // Include the flag in getSettings so read-modify-write updates preserve it.
+    settings.put("enableNativePromptDialog", enableNativePromptDialog);
     settings.put("javaScriptCanOpenWindowsAutomatically", javaScriptCanOpenWindowsAutomatically);
     settings.put("mediaPlaybackRequiresUserGesture", mediaPlaybackRequiresUserGesture);
     settings.put("minimumFontSize", minimumFontSize);

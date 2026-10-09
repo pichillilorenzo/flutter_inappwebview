@@ -1,0 +1,754 @@
+import 'package:drago_inappwebview/platform_interface/platform_interface.dart';
+
+import 'cookie_manager.dart';
+import 'in_app_webview/main.dart';
+import 'web_storage/web_storage.dart';
+
+/// Implementation of [InAppWebViewPlatform] using the Web API.
+class WebPlatformInAppWebViewPlatform extends InAppWebViewPlatform {
+  /// Registers this class as the default instance of [InAppWebViewPlatform].
+  static void registerWith() {
+    InAppWebViewPlatform.instance = WebPlatformInAppWebViewPlatform();
+  }
+
+  /// Creates a new [WebPlatformCookieManager].
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [CookieManager] in `drago_inappwebview` instead.
+  @override
+  WebPlatformCookieManager createPlatformCookieManager(
+    PlatformCookieManagerCreationParams params,
+  ) {
+    return WebPlatformCookieManager(params);
+  }
+
+  /// Creates a new empty [WebPlatformCookieManager] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [CookieManager] in `drago_inappwebview` instead.
+  @override
+  WebPlatformCookieManager createPlatformCookieManagerStatic() {
+    return WebPlatformCookieManager.static();
+  }
+
+  /// Creates a new [WebPlatformInAppWebViewController].
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [InAppWebViewController] in `drago_inappwebview` instead.
+  @override
+  WebPlatformInAppWebViewController createPlatformInAppWebViewController(
+    PlatformInAppWebViewControllerCreationParams params,
+  ) {
+    return WebPlatformInAppWebViewController(params);
+  }
+
+  /// Creates a new empty [WebPlatformInAppWebViewController] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [InAppWebViewController] in `drago_inappwebview` instead.
+  @override
+  WebPlatformInAppWebViewController
+  createPlatformInAppWebViewControllerStatic() {
+    return WebPlatformInAppWebViewController.static();
+  }
+
+  /// Creates a new [WebPlatformInAppWebViewWidget].
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [InAppWebView] in `drago_inappwebview` instead.
+  @override
+  WebPlatformInAppWebViewWidget createPlatformInAppWebViewWidget(
+    PlatformInAppWebViewWidgetCreationParams params,
+  ) {
+    return WebPlatformInAppWebViewWidget(params);
+  }
+
+  /// Creates a new empty [WebPlatformInAppWebViewWidget] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [InAppWebView] in `drago_inappwebview` instead.
+  @override
+  WebPlatformInAppWebViewWidget createPlatformInAppWebViewWidgetStatic() {
+    return WebPlatformInAppWebViewWidget.static();
+  }
+
+  /// Creates a new [WebPlatformHeadlessInAppWebView].
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [HeadlessInAppWebView] in `drago_inappwebview` instead.
+  @override
+  WebPlatformHeadlessInAppWebView createPlatformHeadlessInAppWebView(
+    PlatformHeadlessInAppWebViewCreationParams params,
+  ) {
+    return WebPlatformHeadlessInAppWebView(params);
+  }
+
+  /// Creates a new empty [WebPlatformHeadlessInAppWebView] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [HeadlessInAppWebView] in `drago_inappwebview` instead.
+  @override
+  WebPlatformHeadlessInAppWebView createPlatformHeadlessInAppWebViewStatic() {
+    return WebPlatformHeadlessInAppWebView.static();
+  }
+
+  /// Creates a new [WebPlatformWebStorage].
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [WebStorage] in `drago_inappwebview` instead.
+  @override
+  WebPlatformWebStorage createPlatformWebStorage(
+    PlatformWebStorageCreationParams params,
+  ) {
+    return WebPlatformWebStorage(params);
+  }
+
+  /// Creates a new empty [WebPlatformWebStorage] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [WebStorage] in `drago_inappwebview` instead.
+  @override
+  WebPlatformWebStorage createPlatformWebStorageStatic() {
+    return WebPlatformWebStorage(
+      WebPlatformWebStorageCreationParams(
+        localStorage: createPlatformLocalStorageStatic(),
+        sessionStorage: createPlatformSessionStorageStatic(),
+      ),
+    );
+  }
+
+  /// Creates a new [WebPlatformLocalStorage].
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [LocalStorage] in `drago_inappwebview` instead.
+  @override
+  WebPlatformLocalStorage createPlatformLocalStorage(
+    PlatformLocalStorageCreationParams params,
+  ) {
+    return WebPlatformLocalStorage(params);
+  }
+
+  /// Creates a new empty [WebPlatformLocalStorage] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [LocalStorage] in `drago_inappwebview` instead.
+  @override
+  WebPlatformLocalStorage createPlatformLocalStorageStatic() {
+    return WebPlatformLocalStorage.defaultStorage(controller: null);
+  }
+
+  /// Creates a new [WebPlatformSessionStorage].
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [SessionStorage] in `drago_inappwebview` instead.
+  @override
+  WebPlatformSessionStorage createPlatformSessionStorage(
+    PlatformSessionStorageCreationParams params,
+  ) {
+    return WebPlatformSessionStorage(params);
+  }
+
+  /// Creates a new empty [WebPlatformSessionStorage] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [SessionStorage] in `drago_inappwebview` instead.
+  @override
+  WebPlatformSessionStorage createPlatformSessionStorageStatic() {
+    return WebPlatformSessionStorage.defaultStorage(controller: null);
+  }
+
+  /// Creates a new empty [PlatformWebStorageManager] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [WebStorageManager] in `drago_inappwebview` instead.
+  @override
+  PlatformWebStorageManager createPlatformWebStorageManagerStatic() {
+    return _PlatformWebStorageManager.static();
+  }
+
+  // ************************************************************************ //
+  // Create static instances of unsupported classes to be able to call        //
+  // isClassSupported, isMethodSupported, isPropertySupported, etc.           //
+  // static methods without throwing a missing platform implementation        //
+  // exception.                                                               //
+  // ************************************************************************ //
+
+  /// Creates a new empty [PlatformWebViewEnvironment] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [WebViewEnvironment] in `drago_inappwebview` instead.
+  @override
+  PlatformWebViewEnvironment createPlatformWebViewEnvironmentStatic() {
+    return _PlatformWebViewEnvironment.static();
+  }
+
+  /// Creates a new empty [PlatformInAppBrowser] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [InAppBrowser] in `drago_inappwebview` instead.
+  @override
+  PlatformInAppBrowser createPlatformInAppBrowserStatic() {
+    return _PlatformInAppBrowser.static();
+  }
+
+  /// Creates a new empty [PlatformChromeSafariBrowser] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [ChromeSafariBrowser] in `drago_inappwebview` instead.
+  @override
+  PlatformChromeSafariBrowser createPlatformChromeSafariBrowserStatic() {
+    return _PlatformChromeSafariBrowser.static();
+  }
+
+  /// Creates a new empty [PlatformHttpAuthCredentialDatabase] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [HttpAuthCredentialDatabase] in `drago_inappwebview` instead.
+  @override
+  PlatformHttpAuthCredentialDatabase
+  createPlatformHttpAuthCredentialDatabaseStatic() {
+    return _PlatformHttpAuthCredentialDatabase.static();
+  }
+
+  /// Creates a new empty [PlatformProcessGlobalConfig] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [ProcessGlobalConfig] in `drago_inappwebview` instead.
+  @override
+  PlatformProcessGlobalConfig createPlatformProcessGlobalConfigStatic() {
+    return _PlatformProcessGlobalConfig.static();
+  }
+
+  /// Creates a new empty [PlatformProxyController] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [ProxyController] in `drago_inappwebview` instead.
+  @override
+  PlatformProxyController createPlatformProxyControllerStatic() {
+    return _PlatformProxyController.static();
+  }
+
+  /// Creates a new empty [PlatformServiceWorkerController] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [ServiceWorkerController] in `drago_inappwebview` instead.
+  @override
+  PlatformServiceWorkerController
+  createPlatformServiceWorkerControllerStatic() {
+    return _PlatformServiceWorkerController.static();
+  }
+
+  /// Creates a new empty [PlatformTracingController] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [TracingController] in `drago_inappwebview` instead.
+  @override
+  PlatformTracingController createPlatformTracingControllerStatic() {
+    return _PlatformTracingController.static();
+  }
+
+  /// Creates a new empty [PlatformFindInteractionController] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [FindInteractionController] in `drago_inappwebview` instead.
+  @override
+  PlatformFindInteractionController
+  createPlatformFindInteractionControllerStatic() {
+    return _PlatformFindInteractionController.static();
+  }
+
+  /// Creates a new empty [PlatformPrintJobController] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [PrintJobController] in `drago_inappwebview` instead.
+  @override
+  PlatformPrintJobController createPlatformPrintJobControllerStatic() {
+    return _PlatformPrintJobController.static();
+  }
+
+  /// Creates a new empty [PlatformPullToRefreshController] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [PullToRefreshController] in `drago_inappwebview` instead.
+  @override
+  PlatformPullToRefreshController
+  createPlatformPullToRefreshControllerStatic() {
+    return _PlatformPullToRefreshController.static();
+  }
+
+  /// Creates a new empty [PlatformWebAuthenticationSession] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [WebAuthenticationSession] in `drago_inappwebview` instead.
+  @override
+  PlatformWebAuthenticationSession
+  createPlatformWebAuthenticationSessionStatic() {
+    return _PlatformWebAuthenticationSession.static();
+  }
+
+  /// Creates a new empty [PlatformWebMessageChannel] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [WebMessageChannel] in `drago_inappwebview` instead.
+  @override
+  PlatformWebMessageChannel createPlatformWebMessageChannelStatic() {
+    return _PlatformWebMessageChannel.static();
+  }
+
+  /// Creates a new empty [PlatformWebMessageListener] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [WebMessageListener] in `drago_inappwebview` instead.
+  /// Creates a new [PlatformWebMessageListener].
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [WebMessageListener] in `drago_inappwebview` instead.
+  @override
+  PlatformWebMessageListener createPlatformWebMessageListener(
+    PlatformWebMessageListenerCreationParams params,
+  ) {
+    return _PlatformWebMessageListener(params);
+  }
+
+  @override
+  PlatformWebMessageListener createPlatformWebMessageListenerStatic() {
+    return _PlatformWebMessageListener.static();
+  }
+
+  /// Creates a new empty [PlatformWebNotificationController] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [WebNotificationController] in `drago_inappwebview` instead.
+  @override
+  PlatformWebNotificationController
+  createPlatformWebNotificationControllerStatic() {
+    return _PlatformWebNotificationController.static();
+  }
+
+  /// Creates a new empty [PlatformAssetsPathHandler] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [AssetsPathHandler] in `drago_inappwebview` instead.
+  @override
+  PlatformAssetsPathHandler createPlatformAssetsPathHandlerStatic() {
+    return _PlatformAssetsPathHandler.static();
+  }
+
+  /// Creates a new empty [PlatformResourcesPathHandler] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [ResourcesPathHandler] in `drago_inappwebview` instead.
+  @override
+  PlatformResourcesPathHandler createPlatformResourcesPathHandlerStatic() {
+    return _PlatformResourcesPathHandler.static();
+  }
+
+  /// Creates a new empty [PlatformInternalStoragePathHandler] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [InternalStoragePathHandler] in `drago_inappwebview` instead.
+  @override
+  PlatformInternalStoragePathHandler
+  createPlatformInternalStoragePathHandlerStatic() {
+    return _PlatformInternalStoragePathHandler.static();
+  }
+
+  /// Creates a new empty [PlatformCustomPathHandler] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [CustomPathHandler] in `drago_inappwebview` instead.
+  @override
+  PlatformCustomPathHandler createPlatformCustomPathHandlerStatic() {
+    return _PlatformCustomPathHandler.static();
+  }
+
+  /// Creates a new empty [PlatformInAppLocalhostServer] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [InAppLocalhostServer] in `drago_inappwebview` instead.
+  @override
+  PlatformInAppLocalhostServer createPlatformInAppLocalhostServerStatic() {
+    return _PlatformInAppLocalhostServer.static();
+  }
+
+  /// Creates a new empty [PlatformWebViewFeature] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [WebViewFeature] in `drago_inappwebview` instead
+  @override
+  PlatformWebViewFeature createPlatformWebViewFeatureStatic() {
+    return _PlatformWebViewFeature.static();
+  }
+}
+
+class _PlatformInAppBrowser extends PlatformInAppBrowser {
+  _PlatformInAppBrowser(super.params)
+    : super.implementation();
+  static final _PlatformInAppBrowser _staticValue = _PlatformInAppBrowser(
+    const PlatformInAppBrowserCreationParams(),
+  );
+
+  factory _PlatformInAppBrowser.static() => _staticValue;
+}
+
+class _PlatformChromeSafariBrowser extends PlatformChromeSafariBrowser {
+  _PlatformChromeSafariBrowser(super.params)
+    : super.implementation();
+  static final _PlatformChromeSafariBrowser _staticValue =
+      _PlatformChromeSafariBrowser(
+        const PlatformChromeSafariBrowserCreationParams(),
+      );
+
+  factory _PlatformChromeSafariBrowser.static() => _staticValue;
+}
+
+class _PlatformHttpAuthCredentialDatabase
+    extends PlatformHttpAuthCredentialDatabase {
+  _PlatformHttpAuthCredentialDatabase(
+    super.params,
+  ) : super.implementation();
+  static final _PlatformHttpAuthCredentialDatabase _staticValue =
+      _PlatformHttpAuthCredentialDatabase(
+        const PlatformHttpAuthCredentialDatabaseCreationParams(),
+      );
+
+  factory _PlatformHttpAuthCredentialDatabase.static() => _staticValue;
+}
+
+class _PlatformProcessGlobalConfig extends PlatformProcessGlobalConfig {
+  _PlatformProcessGlobalConfig(super.params)
+    : super.implementation();
+  static final _PlatformProcessGlobalConfig _staticValue =
+      _PlatformProcessGlobalConfig(
+        const PlatformProcessGlobalConfigCreationParams(),
+      );
+
+  factory _PlatformProcessGlobalConfig.static() => _staticValue;
+}
+
+class _PlatformProxyController extends PlatformProxyController {
+  _PlatformProxyController(super.params)
+    : super.implementation();
+  static final _PlatformProxyController _staticValue = _PlatformProxyController(
+    const PlatformProxyControllerCreationParams(),
+  );
+
+  factory _PlatformProxyController.static() => _staticValue;
+}
+
+class _PlatformServiceWorkerController extends PlatformServiceWorkerController {
+  _PlatformServiceWorkerController(
+    super.params,
+  ) : super.implementation();
+  static final _PlatformServiceWorkerController _staticValue =
+      _PlatformServiceWorkerController(
+        const PlatformServiceWorkerControllerCreationParams(),
+      );
+
+  factory _PlatformServiceWorkerController.static() => _staticValue;
+
+  @override
+  ServiceWorkerClient? get serviceWorkerClient => throw UnimplementedError();
+}
+
+class _PlatformTracingController extends PlatformTracingController {
+  _PlatformTracingController(super.params)
+    : super.implementation();
+  static final _PlatformTracingController _staticValue =
+      _PlatformTracingController(
+        const PlatformTracingControllerCreationParams(),
+      );
+
+  factory _PlatformTracingController.static() => _staticValue;
+}
+
+class _PlatformFindInteractionController
+    extends PlatformFindInteractionController {
+  _PlatformFindInteractionController(
+    super.params,
+  ) : super.implementation();
+  static final _PlatformFindInteractionController _staticValue =
+      _PlatformFindInteractionController(
+        const PlatformFindInteractionControllerCreationParams(),
+      );
+
+  factory _PlatformFindInteractionController.static() => _staticValue;
+}
+
+class _PlatformPrintJobController extends PlatformPrintJobController {
+  _PlatformPrintJobController(super.params)
+    : super.implementation();
+
+  static final _PlatformPrintJobController _staticValue =
+      _PlatformPrintJobController(
+        const PlatformPrintJobControllerCreationParams(id: ''),
+      );
+
+  factory _PlatformPrintJobController.static() => _staticValue;
+}
+
+class _PlatformPullToRefreshController extends PlatformPullToRefreshController {
+  _PlatformPullToRefreshController(
+    super.params,
+  ) : super.implementation();
+
+  static final _PlatformPullToRefreshController _staticValue =
+      _PlatformPullToRefreshController(
+        PlatformPullToRefreshControllerCreationParams(),
+      );
+
+  factory _PlatformPullToRefreshController.static() => _staticValue;
+}
+
+class _PlatformWebAuthenticationSession
+    extends PlatformWebAuthenticationSession {
+  _PlatformWebAuthenticationSession(
+    super.params,
+  ) : super.implementation();
+
+  static final _PlatformWebAuthenticationSession _staticValue =
+      _PlatformWebAuthenticationSession(
+        const PlatformWebAuthenticationSessionCreationParams(),
+      );
+
+  factory _PlatformWebAuthenticationSession.static() => _staticValue;
+}
+
+class _PlatformWebMessageChannel extends PlatformWebMessageChannel {
+  _PlatformWebMessageChannel(super.params)
+    : super.implementation();
+
+  static final _PlatformWebMessageChannel _staticValue =
+      _PlatformWebMessageChannel(
+        PlatformWebMessageChannelCreationParams(
+          id: '',
+          port1: _PlatformWebMessagePort(
+            const PlatformWebMessagePortCreationParams(index: 0),
+          ),
+          port2: _PlatformWebMessagePort(
+            const PlatformWebMessagePortCreationParams(index: 1),
+          ),
+        ),
+      );
+
+  factory _PlatformWebMessageChannel.static() => _staticValue;
+}
+
+class _PlatformWebMessageListener extends PlatformWebMessageListener {
+  _PlatformWebMessageListener(super.params)
+    : super.implementation();
+
+  static final _PlatformWebMessageListener _staticValue =
+      _PlatformWebMessageListener(
+        const PlatformWebMessageListenerCreationParams(jsObjectName: ''),
+      );
+
+  factory _PlatformWebMessageListener.static() => _staticValue;
+}
+
+class _PlatformWebMessagePort extends PlatformWebMessagePort {
+  _PlatformWebMessagePort(super.params)
+    : super.implementation();
+
+  static final _PlatformWebMessagePort _staticValue = _PlatformWebMessagePort(
+    const PlatformWebMessagePortCreationParams(index: 0),
+  );
+
+  factory _PlatformWebMessagePort.static() => _staticValue;
+
+  @override
+  Future<void> close() {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> postMessage(WebMessage message) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> setWebMessageCallback(WebMessageCallback? onMessage) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Map<String, dynamic> toJson() {
+    throw UnimplementedError();
+  }
+
+  @override
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
+    throw UnimplementedError();
+  }
+}
+
+class _PlatformWebStorageManager extends PlatformWebStorageManager {
+  _PlatformWebStorageManager(super.params)
+    : super.implementation();
+
+  static final _PlatformWebStorageManager _staticValue =
+      _PlatformWebStorageManager(
+        const PlatformWebStorageManagerCreationParams(),
+      );
+
+  factory _PlatformWebStorageManager.static() => _staticValue;
+}
+
+class _PlatformWebViewEnvironment extends PlatformWebViewEnvironment {
+  _PlatformWebViewEnvironment(super.params)
+    : super.implementation();
+  static final _PlatformWebViewEnvironment _staticValue =
+      _PlatformWebViewEnvironment(
+        const PlatformWebViewEnvironmentCreationParams(),
+      );
+
+  factory _PlatformWebViewEnvironment.static() => _staticValue;
+}
+
+class _PlatformWebNotificationController
+    extends PlatformWebNotificationController {
+  _PlatformWebNotificationController(
+    super.params,
+  ) : super.implementation();
+
+  static final _PlatformWebNotificationController _staticValue =
+      _PlatformWebNotificationController(
+        PlatformWebNotificationControllerCreationParams(
+          id: '',
+          notification: WebNotification(),
+        ),
+      );
+
+  factory _PlatformWebNotificationController.static() => _staticValue;
+}
+
+class _PlatformWebViewFeature extends PlatformWebViewFeature {
+  _PlatformWebViewFeature(super.params)
+    : super.implementation();
+
+  static final _PlatformWebViewFeature _staticValue = _PlatformWebViewFeature(
+    PlatformWebViewFeatureCreationParams(),
+  );
+  factory _PlatformWebViewFeature.static() => _staticValue;
+}
+
+class _PlatformAssetsPathHandler extends PlatformAssetsPathHandler {
+  _PlatformAssetsPathHandler(super.params)
+    : super.implementation();
+
+  static final _PlatformAssetsPathHandler _staticValue =
+      _PlatformAssetsPathHandler(
+        PlatformAssetsPathHandlerCreationParams(
+          PlatformPathHandlerCreationParams(path: ''),
+        ),
+      );
+
+  factory _PlatformAssetsPathHandler.static() => _staticValue;
+
+  @override
+  PlatformPathHandlerEvents? eventHandler;
+
+  @override
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) => {
+    "path": path,
+    "type": type,
+  };
+
+  @override
+  Map<String, dynamic> toJson() => toMap();
+}
+
+class _PlatformResourcesPathHandler extends PlatformResourcesPathHandler {
+  _PlatformResourcesPathHandler(
+    super.params,
+  ) : super.implementation();
+
+  static final _PlatformResourcesPathHandler _staticValue =
+      _PlatformResourcesPathHandler(
+        PlatformResourcesPathHandlerCreationParams(
+          PlatformPathHandlerCreationParams(path: ''),
+        ),
+      );
+
+  factory _PlatformResourcesPathHandler.static() => _staticValue;
+
+  @override
+  PlatformPathHandlerEvents? eventHandler;
+
+  @override
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) => {
+    "path": path,
+    "type": type,
+  };
+
+  @override
+  Map<String, dynamic> toJson() => toMap();
+}
+
+class _PlatformInternalStoragePathHandler
+    extends PlatformInternalStoragePathHandler {
+  _PlatformInternalStoragePathHandler(
+    super.params,
+  ) : super.implementation();
+
+  static final _PlatformInternalStoragePathHandler _staticValue =
+      _PlatformInternalStoragePathHandler(
+        PlatformInternalStoragePathHandlerCreationParams(
+          PlatformPathHandlerCreationParams(path: ''),
+          directory: '',
+        ),
+      );
+
+  factory _PlatformInternalStoragePathHandler.static() => _staticValue;
+
+  @override
+  PlatformPathHandlerEvents? eventHandler;
+
+  @override
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) => {
+    "path": path,
+    "type": type,
+  };
+
+  @override
+  Map<String, dynamic> toJson() => toMap();
+}
+
+class _PlatformCustomPathHandler extends PlatformCustomPathHandler {
+  _PlatformCustomPathHandler(super.params)
+    : super.implementation();
+
+  static final _PlatformCustomPathHandler _staticValue =
+      _PlatformCustomPathHandler(
+        PlatformCustomPathHandlerCreationParams(
+          PlatformPathHandlerCreationParams(path: ''),
+        ),
+      );
+
+  factory _PlatformCustomPathHandler.static() => _staticValue;
+
+  @override
+  PlatformPathHandlerEvents? eventHandler;
+
+  @override
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) => {
+    "path": path,
+    "type": type,
+  };
+
+  @override
+  Map<String, dynamic> toJson() => toMap();
+}
+
+class _PlatformInAppLocalhostServer extends PlatformInAppLocalhostServer {
+  _PlatformInAppLocalhostServer(
+    super.params,
+  ) : super.implementation();
+
+  static final _PlatformInAppLocalhostServer _staticValue =
+      _PlatformInAppLocalhostServer(
+        const PlatformInAppLocalhostServerCreationParams(),
+      );
+
+  factory _PlatformInAppLocalhostServer.static() => _staticValue;
+}

@@ -4,7 +4,7 @@
   "description": "",
   "main": "",
   "scripts": {
-    "build": "esbuild --format=esm --platform=browser --sourcemap=inline --bundle --outfile=../flutter_inappwebview_web/lib/assets/web/web_support.js src/index.ts"
+    "build": "esbuild --format=esm --platform=browser --sourcemap=inline --bundle --outfile=../drago_inappwebview/lib/platforms/web/assets/web/web_support.js src/index.ts"
   },
   "devDependencies": {
     "esbuild": "^0.24.0",

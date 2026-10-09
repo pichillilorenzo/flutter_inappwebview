@@ -1,7 +1,7 @@
 targets:
   $default:
     builders:
-      generators|flutter_inappwebview_internal_annotations:
+      generators|drago_inappwebview_internal_annotations:
         enabled: true
 
 builders:
@@ -19,3 +19,4 @@ builders:
     defaults:
       generate_for:
         - lib/src/**.dart
+        - lib/platform_interface/src/**.dart

@@ -9,8 +9,8 @@ import {
 
 declare global {
   interface Window {
-    flutter_inappwebview_plugin: InAppWebViewPlugin;
-    flutter_inappwebview?: JavaScriptBridgeHandler | null;
+    drago_inappwebview_plugin: InAppWebViewPlugin;
+    drago_inappwebview?: JavaScriptBridgeHandler | null;
     console: Console;
 
     eval(x: string): any;
@@ -22,8 +22,22 @@ declare global {
   let _Array_slice = window.Array.prototype.slice;
   _Array_slice.call = window.Function.prototype.call;
 
-  window.flutter_inappwebview_plugin = {
-    createFlutterInAppWebView: function (viewId: number | string, iframe: HTMLIFrameElement, iframeContainer: HTMLDivElement, bridgeSecret: string) {
+  // Origin rules are anchored so a rule like "https://example.com" cannot
+  // match "https://example.com.evil.com". Rules that already carry an
+  // anchor are left untouched.
+  function _anchorOriginRule(rule: string): string {
+    if (rule.startsWith('^') || rule.endsWith('$')) {
+      return rule;
+    }
+    return '^(?:' + rule + ')$';
+  }
+
+  function _isOriginAllowed(rules: string[], origin: string): boolean {
+    return rules.some((rule) => rule === '*' || new RegExp(_anchorOriginRule(rule)).test(origin));
+  }
+
+  window.drago_inappwebview_plugin = {
+    createDragoInAppWebView: function (viewId: number | string, iframe: HTMLIFrameElement, iframeContainer: HTMLDivElement, bridgeSecret: string) {
       const iframeId = iframe.id;
       const webView: InAppWebView = {
         viewId: viewId,
@@ -52,7 +66,10 @@ declare global {
             }
           }
 
-          document.addEventListener('fullscreenchange', function (event: Event) {
+          if (webView.fullscreenChangeHandler != null) {
+            document.removeEventListener('fullscreenchange', webView.fullscreenChangeHandler);
+          }
+          webView.fullscreenChangeHandler = function (event: Event) {
             // document.fullscreenElement will point to the element that
             // is in fullscreen mode if there is one. If there isn't one,
             // the value of the property is null.
@@ -65,12 +82,16 @@ declare global {
             } else {
               webView.isFullscreen = false;
             }
-          });
+          };
+          document.addEventListener('fullscreenchange', webView.fullscreenChangeHandler);
 
           if (iframe != null) {
             webView.iframe = iframe;
             webView.iframeContainer = iframeContainer;
-            iframe.addEventListener('load', function (event: Event) {
+            if (webView.iframeLoadHandler != null) {
+              iframe.removeEventListener('load', webView.iframeLoadHandler);
+            }
+            webView.iframeLoadHandler = function (event: Event) {
               if (iframe.contentWindow == null) {
                 return;
               }
@@ -81,11 +102,14 @@ declare global {
               try {
                 let javaScriptBridgeEnabled = webView.javaScriptBridgeEnabled;
                 if (javaScriptBridgeOriginAllowList != null) {
-                  javaScriptBridgeEnabled = javaScriptBridgeOriginAllowList
-                      .map(allowedOriginRule => new RegExp(allowedOriginRule))
-                      .some((rx) => {
-                        return rx.test(iframe.contentWindow!.location.origin);
-                      })
+                  let iframeOrigin: string | null = null;
+                  try {
+                    iframeOrigin = iframe.contentWindow!.location.origin;
+                  } catch (_) {
+                    // cross-origin iframe: origin is not readable.
+                    iframeOrigin = null;
+                  }
+                  javaScriptBridgeEnabled = iframeOrigin != null && _isOriginAllowed(javaScriptBridgeOriginAllowList, iframeOrigin);
                 }
                 if (javaScriptBridgeEnabled) {
                   const javaScriptBridgeName = _nativeCommunication<string>('getJavaScriptBridgeName', viewId);
@@ -132,7 +156,7 @@ declare global {
                     if (jsRegExpArray.length > 1) {
                       jsRegExpArray += ",";
                     }
-                    jsRegExpArray += `new RegExp('${allowedOriginRule.replace("\'", "\\'")}')`;
+                    jsRegExpArray += `new RegExp(${_JSON_stringify(_anchorOriginRule(allowedOriginRule))})`;
                   }
                   if (jsRegExpArray.length > 1) {
                     jsRegExpArray += "]";
@@ -341,12 +365,13 @@ declare global {
               _nativeCommunication('onLoadStop', viewId, [url]);
 
               try {
-                iframe.contentWindow.dispatchEvent(new Event('flutterInAppWebViewPlatformReady'));
+                iframe.contentWindow.dispatchEvent(new Event('dragoInAppWebViewPlatformReady'));
               } catch (e) {
                 console.log(e);
               }
 
-            });
+            };
+            iframe.addEventListener('load', webView.iframeLoadHandler);
           }
         },
         setSettings: function (newSettings: InAppWebViewSettings) {
@@ -726,6 +751,113 @@ declare global {
         }
       };
 
+      // Web messages: the host only accepts messages whose source is this
+      // webview's iframe window and whose origin passes the listener's
+      // (anchored) allowed-origin rules.
+      webView.webMessageListeners = {};
+      webView.webMessageHandler = null;
+
+      const _resolveTargetOrigin = function (targetOrigin?: string | null): string | null {
+        if (targetOrigin != null && targetOrigin !== '') {
+          return targetOrigin;
+        }
+        try {
+          const src = webView.iframe?.src;
+          if (src != null && src !== '') {
+            const origin = new URL(src, window.location.href).origin;
+            if (origin != null && origin !== 'null') {
+              return origin;
+            }
+          }
+        } catch (_) {
+        }
+        return null;
+      };
+
+      const _postToIframe = function (data: any, targetOrigin: string | null) {
+        const contentWindow = webView.iframe?.contentWindow;
+        if (contentWindow == null) {
+          throw new Error('WebView iframe is not available.');
+        }
+        if (targetOrigin == null) {
+          throw new Error('Cannot resolve a target origin for the WebView iframe.');
+        }
+        contentWindow.postMessage(data, targetOrigin);
+      };
+
+      webView.postWebMessage = function (data: any, targetOrigin?: string | null) {
+        _postToIframe(data, _resolveTargetOrigin(targetOrigin));
+      };
+
+      webView.replyWebMessage = function (data: any, sourceOrigin: string) {
+        // Reply only to the exact origin that sent the message.
+        if (sourceOrigin == null || sourceOrigin === '' || sourceOrigin === 'null' || sourceOrigin === '*') {
+          throw new Error('Cannot reply to an opaque or wildcard origin.');
+        }
+        _postToIframe(data, sourceOrigin);
+      };
+
+      webView.addWebMessageListener = function (jsObjectName: string, allowedOriginRules: string[]) {
+        webView.webMessageListeners![jsObjectName] = allowedOriginRules ?? [];
+        if (webView.webMessageHandler != null) {
+          return;
+        }
+        webView.webMessageHandler = function (event: MessageEvent) {
+          const contentWindow = webView.iframe?.contentWindow;
+          if (contentWindow == null || event.source !== contentWindow) {
+            return;
+          }
+          const origin = event.origin;
+          let type = 0;
+          let data: any = event.data;
+          if (data instanceof ArrayBuffer) {
+            type = 1;
+            data = Array.from(new Uint8Array(data));
+          } else if (ArrayBuffer.isView(data)) {
+            type = 1;
+            data = Array.from(new Uint8Array(data.buffer, data.byteOffset, data.byteLength));
+          } else if (data != null && typeof data !== 'string') {
+            try {
+              data = _JSON_stringify(data);
+            } catch (_) {
+              return;
+            }
+          }
+          const message = _JSON_stringify({type: type, data: data});
+          const listeners = webView.webMessageListeners ?? {};
+          for (const name of Object.keys(listeners)) {
+            if (_isOriginAllowed(listeners[name], origin)) {
+              _nativeCommunication('onWebMessageListenerPostMessage', viewId, [name, message, origin]);
+            }
+          }
+        };
+        window.addEventListener('message', webView.webMessageHandler);
+      };
+
+      webView.dispose = function () {
+        if (webView.fullscreenChangeHandler != null) {
+          document.removeEventListener('fullscreenchange', webView.fullscreenChangeHandler);
+          webView.fullscreenChangeHandler = null;
+        }
+        const disposedIframe = webView.iframe ?? iframe;
+        if (disposedIframe != null && webView.iframeLoadHandler != null) {
+          disposedIframe.removeEventListener('load', webView.iframeLoadHandler);
+        }
+        webView.iframeLoadHandler = null;
+        try {
+          disposedIframe?.contentWindow?.removeEventListener('contextmenu', webView.disableContextMenuHandler);
+        } catch (_) {
+        }
+        if (webView.webMessageHandler != null) {
+          window.removeEventListener('message', webView.webMessageHandler);
+          webView.webMessageHandler = null;
+        }
+        webView.webMessageListeners = {};
+        webView.functionMap = {};
+        webView.iframe = null;
+        webView.iframeContainer = null;
+      };
+
       return webView;
     },
     getCookieExpirationDate: function (timestamp: number) {
@@ -739,11 +871,11 @@ declare global {
     },
     nativeCommunication: function (method: string, viewId: number | string, args?: any[]) {
       try {
-        const result = window.flutter_inappwebview_plugin.nativeSyncCommunication(method, viewId, args);
+        const result = window.drago_inappwebview_plugin.nativeSyncCommunication(method, viewId, args);
         return result != null ? JSON.parse(result) : null;
       } catch (e1) {
         try {
-          const promise = window.flutter_inappwebview_plugin.nativeAsyncCommunication(method, viewId, args);
+          const promise = window.drago_inappwebview_plugin.nativeAsyncCommunication(method, viewId, args);
           return promise.then(function (result) {
             return result != null ? JSON.parse(result) : null;
           });
@@ -754,5 +886,5 @@ declare global {
     },
   };
 
-  let _nativeCommunication = window.flutter_inappwebview_plugin.nativeCommunication;
+  let _nativeCommunication = window.drago_inappwebview_plugin.nativeCommunication;
 })();

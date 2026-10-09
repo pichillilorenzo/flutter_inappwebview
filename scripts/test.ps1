@@ -91,7 +91,7 @@ try {
     try { flutter clean } catch {}
     try { flutter pub get } catch {}
 
-    Push-Location (Join-Path $ProjectDir "flutter_inappwebview\example")
+    Push-Location (Join-Path $ProjectDir "drago_inappwebview\example")
     
     Write-Host "Running Flutter Clean in example..."
     flutter clean

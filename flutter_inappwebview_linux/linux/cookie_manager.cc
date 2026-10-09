@@ -4,6 +4,7 @@
 #include <cstring>
 #include <ctime>
 
+#include "in_app_webview/in_app_webview.h"
 #include "plugin_instance.h"
 #include "utils/flutter.h"
 #include "utils/log.h"
@@ -168,6 +169,7 @@ WebKitCookieManager* CookieManager::getCookieManager() {
     // WPE WebKit 2.x uses NetworkSession API instead of WebContext
     WebKitNetworkSession* session = webkit_network_session_get_default();
     if (session != nullptr) {
+      EnsurePersistentCookieStorage(session);
       cookie_manager_ = webkit_network_session_get_cookie_manager(session);
     }
   }

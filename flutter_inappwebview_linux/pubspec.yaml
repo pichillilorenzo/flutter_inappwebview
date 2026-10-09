@@ -1,6 +1,6 @@
 name: flutter_inappwebview_linux
 description: "Linux implementation of flutter_inappwebview plugin using WPE WebKit."
-version: 0.1.0-beta.1
+version: 0.1.0-beta.2
 homepage: https://inappwebview.dev/
 repository: https://github.com/pichillilorenzo/flutter_inappwebview/tree/master/flutter_inappwebview_linux
 issue_tracker: https://github.com/pichillilorenzo/flutter_inappwebview/issues

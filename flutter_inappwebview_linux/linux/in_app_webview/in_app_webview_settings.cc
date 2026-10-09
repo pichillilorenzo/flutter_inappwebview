@@ -215,6 +215,9 @@ InAppWebViewSettings::InAppWebViewSettings(FlValue* map) : InAppWebViewSettings(
   // === ITP (Intelligent Tracking Prevention) ===
   itpEnabled = get_fl_map_value(map, "itpEnabled", itpEnabled);
 
+  // === Third party cookies ===
+  thirdPartyCookiesEnabled = get_fl_map_value(map, "thirdPartyCookiesEnabled", thirdPartyCookiesEnabled);
+
   // === Content Blockers ===
   // Store the raw FlValue for later use by ContentBlockerHandler
   if (fl_map_contains_not_null(map, "contentBlockers")) {
@@ -588,6 +591,9 @@ FlValue* InAppWebViewSettings::toFlValue() const {
 
       // === ITP ===
       {"itpEnabled", make_fl_value(itpEnabled)},
+
+      // === Third party cookies ===
+      {"thirdPartyCookiesEnabled", make_fl_value(thirdPartyCookiesEnabled)},
   });
 }
 

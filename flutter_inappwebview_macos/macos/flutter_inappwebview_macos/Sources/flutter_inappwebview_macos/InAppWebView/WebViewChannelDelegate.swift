@@ -486,7 +486,7 @@ public class WebViewChannelDelegate: ChannelDelegate {
             break
         case .postWebMessage:
             if let webView = webView {
-                var message = WebMessage.fromMap(map: arguments!["message"] as! [String: Any?])
+                let message = WebMessage.fromMap(map: arguments!["message"] as! [String: Any?])
                 let targetOrigin = arguments!["targetOrigin"] as! String
                 
                 var ports: [WebMessagePort] = []
@@ -684,7 +684,6 @@ public class WebViewChannelDelegate: ChannelDelegate {
         }
     }
     
-    @available(*, deprecated, message: "Use FindInteractionChannelDelegate.onFindResultReceived instead.")
     public func onFindResultReceived(activeMatchOrdinal: Int, numberOfMatches: Int, isDoneCounting: Bool) {
         let arguments: [String : Any?] = [
             "activeMatchOrdinal": activeMatchOrdinal,

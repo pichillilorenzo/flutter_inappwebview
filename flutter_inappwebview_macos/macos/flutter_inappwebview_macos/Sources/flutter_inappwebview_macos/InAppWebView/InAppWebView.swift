@@ -186,7 +186,7 @@ public class InAppWebView: WKWebView, WKUIDelegate,
                 configuration.defaultWebpagePreferences.preferredContentMode = WKWebpagePreferences.ContentMode(rawValue: settings.preferredContentMode)!
             }
             
-            configuration.preferences.javaScriptEnabled = settings.javaScriptEnabled
+            configuration.preferences.legacyJavaScriptEnabled = settings.javaScriptEnabled
             if #available(macOS 11.0, *) {
                 configuration.defaultWebpagePreferences.allowsContentJavaScript = settings.javaScriptEnabled
             }
@@ -262,7 +262,9 @@ public class InAppWebView: WKWebView, WKUIDelegate,
         let configuration = WKWebViewConfiguration()
         // initialzie WKUserContentController here to fix possible "undefined is not an object (evaluating 'window.webkit.messageHandlers')" javascript error
         configuration.userContentController = WKUserContentController()
-        configuration.processPool = WKProcessPoolManager.sharedProcessPool
+        if #unavailable(macOS 12.0) {
+            configuration.processPool = WKProcessPoolManager.sharedProcessPool
+        }
         
         if let settings = settings {
             configuration.suppressesIncrementalRendering = settings.suppressesIncrementalRendering
@@ -717,7 +719,7 @@ public class InAppWebView: WKWebView, WKUIDelegate,
         }
         
         if newSettingsMap["javaScriptEnabled"] != nil && settings?.javaScriptEnabled != newSettings.javaScriptEnabled {
-            configuration.preferences.javaScriptEnabled = newSettings.javaScriptEnabled
+            configuration.preferences.legacyJavaScriptEnabled = newSettings.javaScriptEnabled
         }
         
         if #available(macOS 11.0, *) {
@@ -831,7 +833,6 @@ public class InAppWebView: WKWebView, WKUIDelegate,
         }
     }
     
-    @available(*, deprecated, message: "Use InAppWebViewManager.clearAllCache instead.")
     public func clearCache() {
         let date = NSDate(timeIntervalSince1970: 0)
         WKWebsiteDataStore.default().removeData(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes(), modifiedSince: date as Date, completionHandler:{ })
@@ -2617,7 +2618,7 @@ if(window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)] 
     }
     
     public func getSelectedText(completionHandler: @escaping (Any?, Error?) -> Void) {
-        if configuration.preferences.javaScriptEnabled {
+        if configuration.preferences.legacyJavaScriptEnabled {
             evaluateJavaScript(PluginScriptsUtil.GET_SELECTED_TEXT_JS_SOURCE, completionHandler: completionHandler)
         } else {
             completionHandler(nil, nil)

@@ -100,7 +100,7 @@ public class InAppBrowserWebViewController: NSViewController, InAppBrowserDelega
         progressBar.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 0.0).isActive = true
         progressBar.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: 0.0).isActive = true
         
-        if let wId = windowId {
+        if windowId != nil {
             channelDelegate?.onBrowserCreated()
             webView?.runWindowBeforeCreatedCallbacks()
         } else {

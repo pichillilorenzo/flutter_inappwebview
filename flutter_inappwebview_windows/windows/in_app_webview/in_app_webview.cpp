@@ -1149,7 +1149,9 @@ namespace flutter_inappwebview_plugin
               std::optional<std::string> contentDisposition = SUCCEEDED(download->get_ContentDisposition(&downloadContentDisposition)) ? wide_to_utf8(downloadContentDisposition.get()) : std::optional<std::string>{};
 
               wil::unique_cotaskmem_string resultFilePath;
-              std::optional<std::string> suggestedFilename = SUCCEEDED(download->get_ContentDisposition(&resultFilePath)) ? wide_to_utf8(resultFilePath.get()) : std::optional<std::string>{};
+              // ResultFilePath is the full path WebView2 picked for the download; its file name
+              // honours Content-Disposition, the <a download> attribute and blob downloads.
+              std::optional<std::string> suggestedFilename = SUCCEEDED(args->get_ResultFilePath(&resultFilePath)) && resultFilePath ? wide_to_utf8(std::filesystem::path(resultFilePath.get()).filename().wstring()) : std::optional<std::string>{};
 
               auto request = std::make_shared<DownloadStartRequest>(
                 contentDisposition,

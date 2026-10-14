@@ -347,7 +347,7 @@ std::string ContentBlockerHandler::convertToJsonString(FlValue* contentBlockers)
 
 void ContentBlockerHandler::loadOrCompile(const std::string& identifier,
                                           const std::string& jsonSource) {
-  auto* context = new CompileContext{this, identifier, jsonSource};
+  auto* context = new CompileContext{this, alive_, identifier, jsonSource};
   webkit_user_content_filter_store_load(filter_store_, context->identifier.c_str(),
                                          nullptr,  // cancellable
                                          onFilterLoaded, context);
@@ -356,23 +356,24 @@ void ContentBlockerHandler::loadOrCompile(const std::string& identifier,
 void ContentBlockerHandler::onFilterLoaded(GObject* source, GAsyncResult* result,
                                             gpointer user_data) {
   auto* context = static_cast<CompileContext*>(user_data);
-  if (context == nullptr) {
-    return;
-  }
-
-  auto* handler = context->handler;
-  if (handler == nullptr || handler->filter_store_ == nullptr) {
-    delete context;
-    return;
-  }
-
+  // The task keeps the store alive even after the handler released it.
+  auto* store = WEBKIT_USER_CONTENT_FILTER_STORE(source);
   GError* error = nullptr;
   WebKitUserContentFilter* filter =
-      webkit_user_content_filter_store_load_finish(handler->filter_store_, result, &error);
+      webkit_user_content_filter_store_load_finish(store, result, &error);
   if (error != nullptr) {
     g_error_free(error);
   }
 
+  if (context->alive.expired()) {
+    if (filter != nullptr) {
+      webkit_user_content_filter_unref(filter);
+    }
+    delete context;
+    return;
+  }
+
+  auto* handler = context->handler;
   if (filter != nullptr) {
     handler->filterReady(filter, context->identifier);
     webkit_user_content_filter_unref(filter);
@@ -382,7 +383,7 @@ void ContentBlockerHandler::onFilterLoaded(GObject* source, GAsyncResult* result
 
   // Not in the store yet: compile it.
   GBytes* sourceBytes = g_bytes_new(context->jsonSource.c_str(), context->jsonSource.length());
-  webkit_user_content_filter_store_save(handler->filter_store_, context->identifier.c_str(),
+  webkit_user_content_filter_store_save(store, context->identifier.c_str(),
                                          sourceBytes,
                                          nullptr,  // cancellable
                                          onFilterCompiled, context);
@@ -392,21 +393,23 @@ void ContentBlockerHandler::onFilterLoaded(GObject* source, GAsyncResult* result
 void ContentBlockerHandler::onFilterCompiled(GObject* source, GAsyncResult* result,
                                               gpointer user_data) {
   auto* context = static_cast<CompileContext*>(user_data);
-  if (context == nullptr) {
-    return;
-  }
-
-  auto* handler = context->handler;
+  auto* handler = context->alive.expired() ? nullptr : context->handler;
   auto identifier = std::move(context->identifier);
   delete context;
 
-  if (handler == nullptr || handler->filter_store_ == nullptr) {
+  GError* error = nullptr;
+  WebKitUserContentFilter* filter = webkit_user_content_filter_store_save_finish(
+      WEBKIT_USER_CONTENT_FILTER_STORE(source), result, &error);
+
+  if (handler == nullptr) {
+    if (filter != nullptr) {
+      webkit_user_content_filter_unref(filter);
+    }
+    if (error != nullptr) {
+      g_error_free(error);
+    }
     return;
   }
-
-  GError* error = nullptr;
-  WebKitUserContentFilter* filter =
-      webkit_user_content_filter_store_save_finish(handler->filter_store_, result, &error);
 
   if (filter == nullptr) {
     errorLog("ContentBlockerHandler: Failed to compile content blockers: " +

@@ -148,30 +148,16 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
             channelDelegate?.onBrowserCreated()
             webView?.runWindowBeforeCreatedCallbacks()
         } else {
-            if #available(iOS 11.0, *) {
-                if let contentBlockers = webView?.settings?.contentBlockers, contentBlockers.count > 0 {
-                    do {
-                        let jsonData = try JSONSerialization.data(withJSONObject: contentBlockers, options: [])
-                        let blockRules = String(data: jsonData, encoding: .utf8)
-                        WKContentRuleListStore.default().compileContentRuleList(
-                            forIdentifier: "ContentBlockingRules",
-                            encodedContentRuleList: blockRules) { (contentRuleList, error) in
-
-                                if let error = error {
-                                    print(error.localizedDescription)
-                                    return
-                                }
-
-                                let configuration = self.webView!.configuration
-                                configuration.userContentController.add(contentRuleList!)
-
-                                self.initLoad()
-                        }
+            if #available(iOS 11.0, *), let webView = webView,
+               let contentBlockers = webView.settings?.contentBlockers, !contentBlockers.isEmpty {
+                // Nothing loads before the rules are enforced, and nothing loads if they fail.
+                webView.applyContentBlockers(contentBlockers) { [weak self] applied in
+                    guard applied else {
                         return
-                    } catch {
-                        print(error.localizedDescription)
                     }
+                    self?.initLoad()
                 }
+                return
             }
             
             initLoad()

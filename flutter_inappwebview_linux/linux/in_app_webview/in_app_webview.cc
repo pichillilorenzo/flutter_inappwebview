@@ -30,6 +30,7 @@
 #include <wpe/wpe-platform.h>
 #include <wpe/headless/wpe-headless.h>
 #include <wpe/WPEBufferSHM.h>  // For SHM software rendering fallback
+#include <libdrm/drm_fourcc.h>  // DRM_FORMAT_MOD_INVALID, for DMA-BUF re-import
 #endif
 
 // WPEBackend-FDO API (legacy)
@@ -1279,11 +1280,18 @@ void InAppWebView::OnWpePlatformBufferRendered(WPEBuffer* buffer) {
     // Check buffer type to determine best rendering path
     bool is_dma_buf = WPE_IS_BUFFER_DMA_BUF(buffer);
     bool is_shm = WPE_IS_BUFFER_SHM(buffer);
-    
+
     // === Priority 1: Try EGL image import (zero-copy, best performance) ===
-    // Only attempt EGL for DMA-BUF buffers (SHM buffers cannot be imported via EGL)
-    // Skip if previous EGL attempts failed
-    if (egl_display_ != nullptr && 
+    // Only attempt EGL for DMA-BUF buffers (SHM buffers cannot be imported via EGL).
+    // Only worth attempting when the texture consumer is actually in zero-copy
+    // GL mode (skip_pixel_readback_) — the resulting current_egl_image_/
+    // current_buffer_width_/height_ feed GetCurrentEglImage()/HasDmaBufExport(),
+    // not the pixel_buffers_ the software/pixel-buffer texture reads from. If we
+    // always attempted it, buffer_handled would be set true here even in
+    // software mode, and pixel_buffers_ would never get filled — the texture
+    // stays a blank default (see upstream #2861).
+    // Skip if previous EGL attempts failed.
+    if (skip_pixel_readback_ && egl_display_ != nullptr &&
         is_dma_buf && !egl_import_failed_permanently) {
       GError* error = nullptr;
       void* egl_image = wpe_buffer_import_to_egl_image(buffer, &error);
@@ -1357,47 +1365,7 @@ void InAppWebView::OnWpePlatformBufferRendered(WPEBuffer* buffer) {
     // === Priority 3: Generic pixel import (works for DMA-BUF with GBM device) ===
     // This is a fallback for DMA-BUF when EGL failed but GBM device is available
     if (!buffer_handled) {
-      GError* error = nullptr;
-      GBytes* pixels = wpe_buffer_import_to_pixels(buffer, &error);
-      if (pixels != nullptr) {
-        gsize size;
-        const uint8_t* data = static_cast<const uint8_t*>(g_bytes_get_data(pixels, &size));
-        
-        // Store in pixel buffer for software rendering
-        size_t write_idx = write_buffer_index_.load(std::memory_order_relaxed);
-        auto& pixel_buffer = pixel_buffers_[write_idx];
-        
-        if (pixel_buffer.data.size() != size) {
-          pixel_buffer.data.resize(size);
-        }
-        memcpy(pixel_buffer.data.data(), data, size);
-        
-        // GBM pixel import also returns ARGB8888, convert to RGBA
-        uint32_t stride = buf_width * 4;
-        ConvertARGB32ToRGBA(pixel_buffer.data.data(),
-                            pixel_buffer.data.data(),
-                            buf_width, buf_height,
-                            stride);
-        
-        pixel_buffer.width = buf_width;
-        pixel_buffer.height = buf_height;
-        
-        // Swap buffers
-        {
-          std::lock_guard<std::mutex> swap_lock(buffer_swap_mutex_);
-          read_buffer_index_.store(write_idx, std::memory_order_release);
-          write_buffer_index_.store((write_idx + 1) % kNumBuffers, std::memory_order_relaxed);
-        }
-        
-        g_bytes_unref(pixels);
-        current_buffer_width_ = buf_width;
-        current_buffer_height_ = buf_height;
-        buffer_handled = true;
-      } else {
-        if (error != nullptr) {
-          g_clear_error(&error);
-        }
-      }
+      buffer_handled = StorePixelsFromBuffer(buffer, buf_width, buf_height);
     }
     
     if (!buffer_handled) {
@@ -1419,6 +1387,53 @@ void InAppWebView::OnWpePlatformBufferRendered(WPEBuffer* buffer) {
   if (buffer_handled && on_frame_available_) {
     on_frame_available_();
   }
+}
+
+bool InAppWebView::StorePixelsFromBuffer(WPEBuffer* buffer, uint32_t buf_width,
+                                         uint32_t buf_height) {
+  GError* error = nullptr;
+  // Borrowed: the buffer owns and caches the pixels, so they are never unreffed.
+  GBytes* pixels = wpe_buffer_import_to_pixels(buffer, &error);
+  if (pixels == nullptr) {
+    if (error != nullptr) {
+      debugLog("InAppWebView: pixel import failed: " + std::string(error->message));
+      g_clear_error(&error);
+    }
+    return false;
+  }
+
+  gsize size;
+  const uint8_t* data = static_cast<const uint8_t*>(g_bytes_get_data(pixels, &size));
+
+  // Store in pixel buffer for software rendering
+  size_t write_idx = write_buffer_index_.load(std::memory_order_relaxed);
+  auto& pixel_buffer = pixel_buffers_[write_idx];
+
+  if (pixel_buffer.data.size() != size) {
+    pixel_buffer.data.resize(size);
+  }
+  memcpy(pixel_buffer.data.data(), data, size);
+
+  // GBM pixel import also returns ARGB8888, convert to RGBA
+  uint32_t stride = buf_width * 4;
+  ConvertARGB32ToRGBA(pixel_buffer.data.data(),
+                      pixel_buffer.data.data(),
+                      buf_width, buf_height,
+                      stride);
+
+  pixel_buffer.width = buf_width;
+  pixel_buffer.height = buf_height;
+
+  // Swap buffers
+  {
+    std::lock_guard<std::mutex> swap_lock(buffer_swap_mutex_);
+    read_buffer_index_.store(write_idx, std::memory_order_release);
+    write_buffer_index_.store((write_idx + 1) % kNumBuffers, std::memory_order_relaxed);
+  }
+
+  current_buffer_width_ = buf_width;
+  current_buffer_height_ = buf_height;
+  return true;
 }
 #endif
 
@@ -3291,6 +3306,26 @@ void InAppWebView::SetPointerButton(int kind, int button, int clickCount) {
 }
 
 void InAppWebView::SetScrollDelta(double dx, double dy) {
+  // There is no native scroll view to disable here — WPE renders offscreen and
+  // Flutter forwards the wheel/trackpad delta straight through — so an axis the
+  // embedder disabled is dropped before the event is built. Reading the current
+  // settings (rather than a cached copy) keeps a later setSettings() call live.
+  if (settings_ != nullptr &&
+      (settings_->disableHorizontalScroll || settings_->disableVerticalScroll)) {
+    if (settings_->disableHorizontalScroll) {
+      dx = 0;
+    }
+    if (settings_->disableVerticalScroll) {
+      dy = 0;
+    }
+    // Every axis the gesture carried was suppressed: swallow it entirely so the
+    // page sees no scroll event at all, the way a disabled platform scroller
+    // would behave.
+    if (dx == 0 && dy == 0) {
+      return;
+    }
+  }
+
   // Hide all popups when scrolling
   HideAllPopups();
 
@@ -3693,6 +3728,113 @@ void* InAppWebView::GetCurrentEglImage(uint32_t* out_width, uint32_t* out_height
     *out_width = 0;
   if (out_height)
     *out_height = 0;
+  return nullptr;
+#endif
+}
+
+void* InAppWebView::ImportCurrentBufferToEglImage(void* target_display, uint32_t* out_width,
+                                                   uint32_t* out_height) {
+  if (out_width)
+    *out_width = 0;
+  if (out_height)
+    *out_height = 0;
+
+#ifdef HAVE_WPE_PLATFORM
+  if (target_display == nullptr) {
+    return nullptr;
+  }
+
+  std::lock_guard<std::mutex> lock(wpe_buffer_mutex_);
+
+  if (!skip_pixel_readback_.load() || current_buffer_ == nullptr ||
+      !WPE_IS_BUFFER_DMA_BUF(current_buffer_)) {
+    return nullptr;
+  }
+
+  WPEBufferDMABuf* dmabuf = WPE_BUFFER_DMA_BUF(current_buffer_);
+  guint32 format = wpe_buffer_dma_buf_get_format(dmabuf);
+  guint32 n_planes = wpe_buffer_dma_buf_get_n_planes(dmabuf);
+  guint64 modifier = wpe_buffer_dma_buf_get_modifier(dmabuf);
+
+  static constexpr guint32 kMaxPlanes = 4;
+  if (n_planes == 0 || n_planes > kMaxPlanes) {
+    return nullptr;
+  }
+
+  static const EGLint kFdAttrs[kMaxPlanes] = {
+      EGL_DMA_BUF_PLANE0_FD_EXT, EGL_DMA_BUF_PLANE1_FD_EXT,
+      EGL_DMA_BUF_PLANE2_FD_EXT, EGL_DMA_BUF_PLANE3_FD_EXT};
+  static const EGLint kOffsetAttrs[kMaxPlanes] = {
+      EGL_DMA_BUF_PLANE0_OFFSET_EXT, EGL_DMA_BUF_PLANE1_OFFSET_EXT,
+      EGL_DMA_BUF_PLANE2_OFFSET_EXT, EGL_DMA_BUF_PLANE3_OFFSET_EXT};
+  static const EGLint kPitchAttrs[kMaxPlanes] = {
+      EGL_DMA_BUF_PLANE0_PITCH_EXT, EGL_DMA_BUF_PLANE1_PITCH_EXT,
+      EGL_DMA_BUF_PLANE2_PITCH_EXT, EGL_DMA_BUF_PLANE3_PITCH_EXT};
+  static const EGLint kModifierLoAttrs[kMaxPlanes] = {
+      EGL_DMA_BUF_PLANE0_MODIFIER_LO_EXT, EGL_DMA_BUF_PLANE1_MODIFIER_LO_EXT,
+      EGL_DMA_BUF_PLANE2_MODIFIER_LO_EXT, EGL_DMA_BUF_PLANE3_MODIFIER_LO_EXT};
+  static const EGLint kModifierHiAttrs[kMaxPlanes] = {
+      EGL_DMA_BUF_PLANE0_MODIFIER_HI_EXT, EGL_DMA_BUF_PLANE1_MODIFIER_HI_EXT,
+      EGL_DMA_BUF_PLANE2_MODIFIER_HI_EXT, EGL_DMA_BUF_PLANE3_MODIFIER_HI_EXT};
+
+  const bool has_modifier = (modifier != DRM_FORMAT_MOD_INVALID);
+
+  std::vector<EGLint> attribs;
+  attribs.push_back(EGL_WIDTH);
+  attribs.push_back(static_cast<EGLint>(current_buffer_width_));
+  attribs.push_back(EGL_HEIGHT);
+  attribs.push_back(static_cast<EGLint>(current_buffer_height_));
+  attribs.push_back(EGL_LINUX_DRM_FOURCC_EXT);
+  attribs.push_back(static_cast<EGLint>(format));
+
+  for (guint32 plane = 0; plane < n_planes; ++plane) {
+    attribs.push_back(kFdAttrs[plane]);
+    attribs.push_back(wpe_buffer_dma_buf_get_fd(dmabuf, plane));
+    attribs.push_back(kOffsetAttrs[plane]);
+    attribs.push_back(static_cast<EGLint>(wpe_buffer_dma_buf_get_offset(dmabuf, plane)));
+    attribs.push_back(kPitchAttrs[plane]);
+    attribs.push_back(static_cast<EGLint>(wpe_buffer_dma_buf_get_stride(dmabuf, plane)));
+    if (has_modifier) {
+      attribs.push_back(kModifierLoAttrs[plane]);
+      attribs.push_back(static_cast<EGLint>(modifier & 0xffffffff));
+      attribs.push_back(kModifierHiAttrs[plane]);
+      attribs.push_back(static_cast<EGLint>(modifier >> 32));
+    }
+  }
+  attribs.push_back(EGL_NONE);
+
+  static PFNEGLCREATEIMAGEKHRPROC eglCreateImageKHR = nullptr;
+  if (eglCreateImageKHR == nullptr) {
+    eglCreateImageKHR = (PFNEGLCREATEIMAGEKHRPROC)eglGetProcAddress("eglCreateImageKHR");
+  }
+  if (eglCreateImageKHR == nullptr) {
+    return nullptr;
+  }
+
+  EGLImageKHR image = eglCreateImageKHR(static_cast<EGLDisplay>(target_display), EGL_NO_CONTEXT,
+                                        EGL_LINUX_DMA_BUF_EXT, static_cast<EGLClientBuffer>(nullptr),
+                                        attribs.data());
+  if (image == EGL_NO_IMAGE_KHR) {
+    // EGL_BAD_MATCH: the display cannot sample this format and modifier, and
+    // never will for this engine — every later frame is the same kind.
+    const EGLint import_error = eglGetError();
+    if (import_error == EGL_BAD_MATCH) {
+      debugLog("InAppWebView: Flutter's EGL display cannot import WebKit's buffers; "
+               "switching to pixel readback");
+      skip_pixel_readback_.store(false);
+      StorePixelsFromBuffer(current_buffer_, current_buffer_width_, current_buffer_height_);
+    }
+    return nullptr;
+  }
+
+  if (out_width)
+    *out_width = current_buffer_width_;
+  if (out_height)
+    *out_height = current_buffer_height_;
+
+  return image;
+#else
+  (void)target_display;
   return nullptr;
 #endif
 }

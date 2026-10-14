@@ -6,6 +6,7 @@
 
 #include "../utils/flutter.h"
 #include "../utils/log.h"
+#include "in_app_webview_manager.h"
 #include "inappwebview_egl_texture.h"
 #include "inappwebview_texture.h"
 
@@ -79,10 +80,11 @@ bool UseGLTexture() {
 }
 }  // namespace
 
-CustomPlatformView::CustomPlatformView(FlBinaryMessenger* messenger,
+CustomPlatformView::CustomPlatformView(InAppWebViewManager* manager,
+                                       FlBinaryMessenger* messenger,
                                        FlTextureRegistrar* texture_registrar,
                                        std::shared_ptr<WebViewType> webview)
-    : webview_(std::move(webview)), texture_registrar_(texture_registrar) {
+    : manager_(manager), webview_(std::move(webview)), texture_registrar_(texture_registrar) {
   if (messenger == nullptr) {
     errorLog("CustomPlatformView: messenger is null");
     return;
@@ -100,16 +102,36 @@ CustomPlatformView::CustomPlatformView(FlBinaryMessenger* messenger,
   //
   // The EGL texture handles both EGL and SHM modes internally, providing the best
   // performance for each environment.
+  // A texture retired by an earlier webview is reused rather than allocated
+  // again; it is never freed while the engine runs. See ~CustomPlatformView.
+  FlTexture* recycled = manager_ != nullptr ? manager_->AcquireRetiredTexture() : nullptr;
   if (UseGLTexture()) {
-    texture_ = FL_TEXTURE(inappwebview_egl_texture_new(webview_.get()));
+    if (recycled != nullptr && INAPPWEBVIEW_IS_EGL_TEXTURE(recycled)) {
+      texture_ = recycled;
+      recycled = nullptr;
+      inappwebview_egl_texture_set_webview(INAPPWEBVIEW_EGL_TEXTURE(texture_), webview_.get());
+    } else {
+      texture_ = FL_TEXTURE(inappwebview_egl_texture_new(webview_.get()));
+    }
     egl_texture_ = INAPPWEBVIEW_EGL_TEXTURE(texture_);
     // In zero-copy EGL mode, we don't need pixel readback - the EGL image is passed
     // directly to Flutter. This improves performance and avoids GL context issues.
     webview_->SetSkipPixelReadback(true);
     debugLog("CustomPlatformView: using GL texture (hardware accelerated)");
   } else {
-    texture_ = FL_TEXTURE(inappwebview_texture_new(webview_.get()));
+    if (recycled != nullptr && INAPPWEBVIEW_IS_TEXTURE(recycled)) {
+      texture_ = recycled;
+      recycled = nullptr;
+      inappwebview_texture_set_webview(INAPPWEBVIEW_TEXTURE(texture_), webview_.get());
+    } else {
+      texture_ = FL_TEXTURE(inappwebview_texture_new(webview_.get()));
+    }
     debugLog("CustomPlatformView: using pixel buffer texture (software)");
+  }
+  // A texture of the other kind is of no use here, but it still must not be
+  // destroyed, so it goes back into the pool.
+  if (recycled != nullptr) {
+    manager_->RetireTexture(recycled);
   }
 
   if (texture_ == nullptr) {
@@ -121,8 +143,14 @@ CustomPlatformView::CustomPlatformView(FlBinaryMessenger* messenger,
   gboolean registered = fl_texture_registrar_register_texture(texture_registrar_, texture_);
   if (!registered) {
     errorLog("CustomPlatformView: failed to register texture");
-    g_object_unref(texture_);
+    DetachTexture();
+    if (manager_ != nullptr) {
+      manager_->RetireTexture(texture_);
+    } else {
+      g_object_unref(texture_);
+    }
     texture_ = nullptr;
+    egl_texture_ = nullptr;
     return;
   }
 
@@ -136,20 +164,11 @@ CustomPlatformView::CustomPlatformView(FlBinaryMessenger* messenger,
     webview_->AttachChannel(messenger, texture_id_);
   }
 
-  // Set up the webview's callback to mark frame available
-  // For EGL texture, we also update the EGL image reference
-  webview_->SetOnFrameAvailable([this]() {
-    // If using EGL texture, update the EGL image reference before marking available
-    if (egl_texture_ != nullptr && webview_ != nullptr) {
-      uint32_t width = 0;
-      uint32_t height = 0;
-      void* egl_image = webview_->GetCurrentEglImage(&width, &height);
-      if (egl_image != nullptr) {
-        inappwebview_egl_texture_set_egl_image(egl_texture_, egl_image, width, height);
-      }
-    }
-    MarkTextureFrameAvailable();
-  });
+  // Set up the webview's callback to mark frame available. The EGL texture
+  // (when in use) re-imports the current DMA-BUF frame itself inside
+  // populate(), on Flutter's render thread where Flutter's EGLDisplay is
+  // current — see InAppWebView::ImportCurrentBufferToEglImage.
+  webview_->SetOnFrameAvailable([this]() { MarkTextureFrameAvailable(); });
 
   // Set up cursor change callback
   webview_->SetOnCursorChanged(
@@ -176,8 +195,29 @@ CustomPlatformView::CustomPlatformView(FlBinaryMessenger* messenger,
   }
 }
 
+void CustomPlatformView::DetachTexture() {
+  if (texture_ == nullptr) {
+    return;
+  }
+  // populate()/copy_pixels() run on the raster thread and read the webview
+  // through a raw pointer, so the texture must let go of it before this view
+  // releases its last reference to the WPE view.
+  if (egl_texture_ != nullptr) {
+    inappwebview_egl_texture_set_webview(egl_texture_, nullptr);
+  } else if (INAPPWEBVIEW_IS_TEXTURE(texture_)) {
+    inappwebview_texture_set_webview(INAPPWEBVIEW_TEXTURE(texture_), nullptr);
+  }
+}
+
 CustomPlatformView::~CustomPlatformView() {
   debugLog("dealloc CustomPlatformView");
+
+  // Both callbacks capture `this`, and WPE delivers them off the platform
+  // thread; clear them before anything they touch goes away.
+  if (webview_ != nullptr) {
+    webview_->SetOnFrameAvailable(nullptr);
+    webview_->SetOnCursorChanged(nullptr);
+  }
 
   if (method_channel_ != nullptr) {
     fl_method_channel_set_method_call_handler(method_channel_, nullptr, nullptr, nullptr);
@@ -191,13 +231,24 @@ CustomPlatformView::~CustomPlatformView() {
     event_channel_ = nullptr;
   }
 
+  DetachTexture();
+
   if (texture_registrar_ != nullptr && texture_ != nullptr) {
     fl_texture_registrar_unregister_texture(texture_registrar_, texture_);
   }
 
   if (texture_ != nullptr) {
-    g_object_unref(texture_);
+    // Deliberately not unreffed: the rasterizer holds textures by borrowed
+    // pointer, so a frame in flight can still call into this one after it has
+    // been unregistered. The manager keeps it alive and hands it to the next
+    // webview. See InAppWebViewManager::RetireTexture.
+    if (manager_ != nullptr) {
+      manager_->RetireTexture(texture_);
+    } else {
+      g_object_unref(texture_);
+    }
     texture_ = nullptr;
+    egl_texture_ = nullptr;
   }
 }
 

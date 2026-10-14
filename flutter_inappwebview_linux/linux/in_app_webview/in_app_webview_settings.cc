@@ -12,6 +12,16 @@
 
 namespace flutter_inappwebview_plugin {
 
+#ifdef HAVE_WPE_PLATFORM
+// Newer WPE WebKit renamed WPE_SETTING_DISABLE_ANIMATIONS to
+// WPE_SETTING_REDUCED_MOTION; build against either header set.
+#ifdef WPE_SETTING_REDUCED_MOTION
+static constexpr const char* kWpeSettingDisableAnimations = WPE_SETTING_REDUCED_MOTION;
+#else
+static constexpr const char* kWpeSettingDisableAnimations = WPE_SETTING_DISABLE_ANIMATIONS;
+#endif
+#endif
+
 InAppWebViewSettings::InAppWebViewSettings() {
   // Default constructor - all defaults are set in the header
 }
@@ -50,6 +60,11 @@ InAppWebViewSettings::InAppWebViewSettings(FlValue* map) : InAppWebViewSettings(
   supportZoom = get_fl_map_value(map, "supportZoom", supportZoom);
   isInspectable = get_fl_map_value(map, "isInspectable", isInspectable);
   disableContextMenu = get_fl_map_value(map, "disableContextMenu", disableContextMenu);
+
+  // === Scroll settings ===
+  disableVerticalScroll = get_fl_map_value(map, "disableVerticalScroll", disableVerticalScroll);
+  disableHorizontalScroll =
+      get_fl_map_value(map, "disableHorizontalScroll", disableHorizontalScroll);
 
   // === JavaScript bridge settings ===
   if (fl_map_contains_not_null(map, "javaScriptHandlersOriginAllowList")) {
@@ -402,7 +417,7 @@ void InAppWebViewSettings::applyWpePlatformSettings(void* display_ptr) const {
 
   // Apply disable animations setting
   if (disableAnimations.has_value()) {
-    wpe_settings_set_boolean(wpe_settings, WPE_SETTING_DISABLE_ANIMATIONS,
+    wpe_settings_set_boolean(wpe_settings, kWpeSettingDisableAnimations,
                              disableAnimations.value(), WPE_SETTINGS_SOURCE_APPLICATION, &error);
     g_clear_error(&error);
   }
@@ -510,6 +525,10 @@ FlValue* InAppWebViewSettings::toFlValue() const {
       {"supportZoom", make_fl_value(supportZoom)},
       {"isInspectable", make_fl_value(isInspectable)},
       {"disableContextMenu", make_fl_value(disableContextMenu)},
+
+      // === Scroll settings ===
+      {"disableVerticalScroll", make_fl_value(disableVerticalScroll)},
+      {"disableHorizontalScroll", make_fl_value(disableHorizontalScroll)},
 
       // === JavaScript bridge settings ===
       {"javaScriptBridgeEnabled", make_fl_value(javaScriptBridgeEnabled)},

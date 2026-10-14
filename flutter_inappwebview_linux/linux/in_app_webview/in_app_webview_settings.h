@@ -43,6 +43,13 @@ class InAppWebViewSettings {
   bool isInspectable = true;
   bool disableContextMenu = false;
 
+  // === Scroll settings ===
+  // WPE draws into an offscreen surface with no native scroll view, so these
+  // are enforced where Flutter's scroll delta is dispatched into the web view
+  // rather than on a platform scroller.
+  bool disableVerticalScroll = false;
+  bool disableHorizontalScroll = false;
+
   // === JavaScript bridge settings ===
   std::optional<std::vector<std::string>> javaScriptHandlersOriginAllowList =
       std::optional<std::vector<std::string>>{};

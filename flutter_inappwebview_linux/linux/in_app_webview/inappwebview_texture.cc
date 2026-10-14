@@ -16,6 +16,10 @@ struct _InAppWebViewTexture {
   // Must remain valid until the next copy_pixels call.
   uint8_t* staging_buffer;
   size_t staging_buffer_size;
+
+  // Guards `webview` and the staging buffer: copy_pixels() runs on Flutter's
+  // raster thread while the platform thread attaches and detaches webviews.
+  GMutex mutex;
 };
 
 G_DEFINE_TYPE(InAppWebViewTexture, inappwebview_texture, fl_pixel_buffer_texture_get_type())
@@ -25,11 +29,14 @@ static gboolean inappwebview_texture_copy_pixels(FlPixelBufferTexture* texture,
                                                  uint32_t* height, GError** error) {
   InAppWebViewTexture* self = INAPPWEBVIEW_TEXTURE(texture);
 
+  g_mutex_lock(&self->mutex);
+
   if (self->webview == nullptr) {
     // Return a 1x1 transparent pixel as fallback
     *out_buffer = self->default_buffer;
     *width = 1;
     *height = 1;
+    g_mutex_unlock(&self->mutex);
     return TRUE;
   }
 
@@ -41,6 +48,7 @@ static gboolean inappwebview_texture_copy_pixels(FlPixelBufferTexture* texture,
     *out_buffer = self->default_buffer;
     *width = 1;
     *height = 1;
+    g_mutex_unlock(&self->mutex);
     return TRUE;
   }
 
@@ -53,6 +61,7 @@ static gboolean inappwebview_texture_copy_pixels(FlPixelBufferTexture* texture,
     *out_buffer = self->default_buffer;
     *width = 1;
     *height = 1;
+    g_mutex_unlock(&self->mutex);
     return TRUE;
   }
 
@@ -61,12 +70,14 @@ static gboolean inappwebview_texture_copy_pixels(FlPixelBufferTexture* texture,
     *out_buffer = self->default_buffer;
     *width = 1;
     *height = 1;
+    g_mutex_unlock(&self->mutex);
     return TRUE;
   }
 
   *out_buffer = self->staging_buffer;
   *width = buf_width;
   *height = buf_height;
+  g_mutex_unlock(&self->mutex);
   return TRUE;
 }
 
@@ -77,6 +88,8 @@ static void inappwebview_texture_finalize(GObject* object) {
     self->staging_buffer = nullptr;
     self->staging_buffer_size = 0;
   }
+  self->webview = nullptr;
+  g_mutex_clear(&self->mutex);
   G_OBJECT_CLASS(inappwebview_texture_parent_class)->finalize(object);
 }
 
@@ -96,6 +109,7 @@ static void inappwebview_texture_init(InAppWebViewTexture* self) {
 
   self->staging_buffer = nullptr;
   self->staging_buffer_size = 0;
+  g_mutex_init(&self->mutex);
 }
 
 InAppWebViewTexture* inappwebview_texture_new(flutter_inappwebview_plugin::WebViewType* webview) {
@@ -104,4 +118,13 @@ InAppWebViewTexture* inappwebview_texture_new(flutter_inappwebview_plugin::WebVi
   self->webview = webview;
   flutter_inappwebview_plugin::debugLog("InAppWebViewTexture: created");
   return self;
+}
+
+void inappwebview_texture_set_webview(InAppWebViewTexture* texture,
+                                      flutter_inappwebview_plugin::WebViewType* webview) {
+  g_return_if_fail(INAPPWEBVIEW_IS_TEXTURE(texture));
+
+  g_mutex_lock(&texture->mutex);
+  texture->webview = webview;
+  g_mutex_unlock(&texture->mutex);
 }

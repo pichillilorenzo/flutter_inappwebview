@@ -5,6 +5,7 @@
 #include <wpe/webkit.h>
 
 #include <cstdint>
+#include <deque>
 #include <map>
 #include <memory>
 #include <string>
@@ -48,6 +49,20 @@ class InAppWebViewManager {
   // Dispose a keep-alive WebView by its ID
   void DisposeKeepAlive(const std::string& keepAliveId);
 
+  // Texture recycling.
+  //
+  // fl_texture_registrar_lookup_texture() hands the rasterizer a borrowed
+  // pointer with no reference, so a frame already in flight can call
+  // populate() on a texture after the platform thread unregistered it.
+  // Releasing the last reference there frees the object underneath that frame.
+  // A disposed webview therefore retires its texture instead of destroying it,
+  // and the next webview takes it back. Retired textures are released only
+  // when the manager itself goes away, by which point the engine is gone.
+  //
+  // Both take and give a reference; both must be called on the platform thread.
+  FlTexture* AcquireRetiredTexture();
+  void RetireTexture(FlTexture* texture);
+
  private:
   PluginInstance* plugin_ = nullptr;
   FlPluginRegistrar* registrar_ = nullptr;
@@ -63,6 +78,10 @@ class InAppWebViewManager {
   // Map of keepAliveId to CustomPlatformView instance
   // These are WebViews that persist when their widget is disposed
   std::map<std::string, std::unique_ptr<CustomPlatformView>> keepAliveWebViews_;
+
+  // Textures whose webview was disposed, oldest first. Held alive for reuse;
+  // see AcquireRetiredTexture.
+  std::deque<FlTexture*> retired_textures_;
 
   // Map of window id to WebViewTransport for popup windows
   // Used to track WebViews created via onCreateWindow

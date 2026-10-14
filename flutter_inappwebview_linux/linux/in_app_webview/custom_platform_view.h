@@ -8,18 +8,23 @@
 
 #include "in_app_webview.h"
 #include "inappwebview_egl_texture.h"
+#include "inappwebview_texture.h"
 
 namespace flutter_inappwebview_plugin {
 
 using WebViewType = InAppWebView;
+
+class InAppWebViewManager;
 
 /// CustomPlatformView handles the method channel communication for
 /// pointer/mouse events, sizing, and other platform view operations.
 /// This is similar to the Windows implementation.
 class CustomPlatformView {
  public:
-  CustomPlatformView(FlBinaryMessenger* messenger, FlTextureRegistrar* texture_registrar,
-                     std::shared_ptr<WebViewType> webview);
+  // The manager owns the texture pool this view borrows from and returns to;
+  // see InAppWebViewManager::AcquireRetiredTexture.
+  CustomPlatformView(InAppWebViewManager* manager, FlBinaryMessenger* messenger,
+                     FlTextureRegistrar* texture_registrar, std::shared_ptr<WebViewType> webview);
   ~CustomPlatformView();
 
   int64_t texture_id() const { return texture_id_; }
@@ -34,6 +39,7 @@ class CustomPlatformView {
   void MarkTextureFrameAvailable();
 
  private:
+  InAppWebViewManager* manager_;
   std::shared_ptr<WebViewType> webview_;
   FlTextureRegistrar* texture_registrar_;
   FlTexture* texture_ = nullptr;
@@ -57,6 +63,9 @@ class CustomPlatformView {
                                          gpointer user_data);
 
   void EmitCursorChanged(const std::string& cursor_name);
+
+  // Stops the texture from reading the webview it was attached to.
+  void DetachTexture();
 };
 
 }  // namespace flutter_inappwebview_plugin

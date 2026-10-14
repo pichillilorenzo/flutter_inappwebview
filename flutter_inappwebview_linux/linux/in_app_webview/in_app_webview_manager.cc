@@ -40,11 +40,37 @@ InAppWebViewManager::~InAppWebViewManager() {
   
   windowWebViews_.clear();
 
+  // Safe here and only here: the platform views above have all been destroyed,
+  // so nothing is registered with the engine any more and no frame can still
+  // reach these textures.
+  for (FlTexture* texture : retired_textures_) {
+    g_object_unref(texture);
+  }
+  retired_textures_.clear();
+
   if (method_channel_ != nullptr) {
     fl_method_channel_set_method_call_handler(method_channel_, nullptr, nullptr, nullptr);
     g_object_unref(method_channel_);
     method_channel_ = nullptr;
   }
+}
+
+FlTexture* InAppWebViewManager::AcquireRetiredTexture() {
+  if (retired_textures_.empty()) {
+    return nullptr;
+  }
+  // Oldest first, so the texture handed out is the one an in-flight frame is
+  // least likely to still be holding.
+  FlTexture* texture = retired_textures_.front();
+  retired_textures_.pop_front();
+  return texture;
+}
+
+void InAppWebViewManager::RetireTexture(FlTexture* texture) {
+  if (texture == nullptr) {
+    return;
+  }
+  retired_textures_.push_back(texture);
 }
 
 CustomPlatformView* InAppWebViewManager::GetPlatformView(int64_t texture_id) const {
@@ -243,7 +269,7 @@ void InAppWebViewManager::CreateInAppWebView(FlMethodCall* method_call) {
   auto webview = std::make_shared<InAppWebView>(registrar_, messenger_, params.id, params);
 
   auto platform_view =
-      std::make_unique<CustomPlatformView>(messenger_, texture_registrar_, webview);
+      std::make_unique<CustomPlatformView>(this, messenger_, texture_registrar_, webview);
 
   int64_t texture_id = platform_view->texture_id();
 

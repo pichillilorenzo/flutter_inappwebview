@@ -2,6 +2,9 @@
 #define FLUTTER_INAPPWEBVIEW_PLUGIN_CUSTOM_SCHEME_RESPONSE_H_
 
 #include <flutter/standard_method_codec.h>
+#include <map>
+#include <optional>
+#include <string>
 #include <WebView2.h>
 #include <wil/com.h>
 
@@ -13,8 +16,10 @@ namespace flutter_inappwebview_plugin
     const std::vector<uint8_t> data;
     const std::string contentType;
     const std::string contentEncoding;
+    const std::optional<std::map<std::string, std::string>> headers;
 
-    CustomSchemeResponse(const std::vector<uint8_t>& data, const std::string& contentType, const std::string& contentEncoding);
+    CustomSchemeResponse(const std::vector<uint8_t>& data, const std::string& contentType, const std::string& contentEncoding,
+      const std::optional<std::map<std::string, std::string>>& headers = std::nullopt);
     CustomSchemeResponse(const flutter::EncodableMap& map);
     ~CustomSchemeResponse() = default;
 

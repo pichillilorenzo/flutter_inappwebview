@@ -20,8 +20,7 @@ public class CustomSchemeHandler: NSObject, WKURLSchemeHandler {
         let callback = WebViewChannelDelegate.LoadResourceWithCustomSchemeCallback()
         callback.nonNullSuccess = { (response: CustomSchemeResponse) in
             if (self.schemeHandlers[urlSchemeTask.hash] != nil) {
-                let urlResponse = URLResponse(url: request.url, mimeType: response.contentType, expectedContentLength: -1, textEncodingName: response.contentEncoding)
-                urlSchemeTask.didReceive(urlResponse)
+                urlSchemeTask.didReceive(CustomSchemeHandler.urlResponse(for: response, url: request.url))
                 urlSchemeTask.didReceive(response.data)
                 urlSchemeTask.didFinish()
                 self.schemeHandlers.removeValue(forKey: urlSchemeTask.hash)
@@ -37,6 +36,22 @@ public class CustomSchemeHandler: NSObject, WKURLSchemeHandler {
         } else {
             callback.defaultBehaviour(nil)
         }
+    }
+    
+    /// An HTTP response when the response carries headers: a plain `URLResponse` has none, so a
+    /// header such as `Content-Security-Policy` would never reach the page.
+    static func urlResponse(for response: CustomSchemeResponse, url: URL) -> URLResponse {
+        guard let headers = response.headers, !headers.isEmpty else {
+            return URLResponse(url: url, mimeType: response.contentType, expectedContentLength: -1, textEncodingName: response.contentEncoding)
+        }
+        var headerFields = headers
+        if !headerFields.keys.contains(where: { $0.caseInsensitiveCompare("Content-Type") == .orderedSame }) {
+            headerFields["Content-Type"] = response.contentEncoding.isEmpty
+                ? response.contentType
+                : "\(response.contentType); charset=\(response.contentEncoding)"
+        }
+        return HTTPURLResponse(url: url, statusCode: 200, httpVersion: "HTTP/1.1", headerFields: headerFields)
+            ?? URLResponse(url: url, mimeType: response.contentType, expectedContentLength: -1, textEncodingName: response.contentEncoding)
     }
     
     public func webView(_ webView: WKWebView, stop urlSchemeTask: WKURLSchemeTask) {

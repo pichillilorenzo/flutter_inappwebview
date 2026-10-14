@@ -19,9 +19,16 @@ class CustomSchemeResponse_ {
   ///Content-Encoding of the data, such as `utf-8`.
   String contentEncoding;
 
+  ///HTTP headers sent with the data, such as `Content-Security-Policy`.
+  ///`Content-Type` is derived from [contentType] unless it is listed here.
+  ///
+  ///**NOTE**: used on iOS, macOS and Windows; other platforms ignore it.
+  Map<String, String>? headers;
+
   CustomSchemeResponse_({
     required this.data,
     required this.contentType,
     this.contentEncoding = 'utf-8',
+    this.headers,
   });
 }

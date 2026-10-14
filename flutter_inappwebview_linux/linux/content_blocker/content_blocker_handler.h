@@ -119,6 +119,8 @@ class ContentBlockerHandler {
   bool pending_ = false;
   // Callers waiting for the latest request to take effect.
   std::vector<std::function<void(bool)>> waiters_;
+  // Expires with the handler; a load or compile can complete after the WebView is closed.
+  std::shared_ptr<bool> alive_ = std::make_shared<bool>(true);
   std::string store_path_;
 
   /**
@@ -126,6 +128,7 @@ class ContentBlockerHandler {
    */
   struct CompileContext {
     ContentBlockerHandler* handler;
+    std::weak_ptr<bool> alive;
     std::string identifier;
     std::string jsonSource;
   };

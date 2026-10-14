@@ -283,8 +283,10 @@ InAppWebView::InAppWebView(FlPluginRegistrar* registrar, FlBinaryMessenger* mess
         settings_->contentBlockers,
         [this, initialUrlRequest, initialData, initialDataMimeType, initialDataEncoding,
          initialDataBaseUrl, initialFile](bool success) {
+          // Loading without the rules would run the page unrestricted.
           if (!success) {
-            debugLog("InAppWebView: Content blockers failed to apply, loading content anyway");
+            errorLog("InAppWebView: Content blockers failed to apply, not loading content");
+            return;
           }
 
           // Now load initial content
@@ -3897,6 +3899,26 @@ gboolean InAppWebView::OnDecidePolicy(WebKitWebView* web_view, WebKitPolicyDecis
 
   if (decision_type != WEBKIT_POLICY_DECISION_TYPE_NAVIGATION_ACTION) {
     return FALSE;  // Let WebKit handle other decision types
+  }
+
+  // Rules were requested but none are in force: the page would run with no restrictions,
+  // so the navigation waits for them, and is refused if they failed.
+  auto* blockers = self->content_blocker_handler_.get();
+  if (blockers != nullptr && blockers->rulesMissing()) {
+    if (!blockers->isPending()) {
+      webkit_policy_decision_ignore(decision);
+      return TRUE;
+    }
+    g_object_ref(decision);
+    blockers->whenSettled([self, web_view, decision, decision_type](bool applied) {
+      if (!applied) {
+        webkit_policy_decision_ignore(decision);
+      } else if (!OnDecidePolicy(web_view, decision, decision_type, self)) {
+        webkit_policy_decision_use(decision);
+      }
+      g_object_unref(decision);
+    });
+    return TRUE;
   }
 
   auto* nav_decision = WEBKIT_NAVIGATION_POLICY_DECISION(decision);

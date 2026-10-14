@@ -1028,6 +1028,125 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         }
     }
     
+    /// The content rule list compiled from `settings.contentBlockers` that this WebView enforces.
+    private var appliedContentRuleList: WKContentRuleList?
+
+    /// Identifier of the latest request: "" for no rules, nil when it could not be encoded.
+    private var requestedContentRuleListIdentifier: String? = ""
+
+    /// Whether the latest request is still being looked up or compiled.
+    private var contentRuleListPending = false
+
+    /// Callers waiting for the latest request to take effect.
+    private var contentRuleListWaiters: [(Bool) -> Void] = []
+
+    private static let contentRuleListPrefix = "ContentBlockingRules-"
+
+    /// Each rule set is stored under its own identifier, so lists of earlier runs pile up in
+    /// the store; they are removed once per process.
+    private static var staleContentRuleListsRemoved = false
+
+    /// Identifiers this process requested, which the removal keeps.
+    private static var requestedContentRuleListIdentifiers = Set<String>()
+
+    /// Enforces `contentBlockers` on this WebView; `completion` reports whether the latest
+    /// request took effect, so a caller whose request was superseded still gets an answer.
+    ///
+    /// The new list is added before the previous one is removed, so replacing the rules never
+    /// leaves the WebView unprotected; when compilation fails the previous list stays in force.
+    @available(iOS 11.0, *)
+    public func applyContentBlockers(_ contentBlockers: [[String: [String: Any]]],
+                                     completion: ((Bool) -> Void)? = nil) {
+        if let completion = completion {
+            contentRuleListWaiters.append(completion)
+        }
+        if contentBlockers.isEmpty {
+            requestedContentRuleListIdentifier = ""
+            enforceContentRuleList(nil)
+            return
+        }
+        guard let jsonData = try? JSONSerialization.data(withJSONObject: contentBlockers, options: [.sortedKeys]),
+              let encodedRules = String(data: jsonData, encoding: .utf8) else {
+            print("InAppWebView: contentBlockers could not be encoded")
+            requestedContentRuleListIdentifier = nil
+            finishContentRuleListRequest(false)
+            return
+        }
+        // The store is shared by every WebView: one identifier for different rules lets a
+        // concurrent compile hand this WebView another WebView's rules.
+        let identifier = InAppWebView.contentRuleListPrefix + Util.sha256Hex(encodedRules)
+        requestedContentRuleListIdentifier = identifier
+        InAppWebView.requestedContentRuleListIdentifiers.insert(identifier)
+        if appliedContentRuleList?.identifier == identifier {
+            finishContentRuleListRequest(true)
+            return
+        }
+        contentRuleListPending = true
+        let store: WKContentRuleListStore = WKContentRuleListStore.default()
+        if !InAppWebView.staleContentRuleListsRemoved {
+            InAppWebView.staleContentRuleListsRemoved = true
+            store.getAvailableContentRuleListIdentifiers { identifiers in
+                for stale in identifiers ?? []
+                where stale.hasPrefix(InAppWebView.contentRuleListPrefix)
+                    && !InAppWebView.requestedContentRuleListIdentifiers.contains(stale) {
+                    store.removeContentRuleList(forIdentifier: stale) { _ in }
+                }
+            }
+        }
+        store.lookUpContentRuleList(forIdentifier: identifier) { [weak self] (storedList, _) in
+            if let storedList = storedList {
+                self?.contentRuleListReady(storedList, identifier: identifier)
+                return
+            }
+            store.compileContentRuleList(
+                forIdentifier: identifier,
+                encodedContentRuleList: encodedRules) { [weak self] (compiledList, error) in
+                    guard let self = self else {
+                        return
+                    }
+                    if let compiledList = compiledList, error == nil {
+                        self.contentRuleListReady(compiledList, identifier: identifier)
+                        return
+                    }
+                    print("InAppWebView: contentBlockers failed to compile: " + (error?.localizedDescription ?? "unknown error"))
+                    if self.requestedContentRuleListIdentifier == identifier {
+                        self.finishContentRuleListRequest(false)
+                    }
+            }
+        }
+    }
+
+    /// A list that is ready after a newer request was made is dropped: enforcing it would undo
+    /// that request.
+    @available(iOS 11.0, *)
+    private func contentRuleListReady(_ contentRuleList: WKContentRuleList, identifier: String) {
+        guard requestedContentRuleListIdentifier == identifier else {
+            return
+        }
+        enforceContentRuleList(contentRuleList)
+    }
+
+    @available(iOS 11.0, *)
+    private func enforceContentRuleList(_ contentRuleList: WKContentRuleList?) {
+        let userContentController = configuration.userContentController
+        let previous = appliedContentRuleList
+        if let contentRuleList = contentRuleList {
+            userContentController.add(contentRuleList)
+        }
+        if let previous = previous, previous.identifier != contentRuleList?.identifier {
+            userContentController.remove(previous)
+        }
+        appliedContentRuleList = contentRuleList
+        finishContentRuleListRequest(true)
+    }
+
+    private func finishContentRuleListRequest(_ applied: Bool) {
+        contentRuleListPending = false
+        let waiters = contentRuleListWaiters
+        contentRuleListWaiters.removeAll()
+        waiters.forEach { $0(applied) }
+    }
+
     func setSettings(newSettings: InAppWebViewSettings, newSettingsMap: [String: Any]) {
         
         // MUST be the first! In this way, all the settings that uses evaluateJavaScript can be applied/blocked!
@@ -1357,25 +1476,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         }
         
         if #available(iOS 11.0, *), newSettingsMap["contentBlockers"] != nil {
-            configuration.userContentController.removeAllContentRuleLists()
-            let contentBlockers = newSettings.contentBlockers
-            if contentBlockers.count > 0 {
-                do {
-                    let jsonData = try JSONSerialization.data(withJSONObject: contentBlockers, options: [])
-                    let blockRules = String(data: jsonData, encoding: .utf8)
-                    WKContentRuleListStore.default().compileContentRuleList(
-                        forIdentifier: "ContentBlockingRules",
-                        encodedContentRuleList: blockRules) { (contentRuleList, error) in
-                            if let error = error {
-                                print(error.localizedDescription)
-                                return
-                            }
-                            self.configuration.userContentController.add(contentRuleList!)
-                    }
-                } catch {
-                    print(error.localizedDescription)
-                }
-            }
+            applyContentBlockers(newSettings.contentBlockers)
         }
         
         if #available(iOS 15.0, *) {
@@ -1916,6 +2017,22 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
     public func webView(_ webView: WKWebView,
                  decidePolicyFor navigationAction: WKNavigationAction,
                  decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+        // Rules were requested but none are in force: the page would run with no restrictions,
+        // so the navigation waits for them, and is refused if they failed.
+        if requestedContentRuleListIdentifier != "", appliedContentRuleList == nil {
+            guard contentRuleListPending else {
+                decisionHandler(.cancel)
+                return
+            }
+            contentRuleListWaiters.append { [weak self] applied in
+                guard let self = self, applied else {
+                    decisionHandler(.cancel)
+                    return
+                }
+                self.webView(webView, decidePolicyFor: navigationAction, decisionHandler: decisionHandler)
+            }
+            return
+        }
         var decisionHandlerCalled = false
         let callback = WebViewChannelDelegate.ShouldOverrideUrlLoadingCallback()
         callback.nonNullSuccess = { (response: WKNavigationActionPolicy) in

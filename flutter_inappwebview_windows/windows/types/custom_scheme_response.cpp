@@ -2,6 +2,7 @@
 #include "../utils/string.h"
 #include "custom_scheme_response.h"
 
+#include "../utils/log.h"
 #include <Shlwapi.h>
 
 namespace flutter_inappwebview_plugin
@@ -28,7 +29,7 @@ namespace flutter_inappwebview_plugin
     };
   }
 
-  ICoreWebView2WebResourceResponse* CustomSchemeResponse::toWebView2Response(const wil::com_ptr<ICoreWebView2Environment> webViewEnvironment) const
+  wil::com_ptr<ICoreWebView2WebResourceResponse> CustomSchemeResponse::toWebView2Response(const wil::com_ptr<ICoreWebView2Environment> webViewEnvironment) const
   {
     wil::com_ptr<ICoreWebView2WebResourceResponse> webResourceResponse;
 
@@ -40,12 +41,17 @@ namespace flutter_inappwebview_plugin
           reinterpret_cast<const BYTE*>(postData.data()), static_cast<UINT>(postData.length())));
       }
 
-      webViewEnvironment->CreateWebResourceResponse(
+      const auto createResponseResult = webViewEnvironment->CreateWebResourceResponse(
         postDataStream.get(),
         200, // Default to 200
         L"OK", // Default to "OK"
         nullptr,
         &webResourceResponse);
+
+      if (FAILED(createResponseResult) || !webResourceResponse) {
+        failedLog(createResponseResult);
+        return nullptr;
+      }
 
       // A Content-Type listed in headers replaces the one derived from contentType.
       auto hasContentTypeHeader = headers.has_value() &&
@@ -66,10 +72,8 @@ namespace flutter_inappwebview_plugin
           }
         }
       }
-
-      webResourceResponse->AddRef();
     }
 
-    return webResourceResponse.get();
+    return webResourceResponse;
   }
 }

@@ -2,6 +2,7 @@
 #include "../utils/strconv.h"
 #include "web_resource_response.h"
 
+#include "../utils/log.h"
 #include <Shlwapi.h>
 #include <limits>
 
@@ -38,7 +39,7 @@ namespace flutter_inappwebview_plugin
     };
   }
 
-  ICoreWebView2WebResourceResponse* WebResourceResponse::toWebView2Response(const wil::com_ptr<ICoreWebView2Environment> webViewEnvironment) const
+  wil::com_ptr<ICoreWebView2WebResourceResponse> WebResourceResponse::toWebView2Response(const wil::com_ptr<ICoreWebView2Environment> webViewEnvironment) const
   {
     wil::com_ptr<ICoreWebView2WebResourceResponse> webResourceResponse;
 
@@ -51,7 +52,7 @@ namespace flutter_inappwebview_plugin
       }
 
       const auto rawStatusCode = statusCode.value_or(200);
-      webViewEnvironment->CreateWebResourceResponse(
+      const auto createResponseResult = webViewEnvironment->CreateWebResourceResponse(
         postDataStream.get(),
         rawStatusCode >= static_cast<int64_t>(std::numeric_limits<int>::min()) &&
           rawStatusCode <= static_cast<int64_t>(std::numeric_limits<int>::max())
@@ -60,6 +61,11 @@ namespace flutter_inappwebview_plugin
         reasonPhrase.has_value() ? utf8_to_wide(reasonPhrase.value()).c_str() : L"OK", // Default to "OK" if reasonPhrase is not set
         nullptr,
         &webResourceResponse);
+
+      if (FAILED(createResponseResult) || !webResourceResponse) {
+        failedLog(createResponseResult);
+        return nullptr;
+      }
 
       wil::com_ptr<ICoreWebView2HttpResponseHeaders> responseHeaders;
       if (SUCCEEDED(webResourceResponse->get_Headers(&responseHeaders))) {
@@ -76,10 +82,8 @@ namespace flutter_inappwebview_plugin
           responseHeaders->AppendHeader(L"Content-Encoding", utf8_to_wide(contentEncoding.value()).c_str());
         }
       }
-
-      webResourceResponse->AddRef();
     }
 
-    return webResourceResponse.get();
+    return webResourceResponse;
   }
 }

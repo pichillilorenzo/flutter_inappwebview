@@ -981,7 +981,10 @@ namespace flutter_inappwebview_plugin
                     };
                   callback->nonNullSuccess = [this, deferral, args](const std::shared_ptr<CustomSchemeResponse> response)
                     {
-                      args->put_Response(response->toWebView2Response(webViewEnv));
+                      auto webViewResponse = response->toWebView2Response(webViewEnv);
+                      if (webViewResponse) {
+                        failedLog(args->put_Response(webViewResponse.get()));
+                      }
                       failedLog(deferral->Complete());
                       return false;
                     };
@@ -1013,7 +1016,10 @@ namespace flutter_inappwebview_plugin
                 };
               callback->nonNullSuccess = [this, deferral, args](const std::shared_ptr<WebResourceResponse> response)
                 {
-                  args->put_Response(response->toWebView2Response(webViewEnv));
+                  auto webViewResponse = response->toWebView2Response(webViewEnv);
+                  if (webViewResponse) {
+                    failedLog(args->put_Response(webViewResponse.get()));
+                  }
                   failedLog(deferral->Complete());
                   return false;
                 };

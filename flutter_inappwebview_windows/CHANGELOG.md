@@ -1,5 +1,6 @@
 ## 0.7.0-beta.3
 
+- Fixed leaked WebView2 response references when serving custom and intercepted resources.
 - Fixed leaked COM stream references in custom responses, intercepted responses, and request bodies.
 - Fixed reversed horizontal scrolling: two-finger trackpad pans and mouse
   tilt-wheel scrolls moved the content in the opposite direction, because

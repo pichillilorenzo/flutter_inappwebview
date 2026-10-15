@@ -2232,10 +2232,16 @@ public class InAppWebView: WKWebView, WKUIDelegate,
                         webView.channelDelegate?.onPrintRequest(url: webView.url, printJobId: printJobId, callback: callback)
                     }
                     break
-                case "onConsoleMessage":
+                case "onConsoleMessage", "onConsoleMessageBatch":
                     if let args = body["args"] as? String, let data = args.data(using: .utf8) {
                         let jsonArgs = try? JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? [[String: Any]]
-                        if let jsonData = jsonArgs?.first {
+                        var consoleMessages: [[String: Any]] = []
+                        if handlerName == "onConsoleMessageBatch" {
+                            consoleMessages = jsonArgs?.first?["messages"] as? [[String: Any]] ?? []
+                        } else if let jsonData = jsonArgs?.first {
+                            consoleMessages = [jsonData]
+                        }
+                        for jsonData in consoleMessages {
                             var messageLevel = 1
                             switch (jsonData["level"] as? String) {
                             case "log":
@@ -2259,8 +2265,15 @@ public class InAppWebView: WKWebView, WKUIDelegate,
                                 messageLevel = 1
                                 break
                             }
-                            let consoleMessage = jsonData["message"] as? String ?? ""
-                            
+                            let consoleMessage: String
+                            if let message = jsonData["message"] as? String {
+                                consoleMessage = message
+                            } else if handlerName == "onConsoleMessageBatch" {
+                                continue
+                            } else {
+                                consoleMessage = ""
+                            }
+
                             webView.channelDelegate?.onConsoleMessage(message: consoleMessage, messageLevel: messageLevel)
                         }
                     }

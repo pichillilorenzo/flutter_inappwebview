@@ -1,5 +1,6 @@
 ## 0.7.0-beta.3
 
+- Published the first captured frame after creation, resizing, or resuming capture.
 - Reused frame-comparison shader bytecode and texture resource views across comparisons.
 - Fixed leaked WebView2 response references when serving custom and intercepted resources.
 - Fixed leaked COM stream references in custom responses, intercepted responses, and request bodies.

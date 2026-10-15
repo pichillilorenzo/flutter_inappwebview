@@ -17,6 +17,7 @@ namespace flutter_inappwebview_plugin
     bool useOnDownloadStart = false;
     bool useShouldInterceptRequest = false;
     std::string userAgent;
+    std::string applicationNameForUserAgent;
     bool javaScriptEnabled = true;
     bool transparentBackground = false;
     bool supportZoom = true;

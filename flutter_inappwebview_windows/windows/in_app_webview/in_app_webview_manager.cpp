@@ -9,6 +9,7 @@
 #include "../types/url_request.h"
 #include "../types/user_script.h"
 #include "../utils/flutter.h"
+#include "../utils/host_window.h"
 #include "../utils/log.h"
 #include "../utils/string.h"
 #include "../utils/vector.h"
@@ -119,13 +120,29 @@ namespace flutter_inappwebview_plugin
     auto webViewEnvironmentId = get_optional_fl_map_value<std::string>(*arguments, "webViewEnvironmentId");
     auto keepAliveId = get_optional_fl_map_value<std::string>(*arguments, "keepAliveId");
     auto windowId = get_optional_fl_map_value<int64_t>(*arguments, "windowId");
+    // Multi-window aware: Dart can pass the hosting RegularWindow's
+    // viewId + engineId so we parent the WebView2 host HWND to the
+    // correct window. Falls back to registrar->GetView() (single-window
+    // C++ runner) or nullptr (multi-window with no view yet).
+    auto flutterViewId = get_optional_fl_map_value<int64_t>(*arguments, "flutterViewId");
+    auto flutterEngineId = get_optional_fl_map_value<int64_t>(*arguments, "flutterEngineId");
 
-    RECT bounds;
-    GetClientRect(plugin->registrar->GetView()->GetNativeWindow(), &bounds);
+    HWND parent = PickHostHwnd(plugin->registrar, flutterEngineId, flutterViewId);
+
+    RECT bounds = {};
+    if (parent) {
+      GetClientRect(parent, &bounds);
+    } else {
+      // No host window resolved — pick a reasonable default. The webview
+      // is rendered through CustomPlatformView's texture, so this size
+      // is just the initial WebView2 viewport; Dart resizes it via the
+      // platform view widget anyway.
+      bounds = {0, 0, 1280, 720};
+    }
 
     auto hwnd = CreateWindowEx(0, windowClass_.lpszClassName, L"", 0, 0,
       0, bounds.right - bounds.left, bounds.bottom - bounds.top,
-      plugin->registrar->GetView()->GetNativeWindow(),
+      parent,
       nullptr,
       windowClass_.hInstance, nullptr);
 

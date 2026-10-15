@@ -4,6 +4,7 @@
 
 #include "../in_app_webview/in_app_webview_settings.h"
 #include "../utils/flutter.h"
+#include "../utils/host_window.h"
 #include "../utils/log.h"
 #include "../utils/string.h"
 #include "../utils/vector.h"
@@ -20,9 +21,14 @@ namespace flutter_inappwebview_plugin
 
     RegisterClass(&windowClass_);
 
+    // Message-only host window. In multi-window mode the registrar has no
+    // top-level view yet at plugin-register time, so fall back to nullptr
+    // (Win32 creates a parent-less top-level window — fine here since
+    // this HWND only receives webview-environment messages, never shown).
+    HWND parent = PickHostHwnd(plugin->registrar, std::nullopt, std::nullopt);
     hwnd_ = CreateWindowEx(0, windowClass_.lpszClassName, L"", 0, 0,
       0, 0, 0,
-      plugin->registrar->GetView()->GetNativeWindow(),
+      parent,
       nullptr,
       windowClass_.hInstance, nullptr);
   }

@@ -58,6 +58,9 @@ Send a submission request to the [Submit App](https://inappwebview.dev/submit-ap
 - Android: `minSdkVersion >= 19`, [AGP](https://developer.android.com/build/releases/gradle-plugin) version `>= 7.3.0` (use [Android Studio - Android Gradle plugin Upgrade Assistant](https://developer.android.com/build/agp-upgrade-assistant) for help)
 - iOS 12.0+, Xcode version `>= 15.0`
 - MacOS 10.14+: Xcode version `>= 15.0`
+- iOS/macOS: [Swift Package Manager](https://docs.flutter.dev/packages-and-plugins/swift-package-manager/for-app-developers) must be enabled in your app
+  (`flutter config --enable-swift-package-manager`). CocoaPods is no longer supported by the
+  iOS and macOS implementations: they only ship a `Package.swift`, no podspec.
 - Windows: [NuGet CLI](https://learn.microsoft.com/en-us/nuget/install-nuget-client-tools?tabs=windows#nugetexe-cli) available on your PATH environment variable
 - Linux: WPE 2.0 WebKit built
 

@@ -1,5 +1,6 @@
 ## 1.2.0-beta.3
 
+- Finished failed custom-scheme requests and prevented delivery after cancellation.
 - Added `WebAuthenticationSession.additionalHeaderFields` on iOS 17.4+.
 - Prevented `evaluateJavascript` crashes in popup WebViews on iOS 14 through 17.
 - Prevented named-content-world `callAsyncJavaScript` crashes in popup WebViews on iOS 14 through 17 while preserving page-world support through a compatibility path.

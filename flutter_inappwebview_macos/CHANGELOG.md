@@ -1,5 +1,6 @@
 ## 1.2.0-beta.3
 
+- Finished failed custom-scheme requests and prevented delivery after cancellation.
 - Fixed native WebView frame drift with fractional platform-view sizes.
 - Added `WebAuthenticationSession.additionalHeaderFields` on macOS 14.4+.
 - Prevented `upgradeKnownHostsToHTTPS` crashes on macOS 11.x.

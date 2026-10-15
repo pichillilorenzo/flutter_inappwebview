@@ -36,8 +36,8 @@ namespace flutter_inappwebview_plugin
       wil::com_ptr<IStream> postDataStream = nullptr;
       if (!data.empty()) {
         auto postData = std::string(data.begin(), data.end());
-        postDataStream = SHCreateMemStream(
-          reinterpret_cast<const BYTE*>(postData.data()), static_cast<UINT>(postData.length()));
+        postDataStream.attach(SHCreateMemStream(
+          reinterpret_cast<const BYTE*>(postData.data()), static_cast<UINT>(postData.length())));
       }
 
       webViewEnvironment->CreateWebResourceResponse(

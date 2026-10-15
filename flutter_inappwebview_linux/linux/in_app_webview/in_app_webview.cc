@@ -1331,35 +1331,36 @@ void InAppWebView::OnWpePlatformBufferRendered(WPEBuffer* buffer) {
           // Store in pixel buffer for software rendering
           size_t write_idx = write_buffer_index_.load(std::memory_order_relaxed);
           auto& pixel_buffer = pixel_buffers_[write_idx];
-          
-          if (pixel_buffer.data.size() != size) {
-            pixel_buffer.data.resize(size);
-          }
-          memcpy(pixel_buffer.data.data(), pixels, size);
-          
+
           // WPE SHM buffers use ARGB8888 format (BGRA in memory on little-endian)
           // Flutter expects RGBA8888, so we need to convert
           // ConvertARGB32ToRGBA handles the BGRA -> RGBA conversion
+          bool pixels_valid = true;
           if (format == WPE_PIXEL_FORMAT_ARGB8888) {
-            ConvertARGB32ToRGBA(pixel_buffer.data.data(),    // source (in-place)
-                                pixel_buffer.data.data(),    // destination (in-place)
-                                buf_width, buf_height,
-                                stride);
+            pixels_valid = ConvertARGB32ToRGBAVector(
+                pixels, size, pixel_buffer.data, buf_width, buf_height, stride);
+          } else {
+            // Keep the original bytes for formats without an ARGB conversion.
+            pixel_buffer.data.resize(size);
+            memcpy(pixel_buffer.data.data(), pixels, size);
           }
-          
-          pixel_buffer.width = buf_width;
-          pixel_buffer.height = buf_height;
-          
-          // Swap buffers
-          {
-            std::lock_guard<std::mutex> swap_lock(buffer_swap_mutex_);
-            read_buffer_index_.store(write_idx, std::memory_order_release);
-            write_buffer_index_.store((write_idx + 1) % kNumBuffers, std::memory_order_relaxed);
+
+          if (pixels_valid) {
+            pixel_buffer.width = buf_width;
+            pixel_buffer.height = buf_height;
+
+            // Swap buffers
+            {
+              std::lock_guard<std::mutex> swap_lock(buffer_swap_mutex_);
+              read_buffer_index_.store(write_idx, std::memory_order_release);
+              write_buffer_index_.store((write_idx + 1) % kNumBuffers,
+                                        std::memory_order_relaxed);
+            }
+
+            current_buffer_width_ = buf_width;
+            current_buffer_height_ = buf_height;
+            buffer_handled = true;
           }
-          
-          current_buffer_width_ = buf_width;
-          current_buffer_height_ = buf_height;
-          buffer_handled = true;
         }
         // Note: Don't unref data - it's borrowed from the buffer
       }
@@ -1374,36 +1375,31 @@ void InAppWebView::OnWpePlatformBufferRendered(WPEBuffer* buffer) {
         gsize size;
         const uint8_t* data = static_cast<const uint8_t*>(g_bytes_get_data(pixels, &size));
         
-        // Store in pixel buffer for software rendering
-        size_t write_idx = write_buffer_index_.load(std::memory_order_relaxed);
-        auto& pixel_buffer = pixel_buffers_[write_idx];
-        
-        if (pixel_buffer.data.size() != size) {
-          pixel_buffer.data.resize(size);
+        if (data != nullptr) {
+          // Store the imported ARGB8888 pixels directly as packed RGBA.
+          size_t write_idx = write_buffer_index_.load(std::memory_order_relaxed);
+          auto& pixel_buffer = pixel_buffers_[write_idx];
+          const size_t stride = static_cast<size_t>(buf_width) * 4;
+          if (ConvertARGB32ToRGBAVector(data, size, pixel_buffer.data, buf_width,
+                                        buf_height, stride)) {
+            pixel_buffer.width = buf_width;
+            pixel_buffer.height = buf_height;
+
+            // Swap buffers
+            {
+              std::lock_guard<std::mutex> swap_lock(buffer_swap_mutex_);
+              read_buffer_index_.store(write_idx, std::memory_order_release);
+              write_buffer_index_.store((write_idx + 1) % kNumBuffers,
+                                        std::memory_order_relaxed);
+            }
+
+            current_buffer_width_ = buf_width;
+            current_buffer_height_ = buf_height;
+            buffer_handled = true;
+          }
         }
-        memcpy(pixel_buffer.data.data(), data, size);
-        
-        // GBM pixel import also returns ARGB8888, convert to RGBA
-        uint32_t stride = buf_width * 4;
-        ConvertARGB32ToRGBA(pixel_buffer.data.data(),
-                            pixel_buffer.data.data(),
-                            buf_width, buf_height,
-                            stride);
-        
-        pixel_buffer.width = buf_width;
-        pixel_buffer.height = buf_height;
-        
-        // Swap buffers
-        {
-          std::lock_guard<std::mutex> swap_lock(buffer_swap_mutex_);
-          read_buffer_index_.store(write_idx, std::memory_order_release);
-          write_buffer_index_.store((write_idx + 1) % kNumBuffers, std::memory_order_relaxed);
-        }
-        
+
         g_bytes_unref(pixels);
-        current_buffer_width_ = buf_width;
-        current_buffer_height_ = buf_height;
-        buffer_handled = true;
       } else {
         if (error != nullptr) {
           g_clear_error(&error);

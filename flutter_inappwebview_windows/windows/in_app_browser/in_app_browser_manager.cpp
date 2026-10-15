@@ -60,6 +60,8 @@ namespace flutter_inappwebview_plugin
     auto data = get_optional_fl_map_value<std::string>(*arguments, "data");
     auto initialUserScriptList = get_optional_fl_map_value<flutter::EncodableList>(*arguments, "initialUserScripts");
     auto webViewEnvironmentId = get_optional_fl_map_value<std::string>(*arguments, "webViewEnvironmentId");
+    auto flutterViewId = get_optional_fl_map_value<int64_t>(*arguments, "flutterViewId");
+    auto flutterEngineId = get_optional_fl_map_value<int64_t>(*arguments, "flutterEngineId");
 
     std::optional<std::shared_ptr<URLRequest>> urlRequest = urlRequestMap.has_value() ? std::make_shared<URLRequest>(urlRequestMap.value()) : std::optional<std::shared_ptr<URLRequest>>{};
 
@@ -78,7 +80,9 @@ namespace flutter_inappwebview_plugin
       std::move(initialSettings),
       std::move(initialWebViewSettings),
       initialUserScripts,
-      webViewEnvironmentId
+      webViewEnvironmentId,
+      flutterViewId,
+      flutterEngineId
     };
 
     auto inAppBrowser = std::make_unique<InAppBrowser>(plugin, params);

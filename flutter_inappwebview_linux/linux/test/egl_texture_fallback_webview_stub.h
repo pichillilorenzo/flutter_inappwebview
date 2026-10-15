@@ -3,6 +3,7 @@
 
 #include <array>
 #include <cstring>
+#include <vector>
 
 #include "../in_app_webview/dma_buf_import_policy.h"
 #include "../in_app_webview/texture_webview_api.h"
@@ -20,9 +21,20 @@ class InAppWebView : public TextureWebViewApi {
   bool inline_texture_consumer = false;
   bool force_no_egl_display = false;
   InlineDmaBufImportState import_state;
-  std::array<uint8_t, 16> pixels = {
+  uint32_t frame_width = 2;
+  uint32_t frame_height = 2;
+  std::vector<uint8_t> pixels = {
       255, 0, 0, 255, 0, 255, 0, 255,
       0, 0, 255, 255, 255, 255, 255, 255};
+
+  void SetFrameSize(uint32_t width, uint32_t height, uint8_t seed = 0) {
+    frame_width = width;
+    frame_height = height;
+    pixels.resize(static_cast<size_t>(width) * height * 4);
+    for (size_t i = 0; i < pixels.size(); ++i) {
+      pixels[i] = static_cast<uint8_t>(i * 13 + seed);
+    }
+  }
 
   void SetInlineFlutterTextureConsumer(bool enabled) {
     inline_texture_consumer = enabled;
@@ -54,14 +66,16 @@ class InAppWebView : public TextureWebViewApi {
     return nullptr;
   }
   size_t GetPixelBufferSize(uint32_t* width, uint32_t* height) const override {
-    *width = *height = has_pixels && frame_kind != FrameKind::kNoFrame ? 2 : 0;
+    *width = has_pixels && frame_kind != FrameKind::kNoFrame ? frame_width : 0;
+    *height = has_pixels && frame_kind != FrameKind::kNoFrame ? frame_height : 0;
     return has_pixels ? pixels.size() : 0;
   }
   bool CopyPixelBufferTo(uint8_t* dst, size_t size, uint32_t* width,
                          uint32_t* height) const override {
     if (!has_pixels || frame_kind == FrameKind::kNoFrame || size < pixels.size())
       return false;
-    *width = *height = 2;
+    *width = frame_width;
+    *height = frame_height;
     std::memcpy(dst, pixels.data(), pixels.size());
     return true;
   }

@@ -1,6 +1,8 @@
 #include <epoxy/egl.h>
 #include <epoxy/gl.h>
 
+#include <vector>
+
 #include "egl_texture_fallback_webview_stub.h"
 #include "../in_app_webview/zero_copy.h"
 
@@ -51,9 +53,9 @@ int main() {
       g_assert_no_error(error);
       g_assert_cmpuint(width, ==, expected_width);
       g_assert_cmpuint(height, ==, expected_height);
-      if (expected_width == 2) {
+      if (expected_width > 1) {
         glBindTexture(target, name);
-        std::array<uint8_t, 16> rendered{};
+        std::vector<uint8_t> rendered(webview.pixels.size());
         glGetTexImage(target, 0, GL_RGBA, GL_UNSIGNED_BYTE, rendered.data());
         g_assert_cmpmem(rendered.data(), rendered.size(),
                         webview.pixels.data(), webview.pixels.size());
@@ -68,6 +70,18 @@ int main() {
     populate(1, 1);
     webview.frame_kind = flutter_inappwebview_plugin::InAppWebView::FrameKind::kShm;
     webview.has_pixels = true;
+    populate(2, 2);
+    webview.SetFrameSize(64, 64, 1);
+    populate(64, 64);
+    const size_t large_fallback_capacity = texture->fallback_buffer_size;
+    g_assert_cmpuint(large_fallback_capacity, >=, webview.pixels.size());
+    webview.SetFrameSize(56, 64, 2);
+    populate(56, 64);
+    g_assert_cmpuint(texture->fallback_buffer_size, ==, large_fallback_capacity);
+    webview.SetFrameSize(16, 16, 3);
+    populate(16, 16);
+    g_assert_cmpuint(texture->fallback_buffer_size, <, large_fallback_capacity);
+    webview.SetFrameSize(2, 2, 4);
     populate(2, 2);
     g_assert_cmpint(webview.import_state.IsFallbackActive(), ==, FALSE);
     g_assert_cmpint(webview.ShouldAttemptFlutterEglImport(), ==, zero_copy_enabled);

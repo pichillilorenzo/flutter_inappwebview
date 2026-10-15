@@ -7,6 +7,8 @@
 
 using flutter_inappwebview_plugin::ConvertARGB32ToRGBA;
 using flutter_inappwebview_plugin::ConvertARGB32ToRGBAVector;
+using flutter_inappwebview_plugin::ResizeByteBuffer;
+using flutter_inappwebview_plugin::ShouldShrinkByteBuffer;
 
 int main() {
   constexpr size_t width = 5;  // Odd width also exercises the scalar tail.
@@ -63,5 +65,40 @@ int main() {
   assert(!ConvertARGB32ToRGBAVector(
       source.data(), source.size(), converted,
       std::numeric_limits<size_t>::max(), height, stride));
+
+  // Keep capacity on a modest resize, then release a peak allocation once the
+  // frame becomes at most one quarter of its previous capacity.
+  std::vector<uint8_t> capacity_buffer;
+  ResizeByteBuffer(capacity_buffer, 16 * 1024);
+  const size_t peak_capacity = capacity_buffer.capacity();
+  assert(!ShouldShrinkByteBuffer(peak_capacity, peak_capacity / 2));
+  ResizeByteBuffer(capacity_buffer, peak_capacity / 2);
+  assert(capacity_buffer.capacity() == peak_capacity);
+  assert(ShouldShrinkByteBuffer(peak_capacity, peak_capacity / 4));
+  ResizeByteBuffer(capacity_buffer, peak_capacity / 4);
+  assert(capacity_buffer.size() == peak_capacity / 4);
+  assert(capacity_buffer.capacity() < peak_capacity);
+
+  auto convert_frame = [&converted](size_t frame_width, size_t frame_height) {
+    const size_t frame_stride = frame_width * 4;
+    std::vector<uint8_t> frame(frame_stride * frame_height);
+    for (size_t i = 0; i < frame.size(); ++i) {
+      frame[i] = static_cast<uint8_t>(i * 17 + frame_width + frame_height);
+    }
+    std::vector<uint8_t> reference(frame_width * frame_height * 4);
+    ConvertARGB32ToRGBA(frame.data(), reference.data(), frame_width,
+                        frame_height, frame_stride);
+    assert(ConvertARGB32ToRGBAVector(frame.data(), frame.size(), converted,
+                                     frame_width, frame_height, frame_stride));
+    assert(converted == reference);
+  };
+
+  convert_frame(64, 64);
+  const size_t large_frame_capacity = converted.capacity();
+  convert_frame(56, 64);
+  assert(converted.capacity() == large_frame_capacity);
+  convert_frame(16, 16);
+  assert(converted.capacity() < large_frame_capacity);
+
   return 0;
 }

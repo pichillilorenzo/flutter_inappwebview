@@ -148,11 +148,16 @@ static gboolean inappwebview_egl_texture_populate(FlTextureGL* texture, uint32_t
   // glEGLImageTargetTexture2DOES calls made while the display that created
   // it is current; the DMA-BUF it wraps is not display-bound, so we can
   // freely create a fresh image per frame here.
-  if (self->webview != nullptr && check_egl_image_extension(self)) {
+  const bool inline_zero_copy_requested =
+      self->webview != nullptr && self->webview->ShouldAttemptFlutterEglImport();
+  bool current_frame_is_dma_buf = false;
+  bool imported_current_frame = false;
+  if (inline_zero_copy_requested && check_egl_image_extension(self)) {
     uint32_t img_width = 0;
     uint32_t img_height = 0;
     void* egl_image = self->webview->ImportCurrentBufferToEglImage(
-        reinterpret_cast<void*>(eglGetCurrentDisplay()), &img_width, &img_height);
+        reinterpret_cast<void*>(eglGetCurrentDisplay()), &img_width, &img_height,
+        &current_frame_is_dma_buf);
 
     if (egl_image != nullptr && img_width > 0 && img_height > 0) {
       // Create texture if needed
@@ -193,10 +198,20 @@ static gboolean inappwebview_egl_texture_populate(FlTextureGL* texture, uint32_t
       *name = self->texture_id;
       *out_width = img_width;
       *out_height = img_height;
+      imported_current_frame = true;
 
       g_mutex_unlock(&self->mutex);
       return TRUE;
     }
+  } else if (inline_zero_copy_requested) {
+    current_frame_is_dma_buf = self->webview->HasCurrentDmaBufBuffer();
+  }
+
+  // Coordinate a failed Flutter-display import with the WPE producer. The
+  // current frame remains available as a referenced DMA-BUF, and subsequent
+  // frames will use the producer's existing pixel conversion fallback.
+  if (inline_zero_copy_requested && !imported_current_frame) {
+    self->webview->ReportFlutterEglImageImportFailure(current_frame_is_dma_buf);
   }
 
   // Fallback: Try to get pixel buffer from webview (SHM mode)

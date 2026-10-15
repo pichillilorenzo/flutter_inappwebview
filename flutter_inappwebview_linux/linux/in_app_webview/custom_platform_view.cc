@@ -105,7 +105,17 @@ CustomPlatformView::CustomPlatformView(FlBinaryMessenger* messenger,
     // Keep the producer and consumer on the same rendering path. Set this
     // before constructing the texture so the first WPE frame is eligible for
     // pixel upload when zero-copy has been explicitly disabled.
-    webview_->SetSkipPixelReadback(!IsZeroCopyDisabled());
+    webview_->SetInlineFlutterTextureConsumer(true);
+    const bool inline_zero_copy_enabled = !IsZeroCopyDisabled();
+#ifdef HAVE_WPE_PLATFORM
+    webview_->SetInlineFlutterEglImportEnabled(inline_zero_copy_enabled);
+    webview_->SetSkipPixelReadback(inline_zero_copy_enabled);
+#else
+    // The legacy export API provides WPE-created EGL images, not DMA-BUF planes
+    // for Flutter's EGLDisplay. Keep its existing pixel readback fallback.
+    webview_->SetInlineFlutterEglImportEnabled(false);
+    webview_->SetSkipPixelReadback(false);
+#endif
     texture_ = FL_TEXTURE(inappwebview_egl_texture_new(webview_.get()));
     debugLog("CustomPlatformView: using GL texture (hardware accelerated)");
   } else {

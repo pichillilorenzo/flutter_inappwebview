@@ -5,6 +5,8 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
+#include <limits>
+#include <vector>
 
 // Detect SIMD capability
 #if defined(__aarch64__) || defined(_M_ARM64)
@@ -249,6 +251,42 @@ inline void ConvertARGB32ToRGBA(const uint8_t* src, uint8_t* dst, int width, int
     }
   }
 #endif
+}
+
+/**
+ * Convert an ARGB32 image directly into a packed RGBA vector.
+ *
+ * The source may have padded rows; the destination is always width * height * 4
+ * bytes. The source and destination are kept separate because in-place
+ * conversion is unsafe when source rows have padding.
+ */
+inline bool ConvertARGB32ToRGBAVector(const uint8_t* src, size_t src_size,
+                                      std::vector<uint8_t>& dst, size_t width,
+                                      size_t height, size_t src_stride) {
+  if (src == nullptr || width == 0 || height == 0 ||
+      width > static_cast<size_t>(std::numeric_limits<int>::max()) ||
+      height > static_cast<size_t>(std::numeric_limits<int>::max()) ||
+      src_stride > static_cast<size_t>(std::numeric_limits<int>::max()) ||
+      width > std::numeric_limits<size_t>::max() / 4) {
+    return false;
+  }
+
+  const size_t row_bytes = width * 4;
+  if (src_stride < row_bytes ||
+      height - 1 > (std::numeric_limits<size_t>::max() - row_bytes) / src_stride) {
+    return false;
+  }
+  const size_t required_src_size = (height - 1) * src_stride + row_bytes;
+  if (src_size < required_src_size ||
+      height > std::numeric_limits<size_t>::max() / row_bytes) {
+    return false;
+  }
+
+  const size_t dst_size = row_bytes * height;
+  dst.resize(dst_size);
+  ConvertARGB32ToRGBA(src, dst.data(), static_cast<int>(width),
+                      static_cast<int>(height), static_cast<int>(src_stride));
+  return true;
 }
 
 /**

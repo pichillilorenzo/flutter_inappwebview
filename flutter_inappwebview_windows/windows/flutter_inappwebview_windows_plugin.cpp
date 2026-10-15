@@ -3,6 +3,7 @@
 #include <flutter/plugin_registrar_windows.h>
 
 #include "cookie_manager.h"
+#include "file_drop/file_drop_manager.h"
 #include "headless_in_app_webview/headless_in_app_webview_manager.h"
 #include "in_app_browser/in_app_browser_manager.h"
 #include "in_app_webview/in_app_webview_manager.h"
@@ -35,6 +36,7 @@ namespace flutter_inappwebview_plugin
     headlessInAppWebViewManager = std::make_unique<HeadlessInAppWebViewManager>(this);
     cookieManager = std::make_unique<CookieManager>(this);
     platformUtil = std::make_unique<PlatformUtil>(this);
+    fileDropManager = std::make_unique<FileDropManager>(this);
 
     window_proc_id = registrar->RegisterTopLevelWindowProcDelegate(
       [this](HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -54,6 +56,7 @@ namespace flutter_inappwebview_plugin
     headlessInAppWebViewManager = nullptr;
     cookieManager = nullptr;
     platformUtil = nullptr;
+    fileDropManager = nullptr;
   }
 
 
@@ -64,6 +67,18 @@ namespace flutter_inappwebview_plugin
     LPARAM lParam)
   {
     std::optional<LRESULT> result = std::nullopt;
+
+    // A later top-level delegate may consume WM_SIZE on minimize
+    // (window_manager does), preventing Flutter's hidden lifecycle event.
+    // Keep inline WebViews synchronized here while the message is available.
+    if (message == WM_SIZE && inAppWebViewManager) {
+      if (wParam == SIZE_MINIMIZED) {
+        inAppWebViewManager->setWindowMinimized(true);
+      }
+      else if (wParam == SIZE_RESTORED || wParam == SIZE_MAXIMIZED) {
+        inAppWebViewManager->setWindowMinimized(false);
+      }
+    }
 
     if (platformUtil) {
       result = platformUtil->HandleWindowProc(hWnd, message, wParam, lParam);

@@ -1,5 +1,18 @@
 ## 1.2.0-beta.3
 
+- Cancelled pending JavaScript callbacks and stale queued evaluations when their document is replaced or disposed.
+- Added `InAppWebViewController.setBackgroundColor`, retaining the selected
+  native color across `transparentBackground` toggles.
+- Added audio capture to Android file choosers, with file-selection fallback
+  when no recorder is installed.
+- Avoided the deprecated status-bar color call when Android 15 edge-to-edge is
+  enforced, while preserving legacy target-SDK behavior.
+- Reduced Java deprecation warnings while preserving synchronous session-cookie
+  clearing [#2641](https://github.com/pichillilorenzo/flutter_inappwebview/issues/2641).
+- Fixed nullable Android context-menu action titles.
+- Restricted captured-media FileProvider access to the app-scoped `Captures`
+  directory.
+- Rejected unsafe `file://` URIs returned by Android file pickers.
 - Updated flutter_inappwebview_platform_interface version to ^1.4.0-beta.3
 - Updated native dependencies:
   - implementation from `'androidx.webkit:webkit:1.12.0'` to `'androidx.webkit:webkit:1.14.0'`

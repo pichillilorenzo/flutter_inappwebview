@@ -3,7 +3,11 @@
 
 #include <flutter/method_result_functions.h>
 #include <flutter/standard_method_codec.h>
+#include <memory>
 #include <optional>
+#include <utility>
+
+#include "../utils/log.h"
 
 namespace flutter_inappwebview_plugin
 {
@@ -18,10 +22,35 @@ namespace flutter_inappwebview_plugin
     std::function<void(const std::optional<T> result)> defaultBehaviour = [](const std::optional<T> result) {};
     std::function<std::optional<T>(const flutter::EncodableValue* result)> decodeResult = [](const flutter::EncodableValue* result) { return std::nullopt; };
 
+    // Owner of the objects captured by the handlers above. Dart may reply long
+    // after that owner is gone (a tab closed while an RPC was in flight), so an
+    // expired token makes every handler a no-op instead of a use-after-free.
+    std::optional<std::weak_ptr<void>> owner;
+
+    // Cleanup that is safe after owner destruction, for example completing a
+    // WebView2 deferral. It runs at most once when a late reply is dropped.
+    std::function<void()> onOwnerGone;
+
+    bool isOwnerGone()
+    {
+      if (!owner.has_value() || !owner.value().expired()) {
+        return false;
+      }
+      debugLog("dropping a Dart reply that outlived its owner");
+      if (onOwnerGone) {
+        auto cleanup = std::move(onOwnerGone);
+        cleanup();
+      }
+      return true;
+    }
+
     BaseCallbackResult<T>() :
       MethodResultFunctions(
         [this](const flutter::EncodableValue* val)
         {
+          if (isOwnerGone()) {
+            return;
+          }
           std::optional<T> result = decodeResult ? decodeResult(val) : std::nullopt;
           auto shouldRunDefaultBehaviour = false;
           if (result.has_value()) {
@@ -36,12 +65,18 @@ namespace flutter_inappwebview_plugin
         },
         [this](const std::string& error_code, const std::string& error_message, const flutter::EncodableValue* error_details)
         {
+          if (isOwnerGone()) {
+            return;
+          }
           if (error) {
             error(error_code, error_message, error_details);
           }
         },
         [this]()
         {
+          if (isOwnerGone()) {
+            return;
+          }
           if (defaultBehaviour) {
             defaultBehaviour(std::nullopt);
           }

@@ -1,5 +1,6 @@
 package com.pichillilorenzo.flutter_inappwebview_android.webview;
 
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.webkit.ValueCallback;
@@ -95,6 +96,15 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
         break;
       case getProgress:
         result.success((webView != null) ? webView.getProgress() : null);
+        break;
+      case setBackgroundColor:
+        if (webView != null) {
+          String color = (String) call.argument("color");
+          if (color != null) {
+            webView.setCustomBackgroundColor(Color.parseColor(color));
+          }
+        }
+        result.success(true);
         break;
       case loadUrl:
         if (webView != null) {

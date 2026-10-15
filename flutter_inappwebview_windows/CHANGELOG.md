@@ -1,5 +1,23 @@
 ## 0.7.0-beta.3
 
+- Kept the shader compiler DLL loaded until its result and error blobs are released.
+- Published the first captured frame after creation, resizing, or resuming capture.
+- Reused frame-comparison shader bytecode and texture resource views across comparisons.
+- Fixed leaked WebView2 response references when serving custom and intercepted resources.
+- Fixed leaked COM stream references in custom responses, intercepted responses, and request bodies.
+- Fixed reversed horizontal scrolling: two-finger trackpad pans and mouse
+  tilt-wheel scrolls moved the content in the opposite direction, because
+  `WM_MOUSEHWHEEL`'s sign convention is inverted relative to `WM_MOUSEWHEEL`.
+- Fixed WebView2 input windows intercepting desktop clicks while the Flutter
+  host window is minimized, including WebViews created or resumed during
+  minimization.
+- Updated Microsoft.Windows.ImplementationLibrary to `1.0.260126.7` and
+  Microsoft.Web.WebView2 to `1.0.4078.44` for current MSVC toolchains.
+- Fixed internal WebView host windows stealing focus from the Flutter window.
+- Fixed owned popups (`<select>` dropdowns, print preview pickers, context
+  menus) opening away from the WebView after the host windows became
+  `WS_CHILD`: positioning now uses parent-client coordinates.
+- Added profile-scoped WebView2 preferred color-scheme control.
 - Updated flutter_inappwebview_platform_interface version to ^1.4.0-beta.3
 - Updated Microsoft.Web.WebView2 SDK version from `1.0.2849.39` to `1.0.3650.58`
 - Implemented `getFrameId`, `getFavicon`, `showSaveAsUI`, `getMemoryUsageTargetLevel`, `setMemoryUsageTargetLevel` InAppWebViewController method

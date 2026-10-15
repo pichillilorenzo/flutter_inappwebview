@@ -72,6 +72,16 @@ public class JavaScriptBridgeJS {
                         }
                     });
                 };
+                window.\(get_JAVASCRIPT_BRIDGE_NAME())._callHandlerOneWay = function() {
+                    var _windowId = \(WindowIdJS.WINDOW_ID_VARIABLE_JS_SOURCE());
+                    _postMessage.call(_UserMessageHandler, {
+                        'handlerName': arguments[0],
+                        '_callHandlerOneWay': true,
+                        '_bridgeSecret': bridgeSecret,
+                        'args': _JSON_stringify(_Array_slice.call(arguments, 1)),
+                        '_windowId': _windowId
+                    });
+                };
             })(window);
             \(WebMessageListenerJS.WEB_MESSAGE_LISTENER_JS_SOURCE())
             \(UTIL_JS_SOURCE())

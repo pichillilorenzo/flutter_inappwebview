@@ -100,34 +100,20 @@ public class InAppBrowserWebViewController: NSViewController, InAppBrowserDelega
         progressBar.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 0.0).isActive = true
         progressBar.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: 0.0).isActive = true
         
-        if let wId = windowId {
+        if windowId != nil {
             channelDelegate?.onBrowserCreated()
             webView?.runWindowBeforeCreatedCallbacks()
         } else {
-            if #available(macOS 10.13, *) {
-                if let contentBlockers = webView?.settings?.contentBlockers, contentBlockers.count > 0 {
-                    do {
-                        let jsonData = try JSONSerialization.data(withJSONObject: contentBlockers, options: [])
-                        let blockRules = String(data: jsonData, encoding: .utf8)
-                        WKContentRuleListStore.default().compileContentRuleList(
-                            forIdentifier: "ContentBlockingRules",
-                            encodedContentRuleList: blockRules) { (contentRuleList, error) in
-
-                                if let error = error {
-                                    print(error.localizedDescription)
-                                    return
-                                }
-
-                                let configuration = self.webView!.configuration
-                                configuration.userContentController.add(contentRuleList!)
-
-                                self.initLoad()
-                        }
+            if #available(macOS 10.13, *), let webView = webView,
+               let contentBlockers = webView.settings?.contentBlockers, !contentBlockers.isEmpty {
+                // Nothing loads before the rules are enforced, and nothing loads if they fail.
+                webView.applyContentBlockers(contentBlockers) { [weak self] applied in
+                    guard applied else {
                         return
-                    } catch {
-                        print(error.localizedDescription)
                     }
+                    self?.initLoad()
                 }
+                return
             }
             
             initLoad()

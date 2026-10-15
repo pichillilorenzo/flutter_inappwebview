@@ -1,0 +1,53 @@
+name: Windows WebView checks
+
+on:
+  pull_request:
+    paths:
+      - "flutter_inappwebview_windows/**"
+      - ".github/workflows/windows-webview-visibility.yaml"
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.44.9
+          cache: true
+
+      - name: Resolve package dependencies
+        working-directory: flutter_inappwebview_windows
+        run: flutter pub get
+
+      - name: Analyze Dart code
+        working-directory: flutter_inappwebview_windows
+        run: flutter analyze
+
+      - name: Run Dart regression tests
+        working-directory: flutter_inappwebview_windows
+        run: flutter test
+
+      - name: Generate Windows build
+        working-directory: flutter_inappwebview_windows/example
+        run: flutter build windows --debug --config-only
+
+      - name: Configure native tests
+        working-directory: flutter_inappwebview_windows/example
+        run: >-
+          cmake -S windows -B build/windows/x64
+          -Dinclude_flutter_inappwebview_windows_tests=TRUE
+
+      - name: Build example and native tests
+        working-directory: flutter_inappwebview_windows/example
+        run: cmake --build build/windows/x64 --config Debug --parallel
+
+      - name: Run native tests
+        working-directory: flutter_inappwebview_windows/example
+        run: >-
+          ctest --test-dir build/windows/x64 -C Debug
+          --output-on-failure --no-tests=error

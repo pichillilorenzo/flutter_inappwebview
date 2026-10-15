@@ -920,7 +920,9 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
       case PICKER_LEGACY:
         Uri result = null;
         if (resultCode == RESULT_OK) {
-          result = data != null ? data.getData() : getCapturedMediaFile();
+          result = data != null
+                  ? sanitizeFileChooserUri(data.getData())
+                  : getCapturedMediaFile();
         }
         if (filePathCallbackLegacy != null) {
           filePathCallbackLegacy.onReceiveValue(result);
@@ -940,7 +942,8 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     // we have one file selected
     if (data != null && data.getData() != null) {
       if (resultCode == RESULT_OK && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-        return WebChromeClient.FileChooserParams.parseResult(resultCode, data);
+        return filterUnsafeFileChooserUris(
+                WebChromeClient.FileChooserParams.parseResult(resultCode, data));
       } else {
         return null;
       }
@@ -953,7 +956,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
       for (int i = 0; i < numSelectedFiles; i++) {
         result[i] = data.getClipData().getItemAt(i).getUri();
       }
-      return result;
+      return filterUnsafeFileChooserUris(result);
     }
 
     // we have a captured image or video file
@@ -963,6 +966,47 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     }
 
     return null;
+  }
+
+  /**
+   * Rejects untrusted file-picker URIs that could expose the host app's private files.
+   * Non-file URIs remain allowed because content providers are the normal picker path.
+   */
+  private boolean isUnsafeFileChooserUri(@Nullable Uri uri) {
+    if (uri == null) {
+      return true;
+    }
+    if (!"file".equalsIgnoreCase(uri.getScheme())) {
+      return false;
+    }
+
+    final Activity activity = getActivity();
+    if (activity == null) {
+      return true;
+    }
+    return FileChooserUriSanitizer.isUnsafeFilePath(
+            uri.getPath(), activity.getApplicationInfo().dataDir);
+  }
+
+  @Nullable
+  private Uri sanitizeFileChooserUri(@Nullable Uri uri) {
+    return isUnsafeFileChooserUri(uri) ? null : uri;
+  }
+
+  @Nullable
+  private Uri[] filterUnsafeFileChooserUris(@Nullable Uri[] uris) {
+    if (uris == null) {
+      return null;
+    }
+
+    final List<Uri> safeUris = new ArrayList<>();
+    for (Uri uri : uris) {
+      final Uri safeUri = sanitizeFileChooserUri(uri);
+      if (safeUri != null) {
+        safeUris.add(safeUri);
+      }
+    }
+    return safeUris.isEmpty() ? null : safeUris.toArray(new Uri[0]);
   }
 
   private boolean isFileNotEmpty(Uri uri) {
@@ -1000,6 +1044,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
 
     boolean images = acceptsImages(acceptType);
     boolean video = acceptsVideo(acceptType);
+    boolean audio = acceptsAudio(acceptType);
 
     Intent pickerIntent = null;
 
@@ -1009,6 +1054,12 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
           pickerIntent = getPhotoIntent();
         } else if (video) {
           pickerIntent = getVideoIntent();
+        }
+      }
+      if (pickerIntent == null && audio && !images && !video) {
+        Intent audioIntent = getAudioIntent();
+        if (canResolveIntent(audioIntent)) {
+          pickerIntent = audioIntent;
         }
       }
     }
@@ -1023,6 +1074,12 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
         }
         if (video) {
           extraIntents.add(getVideoIntent());
+        }
+      }
+      if (audio) {
+        Intent audioIntent = getAudioIntent();
+        if (canResolveIntent(audioIntent)) {
+          extraIntents.add(audioIntent);
         }
       }
       pickerIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, extraIntents.toArray(new Parcelable[]{}));
@@ -1043,6 +1100,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
 
     boolean images = acceptsImages(acceptTypes);
     boolean video = acceptsVideo(acceptTypes);
+    boolean audio = acceptsAudio(acceptTypes);
 
     Intent pickerIntent = null;
 
@@ -1054,6 +1112,12 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
           pickerIntent = getVideoIntent();
         }
       }
+      if (pickerIntent == null && audio && !images && !video) {
+        Intent audioIntent = getAudioIntent();
+        if (canResolveIntent(audioIntent)) {
+          pickerIntent = audioIntent;
+        }
+      }
     }
     if (pickerIntent == null) {
       ArrayList<Parcelable> extraIntents = new ArrayList<>();
@@ -1063,6 +1127,12 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
         }
         if (video) {
           extraIntents.add(getVideoIntent());
+        }
+      }
+      if (audio) {
+        Intent audioIntent = getAudioIntent();
+        if (canResolveIntent(audioIntent)) {
+          extraIntents.add(audioIntent);
         }
       }
 
@@ -1116,6 +1186,10 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     videoOutputFileUri = getOutputUri(MediaStore.ACTION_VIDEO_CAPTURE);
     intent.putExtra(MediaStore.EXTRA_OUTPUT, videoOutputFileUri);
     return intent;
+  }
+
+  private Intent getAudioIntent() {
+    return new Intent(MediaStore.Audio.Media.RECORD_SOUND_ACTION);
   }
 
   private Intent getFileChooserIntent(String acceptTypes) {
@@ -1180,6 +1254,19 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
   private Boolean acceptsVideo(String[] types) {
     String[] mimeTypes = getAcceptedMimeType(types);
     return acceptsAny(types) || arrayContainsString(mimeTypes, "video");
+  }
+
+  private Boolean acceptsAudio(String types) {
+    String mimeType = types;
+    if (types.matches("\\.\\w+")) {
+      mimeType = getMimeTypeFromExtension(types.replace(".", ""));
+    }
+    return mimeType != null && mimeType.toLowerCase().contains("audio");
+  }
+
+  private Boolean acceptsAudio(String[] types) {
+    String[] mimeTypes = getAcceptedMimeType(types);
+    return arrayContainsString(mimeTypes, "audio");
   }
 
   private Boolean arrayContainsString(String[] array, String pattern) {
@@ -1280,7 +1367,13 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     if (activity == null) {
       return null;
     }
-    File storageDir = activity.getApplicationContext().getExternalFilesDir(null);
+    File storageDir = activity.getApplicationContext().getExternalFilesDir("Captures");
+    if (storageDir == null) {
+      throw new IOException("External capture storage is unavailable");
+    }
+    if (!storageDir.exists() && !storageDir.mkdirs()) {
+      throw new IOException("Cannot create external capture storage");
+    }
     return File.createTempFile(prefix, suffix, storageDir);
   }
 
@@ -1289,6 +1382,11 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     // i.e. <input type="file" />, without any "accept" attr
     // will be an array with one empty string element, afaik
     return arr.length == 0 || (arr.length == 1 && arr[0].length() == 0);
+  }
+
+  private boolean canResolveIntent(Intent intent) {
+    Activity activity = getActivity();
+    return activity != null && intent.resolveActivity(activity.getPackageManager()) != null;
   }
 
   @Override

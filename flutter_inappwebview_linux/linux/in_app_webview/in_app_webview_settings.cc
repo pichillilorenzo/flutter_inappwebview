@@ -51,6 +51,11 @@ InAppWebViewSettings::InAppWebViewSettings(FlValue* map) : InAppWebViewSettings(
   isInspectable = get_fl_map_value(map, "isInspectable", isInspectable);
   disableContextMenu = get_fl_map_value(map, "disableContextMenu", disableContextMenu);
 
+  // === Scroll settings ===
+  disableVerticalScroll = get_fl_map_value(map, "disableVerticalScroll", disableVerticalScroll);
+  disableHorizontalScroll =
+      get_fl_map_value(map, "disableHorizontalScroll", disableHorizontalScroll);
+
   // === JavaScript bridge settings ===
   if (fl_map_contains_not_null(map, "javaScriptHandlersOriginAllowList")) {
     javaScriptHandlersOriginAllowList =
@@ -510,6 +515,10 @@ FlValue* InAppWebViewSettings::toFlValue() const {
       {"supportZoom", make_fl_value(supportZoom)},
       {"isInspectable", make_fl_value(isInspectable)},
       {"disableContextMenu", make_fl_value(disableContextMenu)},
+
+      // === Scroll settings ===
+      {"disableVerticalScroll", make_fl_value(disableVerticalScroll)},
+      {"disableHorizontalScroll", make_fl_value(disableHorizontalScroll)},
 
       // === JavaScript bridge settings ===
       {"javaScriptBridgeEnabled", make_fl_value(javaScriptBridgeEnabled)},

@@ -27,6 +27,9 @@
 
 #include <flutter_linux/flutter_linux.h>
 
+#include "dma_buf_import_policy.h"
+#include "texture_webview_api.h"
+
 // WPE WebKit core includes (always available)
 #include <wpe/webkit.h>
 #include <jsc/jsc.h>
@@ -121,7 +124,7 @@ enum class WpePointerButton { None = 0, Primary = 1, Secondary = 2, Tertiary = 3
 /// This class provides offscreen web rendering using WPE WebKit.
 /// Unlike WebKitGTK, WPE doesn't require a GTK widget hierarchy
 /// and can render directly to GPU textures via the FDO backend.
-class InAppWebView {
+class InAppWebView : public TextureWebViewApi {
  public:
   static constexpr const char* METHOD_CHANNEL_NAME_PREFIX =
       "com.pichillilorenzo/flutter_inappwebview_";
@@ -219,6 +222,14 @@ class InAppWebView {
   // Screenshot - captures the current visible content as PNG data
   void takeScreenshot(std::function<void(const std::optional<std::vector<uint8_t>>&)> callback);
 
+  // PDF export via the Otzaria WPE runtime patch (webkit_otzaria_web_view_print_to_pdf,
+  // resolved with dlsym). Sizes are in PDF points; yields nullopt when the
+  // running libWPEWebKit lacks the symbol (unpatched build).
+  void createPdf(double pageWidthPt, double pageHeightPt,
+                 double marginTopPt, double marginRightPt,
+                 double marginBottomPt, double marginLeftPt,
+                 std::function<void(const std::optional<std::vector<uint8_t>>&)> callback);
+
   // Session state - save and restore navigation state
   std::optional<std::vector<uint8_t>> saveState() const;
   bool restoreState(const std::vector<uint8_t>& stateData);
@@ -292,9 +303,10 @@ class InAppWebView {
                       const std::vector<std::tuple<int, double, double, int>>& touchPoints);
 
   // Texture pixel buffer access (called by texture classes)
-  size_t GetPixelBufferSize(uint32_t* out_width, uint32_t* out_height) const;
+  size_t GetPixelBufferSize(uint32_t* out_width,
+                            uint32_t* out_height) const override;
   bool CopyPixelBufferTo(uint8_t* dst, size_t dst_size, uint32_t* out_width,
-                         uint32_t* out_height) const;
+                         uint32_t* out_height) const override;
 
   // DMA-BUF export (WPE-specific, for zero-copy GPU texture sharing)
   bool HasDmaBufExport() const;
@@ -305,9 +317,38 @@ class InAppWebView {
   // The EGL image is owned by WPE and remains valid until the next frame.
   void* GetCurrentEglImage(uint32_t* out_width, uint32_t* out_height) const;
 
+  // Re-import the current frame's DMA-BUF planes directly into
+  // target_display (Flutter's EGLDisplay), instead of reusing the
+  // EGLImageKHR WPE created against its own headless EGLDisplay. A DMA-BUF
+  // itself is display-agnostic; the EGLImageKHR wrapping it is not, so an
+  // image created in WPE's display cannot be bound to a texture while a
+  // different EGLDisplay is current (glEGLImageTargetTexture2DOES fails
+  // with GL_INVALID_VALUE). Caller owns the returned EGLImageKHR and must
+  // eglDestroyImageKHR it — safe to do immediately after binding the image
+  // to a texture via glEGLImageTargetTexture2DOES. Returns nullptr if the
+  // current frame is not a DMA-BUF buffer (e.g. SHM/software mode).
+  void* ImportCurrentBufferToEglImage(void* target_display, uint32_t* out_width,
+                                      uint32_t* out_height,
+                                      bool* out_is_dma_buf_frame = nullptr) const override;
+  bool HasCurrentDmaBufBuffer() const override;
+  bool ShouldAttemptFlutterEglImport() const override;
+  void ReportFlutterEglImageImportFailure(bool current_frame_is_dma_buf) override;
+
   // Skip pixel readback - when using zero-copy EGL texture mode, we don't need
   // to read pixels back to CPU. This improves performance and avoids GL context issues.
-  void SetSkipPixelReadback(bool skip) { skip_pixel_readback_ = skip; }
+  void SetSkipPixelReadback(bool skip) {
+    skip_pixel_readback_.store(skip, std::memory_order_release);
+  }
+
+  // Inline Flutter textures import DMA-BUFs on Flutter's EGLDisplay. InAppBrowser
+  // instead consumes the EGL image created by WPE, so it leaves this disabled.
+  void SetInlineFlutterTextureConsumer(bool enabled) {
+    inline_flutter_texture_consumer_.store(enabled, std::memory_order_release);
+  }
+
+  void SetInlineFlutterEglImportEnabled(bool enabled) {
+    inline_flutter_import_state_.SetEnabled(enabled);
+  }
 
   // Frame available callback (called when new frame is ready)
   void SetOnFrameAvailable(std::function<void()> callback);
@@ -475,7 +516,7 @@ class InAppWebView {
   
   // Buffer rendering for WPEPlatform
   WPEBuffer* current_buffer_ = nullptr;   // Current frame buffer (borrowed, not owned)
-  void* current_egl_image_ = nullptr;     // EGL image created from current buffer
+  void* current_egl_image_ = nullptr;     // Borrowed from current WPEBuffer; never destroy here
   uint32_t current_buffer_width_ = 0;     // Width of current buffer
   uint32_t current_buffer_height_ = 0;    // Height of current buffer
   gulong buffer_rendered_handler_ = 0;    // Signal handler ID for buffer-rendered
@@ -522,7 +563,9 @@ class InAppWebView {
   
   // Flag to skip pixel readback when using zero-copy EGL texture mode
   // When true, OnExportDmaBuf won't call ReadPixelsFromEglImage
-  bool skip_pixel_readback_ = false;
+  std::atomic<bool> skip_pixel_readback_{false};
+  std::atomic<bool> inline_flutter_texture_consumer_{false};
+  InlineDmaBufImportState inline_flutter_import_state_;
 
   // View dimensions
   int width_ = 800;

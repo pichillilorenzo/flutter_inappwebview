@@ -103,9 +103,17 @@ install(FILES "${FLUTTER_LIBRARY}" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
   COMPONENT Runtime)
 
 foreach(bundled_library ${PLUGIN_BUNDLED_LIBRARIES})
-  install(FILES "${bundled_library}"
-    DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
-    COMPONENT Runtime)
+  get_filename_component(bundled_name "${bundled_library}" NAME)
+  # WPE helper processes must stay executable; install(FILES) would drop the bit.
+  if(bundled_name MATCHES "^WPE.*Process$")
+    install(PROGRAMS "${bundled_library}"
+      DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
+      COMPONENT Runtime)
+  else()
+    install(FILES "${bundled_library}"
+      DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
+      COMPONENT Runtime)
+  endif()
 endforeach(bundled_library)
 
 # === WPE Library Symlink Creation ===
@@ -115,14 +123,14 @@ install(CODE "
   set(LIB_DIR \"${INSTALL_BUNDLE_LIB_DIR}\")
     
     # Function to create soname symlinks for a library
-    macro(create_lib_symlinks LIB_PATTERN SONAME_BASE)
+    macro(create_lib_symlinks LIB_PATTERN SONAME_BASE SONAME_VERSION)
       file(GLOB LIB_FILES \"\${LIB_DIR}/\${LIB_PATTERN}\")
       if(LIB_FILES)
         list(GET LIB_FILES 0 REAL_LIB)
         get_filename_component(REAL_LIB_NAME \"\${REAL_LIB}\" NAME)
         
         # Create .so.X symlink (e.g., libwpe-1.0.so.1 -> libwpe-1.0.so.1.10.0)
-        set(SONAME_LINK \"\${LIB_DIR}/\${SONAME_BASE}.so.1\")
+        set(SONAME_LINK \"\${LIB_DIR}/\${SONAME_BASE}.so.\${SONAME_VERSION}\")
         if(NOT EXISTS \"\${SONAME_LINK}\")
           execute_process(COMMAND \${CMAKE_COMMAND} -E create_symlink
             \"\${REAL_LIB_NAME}\" \"\${SONAME_LINK}\")
@@ -133,16 +141,17 @@ install(CODE "
         set(SO_LINK \"\${LIB_DIR}/\${SONAME_BASE}.so\")
         if(NOT EXISTS \"\${SO_LINK}\")
           execute_process(COMMAND \${CMAKE_COMMAND} -E create_symlink
-            \"\${SONAME_BASE}.so.1\" \"\${SO_LINK}\")
-          message(STATUS \"Created symlink: \${SO_LINK} -> \${SONAME_BASE}.so.1\")
+            \"\${SONAME_BASE}.so.\${SONAME_VERSION}\" \"\${SO_LINK}\")
+          message(STATUS \"Created symlink: \${SO_LINK} -> \${SONAME_BASE}.so.\${SONAME_VERSION}\")
         endif()
       endif()
     endmacro()
     
     # Create symlinks for each WPE library
-    create_lib_symlinks(\"libWPEWebKit-2.0.so.*.*.*\" \"libWPEWebKit-2.0\")
-    create_lib_symlinks(\"libwpe-1.0.so.*.*.*\" \"libwpe-1.0\")
-    create_lib_symlinks(\"libWPEBackend-fdo-1.0.so.*.*.*\" \"libWPEBackend-fdo-1.0\")
+    create_lib_symlinks(\"libWPEWebKit-2.0.so.*.*.*\" \"libWPEWebKit-2.0\" \"1\")
+    create_lib_symlinks(\"libwpe-1.0.so.*.*.*\" \"libwpe-1.0\" \"1\")
+    create_lib_symlinks(\"libWPEPlatform-2.0.so.*.*.*\" \"libWPEPlatform-2.0\" \"0\")
+    create_lib_symlinks(\"libWPEBackend-fdo-1.0.so.*.*.*\" \"libWPEBackend-fdo-1.0\" \"1\")
     
     # Create the default backend symlink that WPE expects
     set(DEFAULT_BACKEND_LINK \"\${LIB_DIR}/libWPEBackend-default.so\")

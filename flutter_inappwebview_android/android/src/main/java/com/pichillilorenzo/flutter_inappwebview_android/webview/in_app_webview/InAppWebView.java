@@ -142,6 +142,8 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
   public InAppWebViewSettings customSettings = new InAppWebViewSettings();
   public boolean isLoading = false;
   private boolean inFullscreen = false;
+  @Nullable
+  private Integer customBackgroundColor;
   public float zoomScale = 1.0f;
   public ContentBlockerHandler contentBlockerHandler = new ContentBlockerHandler();
   @Nullable
@@ -151,7 +153,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
   @Nullable
   public Map<String, Object> contextMenu = null;
   public Handler mainLooperHandler = new Handler(getWebViewLooper());
-  static Handler mHandler = new Handler();
+  static Handler mHandler = new Handler(Looper.getMainLooper());
 
   public Runnable checkScrollStoppedTask;
   public int initialPositionScrollStoppedTask;
@@ -162,8 +164,9 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
 
   public UserContentController userContentController = new UserContentController(this);
 
-  public Map<String, ValueCallback<String>> callAsyncJavaScriptCallbacks = new HashMap<>();
-  public Map<String, ValueCallback<String>> evaluateJavaScriptContentWorldCallbacks = new HashMap<>();
+  public PendingJavaScriptCallbacks callAsyncJavaScriptCallbacks = new PendingJavaScriptCallbacks();
+  public PendingJavaScriptCallbacks evaluateJavaScriptContentWorldCallbacks = new PendingJavaScriptCallbacks();
+  private final DocumentJavaScriptGeneration documentJavaScriptGeneration = new DocumentJavaScriptGeneration();
 
   public Map<String, WebMessageChannel> webMessageChannels = new HashMap<>();
   public List<WebMessageListener> webMessageListeners = new ArrayList<>();
@@ -337,7 +340,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     if (customSettings.clearCache)
       clearAllCache();
     else if (customSettings.clearSessionCache)
-      CookieManager.getInstance().removeSessionCookie();
+      clearSessionCookies();
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
       CookieManager.getInstance().setAcceptThirdPartyCookies(this, customSettings.thirdPartyCookiesEnabled);
@@ -636,6 +639,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     this.userContentController.addUserOnlyScripts(this.initialUserOnlyScripts);
   }
 
+  @SuppressWarnings("deprecation")
   public void setIncognito(boolean enabled) {
     WebSettings settings = getSettings();
     if (enabled) {
@@ -727,6 +731,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
    * @deprecated
    */
   @Deprecated
+  @SuppressWarnings("deprecation")
   private void clearCookies() {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
       CookieManager.getInstance().removeAllCookies(new ValueCallback<Boolean>() {
@@ -738,6 +743,18 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     } else {
       CookieManager.getInstance().removeAllCookie();
     }
+  }
+
+  @SuppressWarnings("deprecation")
+  private void clearSessionCookies() {
+    // This deprecated call is intentionally synchronous. The modern API is
+    // asynchronous and can race the initial navigation with stale cookies.
+    CookieManager.getInstance().removeSessionCookie();
+  }
+
+  public void setCustomBackgroundColor(int color) {
+    customBackgroundColor = color;
+    setBackgroundColor(color);
   }
 
   /**
@@ -919,7 +936,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     if (newSettingsMap.get("clearCache") != null && newCustomSettings.clearCache)
       clearAllCache();
     else if (newSettingsMap.get("clearSessionCache") != null && newCustomSettings.clearSessionCache)
-      CookieManager.getInstance().removeSessionCookie();
+      clearSessionCookies();
 
     if (newSettingsMap.get("thirdPartyCookiesEnabled") != null && customSettings.thirdPartyCookiesEnabled != newCustomSettings.thirdPartyCookiesEnabled && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
       CookieManager.getInstance().setAcceptThirdPartyCookies(this, newCustomSettings.thirdPartyCookiesEnabled);
@@ -943,7 +960,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
       if (newCustomSettings.transparentBackground) {
         setBackgroundColor(Color.TRANSPARENT);
       } else {
-        setBackgroundColor(Color.parseColor("#FFFFFF"));
+        setBackgroundColor(customBackgroundColor != null ? customBackgroundColor : Color.WHITE);
       }
     }
 
@@ -1234,25 +1251,45 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
       scriptToInject = String.format(jsWrapper, jsonSourceString);
     }
     if (resultUuid != null && resultCallback != null) {
-      evaluateJavaScriptContentWorldCallbacks.put(resultUuid, resultCallback);
+      evaluateJavaScriptContentWorldCallbacks.put(resultUuid, resultCallback::onReceiveValue);
       scriptToInject = Util.replaceAll(PluginScriptsUtil.EVALUATE_JAVASCRIPT_WITH_CONTENT_WORLD_WRAPPER_JS_SOURCE(),
                       PluginScriptsUtil.VAR_RANDOM_NAME, "_" + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + "_" + Math.round(Math.random() * 1000000))
               .replace(PluginScriptsUtil.VAR_PLACEHOLDER_VALUE, UserContentController.escapeCode(source))
               .replace(PluginScriptsUtil.VAR_RESULT_UUID, resultUuid);
     }
     final String finalScriptToInject = scriptToInject;
+    final long evaluationDocumentGeneration = documentJavaScriptGeneration.capture();
     mainLooperHandler.post(new Runnable() {
       @Override
       public void run() {
-        String scriptToInject = userContentController.generateCodeForScriptEvaluation(finalScriptToInject, contentWorld);
-        evaluateJavascript(scriptToInject, new ValueCallback<String>() {
-          @Override
-          public void onReceiveValue(String s) {
-            if (resultUuid != null || resultCallback == null)
-              return;
-            resultCallback.onReceiveValue(s);
-          }
-        });
+        if (!documentJavaScriptGeneration.runIfCurrent(
+                evaluationDocumentGeneration,
+                evaluateJavaScriptContentWorldCallbacks,
+                resultUuid != null && resultCallback != null ? resultUuid : null,
+                new Runnable() {
+                  @Override
+                  public void run() {
+                    injectDeferredObjectOnMainLooper(finalScriptToInject, contentWorld, resultUuid, resultCallback);
+                  }
+                })) {
+          return;
+        }
+      }
+    });
+  }
+
+  private void injectDeferredObjectOnMainLooper(
+      String finalScriptToInject,
+      @Nullable ContentWorld contentWorld,
+      @Nullable String resultUuid,
+      @Nullable ValueCallback<String> resultCallback) {
+    String scriptToInject = userContentController.generateCodeForScriptEvaluation(finalScriptToInject, contentWorld);
+    evaluateJavascript(scriptToInject, new ValueCallback<String>() {
+      @Override
+      public void onReceiveValue(String s) {
+        if (resultUuid != null || resultCallback == null)
+          return;
+        resultCallback.onReceiveValue(s);
       }
     });
   }
@@ -1898,11 +1935,20 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     return obj;
   }
 
+  public void cancelPendingJavaScriptCallbacks(String reason) {
+    documentJavaScriptGeneration.advance();
+    String callAsyncJavaScriptError = "{\"value\":null,\"error\":" + JSONObject.quote(reason) + "}";
+    // evaluateJavascript results are JSON encoded by Android. The Dart side decodes "null" to null.
+    PendingJavaScriptCallbacks.cancelBoth(
+            callAsyncJavaScriptCallbacks, callAsyncJavaScriptError,
+            evaluateJavaScriptContentWorldCallbacks, "null");
+  }
+
   @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
   public void callAsyncJavaScript(String functionBody, Map<String, Object> arguments, @Nullable ContentWorld contentWorld, @Nullable ValueCallback<String> resultCallback) {
     String resultUuid = UUID.randomUUID().toString();
     if (resultCallback != null) {
-      callAsyncJavaScriptCallbacks.put(resultUuid, resultCallback);
+      callAsyncJavaScriptCallbacks.put(resultUuid, resultCallback::onReceiveValue);
     }
 
     JSONObject functionArguments = new JSONObject(arguments);
@@ -2175,6 +2221,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
 
   @Override
   public void dispose() {
+    cancelPendingJavaScriptCallbacks("WebView disposed");
     if (channelDelegate != null) {
       channelDelegate.dispose();
       channelDelegate = null;
@@ -2214,8 +2261,6 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
       removeCallbacks(checkContextMenuShouldBeClosedTask);
     if (checkScrollStoppedTask != null)
       removeCallbacks(checkScrollStoppedTask);
-    callAsyncJavaScriptCallbacks.clear();
-    evaluateJavaScriptContentWorldCallbacks.clear();
     inAppBrowserDelegate = null;
     if (inAppWebViewRenderProcessClient != null) {
       inAppWebViewRenderProcessClient.dispose();

@@ -1,5 +1,13 @@
 ## 1.2.0-beta.3
 
+- Batched console notifications while preserving message order and immediate warning/error delivery.
+- Coalesced scroll notifications and removed their unused JavaScript promise round trip.
+- Finished failed custom-scheme requests and prevented delivery after cancellation.
+- Fixed native WebView frame drift with fractional platform-view sizes.
+- Added `WebAuthenticationSession.additionalHeaderFields` on macOS 14.4+.
+- Prevented `upgradeKnownHostsToHTTPS` crashes on macOS 11.x.
+- Fixed IIFE evaluation in named content worlds when the print bridge is active.
+- Fixed Xcode 26 builds when targeting macOS 10.14.
 - Updated flutter_inappwebview_platform_interface version to ^1.4.0-beta.3
 - Implemented `saveState`, `restoreState` InAppWebViewController methods
 - Implemented `PlatformProxyController` class

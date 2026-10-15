@@ -480,11 +480,75 @@ The following files are automatically copied to your app's `lib/` directory:
 - `libwpe-1.0.so.*` - libwpe library
 
 **With WPEPlatform (default):**
-- WPEPlatform is built into `libWPEWebKit-2.0.so`, so no additional libraries are needed.
+- `libWPEPlatform-2.0.so.*` - the WPEPlatform runtime linked by the plugin
 
 **With WPEBackend-FDO (legacy):**
 - `libWPEBackend-fdo-1.0.so.*` - FDO backend library
 - `libWPEBackend-default.so` - Symlink to FDO backend
+
+## Self-Contained Bundling (running without a system WPE install)
+
+WPE WebKit is multi-process. In addition to the `.so` files above, `libWPEWebKit`
+spawns helper processes and loads an injected bundle, whose locations are baked
+into the library as absolute paths (`PKGLIBEXECDIR`, `PKGLIBDIR`). Bundling only
+the libraries is therefore not enough for a machine without WPE installed — the
+app fails with `Failed to spawn child process '.../WPENetworkProcess'`.
+
+When available at build time, the plugin also bundles these files into `lib/`.
+The set is located under the exact install prefix selected by the WPE WebKit
+`pkg-config` file and staged all-or-nothing. The plugin deliberately does not
+fall back independently to `/usr`, because that could combine a custom
+`libWPEWebKit` with system helper processes from another version:
+
+- `WPEWebProcess`, `WPENetworkProcess` (and `WPEGPUProcess` if present) - helper processes
+- `libWPEInjectedBundle.so` - injected bundle
+
+At startup, before any WebView is created, the plugin resolves its own directory
+(via `dladdr`), restores the execute bit on the helper processes (an app's
+`install(FILES)` step drops it), and — only when the full set (both helper
+processes runnable + the injected bundle, plus `WPEGPUProcess` runnable when it
+exists) is present — points WebKit at the bundled copies via environment
+variables, set together as one unit:
+
+- `WEBKIT_EXEC_PATH` (helper processes) - **only honored when `libWPEWebKit` was
+  built with `-DDEVELOPER_MODE=ON`.** A stock distro (Debian/Ubuntu) release
+  build ignores it and always uses the compile-time `PKGLIBEXECDIR`. To ship a
+  self-contained app you must build WPE WebKit from source with
+  `-DDEVELOPER_MODE=ON` (see the source-build section above). Without it, the app
+  still requires the system helper processes to be installed.
+- `WEBKIT_INJECTED_BUNDLE_PATH` - honored by all WebKit builds, but set **only on
+  the bundled path** (i.e. alongside the bundled helper processes). Pairing a
+  bundled injected bundle with a system web process could cause an ABI mismatch.
+
+If any part of the set is missing/non-executable at runtime, or the paths are
+already set, the plugin falls back silently to the system WPE install (existing
+behavior) and sets none of the variables.
+
+### Scope: what the plugin does NOT bundle
+
+The plugin stages only the WPE-specific runtime pieces (helper processes,
+injected bundle, and the `.so` files listed above, including WPEPlatform). It
+does **not** close the
+transitive shared-library dependencies of `libWPEWebKit` (ICU, libsoup,
+image/media codecs, ...), whose sonames differ between distros. A truly
+self-contained app must handle that closure in its packaging step — e.g. an
+`ldd`-based copy of non-host libraries into the bundle `lib/` dir (see the
+Otzaria CI for a working example) — or ship on a base image where those
+dependencies are guaranteed.
+
+Consumers must also install the helper processes with the execute bit
+preserved: use `install(PROGRAMS ...)` (not `install(FILES ...)`) for
+`WPE*Process` files in the app's `linux/CMakeLists.txt` (see
+`example/linux/CMakeLists.txt`). The runtime `chmod` fallback cannot fix a
+package installed root-owned (DEB/RPM) when the app runs as a regular user.
+
+The runtime path variables are process-wide environment variables. GLib does
+not guarantee that environment mutation is thread-safe on Unix, so applications
+that require strict thread-safety should set `WEBKIT_EXEC_PATH`,
+`WEBKIT_INJECTED_BUNDLE_PATH`, and the helper library search path in their native
+launcher before starting the Flutter engine. The plugin registration fallback
+is intentionally early and idempotent, but cannot make process-wide environment
+updates atomic with unrelated application threads.
 
 ## Architecture
 
@@ -521,6 +585,31 @@ InAppWebView (C++)
 ```
 
 ## Troubleshooting
+
+### Blank texture with otherwise working WebKit
+
+DMA-BUF import depends on the EGL display and driver used by Flutter, as well as
+the WPE producer. Keep the default zero-copy path when it works. If a Linux/WPE
+combination still displays a blank texture, start the application with:
+
+```bash
+FLUTTER_INAPPWEBVIEW_LINUX_DISABLE_ZERO_COPY=1 your_application
+```
+
+This enables WPE pixel readback and uploads those pixels through the existing GL
+texture. It does not disable OpenGL or change touch, mouse, or keyboard input.
+The extra GPU/CPU transfer can increase CPU usage and memory bandwidth. Like
+`FLUTTER_INAPPWEBVIEW_LINUX_DISABLE_GL`, presence of the variable enables the
+override, including an empty value or `0`. Unset it and restart to restore
+zero-copy. Set it before creating any WebViews; changing it at runtime is unsupported.
+
+The native regression test exercises pixel upload and subsequent frame updates
+using Mesa's surfaceless EGL display, without opening an application window:
+
+```bash
+flutter precache --linux
+FLUTTER_ROOT=/path/to/flutter bash linux/test/run_egl_texture_fallback_test.sh
+```
 
 ### "WPE WebKit not found"
 

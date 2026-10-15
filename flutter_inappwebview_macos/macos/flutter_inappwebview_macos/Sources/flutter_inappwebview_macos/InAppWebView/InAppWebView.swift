@@ -186,7 +186,7 @@ public class InAppWebView: WKWebView, WKUIDelegate,
                 configuration.defaultWebpagePreferences.preferredContentMode = WKWebpagePreferences.ContentMode(rawValue: settings.preferredContentMode)!
             }
             
-            configuration.preferences.javaScriptEnabled = settings.javaScriptEnabled
+            configuration.preferences.legacyJavaScriptEnabled = settings.javaScriptEnabled
             if #available(macOS 11.0, *) {
                 configuration.defaultWebpagePreferences.allowsContentJavaScript = settings.javaScriptEnabled
             }
@@ -262,7 +262,9 @@ public class InAppWebView: WKWebView, WKUIDelegate,
         let configuration = WKWebViewConfiguration()
         // initialzie WKUserContentController here to fix possible "undefined is not an object (evaluating 'window.webkit.messageHandlers')" javascript error
         configuration.userContentController = WKUserContentController()
-        configuration.processPool = WKProcessPoolManager.sharedProcessPool
+        if #unavailable(macOS 12.0) {
+            configuration.processPool = WKProcessPoolManager.sharedProcessPool
+        }
         
         if let settings = settings {
             configuration.suppressesIncrementalRendering = settings.suppressesIncrementalRendering
@@ -314,7 +316,9 @@ public class InAppWebView: WKWebView, WKUIDelegate,
             }
             
             if #available(macOS 11.3, *) {
-                configuration.upgradeKnownHostsToHTTPS = settings.upgradeKnownHostsToHTTPS
+                if configuration.responds(to: NSSelectorFromString("setUpgradeKnownHostsToHTTPS:")) {
+                    configuration.upgradeKnownHostsToHTTPS = settings.upgradeKnownHostsToHTTPS
+                }
             }
         }
         
@@ -556,6 +560,125 @@ public class InAppWebView: WKWebView, WKUIDelegate,
         loadUrl(urlRequest: urlRequest, allowingReadAccessTo: nil)
     }
     
+    /// The content rule list compiled from `settings.contentBlockers` that this WebView enforces.
+    private var appliedContentRuleList: WKContentRuleList?
+
+    /// Identifier of the latest request: "" for no rules, nil when it could not be encoded.
+    private var requestedContentRuleListIdentifier: String? = ""
+
+    /// Whether the latest request is still being looked up or compiled.
+    private var contentRuleListPending = false
+
+    /// Callers waiting for the latest request to take effect.
+    private var contentRuleListWaiters: [(Bool) -> Void] = []
+
+    private static let contentRuleListPrefix = "ContentBlockingRules-"
+
+    /// Each rule set is stored under its own identifier, so lists of earlier runs pile up in
+    /// the store; they are removed once per process.
+    private static var staleContentRuleListsRemoved = false
+
+    /// Identifiers this process requested, which the removal keeps.
+    private static var requestedContentRuleListIdentifiers = Set<String>()
+
+    /// Enforces `contentBlockers` on this WebView; `completion` reports whether the latest
+    /// request took effect, so a caller whose request was superseded still gets an answer.
+    ///
+    /// The new list is added before the previous one is removed, so replacing the rules never
+    /// leaves the WebView unprotected; when compilation fails the previous list stays in force.
+    @available(macOS 10.13, *)
+    public func applyContentBlockers(_ contentBlockers: [[String: [String: Any]]],
+                                     completion: ((Bool) -> Void)? = nil) {
+        if let completion = completion {
+            contentRuleListWaiters.append(completion)
+        }
+        if contentBlockers.isEmpty {
+            requestedContentRuleListIdentifier = ""
+            enforceContentRuleList(nil)
+            return
+        }
+        guard let jsonData = try? JSONSerialization.data(withJSONObject: contentBlockers, options: [.sortedKeys]),
+              let encodedRules = String(data: jsonData, encoding: .utf8) else {
+            print("InAppWebView: contentBlockers could not be encoded")
+            requestedContentRuleListIdentifier = nil
+            finishContentRuleListRequest(false)
+            return
+        }
+        // The store is shared by every WebView: one identifier for different rules lets a
+        // concurrent compile hand this WebView another WebView's rules.
+        let identifier = InAppWebView.contentRuleListPrefix + Util.sha256Hex(encodedRules)
+        requestedContentRuleListIdentifier = identifier
+        InAppWebView.requestedContentRuleListIdentifiers.insert(identifier)
+        if appliedContentRuleList?.identifier == identifier {
+            finishContentRuleListRequest(true)
+            return
+        }
+        contentRuleListPending = true
+        let store: WKContentRuleListStore = WKContentRuleListStore.default()
+        if !InAppWebView.staleContentRuleListsRemoved {
+            InAppWebView.staleContentRuleListsRemoved = true
+            store.getAvailableContentRuleListIdentifiers { identifiers in
+                for stale in identifiers ?? []
+                where stale.hasPrefix(InAppWebView.contentRuleListPrefix)
+                    && !InAppWebView.requestedContentRuleListIdentifiers.contains(stale) {
+                    store.removeContentRuleList(forIdentifier: stale) { _ in }
+                }
+            }
+        }
+        store.lookUpContentRuleList(forIdentifier: identifier) { [weak self] (storedList, _) in
+            if let storedList = storedList {
+                self?.contentRuleListReady(storedList, identifier: identifier)
+                return
+            }
+            store.compileContentRuleList(
+                forIdentifier: identifier,
+                encodedContentRuleList: encodedRules) { [weak self] (compiledList, error) in
+                    guard let self = self else {
+                        return
+                    }
+                    if let compiledList = compiledList, error == nil {
+                        self.contentRuleListReady(compiledList, identifier: identifier)
+                        return
+                    }
+                    print("InAppWebView: contentBlockers failed to compile: " + (error?.localizedDescription ?? "unknown error"))
+                    if self.requestedContentRuleListIdentifier == identifier {
+                        self.finishContentRuleListRequest(false)
+                    }
+            }
+        }
+    }
+
+    /// A list that is ready after a newer request was made is dropped: enforcing it would undo
+    /// that request.
+    @available(macOS 10.13, *)
+    private func contentRuleListReady(_ contentRuleList: WKContentRuleList, identifier: String) {
+        guard requestedContentRuleListIdentifier == identifier else {
+            return
+        }
+        enforceContentRuleList(contentRuleList)
+    }
+
+    @available(macOS 10.13, *)
+    private func enforceContentRuleList(_ contentRuleList: WKContentRuleList?) {
+        let userContentController = configuration.userContentController
+        let previous = appliedContentRuleList
+        if let contentRuleList = contentRuleList {
+            userContentController.add(contentRuleList)
+        }
+        if let previous = previous, previous.identifier != contentRuleList?.identifier {
+            userContentController.remove(previous)
+        }
+        appliedContentRuleList = contentRuleList
+        finishContentRuleListRequest(true)
+    }
+
+    private func finishContentRuleListRequest(_ applied: Bool) {
+        contentRuleListPending = false
+        let waiters = contentRuleListWaiters
+        contentRuleListWaiters.removeAll()
+        waiters.forEach { $0(applied) }
+    }
+
     func setSettings(newSettings: InAppWebViewSettings, newSettingsMap: [String: Any]) {
         
         if newSettingsMap["alpha"] != nil, settings?.alpha != newSettings.alpha, let viewAlpha = newSettings.alpha {
@@ -715,7 +838,7 @@ public class InAppWebView: WKWebView, WKUIDelegate,
         }
         
         if newSettingsMap["javaScriptEnabled"] != nil && settings?.javaScriptEnabled != newSettings.javaScriptEnabled {
-            configuration.preferences.javaScriptEnabled = newSettings.javaScriptEnabled
+            configuration.preferences.legacyJavaScriptEnabled = newSettings.javaScriptEnabled
         }
         
         if #available(macOS 11.0, *) {
@@ -737,29 +860,13 @@ public class InAppWebView: WKWebView, WKUIDelegate,
         }
         
         if #available(macOS 10.13, *), newSettingsMap["contentBlockers"] != nil {
-            configuration.userContentController.removeAllContentRuleLists()
-            let contentBlockers = newSettings.contentBlockers
-            if contentBlockers.count > 0 {
-                do {
-                    let jsonData = try JSONSerialization.data(withJSONObject: contentBlockers, options: [])
-                    let blockRules = String(data: jsonData, encoding: .utf8)
-                    WKContentRuleListStore.default().compileContentRuleList(
-                        forIdentifier: "ContentBlockingRules",
-                        encodedContentRuleList: blockRules) { (contentRuleList, error) in
-                            if let error = error {
-                                print(error.localizedDescription)
-                                return
-                            }
-                            self.configuration.userContentController.add(contentRuleList!)
-                    }
-                } catch {
-                    print(error.localizedDescription)
-                }
-            }
+            applyContentBlockers(newSettings.contentBlockers)
         }
         
         if #available(macOS 11.3, *) {
-            if newSettingsMap["upgradeKnownHostsToHTTPS"] != nil && settings?.upgradeKnownHostsToHTTPS != newSettings.upgradeKnownHostsToHTTPS {
+            if newSettingsMap["upgradeKnownHostsToHTTPS"] != nil &&
+                settings?.upgradeKnownHostsToHTTPS != newSettings.upgradeKnownHostsToHTTPS &&
+                configuration.responds(to: NSSelectorFromString("setUpgradeKnownHostsToHTTPS:")) {
                 configuration.upgradeKnownHostsToHTTPS = newSettings.upgradeKnownHostsToHTTPS
             }
             if newSettingsMap["isTextInteractionEnabled"] != nil && settings?.isTextInteractionEnabled != newSettings.isTextInteractionEnabled {
@@ -827,7 +934,6 @@ public class InAppWebView: WKWebView, WKUIDelegate,
         }
     }
     
-    @available(*, deprecated, message: "Use InAppWebViewManager.clearAllCache instead.")
     public func clearCache() {
         let date = NSDate(timeIntervalSince1970: 0)
         WKWebsiteDataStore.default().removeData(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes(), modifiedSince: date as Date, completionHandler:{ })
@@ -1205,6 +1311,22 @@ public class InAppWebView: WKWebView, WKUIDelegate,
     public func webView(_ webView: WKWebView,
                  decidePolicyFor navigationAction: WKNavigationAction,
                  decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+        // Rules were requested but none are in force: the page would run with no restrictions,
+        // so the navigation waits for them, and is refused if they failed.
+        if requestedContentRuleListIdentifier != "", appliedContentRuleList == nil {
+            guard contentRuleListPending else {
+                decisionHandler(.cancel)
+                return
+            }
+            contentRuleListWaiters.append { [weak self] applied in
+                guard let self = self, applied else {
+                    decisionHandler(.cancel)
+                    return
+                }
+                self.webView(webView, decidePolicyFor: navigationAction, decisionHandler: decisionHandler)
+            }
+            return
+        }
         var decisionHandlerCalled = false
         let callback = WebViewChannelDelegate.ShouldOverrideUrlLoadingCallback()
         callback.nonNullSuccess = { (response: WKNavigationActionPolicy) in
@@ -2232,10 +2354,16 @@ public class InAppWebView: WKWebView, WKUIDelegate,
                         webView.channelDelegate?.onPrintRequest(url: webView.url, printJobId: printJobId, callback: callback)
                     }
                     break
-                case "onConsoleMessage":
+                case "onConsoleMessage", "onConsoleMessageBatch":
                     if let args = body["args"] as? String, let data = args.data(using: .utf8) {
                         let jsonArgs = try? JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? [[String: Any]]
-                        if let jsonData = jsonArgs?.first {
+                        var consoleMessages: [[String: Any]] = []
+                        if handlerName == "onConsoleMessageBatch" {
+                            consoleMessages = jsonArgs?.first?["messages"] as? [[String: Any]] ?? []
+                        } else if let jsonData = jsonArgs?.first {
+                            consoleMessages = [jsonData]
+                        }
+                        for jsonData in consoleMessages {
                             var messageLevel = 1
                             switch (jsonData["level"] as? String) {
                             case "log":
@@ -2259,8 +2387,15 @@ public class InAppWebView: WKWebView, WKUIDelegate,
                                 messageLevel = 1
                                 break
                             }
-                            let consoleMessage = jsonData["message"] as? String ?? ""
-                            
+                            let consoleMessage: String
+                            if let message = jsonData["message"] as? String {
+                                consoleMessage = message
+                            } else if handlerName == "onConsoleMessageBatch" {
+                                continue
+                            } else {
+                                consoleMessage = ""
+                            }
+
                             webView.channelDelegate?.onConsoleMessage(message: consoleMessage, messageLevel: messageLevel)
                         }
                     }
@@ -2357,6 +2492,9 @@ public class InAppWebView: WKWebView, WKUIDelegate,
             let _callHandlerID = body["_callHandlerID"] as? Int64 ?? 0
             
             if isInternalHandler {
+                if body["_callHandlerOneWay"] as? Bool == true {
+                    return
+                }
                 evaluateJavaScript("""
 if(window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)] != null) {
     window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)].resolve();
@@ -2613,7 +2751,7 @@ if(window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)] 
     }
     
     public func getSelectedText(completionHandler: @escaping (Any?, Error?) -> Void) {
-        if configuration.preferences.javaScriptEnabled {
+        if configuration.preferences.legacyJavaScriptEnabled {
             evaluateJavaScript(PluginScriptsUtil.GET_SELECTED_TEXT_JS_SOURCE, completionHandler: completionHandler)
         } else {
             completionHandler(nil, nil)

@@ -6,6 +6,7 @@
 // - WPEBackend-FDO (HAVE_WPE_BACKEND_LEGACY): Legacy API for older systems
 
 #include "in_app_webview.h"
+#include "dma_buf_import_policy.h"
 
 #include <dlfcn.h>
 #include <linux/limits.h>
@@ -13,6 +14,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <cstdlib>
 #include <cstring>
 #include <filesystem>
 #include <limits>
@@ -67,6 +69,7 @@
 #include "../flutter_inappwebview_linux_plugin_private.h"
 #include "../plugin_instance.h"
 #include "../utils/flutter.h"
+#include "../utils/gdk_scale.h"
 #include "../utils/gl_context.h"
 #include "../utils/log.h"
 #include "../utils/uri.h"
@@ -283,8 +286,10 @@ InAppWebView::InAppWebView(FlPluginRegistrar* registrar, FlBinaryMessenger* mess
         settings_->contentBlockers,
         [this, initialUrlRequest, initialData, initialDataMimeType, initialDataEncoding,
          initialDataBaseUrl, initialFile](bool success) {
+          // Loading without the rules would run the page unrestricted.
           if (!success) {
-            debugLog("InAppWebView: Content blockers failed to apply, loading content anyway");
+            errorLog("InAppWebView: Content blockers failed to apply, not loading content");
+            return;
           }
 
           // Now load initial content
@@ -443,22 +448,13 @@ InAppWebView::~InAppWebView() {
     wpe_view_unmap(wpe_view_);
   }
   
-  // 4. Release any pending buffer back to WPE and clean up EGL image
+  // 4. Release any pending buffer back to WPE
   {
     std::lock_guard<std::mutex> lock(wpe_buffer_mutex_);
-    
-    // Clean up EGL image first (while display is still valid)
-    if (current_egl_image_ != nullptr && egl_display_ != nullptr) {
-      static PFNEGLDESTROYIMAGEKHRPROC eglDestroyImageKHR = nullptr;
-      if (eglDestroyImageKHR == nullptr) {
-        eglDestroyImageKHR = (PFNEGLDESTROYIMAGEKHRPROC)eglGetProcAddress("eglDestroyImageKHR");
-      }
-      if (eglDestroyImageKHR != nullptr) {
-        eglDestroyImageKHR(static_cast<EGLDisplay>(egl_display_), 
-                           static_cast<EGLImageKHR>(current_egl_image_));
-      }
-      current_egl_image_ = nullptr;
-    }
+
+    // wpe_buffer_import_to_egl_image returns an image owned by WPEBuffer.
+    // WPE destroys it when it disposes the buffer.
+    current_egl_image_ = nullptr;
     
     // Release pending buffer back to WPE
     if (current_buffer_ != nullptr && wpe_view_ != nullptr) {
@@ -1197,7 +1193,8 @@ void InAppWebView::OnExportDmaBuf(::wpe_fdo_egl_exported_image* image) {
   // 1. skip_pixel_readback_ is false (not using zero-copy mode)
   // 2. egl_display_ is available
   // 3. We have a valid EGL image
-  if (!skip_pixel_readback_ && egl_image != EGL_NO_IMAGE_KHR && egl_display_ != nullptr) {
+  if (!skip_pixel_readback_.load(std::memory_order_acquire) &&
+      egl_image != EGL_NO_IMAGE_KHR && egl_display_ != nullptr) {
     ReadPixelsFromEglImage(egl_image, img_width, img_height);
   }
 
@@ -1263,39 +1260,44 @@ void InAppWebView::OnWpePlatformBufferRendered(WPEBuffer* buffer) {
     // This ensures the EGL image's backing memory stays valid until we have a new frame
     previous_buffer = current_buffer_;
     
-    // Destroy previous EGL image if we created one
-    if (current_egl_image_ != nullptr && egl_display_ != nullptr) {
-      static PFNEGLDESTROYIMAGEKHRPROC eglDestroyImageKHR = nullptr;
-      if (eglDestroyImageKHR == nullptr) {
-        eglDestroyImageKHR = (PFNEGLDESTROYIMAGEKHRPROC)eglGetProcAddress("eglDestroyImageKHR");
-      }
-      if (eglDestroyImageKHR != nullptr) {
-        eglDestroyImageKHR(static_cast<EGLDisplay>(egl_display_), 
-                           static_cast<EGLImageKHR>(current_egl_image_));
-      }
-      current_egl_image_ = nullptr;
-    }
+    // The previous EGL image belongs to its WPEBuffer, not to this view.
+    // Drop our borrowed handle before releasing that buffer below.
+    current_egl_image_ = nullptr;
     
     // Check buffer type to determine best rendering path
     bool is_dma_buf = WPE_IS_BUFFER_DMA_BUF(buffer);
     bool is_shm = WPE_IS_BUFFER_SHM(buffer);
-    
-    // === Priority 1: Try EGL image import (zero-copy, best performance) ===
-    // Only attempt EGL for DMA-BUF buffers (SHM buffers cannot be imported via EGL)
-    // Skip if previous EGL attempts failed
-    if (egl_display_ != nullptr && 
-        is_dma_buf && !egl_import_failed_permanently) {
+
+    // === Priority 1: choose the DMA-BUF consumer's EGL import path ===
+    // Inline Flutter textures import into Flutter's current EGLDisplay during
+    // populate(), so a WPE-display EGLImage would be unused. Keep the buffer
+    // referenced and publish its dimensions for that import. Native InAppBrowser
+    // remains on the WPE EGLImage path through GetCurrentEglImage().
+    const bool skip_pixel_readback =
+        skip_pixel_readback_.load(std::memory_order_acquire);
+    const bool inline_flutter_consumer =
+        inline_flutter_texture_consumer_.load(std::memory_order_acquire);
+    const auto import_action = is_dma_buf
+        ? DecideDmaBufImportAction(inline_flutter_consumer, skip_pixel_readback,
+                                   egl_import_failed_permanently)
+        : DmaBufImportAction::kImportPixels;
+
+    if (import_action == DmaBufImportAction::kDeferToFlutter) {
+      current_buffer_width_ = buf_width;
+      current_buffer_height_ = buf_height;
+      buffer_handled = true;
+    } else if (import_action == DmaBufImportAction::kImportInWpe &&
+               egl_display_ != nullptr) {
       GError* error = nullptr;
       void* egl_image = wpe_buffer_import_to_egl_image(buffer, &error);
-      
+
       if (egl_image != nullptr) {
         current_egl_image_ = egl_image;
         current_buffer_width_ = buf_width;
         current_buffer_height_ = buf_height;
         buffer_handled = true;
       } else {
-        // Mark EGL as permanently failed so we don't keep trying
-        // This is common in VMs or software-only environments
+        // Mark EGL as permanently failed so we don't keep trying.
         egl_import_failed_permanently = true;
         if (error != nullptr) {
           g_clear_error(&error);
@@ -1320,35 +1322,36 @@ void InAppWebView::OnWpePlatformBufferRendered(WPEBuffer* buffer) {
           // Store in pixel buffer for software rendering
           size_t write_idx = write_buffer_index_.load(std::memory_order_relaxed);
           auto& pixel_buffer = pixel_buffers_[write_idx];
-          
-          if (pixel_buffer.data.size() != size) {
-            pixel_buffer.data.resize(size);
-          }
-          memcpy(pixel_buffer.data.data(), pixels, size);
-          
+
           // WPE SHM buffers use ARGB8888 format (BGRA in memory on little-endian)
           // Flutter expects RGBA8888, so we need to convert
           // ConvertARGB32ToRGBA handles the BGRA -> RGBA conversion
+          bool pixels_valid = true;
           if (format == WPE_PIXEL_FORMAT_ARGB8888) {
-            ConvertARGB32ToRGBA(pixel_buffer.data.data(),    // source (in-place)
-                                pixel_buffer.data.data(),    // destination (in-place)
-                                buf_width, buf_height,
-                                stride);
+            pixels_valid = ConvertARGB32ToRGBAVector(
+                pixels, size, pixel_buffer.data, buf_width, buf_height, stride);
+          } else {
+            // Keep the original bytes for formats without an ARGB conversion.
+            ResizeByteBuffer(pixel_buffer.data, size);
+            memcpy(pixel_buffer.data.data(), pixels, size);
           }
-          
-          pixel_buffer.width = buf_width;
-          pixel_buffer.height = buf_height;
-          
-          // Swap buffers
-          {
-            std::lock_guard<std::mutex> swap_lock(buffer_swap_mutex_);
-            read_buffer_index_.store(write_idx, std::memory_order_release);
-            write_buffer_index_.store((write_idx + 1) % kNumBuffers, std::memory_order_relaxed);
+
+          if (pixels_valid) {
+            pixel_buffer.width = buf_width;
+            pixel_buffer.height = buf_height;
+
+            // Swap buffers
+            {
+              std::lock_guard<std::mutex> swap_lock(buffer_swap_mutex_);
+              read_buffer_index_.store(write_idx, std::memory_order_release);
+              write_buffer_index_.store((write_idx + 1) % kNumBuffers,
+                                        std::memory_order_relaxed);
+            }
+
+            current_buffer_width_ = buf_width;
+            current_buffer_height_ = buf_height;
+            buffer_handled = true;
           }
-          
-          current_buffer_width_ = buf_width;
-          current_buffer_height_ = buf_height;
-          buffer_handled = true;
         }
         // Note: Don't unref data - it's borrowed from the buffer
       }
@@ -1363,36 +1366,32 @@ void InAppWebView::OnWpePlatformBufferRendered(WPEBuffer* buffer) {
         gsize size;
         const uint8_t* data = static_cast<const uint8_t*>(g_bytes_get_data(pixels, &size));
         
-        // Store in pixel buffer for software rendering
-        size_t write_idx = write_buffer_index_.load(std::memory_order_relaxed);
-        auto& pixel_buffer = pixel_buffers_[write_idx];
-        
-        if (pixel_buffer.data.size() != size) {
-          pixel_buffer.data.resize(size);
+        if (data != nullptr) {
+          // Store the imported ARGB8888 pixels directly as packed RGBA.
+          size_t write_idx = write_buffer_index_.load(std::memory_order_relaxed);
+          auto& pixel_buffer = pixel_buffers_[write_idx];
+          const size_t stride = static_cast<size_t>(buf_width) * 4;
+          if (ConvertARGB32ToRGBAVector(data, size, pixel_buffer.data, buf_width,
+                                        buf_height, stride)) {
+            pixel_buffer.width = buf_width;
+            pixel_buffer.height = buf_height;
+
+            // Swap buffers
+            {
+              std::lock_guard<std::mutex> swap_lock(buffer_swap_mutex_);
+              read_buffer_index_.store(write_idx, std::memory_order_release);
+              write_buffer_index_.store((write_idx + 1) % kNumBuffers,
+                                        std::memory_order_relaxed);
+            }
+
+            current_buffer_width_ = buf_width;
+            current_buffer_height_ = buf_height;
+            buffer_handled = true;
+          }
         }
-        memcpy(pixel_buffer.data.data(), data, size);
-        
-        // GBM pixel import also returns ARGB8888, convert to RGBA
-        uint32_t stride = buf_width * 4;
-        ConvertARGB32ToRGBA(pixel_buffer.data.data(),
-                            pixel_buffer.data.data(),
-                            buf_width, buf_height,
-                            stride);
-        
-        pixel_buffer.width = buf_width;
-        pixel_buffer.height = buf_height;
-        
-        // Swap buffers
-        {
-          std::lock_guard<std::mutex> swap_lock(buffer_swap_mutex_);
-          read_buffer_index_.store(write_idx, std::memory_order_release);
-          write_buffer_index_.store((write_idx + 1) % kNumBuffers, std::memory_order_relaxed);
-        }
-        
-        g_bytes_unref(pixels);
-        current_buffer_width_ = buf_width;
-        current_buffer_height_ = buf_height;
-        buffer_handled = true;
+
+        // The imported GBytes is owned by the WPEBuffer (transfer none).
+        // WPE releases it when the buffer is disposed.
       } else {
         if (error != nullptr) {
           g_clear_error(&error);
@@ -1410,8 +1409,7 @@ void InAppWebView::OnWpePlatformBufferRendered(WPEBuffer* buffer) {
   }
   
   // Release the PREVIOUS buffer now that we have a new one
-  // The previous EGL image has been destroyed and we have a new frame,
-  // so it's safe to let WPE reuse the old buffer's memory
+  // WPE will dispose of the previous buffer's EGL image when appropriate.
   if (previous_buffer != nullptr && wpe_view_ != nullptr && WPE_IS_BUFFER(previous_buffer)) {
     wpe_view_buffer_released(wpe_view_, previous_buffer);
   }
@@ -2466,6 +2464,68 @@ void InAppWebView::takeScreenshot(std::function<void(const std::optional<std::ve
   callback(png_data);
 }
 
+// === PDF export (Otzaria WPE runtime patch) ===
+
+namespace {
+
+typedef void (*OtzariaPrintToPdfFn)(WebKitWebView*, double, double, double, double,
+                                    double, double, GCancellable*, GAsyncReadyCallback, gpointer);
+typedef GBytes* (*OtzariaPrintToPdfFinishFn)(WebKitWebView*, GAsyncResult*, GError**);
+
+struct CreatePdfCall {
+  std::function<void(const std::optional<std::vector<uint8_t>>&)> callback;
+  OtzariaPrintToPdfFinishFn finish;
+};
+
+}  // namespace
+
+void InAppWebView::createPdf(double pageWidthPt, double pageHeightPt,
+                             double marginTopPt, double marginRightPt,
+                             double marginBottomPt, double marginLeftPt,
+                             std::function<void(const std::optional<std::vector<uint8_t>>&)> callback) {
+  if (webview_ == nullptr || callback == nullptr) {
+    if (callback) {
+      callback(std::nullopt);
+    }
+    return;
+  }
+
+  // הסימבולים קיימים רק ב-libWPEWebKit מה-runtime המטולא של אוצריא;
+  // בבנייה רגילה dlsym מחזיר null ואנחנו מדווחים "אין תמיכה" בשקט.
+  auto print_fn = reinterpret_cast<OtzariaPrintToPdfFn>(
+      dlsym(RTLD_DEFAULT, "webkit_otzaria_web_view_print_to_pdf"));
+  auto finish_fn = reinterpret_cast<OtzariaPrintToPdfFinishFn>(
+      dlsym(RTLD_DEFAULT, "webkit_otzaria_web_view_print_to_pdf_finish"));
+  if (print_fn == nullptr || finish_fn == nullptr) {
+    callback(std::nullopt);
+    return;
+  }
+
+  auto* call = new CreatePdfCall{std::move(callback), finish_fn};
+  print_fn(
+      webview_, pageWidthPt, pageHeightPt, marginTopPt, marginRightPt, marginBottomPt,
+      marginLeftPt, nullptr,
+      [](GObject* source, GAsyncResult* result, gpointer user_data) {
+        std::unique_ptr<CreatePdfCall> call(static_cast<CreatePdfCall*>(user_data));
+        GError* error = nullptr;
+        GBytes* bytes = call->finish(WEBKIT_WEB_VIEW(source), result, &error);
+        if (error != nullptr || bytes == nullptr) {
+          if (error != nullptr) {
+            g_warning("createPdf failed: %s", error->message);
+            g_error_free(error);
+          }
+          call->callback(std::nullopt);
+          return;
+        }
+        gsize size = 0;
+        const auto* data = static_cast<const uint8_t*>(g_bytes_get_data(bytes, &size));
+        std::vector<uint8_t> pdf(data, data + size);
+        g_bytes_unref(bytes);
+        call->callback(pdf);
+      },
+      call);
+}
+
 // === Session State ===
 
 std::optional<std::vector<uint8_t>> InAppWebView::saveState() const {
@@ -2747,6 +2807,13 @@ void InAppWebView::setSize(int width, int height) {
 }
 
 void InAppWebView::setScaleFactor(double scale_factor) {
+  // GTK3 exposes only integer widget scaling to Flutter on Wayland. Apps that
+  // deliberately render at a higher integer GDK_SCALE need WPE's offscreen
+  // backing buffer to use the same scale, otherwise the compositor upscales a
+  // low-resolution texture. Respect an explicit GDK_SCALE when it is larger
+  // than the scale reported by Flutter.
+  scale_factor = EffectiveWpeScale(scale_factor, std::getenv("GDK_SCALE"));
+
   if (scale_factor == scale_factor_)
     return;
   scale_factor_ = scale_factor;
@@ -3291,8 +3358,28 @@ void InAppWebView::SetPointerButton(int kind, int button, int clickCount) {
 }
 
 void InAppWebView::SetScrollDelta(double dx, double dy) {
-  // Hide all popups when scrolling
+  // Preserve the existing behavior even when every scroll axis is suppressed.
   HideAllPopups();
+
+  // There is no native scroll view to disable here — WPE renders offscreen and
+  // Flutter forwards the wheel/trackpad delta straight through — so an axis the
+  // embedder disabled is dropped before the event is built. Reading the current
+  // settings (rather than a cached copy) keeps a later setSettings() call live.
+  if (settings_ != nullptr &&
+      (settings_->disableHorizontalScroll || settings_->disableVerticalScroll)) {
+    if (settings_->disableHorizontalScroll) {
+      dx = 0;
+    }
+    if (settings_->disableVerticalScroll) {
+      dy = 0;
+    }
+    // Every axis the gesture carried was suppressed: swallow it entirely so the
+    // page sees no scroll event at all, the way a disabled platform scroller
+    // would behave.
+    if (dx == 0 && dy == 0) {
+      return;
+    }
+  }
 
 #ifdef HAVE_WPE_PLATFORM
   if (wpe_view_ == nullptr)
@@ -3618,6 +3705,28 @@ bool InAppWebView::HasDmaBufExport() const {
 #endif
 }
 
+bool InAppWebView::HasCurrentDmaBufBuffer() const {
+#ifdef HAVE_WPE_PLATFORM
+  std::lock_guard<std::mutex> lock(wpe_buffer_mutex_);
+  return current_buffer_ != nullptr && WPE_IS_BUFFER_DMA_BUF(current_buffer_);
+#else
+  return false;
+#endif
+}
+
+bool InAppWebView::ShouldAttemptFlutterEglImport() const {
+  return inline_flutter_texture_consumer_.load(std::memory_order_acquire) &&
+         inline_flutter_import_state_.ShouldAttemptImport();
+}
+
+void InAppWebView::ReportFlutterEglImageImportFailure(
+    bool current_frame_is_dma_buf) {
+  if (inline_flutter_texture_consumer_.load(std::memory_order_acquire) &&
+      inline_flutter_import_state_.ReportFailedImport(current_frame_is_dma_buf)) {
+    SetSkipPixelReadback(false);
+  }
+}
+
 bool InAppWebView::GetDmaBufFd(int* fd, uint32_t* stride, uint32_t* width, uint32_t* height) const {
 #ifdef HAVE_WPE_BACKEND_LEGACY
   std::lock_guard<std::mutex> lock(exported_image_mutex_);
@@ -3693,6 +3802,114 @@ void* InAppWebView::GetCurrentEglImage(uint32_t* out_width, uint32_t* out_height
     *out_width = 0;
   if (out_height)
     *out_height = 0;
+  return nullptr;
+#endif
+}
+
+void* InAppWebView::ImportCurrentBufferToEglImage(void* target_display, uint32_t* out_width,
+                                                   uint32_t* out_height,
+                                                   bool* out_is_dma_buf_frame) const {
+  if (out_width)
+    *out_width = 0;
+  if (out_height)
+    *out_height = 0;
+  if (out_is_dma_buf_frame)
+    *out_is_dma_buf_frame = false;
+
+#ifdef HAVE_WPE_PLATFORM
+  std::lock_guard<std::mutex> lock(wpe_buffer_mutex_);
+
+  // Determine frame eligibility while holding the same lock as the buffer
+  // access. A missing EGLDisplay (for example with a current GLX context) is
+  // an import failure only after we know an actual DMA-BUF frame was present.
+  if (!IsEligibleDmaBufFrame(
+          current_buffer_ != nullptr,
+          current_buffer_ != nullptr && WPE_IS_BUFFER_DMA_BUF(current_buffer_),
+          out_is_dma_buf_frame)) {
+    return nullptr;
+  }
+
+  if (target_display == nullptr) {
+    return nullptr;
+  }
+
+  WPEBufferDMABuf* dmabuf = WPE_BUFFER_DMA_BUF(current_buffer_);
+  guint32 format = wpe_buffer_dma_buf_get_format(dmabuf);
+  guint32 n_planes = wpe_buffer_dma_buf_get_n_planes(dmabuf);
+  guint64 modifier = wpe_buffer_dma_buf_get_modifier(dmabuf);
+
+  static constexpr guint32 kMaxPlanes = 4;
+  if (n_planes == 0 || n_planes > kMaxPlanes) {
+    return nullptr;
+  }
+
+  static const EGLint kFdAttrs[kMaxPlanes] = {
+      EGL_DMA_BUF_PLANE0_FD_EXT, EGL_DMA_BUF_PLANE1_FD_EXT,
+      EGL_DMA_BUF_PLANE2_FD_EXT, EGL_DMA_BUF_PLANE3_FD_EXT};
+  static const EGLint kOffsetAttrs[kMaxPlanes] = {
+      EGL_DMA_BUF_PLANE0_OFFSET_EXT, EGL_DMA_BUF_PLANE1_OFFSET_EXT,
+      EGL_DMA_BUF_PLANE2_OFFSET_EXT, EGL_DMA_BUF_PLANE3_OFFSET_EXT};
+  static const EGLint kPitchAttrs[kMaxPlanes] = {
+      EGL_DMA_BUF_PLANE0_PITCH_EXT, EGL_DMA_BUF_PLANE1_PITCH_EXT,
+      EGL_DMA_BUF_PLANE2_PITCH_EXT, EGL_DMA_BUF_PLANE3_PITCH_EXT};
+  static const EGLint kModifierLoAttrs[kMaxPlanes] = {
+      EGL_DMA_BUF_PLANE0_MODIFIER_LO_EXT, EGL_DMA_BUF_PLANE1_MODIFIER_LO_EXT,
+      EGL_DMA_BUF_PLANE2_MODIFIER_LO_EXT, EGL_DMA_BUF_PLANE3_MODIFIER_LO_EXT};
+  static const EGLint kModifierHiAttrs[kMaxPlanes] = {
+      EGL_DMA_BUF_PLANE0_MODIFIER_HI_EXT, EGL_DMA_BUF_PLANE1_MODIFIER_HI_EXT,
+      EGL_DMA_BUF_PLANE2_MODIFIER_HI_EXT, EGL_DMA_BUF_PLANE3_MODIFIER_HI_EXT};
+
+  // DRM_FORMAT_MOD_INVALID is defined by libdrm as all bits set. Keep this
+  // local so the Linux plugin does not gain a direct libdrm header dependency.
+  const bool has_modifier = (modifier != std::numeric_limits<guint64>::max());
+
+  std::vector<EGLint> attribs;
+  attribs.push_back(EGL_WIDTH);
+  attribs.push_back(static_cast<EGLint>(current_buffer_width_));
+  attribs.push_back(EGL_HEIGHT);
+  attribs.push_back(static_cast<EGLint>(current_buffer_height_));
+  attribs.push_back(EGL_LINUX_DRM_FOURCC_EXT);
+  attribs.push_back(static_cast<EGLint>(format));
+
+  for (guint32 plane = 0; plane < n_planes; ++plane) {
+    attribs.push_back(kFdAttrs[plane]);
+    attribs.push_back(wpe_buffer_dma_buf_get_fd(dmabuf, plane));
+    attribs.push_back(kOffsetAttrs[plane]);
+    attribs.push_back(static_cast<EGLint>(wpe_buffer_dma_buf_get_offset(dmabuf, plane)));
+    attribs.push_back(kPitchAttrs[plane]);
+    attribs.push_back(static_cast<EGLint>(wpe_buffer_dma_buf_get_stride(dmabuf, plane)));
+    if (has_modifier) {
+      attribs.push_back(kModifierLoAttrs[plane]);
+      attribs.push_back(static_cast<EGLint>(modifier & 0xffffffff));
+      attribs.push_back(kModifierHiAttrs[plane]);
+      attribs.push_back(static_cast<EGLint>(modifier >> 32));
+    }
+  }
+  attribs.push_back(EGL_NONE);
+
+  static PFNEGLCREATEIMAGEKHRPROC eglCreateImageKHR = nullptr;
+  if (eglCreateImageKHR == nullptr) {
+    eglCreateImageKHR = (PFNEGLCREATEIMAGEKHRPROC)eglGetProcAddress("eglCreateImageKHR");
+  }
+  if (eglCreateImageKHR == nullptr) {
+    return nullptr;
+  }
+
+  EGLImageKHR image = eglCreateImageKHR(static_cast<EGLDisplay>(target_display), EGL_NO_CONTEXT,
+                                        EGL_LINUX_DMA_BUF_EXT, static_cast<EGLClientBuffer>(nullptr),
+                                        attribs.data());
+  if (image == EGL_NO_IMAGE_KHR) {
+    return nullptr;
+  }
+
+  if (out_width)
+    *out_width = current_buffer_width_;
+  if (out_height)
+    *out_height = current_buffer_height_;
+
+  return image;
+#else
+  (void)target_display;
   return nullptr;
 #endif
 }
@@ -3897,6 +4114,26 @@ gboolean InAppWebView::OnDecidePolicy(WebKitWebView* web_view, WebKitPolicyDecis
 
   if (decision_type != WEBKIT_POLICY_DECISION_TYPE_NAVIGATION_ACTION) {
     return FALSE;  // Let WebKit handle other decision types
+  }
+
+  // Rules were requested but none are in force: the page would run with no restrictions,
+  // so the navigation waits for them, and is refused if they failed.
+  auto* blockers = self->content_blocker_handler_.get();
+  if (blockers != nullptr && blockers->rulesMissing()) {
+    if (!blockers->isPending()) {
+      webkit_policy_decision_ignore(decision);
+      return TRUE;
+    }
+    g_object_ref(decision);
+    blockers->whenSettled([self, web_view, decision, decision_type](bool applied) {
+      if (!applied) {
+        webkit_policy_decision_ignore(decision);
+      } else if (!OnDecidePolicy(web_view, decision, decision_type, self)) {
+        webkit_policy_decision_use(decision);
+      }
+      g_object_unref(decision);
+    });
+    return TRUE;
   }
 
   auto* nav_decision = WEBKIT_NAVIGATION_POLICY_DECISION(decision);
@@ -6209,7 +6446,10 @@ void InAppWebView::setMicrophoneCaptureState(int state) {
 
 std::optional<std::string> InAppWebView::getMetaThemeColor() const {
   if (webview_ == nullptr) return std::nullopt;
-  
+#if !WEBKIT_CHECK_VERSION(2, 50, 0)
+  // webkit_web_view_get_theme_color / WebKitColor require WPE WebKit >= 2.50.
+  return std::nullopt;
+#else
   WebKitColor color;
   gboolean hasColor = webkit_web_view_get_theme_color(webview_, &color);
   
@@ -6238,6 +6478,7 @@ std::optional<std::string> InAppWebView::getMetaThemeColor() const {
   }
   
   return std::string(hexColor);
+#endif
 }
 
 // === Audio State (Playing and Mute) ===
@@ -7325,39 +7566,54 @@ bool InAppWebView::handleScriptMessageWithReply(const std::string& body, WebKitS
 
   // === Handle Internal Handlers ===
   
-  if (handlerName == "onConsoleMessage") {
+  if (handlerName == "onConsoleMessage" ||
+      handlerName == "onConsoleMessageBatch") {
     // Handle console message interception
-    std::string message = "";
-    std::string level = "log";
-
+    std::vector<json> consoleMessages;
     if (!argsJsonStr.empty()) {
       try {
         json argsJson = json::parse(argsJsonStr);
         if (argsJson.is_array() && !argsJson.empty()) {
           json firstArg = argsJson[0];
-          if (firstArg.contains("level") && firstArg["level"].is_string()) {
-            level = firstArg["level"].get<std::string>();
-          }
-          if (firstArg.contains("message") && firstArg["message"].is_string()) {
-            message = firstArg["message"].get<std::string>();
+          if (handlerName == "onConsoleMessageBatch" &&
+              firstArg.is_object() && firstArg.contains("messages") &&
+              firstArg["messages"].is_array()) {
+            for (const auto& item : firstArg["messages"]) {
+              if (item.is_object() && item.contains("message") &&
+                  item["message"].is_string()) {
+                consoleMessages.push_back(item);
+              }
+            }
+          } else if (handlerName == "onConsoleMessage" &&
+                     firstArg.is_object()) {
+            consoleMessages.push_back(firstArg);
           }
         }
       } catch (const json::parse_error& e) {}
     }
 
-    int64_t messageLevel = 1;  // LOG
-    if (level == "debug") {
-      messageLevel = 0;
-    } else if (level == "info" || level == "log") {
-      messageLevel = 1;
-    } else if (level == "warn") {
-      messageLevel = 2;
-    } else if (level == "error") {
-      messageLevel = 3;
-    }
-
     if (targetWebView->channel_delegate_) {
-      targetWebView->channel_delegate_->onConsoleMessage(message, messageLevel);
+      for (const auto& consoleMessage : consoleMessages) {
+        const std::string message =
+            consoleMessage.contains("message") &&
+                    consoleMessage["message"].is_string()
+                ? consoleMessage["message"].get<std::string>()
+                : "";
+        const std::string level =
+            consoleMessage.contains("level") && consoleMessage["level"].is_string()
+                ? consoleMessage["level"].get<std::string>()
+                : "log";
+        int64_t messageLevel = 1;  // LOG
+        if (level == "debug") {
+          messageLevel = 0;
+        } else if (level == "warn") {
+          messageLevel = 2;
+        } else if (level == "error") {
+          messageLevel = 3;
+        }
+        targetWebView->channel_delegate_->onConsoleMessage(message,
+                                                           messageLevel);
+      }
     }
     ResolveInternalHandlerWithReply(reply, "null");
     return true;

@@ -17,7 +17,8 @@ jobs:
       issues: write
     runs-on: ubuntu-latest
     steps:
-      - uses: dessant/lock-threads@v5.0.1
+      # v6.0.2 accepts current GitHub token lengths on Node 24.
+      - uses: dessant/lock-threads@89ae32b08ed1a541efecbab17912962a5e38981c # v6.0.2
         with:
           process-only: 'issues'
           github-token: ${{ github.token }}

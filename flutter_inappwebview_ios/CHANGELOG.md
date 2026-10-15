@@ -1,5 +1,13 @@
 ## 1.2.0-beta.3
 
+- Batched console notifications while preserving message order and immediate warning/error delivery.
+- Finished failed custom-scheme requests and prevented delivery after cancellation.
+- Added `WebAuthenticationSession.additionalHeaderFields` on iOS 17.4+.
+- Prevented `evaluateJavascript` crashes in popup WebViews on iOS 14 through 17.
+- Prevented named-content-world `callAsyncJavaScript` crashes in popup WebViews on iOS 14 through 17 while preserving page-world support through a compatibility path.
+- Restored scroll insets after dismissing the keyboard on iOS 17.2 and later.
+- Fixed IIFE evaluation in named content worlds when the print bridge is active.
+- Fixed `callAsyncJavaScript` with arguments on iOS versions below 14.3.
 - Updated flutter_inappwebview_platform_interface version to ^1.4.0-beta.3
 - Implemented `saveState`, `restoreState` InAppWebViewController methods
 - Implemented `PlatformProxyController` class

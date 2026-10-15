@@ -4,8 +4,8 @@
 # customers of the plugin.
 cmake_minimum_required(VERSION 3.14)
 
-set(WIL_VERSION "1.0.250325.1")
-set(WEBVIEW_VERSION "1.0.3650.58")
+set(WIL_VERSION "1.0.260126.7")
+set(WEBVIEW_VERSION "1.0.4078.44")
 set(NLOHMANN_JSON_VERSION "3.12.0")
 set(CPP_WINRT_VERSION "2.0.250303.1")
 
@@ -35,7 +35,6 @@ add_custom_command(
   COMMAND ${NUGET} install Microsoft.Windows.CppWinRT -Version ${CPP_WINRT_VERSION} -ExcludeVersion -OutputDirectory ${CMAKE_BINARY_DIR}/packages
   COMMAND ${NUGET} install Microsoft.Web.WebView2 -Version ${WEBVIEW_VERSION} -ExcludeVersion -OutputDirectory ${CMAKE_BINARY_DIR}/packages
   COMMAND ${NUGET} install nlohmann.json -Version ${NLOHMANN_JSON_VERSION} -ExcludeVersion -OutputDirectory ${CMAKE_BINARY_DIR}/packages
-  DEPENDS ${NUGET}
 )
 
 # Any new source files that you add to the plugin should be added here.
@@ -58,6 +57,7 @@ list(APPEND PLUGIN_SOURCES
   "types/channel_delegate.cpp"
   "types/channel_delegate.h"
   "types/base_callback_result.h"
+  "types/lifetime_token.h"
   "types/url_request.cpp"
   "types/url_request.h"
   "types/navigation_action.cpp"
@@ -171,6 +171,8 @@ list(APPEND PLUGIN_SOURCES
   "types/accelerator_key_pressed_detail.cpp"
   "types/accelerator_key_pressed_detail.h"
   "custom_platform_view/custom_platform_view.cc"
+  "custom_platform_view/webview_drop_target.cc"
+  "custom_platform_view/webview_drop_target.h"
   "custom_platform_view/custom_platform_view.h"
   "custom_platform_view/texture_bridge.cc"
   "custom_platform_view/texture_bridge.h"
@@ -225,6 +227,7 @@ list(APPEND PLUGIN_SOURCES
   "in_app_webview/in_app_webview_settings.h"
   "in_app_webview/in_app_webview.cpp"
   "in_app_webview/in_app_webview.h"
+  "in_app_webview/webview_visibility_state.h"
   "in_app_webview/in_app_webview_manager.cpp"
   "in_app_webview/in_app_webview_manager.h"
   "in_app_webview/webview_channel_delegate.cpp"
@@ -246,6 +249,8 @@ list(APPEND PLUGIN_SOURCES
   "cookie_manager.cpp"
   "cookie_manager.h"
   "platform_util.cpp"
+  "file_drop/file_drop_manager.h"
+  "file_drop/file_drop_manager.cpp"
   "platform_util.h"
 )
 
@@ -291,13 +296,18 @@ endif()
 # Also, added /bigobj flag.
 function(FLUTTER_INAPPWEBVIEW_WINDOWS_APPLY_STANDARD_SETTINGS TARGET)
   target_compile_features(${TARGET} PUBLIC cxx_std_17)
-  target_compile_options(${TARGET} PRIVATE /W4 /wd"4100")
+  target_compile_options(${TARGET} PRIVATE /W4 /wd"4100" /wd"4458")
   target_compile_options(${TARGET} PRIVATE /EHsc)
   target_compile_options(${TARGET} PRIVATE /bigobj)
   target_compile_definitions(${TARGET} PRIVATE "_HAS_EXCEPTIONS=0")
   target_compile_definitions(${TARGET} PRIVATE "$<$<CONFIG:Debug>:_DEBUG>")
 endfunction()
 flutter_inappwebview_windows_apply_standard_settings(${PLUGIN_NAME})
+
+# C++/WinRT still includes <experimental/coroutine> in C++17 mode. Newer MSVC
+# releases require this compatibility opt-in until the plugin moves to C++20.
+target_compile_definitions(${PLUGIN_NAME} PRIVATE
+  "_SILENCE_EXPERIMENTAL_COROUTINE_DEPRECATION_WARNINGS")
 
 target_link_libraries(${PLUGIN_NAME} PRIVATE ${CMAKE_BINARY_DIR}/packages/Microsoft.Web.WebView2/build/native/Microsoft.Web.WebView2.targets)
 target_link_libraries(${PLUGIN_NAME} PRIVATE ${CMAKE_BINARY_DIR}/packages/Microsoft.Windows.ImplementationLibrary/build/native/Microsoft.Windows.ImplementationLibrary.targets)
@@ -315,6 +325,8 @@ target_compile_definitions(${PLUGIN_NAME} PRIVATE FLUTTER_PLUGIN_IMPL)
 target_include_directories(${PLUGIN_NAME} INTERFACE
   "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_link_libraries(${PLUGIN_NAME} PRIVATE flutter flutter_wrapper_plugin)
+# OLE drag and drop (RegisterDragDrop/OleInitialize) for WebViewDropTarget.
+target_link_libraries(${PLUGIN_NAME} PRIVATE ole32)
 
 # List of absolute paths to libraries that should be bundled with the plugin.
 # This list could contain prebuilt libraries, or libraries created by an
@@ -337,7 +349,8 @@ enable_testing()
 include(FetchContent)
 FetchContent_Declare(
   googletest
-  URL https://github.com/google/googletest/archive/release-1.11.0.zip
+  URL https://github.com/google/googletest/archive/refs/tags/v1.17.0.zip
+  DOWNLOAD_EXTRACT_TIMESTAMP TRUE
 )
 # Prevent overriding the parent project's compiler/linker settings
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
@@ -345,29 +358,16 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 set(INSTALL_GTEST OFF CACHE BOOL "Disable installation of googletest" FORCE)
 FetchContent_MakeAvailable(googletest)
 
-# The plugin's C API is not very useful for unit testing, so build the sources
-# directly into the test binary rather than using the DLL.
 add_executable(${TEST_RUNNER}
   test/flutter_inappwebview_windows_plugin_test.cpp
-  ${PLUGIN_SOURCES}
 )
 apply_standard_settings(${TEST_RUNNER})
-target_compile_options(${TEST_RUNNER} PRIVATE /bigobj)
-target_compile_options(${TEST_RUNNER} PRIVATE /WX-)
 target_include_directories(${TEST_RUNNER} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
-target_link_libraries(${TEST_RUNNER} PRIVATE flutter_wrapper_plugin)
-target_link_libraries(${TEST_RUNNER} PRIVATE gtest_main gmock)
-add_dependencies(${TEST_RUNNER} ${PROJECT_NAME}_DEPS)
-target_link_libraries(${TEST_RUNNER} PRIVATE ${CMAKE_BINARY_DIR}/packages/Microsoft.Web.WebView2/build/native/Microsoft.Web.WebView2.targets)
-target_link_libraries(${TEST_RUNNER} PRIVATE ${CMAKE_BINARY_DIR}/packages/Microsoft.Windows.ImplementationLibrary/build/native/Microsoft.Windows.ImplementationLibrary.targets)
-target_link_libraries(${TEST_RUNNER} PRIVATE ${CMAKE_BINARY_DIR}/packages/nlohmann.json/build/native/nlohmann.json.targets)
-# flutter_wrapper_plugin has link dependencies on the Flutter DLL.
-add_custom_command(TARGET ${TEST_RUNNER} POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -E copy_if_different
-  "${FLUTTER_LIBRARY}" $<TARGET_FILE_DIR:${TEST_RUNNER}>
-)
+target_link_libraries(${TEST_RUNNER} PRIVATE flutter flutter_wrapper_plugin gtest_main)
 
-# Enable automatic test discovery.
+# Enable automatic test discovery. The default 5s DISCOVERY_TIMEOUT is
+# marginal on cold CI runners (antivirus scans the fresh executable) and
+# was observed killing --gtest_list_tests mid-print.
 include(GoogleTest)
-gtest_discover_tests(${TEST_RUNNER})
+gtest_discover_tests(${TEST_RUNNER} DISCOVERY_TIMEOUT 60)
 endif()

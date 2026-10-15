@@ -8,6 +8,7 @@
 #include "../utils/log.h"
 #include "inappwebview_egl_texture.h"
 #include "inappwebview_texture.h"
+#include "zero_copy.h"
 
 namespace flutter_inappwebview_plugin {
 
@@ -101,11 +102,21 @@ CustomPlatformView::CustomPlatformView(FlBinaryMessenger* messenger,
   // The EGL texture handles both EGL and SHM modes internally, providing the best
   // performance for each environment.
   if (UseGLTexture()) {
+    // Keep the producer and consumer on the same rendering path. Set this
+    // before constructing the texture so the first WPE frame is eligible for
+    // pixel upload when zero-copy has been explicitly disabled.
+    webview_->SetInlineFlutterTextureConsumer(true);
+    const bool inline_zero_copy_enabled = !IsZeroCopyDisabled();
+#ifdef HAVE_WPE_PLATFORM
+    webview_->SetInlineFlutterEglImportEnabled(inline_zero_copy_enabled);
+    webview_->SetSkipPixelReadback(inline_zero_copy_enabled);
+#else
+    // The legacy export API provides WPE-created EGL images, not DMA-BUF planes
+    // for Flutter's EGLDisplay. Keep its existing pixel readback fallback.
+    webview_->SetInlineFlutterEglImportEnabled(false);
+    webview_->SetSkipPixelReadback(false);
+#endif
     texture_ = FL_TEXTURE(inappwebview_egl_texture_new(webview_.get()));
-    egl_texture_ = INAPPWEBVIEW_EGL_TEXTURE(texture_);
-    // In zero-copy EGL mode, we don't need pixel readback - the EGL image is passed
-    // directly to Flutter. This improves performance and avoids GL context issues.
-    webview_->SetSkipPixelReadback(true);
     debugLog("CustomPlatformView: using GL texture (hardware accelerated)");
   } else {
     texture_ = FL_TEXTURE(inappwebview_texture_new(webview_.get()));
@@ -136,20 +147,11 @@ CustomPlatformView::CustomPlatformView(FlBinaryMessenger* messenger,
     webview_->AttachChannel(messenger, texture_id_);
   }
 
-  // Set up the webview's callback to mark frame available
-  // For EGL texture, we also update the EGL image reference
-  webview_->SetOnFrameAvailable([this]() {
-    // If using EGL texture, update the EGL image reference before marking available
-    if (egl_texture_ != nullptr && webview_ != nullptr) {
-      uint32_t width = 0;
-      uint32_t height = 0;
-      void* egl_image = webview_->GetCurrentEglImage(&width, &height);
-      if (egl_image != nullptr) {
-        inappwebview_egl_texture_set_egl_image(egl_texture_, egl_image, width, height);
-      }
-    }
-    MarkTextureFrameAvailable();
-  });
+  // Set up the webview's callback to mark frame available. The EGL texture
+  // (when in use) re-imports the current DMA-BUF frame itself inside
+  // populate(), on Flutter's render thread where Flutter's EGLDisplay is
+  // current — see InAppWebView::ImportCurrentBufferToEglImage.
+  webview_->SetOnFrameAvailable([this]() { MarkTextureFrameAvailable(); });
 
   // Set up cursor change callback
   webview_->SetOnCursorChanged(

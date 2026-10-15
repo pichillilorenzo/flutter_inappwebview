@@ -4,9 +4,11 @@ import 'dart:ui';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 import '../platform_util.dart';
 import '_static_channel.dart';
+import 'webview_creation_failure.dart';
 
 const Map<String, SystemMouseCursor> _cursors = {
   'none': SystemMouseCursors.none,
@@ -49,6 +51,24 @@ const Map<String, SystemMouseCursor> _cursors = {
 
 SystemMouseCursor _getCursorByName(String name) =>
     _cursors[name] ?? SystemMouseCursors.basic;
+
+/// The trackpad scroll-speed knob: how far the page moves per pixel of
+/// finger travel. 1.0 is exact 1:1 tracking (measured); it was reported to
+/// feel sluggish next to native precision-touchpad scrolling, which applies
+/// gain plus inertia. Synthetic fling distances pass through this factor
+/// too, so the glide scales together with the drag.
+const double _kTrackpadGain = 1.5;
+
+/// Converts trackpad pan pixels to WebView2 wheel units.
+/// Mouse-wheel deltas are already wheel-derived and are not scaled.
+///
+/// WHEEL_DELTA (120) is one wheel notch and Chromium scrolls ~100px per
+/// notch (measured against a real WebView2), so pan*120/100 gives exact 1:1
+/// finger-to-page tracking, multiplied by the felt [_kTrackpadGain].
+double _panToWheelUnits(double pan) => (pan * 120.0 / 100.0) * _kTrackpadGain;
+
+Offset _dominantAxis(Offset delta) =>
+    delta.dx.abs() > delta.dy.abs() ? Offset(delta.dx, 0) : Offset(0, delta.dy);
 
 /// Pointer button type
 // Order must match InAppWebViewPointerEventKind (see in_app_webview.h)
@@ -97,6 +117,20 @@ class CustomFlutterViewControllerValue {
   CustomFlutterViewControllerValue.uninitialized() : this(isInitialized: false);
 }
 
+/// The URL a creation request was going to load, read back from its creation
+/// params. It is the only identifier both sides share before the webview
+/// exists, so it is what lets a host match a failure to its own request.
+String? _requestedUrlOf(dynamic arguments) {
+  if (arguments is! Map) return null;
+  final urlRequest = arguments['initialUrlRequest'];
+  if (urlRequest is Map) {
+    final url = urlRequest['url'];
+    if (url != null) return url.toString();
+  }
+  final file = arguments['initialFile'];
+  return file?.toString();
+}
+
 /// Controls a WebView and provides streams for various change events.
 class CustomPlatformViewController
     extends ValueNotifier<CustomFlutterViewControllerValue> {
@@ -122,15 +156,32 @@ class CustomPlatformViewController
   /// Initializes the underlying platform view.
   Future<void> initialize({
     Function(int id)? onPlatformViewCreated,
+    Key? creationKey,
     dynamic arguments,
   }) async {
     if (_isDisposed) {
       return;
     }
-    _textureId = (await _pluginChannel.invokeMethod<int>(
-      'createInAppWebView',
-      arguments,
-    ))!;
+    try {
+      _textureId = (await _pluginChannel.invokeMethod<int>(
+        'createInAppWebView',
+        arguments,
+      ))!;
+    } catch (error, stackTrace) {
+      // No native view exists; release waiters and prevent channel calls.
+      _isDisposed = true;
+      if (!_creatingCompleter.isCompleted) {
+        _creatingCompleter.complete();
+      }
+      final failure = WindowsWebViewCreationFailure(
+        error,
+        stackTrace,
+        requestedUrl: _requestedUrlOf(arguments),
+        creationKey: creationKey,
+      );
+      WindowsWebViewCreationFailures.reportFailure(failure);
+      rethrow;
+    }
 
     _methodChannel = MethodChannel(
       'com.pichillilorenzo/custom_platform_view_$_textureId',
@@ -178,6 +229,24 @@ class CustomPlatformViewController
     }
     assert(value.isInitialized);
     return _methodChannel.invokeMethod('setFpsLimit', maxFps);
+  }
+
+  /// Requests focus for the underlying WebView2 control via MoveFocus.
+  Future<void> requestFocus() async {
+    if (_isDisposed) {
+      return;
+    }
+    assert(value.isInitialized);
+    return _methodChannel.invokeMethod('requestFocus');
+  }
+
+  /// Clears focus from the active element inside the WebView2 control.
+  Future<void> clearFocus() async {
+    if (_isDisposed) {
+      return;
+    }
+    assert(value.isInitialized);
+    return _methodChannel.invokeMethod('clearFocus');
   }
 
   /// Sends a Pointer (Touch) update
@@ -282,9 +351,17 @@ class CustomPlatformView extends StatefulWidget {
 
   final Function(int id)? onPlatformViewCreated;
 
+  /// The caller-supplied key that identifies this creation attempt.
+  ///
+  /// It is carried on [WindowsWebViewCreationFailure] so listeners on the
+  /// global failure stream can identify the failed widget even when multiple
+  /// WebViews request the same URL.
+  final Key? creationKey;
+
   const CustomPlatformView({
     this.creationParams,
     this.onPlatformViewCreated,
+    this.creationKey,
     this.scaleFactor,
     this.filterQuality = FilterQuality.none,
   });
@@ -294,11 +371,40 @@ class CustomPlatformView extends StatefulWidget {
 }
 
 class _CustomPlatformViewState extends State<CustomPlatformView>
-    with PlatformUtilListener {
+    with PlatformUtilListener, SingleTickerProviderStateMixin {
   final GlobalKey _key = GlobalKey();
   final _downButtons = <int, PointerButton>{};
 
+  // Set when the cursor left the view while a mouse button was still held and
+  // the LEAVE was therefore withheld, so it can be delivered once the button
+  // comes back up. See [MouseRegion.onExit] below for why it is withheld.
+  bool _leaveDeferred = false;
+
   PointerDeviceKind _pointerKind = PointerDeviceKind.unknown;
+
+  // Per-pointer touch state: down position and whether the sequence has so far
+  // stayed within the tap slop. Focus is granted only for a single-finger tap,
+  // never for scroll/pan or any multi-touch gesture. Keyed by pointer so a
+  // second finger can't reset the first finger's sequence.
+  final _touchDownPositions = <int, Offset>{};
+  final _touchPointerIsTap = <int, bool>{};
+
+  // Pending post-tap focus request; cancelled on a new tap or on dispose so it
+  // can't fire after the user moved focus elsewhere or the view is gone.
+  Timer? _tapFocusTimer;
+
+  // Accumulates fractional wheel deltas so sub-pixel trackpad movement is not
+  // lost when the native side truncates to short.
+  double _scrollRemainderX = 0;
+  double _scrollRemainderY = 0;
+
+  // Synthetic trackpad inertia; this view bypasses Flutter Scrollable, so it
+  // must continue a fast pan after the fingers lift.
+  VelocityTracker? _panVelocityTracker;
+  Ticker? _flingTicker;
+  ClampingScrollSimulation? _flingSimulation;
+  Offset _flingDirection = Offset.zero;
+  double _flingLastDistance = 0;
 
   MouseCursor _cursor = SystemMouseCursors.basic;
 
@@ -317,13 +423,21 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
 
     _platformUtil.addListener(this);
 
-    _controller.initialize(
-      onPlatformViewCreated: (id) {
-        widget.onPlatformViewCreated?.call(id);
-        setState(() {});
-      },
-      arguments: widget.creationParams,
-    );
+    // `initialize` reports native creation failures through
+    // WindowsWebViewCreationFailures, then rethrows for direct callers. This
+    // widget has no per-instance creation-error callback, so consume that
+    // rethrown Future here instead of producing an unhandled async error.
+    _controller
+        .initialize(
+          onPlatformViewCreated: (id) {
+            if (!mounted) return;
+            widget.onPlatformViewCreated?.call(id);
+            setState(() {});
+          },
+          creationKey: widget.creationKey,
+          arguments: widget.creationParams,
+        )
+        .ignore();
 
     _listener = AppLifecycleListener(
       onStateChange: (state) {
@@ -339,11 +453,13 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
 
     // Report initial surface size and widget position
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
       _reportSurfaceSize();
       _reportWidgetPosition();
     });
 
     _cursorSubscription = _controller._cursor.listen((cursor) {
+      if (!mounted) return;
       setState(() {
         _cursor = cursor;
       });
@@ -363,7 +479,15 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
       focusNode: _focusNode,
       canRequestFocus: true,
       debugLabel: "flutter_inappwebview_windows_custom_platform_view",
-      onFocusChange: (focused) {},
+      onFocusChange: (focused) {
+        // Deliberately no native MoveFocus/blur here. A mouse click already
+        // focuses the clicked element natively; a MoveFocus arriving after it
+        // toggles that focus away (upstream #2736) and typing breaks. Touch is
+        // handled in onPointerUp, which is the only case that needs it.
+        if (!mounted || !_controller.value.isInitialized) return;
+        // A pending post-tap grab must not pull focus back after it left.
+        if (!focused) _tapFocusTimer?.cancel();
+      },
       child: SizedBox.expand(key: _key, child: _buildInner()),
     );
   }
@@ -388,20 +512,27 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
                   _controller._setCursorPos(ev.localPosition);
                 },
                 onPointerDown: (ev) {
+                  _stopFling();
                   _reportSurfaceSize();
                   _reportWidgetPosition();
+                  // A new gesture supersedes any pending post-tap focus.
+                  _tapFocusTimer?.cancel();
 
                   if (!_focusNode.hasFocus) {
                     _focusNode.requestFocus();
-                    Future.delayed(const Duration(milliseconds: 50), () {
-                      if (!_focusNode.hasFocus) {
-                        _focusNode.requestFocus();
-                      }
-                    });
                   }
 
                   _pointerKind = ev.kind;
                   if (ev.kind == PointerDeviceKind.touch) {
+                    _touchDownPositions[ev.pointer] = ev.localPosition;
+                    if (_touchDownPositions.length > 1) {
+                      // A second finger means a multi-touch gesture (pinch/
+                      // scroll) — no sequence may grant focus.
+                      _touchPointerIsTap.updateAll((_, __) => false);
+                      _touchPointerIsTap[ev.pointer] = false;
+                    } else {
+                      _touchPointerIsTap[ev.pointer] = true;
+                    }
                     _controller._setPointerUpdate(
                       InAppWebViewPointerEventKind.down,
                       ev.pointer,
@@ -428,6 +559,26 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
                       ev.size,
                       ev.pressure,
                     );
+                    // SendMouseInput grants the renderer focus natively on
+                    // click, but SendPointerInput does not — without this a
+                    // touch tap reaches the DOM yet the input never shows a
+                    // caret and typing is impossible. Must run after Chromium
+                    // finished processing the tap; earlier it gets reverted.
+                    // Scroll/pan gestures are excluded so they don't steal
+                    // focus from the app.
+                    final wasTap =
+                        _touchPointerIsTap.remove(ev.pointer) ?? false;
+                    _touchDownPositions.remove(ev.pointer);
+                    if (wasTap) {
+                      _tapFocusTimer?.cancel();
+                      _tapFocusTimer = Timer(
+                        const Duration(milliseconds: 100),
+                        () {
+                          if (!mounted) return;
+                          _controller.requestFocus();
+                        },
+                      );
+                    }
                     return;
                   }
                   final button = _downButtons.remove(ev.pointer);
@@ -437,20 +588,36 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
                       button,
                     );
                   }
+                  _flushDeferredLeave();
                 },
                 onPointerCancel: (ev) {
                   _pointerKind = ev.kind;
+                  if (ev.kind == PointerDeviceKind.touch) {
+                    _touchPointerIsTap.remove(ev.pointer);
+                    _touchDownPositions.remove(ev.pointer);
+                    return;
+                  }
                   final button = _downButtons.remove(ev.pointer);
                   if (button != null) {
+                    // WebView2 has no mouse-cancel event. Its native state
+                    // must still be released, otherwise later pointer moves
+                    // continue to carry a button-down virtual key.
                     _controller._setPointerButtonState(
-                      InAppWebViewPointerEventKind.cancel,
+                      InAppWebViewPointerEventKind.up,
                       button,
                     );
                   }
+                  _flushDeferredLeave();
                 },
                 onPointerMove: (ev) {
                   _pointerKind = ev.kind;
                   if (ev.kind == PointerDeviceKind.touch) {
+                    final downPosition = _touchDownPositions[ev.pointer];
+                    if (downPosition != null &&
+                        (ev.localPosition - downPosition).distance >
+                            kTouchSlop) {
+                      _touchPointerIsTap[ev.pointer] = false;
+                    }
                     _controller._setPointerUpdate(
                       InAppWebViewPointerEventKind.update,
                       ev.pointer,
@@ -464,18 +631,52 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
                 },
                 onPointerSignal: (signal) {
                   if (signal is PointerScrollEvent) {
-                    _controller._setScrollDelta(
-                      -signal.scrollDelta.dx,
+                    _controller._setCursorPos(signal.localPosition);
+                    _stopFling();
+                    _sendScrollDelta(
+                      signal.scrollDelta.dx,
                       -signal.scrollDelta.dy,
                     );
+                  } else if (signal is PointerScrollInertiaCancelEvent) {
+                    // Sent by the engine when the user touches the trackpad
+                    // during inertia — that touch must also halt the
+                    // synthetic glide.
+                    _stopFling();
                   }
                 },
+                onPointerPanZoomStart: (ev) {
+                  _controller._setCursorPos(ev.localPosition);
+                  _stopFling();
+                  _scrollRemainderX = 0;
+                  _scrollRemainderY = 0;
+                  _panVelocityTracker = VelocityTracker.withKind(
+                    PointerDeviceKind.trackpad,
+                  );
+                },
                 onPointerPanZoomUpdate: (ev) {
-                  _controller._setScrollDelta(ev.panDelta.dx, ev.panDelta.dy);
+                  _panVelocityTracker?.addPosition(ev.timeStamp, ev.pan);
+                  _sendTrackpadScrollDelta(
+                    _panToWheelUnits(ev.panDelta.dx),
+                    _panToWheelUnits(ev.panDelta.dy),
+                  );
+                },
+                onPointerPanZoomEnd: (ev) {
+                  final tracker = _panVelocityTracker;
+                  _panVelocityTracker = null;
+                  if (tracker != null) {
+                    _startFling(tracker.getVelocity());
+                  }
                 },
                 child: MouseRegion(
                   cursor: _cursor,
                   onEnter: (ev) {
+                    // The cursor may be coming back from a drag whose LEAVE was
+                    // withheld; WebView2 was never told it left, so it must not
+                    // be told it entered either.
+                    if (_leaveDeferred) {
+                      _leaveDeferred = false;
+                      return;
+                    }
                     final button = _getButton(ev.buttons);
                     _controller._setPointerButtonState(
                       InAppWebViewPointerEventKind.enter,
@@ -483,6 +684,17 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
                     );
                   },
                   onExit: (ev) {
+                    // A drag that leaves the view is still live: Flutter keeps
+                    // routing its moves here until the button comes up, and
+                    // dragging past the edge is how every platform extends a
+                    // selection. Forwarding LEAVE now ends the gesture instead
+                    // -- WebView2 turns it into WM_MOUSELEAVE and Chromium
+                    // drops the drag, so the user releases the button to find
+                    // the selection gone. Withhold it until the release.
+                    if (_downButtons.isNotEmpty) {
+                      _leaveDeferred = true;
+                      return;
+                    }
                     final button = _getButton(ev.buttons);
                     _controller._setPointerButtonState(
                       InAppWebViewPointerEventKind.leave,
@@ -500,10 +712,93 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
     );
   }
 
+  /// Delivers the LEAVE that [MouseRegion.onExit] withheld because a button
+  /// was still down. Called on button-up and on cancel; a no-op while any
+  /// button remains held, so a multi-button drag keeps the view "entered"
+  /// until the last one is released, and a no-op when the cursor came back
+  /// inside, because [MouseRegion.onEnter] already cleared the deferral.
+  void _flushDeferredLeave() {
+    if (!_leaveDeferred || _downButtons.isNotEmpty) {
+      return;
+    }
+    _leaveDeferred = false;
+    _controller._setPointerButtonState(
+      InAppWebViewPointerEventKind.leave,
+      PointerButton.none,
+    );
+  }
+
+  /// Forwards raw WM wheel data immediately, preserving fractional
+  /// remainders. WM sign asymmetry: positive dy = up, positive dx = right.
+  void _sendScrollDelta(double dx, double dy) {
+    _scrollRemainderX += dx;
+    _scrollRemainderY += dy;
+    final flushX = _scrollRemainderX.truncateToDouble();
+    final flushY = _scrollRemainderY.truncateToDouble();
+    if (flushX == 0 && flushY == 0) {
+      return;
+    }
+    _scrollRemainderX -= flushX;
+    _scrollRemainderY -= flushY;
+    _controller._setScrollDelta(flushX, flushY);
+  }
+
+  void _sendTrackpadScrollDelta(double dx, double dy) {
+    final delta = _dominantAxis(Offset(dx, dy));
+    // Content follows the fingers: fingers right = scroll left = negative
+    // hwheel (WM_MOUSEHWHEEL positive means right, unlike the vertical axis).
+    _sendScrollDelta(-delta.dx, delta.dy);
+  }
+
+  /// Starts synthetic inertia after a fast lifted pan.
+  void _startFling(Velocity velocity) {
+    final speed = velocity.pixelsPerSecond.distance.clamp(
+      0.0,
+      kMaxFlingVelocity,
+    );
+    if (speed < kMinFlingVelocity) {
+      return;
+    }
+    _flingDirection =
+        velocity.pixelsPerSecond / velocity.pixelsPerSecond.distance;
+    _flingSimulation = ClampingScrollSimulation(position: 0, velocity: speed);
+    _flingLastDistance = 0;
+    final ticker = _flingTicker ??= createTicker(_onFlingTick);
+    ticker.stop();
+    ticker.start();
+  }
+
+  void _stopFling() {
+    _flingSimulation = null;
+    _flingTicker?.stop();
+  }
+
+  void _onFlingTick(Duration elapsed) {
+    final simulation = _flingSimulation;
+    if (simulation == null) {
+      _flingTicker?.stop();
+      return;
+    }
+    final seconds = elapsed.inMicroseconds / Duration.microsecondsPerSecond;
+    final distance = simulation.x(seconds);
+    final step = distance - _flingLastDistance;
+    _flingLastDistance = distance;
+    if (simulation.isDone(seconds)) {
+      _stopFling();
+    }
+    if (step != 0) {
+      _sendTrackpadScrollDelta(
+        _panToWheelUnits(_flingDirection.dx * step),
+        _panToWheelUnits(_flingDirection.dy * step),
+      );
+    }
+  }
+
   void _reportSurfaceSize() async {
     final box = _key.currentContext?.findRenderObject() as RenderBox?;
     if (box != null) {
       await _controller.ready;
+      if (!mounted || !box.attached) return;
       unawaited(
         _controller._setSize(
           box.size,
@@ -517,6 +812,7 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
     final box = _key.currentContext?.findRenderObject() as RenderBox?;
     if (box != null) {
       await _controller.ready;
+      if (!mounted || !box.attached) return;
       final position = box.localToGlobal(Offset.zero);
       unawaited(
         _controller._setPosition(
@@ -529,11 +825,13 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
 
   @override
   void dispose() {
-    super.dispose();
+    _tapFocusTimer?.cancel();
+    _flingTicker?.dispose();
     _platformUtil.removeListener(this);
     _cursorSubscription?.cancel();
     _controller.dispose();
     _focusNode.dispose();
     _listener.dispose();
+    super.dispose();
   }
 }

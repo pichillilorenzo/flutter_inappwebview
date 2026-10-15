@@ -1,7 +1,9 @@
 #include <DispatcherQueue.h>
 #include <flutter/method_channel.h>
 #include <flutter/standard_method_codec.h>
+#include <cassert>
 #include <shlobj.h>
+#include <windows.foundation.h>
 #include <windows.graphics.capture.h>
 
 #include "../in_app_webview/in_app_webview_settings.h"
@@ -21,34 +23,35 @@ namespace flutter_inappwebview_plugin
     : plugin(plugin),
     ChannelDelegate(plugin->registrar->messenger(), InAppWebViewManager::METHOD_CHANNEL_NAME)
   {
-    if (!rohelper_) {
-      rohelper_ = std::make_unique<rx::RoHelper>(RO_INIT_SINGLETHREADED);
+    {
+      const std::lock_guard<std::mutex> lock(shared_resources_mutex_);
+      ++instance_count_;
 
-      if (rohelper_->WinRtAvailable()) {
-        DispatcherQueueOptions options{ sizeof(DispatcherQueueOptions),
-                                       DQTYPE_THREAD_CURRENT, DQTAT_COM_STA };
+      if (!rohelper_) {
+        rohelper_ = new rx::RoHelper(RO_INIT_SINGLETHREADED);
 
-        if (FAILED(rohelper_->CreateDispatcherQueueController(
-          options, dispatcher_queue_controller_.put()))) {
-          std::cerr << "Creating DispatcherQueueController failed." << std::endl;
-          return;
+        if (rohelper_->WinRtAvailable()) {
+          DispatcherQueueOptions options{ sizeof(DispatcherQueueOptions),
+                                         DQTYPE_THREAD_CURRENT, DQTAT_COM_STA };
+
+          if (FAILED(rohelper_->CreateDispatcherQueueController(
+            options, &dispatcher_queue_controller_))) {
+            std::cerr << "Creating DispatcherQueueController failed." << std::endl;
+            return;
+          }
+
+          if (!isGraphicsCaptureSessionSupported()) {
+            std::cerr << "Windows::Graphics::Capture::GraphicsCaptureSession is not "
+              "supported."
+              << std::endl;
+            return;
+          }
+
+          graphics_context_ = new GraphicsContext(rohelper_);
+          auto compositor = graphics_context_->CreateCompositor();
+          compositor_ = compositor.detach();
+          valid_ = graphics_context_->IsValid();
         }
-
-        if (!isGraphicsCaptureSessionSupported()) {
-          std::cerr << "Windows::Graphics::Capture::GraphicsCaptureSession is not "
-            "supported."
-            << std::endl;
-          return;
-        }
-
-        graphics_context_ = std::make_unique<GraphicsContext>(rohelper_.get());
-        compositor_ = graphics_context_->CreateCompositor();
-        if (compositor_) {
-          // fix for KernelBase.dll RaiseFailFastException
-          // when app is closing 
-          compositor_->AddRef();
-        }
-        valid_ = graphics_context_->IsValid();
       }
     }
 
@@ -123,7 +126,8 @@ namespace flutter_inappwebview_plugin
     RECT bounds;
     GetClientRect(plugin->registrar->GetView()->GetNativeWindow(), &bounds);
 
-    auto hwnd = CreateWindowEx(0, windowClass_.lpszClassName, L"", 0, 0,
+    const DWORD windowStyle = WS_CHILD | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
+    auto hwnd = CreateWindowEx(0, windowClass_.lpszClassName, L"", windowStyle, 0,
       0, bounds.right - bounds.left, bounds.bottom - bounds.top,
       plugin->registrar->GetView()->GetNativeWindow(),
       nullptr,
@@ -149,10 +153,19 @@ namespace flutter_inappwebview_plugin
     auto initialSettings = std::make_shared<InAppWebViewSettings>(settingsMap);
 
     InAppWebView::createInAppWebViewEnv(hwnd, true, webViewEnvironment, initialSettings,
-      [=](wil::com_ptr<ICoreWebView2Environment> webViewEnv,
+      [=, alive = alive_.weak()](HRESULT errorCode,
+        wil::com_ptr<ICoreWebView2Environment> webViewEnv,
         wil::com_ptr<ICoreWebView2Controller> webViewController,
         wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController)
       {
+        if (alive.expired()) {
+          // The engine was torn down while WebView2 was still creating the
+          // controller: this object, the registrar and result_ are all gone.
+          if (webViewController) {
+            failedLog(webViewController->Close());
+          }
+          return;
+        }
         if (plugin && webViewEnv && webViewController && webViewCompositionController) {
           std::optional<std::vector<std::shared_ptr<UserScript>>> initialUserScripts = initialUserScriptList.has_value() ?
             functional_map(initialUserScriptList.value(), [](const flutter::EncodableValue& map) { return std::make_shared<UserScript>(std::get<flutter::EncodableMap>(map)); }) :
@@ -164,7 +177,13 @@ namespace flutter_inappwebview_plugin
             initialUserScripts
           };
 
-          auto inAppWebView = std::make_unique<InAppWebView>(plugin, params, hwnd, std::move(webViewEnv), std::move(webViewController), std::move(webViewCompositionController));
+          auto inAppWebView = std::make_unique<InAppWebView>(plugin, params, hwnd,
+            std::move(webViewEnv), std::move(webViewController),
+            std::move(webViewCompositionController), windowMinimized_);
+          if (!inAppWebView->webView || !inAppWebView->surface()) {
+            result_->Error("0", "Cannot create the InAppWebView surface!");
+            return;
+          }
 
           std::optional<std::shared_ptr<URLRequest>> urlRequest = urlRequestMap.has_value() ? std::make_shared<URLRequest>(urlRequestMap.value()) : std::optional<std::shared_ptr<URLRequest>>{};
           if (urlRequest.has_value()) {
@@ -204,7 +223,8 @@ namespace flutter_inappwebview_plugin
           result_->Success(textureId);
         }
         else {
-          result_->Error("0", "Cannot create the InAppWebView instance!");
+          DestroyWindow(hwnd);
+          result_->Error("0", "Cannot create the InAppWebView instance! HRESULT " + getHRErrorString(errorCode));
         }
       }
     );
@@ -218,6 +238,33 @@ namespace flutter_inappwebview_plugin
         platformView->UnregisterMethodCallHandler();
       }
       keepAliveWebViews.erase(keepAliveId);
+    }
+  }
+
+  // WebView2 keeps its own top-level input window (class Chrome_WidgetWin_1,
+  // owned by no window) over the widget area. It has no redirection bitmap, so
+  // it is invisible - but it still hit-tests, and minimizing the app leaves it
+  // on screen swallowing every mouse click over the region the app occupied.
+  // Hiding the controller hides that window. Each WebView keeps its requested
+  // pause state separate from this temporary host-window state, so resume()
+  // cannot expose it while minimized and restore cannot expose a paused view.
+  void InAppWebViewManager::setWindowMinimized(const bool minimized)
+  {
+    windowMinimized_ = minimized;
+
+    const auto applyWindowState = [minimized](const std::unique_ptr<CustomPlatformView>& platformView)
+      {
+        const auto webView = platformView ? platformView->view.get() : nullptr;
+        if (webView) {
+          webView->setHostWindowMinimized(minimized);
+        }
+      };
+
+    for (const auto& [id, platformView] : webViews) {
+      applyWindowState(platformView);
+    }
+    for (const auto& [keepAliveId, platformView] : keepAliveWebViews) {
+      applyWindowState(platformView);
     }
   }
 
@@ -250,13 +297,54 @@ namespace flutter_inappwebview_plugin
     return !!is_supported;
   }
 
+  ABI::Windows::System::IDispatcherQueueController* InAppWebViewManager::detachSharedResourcesForShutdown()
+  {
+    // These WinRT/Composition objects are intentionally process-lifetime
+    // objects. Releasing them during Flutter engine teardown can call into
+    // WinRT DLLs while they are unloading. Null the cached pointers so the
+    // plugin won't use them again; the OS will reclaim them at process exit.
+    valid_ = false;
+    const auto dispatcherQueueController = dispatcher_queue_controller_;
+    dispatcher_queue_controller_ = nullptr;
+    compositor_ = nullptr;
+    graphics_context_ = nullptr;
+    rohelper_ = nullptr;
+    return dispatcherQueueController;
+  }
+
+  void InAppWebViewManager::shutdownDispatcherQueue(ABI::Windows::System::IDispatcherQueueController* dispatcherQueueController)
+  {
+    if (!dispatcherQueueController) {
+      return;
+    }
+
+    ABI::Windows::Foundation::IAsyncAction* shutdownOperation = nullptr;
+    failedLog(dispatcherQueueController->ShutdownQueueAsync(&shutdownOperation));
+    // Do not release the async operation during shutdown; keep it alive for
+    // the remaining process lifetime so it cannot race with queue shutdown.
+    (void)shutdownOperation;
+  }
+
   InAppWebViewManager::~InAppWebViewManager()
   {
     debugLog("dealloc InAppWebViewManager");
+    alive_.expire();
     webViews.clear();
     keepAliveWebViews.clear();
     windowWebViews.clear();
     UnregisterClass(windowClass_.lpszClassName, nullptr);
     plugin = nullptr;
+
+    ABI::Windows::System::IDispatcherQueueController* dispatcherQueueController = nullptr;
+    {
+      const std::lock_guard<std::mutex> lock(shared_resources_mutex_);
+      assert(instance_count_ > 0);
+      --instance_count_;
+      if (instance_count_ == 0) {
+        dispatcherQueueController = detachSharedResourcesForShutdown();
+      }
+    }
+
+    shutdownDispatcherQueue(dispatcherQueueController);
   }
 }

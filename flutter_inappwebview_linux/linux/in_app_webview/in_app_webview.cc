@@ -446,22 +446,13 @@ InAppWebView::~InAppWebView() {
     wpe_view_unmap(wpe_view_);
   }
   
-  // 4. Release any pending buffer back to WPE and clean up EGL image
+  // 4. Release any pending buffer back to WPE
   {
     std::lock_guard<std::mutex> lock(wpe_buffer_mutex_);
-    
-    // Clean up EGL image first (while display is still valid)
-    if (current_egl_image_ != nullptr && egl_display_ != nullptr) {
-      static PFNEGLDESTROYIMAGEKHRPROC eglDestroyImageKHR = nullptr;
-      if (eglDestroyImageKHR == nullptr) {
-        eglDestroyImageKHR = (PFNEGLDESTROYIMAGEKHRPROC)eglGetProcAddress("eglDestroyImageKHR");
-      }
-      if (eglDestroyImageKHR != nullptr) {
-        eglDestroyImageKHR(static_cast<EGLDisplay>(egl_display_), 
-                           static_cast<EGLImageKHR>(current_egl_image_));
-      }
-      current_egl_image_ = nullptr;
-    }
+
+    // wpe_buffer_import_to_egl_image returns an image owned by WPEBuffer.
+    // WPE destroys it when it disposes the buffer.
+    current_egl_image_ = nullptr;
     
     // Release pending buffer back to WPE
     if (current_buffer_ != nullptr && wpe_view_ != nullptr) {
@@ -1267,18 +1258,9 @@ void InAppWebView::OnWpePlatformBufferRendered(WPEBuffer* buffer) {
     // This ensures the EGL image's backing memory stays valid until we have a new frame
     previous_buffer = current_buffer_;
     
-    // Destroy previous EGL image if we created one
-    if (current_egl_image_ != nullptr && egl_display_ != nullptr) {
-      static PFNEGLDESTROYIMAGEKHRPROC eglDestroyImageKHR = nullptr;
-      if (eglDestroyImageKHR == nullptr) {
-        eglDestroyImageKHR = (PFNEGLDESTROYIMAGEKHRPROC)eglGetProcAddress("eglDestroyImageKHR");
-      }
-      if (eglDestroyImageKHR != nullptr) {
-        eglDestroyImageKHR(static_cast<EGLDisplay>(egl_display_), 
-                           static_cast<EGLImageKHR>(current_egl_image_));
-      }
-      current_egl_image_ = nullptr;
-    }
+    // The previous EGL image belongs to its WPEBuffer, not to this view.
+    // Drop our borrowed handle before releasing that buffer below.
+    current_egl_image_ = nullptr;
     
     // Check buffer type to determine best rendering path
     bool is_dma_buf = WPE_IS_BUFFER_DMA_BUF(buffer);
@@ -1406,7 +1388,8 @@ void InAppWebView::OnWpePlatformBufferRendered(WPEBuffer* buffer) {
           }
         }
 
-        g_bytes_unref(pixels);
+        // The imported GBytes is owned by the WPEBuffer (transfer none).
+        // WPE releases it when the buffer is disposed.
       } else {
         if (error != nullptr) {
           g_clear_error(&error);
@@ -1424,8 +1407,7 @@ void InAppWebView::OnWpePlatformBufferRendered(WPEBuffer* buffer) {
   }
   
   // Release the PREVIOUS buffer now that we have a new one
-  // The previous EGL image has been destroyed and we have a new frame,
-  // so it's safe to let WPE reuse the old buffer's memory
+  // WPE will dispose of the previous buffer's EGL image when appropriate.
   if (previous_buffer != nullptr && wpe_view_ != nullptr && WPE_IS_BUFFER(previous_buffer)) {
     wpe_view_buffer_released(wpe_view_, previous_buffer);
   }

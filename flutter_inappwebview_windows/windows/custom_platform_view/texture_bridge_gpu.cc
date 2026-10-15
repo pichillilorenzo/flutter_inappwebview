@@ -7,6 +7,7 @@
 #include <iostream>
 #include <memory>
 #include <mutex>
+#include <type_traits>
 #include <vector>
 
 #include "util/direct3d11.interop.h"
@@ -61,19 +62,22 @@ void main(uint3 id : SV_DispatchThreadID) {
       // d3dcompiler_47.dll ships with Windows 8.1 and later. Loaded on demand
       // so the plugin has no link-time dependency on it. Failed compilation
       // is not cached, allowing a later comparer to retry.
-      const HMODULE compiler = LoadLibraryW(L"d3dcompiler_47.dll");
+      using ScopedModule = std::unique_ptr<
+        std::remove_pointer<HMODULE>::type, decltype(&FreeLibrary)>;
+      ScopedModule compiler(LoadLibraryW(L"d3dcompiler_47.dll"), FreeLibrary);
       if (!compiler) {
         return nullptr;
       }
       const auto compile = reinterpret_cast<D3DCompileFn>(
-        GetProcAddress(compiler, "D3DCompile"));
+        GetProcAddress(compiler.get(), "D3DCompile"));
+      // Keep the compiler loaded until both blobs have been read and released:
+      // their COM vtables may live in d3dcompiler_47.dll.
       winrt::com_ptr<ID3DBlob> code;
       winrt::com_ptr<ID3DBlob> errors;
       const HRESULT compiled = compile
         ? compile(kCompareShader, sizeof(kCompareShader) - 1, "frame_compare",
           nullptr, nullptr, "main", "cs_5_0", 0, 0, code.put(), errors.put())
         : E_FAIL;
-      FreeLibrary(compiler);
       if (FAILED(compiled) || !code) {
         if (errors) {
           std::cerr << "frame compare shader: ";

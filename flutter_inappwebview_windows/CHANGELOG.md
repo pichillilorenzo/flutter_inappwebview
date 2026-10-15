@@ -1,5 +1,6 @@
 ## 0.7.0-beta.3
 
+- Kept the shader compiler DLL loaded until its result and error blobs are released.
 - Published the first captured frame after creation, resizing, or resuming capture.
 - Reused frame-comparison shader bytecode and texture resource views across comparisons.
 - Fixed leaked WebView2 response references when serving custom and intercepted resources.

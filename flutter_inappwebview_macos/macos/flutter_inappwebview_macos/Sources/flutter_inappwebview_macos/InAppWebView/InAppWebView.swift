@@ -2479,6 +2479,9 @@ public class InAppWebView: WKWebView, WKUIDelegate,
             let _callHandlerID = body["_callHandlerID"] as? Int64 ?? 0
             
             if isInternalHandler {
+                if body["_callHandlerOneWay"] as? Bool == true {
+                    return
+                }
                 evaluateJavaScript("""
 if(window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)] != null) {
     window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)].resolve();

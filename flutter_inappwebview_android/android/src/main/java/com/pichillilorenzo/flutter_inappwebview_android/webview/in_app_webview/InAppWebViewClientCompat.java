@@ -214,6 +214,8 @@ public class InAppWebViewClientCompat extends WebViewClientCompat {
   @Override
   public void onPageStarted(WebView view, String url, Bitmap favicon) {
     final InAppWebView webView = (InAppWebView) view;
+    // Clear callbacks before load-start listeners can submit evaluations for the new document.
+    webView.cancelPendingJavaScriptCallbacks("Document navigated");
     webView.isLoading = true;
     webView.disposeWebMessageChannels();
     webView.userContentController.resetContentWorlds();
@@ -819,6 +821,7 @@ public class InAppWebViewClientCompat extends WebViewClientCompat {
   @Override
   public boolean onRenderProcessGone(WebView view, RenderProcessGoneDetail detail) {
     final InAppWebView webView = (InAppWebView) view;
+    webView.cancelPendingJavaScriptCallbacks("WebView renderer exited");
 
     if (webView.customSettings.useOnRenderProcessGone && webView.channelDelegate != null) {
       boolean didCrash = detail.didCrash();

@@ -1,5 +1,6 @@
 ## 1.2.0-beta.3
 
+- Cancelled pending JavaScript callbacks and stale queued evaluations when their document is replaced or disposed.
 - Added `InAppWebViewController.setBackgroundColor`, retaining the selected
   native color across `transparentBackground` toggles.
 - Added audio capture to Android file choosers, with file-selection fallback

@@ -1348,7 +1348,7 @@ void InAppWebView::OnWpePlatformBufferRendered(WPEBuffer* buffer) {
                 pixels, size, pixel_buffer.data, buf_width, buf_height, stride);
           } else {
             // Keep the original bytes for formats without an ARGB conversion.
-            pixel_buffer.data.resize(size);
+            ResizeByteBuffer(pixel_buffer.data, size);
             memcpy(pixel_buffer.data.data(), pixels, size);
           }
 

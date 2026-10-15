@@ -25,6 +25,22 @@
 
 namespace flutter_inappwebview_plugin {
 
+// Keep reusable frame buffers for ordinary resizes, but release a stale peak
+// allocation after the required frame size falls to at most one quarter.
+inline bool ShouldShrinkByteBuffer(size_t capacity, size_t required_size) {
+  return required_size > 0 && capacity >= required_size &&
+         capacity / 4 >= required_size;
+}
+
+inline void ResizeByteBuffer(std::vector<uint8_t>& buffer, size_t required_size) {
+  if (ShouldShrinkByteBuffer(buffer.capacity(), required_size)) {
+    std::vector<uint8_t> smaller(required_size);
+    buffer.swap(smaller);
+  } else {
+    buffer.resize(required_size);
+  }
+}
+
 /**
  * Convert Cairo ARGB32 premultiplied (native-endian) to Flutter RGBA8888.
  *
@@ -283,7 +299,7 @@ inline bool ConvertARGB32ToRGBAVector(const uint8_t* src, size_t src_size,
   }
 
   const size_t dst_size = row_bytes * height;
-  dst.resize(dst_size);
+  ResizeByteBuffer(dst, dst_size);
   ConvertARGB32ToRGBA(src, dst.data(), static_cast<int>(width),
                       static_cast<int>(height), static_cast<int>(src_stride));
   return true;

@@ -6,6 +6,7 @@
 #include "../utils/gl_context.h"
 #include "../utils/log.h"
 #include "in_app_webview.h"
+#include "simd_convert.h"
 #include "zero_copy.h"
 
 // Use the shared HasCurrentGLContext from gl_context.h
@@ -230,7 +231,9 @@ static gboolean inappwebview_egl_texture_populate(FlTextureGL* texture, uint32_t
       }
 
       // Reallocate fallback buffer if needed
-      if (self->fallback_buffer_size < required_size) {
+      if (self->fallback_buffer_size < required_size ||
+          flutter_inappwebview_plugin::ShouldShrinkByteBuffer(
+              self->fallback_buffer_size, required_size)) {
         self->fallback_buffer = static_cast<uint8_t*>(g_realloc(self->fallback_buffer, required_size));
         self->fallback_buffer_size = required_size;
       }

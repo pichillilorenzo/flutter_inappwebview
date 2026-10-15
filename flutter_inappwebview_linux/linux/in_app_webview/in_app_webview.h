@@ -516,7 +516,7 @@ class InAppWebView : public TextureWebViewApi {
   
   // Buffer rendering for WPEPlatform
   WPEBuffer* current_buffer_ = nullptr;   // Current frame buffer (borrowed, not owned)
-  void* current_egl_image_ = nullptr;     // EGL image created from current buffer
+  void* current_egl_image_ = nullptr;     // Borrowed from current WPEBuffer; never destroy here
   uint32_t current_buffer_width_ = 0;     // Width of current buffer
   uint32_t current_buffer_height_ = 0;    // Height of current buffer
   gulong buffer_rendered_handler_ = 0;    // Signal handler ID for buffer-rendered

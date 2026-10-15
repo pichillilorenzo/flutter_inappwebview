@@ -50,6 +50,10 @@ namespace flutter_inappwebview_plugin
     // early.
     winrt::com_ptr<ID3D11Texture2D> incoming_{ nullptr };
     Size incoming_size_ = { 0, 0 };
+    // Views are reused with their textures and released when those textures
+    // are resized.
+    winrt::com_ptr<ID3D11ShaderResourceView> reference_view_{ nullptr };
+    winrt::com_ptr<ID3D11ShaderResourceView> incoming_view_{ nullptr };
     // Compare pass. Null when the compute shader could not be built; every
     // frame is then treated as changed (the previous behaviour).
     winrt::com_ptr<ID3D11ComputeShader> compare_shader_;

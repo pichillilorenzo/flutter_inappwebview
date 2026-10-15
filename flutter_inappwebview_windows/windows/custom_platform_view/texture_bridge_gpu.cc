@@ -42,6 +42,52 @@ void main(uint3 id : SV_DispatchThreadID) {
 
     constexpr UINT kCompareResultBytes = 16;
     constexpr size_t kSurfacePoolSize = 2;
+
+    // The shader is identical for every comparer. Cache only immutable CPU
+    // bytecode; device resources remain owned by their GraphicsContext or
+    // TextureBridgeGpu and are released with those objects.
+    const std::vector<uint8_t>* GetCompareShaderBytecode()
+    {
+      struct Cache {
+        std::mutex mutex;
+        std::vector<uint8_t> bytecode;
+      };
+      static Cache cache;
+      const std::lock_guard<std::mutex> lock(cache.mutex);
+      if (!cache.bytecode.empty()) {
+        return &cache.bytecode;
+      }
+
+      // d3dcompiler_47.dll ships with Windows 8.1 and later. Loaded on demand
+      // so the plugin has no link-time dependency on it. Failed compilation
+      // is not cached, allowing a later comparer to retry.
+      const HMODULE compiler = LoadLibraryW(L"d3dcompiler_47.dll");
+      if (!compiler) {
+        return nullptr;
+      }
+      const auto compile = reinterpret_cast<D3DCompileFn>(
+        GetProcAddress(compiler, "D3DCompile"));
+      winrt::com_ptr<ID3DBlob> code;
+      winrt::com_ptr<ID3DBlob> errors;
+      const HRESULT compiled = compile
+        ? compile(kCompareShader, sizeof(kCompareShader) - 1, "frame_compare",
+          nullptr, nullptr, "main", "cs_5_0", 0, 0, code.put(), errors.put())
+        : E_FAIL;
+      FreeLibrary(compiler);
+      if (FAILED(compiled) || !code) {
+        if (errors) {
+          std::cerr << "frame compare shader: ";
+          std::cerr.write(static_cast<const char*>(errors->GetBufferPointer()),
+            static_cast<std::streamsize>(errors->GetBufferSize()));
+          std::cerr << std::endl;
+        }
+        return nullptr;
+      }
+
+      const auto* begin = static_cast<const uint8_t*>(code->GetBufferPointer());
+      cache.bytecode.assign(begin, begin + code->GetBufferSize());
+      return &cache.bytecode;
+    }
   }
 
   struct TextureBridgeGpu::SurfacePool {
@@ -82,32 +128,12 @@ void main(uint3 id : SV_DispatchThreadID) {
       return false;
     }
 
-    // d3dcompiler_47.dll ships with Windows 8.1 and later. Loaded on demand so
-    // the plugin has no link-time dependency on it.
-    const HMODULE compiler = LoadLibraryW(L"d3dcompiler_47.dll");
-    if (!compiler) {
+    const auto* bytecode = GetCompareShaderBytecode();
+    if (!bytecode) {
       return false;
     }
-    const auto compile = reinterpret_cast<D3DCompileFn>(
-      GetProcAddress(compiler, "D3DCompile"));
-    winrt::com_ptr<ID3DBlob> code;
-    winrt::com_ptr<ID3DBlob> errors;
-    const HRESULT compiled = compile
-      ? compile(kCompareShader, sizeof(kCompareShader) - 1, "frame_compare",
-        nullptr, nullptr, "main", "cs_5_0", 0, 0, code.put(), errors.put())
-      : E_FAIL;
-    FreeLibrary(compiler);
-    if (FAILED(compiled) || !code) {
-      if (errors) {
-        std::cerr << "frame compare shader: ";
-        std::cerr.write(static_cast<const char*>(errors->GetBufferPointer()),
-          static_cast<std::streamsize>(errors->GetBufferSize()));
-        std::cerr << std::endl;
-      }
-      return false;
-    }
-    if (FAILED(device->CreateComputeShader(code->GetBufferPointer(),
-      code->GetBufferSize(), nullptr, compare_shader_.put()))) {
+    if (FAILED(device->CreateComputeShader(bytecode->data(),
+      bytecode->size(), nullptr, compare_shader_.put()))) {
       return false;
     }
 
@@ -153,16 +179,17 @@ void main(uint3 id : SV_DispatchThreadID) {
     auto device = graphics_context_->d3d_device();
     auto context = graphics_context_->d3d_device_context();
 
-    winrt::com_ptr<ID3D11ShaderResourceView> view_a;
-    winrt::com_ptr<ID3D11ShaderResourceView> view_b;
-    if (FAILED(device->CreateShaderResourceView(a, nullptr, view_a.put())) ||
-      FAILED(device->CreateShaderResourceView(b, nullptr, view_b.put()))) {
+    if ((!incoming_view_ && FAILED(device->CreateShaderResourceView(a, nullptr,
+        incoming_view_.put()))) ||
+      (!reference_view_ && FAILED(device->CreateShaderResourceView(b, nullptr,
+        reference_view_.put())))) {
       return true;
     }
 
     const UINT zeros[4] = { 0, 0, 0, 0 };
     context->ClearUnorderedAccessViewUint(compare_result_uav_.get(), zeros);
-    ID3D11ShaderResourceView* views[2] = { view_a.get(), view_b.get() };
+    ID3D11ShaderResourceView* views[2] = {
+      incoming_view_.get(), reference_view_.get() };
     ID3D11UnorderedAccessView* uavs[1] = { compare_result_uav_.get() };
     context->CSSetShader(compare_shader_.get(), nullptr, 0);
     context->CSSetShaderResources(0, 2, views);
@@ -310,6 +337,7 @@ void main(uint3 id : SV_DispatchThreadID) {
     desc.SampleDesc.Count = 1;
     desc.Usage = D3D11_USAGE_DEFAULT;
     reference_ = nullptr;
+    reference_view_ = nullptr;
     reference_size_ = { 0, 0 };
     if (FAILED(graphics_context_->d3d_device()->CreateTexture2D(
       &desc, nullptr, reference_.put()))) {
@@ -336,6 +364,7 @@ void main(uint3 id : SV_DispatchThreadID) {
     desc.SampleDesc.Count = 1;
     desc.Usage = D3D11_USAGE_DEFAULT;
     incoming_ = nullptr;
+    incoming_view_ = nullptr;
     incoming_size_ = { 0, 0 };
     if (FAILED(graphics_context_->d3d_device()->CreateTexture2D(
       &desc, nullptr, incoming_.put()))) {
@@ -391,8 +420,10 @@ void main(uint3 id : SV_DispatchThreadID) {
     // callbacks run; a resumed capture creates a new pool.
     surface_pool_.reset();
     reference_ = nullptr;
+    reference_view_ = nullptr;
     reference_size_ = { 0, 0 };
     incoming_ = nullptr;
+    incoming_view_ = nullptr;
     incoming_size_ = { 0, 0 };
   }
 }

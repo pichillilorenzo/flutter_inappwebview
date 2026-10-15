@@ -259,6 +259,17 @@ namespace flutter_inappwebview_plugin
 
     const std::string expectedBridgeSecret = get_uuid();
     bool javaScriptBridgeEnabled = true;
+    // Alive token for asynchronous callbacks. Many event handlers capture
+    // raw `this` into lambdas that only run after a round-trip through the
+    // Dart side (CDP Fetch.requestPaused continuations, WebView2 deferral
+    // completions, Runtime.evaluate completions). If the webview is
+    // destroyed while such a round-trip is in flight — e.g. a JS bridge or
+    // url handler closes the hosting window while an iframe-heavy page
+    // (payment PSPs) still has intercepted navigations pending — the
+    // callback would dereference a dangling `this` and crash with an
+    // access violation. Async lambdas must capture this token and bail out
+    // when it is set.
+    std::shared_ptr<bool> destroyed_ = std::make_shared<bool>(false);
     std::map<UINT64, std::shared_ptr<NavigationAction>> navigationActions_ = {};
     std::shared_ptr<NavigationAction> lastNavigationAction_;
     bool isLoading_ = false;

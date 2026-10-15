@@ -392,27 +392,53 @@ namespace flutter_inappwebview_plugin
           {
             wil::unique_cotaskmem_string json;
             if (succeededOrLog(args->get_ParameterObjectAsJson(&json))) {
-              auto requestPausedData = nlohmann::json::parse(wide_to_utf8(json.get()));
+              nlohmann::json requestPausedData;
+              std::string requestId;
+              std::string resourceType;
+              std::string frameId;
+              bool isResponseStage = false;
+              try {
+                requestPausedData = nlohmann::json::parse(wide_to_utf8(json.get()));
+                requestId = requestPausedData.at("requestId").get<std::string>();
+                resourceType = requestPausedData.at("resourceType").get<std::string>();
+                isResponseStage = requestPausedData.contains("responseStatusCode");
+                frameId = requestPausedData.at("frameId").get<std::string>();
+              }
+              catch (const std::exception& err) {
+                debugLog("Error parsing Fetch.requestPaused data: " + std::string(err.what()));
+                return S_OK;
+              }
 
-              auto requestId = requestPausedData.at("requestId").get<std::string>();
-              auto resourceType = requestPausedData.at("resourceType").get<std::string>();
-              auto isResponseStage = requestPausedData.contains("responseStatusCode");
-              auto frameId = requestPausedData.at("frameId").get<std::string>();
-
-              auto request = requestPausedData.at("request").get<nlohmann::json>();
-              std::optional<std::string> url = request.at("url").is_string() ? request.at("url").get<std::string>() : std::optional<std::string>{};
-              std::optional<std::string> urlFragment = request.contains("urlFragment") && request.at("urlFragment").is_string() ? request.at("urlFragment").get<std::string>() : std::optional<std::string>{};
-              if (url.has_value() && urlFragment.has_value()) {
-                url = url.value() + urlFragment.value();
+              nlohmann::json request;
+              std::optional<std::string> url;
+              try {
+                request = requestPausedData.at("request").get<nlohmann::json>();
+                url = request.at("url").is_string() ? request.at("url").get<std::string>() : std::optional<std::string>{};
+                std::optional<std::string> urlFragment = request.contains("urlFragment") && request.at("urlFragment").is_string() ? request.at("urlFragment").get<std::string>() : std::optional<std::string>{};
+                if (url.has_value() && urlFragment.has_value()) {
+                  url = url.value() + urlFragment.value();
+                }
+              }
+              catch (const std::exception& err) {
+                debugLog("Error parsing Fetch.requestPaused request data: " + std::string(err.what()));
+                return S_OK;
               }
               auto isForMainFrame = pageFrameId_.empty() || string_equals(pageFrameId_, frameId);
 
-              auto allowRequest = [this, requestId, url, isForMainFrame]()
+              // These continuations run after an asynchronous round-trip
+              // through the Dart side — guard against this webview being
+              // destroyed in the meantime (e.g. a bridge or url handler
+              // closed the hosting window while iframe navigations were
+              // still paused).
+              auto allowRequest = [this, destroyed = destroyed_, requestId, url, isForMainFrame]()
                 {
+                  if (*destroyed || !webView) {
+                    return;
+                  }
                   failedAndLog(webView->CallDevToolsProtocolMethod(L"Fetch.continueRequest",
                     utf8_to_wide("{\"requestId\":\"" + requestId + "\"}").c_str(),
                     Callback<ICoreWebView2CallDevToolsProtocolMethodCompletedHandler>(
-                      [this](HRESULT errorCode, LPCWSTR returnObjectAsJson)
+                      [destroyed](HRESULT errorCode, LPCWSTR returnObjectAsJson)
                       {
                         failedLog(errorCode);
                         return S_OK;
@@ -428,12 +454,15 @@ namespace flutter_inappwebview_plugin
                   }
                 };
 
-              auto cancelRequest = [this, requestId]()
+              auto cancelRequest = [this, destroyed = destroyed_, requestId]()
                 {
+                  if (*destroyed || !webView) {
+                    return;
+                  }
                   failedAndLog(webView->CallDevToolsProtocolMethod(L"Fetch.failRequest",
                     utf8_to_wide("{\"requestId\":\"" + requestId + "\", \"errorReason\": \"Aborted\"}").c_str(),
                     Callback<ICoreWebView2CallDevToolsProtocolMethodCompletedHandler>(
-                      [this](HRESULT errorCode, LPCWSTR returnObjectAsJson)
+                      [destroyed](HRESULT errorCode, LPCWSTR returnObjectAsJson)
                       {
                         failedLog(errorCode);
                         return S_OK;
@@ -442,9 +471,25 @@ namespace flutter_inappwebview_plugin
                 };
 
               if (!isResponseStage && channelDelegate && settings->useShouldOverrideUrlLoading && string_equals(resourceType, "Document")) {
-                std::optional<std::string> method = request.at("method").is_string() ? request.at("method").get<std::string>() : std::optional<std::string>{};
-                std::optional<std::map<std::string, std::string>> headers = request.at("headers").is_object() ? request.at("headers").get<std::map<std::string, std::string>>() : std::optional<std::map<std::string, std::string>>{};
-                std::optional<std::string> redirectedRequestId = request.contains("redirectedRequestId") && request.at("redirectedRequestId").is_string() ? request.at("redirectedRequestId").get<std::string>() : std::optional<std::string>{};
+                std::optional<std::string> method;
+                std::optional<std::map<std::string, std::string>> headers;
+                std::optional<std::string> redirectedRequestId;
+                try {
+                  method = request.contains("method") && request.at("method").is_string() ? request.at("method").get<std::string>() : std::optional<std::string>{};
+                  if (request.contains("headers") && request.at("headers").is_object()) {
+                    // CDP serializes header values as strings, but be tolerant
+                    // of non-string values instead of letting get<map<...>>
+                    // throw out of the WRL callback.
+                    headers = std::map<std::string, std::string>{};
+                    for (auto const& [headerName, headerValue] : request.at("headers").items()) {
+                      headers->insert({ headerName, headerValue.is_string() ? headerValue.get<std::string>() : headerValue.dump() });
+                    }
+                  }
+                  redirectedRequestId = request.contains("redirectedRequestId") && request.at("redirectedRequestId").is_string() ? request.at("redirectedRequestId").get<std::string>() : std::optional<std::string>{};
+                }
+                catch (const std::exception& err) {
+                  debugLog("Error parsing Fetch.requestPaused request fields: " + std::string(err.what()));
+                }
 
                 std::optional<std::vector<uint8_t>> body = std::optional<std::vector<uint8_t>>{};
                 auto hasPostData = request.contains("hasPostData") && request.at("hasPostData").is_boolean() && request.at("hasPostData").get<bool>()
@@ -774,9 +819,18 @@ namespace flutter_inappwebview_plugin
 
             wil::unique_cotaskmem_string json;
             if (succeededOrLog(args->get_ParameterObjectAsJson(&json))) {
-              auto consoleMessageJson = nlohmann::json::parse(wide_to_utf8(json.get()));
-
-              auto level = consoleMessageJson.at("type").get<std::string>();
+              // Page-driven payload: never let a malformed console event
+              // throw out of the WRL callback (std::terminate).
+              nlohmann::json consoleMessageJson;
+              std::string level;
+              try {
+                consoleMessageJson = nlohmann::json::parse(wide_to_utf8(json.get()));
+                level = consoleMessageJson.at("type").get<std::string>();
+              }
+              catch (const std::exception& err) {
+                debugLog("Error parsing console message: " + std::string(err.what()));
+                return S_OK;
+              }
               int64_t messageLevel = 1;
               if (string_equals(level, "log")) {
                 messageLevel = 1;
@@ -794,9 +848,14 @@ namespace flutter_inappwebview_plugin
                 messageLevel = 2;
               }
 
-              auto consoleArgs = consoleMessageJson.at("args").get<std::vector<nlohmann::json>>();
-              auto message = join(functional_map(consoleArgs, [](const nlohmann::json& json) { return json.contains("value") ? json.at("value").dump() : (json.contains("description") ? json.at("description").dump() : json.dump()); }), std::string{ " " });
-              channelDelegate->onConsoleMessage(message, messageLevel);
+              try {
+                auto consoleArgs = consoleMessageJson.at("args").get<std::vector<nlohmann::json>>();
+                auto message = join(functional_map(consoleArgs, [](const nlohmann::json& json) { return json.contains("value") ? json.at("value").dump() : (json.contains("description") ? json.at("description").dump() : json.dump()); }), std::string{ " " });
+                channelDelegate->onConsoleMessage(message, messageLevel);
+              }
+              catch (const std::exception& err) {
+                debugLog("Error parsing console message args: " + std::string(err.what()));
+              }
             }
 
             return S_OK;
@@ -839,8 +898,13 @@ namespace flutter_inappwebview_plugin
               std::move(windowFeatures));
 
             auto callback = std::make_unique<WebViewChannelDelegate::CreateWindowCallback>();
-            auto defaultBehaviour = [this, windowId, urlRequest, deferral, args](const std::optional<const bool> handledByClient)
+            auto defaultBehaviour = [this, destroyed = destroyed_, windowId, urlRequest, deferral, args](const std::optional<const bool> handledByClient)
               {
+                // Runs after an async Dart round-trip — this webview may have
+                // been destroyed in the meantime.
+                if (*destroyed) {
+                  return;
+                }
                 if (plugin && plugin->inAppWebViewManager && map_contains(plugin->inAppWebViewManager->windowWebViews, windowId)) {
                   plugin->inAppWebViewManager->windowWebViews.erase(windowId);
                 }
@@ -888,13 +952,21 @@ namespace flutter_inappwebview_plugin
           failedLog(args->get_PermissionKind(&resource));
 
           auto callback = std::make_unique<WebViewChannelDelegate::PermissionRequestCallback>();
-          auto defaultBehaviour = [this, deferral, args](const std::optional<const std::shared_ptr<PermissionResponse>> permissionResponse)
+          auto defaultBehaviour = [destroyed = destroyed_, deferral, args](const std::optional<const std::shared_ptr<PermissionResponse>> permissionResponse)
             {
+              // Runs after an async Dart round-trip — this webview may have
+              // been destroyed in the meantime.
+              if (*destroyed) {
+                return;
+              }
               failedLog(args->put_State(COREWEBVIEW2_PERMISSION_STATE_DENY));
               failedLog(deferral->Complete());
             };
-          callback->nonNullSuccess = [this, deferral, args](const std::shared_ptr<PermissionResponse> permissionResponse)
+          callback->nonNullSuccess = [destroyed = destroyed_, deferral, args](const std::shared_ptr<PermissionResponse> permissionResponse)
             {
+              if (*destroyed) {
+                return false;
+              }
               auto action = permissionResponse->action;
               if (action.has_value()) {
                 switch (action.value()) {
@@ -2287,8 +2359,17 @@ namespace flutter_inappwebview_plugin
     }
 
     userContentController->createContentWorld(contentWorld,
-      [=](const int& contextId)
+      [=, destroyed = destroyed_](const int& contextId)
       {
+        // May run after an async CDP round-trip — this webview may have been
+        // destroyed in the meantime.
+        if (*destroyed || !webView) {
+          if (completionHandler) {
+            completionHandler("null");
+          }
+          return;
+        }
+
         nlohmann::json parameters = {
           {"expression", source},
           { "returnByValue", true }
@@ -2299,22 +2380,28 @@ namespace flutter_inappwebview_plugin
         }
 
         auto hr = webView->CallDevToolsProtocolMethod(L"Runtime.evaluate", utf8_to_wide(parameters.dump()).c_str(), Callback<ICoreWebView2CallDevToolsProtocolMethodCompletedHandler>(
-          [this, completionHandler](HRESULT errorCode, LPCWSTR returnObjectAsJson)
+          [this, destroyed, completionHandler](HRESULT errorCode, LPCWSTR returnObjectAsJson)
           {
             nlohmann::json result;
-            if (succeededOrLog(errorCode)) {
-              nlohmann::json json = nlohmann::json::parse(wide_to_utf8(returnObjectAsJson));
-              result = json["result"].contains("value") ? json["result"]["value"] : nlohmann::json{};
-              if (json.contains("exceptionDetails")) {
-                nlohmann::json exceptionDetails = json["exceptionDetails"];
-                auto errorMessage = exceptionDetails.contains("exception") && exceptionDetails["exception"].contains("value")
-                  ? exceptionDetails["exception"]["value"].dump() :
-                  (result["value"].is_null() ? exceptionDetails["text"].get<std::string>() : result["value"].dump());
-                result = nlohmann::json{};
-                debugLog(exceptionDetails.dump());
-                if (channelDelegate) {
-                  channelDelegate->onConsoleMessage(errorMessage, 3);
+            if (!*destroyed && succeededOrLog(errorCode)) {
+              try {
+                nlohmann::json json = nlohmann::json::parse(wide_to_utf8(returnObjectAsJson));
+                result = json["result"].contains("value") ? json["result"]["value"] : nlohmann::json{};
+                if (json.contains("exceptionDetails")) {
+                  nlohmann::json exceptionDetails = json["exceptionDetails"];
+                  auto errorMessage = exceptionDetails.contains("exception") && exceptionDetails["exception"].contains("value")
+                    ? exceptionDetails["exception"]["value"].dump() :
+                    (result["value"].is_null() && exceptionDetails.contains("text") ? exceptionDetails["text"].dump() : result["value"].dump());
+                  result = nlohmann::json{};
+                  debugLog(exceptionDetails.dump());
+                  if (channelDelegate) {
+                    channelDelegate->onConsoleMessage(errorMessage, 3);
+                  }
                 }
+              }
+              catch (const std::exception& err) {
+                debugLog("Error parsing Runtime.evaluate result: " + std::string(err.what()));
+                result = nlohmann::json{};
               }
             }
             if (completionHandler) {
@@ -4098,11 +4185,22 @@ namespace flutter_inappwebview_plugin
           */
 
           auto callback = std::make_unique<WebViewChannelDelegate::CallJsHandlerCallback>();
-          callback->defaultBehaviour = [this, callHandlerID](const std::optional<const flutter::EncodableValue*> response)
+          callback->defaultBehaviour = [this, destroyed = destroyed_, callHandlerID](const std::optional<const flutter::EncodableValue*> response)
             {
+              // Runs after an async Dart round-trip — this webview may have
+              // been destroyed in the meantime (e.g. a bridge handler closed
+              // the hosting window).
+              if (*destroyed) {
+                return;
+              }
               std::string json = "null";
-              if (response.has_value() && !response.value()->IsNull()) {
-                json = std::get<std::string>(*(response.value()));
+              // response can be an engaged optional holding nullptr when the
+              // Dart handler returned null, and the value is only a string
+              // for well-formed handler results — never trust either.
+              if (response.has_value() && response.value() != nullptr && !response.value()->IsNull()) {
+                if (const auto* stringValue = std::get_if<std::string>(response.value())) {
+                  json = *stringValue;
+                }
               }
 
               evaluateJavascript("if (window." + JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + "[" + std::to_string(callHandlerID) + "] != null) { \
@@ -4110,11 +4208,14 @@ namespace flutter_inappwebview_plugin
                       delete window." + JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + "[" + std::to_string(callHandlerID) + "]; \
                     }", ContentWorld::page(), nullptr);
             };
-          callback->error = [this, callHandlerID](const std::string& error_code, const std::string& error_message, const flutter::EncodableValue* error_details)
+          callback->error = [this, destroyed = destroyed_, callHandlerID](const std::string& error_code, const std::string& error_message, const flutter::EncodableValue* error_details)
             {
               auto errorMessage = error_code + ", " + error_message;
               debugLog(errorMessage);
 
+              if (*destroyed) {
+                return;
+              }
               evaluateJavascript("if (window." + JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + "[" + std::to_string(callHandlerID) + "] != null) { \
                       window." + JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + "[" + std::to_string(callHandlerID) + "].reject(new Error('" + replace_all_copy(errorMessage, "\'", "\\'") + "')); \
                       delete window." + JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + "[" + std::to_string(callHandlerID) + "]; \
@@ -4136,6 +4237,10 @@ namespace flutter_inappwebview_plugin
   InAppWebView::~InAppWebView()
   {
     debugLog("dealloc InAppWebView");
+    // Invalidate the alive token first: in-flight async callbacks (CDP
+    // continuations, deferral completions) must bail out instead of
+    // dereferencing this instance.
+    *destroyed_ = true;
     userContentController = nullptr;
     if (webView) {
       failedLog(webView->Stop());

@@ -1,5 +1,6 @@
 ## 1.2.0-beta.3
 
+- Batched console notifications while preserving message order and immediate warning/error delivery.
 - Coalesced scroll notifications and removed their unused JavaScript promise round trip.
 - Finished failed custom-scheme requests and prevented delivery after cancellation.
 - Fixed native WebView frame drift with fractional platform-view sizes.

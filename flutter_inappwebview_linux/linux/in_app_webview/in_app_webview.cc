@@ -7584,39 +7584,54 @@ bool InAppWebView::handleScriptMessageWithReply(const std::string& body, WebKitS
 
   // === Handle Internal Handlers ===
   
-  if (handlerName == "onConsoleMessage") {
+  if (handlerName == "onConsoleMessage" ||
+      handlerName == "onConsoleMessageBatch") {
     // Handle console message interception
-    std::string message = "";
-    std::string level = "log";
-
+    std::vector<json> consoleMessages;
     if (!argsJsonStr.empty()) {
       try {
         json argsJson = json::parse(argsJsonStr);
         if (argsJson.is_array() && !argsJson.empty()) {
           json firstArg = argsJson[0];
-          if (firstArg.contains("level") && firstArg["level"].is_string()) {
-            level = firstArg["level"].get<std::string>();
-          }
-          if (firstArg.contains("message") && firstArg["message"].is_string()) {
-            message = firstArg["message"].get<std::string>();
+          if (handlerName == "onConsoleMessageBatch" &&
+              firstArg.is_object() && firstArg.contains("messages") &&
+              firstArg["messages"].is_array()) {
+            for (const auto& item : firstArg["messages"]) {
+              if (item.is_object() && item.contains("message") &&
+                  item["message"].is_string()) {
+                consoleMessages.push_back(item);
+              }
+            }
+          } else if (handlerName == "onConsoleMessage" &&
+                     firstArg.is_object()) {
+            consoleMessages.push_back(firstArg);
           }
         }
       } catch (const json::parse_error& e) {}
     }
 
-    int64_t messageLevel = 1;  // LOG
-    if (level == "debug") {
-      messageLevel = 0;
-    } else if (level == "info" || level == "log") {
-      messageLevel = 1;
-    } else if (level == "warn") {
-      messageLevel = 2;
-    } else if (level == "error") {
-      messageLevel = 3;
-    }
-
     if (targetWebView->channel_delegate_) {
-      targetWebView->channel_delegate_->onConsoleMessage(message, messageLevel);
+      for (const auto& consoleMessage : consoleMessages) {
+        const std::string message =
+            consoleMessage.contains("message") &&
+                    consoleMessage["message"].is_string()
+                ? consoleMessage["message"].get<std::string>()
+                : "";
+        const std::string level =
+            consoleMessage.contains("level") && consoleMessage["level"].is_string()
+                ? consoleMessage["level"].get<std::string>()
+                : "log";
+        int64_t messageLevel = 1;  // LOG
+        if (level == "debug") {
+          messageLevel = 0;
+        } else if (level == "warn") {
+          messageLevel = 2;
+        } else if (level == "error") {
+          messageLevel = 3;
+        }
+        targetWebView->channel_delegate_->onConsoleMessage(message,
+                                                           messageLevel);
+      }
     }
     ResolveInternalHandlerWithReply(reply, "null");
     return true;

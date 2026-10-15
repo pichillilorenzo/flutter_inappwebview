@@ -1,5 +1,6 @@
 ## 0.1.0-beta.1
 
+- Batched console notifications while preserving message order and immediate warning/error delivery.
 - Released oversized fallback pixel buffers after substantial viewport reductions while reusing capacity for modest resizes.
 - Deferred inline DMA-BUF imports to Flutter and coordinated EGL failures with the pixel fallback.
 - Converted fallback pixel frames directly into packed RGBA buffers without an intermediate full-frame copy.

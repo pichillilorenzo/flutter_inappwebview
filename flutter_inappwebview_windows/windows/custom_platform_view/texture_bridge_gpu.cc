@@ -255,7 +255,7 @@ void main(uint3 id : SV_DispatchThreadID) {
     bool changed = true;
     if (compare_shader_ && EnsureIncoming(desc.Width, desc.Height)) {
       context->CopyResource(incoming_.get(), frame.get());
-      changed = !reference_created && FramesDiffer(incoming_.get(),
+      changed = reference_created || FramesDiffer(incoming_.get(),
         reference_.get(), desc.Width, desc.Height);
       if (changed) {
         context->CopyResource(reference_.get(), incoming_.get());

@@ -6,6 +6,7 @@
 // - WPEBackend-FDO (HAVE_WPE_BACKEND_LEGACY): Legacy API for older systems
 
 #include "in_app_webview.h"
+#include "dma_buf_import_policy.h"
 
 #include <dlfcn.h>
 #include <linux/limits.h>
@@ -1199,7 +1200,8 @@ void InAppWebView::OnExportDmaBuf(::wpe_fdo_egl_exported_image* image) {
   // 1. skip_pixel_readback_ is false (not using zero-copy mode)
   // 2. egl_display_ is available
   // 3. We have a valid EGL image
-  if (!skip_pixel_readback_ && egl_image != EGL_NO_IMAGE_KHR && egl_display_ != nullptr) {
+  if (!skip_pixel_readback_.load(std::memory_order_acquire) &&
+      egl_image != EGL_NO_IMAGE_KHR && egl_display_ != nullptr) {
     ReadPixelsFromEglImage(egl_image, img_width, img_height);
   }
 
@@ -1282,29 +1284,36 @@ void InAppWebView::OnWpePlatformBufferRendered(WPEBuffer* buffer) {
     bool is_dma_buf = WPE_IS_BUFFER_DMA_BUF(buffer);
     bool is_shm = WPE_IS_BUFFER_SHM(buffer);
 
-    // === Priority 1: Try EGL image import (zero-copy, best performance) ===
-    // Only attempt EGL for DMA-BUF buffers (SHM buffers cannot be imported via EGL).
-    // Only worth attempting when the texture consumer is actually in zero-copy
-    // GL mode (skip_pixel_readback_) — the resulting current_egl_image_/
-    // current_buffer_width_/height_ feed GetCurrentEglImage()/HasDmaBufExport(),
-    // not the pixel_buffers_ the software/pixel-buffer texture reads from. If we
-    // always attempted it, buffer_handled would be set true here even in
-    // software mode, and pixel_buffers_ would never get filled — the texture
-    // stays a blank default (see upstream #2861).
-    // Skip if previous EGL attempts failed.
-    if (skip_pixel_readback_ && egl_display_ != nullptr &&
-        is_dma_buf && !egl_import_failed_permanently) {
+    // === Priority 1: choose the DMA-BUF consumer's EGL import path ===
+    // Inline Flutter textures import into Flutter's current EGLDisplay during
+    // populate(), so a WPE-display EGLImage would be unused. Keep the buffer
+    // referenced and publish its dimensions for that import. Native InAppBrowser
+    // remains on the WPE EGLImage path through GetCurrentEglImage().
+    const bool skip_pixel_readback =
+        skip_pixel_readback_.load(std::memory_order_acquire);
+    const bool inline_flutter_consumer =
+        inline_flutter_texture_consumer_.load(std::memory_order_acquire);
+    const auto import_action = is_dma_buf
+        ? DecideDmaBufImportAction(inline_flutter_consumer, skip_pixel_readback,
+                                   egl_import_failed_permanently)
+        : DmaBufImportAction::kImportPixels;
+
+    if (import_action == DmaBufImportAction::kDeferToFlutter) {
+      current_buffer_width_ = buf_width;
+      current_buffer_height_ = buf_height;
+      buffer_handled = true;
+    } else if (import_action == DmaBufImportAction::kImportInWpe &&
+               egl_display_ != nullptr) {
       GError* error = nullptr;
       void* egl_image = wpe_buffer_import_to_egl_image(buffer, &error);
-      
+
       if (egl_image != nullptr) {
         current_egl_image_ = egl_image;
         current_buffer_width_ = buf_width;
         current_buffer_height_ = buf_height;
         buffer_handled = true;
       } else {
-        // Mark EGL as permanently failed so we don't keep trying
-        // This is common in VMs or software-only environments
+        // Mark EGL as permanently failed so we don't keep trying.
         egl_import_failed_permanently = true;
         if (error != nullptr) {
           g_clear_error(&error);
@@ -3630,6 +3639,28 @@ bool InAppWebView::HasDmaBufExport() const {
 #endif
 }
 
+bool InAppWebView::HasCurrentDmaBufBuffer() const {
+#ifdef HAVE_WPE_PLATFORM
+  std::lock_guard<std::mutex> lock(wpe_buffer_mutex_);
+  return current_buffer_ != nullptr && WPE_IS_BUFFER_DMA_BUF(current_buffer_);
+#else
+  return false;
+#endif
+}
+
+bool InAppWebView::ShouldAttemptFlutterEglImport() const {
+  return inline_flutter_texture_consumer_.load(std::memory_order_acquire) &&
+         inline_flutter_import_state_.ShouldAttemptImport();
+}
+
+void InAppWebView::ReportFlutterEglImageImportFailure(
+    bool current_frame_is_dma_buf) {
+  if (inline_flutter_texture_consumer_.load(std::memory_order_acquire) &&
+      inline_flutter_import_state_.ReportFailedImport(current_frame_is_dma_buf)) {
+    SetSkipPixelReadback(false);
+  }
+}
+
 bool InAppWebView::GetDmaBufFd(int* fd, uint32_t* stride, uint32_t* width, uint32_t* height) const {
 #ifdef HAVE_WPE_BACKEND_LEGACY
   std::lock_guard<std::mutex> lock(exported_image_mutex_);
@@ -3710,20 +3741,29 @@ void* InAppWebView::GetCurrentEglImage(uint32_t* out_width, uint32_t* out_height
 }
 
 void* InAppWebView::ImportCurrentBufferToEglImage(void* target_display, uint32_t* out_width,
-                                                   uint32_t* out_height) const {
+                                                   uint32_t* out_height,
+                                                   bool* out_is_dma_buf_frame) const {
   if (out_width)
     *out_width = 0;
   if (out_height)
     *out_height = 0;
+  if (out_is_dma_buf_frame)
+    *out_is_dma_buf_frame = false;
 
 #ifdef HAVE_WPE_PLATFORM
-  if (target_display == nullptr) {
+  std::lock_guard<std::mutex> lock(wpe_buffer_mutex_);
+
+  // Determine frame eligibility while holding the same lock as the buffer
+  // access. A missing EGLDisplay (for example with a current GLX context) is
+  // an import failure only after we know an actual DMA-BUF frame was present.
+  if (!IsEligibleDmaBufFrame(
+          current_buffer_ != nullptr,
+          current_buffer_ != nullptr && WPE_IS_BUFFER_DMA_BUF(current_buffer_),
+          out_is_dma_buf_frame)) {
     return nullptr;
   }
 
-  std::lock_guard<std::mutex> lock(wpe_buffer_mutex_);
-
-  if (current_buffer_ == nullptr || !WPE_IS_BUFFER_DMA_BUF(current_buffer_)) {
+  if (target_display == nullptr) {
     return nullptr;
   }
 

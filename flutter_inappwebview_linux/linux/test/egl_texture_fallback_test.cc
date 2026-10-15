@@ -1,39 +1,11 @@
-#include <array>
-#include <cstring>
 #include <epoxy/egl.h>
 #include <epoxy/gl.h>
 
+#include "egl_texture_fallback_webview_stub.h"
 #include "../in_app_webview/zero_copy.h"
 
 // Exercise the real texture consumer with a deterministic frame producer.
 #define FLUTTER_INAPPWEBVIEW_PLUGIN_IN_APP_WEBVIEW_H_
-namespace flutter_inappwebview_plugin {
-class InAppWebView {
- public:
-  int imports = 0;
-  bool has_pixels = true;
-  std::array<uint8_t, 16> pixels = {
-      255, 0, 0, 255, 0, 255, 0, 255,
-      0, 0, 255, 255, 255, 255, 255, 255};
-
-  void* ImportCurrentBufferToEglImage(void*, uint32_t*, uint32_t*) {
-    ++imports;
-    return nullptr;
-  }
-  size_t GetPixelBufferSize(uint32_t* width, uint32_t* height) const {
-    *width = *height = has_pixels ? 2 : 0;
-    return has_pixels ? pixels.size() : 0;
-  }
-  bool CopyPixelBufferTo(uint8_t* dst, size_t size, uint32_t* width,
-                         uint32_t* height) const {
-    if (!has_pixels || size < pixels.size()) return false;
-    *width = *height = 2;
-    std::memcpy(dst, pixels.data(), pixels.size());
-    return true;
-  }
-};
-}  // namespace flutter_inappwebview_plugin
-
 #include "../in_app_webview/inappwebview_egl_texture.cc"
 
 int main() {
@@ -63,25 +35,59 @@ int main() {
     g_assert_cmpint(flutter_inappwebview_plugin::IsZeroCopyDisabled(), ==,
                     value != nullptr);
     flutter_inappwebview_plugin::InAppWebView webview;
+    const bool zero_copy_enabled = !flutter_inappwebview_plugin::IsZeroCopyDisabled();
+    webview.SetInlineFlutterTextureConsumer(true);
+    webview.SetInlineFlutterEglImportEnabled(zero_copy_enabled);
+    webview.SetSkipPixelReadback(zero_copy_enabled);
+    // Simulate a current GLX context: GL works, but eglGetCurrentDisplay() is
+    // EGL_NO_DISPLAY when the texture asks its fake producer to import.
+    webview.force_no_egl_display = zero_copy_enabled;
     auto* texture = inappwebview_egl_texture_new(&webview);
-    for (int frame = 0; frame < 2; ++frame) {
-      webview.pixels[0] = static_cast<uint8_t>(200 + frame);
+    auto populate = [&](uint32_t expected_width, uint32_t expected_height) {
       uint32_t target = 0, name = 0, width = 0, height = 0;
       GError* error = nullptr;
       g_assert_true(inappwebview_egl_texture_populate(
           FL_TEXTURE_GL(texture), &target, &name, &width, &height, &error));
       g_assert_no_error(error);
-      g_assert_cmpuint(width, ==, 2);
-      g_assert_cmpuint(height, ==, 2);
-      glBindTexture(target, name);
-      std::array<uint8_t, 16> rendered{};
-      glGetTexImage(target, 0, GL_RGBA, GL_UNSIGNED_BYTE, rendered.data());
-      g_assert_cmpmem(rendered.data(), rendered.size(),
-                      webview.pixels.data(), webview.pixels.size());
-      g_assert_cmpuint(glGetError(), ==, GL_NO_ERROR);
+      g_assert_cmpuint(width, ==, expected_width);
+      g_assert_cmpuint(height, ==, expected_height);
+      if (expected_width == 2) {
+        glBindTexture(target, name);
+        std::array<uint8_t, 16> rendered{};
+        glGetTexImage(target, 0, GL_RGBA, GL_UNSIGNED_BYTE, rendered.data());
+        g_assert_cmpmem(rendered.data(), rendered.size(),
+                        webview.pixels.data(), webview.pixels.size());
+        g_assert_cmpuint(glGetError(), ==, GL_NO_ERROR);
+      }
+    };
+
+    // With no EGL target, no-frame and SHM results still cannot disable
+    // eligibility. A real DMA-BUF on the same path must enter pixel fallback.
+    webview.has_pixels = false;
+    webview.frame_kind = flutter_inappwebview_plugin::InAppWebView::FrameKind::kNoFrame;
+    populate(1, 1);
+    webview.frame_kind = flutter_inappwebview_plugin::InAppWebView::FrameKind::kShm;
+    webview.has_pixels = true;
+    populate(2, 2);
+    g_assert_cmpint(webview.import_state.IsFallbackActive(), ==, FALSE);
+    g_assert_cmpint(webview.ShouldAttemptFlutterEglImport(), ==, zero_copy_enabled);
+
+    // A failed actual DMA-BUF import switches both producer and consumer to
+    // pixel mode; later populate calls must not repeat the EGL import attempt.
+    webview.frame_kind = flutter_inappwebview_plugin::InAppWebView::FrameKind::kDmaBuf;
+    webview.pixels[0] = 200;
+    populate(2, 2);
+    g_assert_cmpint(webview.import_state.IsFallbackActive(), ==, zero_copy_enabled);
+    g_assert_cmpint(webview.skip_pixel_readback, ==, false);
+    const int imports_after_dma_frame = webview.imports;
+    webview.pixels[0] = 201;
+    populate(2, 2);
+    g_assert_cmpint(webview.imports, ==, imports_after_dma_frame);
+
+    // Explicitly disabled zero-copy skips every EGL import attempt.
+    if (!zero_copy_enabled) {
+      g_assert_cmpint(webview.imports, ==, 0);
     }
-    // Presence follows the existing DISABLE_GL convention, including empty/0.
-    g_assert_cmpint(webview.imports, ==, value ? 0 : 2);
     glDeleteTextures(1, &texture->texture_id);
     g_object_unref(texture);
   }

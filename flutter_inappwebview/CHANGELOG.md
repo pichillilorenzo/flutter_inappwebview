@@ -1,3 +1,7 @@
+## 6.2.0-beta.4
+
+- Added `cancellationSignal` optional parameter to `InAppWebViewController.takeScreenshot`
+
 ## 6.2.0-beta.3
 
 - Added Linux support

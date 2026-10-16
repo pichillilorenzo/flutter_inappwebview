@@ -28,6 +28,10 @@ class ScreenshotConfiguration_ {
   ///The web view maintains the aspect ratio of the captured content, but scales it to match the width you specify.
   ///
   ///The default value of this property is `null`, which returns an image whose size matches the original size of the captured rectangle.
+  ///
+  ///On Android this width is in logical pixels and is multiplied by the display density, so the
+  ///image is `snapshotWidth * devicePixelRatio` pixels wide: asking for `320` on a `3x` device
+  ///produces a 960 px wide image.
   @SupportedPlatforms(
     platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()],
   )
@@ -72,6 +76,35 @@ class ScreenshotConfiguration_ {
   )
   bool afterScreenUpdates;
 
+  ///When `true` and [snapshotWidth] is smaller than the captured area, the WebView is drawn
+  ///straight into a bitmap of the snapshot size (the canvas is scaled before drawing) instead
+  ///of being drawn at full size and downscaled afterwards. This makes the part of the capture
+  ///that must run on the UI thread proportionally cheaper; text and images are rasterized at
+  ///the smaller size rather than filtered down, which is a slightly different look.
+  ///The default value is `false`.
+  @SupportedPlatforms(platforms: [AndroidPlatform()])
+  bool drawScaled;
+
+  ///When `true`, the pixels are copied from the app window's composited surface with
+  ///`PixelCopy` instead of asking the WebView to draw itself. The copy runs off the UI thread
+  ///and costs it almost nothing, and the result is exactly what is on screen — including any
+  ///Flutter widgets drawn over the WebView, which callers may need to avoid capturing.
+  ///It only works while the WebView is attached, visible and the requested area is fully on
+  ///screen (so it cannot capture outside the viewport); in every other case, and whenever the
+  ///copy fails, the WebView is drawn as if this were `false`.
+  ///The default value is `false`.
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(
+        available: '26',
+        apiName: 'PixelCopy.request',
+        apiUrl:
+            'https://developer.android.com/reference/android/view/PixelCopy#request(android.view.Window,%20android.graphics.Rect,%20android.graphics.Bitmap,%20android.view.PixelCopy.OnPixelCopyFinishedListener,%20android.os.Handler)',
+      ),
+    ],
+  )
+  bool usePixelCopy;
+
   @ExchangeableObjectConstructor()
   ScreenshotConfiguration_({
     this.rect,
@@ -80,6 +113,8 @@ class ScreenshotConfiguration_ {
     this.quality = 100,
     @Deprecated("Use afterScreenUpdates instead") this.iosAfterScreenUpdates,
     this.afterScreenUpdates = true,
+    this.drawScaled = false,
+    this.usePixelCopy = false,
   }) : compressFormat = compressFormat ?? CompressFormat_.PNG {
     assert(this.quality >= 0);
     // ignore: deprecated_member_use_from_same_package

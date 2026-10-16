@@ -2293,13 +2293,21 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
   @override
   Future<Uint8List?> takeScreenshot({
     ScreenshotConfiguration? screenshotConfiguration,
+    ScreenshotCancellationSignal? cancellationSignal,
   }) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent(
       'screenshotConfiguration',
       () => screenshotConfiguration?.toMap(),
     );
-    return await channel?.invokeMethod<Uint8List?>('takeScreenshot', args);
+    if (cancellationSignal == null) {
+      return await channel?.invokeMethod<Uint8List?>('takeScreenshot', args);
+    }
+    // No native cancellation on this platform: pre-cancel rejection and
+    // late-result suppression only.
+    return await cancellationSignal.guard<Uint8List>(
+      () => channel?.invokeMethod<Uint8List?>('takeScreenshot', args),
+    );
   }
 
   @override

@@ -134,6 +134,7 @@ export 'safe_browsing_response.dart' show SafeBrowsingResponse;
 export 'safe_browsing_response_action.dart' show SafeBrowsingResponseAction;
 export 'safe_browsing_threat.dart' show SafeBrowsingThreat;
 export 'sandbox.dart' show Sandbox;
+export 'screenshot_cancellation_signal.dart' show ScreenshotCancellationSignal;
 export 'screenshot_configuration.dart' show ScreenshotConfiguration;
 export 'script_html_tag_attributes.dart' show ScriptHtmlTagAttributes;
 export 'scrollbar_style.dart' show ScrollBarStyle, AndroidScrollBarStyle;

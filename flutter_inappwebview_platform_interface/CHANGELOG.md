@@ -2,6 +2,8 @@
 
 - Added `drawScaled` property to `ScreenshotConfiguration`
 - Documented that `ScreenshotConfiguration.snapshotWidth` is multiplied by the display density on Android
+- Added `cancellationSignal` optional parameter to `PlatformInAppWebViewController.takeScreenshot`
+- Added `ScreenshotCancellationSignal` class
 
 ## 1.4.0-beta.3
 

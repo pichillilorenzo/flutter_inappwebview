@@ -13,10 +13,16 @@ import io.flutter.plugin.common.MethodChannel;
 /**
  * One accepted {@code takeScreenshot()} call, tracked from admission until its reply is settled.
  *
+ * <p>Cancellation is cooperative. {@link #cancel} only raises a flag; whichever thread currently owns
+ * the request (the WebView looper while capturing, the encode worker afterwards) polls the flag
+ * between stages and discards its output. None of {@code draw}, {@code createScaledBitmap} or
+ * {@code compress} is preemptible; {@code compress} is cut short by
+ * {@link ScreenshotEncoder.CancellableByteArrayOutputStream} refusing further writes.
+ *
  * <p>Three one-shot latches keep the lifecycle race-free no matter which thread gets there first:
  * <ul>
- *   <li>{@link #tryMarkStarted()} decides who owns the capture stage: the posted runnable, or
- *       {@code dispose()} settling the request while it was still queued.</li>
+ *   <li>{@link #tryMarkStarted()} decides who owns the capture stage: the posted runnable, or a
+ *       cancel that arrived while it was still queued.</li>
  *   <li>{@link #settle(byte[])} delivers the {@link MethodChannel.Result} exactly once.</li>
  *   <li>{@link #finish()} runs the owner's bookkeeping (registry removal, admission permit) exactly
  *       once.</li>
@@ -27,11 +33,13 @@ final class ScreenshotRequest {
     void onFinished(@NonNull ScreenshotRequest request);
   }
 
+  final long id;
   @Nullable
   final Map<String, Object> configuration;
   private final MethodChannel.Result result;
   private final Listener listener;
   private final AtomicBoolean started = new AtomicBoolean(false);
+  private final AtomicBoolean cancelled = new AtomicBoolean(false);
   private final AtomicBoolean settled = new AtomicBoolean(false);
   private final AtomicBoolean finished = new AtomicBoolean(false);
 
@@ -55,9 +63,11 @@ final class ScreenshotRequest {
   /** True when the capture stage already produced the bitmap at dstWidth x dstHeight. */
   boolean alreadyScaled;
 
-  ScreenshotRequest(@Nullable Map<String, Object> configuration,
+  ScreenshotRequest(long id,
+                    @Nullable Map<String, Object> configuration,
                     @NonNull MethodChannel.Result result,
                     @NonNull Listener listener) {
+    this.id = id;
     this.configuration = configuration;
     this.result = result;
     this.listener = listener;
@@ -66,6 +76,18 @@ final class ScreenshotRequest {
   /** Claims the capture stage. Exactly one caller ever gets {@code true}. */
   boolean tryMarkStarted() {
     return started.compareAndSet(false, true);
+  }
+
+  /**
+   * Raises the cancellation flag. Returns {@code false} if it was already raised. Does not settle
+   * the reply; see {@link InAppWebView#cancelScreenshot(long)} for the completion rule.
+   */
+  boolean cancel() {
+    return cancelled.compareAndSet(false, true);
+  }
+
+  boolean isCancelled() {
+    return cancelled.get();
   }
 
   /**

@@ -279,8 +279,11 @@ class InAppWebViewController {
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.takeScreenshot.supported_platforms}
   Future<Uint8List?> takeScreenshot({
     ScreenshotConfiguration? screenshotConfiguration,
-  }) =>
-      platform.takeScreenshot(screenshotConfiguration: screenshotConfiguration);
+    ScreenshotCancellationSignal? cancellationSignal,
+  }) => platform.takeScreenshot(
+    screenshotConfiguration: screenshotConfiguration,
+    cancellationSignal: cancellationSignal,
+  );
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.setOptions}
   ///

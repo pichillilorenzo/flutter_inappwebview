@@ -2640,13 +2640,23 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
   @override
   Future<Uint8List?> takeScreenshot({
     ScreenshotConfiguration? screenshotConfiguration,
+    ScreenshotCancellationSignal? cancellationSignal,
   }) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent(
       'screenshotConfiguration',
       () => screenshotConfiguration?.toMap(),
     );
-    final base64 = await channel?.invokeMethod<String?>('takeScreenshot', args);
+    final String? base64;
+    if (cancellationSignal == null) {
+      base64 = await channel?.invokeMethod<String?>('takeScreenshot', args);
+    } else {
+      // No native cancellation on this platform: pre-cancel rejection and
+      // late-result suppression only.
+      base64 = await cancellationSignal.guard<String>(
+        () => channel?.invokeMethod<String?>('takeScreenshot', args),
+      );
+    }
     return base64 != null ? base64Decode(base64) : null;
   }
 

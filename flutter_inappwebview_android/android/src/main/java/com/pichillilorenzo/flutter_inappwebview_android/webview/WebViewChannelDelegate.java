@@ -213,9 +213,17 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
       case takeScreenshot:
         if (webView != null) {
           Map<String, Object> screenshotConfiguration = (Map<String, Object>) call.argument("screenshotConfiguration");
-          webView.takeScreenshot(screenshotConfiguration, result);
+          // Dart ints decode as Integer or Long depending on magnitude.
+          Number requestId = (Number) call.argument("requestId");
+          webView.takeScreenshot(screenshotConfiguration, requestId != null ? requestId.longValue() : null, result);
         } else
           result.success(null);
+        break;
+      case cancelScreenshot:
+        {
+          Number requestId = (Number) call.argument("requestId");
+          result.success(webView != null && requestId != null && webView.cancelScreenshot(requestId.longValue()));
+        }
         break;
       case setSettings:
         if (webView != null && webView.getInAppBrowserDelegate() instanceof InAppBrowserActivity) {

@@ -1193,7 +1193,7 @@ class SupportChecker {
         ApiMethodDefinition(
           name: PlatformInAppWebViewControllerMethod.takeScreenshot.name,
           signature:
-              'Future<Uint8List?> takeScreenshot({ScreenshotConfiguration? screenshotConfiguration})',
+              'Future<Uint8List?> takeScreenshot({ScreenshotConfiguration? screenshotConfiguration, ScreenshotCancellationSignal? cancellationSignal})',
           description: 'Takes a screenshot of the WebView.',
           className: className,
           category: 'Screenshot',

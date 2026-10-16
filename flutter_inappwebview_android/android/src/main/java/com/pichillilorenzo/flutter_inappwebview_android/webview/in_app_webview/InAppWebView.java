@@ -106,7 +106,6 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -114,6 +113,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 import io.flutter.plugin.common.MethodChannel;
 
@@ -766,24 +766,38 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
   // The reply bytes are unchanged. Every accepted request is tracked in pendingScreenshots until
   // its reply is settled, so dispose() can answer a request whose capture is still queued instead
   // of dropping its MethodChannel.Result when the looper queue is cleared.
+  //
+  // A request can also be abandoned: cancelScreenshot() raises a cooperative flag that the thread
+  // owning the request polls between stages. The rule is that the cancel settles the reply with
+  // null at once and the owner discards its output at the next check. draw() itself cannot be
+  // interrupted, so a cancel that lands mid-draw takes effect right after it.
 
   /** Requests alive for this WebView. Two allows one cancelled-but-draining request plus a new one. */
   private static final int MAX_PENDING_SCREENSHOTS_PER_WEBVIEW = 2;
 
-  private final Set<ScreenshotRequest> pendingScreenshots =
-          Collections.newSetFromMap(new ConcurrentHashMap<ScreenshotRequest, Boolean>());
+  private final Map<Long, ScreenshotRequest> pendingScreenshots = new ConcurrentHashMap<>();
+  private final AtomicLong nativeScreenshotRequestIds = new AtomicLong();
   private volatile boolean screenshotsDisposed = false;
 
   private final ScreenshotRequest.Listener screenshotRequestListener = new ScreenshotRequest.Listener() {
     @Override
     public void onFinished(@NonNull ScreenshotRequest request) {
-      pendingScreenshots.remove(request);
+      pendingScreenshots.remove(request.id, request);
       ScreenshotEncoder.release();
     }
   };
 
   public void takeScreenshot(final @Nullable Map<String, Object> screenshotConfiguration, final MethodChannel.Result result) {
-    final ScreenshotRequest request = new ScreenshotRequest(screenshotConfiguration, result, screenshotRequestListener);
+    takeScreenshot(screenshotConfiguration, null, result);
+  }
+
+  public void takeScreenshot(final @Nullable Map<String, Object> screenshotConfiguration,
+                             final @Nullable Long requestId,
+                             final MethodChannel.Result result) {
+    // Dart supplies positive ids so it can cancel by id; a caller without one gets a negative id
+    // that exists only for the registry.
+    final long id = requestId != null ? requestId : -nativeScreenshotRequestIds.incrementAndGet();
+    final ScreenshotRequest request = new ScreenshotRequest(id, screenshotConfiguration, result, screenshotRequestListener);
 
     if (screenshotsDisposed) {
       rejectScreenshot(request, false);
@@ -797,7 +811,10 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
       rejectScreenshot(request, false);
       return;
     }
-    pendingScreenshots.add(request);
+    if (pendingScreenshots.putIfAbsent(id, request) != null) {
+      rejectScreenshot(request, true);
+      return;
+    }
 
     request.pixelDensity = Util.getPixelDensity(getContext());
     request.captureTask = new Runnable() {
@@ -816,38 +833,60 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
   }
 
   /**
-   * Settles every pending request before the WebView goes away: a capture still queued on the
-   * looper would otherwise be removed by {@code removeCallbacksAndMessages(null)} in
-   * {@link #dispose()} with its {@link MethodChannel.Result} never answered, leaving the Dart
-   * future hanging. Bitmaps already handed to the encoder are released by it.
+   * Cancels a request accepted by {@link #takeScreenshot(Map, Long, MethodChannel.Result)}.
+   * Returns {@code false} if the id is unknown, already finished, or already cancelled.
    */
-  private void settlePendingScreenshots() {
+  public boolean cancelScreenshot(long requestId) {
+    final ScreenshotRequest request = pendingScreenshots.get(requestId);
+    if (request == null) {
+      return false;
+    }
+    return cancelScreenshotRequest(request);
+  }
+
+  private boolean cancelScreenshotRequest(ScreenshotRequest request) {
+    if (!request.cancel()) {
+      return false;
+    }
+    // Completion rule: the cancel settles the reply. The owning thread will find it settled and
+    // only clean up. Dart may also have completed locally already; a second null is harmless.
+    request.settle(null);
+    final Runnable captureTask = request.captureTask;
+    if (captureTask != null) {
+      mainLooperHandler.removeCallbacks(captureTask);
+    }
+    if (request.tryMarkStarted()) {
+      // The capture runnable had not started and now never will: nothing was allocated.
+      request.finish();
+    }
+    return true;
+  }
+
+  /** Settles every pending request before the WebView goes away. Bitmaps are released by their owners. */
+  private void cancelAllScreenshots() {
     screenshotsDisposed = true;
-    for (ScreenshotRequest request : pendingScreenshots) {
-      request.settle(null);
-      final Runnable captureTask = request.captureTask;
-      if (captureTask != null) {
-        mainLooperHandler.removeCallbacks(captureTask);
-      }
-      if (request.tryMarkStarted()) {
-        // The capture runnable had not started and now never will: nothing was allocated.
-        request.finish();
-      }
+    for (ScreenshotRequest request : pendingScreenshots.values()) {
+      cancelScreenshotRequest(request);
     }
   }
 
   /**
    * Capture stage, on the WebView looper. Parses the geometry and the configuration exactly as
-   * before, draws the view into a bitmap and hands it to the encoder.
+   * before, draws the view into a bitmap and hands it to the encoder. The cancellation flag is
+   * polled around draw(), the one stage that cannot be interrupted.
    */
   private void captureScreenshot(final ScreenshotRequest request) {
     if (!request.tryMarkStarted()) {
-      return; // settled by settlePendingScreenshots() while it was still queued
+      return; // cancelled while queued; cancelScreenshotRequest() already finished it
     }
     final Map<String, Object> screenshotConfiguration = request.configuration;
     final float pixelDensity = request.pixelDensity;
     boolean handedOff = false;
     try {
+      if (request.isCancelled()) {
+        return;
+      }
+
       int bitmapWidth = getMeasuredWidth();
       int bitmapHeight = getMeasuredHeight();
       int bitmapScrollX = getScrollX();
@@ -923,8 +962,16 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
         c.scale(width / (float) request.captureWidth, height / (float) request.captureHeight);
       }
       c.translate(-request.captureX, -request.captureY);
+
+      // Last chance to skip the one stage that cannot be interrupted.
+      if (request.isCancelled()) {
+        return false;
+      }
       draw(c);
 
+      if (request.isCancelled()) {
+        return false;
+      }
       request.alreadyScaled = scaledDraw;
       // Ownership of the bitmap moves to the encoder, which also finishes the request.
       final Bitmap captured = screenshotBitmap;
@@ -2289,7 +2336,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
   public void dispose() {
     // Settle pending screenshot replies before the looper queue is cleared below; a queued capture
     // removed by removeCallbacksAndMessages(null) would otherwise never answer its Result.
-    settlePendingScreenshots();
+    cancelAllScreenshots();
     if (channelDelegate != null) {
       channelDelegate.dispose();
       channelDelegate = null;

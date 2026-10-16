@@ -8,6 +8,7 @@
   - a screenshot configuration without `quality` threw a `NullPointerException`
 - Moved `InAppWebViewController.takeScreenshot` scaling and compression off the UI thread: the WebView looper only allocates the bitmap and draws into it, a single process-wide worker thread does the rest and replies, and the number of captures alive at once is bounded
 - Added `ScreenshotConfiguration.drawScaled` support: with a smaller `snapshotWidth` the WebView is drawn straight at the target size instead of being drawn full size and downscaled
+- Added `cancellationSignal` support to `InAppWebViewController.takeScreenshot`: a cancelled capture is removed from the queue or aborted between stages natively and its bitmap released
 
 ## 1.2.0-beta.3
 

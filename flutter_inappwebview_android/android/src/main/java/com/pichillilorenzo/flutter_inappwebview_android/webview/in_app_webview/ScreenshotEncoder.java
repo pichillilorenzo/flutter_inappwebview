@@ -95,6 +95,10 @@ final class ScreenshotEncoder {
   static void encode(@NonNull ScreenshotRequest request, @NonNull Bitmap captured) {
     Bitmap bitmap = captured;
     try {
+      if (request.isCancelled()) {
+        return;
+      }
+
       if (request.snapshotWidth != null && !request.alreadyScaled) {
         int dstWidth = (int) Math.floor(request.snapshotWidth * request.pixelDensity + 0.5);
         float ratioBitmap = (float) bitmap.getWidth() / (float) bitmap.getHeight();
@@ -108,9 +112,22 @@ final class ScreenshotEncoder {
         }
       }
 
-      ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-      final boolean compressed =
-              bitmap.compress(request.compressFormat, request.quality, byteArrayOutputStream);
+      if (request.isCancelled()) {
+        return;
+      }
+
+      CancellableByteArrayOutputStream byteArrayOutputStream = new CancellableByteArrayOutputStream(request);
+      boolean compressed;
+      try {
+        compressed = bitmap.compress(request.compressFormat, request.quality, byteArrayOutputStream);
+      } catch (ScreenshotCancelledException e) {
+        // Skia clears the Java exception inside the JNI write adaptor and reports a failed write,
+        // so compress() normally just returns false; this guards against an embedding that rethrows.
+        compressed = false;
+      }
+      if (request.isCancelled()) {
+        return;
+      }
       if (!compressed) {
         Log.e(LOG_TAG, "Screenshot cannot be compressed using compressFormat " +
                 request.compressFormat.name() + " with quality " + request.quality, null);
@@ -124,16 +141,65 @@ final class ScreenshotEncoder {
       }
       bitmap.recycle();
       bitmap = null;
-      request.settle(byteArrayOutputStream.toByteArray());
+      final byte[] screenshotBytes = byteArrayOutputStream.toByteArray();
+
+      // Last check before the reply. A cancel that lands after this point loses the race: the
+      // request is settled with the bytes and the cancel becomes a no-op.
+      if (request.isCancelled()) {
+        return;
+      }
+      request.settle(screenshotBytes);
     } catch (IllegalArgumentException | OutOfMemoryError e) {
       Log.e(LOG_TAG, "", e);
     } finally {
       if (bitmap != null) {
         bitmap.recycle();
       }
-      // Any path that returned without a reply (a failed compress, an error) answers null here.
+      // Cancelled paths fall through here without having settled: the cancel already did.
       request.settle(null);
       request.finish();
+    }
+  }
+
+  /** Thrown from the output stream to make an in-progress {@code Bitmap.compress} stop writing. */
+  static final class ScreenshotCancelledException extends RuntimeException {
+    private static final long serialVersionUID = 1L;
+
+    ScreenshotCancelledException() {
+      // No stack trace: the JNI adaptor prints every exception it swallows.
+      super("screenshot cancelled", null, false, false);
+    }
+  }
+
+  /**
+   * Refuses writes once the request is cancelled. {@code Bitmap.compress} drives the encoder through
+   * an {@code OutputStream} adaptor that treats a throwing {@code write} as a failed write; every
+   * Skia encoder (PNG, JPEG, WEBP) then aborts and {@code compress} returns {@code false}. PNG flushes
+   * roughly every 8 KB of output, so the abort latency is a small fraction of a full encode.
+   */
+  static final class CancellableByteArrayOutputStream extends ByteArrayOutputStream {
+    private final ScreenshotRequest request;
+
+    CancellableByteArrayOutputStream(@NonNull ScreenshotRequest request) {
+      this.request = request;
+    }
+
+    @Override
+    public synchronized void write(int b) {
+      throwIfCancelled();
+      super.write(b);
+    }
+
+    @Override
+    public synchronized void write(@NonNull byte[] b, int off, int len) {
+      throwIfCancelled();
+      super.write(b, off, len);
+    }
+
+    private void throwIfCancelled() {
+      if (request.isCancelled()) {
+        throw new ScreenshotCancelledException();
+      }
     }
   }
 }

@@ -1,3 +1,7 @@
+## 0.7.0-beta.4
+
+- Added `cancellationSignal` support to `InAppWebViewController.takeScreenshot`: the capture completes with `null` as soon as the signal is cancelled and a late platform result is discarded
+
 ## 0.7.0-beta.3
 
 - Updated flutter_inappwebview_platform_interface version to ^1.4.0-beta.3

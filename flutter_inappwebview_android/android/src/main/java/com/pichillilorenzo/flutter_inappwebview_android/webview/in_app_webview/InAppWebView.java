@@ -107,6 +107,7 @@ import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -751,12 +752,29 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     WebStorage.getInstance().deleteAllData();
   }
 
+  /**
+   * Replies owed to {@code takeScreenshot} calls whose capture is still queued on the looper.
+   * {@link #dispose()} clears that queue, so without this list a queued capture would be dropped
+   * with its {@link MethodChannel.Result} unanswered and the Dart future would never complete.
+   * Removing a result from the list claims it, so the capture and {@code dispose()} can race and
+   * exactly one of them replies.
+   */
+  private final List<MethodChannel.Result> pendingScreenshotResults =
+          Collections.synchronizedList(new ArrayList<MethodChannel.Result>());
+
   public void takeScreenshot(final @Nullable Map<String, Object> screenshotConfiguration, final MethodChannel.Result result) {
     final float pixelDensity = Util.getPixelDensity(getContext());
 
+    pendingScreenshotResults.add(result);
     mainLooperHandler.post(new Runnable() {
       @Override
       public void run() {
+        if (!pendingScreenshotResults.remove(result)) {
+          return; // already answered by dispose()
+        }
+        final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        Bitmap screenshotBitmap = null;
+        byte[] screenshotBytes = null;
         try {
           int bitmapWidth = getMeasuredWidth();
           int bitmapHeight = getMeasuredHeight();
@@ -781,15 +799,17 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
               Log.e(LOG_TAG, "", e);
             }
 
-            quality = (Integer) screenshotConfiguration.get("quality");
+            // The Dart side always sends a quality, but this method is public API.
+            final Integer qualityValue = (Integer) screenshotConfiguration.get("quality");
+            if (qualityValue != null) {
+              quality = qualityValue;
+            }
           }
 
-          Bitmap screenshotBitmap = Bitmap.createBitmap(bitmapWidth, bitmapHeight, Bitmap.Config.ARGB_8888);
+          screenshotBitmap = Bitmap.createBitmap(bitmapWidth, bitmapHeight, Bitmap.Config.ARGB_8888);
           Canvas c = new Canvas(screenshotBitmap);
           c.translate(-bitmapScrollX, -bitmapScrollY);
           draw(c);
-
-          ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
           if (screenshotConfiguration != null) {
             Double snapshotWidth = (Double) screenshotConfiguration.get("snapshotWidth");
@@ -797,7 +817,13 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
               int dstWidth = (int) Math.floor(snapshotWidth * pixelDensity + 0.5);
               float ratioBitmap = (float) screenshotBitmap.getWidth() / (float) screenshotBitmap.getHeight();
               int dstHeight = (int) ((float) dstWidth / ratioBitmap);
-              screenshotBitmap = Bitmap.createScaledBitmap(screenshotBitmap, dstWidth, dstHeight, true);
+              Bitmap scaledBitmap = Bitmap.createScaledBitmap(screenshotBitmap, dstWidth, dstHeight, true);
+              // createScaledBitmap returns the source itself when no scaling is needed; never
+              // recycle the bitmap that is about to be compressed.
+              if (scaledBitmap != screenshotBitmap) {
+                screenshotBitmap.recycle();
+                screenshotBitmap = scaledBitmap;
+              }
             }
           }
 
@@ -805,25 +831,42 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
                   compressFormat,
                   quality,
                   byteArrayOutputStream);
-          if (!compressed) {
+          if (compressed) {
+            screenshotBytes = byteArrayOutputStream.toByteArray();
+          } else {
+            // Replying with the buffer anyway would hand the caller bytes it cannot decode.
             Log.e(LOG_TAG, "Screenshot cannot be compressed using compressFormat " +
                     compressFormat.name() + " with quality " + quality, null);
           }
-
+        } catch (IllegalArgumentException | OutOfMemoryError e) {
+          // A viewport-sized ARGB_8888 bitmap can fail to allocate on a low-end device under
+          // memory pressure: a screenshot must not be able to take the process down.
+          Log.e(LOG_TAG, "", e);
+        } finally {
+          if (screenshotBitmap != null) {
+            screenshotBitmap.recycle();
+          }
           try {
             byteArrayOutputStream.close();
           } catch (IOException e) {
             Log.e(LOG_TAG, "", e);
           }
-          screenshotBitmap.recycle();
-          result.success(byteArrayOutputStream.toByteArray());
-
-        } catch (IllegalArgumentException e) {
-          Log.e(LOG_TAG, "", e);
-          result.success(null);
+          result.success(screenshotBytes);
         }
       }
     });
+  }
+
+  /** Answers every screenshot still queued on the looper; see {@link #pendingScreenshotResults}. */
+  private void settlePendingScreenshots() {
+    final List<MethodChannel.Result> pending;
+    synchronized (pendingScreenshotResults) {
+      pending = new ArrayList<>(pendingScreenshotResults);
+      pendingScreenshotResults.clear();
+    }
+    for (MethodChannel.Result pendingResult : pending) {
+      pendingResult.success(null);
+    }
   }
 
   @SuppressLint("RestrictedApi")
@@ -2175,6 +2218,9 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
 
   @Override
   public void dispose() {
+    // Settle pending screenshot replies before the looper queue is cleared below; a queued capture
+    // removed by removeCallbacksAndMessages(null) would otherwise never answer its Result.
+    settlePendingScreenshots();
     if (channelDelegate != null) {
       channelDelegate.dispose();
       channelDelegate = null;

@@ -1,3 +1,12 @@
+## 1.2.0-beta.4
+
+- Fixed multiple `InAppWebViewController.takeScreenshot` defects on Android:
+  - a capture still queued when the WebView was disposed was dropped with its reply unanswered, leaving the `Future` pending forever
+  - an `OutOfMemoryError` while allocating the bitmap crashed the app instead of returning `null`
+  - a failed `Bitmap.compress` still returned the partial buffer instead of `null`
+  - the full-size bitmap was not recycled when `snapshotWidth` was set
+  - a screenshot configuration without `quality` threw a `NullPointerException`
+
 ## 1.2.0-beta.3
 
 - Updated flutter_inappwebview_platform_interface version to ^1.4.0-beta.3

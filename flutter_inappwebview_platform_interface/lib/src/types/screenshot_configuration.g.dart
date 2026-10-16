@@ -27,6 +27,17 @@ class ScreenshotConfiguration {
   ///- Windows WebView2
   CompressFormat compressFormat;
 
+  ///When `true` and [snapshotWidth] is smaller than the captured area, the WebView is drawn
+  ///straight into a bitmap of the snapshot size (the canvas is scaled before drawing) instead
+  ///of being drawn at full size and downscaled afterwards. This makes the part of the capture
+  ///that must run on the UI thread proportionally cheaper; text and images are rasterized at
+  ///the smaller size rather than filtered down, which is a slightly different look.
+  ///The default value is `false`.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android WebView
+  bool drawScaled;
+
   ///Use [afterScreenUpdates] instead.
   @Deprecated('Use afterScreenUpdates instead')
   bool? iosAfterScreenUpdates;
@@ -58,6 +69,10 @@ class ScreenshotConfiguration {
   ///
   ///The default value of this property is `null`, which returns an image whose size matches the original size of the captured rectangle.
   ///
+  ///On Android this width is in logical pixels and is multiplied by the display density, so the
+  ///image is `snapshotWidth * devicePixelRatio` pixels wide: asking for `320` on a `3x` device
+  ///produces a 960 px wide image.
+  ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView
   ///- iOS WKWebView
@@ -70,6 +85,7 @@ class ScreenshotConfiguration {
     this.quality = 100,
     @Deprecated("Use afterScreenUpdates instead") this.iosAfterScreenUpdates,
     this.afterScreenUpdates = true,
+    this.drawScaled = false,
   }) : compressFormat = compressFormat ?? CompressFormat.PNG {
     assert(this.quality >= 0);
     this.afterScreenUpdates = this.iosAfterScreenUpdates != null
@@ -105,6 +121,9 @@ class ScreenshotConfiguration {
         EnumMethod.name => CompressFormat.byName(map['compressFormat']),
       }!;
     }
+    if (map['drawScaled'] != null) {
+      instance.drawScaled = map['drawScaled'];
+    }
     if (map['quality'] != null) {
       instance.quality = map['quality'];
     }
@@ -120,6 +139,7 @@ class ScreenshotConfiguration {
         EnumMethod.value => compressFormat.toValue(),
         EnumMethod.name => compressFormat.name(),
       },
+      "drawScaled": drawScaled,
       "quality": quality,
       "rect": rect?.toMap(enumMethod: enumMethod),
       "snapshotWidth": snapshotWidth,
@@ -133,6 +153,6 @@ class ScreenshotConfiguration {
 
   @override
   String toString() {
-    return 'ScreenshotConfiguration{afterScreenUpdates: $afterScreenUpdates, compressFormat: $compressFormat, quality: $quality, rect: $rect, snapshotWidth: $snapshotWidth}';
+    return 'ScreenshotConfiguration{afterScreenUpdates: $afterScreenUpdates, compressFormat: $compressFormat, drawScaled: $drawScaled, quality: $quality, rect: $rect, snapshotWidth: $snapshotWidth}';
   }
 }

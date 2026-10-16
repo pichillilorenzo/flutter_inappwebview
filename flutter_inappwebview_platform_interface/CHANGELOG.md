@@ -1,3 +1,8 @@
+## 1.4.0-beta.4
+
+- Added `drawScaled` property to `ScreenshotConfiguration`
+- Documented that `ScreenshotConfiguration.snapshotWidth` is multiplied by the display density on Android
+
 ## 1.4.0-beta.3
 
 - Updated `flutter_inappwebview_internal_annotations` dependency from `^1.2.0` to `^1.3.0`

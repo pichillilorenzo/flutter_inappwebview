@@ -6,6 +6,8 @@
   - a failed `Bitmap.compress` still returned the partial buffer instead of `null`
   - the full-size bitmap was not recycled when `snapshotWidth` was set
   - a screenshot configuration without `quality` threw a `NullPointerException`
+- Moved `InAppWebViewController.takeScreenshot` scaling and compression off the UI thread: the WebView looper only allocates the bitmap and draws into it, a single process-wide worker thread does the rest and replies, and the number of captures alive at once is bounded
+- Added `ScreenshotConfiguration.drawScaled` support: with a smaller `snapshotWidth` the WebView is drawn straight at the target size instead of being drawn full size and downscaled
 
 ## 1.2.0-beta.3
 

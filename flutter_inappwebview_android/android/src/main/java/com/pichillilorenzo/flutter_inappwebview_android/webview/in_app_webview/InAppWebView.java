@@ -104,7 +104,6 @@ import com.pichillilorenzo.flutter_inappwebview_android.webview.web_message.WebM
 
 import org.json.JSONObject;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -113,6 +112,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 import io.flutter.plugin.common.MethodChannel;
 
@@ -751,79 +752,237 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     WebStorage.getInstance().deleteAllData();
   }
 
-  public void takeScreenshot(final @Nullable Map<String, Object> screenshotConfiguration, final MethodChannel.Result result) {
-    final float pixelDensity = Util.getPixelDensity(getContext());
+  // ---- Screenshot pipeline -----------------------------------------------------------------------
+  //
+  // takeScreenshot() used to allocate, draw, scale, compress and reply as one synchronous block on
+  // the WebView looper. Only draw() has to run on the view's thread; scaling and compressing a
+  // viewport-sized bitmap are plain pixel work that costs hundreds of milliseconds on a low-end
+  // phone (Bitmap.compress is documented as possibly taking "several seconds"), so a request is
+  // now handled in two stages:
+  //
+  //   1. capture  (WebView looper)    allocate + draw(canvas)
+  //   2. encode   (ScreenshotEncoder) scale + compress + reply, off the looper
+  //
+  // The reply bytes are unchanged. Every accepted request is tracked in pendingScreenshots until
+  // its reply is settled, so dispose() can answer a request whose capture is still queued instead
+  // of dropping its MethodChannel.Result when the looper queue is cleared.
+  //
+  // A request can also be abandoned: cancelScreenshot() raises a cooperative flag that the thread
+  // owning the request polls between stages. The rule is that the cancel settles the reply with
+  // null at once and the owner discards its output at the next check. draw() itself cannot be
+  // interrupted, so a cancel that lands mid-draw takes effect right after it.
 
-    mainLooperHandler.post(new Runnable() {
+  /** Requests alive for this WebView. Two allows one cancelled-but-draining request plus a new one. */
+  private static final int MAX_PENDING_SCREENSHOTS_PER_WEBVIEW = 2;
+
+  private final Map<Long, ScreenshotRequest> pendingScreenshots = new ConcurrentHashMap<>();
+  private final AtomicLong nativeScreenshotRequestIds = new AtomicLong();
+  private volatile boolean screenshotsDisposed = false;
+
+  private final ScreenshotRequest.Listener screenshotRequestListener = new ScreenshotRequest.Listener() {
+    @Override
+    public void onFinished(@NonNull ScreenshotRequest request) {
+      pendingScreenshots.remove(request.id, request);
+      ScreenshotEncoder.release();
+    }
+  };
+
+  public void takeScreenshot(final @Nullable Map<String, Object> screenshotConfiguration, final MethodChannel.Result result) {
+    takeScreenshot(screenshotConfiguration, null, result);
+  }
+
+  public void takeScreenshot(final @Nullable Map<String, Object> screenshotConfiguration,
+                             final @Nullable Long requestId,
+                             final MethodChannel.Result result) {
+    // Dart supplies positive ids so it can cancel by id; a caller without one gets a negative id
+    // that exists only for the registry.
+    final long id = requestId != null ? requestId : -nativeScreenshotRequestIds.incrementAndGet();
+    final ScreenshotRequest request = new ScreenshotRequest(id, screenshotConfiguration, result, screenshotRequestListener);
+
+    if (screenshotsDisposed) {
+      rejectScreenshot(request, false);
+      return;
+    }
+    if (pendingScreenshots.size() >= MAX_PENDING_SCREENSHOTS_PER_WEBVIEW) {
+      rejectScreenshot(request, false);
+      return;
+    }
+    if (!ScreenshotEncoder.tryAcquire()) {
+      rejectScreenshot(request, false);
+      return;
+    }
+    if (pendingScreenshots.putIfAbsent(id, request) != null) {
+      rejectScreenshot(request, true);
+      return;
+    }
+
+    request.pixelDensity = Util.getPixelDensity(getContext());
+    request.captureTask = new Runnable() {
       @Override
       public void run() {
+        captureScreenshot(request);
+      }
+    };
+    mainLooperHandler.post(request.captureTask);
+  }
+
+  /** Admission refused: reply null now, allocate nothing. */
+  private void rejectScreenshot(ScreenshotRequest request, boolean releasePermit) {
+    request.settle(null);
+    if (releasePermit) ScreenshotEncoder.release();
+  }
+
+  /**
+   * Cancels a request accepted by {@link #takeScreenshot(Map, Long, MethodChannel.Result)}.
+   * Returns {@code false} if the id is unknown, already finished, or already cancelled.
+   */
+  public boolean cancelScreenshot(long requestId) {
+    final ScreenshotRequest request = pendingScreenshots.get(requestId);
+    if (request == null) {
+      return false;
+    }
+    return cancelScreenshotRequest(request);
+  }
+
+  private boolean cancelScreenshotRequest(ScreenshotRequest request) {
+    if (!request.cancel()) {
+      return false;
+    }
+    // Completion rule: the cancel settles the reply. The owning thread will find it settled and
+    // only clean up. Dart may also have completed locally already; a second null is harmless.
+    request.settle(null);
+    final Runnable captureTask = request.captureTask;
+    if (captureTask != null) {
+      mainLooperHandler.removeCallbacks(captureTask);
+    }
+    if (request.tryMarkStarted()) {
+      // The capture runnable had not started and now never will: nothing was allocated.
+      request.finish();
+    }
+    return true;
+  }
+
+  /** Settles every pending request before the WebView goes away. Bitmaps are released by their owners. */
+  private void cancelAllScreenshots() {
+    screenshotsDisposed = true;
+    for (ScreenshotRequest request : pendingScreenshots.values()) {
+      cancelScreenshotRequest(request);
+    }
+  }
+
+  /**
+   * Capture stage, on the WebView looper. Parses the geometry and the configuration exactly as
+   * before, draws the view into a bitmap and hands it to the encoder. The cancellation flag is
+   * polled around draw(), the one stage that cannot be interrupted.
+   */
+  private void captureScreenshot(final ScreenshotRequest request) {
+    if (!request.tryMarkStarted()) {
+      return; // cancelled while queued; cancelScreenshotRequest() already finished it
+    }
+    final Map<String, Object> screenshotConfiguration = request.configuration;
+    final float pixelDensity = request.pixelDensity;
+    boolean handedOff = false;
+    try {
+      if (request.isCancelled()) {
+        return;
+      }
+
+      int bitmapWidth = getMeasuredWidth();
+      int bitmapHeight = getMeasuredHeight();
+      int bitmapScrollX = getScrollX();
+      int bitmapScrollY = getScrollY();
+
+      Bitmap.CompressFormat compressFormat = Bitmap.CompressFormat.PNG;
+      int quality = 100;
+
+      if (screenshotConfiguration != null) {
+        Map<String, Double> rect = (Map<String, Double>) screenshotConfiguration.get("rect");
+        if (rect != null) {
+          bitmapScrollX = (int) Math.floor(rect.get("x") * pixelDensity + 0.5);
+          bitmapScrollY = (int) Math.floor(rect.get("y") * pixelDensity + 0.5);
+          bitmapWidth = (int) Math.floor(rect.get("width") * pixelDensity + 0.5);
+          bitmapHeight = (int) Math.floor(rect.get("height") * pixelDensity + 0.5);
+        }
+
         try {
-          int bitmapWidth = getMeasuredWidth();
-          int bitmapHeight = getMeasuredHeight();
-          int bitmapScrollX = getScrollX();
-          int bitmapScrollY = getScrollY();
-
-          Bitmap.CompressFormat compressFormat = Bitmap.CompressFormat.PNG;
-          int quality = 100;
-
-          if (screenshotConfiguration != null) {
-            Map<String, Double> rect = (Map<String, Double>) screenshotConfiguration.get("rect");
-            if (rect != null) {
-              bitmapScrollX = (int) Math.floor(rect.get("x") * pixelDensity + 0.5);
-              bitmapScrollY = (int) Math.floor(rect.get("y") * pixelDensity + 0.5);
-              bitmapWidth = (int) Math.floor(rect.get("width") * pixelDensity + 0.5);
-              bitmapHeight = (int) Math.floor(rect.get("height") * pixelDensity + 0.5);
-            }
-
-            try {
-              compressFormat = Bitmap.CompressFormat.valueOf((String) screenshotConfiguration.get("compressFormat"));
-            } catch (IllegalArgumentException e) {
-              Log.e(LOG_TAG, "", e);
-            }
-
-            quality = (Integer) screenshotConfiguration.get("quality");
-          }
-
-          Bitmap screenshotBitmap = Bitmap.createBitmap(bitmapWidth, bitmapHeight, Bitmap.Config.ARGB_8888);
-          Canvas c = new Canvas(screenshotBitmap);
-          c.translate(-bitmapScrollX, -bitmapScrollY);
-          draw(c);
-
-          ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-
-          if (screenshotConfiguration != null) {
-            Double snapshotWidth = (Double) screenshotConfiguration.get("snapshotWidth");
-            if (snapshotWidth != null) {
-              int dstWidth = (int) Math.floor(snapshotWidth * pixelDensity + 0.5);
-              float ratioBitmap = (float) screenshotBitmap.getWidth() / (float) screenshotBitmap.getHeight();
-              int dstHeight = (int) ((float) dstWidth / ratioBitmap);
-              screenshotBitmap = Bitmap.createScaledBitmap(screenshotBitmap, dstWidth, dstHeight, true);
-            }
-          }
-
-          final boolean compressed = screenshotBitmap.compress(
-                  compressFormat,
-                  quality,
-                  byteArrayOutputStream);
-          if (!compressed) {
-            Log.e(LOG_TAG, "Screenshot cannot be compressed using compressFormat " +
-                    compressFormat.name() + " with quality " + quality, null);
-          }
-
-          try {
-            byteArrayOutputStream.close();
-          } catch (IOException e) {
-            Log.e(LOG_TAG, "", e);
-          }
-          screenshotBitmap.recycle();
-          result.success(byteArrayOutputStream.toByteArray());
-
+          compressFormat = Bitmap.CompressFormat.valueOf((String) screenshotConfiguration.get("compressFormat"));
         } catch (IllegalArgumentException e) {
           Log.e(LOG_TAG, "", e);
-          result.success(null);
         }
+
+        final Integer qualityValue = (Integer) screenshotConfiguration.get("quality");
+        if (qualityValue != null) {
+          quality = qualityValue;
+        }
+        request.snapshotWidth = (Double) screenshotConfiguration.get("snapshotWidth");
+        request.drawScaled = Boolean.TRUE.equals(screenshotConfiguration.get("drawScaled"));
       }
-    });
+      request.compressFormat = compressFormat;
+      request.quality = quality;
+      request.captureX = bitmapScrollX;
+      request.captureY = bitmapScrollY;
+      request.captureWidth = bitmapWidth;
+      request.captureHeight = bitmapHeight;
+      if (request.snapshotWidth != null && bitmapHeight > 0) {
+        // Same rounding as the scale stage, so the output geometry is identical either way.
+        request.dstWidth = (int) Math.floor(request.snapshotWidth * pixelDensity + 0.5);
+        float ratioBitmap = (float) bitmapWidth / (float) bitmapHeight;
+        request.dstHeight = (int) ((float) request.dstWidth / ratioBitmap);
+      }
+
+      handedOff = drawScreenshot(request);
+    } catch (IllegalArgumentException | OutOfMemoryError e) {
+      // A viewport-sized ARGB_8888 bitmap can fail to allocate on a low-end device under memory
+      // pressure: a screenshot must not be able to take the process down.
+      Log.e(LOG_TAG, "", e);
+    } finally {
+      if (!handedOff) {
+        request.settle(null);
+        request.finish();
+      }
+    }
+  }
+
+  /**
+   * Draws the view into a fresh bitmap and hands it to the encoder. Returns {@code true} once the
+   * encoder owns the request; on {@code false} nothing was handed off and the caller settles.
+   * With {@code drawScaled} and a smaller snapshot size the canvas is scaled first, so the WebView
+   * rasterises straight at thumbnail size and the scale stage is skipped.
+   */
+  private boolean drawScreenshot(final ScreenshotRequest request) {
+    final boolean scaledDraw = request.drawScaled && request.dstWidth > 0
+            && request.dstWidth < request.captureWidth && request.dstHeight > 0;
+    final int width = scaledDraw ? request.dstWidth : request.captureWidth;
+    final int height = scaledDraw ? request.dstHeight : request.captureHeight;
+    Bitmap screenshotBitmap = null;
+    try {
+      screenshotBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+      Canvas c = new Canvas(screenshotBitmap);
+      if (scaledDraw) {
+        c.scale(width / (float) request.captureWidth, height / (float) request.captureHeight);
+      }
+      c.translate(-request.captureX, -request.captureY);
+
+      // Last chance to skip the one stage that cannot be interrupted.
+      if (request.isCancelled()) {
+        return false;
+      }
+      draw(c);
+
+      if (request.isCancelled()) {
+        return false;
+      }
+      request.alreadyScaled = scaledDraw;
+      // Ownership of the bitmap moves to the encoder, which also finishes the request.
+      final Bitmap captured = screenshotBitmap;
+      screenshotBitmap = null;
+      ScreenshotEncoder.submit(request, captured);
+      return true;
+    } finally {
+      if (screenshotBitmap != null) {
+        screenshotBitmap.recycle();
+      }
+    }
   }
 
   @SuppressLint("RestrictedApi")
@@ -2175,6 +2334,9 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
 
   @Override
   public void dispose() {
+    // Settle pending screenshot replies before the looper queue is cleared below; a queued capture
+    // removed by removeCallbacksAndMessages(null) would otherwise never answer its Result.
+    cancelAllScreenshots();
     if (channelDelegate != null) {
       channelDelegate.dispose();
       channelDelegate = null;

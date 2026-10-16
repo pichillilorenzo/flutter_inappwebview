@@ -28,6 +28,10 @@ class ScreenshotConfiguration_ {
   ///The web view maintains the aspect ratio of the captured content, but scales it to match the width you specify.
   ///
   ///The default value of this property is `null`, which returns an image whose size matches the original size of the captured rectangle.
+  ///
+  ///On Android this width is in logical pixels and is multiplied by the display density, so the
+  ///image is `snapshotWidth * devicePixelRatio` pixels wide: asking for `320` on a `3x` device
+  ///produces a 960 px wide image.
   @SupportedPlatforms(
     platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()],
   )
@@ -72,6 +76,15 @@ class ScreenshotConfiguration_ {
   )
   bool afterScreenUpdates;
 
+  ///When `true` and [snapshotWidth] is smaller than the captured area, the WebView is drawn
+  ///straight into a bitmap of the snapshot size (the canvas is scaled before drawing) instead
+  ///of being drawn at full size and downscaled afterwards. This makes the part of the capture
+  ///that must run on the UI thread proportionally cheaper; text and images are rasterized at
+  ///the smaller size rather than filtered down, which is a slightly different look.
+  ///The default value is `false`.
+  @SupportedPlatforms(platforms: [AndroidPlatform()])
+  bool drawScaled;
+
   @ExchangeableObjectConstructor()
   ScreenshotConfiguration_({
     this.rect,
@@ -80,6 +93,7 @@ class ScreenshotConfiguration_ {
     this.quality = 100,
     @Deprecated("Use afterScreenUpdates instead") this.iosAfterScreenUpdates,
     this.afterScreenUpdates = true,
+    this.drawScaled = false,
   }) : compressFormat = compressFormat ?? CompressFormat_.PNG {
     assert(this.quality >= 0);
     // ignore: deprecated_member_use_from_same_package

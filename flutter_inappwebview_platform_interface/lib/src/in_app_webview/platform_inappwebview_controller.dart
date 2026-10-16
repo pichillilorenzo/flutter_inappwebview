@@ -1364,6 +1364,14 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///Takes a screenshot of the WebView's visible viewport and returns a [Uint8List]. Returns `null` if it wasn't be able to take it.
   ///
   ///[screenshotConfiguration] represents the configuration data to use when generating an image from a web view’s contents.
+  ///
+  ///[cancellationSignal] lets the caller abandon the capture. Once
+  ///[ScreenshotCancellationSignal.cancel] is called the returned future completes
+  ///with `null` immediately and a late platform result is discarded; a signal that
+  ///is already cancelled makes this method return `null` without contacting the
+  ///platform. On Android the native request is also skipped or aborted at its next
+  ///checkpoint and its bitmap released; on the other platforms cancellation is
+  ///Dart-side only. See [ScreenshotCancellationSignal] for the exact rules.
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.takeScreenshot.supported_platforms}
@@ -1391,6 +1399,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   )
   Future<Uint8List?> takeScreenshot({
     ScreenshotConfiguration? screenshotConfiguration,
+    ScreenshotCancellationSignal? cancellationSignal,
   }) {
     throw UnimplementedError(
       '${PlatformInAppWebViewControllerMethod.takeScreenshot.name} is not implemented on the current platform',

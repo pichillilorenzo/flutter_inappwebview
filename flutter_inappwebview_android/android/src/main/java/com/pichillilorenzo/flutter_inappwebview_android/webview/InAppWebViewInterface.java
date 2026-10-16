@@ -51,6 +51,8 @@ public interface InAppWebViewInterface {
   void stopLoading();
   boolean isLoading();
   void takeScreenshot(Map<String, Object> screenshotConfiguration, MethodChannel.Result result);
+  void takeScreenshot(Map<String, Object> screenshotConfiguration, @Nullable Long requestId, MethodChannel.Result result);
+  boolean cancelScreenshot(long requestId);
   void setSettings(InAppWebViewSettings newSettings, HashMap<String, Object> newSettingsMap);
   InAppWebViewSettings getCustomSettings();
   Map<String, Object> getCustomSettingsMap();

@@ -2491,6 +2491,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [screenshotConfiguration]: all platforms
+  ///- [cancellationSignal]: all platforms
   ///
   ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}

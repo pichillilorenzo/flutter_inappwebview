@@ -85,6 +85,26 @@ class ScreenshotConfiguration_ {
   @SupportedPlatforms(platforms: [AndroidPlatform()])
   bool drawScaled;
 
+  ///When `true`, the pixels are copied from the app window's composited surface with
+  ///`PixelCopy` instead of asking the WebView to draw itself. The copy runs off the UI thread
+  ///and costs it almost nothing, and the result is exactly what is on screen — including any
+  ///Flutter widgets drawn over the WebView, which callers may need to avoid capturing.
+  ///It only works while the WebView is attached, visible and the requested area is fully on
+  ///screen (so it cannot capture outside the viewport); in every other case, and whenever the
+  ///copy fails, the WebView is drawn as if this were `false`.
+  ///The default value is `false`.
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(
+        available: '26',
+        apiName: 'PixelCopy.request',
+        apiUrl:
+            'https://developer.android.com/reference/android/view/PixelCopy#request(android.view.Window,%20android.graphics.Rect,%20android.graphics.Bitmap,%20android.view.PixelCopy.OnPixelCopyFinishedListener,%20android.os.Handler)',
+      ),
+    ],
+  )
+  bool usePixelCopy;
+
   @ExchangeableObjectConstructor()
   ScreenshotConfiguration_({
     this.rect,
@@ -94,6 +114,7 @@ class ScreenshotConfiguration_ {
     @Deprecated("Use afterScreenUpdates instead") this.iosAfterScreenUpdates,
     this.afterScreenUpdates = true,
     this.drawScaled = false,
+    this.usePixelCopy = false,
   }) : compressFormat = compressFormat ?? CompressFormat_.PNG {
     assert(this.quality >= 0);
     // ignore: deprecated_member_use_from_same_package

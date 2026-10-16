@@ -58,8 +58,8 @@ final class ScreenshotRequest {
   int captureX, captureY, captureWidth, captureHeight;
   /** Target size when snapshotWidth is set (same rounding as the scale stage), else 0. */
   int dstWidth, dstHeight;
-  /** Android-only option from ScreenshotConfiguration. */
-  boolean drawScaled;
+  /** Android-only options from ScreenshotConfiguration. */
+  boolean drawScaled, usePixelCopy;
   /** True when the capture stage already produced the bitmap at dstWidth x dstHeight. */
   boolean alreadyScaled;
 

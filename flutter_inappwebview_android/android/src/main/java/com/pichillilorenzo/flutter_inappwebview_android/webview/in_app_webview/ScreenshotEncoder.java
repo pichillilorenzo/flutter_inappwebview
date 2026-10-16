@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  * <p>A single process-wide worker thread serialises encodes so the number of large bitmaps alive at
  * once stays bounded and no thread is created per screenshot or per WebView. It is a HandlerThread
- * rather than an executor so the worker stays addressable as a Handler. Admission is
+ * rather than an executor so {@code PixelCopy} can deliver its result straight onto it. Admission is
  * a counting permit taken by {@link InAppWebView#takeScreenshot} before anything is allocated and
  * released by {@link ScreenshotRequest#finish()}, so a rejected request costs no bitmap.
  */
@@ -47,7 +47,7 @@ final class ScreenshotEncoder {
     THREAD.start();
   }
 
-  /** The worker's handler. */
+  /** The worker's handler. Also the delivery thread for PixelCopy results. */
   static final Handler HANDLER = new Handler(THREAD.getLooper());
 
   private ScreenshotEncoder() {

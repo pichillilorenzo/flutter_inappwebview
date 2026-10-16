@@ -7,12 +7,15 @@ import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.pm.PackageInfo;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Point;
+import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Build;
@@ -37,10 +40,12 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
+import android.view.PixelCopy;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.view.ViewTreeObserver;
+import android.view.Window;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputMethodManager;
@@ -771,6 +776,11 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
   // owning the request polls between stages. The rule is that the cancel settles the reply with
   // null at once and the owner discards its output at the next check. draw() itself cannot be
   // interrupted, so a cancel that lands mid-draw takes effect right after it.
+  //
+  // With the usePixelCopy option the capture stage asks the window for its composited pixels
+  // (PixelCopy, asynchronous, delivered on the encoder thread) instead of drawing the view, which
+  // leaves the looper with nothing to do but issue the request. Any precondition that does not
+  // hold, and any failure, falls back to drawing.
 
   /** Requests alive for this WebView. Two allows one cancelled-but-draining request plus a new one. */
   private static final int MAX_PENDING_SCREENSHOTS_PER_WEBVIEW = 2;
@@ -871,9 +881,9 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
   }
 
   /**
-   * Capture stage, on the WebView looper. Parses the geometry and the configuration exactly as
-   * before, draws the view into a bitmap and hands it to the encoder. The cancellation flag is
-   * polled around draw(), the one stage that cannot be interrupted.
+   * Capture stage, on the WebView looper. Parses geometry and configuration exactly as before, then
+   * either copies the pixels from the window (PixelCopy, asynchronous, nearly free for this thread)
+   * or draws the view into a bitmap (synchronous). Both hand the bitmap to the encoder.
    */
   private void captureScreenshot(final ScreenshotRequest request) {
     if (!request.tryMarkStarted()) {
@@ -916,6 +926,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
         }
         request.snapshotWidth = (Double) screenshotConfiguration.get("snapshotWidth");
         request.drawScaled = Boolean.TRUE.equals(screenshotConfiguration.get("drawScaled"));
+        request.usePixelCopy = Boolean.TRUE.equals(screenshotConfiguration.get("usePixelCopy"));
       }
       request.compressFormat = compressFormat;
       request.quality = quality;
@@ -930,6 +941,10 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
         request.dstHeight = (int) ((float) request.dstWidth / ratioBitmap);
       }
 
+      if (request.usePixelCopy && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && requestPixelCopy(request)) {
+        handedOff = true; // the PixelCopy listener owns the request from here
+        return;
+      }
       handedOff = drawScreenshot(request);
     } catch (IllegalArgumentException | OutOfMemoryError e) {
       // A viewport-sized ARGB_8888 bitmap can fail to allocate on a low-end device under memory
@@ -983,6 +998,119 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
         screenshotBitmap.recycle();
       }
     }
+  }
+
+  /**
+   * Copies the visible pixels of this view from the window's composited surface into a bitmap of
+   * the final size, asynchronously, with the result delivered on the encoder thread. Costs this
+   * thread only the request. Returns {@code false} (nothing started) when the view is not the
+   * visible child of a window, the requested rect is not fully on screen, or the API is too old;
+   * the caller then draws instead. A copy that fails at runtime also falls back to drawing.
+   */
+  @RequiresApi(api = Build.VERSION_CODES.O)
+  private boolean requestPixelCopy(final ScreenshotRequest request) {
+    final Window window = findScreenshotWindow();
+    if (window == null) {
+      return false;
+    }
+    final View decorView = window.peekDecorView();
+    if (decorView == null || getRootView() != decorView || !isAttachedToWindow() || !isShown()) {
+      return false;
+    }
+    final int[] location = new int[2];
+    getLocationInWindow(location);
+    final Rect viewBounds = new Rect(location[0], location[1], location[0] + getWidth(), location[1] + getHeight());
+    final int left = location[0] + (request.captureX - getScrollX());
+    final int top = location[1] + (request.captureY - getScrollY());
+    final Rect source = new Rect(left, top, left + request.captureWidth, top + request.captureHeight);
+    if (source.isEmpty() || !viewBounds.contains(source)) {
+      return false; // off-viewport capture needs draw()
+    }
+    final boolean scaled = request.dstWidth > 0 && request.dstHeight > 0;
+    final int width = scaled ? request.dstWidth : source.width();
+    final int height = scaled ? request.dstHeight : source.height();
+    final Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+    request.alreadyScaled = scaled;
+    final PixelCopy.OnPixelCopyFinishedListener listener = new PixelCopy.OnPixelCopyFinishedListener() {
+      @Override
+      public void onPixelCopyFinished(int copyResult) {
+        // Runs on the encoder thread.
+        if (copyResult == PixelCopy.SUCCESS) {
+          ScreenshotEncoder.encode(request, bitmap);
+          return;
+        }
+        bitmap.recycle();
+        if (request.isCancelled() || screenshotsDisposed) {
+          request.settle(null);
+          request.finish();
+          return;
+        }
+        // Fall back to drawing on the looper; the request stays registered meanwhile.
+        final boolean posted = mainLooperHandler.post(new Runnable() {
+          @Override
+          public void run() {
+            drawScreenshotAfterFailedCopy(request);
+          }
+        });
+        if (!posted) {
+          request.settle(null);
+          request.finish();
+        }
+      }
+    };
+    try {
+      PixelCopy.request(window, source, bitmap, listener, ScreenshotEncoder.HANDLER);
+    } catch (IllegalArgumentException e) {
+      // e.g. "Window doesn't have a backing surface": draw instead.
+      bitmap.recycle();
+      request.alreadyScaled = false;
+      return false;
+    }
+    return true;
+  }
+
+  /** Looper-side fallback for a failed PixelCopy: the plain draw path with the same settlement rules. */
+  private void drawScreenshotAfterFailedCopy(final ScreenshotRequest request) {
+    boolean handedOff = false;
+    try {
+      if (request.isCancelled() || screenshotsDisposed) {
+        return;
+      }
+      handedOff = drawScreenshot(request);
+    } catch (IllegalArgumentException | OutOfMemoryError e) {
+      Log.e(LOG_TAG, "", e);
+    } finally {
+      if (!handedOff) {
+        request.settle(null);
+        request.finish();
+      }
+    }
+  }
+
+  /**
+   * The window this view is currently drawn in. Resolved from the root of the hierarchy the view is
+   * attached to right now (the decor view's context is its Activity), not from the view's creation
+   * context: an Activity can be destroyed and recreated underneath a WebView that stays alive, and
+   * the old Activity's window would then no longer be the one on screen. The creation context and
+   * the plugin's Activity are only fallbacks.
+   */
+  @Nullable
+  private Window findScreenshotWindow() {
+    Window window = windowOf(getRootView().getContext());
+    if (window == null) window = windowOf(getContext());
+    if (window == null && plugin != null && plugin.activity != null) window = plugin.activity.getWindow();
+    return window;
+  }
+
+  @Nullable
+  private static Window windowOf(@Nullable Context context) {
+    while (context instanceof ContextWrapper) {
+      if (context instanceof Activity) {
+        return ((Activity) context).getWindow();
+      }
+      context = ((ContextWrapper) context).getBaseContext();
+    }
+    return null;
   }
 
   @SuppressLint("RestrictedApi")

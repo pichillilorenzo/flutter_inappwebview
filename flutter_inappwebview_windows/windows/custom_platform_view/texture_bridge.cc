@@ -87,7 +87,9 @@ namespace flutter_inappwebview_plugin
       static_cast<ABI::Windows::Graphics::DirectX::DirectXPixelFormat>(
         kPixelFormat),
       kNumBuffers, size);
-    assert(frame_pool_);
+    if (!frame_pool_) {
+      return false;
+    }
 
     frame_pool_->add_FrameArrived(
       Microsoft::WRL::Callback<ABI::Windows::Foundation::ITypedEventHandler<

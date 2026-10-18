@@ -2048,6 +2048,9 @@ namespace flutter_inappwebview_plugin
 
   std::optional<int64_t> InAppWebView::getMemoryUsageTargetLevel() const
   {
+    if (pendingMemoryTarget_.has_value()) {
+      return pendingMemoryTarget_;
+    }
     if (auto webView19 = webView.try_query<ICoreWebView2_19>()) {
       COREWEBVIEW2_MEMORY_USAGE_TARGET_LEVEL level = COREWEBVIEW2_MEMORY_USAGE_TARGET_LEVEL_NORMAL;
       if (succeededOrLog(webView19->get_MemoryUsageTargetLevel(&level))) {
@@ -2057,11 +2060,11 @@ namespace flutter_inappwebview_plugin
     return std::nullopt;
   }
 
-  void InAppWebView::setMemoryUsageTargetLevel(const int64_t& level) const
+  void InAppWebView::setMemoryUsageTargetLevel(const int64_t& level)
   {
-    if (auto webView19 = webView.try_query<ICoreWebView2_19>()) {
-      failedLog(webView19->put_MemoryUsageTargetLevel(static_cast<COREWEBVIEW2_MEMORY_USAGE_TARGET_LEVEL>(level)));
-    }
+    // Browser IPC like Resume: delivered through the same responsiveness gate.
+    pendingMemoryTarget_ = level;
+    applyPendingBrowserState();
   }
 
   void InAppWebView::getFavicon(const std::optional<std::string>& url, const std::optional<FaviconImageFormat>& faviconImageFormat,
@@ -3349,7 +3352,8 @@ namespace flutter_inappwebview_plugin
   void InAppWebView::applyPendingBrowserState()
   {
     if (webViewController &&
-      (visibilityState_.needsApply() || pendingResume_ || pendingSuspend_)) {
+      (visibilityState_.needsApply() || pendingResume_ || pendingSuspend_ ||
+        pendingMemoryTarget_.has_value())) {
       const auto browserPid = cachedBrowserProcessId();
       if (browserPid && !browserGate().tryAcquire(browserPid, this)) {
         return;
@@ -3359,6 +3363,14 @@ namespace flutter_inappwebview_plugin
         wil::com_ptr<ICoreWebView2_3> webView3;
         if (webView && SUCCEEDED(webView->QueryInterface(IID_PPV_ARGS(&webView3)))) {
           failedLog(webView3->Resume());
+        }
+      }
+      if (pendingMemoryTarget_.has_value()) {
+        const auto level = pendingMemoryTarget_.value();
+        pendingMemoryTarget_.reset();
+        if (auto webView19 = webView.try_query<ICoreWebView2_19>()) {
+          failedLog(webView19->put_MemoryUsageTargetLevel(
+            static_cast<COREWEBVIEW2_MEMORY_USAGE_TARGET_LEVEL>(level)));
         }
       }
       if (visibilityState_.needsApply()) {

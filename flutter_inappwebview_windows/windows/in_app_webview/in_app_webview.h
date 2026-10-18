@@ -181,7 +181,7 @@ namespace flutter_inappwebview_plugin
     std::optional<std::string> getTitle() const;
     std::optional<int64_t> getFrameId() const;
     std::optional<int64_t> getMemoryUsageTargetLevel() const;
-    void setMemoryUsageTargetLevel(const int64_t& level) const;
+    void setMemoryUsageTargetLevel(const int64_t& level);
     void getFavicon(const std::optional<std::string>& url, const std::optional<FaviconImageFormat>& faviconImageFormat,
       const std::function<void(const std::optional<std::vector<uint8_t>>)> completionHandler) const;
     void showSaveAsUI(const std::function<void(const std::optional<int64_t>)> completionHandler) const;
@@ -316,6 +316,7 @@ namespace flutter_inappwebview_plugin
     // as long as that thread takes to wake.
     bool pendingSuspend_ = false;
     bool pendingResume_ = false;
+    std::optional<int64_t> pendingMemoryTarget_;
     // Queried once and reused; refreshed only after the browser process exits,
     // so no per-flip round-trip depends on it.
     DWORD browserProcessId_ = 0;

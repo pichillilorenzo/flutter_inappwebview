@@ -8,6 +8,7 @@
 #include <memory>
 #include <mutex>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 #include "util/direct3d11.interop.h"
@@ -262,9 +263,12 @@ void main(uint3 id : SV_DispatchThreadID) {
       changed = reference_created || FramesDiffer(incoming_.get(),
         reference_.get(), desc.Width, desc.Height);
       if (changed) {
-        context->CopyResource(reference_.get(), incoming_.get());
         context->CopyResource(pool->surfaces[writable_surface].texture.get(),
           incoming_.get());
+        // Both textures share one description: the new frame becomes the
+        // reference without a copy, and the old reference is overwritten next.
+        std::swap(reference_, incoming_);
+        std::swap(reference_view_, incoming_view_);
       }
     }
     else {

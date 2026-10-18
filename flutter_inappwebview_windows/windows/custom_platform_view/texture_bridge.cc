@@ -90,6 +90,7 @@ namespace flutter_inappwebview_plugin
     if (!frame_pool_) {
       return false;
     }
+    pool_size_ = size;
 
     frame_pool_->add_FrameArrived(
       Microsoft::WRL::Callback<ABI::Windows::Foundation::ITypedEventHandler<
@@ -186,11 +187,15 @@ namespace flutter_inappwebview_plugin
     if (needs_update_) {
       ABI::Windows::Graphics::SizeInt32 size;
       capture_item_->get_Size(&size);
-      frame_pool_->Recreate(
-        graphics_context_->device(),
-        static_cast<ABI::Windows::Graphics::DirectX::DirectXPixelFormat>(
-          kPixelFormat),
-        kNumBuffers, size);
+      // A resize that ended at the pool's size needs no new buffers.
+      if (size.Width != pool_size_.Width || size.Height != pool_size_.Height) {
+        frame_pool_->Recreate(
+          graphics_context_->device(),
+          static_cast<ABI::Windows::Graphics::DirectX::DirectXPixelFormat>(
+            kPixelFormat),
+          kNumBuffers, size);
+        pool_size_ = size;
+      }
       needs_update_ = false;
     }
 

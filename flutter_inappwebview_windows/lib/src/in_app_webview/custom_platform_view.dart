@@ -408,6 +408,8 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
 
   MouseCursor _cursor = SystemMouseCursors.basic;
 
+  bool _surfaceSizeReportScheduled = false;
+
   final _controller = CustomPlatformViewController();
   final _focusNode = FocusNode();
 
@@ -454,7 +456,7 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
     // Report initial surface size and widget position
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      _reportSurfaceSize();
+      _sendSurfaceSize();
       _reportWidgetPosition();
     });
 
@@ -794,7 +796,19 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
     }
   }
 
-  void _reportSurfaceSize() async {
+  // Layout, pointer and window events can each ask for this several times per
+  // frame; each one is a native round trip, so send at most once per frame.
+  void _reportSurfaceSize() {
+    if (_surfaceSizeReportScheduled) return;
+    _surfaceSizeReportScheduled = true;
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      _surfaceSizeReportScheduled = false;
+      if (mounted) _sendSurfaceSize();
+    });
+    SchedulerBinding.instance.ensureVisualUpdate();
+  }
+
+  void _sendSurfaceSize() async {
     final box = _key.currentContext?.findRenderObject() as RenderBox?;
     if (box != null) {
       await _controller.ready;

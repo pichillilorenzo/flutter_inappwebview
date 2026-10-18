@@ -3865,6 +3865,14 @@ namespace flutter_inappwebview_plugin
       auto scaled_width = width * scale_factor;
       auto scaled_height = height * scale_factor;
 
+      // Each call costs browser IPC and a capture frame pool rebuild.
+      if (surfaceSize_.cx == static_cast<LONG>(scaled_width) &&
+        surfaceSize_.cy == static_cast<LONG>(scaled_height) &&
+        surfaceScaleFactor_ == scale_factor) {
+        return;
+      }
+      surfaceScaleFactor_ = scale_factor;
+
       RECT bounds;
       bounds.left = 0;
       bounds.top = 0;

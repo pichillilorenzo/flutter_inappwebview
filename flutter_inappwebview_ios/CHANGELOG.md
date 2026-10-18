@@ -1,3 +1,7 @@
+## Unreleased
+
+- Fixed `evaluateJavascript` and `callAsyncJavaScript` crashes in popup WebViews on iOS 14 through 17; named content worlds are unavailable there, while the page world keeps working ([#2776](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2776)) (thanks to [studiogaram](https://github.com/studiogaram))
+
 ## 1.2.0-beta.3
 
 - Updated flutter_inappwebview_platform_interface version to ^1.4.0-beta.3

@@ -1,3 +1,7 @@
+## Unreleased
+
+- Documented that named content worlds are unavailable in popup WebViews on iOS 14 through 17
+
 ## 1.4.0-beta.3
 
 - Updated `flutter_inappwebview_internal_annotations` dependency from `^1.2.0` to `^1.3.0`

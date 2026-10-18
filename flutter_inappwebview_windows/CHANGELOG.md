@@ -12,6 +12,7 @@
 - Fixed `ready` and `dispose` waiting forever, and the host window leaking, when WebView creation fails
 - Fixed a hang when WebView2 controller creation fails synchronously
 - Fixed `setState` and `localToGlobal` calls after a `CustomPlatformView` is disposed
+- Fixed WebView2 input windows intercepting desktop clicks while the app is minimized, including WebViews created or resumed while minimized
 
 ## 0.7.0-beta.3
 

@@ -69,6 +69,13 @@ namespace flutter_inappwebview_plugin
     EventRegistrationToken on_frame_arrived_token_ = {};
 
     virtual void StopInternal();
+    // Called under |mutex_| for every captured frame that survived the fps
+    // limit. Returning false skips the frame: Flutter is not notified and the
+    // frame is not drawn. The base bridge accepts everything; the GPU bridge
+    // rejects frames whose pixels equal the frame Flutter already shows, since
+    // Windows.Graphics.Capture delivers a frame on every compositor tick even
+    // when the captured visual has not changed.
+    virtual bool AcceptFrame(const winrt::com_ptr<ID3D11Texture2D>& frame);
     void OnFrameArrived();
     bool ShouldDropFrame();
 

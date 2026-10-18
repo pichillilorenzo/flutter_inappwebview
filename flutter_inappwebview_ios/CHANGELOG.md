@@ -1,3 +1,7 @@
+## Unreleased
+
+- Fixed content blockers loading the page without restrictions when the rules fail to compile, and swapped updated rules in without an unprotected gap
+
 ## 1.2.0-beta.3
 
 - Updated flutter_inappwebview_platform_interface version to ^1.4.0-beta.3

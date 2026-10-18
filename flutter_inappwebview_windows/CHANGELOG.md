@@ -2,6 +2,7 @@
 
 - Delivered `setMemoryUsageTargetLevel` through the browser responsiveness gate, so it never blocks the platform thread on an unresponsive browser process.
 - Stopped capturing frames of paused WebViews and of WebViews whose host window is minimized; the last frame stays on screen until capture resumes.
+- Coalesced surface size reports to at most one per frame, skipped unchanged sizes natively, and rebuilt the capture frame pool only when the captured size actually changed.
 - Kept the shader compiler DLL loaded until its result and error blobs are released.
 - Published the first captured frame after creation, resizing, or resuming capture.
 - Reused frame-comparison shader bytecode and texture resource views across comparisons.

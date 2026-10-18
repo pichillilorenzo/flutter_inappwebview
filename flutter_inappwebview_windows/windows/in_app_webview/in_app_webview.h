@@ -291,6 +291,7 @@ namespace flutter_inappwebview_plugin
     POINT lastCursorPos_ = { 0, 0 };
     POINT widgetOffset_ = { 0, 0 };
     SIZE surfaceSize_ = { 0, 0 };
+    float surfaceScaleFactor_ = 0;
     VirtualKeyState virtualKeys_;
     WebViewVisibilityState visibilityState_;
 

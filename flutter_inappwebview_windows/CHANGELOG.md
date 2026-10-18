@@ -4,6 +4,10 @@
 - Fixed CMake and MSVC `C4244`, `C4458` compiler warnings
 - Updated GoogleTest from `1.11.0` to `1.17.0` for CMake 4 compatibility
 - Added two-finger trackpad scrolling with natural inertia and 1:1 distance calibration
+- Fixed touch taps not focusing inputs inside the WebView (based on [#2802](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2802))
+- Fixed HTML5 drag and drop by forwarding OLE drag and drop events to the WebView
+- Fixed a text selection or drag being cancelled when the cursor leaves the WebView with a mouse button held
+- Fixed reversed horizontal scrolling for trackpad pans and mouse tilt-wheel input
 
 ## 0.7.0-beta.3
 

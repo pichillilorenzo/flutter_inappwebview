@@ -1,9 +1,11 @@
 import 'package:flutter/services.dart';
+
 import 'dart:async';
 import 'dart:ui';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 
 import '_static_channel.dart';
@@ -368,6 +370,13 @@ class _CustomPlatformViewState extends State<CustomPlatformView> {
   final _focusNode = FocusNode();
 
   StreamSubscription? _cursorSubscription;
+  bool _surfaceSizeReportScheduled = false;
+  bool _surfaceSizeReportWaitingForReady = false;
+  bool _surfaceSizeReportDirty = false;
+  bool _textureOffsetReportScheduled = false;
+  bool _textureOffsetReportWaitingForReady = false;
+  bool _textureOffsetReportDirty = false;
+  double? _lastObservedScaleFactor;
 
   // Track click timing for double-click detection
   DateTime? _lastClickTime;
@@ -385,23 +394,49 @@ class _CustomPlatformViewState extends State<CustomPlatformView> {
 
     _controller.initialize(
       onPlatformViewCreated: (id) {
+        if (!mounted) {
+          return;
+        }
         widget.onPlatformViewCreated?.call(id);
         setState(() {});
       },
       arguments: widget.creationParams,
     );
 
-    // Report initial surface size
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _reportSurfaceSize();
-    });
-
     _cursorSubscription = _controller._cursor.listen((cursor) {
+      if (!mounted) {
+        return;
+      }
       setState(() {
         _cursor = cursor;
       });
     });
   }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final scaleFactor = _effectiveScaleFactor;
+    if (_lastObservedScaleFactor != scaleFactor) {
+      _lastObservedScaleFactor = scaleFactor;
+      _scheduleSurfaceSizeReport();
+      _scheduleTextureOffsetReport();
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant CustomPlatformView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.scaleFactor != widget.scaleFactor) {
+      _lastObservedScaleFactor = _effectiveScaleFactor;
+      _scheduleSurfaceSizeReport();
+    }
+  }
+
+  double get _effectiveScaleFactor =>
+      widget.scaleFactor ??
+      MediaQuery.maybeDevicePixelRatioOf(context) ??
+      View.of(context).devicePixelRatio;
 
   @override
   Widget build(BuildContext context) {
@@ -472,7 +507,8 @@ class _CustomPlatformViewState extends State<CustomPlatformView> {
   Widget _buildInner() {
     return NotificationListener<SizeChangedLayoutNotification>(
       onNotification: (notification) {
-        _reportSurfaceSize();
+        _scheduleSurfaceSizeReport();
+        _scheduleTextureOffsetReport();
         return true;
       },
       child: SizeChangedLayoutNotifier(
@@ -486,7 +522,10 @@ class _CustomPlatformViewState extends State<CustomPlatformView> {
                   _controller._setCursorPos(ev.localPosition);
                 },
                 onPointerDown: (ev) async {
-                  _reportSurfaceSize();
+                  _scheduleSurfaceSizeReport();
+                  // Position-only moves do not trigger a size notification.
+                  // Send the current offset before forwarding this input.
+                  unawaited(_reportTextureOffset());
 
                   final needsFocus = !_focusNode.hasFocus;
                   if (needsFocus) {
@@ -659,21 +698,91 @@ class _CustomPlatformViewState extends State<CustomPlatformView> {
     );
   }
 
-  void _reportSurfaceSize() async {
+  void _scheduleSurfaceSizeReport() {
+    _surfaceSizeReportDirty = true;
+    if (_surfaceSizeReportScheduled || _surfaceSizeReportWaitingForReady) {
+      return;
+    }
+
+    _surfaceSizeReportScheduled = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _surfaceSizeReportScheduled = false;
+      unawaited(_flushSurfaceSizeReport());
+    });
+    SchedulerBinding.instance.ensureVisualUpdate();
+  }
+
+  Future<void> _flushSurfaceSizeReport() async {
+    if (!mounted || !_surfaceSizeReportDirty) {
+      return;
+    }
+
+    _surfaceSizeReportWaitingForReady = true;
+    await _controller.ready;
+    _surfaceSizeReportWaitingForReady = false;
+    if (!mounted) {
+      return;
+    }
+
+    // Read geometry only after creation completes so several pending layout
+    // changes collapse to the latest logical size and scale factor.
+    _surfaceSizeReportDirty = false;
     final box = _key.currentContext?.findRenderObject() as RenderBox?;
     if (box != null) {
-      await _controller.ready;
-      unawaited(
-        _controller._setSize(
-          box.size,
-          widget.scaleFactor ?? window.devicePixelRatio,
-        ),
-      );
-
-      // Also report the texture offset (position within the window)
-      final globalPosition = box.localToGlobal(Offset.zero);
-      unawaited(_controller._setTextureOffset(globalPosition));
+      await _controller._setSize(box.size, _effectiveScaleFactor);
     }
+
+    if (_surfaceSizeReportDirty) {
+      _scheduleSurfaceSizeReport();
+    }
+  }
+
+  void _scheduleTextureOffsetReport() {
+    _textureOffsetReportDirty = true;
+    if (_textureOffsetReportScheduled || _textureOffsetReportWaitingForReady) {
+      return;
+    }
+
+    _textureOffsetReportScheduled = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _textureOffsetReportScheduled = false;
+      unawaited(_flushTextureOffsetReport());
+    });
+    SchedulerBinding.instance.ensureVisualUpdate();
+  }
+
+  Future<void> _flushTextureOffsetReport() async {
+    if (!mounted || !_textureOffsetReportDirty) {
+      return;
+    }
+
+    if (!_controller.value.isInitialized) {
+      _textureOffsetReportWaitingForReady = true;
+      await _controller.ready;
+      _textureOffsetReportWaitingForReady = false;
+      if (!mounted || !_controller.value.isInitialized) {
+        return;
+      }
+    }
+
+    _textureOffsetReportDirty = false;
+    await _reportTextureOffset();
+    if (_textureOffsetReportDirty) {
+      _scheduleTextureOffsetReport();
+    }
+  }
+
+  Future<void> _reportTextureOffset() {
+    if (!mounted || !_controller.value.isInitialized) {
+      return Future<void>.value();
+    }
+    final box = _key.currentContext?.findRenderObject() as RenderBox?;
+    if (box != null) {
+      // Invoke the channel synchronously so FIFO ordering puts this offset
+      // ahead of pointer/touch messages, without waiting for the native reply.
+      return _controller._setTextureOffset(box.localToGlobal(Offset.zero));
+    }
+    return Future<void>.value();
   }
 
   @override

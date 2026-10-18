@@ -18,6 +18,9 @@
 - Fixed internal WebView host windows stealing focus from the Flutter window (based on [#2768](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2768))
 - Redrew the WebView texture only when the captured frame changed, instead of at the display refresh rate
 - Reduced per-frame GPU work by leasing texture buffers to Flutter and reusing frame comparison resources
+- Stopped capturing frames of paused WebViews and of WebViews whose host window is minimized
+- Coalesced surface resizes to at most one per frame and recreated the capture frame pool only when the size changes
+- Fixed `setMemoryUsageTargetLevel` blocking the platform thread on an unresponsive browser process
 
 ## 0.7.0-beta.3
 

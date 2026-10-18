@@ -3,6 +3,7 @@
 - Updated Microsoft.Web.WebView2 SDK version from `1.0.3650.58` to `1.0.4078.44` and Microsoft.Windows.ImplementationLibrary from `1.0.250325.1` to `1.0.260126.7` to build with Visual Studio 2026 (based on [#2869](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2869))
 - Fixed CMake and MSVC `C4244`, `C4458` compiler warnings
 - Updated GoogleTest from `1.11.0` to `1.17.0` for CMake 4 compatibility
+- Added two-finger trackpad scrolling with natural inertia and 1:1 distance calibration
 
 ## 0.7.0-beta.3
 

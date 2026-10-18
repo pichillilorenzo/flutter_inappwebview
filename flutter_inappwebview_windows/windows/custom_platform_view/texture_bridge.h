@@ -30,6 +30,9 @@ namespace flutter_inappwebview_plugin
 
     bool Start();
     void Stop();
+    // Closes the capture session while the WebView is hidden and reopens it
+    // when shown. Flutter keeps the last frame meanwhile.
+    void SetCaptureSuspended(bool suspended);
 
     void SetOnFrameAvailable(FrameAvailableCallback callback)
     {
@@ -46,6 +49,7 @@ namespace flutter_inappwebview_plugin
 
   protected:
     bool is_running_ = false;
+    bool capture_suspended_ = false;
 
     const GraphicsContext* graphics_context_;
     std::mutex mutex_;
@@ -69,6 +73,8 @@ namespace flutter_inappwebview_plugin
     EventRegistrationToken on_frame_arrived_token_ = {};
 
     virtual void StopInternal();
+    // Called under |mutex_| after a suspend closed the capture session.
+    virtual void OnCaptureSuspended();
     // Called under |mutex_| for every captured frame that survived the fps
     // limit. Returning false skips the frame: Flutter is not notified and the
     // frame is not drawn. The base bridge accepts everything; the GPU bridge
@@ -78,6 +84,8 @@ namespace flutter_inappwebview_plugin
     virtual bool AcceptFrame(const winrt::com_ptr<ID3D11Texture2D>& frame);
     void OnFrameArrived();
     bool ShouldDropFrame();
+    bool StartCapture();
+    void StopCapture();
 
     // corresponds to DXGI_FORMAT_B8G8R8A8_UNORM
     static constexpr auto kPixelFormat = ABI::Windows::Graphics::DirectX::

@@ -3389,26 +3389,40 @@ namespace flutter_inappwebview_plugin
     browserGate().removeWaiter(this);
   }
 
+  void InAppWebView::notifyVisibilityChanged(const bool wasVisible)
+  {
+    const bool visible = visibilityState_.shouldBeVisible();
+    if (visible != wasVisible && visibilityChangedCallback_) {
+      visibilityChangedCallback_(visible);
+    }
+  }
+
   void InAppWebView::setHostWindowMinimized(const bool minimized)
   {
+    const bool wasVisible = visibilityState_.shouldBeVisible();
     visibilityState_.setHostWindowMinimized(minimized);
     applyPendingBrowserState();
+    notifyVisibilityChanged(wasVisible);
   }
 
   void InAppWebView::pause()
   {
+    const bool wasVisible = visibilityState_.shouldBeVisible();
     visibilityState_.setPaused(true);
     pendingResume_ = false;
     pendingSuspend_ = true;
     applyPendingBrowserState();
+    notifyVisibilityChanged(wasVisible);
   }
 
   void InAppWebView::resume()
   {
+    const bool wasVisible = visibilityState_.shouldBeVisible();
     visibilityState_.setPaused(false);
     pendingSuspend_ = false;
     pendingResume_ = true;
     applyPendingBrowserState();
+    notifyVisibilityChanged(wasVisible);
   }
 
 

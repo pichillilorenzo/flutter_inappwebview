@@ -50,7 +50,35 @@ namespace flutter_inappwebview_plugin
     if (is_running_ || !capture_item_) {
       return false;
     }
+    if (!capture_suspended_ && !StartCapture()) {
+      return false;
+    }
+    is_running_ = true;
+    return true;
+  }
 
+  void TextureBridge::SetCaptureSuspended(bool suspended)
+  {
+    const std::lock_guard<std::mutex> lock(mutex_);
+    if (capture_suspended_ == suspended) {
+      return;
+    }
+    capture_suspended_ = suspended;
+    if (!is_running_) {
+      return;
+    }
+    if (suspended) {
+      StopCapture();
+      last_frame_ = nullptr;
+      OnCaptureSuspended();
+    }
+    else if (!StartCapture()) {
+      StopInternal();
+    }
+  }
+
+  bool TextureBridge::StartCapture()
+  {
     ABI::Windows::Graphics::SizeInt32 size;
     capture_item_->get_Size(&size);
 
@@ -78,15 +106,38 @@ namespace flutter_inappwebview_plugin
     if (FAILED(frame_pool_->CreateCaptureSession(capture_item_.get(),
       capture_session_.put()))) {
       std::cerr << "Creating capture session failed." << std::endl;
+      StopCapture();
       return false;
     }
 
-    if (SUCCEEDED(capture_session_->StartCapture())) {
-      is_running_ = true;
-      return true;
+    if (FAILED(capture_session_->StartCapture())) {
+      StopCapture();
+      return false;
     }
+    // The new pool already has the current size.
+    needs_update_ = false;
+    return true;
+  }
 
-    return false;
+  void TextureBridge::StopCapture()
+  {
+    if (frame_pool_) {
+      frame_pool_->remove_FrameArrived(on_frame_arrived_token_);
+    }
+    if (capture_session_) {
+      auto closable =
+        capture_session_.try_as<ABI::Windows::Foundation::IClosable>();
+      assert(closable);
+      closable->Close();
+      capture_session_ = nullptr;
+    }
+    if (frame_pool_) {
+      if (auto closable =
+        frame_pool_.try_as<ABI::Windows::Foundation::IClosable>()) {
+        closable->Close();
+      }
+      frame_pool_ = nullptr;
+    }
   }
 
   void TextureBridge::Stop()
@@ -99,19 +150,17 @@ namespace flutter_inappwebview_plugin
   {
     if (is_running_) {
       is_running_ = false;
-      frame_pool_->remove_FrameArrived(on_frame_arrived_token_);
-      auto closable =
-        capture_session_.try_as<ABI::Windows::Foundation::IClosable>();
-      assert(closable);
-      closable->Close();
-      capture_session_ = nullptr;
+      StopCapture();
     }
   }
+
+  void TextureBridge::OnCaptureSuspended() {}
 
   void TextureBridge::OnFrameArrived()
   {
     const std::lock_guard<std::mutex> lock(mutex_);
-    if (!is_running_) {
+    // A frame already in flight when capture was suspended finds no pool.
+    if (!is_running_ || !frame_pool_) {
       return;
     }
 

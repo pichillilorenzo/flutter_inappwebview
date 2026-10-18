@@ -421,17 +421,24 @@ void main(uint3 id : SV_DispatchThreadID) {
     lease->pool->surfaces[lease->surface_index].is_leased = false;
   }
 
-  void TextureBridgeGpu::StopInternal()
+  void TextureBridgeGpu::OnCaptureSuspended()
   {
-    TextureBridge::StopInternal();
-    // Outstanding Flutter leases retain the old pool until their release
-    // callbacks run; a resumed capture creates a new pool.
-    surface_pool_.reset();
+    // |surface_pool_| keeps the last frame on screen; the compare textures
+    // are rebuilt on resume and its first frame is always published.
     reference_ = nullptr;
     reference_view_ = nullptr;
     reference_size_ = { 0, 0 };
     incoming_ = nullptr;
     incoming_view_ = nullptr;
     incoming_size_ = { 0, 0 };
+  }
+
+  void TextureBridgeGpu::StopInternal()
+  {
+    TextureBridge::StopInternal();
+    // Outstanding Flutter leases retain the old pool until their release
+    // callbacks run; a resumed capture creates a new pool.
+    surface_pool_.reset();
+    OnCaptureSuspended();
   }
 }

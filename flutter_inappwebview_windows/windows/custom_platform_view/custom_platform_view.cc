@@ -150,6 +150,12 @@ namespace flutter_inappwebview_plugin
     texture_id_ = texture_registrar->RegisterTexture(flutter_texture_.get());
     texture_bridge_->SetOnFrameAvailable(
       [this]() { texture_registrar_->MarkTextureFrameAvailable(texture_id_); });
+    // A paused or minimized WebView needs no capture: stop paying for frames.
+    texture_bridge_->SetCaptureSuspended(!view->shouldBeVisible());
+    view->onVisibilityChanged([this](bool visible)
+      {
+        texture_bridge_->SetCaptureSuspended(!visible);
+      });
     // texture_bridge_->SetOnSurfaceSizeChanged([this](Size size) {
     //  view->SetSurfaceSize(size.width, size.height);
     //});
@@ -201,6 +207,9 @@ namespace flutter_inappwebview_plugin
   CustomPlatformView::~CustomPlatformView()
   {
     debugLog("dealloc CustomPlatformView");
+    if (view) {
+      view->onVisibilityChanged(nullptr);
+    }
     event_sink_ = nullptr;
     texture_registrar_->UnregisterTexture(texture_id_, nullptr);
   }

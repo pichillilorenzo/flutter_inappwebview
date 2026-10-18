@@ -25,6 +25,12 @@ jobs:
         with:
           channel: stable
           flutter-version: '3.47.2'
+      - name: Resolve Linux Dart package dependencies
+        run: flutter pub get --no-example
+        working-directory: flutter_inappwebview_linux
+      - name: Test Linux surface reporting
+        run: flutter test --no-pub
+        working-directory: flutter_inappwebview_linux
       - name: Install native texture test dependencies
         run: sudo apt-get update && sudo apt-get install -y libgtk-3-dev libepoxy-dev libegl1-mesa-dev libgl1-mesa-dri
       - run: flutter precache --linux

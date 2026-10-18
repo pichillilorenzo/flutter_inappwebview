@@ -46,6 +46,7 @@ namespace flutter_inappwebview_plugin
   typedef std::function<void(size_t width, size_t height)>
     SurfaceSizeChangedCallback;
   typedef std::function<void(const HCURSOR)> CursorChangedCallback;
+  typedef std::function<void(bool visible)> VisibilityChangedCallback;
   struct VirtualKeyState {
   public:
     inline void setIsLeftButtonDown(bool is_down)
@@ -157,6 +158,16 @@ namespace flutter_inappwebview_plugin
     {
       cursorChangedCallback_ = std::move(callback);
     }
+    // Reports pause/resume and host minimize/restore as the visibility the
+    // WebView should have, before the deferred browser-side flip is delivered.
+    void onVisibilityChanged(VisibilityChangedCallback callback)
+    {
+      visibilityChangedCallback_ = std::move(callback);
+    }
+    bool shouldBeVisible() const
+    {
+      return visibilityState_.shouldBeVisible();
+    }
     bool createSurface(const HWND parentWindow,
       winrt::com_ptr<ABI::Windows::UI::Composition::ICompositor> compositor);
     // Widget origin and size inside the Flutter view, physical pixels —
@@ -170,7 +181,7 @@ namespace flutter_inappwebview_plugin
     std::optional<std::string> getTitle() const;
     std::optional<int64_t> getFrameId() const;
     std::optional<int64_t> getMemoryUsageTargetLevel() const;
-    void setMemoryUsageTargetLevel(const int64_t& level) const;
+    void setMemoryUsageTargetLevel(const int64_t& level);
     void getFavicon(const std::optional<std::string>& url, const std::optional<FaviconImageFormat>& faviconImageFormat,
       const std::function<void(const std::optional<std::vector<uint8_t>>)> completionHandler) const;
     void showSaveAsUI(const std::function<void(const std::optional<int64_t>)> completionHandler) const;
@@ -275,10 +286,12 @@ namespace flutter_inappwebview_plugin
     winrt::com_ptr<ABI::Windows::UI::Composition::IVisual> surface_;
     SurfaceSizeChangedCallback surfaceSizeChangedCallback_;
     CursorChangedCallback cursorChangedCallback_;
+    VisibilityChangedCallback visibilityChangedCallback_;
     float scaleFactor_ = 1.0;
     POINT lastCursorPos_ = { 0, 0 };
     POINT widgetOffset_ = { 0, 0 };
     SIZE surfaceSize_ = { 0, 0 };
+    float surfaceScaleFactor_ = 0;
     VirtualKeyState virtualKeys_;
     WebViewVisibilityState visibilityState_;
 
@@ -304,6 +317,7 @@ namespace flutter_inappwebview_plugin
     // as long as that thread takes to wake.
     bool pendingSuspend_ = false;
     bool pendingResume_ = false;
+    std::optional<int64_t> pendingMemoryTarget_;
     // Queried once and reused; refreshed only after the browser process exits,
     // so no per-flip round-trip depends on it.
     DWORD browserProcessId_ = 0;
@@ -312,6 +326,7 @@ namespace flutter_inappwebview_plugin
     void registerSurfaceEventHandlers();
     DWORD cachedBrowserProcessId();
     void invalidateBrowserProcessCache();
+    void notifyVisibilityChanged(bool wasVisible);
     HRESULT onCallJsHandler(const bool& isMainFrame, ICoreWebView2WebMessageReceivedEventArgs* args);
   };
 }

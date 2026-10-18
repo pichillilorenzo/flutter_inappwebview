@@ -291,6 +291,10 @@ endif()
 # Also, added /bigobj flag.
 function(FLUTTER_INAPPWEBVIEW_WINDOWS_APPLY_STANDARD_SETTINGS TARGET)
   target_compile_features(${TARGET} PUBLIC cxx_std_17)
+  # C++/WinRT reaches for <experimental/coroutine> below C++20, and MSVC
+  # 14.51 rejects that header outright. C++20 is the real fix, but the
+  # sources are not conformant enough for it yet.
+  target_compile_definitions(${TARGET} PRIVATE "_SILENCE_EXPERIMENTAL_COROUTINE_DEPRECATION_WARNINGS")
   target_compile_options(${TARGET} PRIVATE /W4 /wd"4100")
   target_compile_options(${TARGET} PRIVATE /EHsc)
   target_compile_options(${TARGET} PRIVATE /bigobj)

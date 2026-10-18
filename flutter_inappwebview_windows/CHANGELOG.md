@@ -1,3 +1,8 @@
+## Unreleased
+
+- Implemented `preferredColorScheme` property of `InAppWebViewSettings` ([#2766](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2766)) (thanks to [rdesoky](https://github.com/rdesoky))
+- Fixed `setSettings` skipping a `preferredColorScheme` change after another WebView sharing the profile changed it
+
 ## 0.7.0-beta.3
 
 - Updated flutter_inappwebview_platform_interface version to ^1.4.0-beta.3

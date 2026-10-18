@@ -1,3 +1,7 @@
+## Unreleased
+
+- Added `PreferredColorScheme` and the Windows `InAppWebViewSettings.preferredColorScheme` property ([#2766](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2766)) (thanks to [rdesoky](https://github.com/rdesoky))
+
 ## 1.4.0-beta.3
 
 - Updated `flutter_inappwebview_internal_annotations` dependency from `^1.2.0` to `^1.3.0`

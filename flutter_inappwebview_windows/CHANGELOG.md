@@ -1,3 +1,8 @@
+## Unreleased
+
+- Fixed a crash on permission kinds introduced by newer WebView2 runtimes (based on [#2876](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2876))
+- Stopped WebView2 from saving permission decisions in the profile, so `onPermissionRequest` handles every request
+
 ## 0.7.0-beta.3
 
 - Updated flutter_inappwebview_platform_interface version to ^1.4.0-beta.3

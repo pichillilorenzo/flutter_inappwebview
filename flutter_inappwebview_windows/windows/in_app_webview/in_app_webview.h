@@ -130,10 +130,12 @@ namespace flutter_inappwebview_plugin
 
     // On failure the completionHandler receives the failing HRESULT and null
     // pointers, so callers can surface the real error code to the Dart side.
+    // failureStage, when given, is set to the WebView2 call that failed.
     static void createInAppWebViewEnv(const HWND parentWindow, const bool& willBeSurface, WebViewEnvironment* webViewEnvironment, const std::shared_ptr<InAppWebViewSettings> initialSettings, std::function<void(HRESULT errorCode,
       wil::com_ptr<ICoreWebView2Environment> webViewEnv,
       wil::com_ptr<ICoreWebView2Controller> webViewController,
-      wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController)> completionHandler);
+      wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController)> completionHandler,
+      std::shared_ptr<std::string> failureStage = nullptr);
 
     // custom_platform_view
     ABI::Windows::UI::Composition::IVisual* const surface()

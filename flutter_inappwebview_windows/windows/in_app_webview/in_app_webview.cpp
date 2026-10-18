@@ -99,12 +99,20 @@ namespace flutter_inappwebview_plugin
   void InAppWebView::createInAppWebViewEnv(const HWND parentWindow, const bool& willBeSurface, WebViewEnvironment* webViewEnvironment, const std::shared_ptr<InAppWebViewSettings> initialSettings, std::function<void(HRESULT errorCode,
     wil::com_ptr<ICoreWebView2Environment> webViewEnv,
     wil::com_ptr<ICoreWebView2Controller> webViewController,
-    wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController)> completionHandler)
+    wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController)> completionHandler,
+    std::shared_ptr<std::string> failureStage)
   {
-    auto callback = [parentWindow, willBeSurface, completionHandler, initialSettings](HRESULT result, wil::com_ptr<ICoreWebView2Environment> env) -> HRESULT
+    auto fail = [completionHandler, failureStage](const char* stage, HRESULT hr)
+      {
+        if (failureStage) {
+          *failureStage = stage;
+        }
+        completionHandler(hr, nullptr, nullptr, nullptr);
+      };
+    auto callback = [parentWindow, willBeSurface, completionHandler, initialSettings, fail](HRESULT result, wil::com_ptr<ICoreWebView2Environment> env) -> HRESULT
       {
         if (failedAndLog(result) || !env) {
-          completionHandler(FAILED(result) ? result : E_FAIL, nullptr, nullptr, nullptr);
+          fail("CreateCoreWebView2EnvironmentWithOptions callback", FAILED(result) ? result : E_FAIL);
           return E_FAIL;
         }
 
@@ -121,12 +129,12 @@ namespace flutter_inappwebview_plugin
         }
         if (willBeSurface && (webViewEnv10 || webViewEnv3)) {
           auto compositionCallback = Callback<ICoreWebView2CreateCoreWebView2CompositionControllerCompletedHandler>(
-            [completionHandler, env](HRESULT result, wil::com_ptr<ICoreWebView2CompositionController> compositionController) -> HRESULT
+            [completionHandler, fail, env](HRESULT result, wil::com_ptr<ICoreWebView2CompositionController> compositionController) -> HRESULT
             {
               wil::com_ptr<ICoreWebView2Controller3> webViewController = compositionController.try_query<ICoreWebView2Controller3>();
 
               if (failedAndLog(result) || !webViewController) {
-                completionHandler(FAILED(result) ? result : E_FAIL, nullptr, nullptr, nullptr);
+                fail("CreateCoreWebView2CompositionController callback", FAILED(result) ? result : E_FAIL);
                 return E_FAIL;
               }
 
@@ -146,15 +154,15 @@ namespace flutter_inappwebview_plugin
             ? webViewEnv10->CreateCoreWebView2CompositionControllerWithOptions(parentWindow, options.get(), compositionCallback.Get())
             : webViewEnv3->CreateCoreWebView2CompositionController(parentWindow, compositionCallback.Get());
           if (failedAndLog(createHr)) {
-            completionHandler(createHr, nullptr, nullptr, nullptr);
+            fail("CreateCoreWebView2CompositionController", createHr);
           }
         }
         else {
           auto controllerCallback = Callback<ICoreWebView2CreateCoreWebView2ControllerCompletedHandler>(
-            [completionHandler, env](HRESULT result, wil::com_ptr<ICoreWebView2Controller> controller) -> HRESULT
+            [completionHandler, fail, env](HRESULT result, wil::com_ptr<ICoreWebView2Controller> controller) -> HRESULT
             {
               if (failedAndLog(result) || !controller) {
-                completionHandler(FAILED(result) ? result : E_FAIL, nullptr, nullptr, nullptr);
+                fail("CreateCoreWebView2Controller callback", FAILED(result) ? result : E_FAIL);
                 return E_FAIL;
               }
 
@@ -165,7 +173,7 @@ namespace flutter_inappwebview_plugin
             ? webViewEnv10->CreateCoreWebView2ControllerWithOptions(parentWindow, options.get(), controllerCallback.Get())
             : env->CreateCoreWebView2Controller(parentWindow, controllerCallback.Get());
           if (failedAndLog(createHr)) {
-            completionHandler(createHr, nullptr, nullptr, nullptr);
+            fail("CreateCoreWebView2Controller", createHr);
           }
         }
         return S_OK;
@@ -182,7 +190,7 @@ namespace flutter_inappwebview_plugin
     }
 
     if (failedAndLog(hr)) {
-      completionHandler(hr, nullptr, nullptr, nullptr);
+      fail("CreateCoreWebView2EnvironmentWithOptions", hr);
     }
   }
 

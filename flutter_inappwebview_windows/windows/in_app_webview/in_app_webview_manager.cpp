@@ -151,6 +151,7 @@ namespace flutter_inappwebview_plugin
       ? plugin->webViewEnvironmentManager->webViewEnvironments.at(webViewEnvironmentId.value()).get() : nullptr;
 
     auto initialSettings = std::make_shared<InAppWebViewSettings>(settingsMap);
+    auto failureStage = std::make_shared<std::string>();
 
     InAppWebView::createInAppWebViewEnv(hwnd, true, webViewEnvironment, initialSettings,
       [=, alive = alive_.weak()](HRESULT errorCode,
@@ -224,9 +225,11 @@ namespace flutter_inappwebview_plugin
         }
         else {
           DestroyWindow(hwnd);
-          result_->Error("0", "Cannot create the InAppWebView instance! HRESULT " + getHRErrorString(errorCode));
+          const std::string stage = failureStage->empty() ? "" : " (" + *failureStage + ")";
+          result_->Error("0", "Cannot create the InAppWebView instance" + stage + "! HRESULT " + getHRErrorString(errorCode));
         }
-      }
+      },
+      failureStage
     );
   }
 

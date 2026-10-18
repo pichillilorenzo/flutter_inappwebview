@@ -1,3 +1,8 @@
+## Unreleased
+
+- Redrew the WebView texture only when the captured frame changed, instead of at the display refresh rate
+- Reduced per-frame GPU work by leasing texture buffers to Flutter and reusing frame comparison resources
+
 ## 0.7.0-beta.3
 
 - Updated flutter_inappwebview_platform_interface version to ^1.4.0-beta.3

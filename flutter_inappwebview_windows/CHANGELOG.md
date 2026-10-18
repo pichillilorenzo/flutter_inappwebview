@@ -8,6 +8,10 @@
 - Fixed HTML5 drag and drop by forwarding OLE drag and drop events to the WebView
 - Fixed a text selection or drag being cancelled when the cursor leaves the WebView with a mouse button held
 - Fixed reversed horizontal scrolling for trackpad pans and mouse tilt-wheel input
+- Added `WindowsWebViewCreationFailures` to report native WebView creation failures with the failing HRESULT, the requested URL and the widget key
+- Fixed `ready` and `dispose` waiting forever, and the host window leaking, when WebView creation fails
+- Fixed a hang when WebView2 controller creation fails synchronously
+- Fixed `setState` and `localToGlobal` calls after a `CustomPlatformView` is disposed
 
 ## 0.7.0-beta.3
 

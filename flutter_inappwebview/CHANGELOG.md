@@ -1,3 +1,7 @@
+## Unreleased
+
+- Passed the `InAppWebView` key to the platform widget, so a Windows creation failure can be matched to its widget
+
 ## 6.2.0-beta.3
 
 - Added Linux support

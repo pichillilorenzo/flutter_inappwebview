@@ -15,6 +15,7 @@
 - Fixed WebView2 input windows intercepting desktop clicks while the app is minimized, including WebViews created or resumed while minimized
 - Fixed crashes when a Dart reply, a WebView2 deferral or a creation callback arrives after its WebView was disposed
 - Fixed the platform thread blocking on an unresponsive WebView2 browser process when pausing, resuming or minimizing
+- Fixed internal WebView host windows stealing focus from the Flutter window (based on [#2768](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2768))
 
 ## 0.7.0-beta.3
 

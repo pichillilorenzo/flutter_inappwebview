@@ -1,6 +1,7 @@
 ## Unreleased
 
 - Implemented `headers` property of `CustomSchemeResponse`
+- Fixed COM stream and WebView2 response leaks in custom scheme responses, intercepted responses and request bodies
 
 ## 0.7.0-beta.3
 

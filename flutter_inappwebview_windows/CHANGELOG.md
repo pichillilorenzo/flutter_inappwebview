@@ -1,5 +1,6 @@
 ## 0.7.0-beta.3
 
+- Saved one full-frame GPU copy per changed WebView frame by swapping the comparison textures instead of copying between them.
 - Kept the shader compiler DLL loaded until its result and error blobs are released.
 - Published the first captured frame after creation, resizing, or resuming capture.
 - Reused frame-comparison shader bytecode and texture resource views across comparisons.

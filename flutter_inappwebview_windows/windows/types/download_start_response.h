@@ -42,13 +42,13 @@ namespace flutter_inappwebview_plugin
     DownloadStartResponse(const flutter::EncodableMap& map);
     ~DownloadStartResponse() = default;
 
-    bool DownloadStartResponse::operator==(const DownloadStartResponse& other)
+    bool operator==(const DownloadStartResponse& other)
     {
       return handled == other.handled &&
         action == other.action &&
         resultFilePath == other.resultFilePath;
     }
-    bool DownloadStartResponse::operator!=(const DownloadStartResponse& other)
+    bool operator!=(const DownloadStartResponse& other)
     {
       return !(*this == other);
     }

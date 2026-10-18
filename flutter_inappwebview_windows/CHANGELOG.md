@@ -1,5 +1,6 @@
 ## 0.7.0-beta.3
 
+- Stopped capturing frames of paused WebViews and of WebViews whose host window is minimized; the last frame stays on screen until capture resumes.
 - Kept the shader compiler DLL loaded until its result and error blobs are released.
 - Published the first captured frame after creation, resizing, or resuming capture.
 - Reused frame-comparison shader bytecode and texture resource views across comparisons.

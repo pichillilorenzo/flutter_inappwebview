@@ -31,6 +31,7 @@ namespace flutter_inappwebview_plugin
 
   protected:
     void StopInternal() override;
+    void OnCaptureSuspended() override;
     bool AcceptFrame(const winrt::com_ptr<ID3D11Texture2D>& frame) override;
 
   private:

@@ -46,6 +46,7 @@ namespace flutter_inappwebview_plugin
   typedef std::function<void(size_t width, size_t height)>
     SurfaceSizeChangedCallback;
   typedef std::function<void(const HCURSOR)> CursorChangedCallback;
+  typedef std::function<void(bool visible)> VisibilityChangedCallback;
   struct VirtualKeyState {
   public:
     inline void setIsLeftButtonDown(bool is_down)
@@ -156,6 +157,16 @@ namespace flutter_inappwebview_plugin
     void onCursorChanged(CursorChangedCallback callback)
     {
       cursorChangedCallback_ = std::move(callback);
+    }
+    // Reports pause/resume and host minimize/restore as the visibility the
+    // WebView should have, before the deferred browser-side flip is delivered.
+    void onVisibilityChanged(VisibilityChangedCallback callback)
+    {
+      visibilityChangedCallback_ = std::move(callback);
+    }
+    bool shouldBeVisible() const
+    {
+      return visibilityState_.shouldBeVisible();
     }
     bool createSurface(const HWND parentWindow,
       winrt::com_ptr<ABI::Windows::UI::Composition::ICompositor> compositor);
@@ -275,6 +286,7 @@ namespace flutter_inappwebview_plugin
     winrt::com_ptr<ABI::Windows::UI::Composition::IVisual> surface_;
     SurfaceSizeChangedCallback surfaceSizeChangedCallback_;
     CursorChangedCallback cursorChangedCallback_;
+    VisibilityChangedCallback visibilityChangedCallback_;
     float scaleFactor_ = 1.0;
     POINT lastCursorPos_ = { 0, 0 };
     POINT widgetOffset_ = { 0, 0 };
@@ -312,6 +324,7 @@ namespace flutter_inappwebview_plugin
     void registerSurfaceEventHandlers();
     DWORD cachedBrowserProcessId();
     void invalidateBrowserProcessCache();
+    void notifyVisibilityChanged(bool wasVisible);
     HRESULT onCallJsHandler(const bool& isMainFrame, ICoreWebView2WebMessageReceivedEventArgs* args);
   };
 }

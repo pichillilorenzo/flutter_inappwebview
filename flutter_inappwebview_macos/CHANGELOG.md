@@ -1,3 +1,8 @@
+## Unreleased
+
+- Coalesced scroll notifications and removed their unused JavaScript promise round trip
+- Batched console message notifications, preserving message order and delivering warnings and errors immediately
+
 ## 1.2.0-beta.3
 
 - Updated flutter_inappwebview_platform_interface version to ^1.4.0-beta.3

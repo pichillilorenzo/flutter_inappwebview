@@ -1,3 +1,7 @@
+## Unreleased
+
+- Cancelled pending JavaScript callbacks and stale queued evaluations when their document is replaced or disposed
+
 ## 1.2.0-beta.3
 
 - Updated flutter_inappwebview_platform_interface version to ^1.4.0-beta.3

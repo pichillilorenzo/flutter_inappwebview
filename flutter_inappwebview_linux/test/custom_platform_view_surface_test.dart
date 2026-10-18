@@ -48,7 +48,15 @@ void main() {
     double width = 100,
     double height = 60,
     double? scaleFactor,
+    double? mediaQueryDpr,
   }) {
+    Widget view = CustomPlatformView(scaleFactor: scaleFactor);
+    if (mediaQueryDpr != null) {
+      view = MediaQuery(
+        data: MediaQueryData(devicePixelRatio: mediaQueryDpr),
+        child: view,
+      );
+    }
     return MaterialApp(
       home: Scaffold(
         body: Stack(
@@ -58,7 +66,7 @@ void main() {
               top: top,
               width: width,
               height: height,
-              child: CustomPlatformView(scaleFactor: scaleFactor),
+              child: view,
             ),
           ],
         ),
@@ -114,6 +122,91 @@ void main() {
     tester.view.resetDevicePixelRatio();
   });
 
+  testWidgets(
+    'ready layout bursts coalesce within a frame and pointer wakes it',
+    (tester) async {
+      tester.view.devicePixelRatio = 2;
+      tester.view.physicalSize = const Size(1000, 800);
+      installChannelMocks();
+
+      var width = 100.0;
+      var height = 60.0;
+      var left = 20.0;
+      var scaleFactor = 1.25;
+      late StateSetter updateLayout;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: StatefulBuilder(
+              builder: (context, setState) {
+                updateLayout = setState;
+                return Stack(
+                  children: [
+                    Positioned(
+                      left: left,
+                      top: 15,
+                      width: width,
+                      height: height,
+                      child: CustomPlatformView(scaleFactor: scaleFactor),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+      viewCalls.clear();
+
+      updateLayout(() {
+        width = 180;
+        height = 90;
+        left = 50;
+        scaleFactor = 1.75;
+      });
+      final notificationContext = tester.element(
+        find.byType(SizeChangedLayoutNotifier),
+      );
+      for (var i = 0; i < 4; i++) {
+        const SizeChangedLayoutNotification().dispatch(notificationContext);
+      }
+      expect(callsFor('setSize'), isEmpty);
+
+      await tester.pump();
+      expect(callsFor('setSize'), hasLength(1));
+      expect(callsFor('setSize').single.arguments, [180.0, 90.0, 1.75]);
+      expect(callsFor('setTextureOffset').last.arguments, [50.0, 15.0]);
+
+      viewCalls.clear();
+      expect(tester.binding.hasScheduledFrame, isFalse);
+      tester.binding.handlePointerEvent(
+        const PointerDownEvent(
+          pointer: 2,
+          position: Offset(60, 25),
+          buttons: kPrimaryMouseButton,
+          kind: PointerDeviceKind.mouse,
+        ),
+      );
+      expect(tester.binding.hasScheduledFrame, isTrue);
+      expect(callsFor('setSize'), isEmpty);
+      await tester.pump();
+      expect(callsFor('setSize'), hasLength(1));
+      expect(callsFor('setSize').single.arguments, [180.0, 90.0, 1.75]);
+      tester.binding.handlePointerEvent(
+        const PointerUpEvent(
+          pointer: 2,
+          position: Offset(60, 25),
+          kind: PointerDeviceKind.mouse,
+        ),
+      );
+
+      await tester.pumpWidget(const SizedBox());
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    },
+  );
+
   testWidgets('a device pixel ratio change reports unchanged logical size', (
     tester,
   ) async {
@@ -126,12 +219,27 @@ void main() {
     expect(callsFor('setSize').last.arguments, [80.0, 40.0, 1.5]);
 
     tester.view.devicePixelRatio = 2.5;
-    await tester.pumpWidget(buildView(width: 80, height: 40));
     await tester.pump();
 
     expect(callsFor('setSize').last.arguments, [80.0, 40.0, 2.5]);
     expect(callsFor('setSize'), hasLength(2));
 
+    await tester.pumpWidget(const SizedBox());
+    tester.view.resetPhysicalSize();
+    tester.view.resetDevicePixelRatio();
+  });
+
+  testWidgets('default scale uses FlutterView DPR over MediaQuery override', (
+    tester,
+  ) async {
+    tester.view.devicePixelRatio = 2;
+    tester.view.physicalSize = const Size(1000, 800);
+    installChannelMocks();
+
+    await tester.pumpWidget(buildView(width: 80, height: 40, mediaQueryDpr: 7));
+    await tester.pump();
+
+    expect(callsFor('setSize').single.arguments, [80.0, 40.0, 2.0]);
     await tester.pumpWidget(const SizedBox());
     tester.view.resetPhysicalSize();
     tester.view.resetDevicePixelRatio();
@@ -223,6 +331,26 @@ void main() {
       tester.view.resetPhysicalSize();
     },
   );
+
+  testWidgets('disposal after readiness cancels a queued layout report', (
+    tester,
+  ) async {
+    installChannelMocks();
+    await tester.pumpWidget(buildView(width: 100, height: 50));
+    await tester.pump();
+    viewCalls.clear();
+
+    final notificationContext = tester.element(
+      find.byType(SizeChangedLayoutNotifier),
+    );
+    const SizeChangedLayoutNotification().dispatch(notificationContext);
+    expect(callsFor('setSize'), isEmpty);
+
+    await tester.pumpWidget(const SizedBox());
+    expect(callsFor('setSize'), isEmpty);
+    expect(callsFor('setTextureOffset'), isEmpty);
+    expect(tester.takeException(), isNull);
+  });
 
   testWidgets(
     'disposal during creation drops pending size and offset reports',

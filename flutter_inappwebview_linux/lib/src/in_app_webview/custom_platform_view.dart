@@ -358,7 +358,8 @@ class CustomPlatformView extends StatefulWidget {
   _CustomPlatformViewState createState() => _CustomPlatformViewState();
 }
 
-class _CustomPlatformViewState extends State<CustomPlatformView> {
+class _CustomPlatformViewState extends State<CustomPlatformView>
+    with WidgetsBindingObserver {
   final GlobalKey _key = GlobalKey();
   final _downButtons = <int, PointerButton>{};
 
@@ -391,6 +392,7 @@ class _CustomPlatformViewState extends State<CustomPlatformView> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
 
     _controller.initialize(
       onPlatformViewCreated: (id) {
@@ -425,6 +427,19 @@ class _CustomPlatformViewState extends State<CustomPlatformView> {
   }
 
   @override
+  void didChangeMetrics() {
+    super.didChangeMetrics();
+    if (widget.scaleFactor != null) {
+      return;
+    }
+    final scaleFactor = _effectiveScaleFactor;
+    if (_lastObservedScaleFactor != scaleFactor) {
+      _lastObservedScaleFactor = scaleFactor;
+      _scheduleSurfaceSizeReport();
+    }
+  }
+
+  @override
   void didUpdateWidget(covariant CustomPlatformView oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.scaleFactor != widget.scaleFactor) {
@@ -434,9 +449,7 @@ class _CustomPlatformViewState extends State<CustomPlatformView> {
   }
 
   double get _effectiveScaleFactor =>
-      widget.scaleFactor ??
-      MediaQuery.maybeDevicePixelRatioOf(context) ??
-      View.of(context).devicePixelRatio;
+      widget.scaleFactor ?? View.of(context).devicePixelRatio;
 
   @override
   Widget build(BuildContext context) {
@@ -787,6 +800,7 @@ class _CustomPlatformViewState extends State<CustomPlatformView> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
     _cursorSubscription?.cancel();
     _controller.dispose();

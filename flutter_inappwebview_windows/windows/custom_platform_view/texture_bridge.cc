@@ -73,7 +73,9 @@ namespace flutter_inappwebview_plugin
       OnCaptureSuspended();
     }
     else if (!StartCapture()) {
-      StopInternal();
+      // Keep the bridge running and retain the last published frame. A later
+      // visibility transition can retry StartCapture without requiring a
+      // surface resize to call Start() again.
     }
   }
 

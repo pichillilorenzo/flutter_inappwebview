@@ -13,6 +13,8 @@
 - Fixed a hang when WebView2 controller creation fails synchronously
 - Fixed `setState` and `localToGlobal` calls after a `CustomPlatformView` is disposed
 - Fixed WebView2 input windows intercepting desktop clicks while the app is minimized, including WebViews created or resumed while minimized
+- Fixed crashes when a Dart reply, a WebView2 deferral or a creation callback arrives after its WebView was disposed
+- Fixed the platform thread blocking on an unresponsive WebView2 browser process when pausing, resuming or minimizing
 
 ## 0.7.0-beta.3
 

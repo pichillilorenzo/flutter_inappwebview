@@ -64,6 +64,7 @@ namespace flutter_inappwebview_plugin
       frame_pool_;
     winrt::com_ptr<ABI::Windows::Graphics::Capture::IGraphicsCaptureSession>
       capture_session_;
+    ABI::Windows::Graphics::SizeInt32 pool_size_ = { 0, 0 };
 
     EventRegistrationToken on_closed_token_ = {};
     EventRegistrationToken on_frame_arrived_token_ = {};

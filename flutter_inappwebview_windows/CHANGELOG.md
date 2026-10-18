@@ -1,5 +1,6 @@
 ## 0.7.0-beta.3
 
+- Coalesced surface size reports to at most one per frame, skipped unchanged sizes natively, and rebuilt the capture frame pool only when the captured size actually changed.
 - Kept the shader compiler DLL loaded until its result and error blobs are released.
 - Published the first captured frame after creation, resizing, or resuming capture.
 - Reused frame-comparison shader bytecode and texture resource views across comparisons.

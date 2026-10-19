@@ -20,6 +20,7 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   late List<MethodCall> viewCalls;
+  late List<MethodCall> managerCalls;
   Completer<int>? creation;
   Completer<void>? delayedOffsetReply;
 
@@ -27,6 +28,7 @@ void main() {
     final messenger =
         TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
     messenger.setMockMethodCallHandler(_managerChannel, (call) async {
+      managerCalls.add(call);
       if (call.method == 'createInAppWebView') {
         return creation == null ? 7 : creation!.future;
       }
@@ -79,6 +81,7 @@ void main() {
 
   setUp(() {
     viewCalls = <MethodCall>[];
+    managerCalls = <MethodCall>[];
     creation = null;
     delayedOffsetReply = null;
   });
@@ -121,6 +124,54 @@ void main() {
     tester.view.resetPhysicalSize();
     tester.view.resetDevicePixelRatio();
   });
+
+  testWidgets(
+    'failed creation is observable and does not use an invalid channel',
+    (tester) async {
+      final creationErrors = <LinuxWebViewCreationFailure>[];
+      final subscription = LinuxWebViewCreationDiagnostics.creationErrors
+          .listen(creationErrors.add);
+      addTearDown(subscription.cancel);
+      creation = Completer<int>();
+      installChannelMocks();
+
+      await tester.pumpWidget(buildView());
+      creation!.completeError(
+        PlatformException(
+          code: 'WEBVIEW_CREATION_FAILED',
+          message: 'WPE display connection failed',
+          details: <String, Object?>{
+            'stage': 'wpe_display_connect',
+            'nativeCode': 12,
+            'nativeDomain': 'wpe-platform-error',
+          },
+        ),
+      );
+      await tester.pump();
+      await tester.pumpAndSettle();
+      final pointerPosition = tester.getCenter(find.byType(CustomPlatformView));
+      await tester.sendEventToBinding(
+        PointerDownEvent(
+          pointer: 12,
+          position: pointerPosition,
+          buttons: kPrimaryButton,
+        ),
+      );
+      await tester.sendEventToBinding(
+        PointerUpEvent(pointer: 12, position: pointerPosition),
+      );
+      await tester.pump();
+      await tester.pumpWidget(const SizedBox());
+
+      expect(tester.takeException(), isNull);
+      expect(creationErrors, hasLength(1));
+      final platformError = creationErrors.single.error as PlatformException;
+      expect(platformError.code, 'WEBVIEW_CREATION_FAILED');
+      expect(platformError.details['stage'], 'wpe_display_connect');
+      expect(viewCalls, isEmpty);
+      expect(managerCalls.map((call) => call.method), ['createInAppWebView']);
+    },
+  );
 
   testWidgets(
     'ready layout bursts coalesce within a frame and pointer wakes it',

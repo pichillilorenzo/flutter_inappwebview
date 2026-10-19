@@ -73,9 +73,10 @@ namespace flutter_inappwebview_plugin
 
     auto webViewEnvironment = params.webViewEnvironmentId.has_value() && map_contains(plugin->webViewEnvironmentManager->webViewEnvironments, params.webViewEnvironmentId.value())
       ? plugin->webViewEnvironmentManager->webViewEnvironments.at(params.webViewEnvironmentId.value()).get() : nullptr;
+    auto failureStage = std::make_shared<std::string>();
 
     InAppWebView::createInAppWebViewEnv(m_hWnd, false, webViewEnvironment, params.initialWebViewSettings,
-      [this, params, webViewParams, alive = alive_.weak()](HRESULT errorCode, wil::com_ptr<ICoreWebView2Environment> webViewEnv, wil::com_ptr<ICoreWebView2Controller> webViewController, wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController) -> void
+      [this, params, webViewParams, failureStage, alive = alive_.weak()](HRESULT errorCode, wil::com_ptr<ICoreWebView2Environment> webViewEnv, wil::com_ptr<ICoreWebView2Controller> webViewController, wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController) -> void
       {
         if (alive.expired()) {
           // The engine was torn down while WebView2 was still creating the
@@ -106,10 +107,12 @@ namespace flutter_inappwebview_plugin
           }
         }
         else {
-          std::cerr << "Cannot create the InAppWebView instance! HRESULT " << getHRErrorString(errorCode) << std::endl;
+          const std::string stage = failureStage->empty() ? "" : " (" + *failureStage + ")";
+          std::cerr << "Cannot create the InAppWebView instance" << stage << "! HRESULT " << getHRErrorString(errorCode) << std::endl;
           close();
         }
-      });
+      },
+      failureStage);
   }
 
   void InAppBrowser::close() const

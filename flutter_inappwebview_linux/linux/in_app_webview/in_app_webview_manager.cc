@@ -241,6 +241,17 @@ void InAppWebViewManager::CreateInAppWebView(FlMethodCall* method_call) {
   }
 
   auto webview = std::make_shared<InAppWebView>(registrar_, messenger_, params.id, params);
+  if (webview->creationError().has_value()) {
+    const auto& error = webview->creationError().value();
+    g_autoptr(FlValue) details = to_fl_map({
+        {"stage", make_fl_value(error.stage)},
+        {"nativeCode", make_fl_value(error.nativeCode)},
+        {"nativeDomain", make_fl_value(error.nativeDomain)},
+    });
+    fl_method_call_respond_error(method_call, "WEBVIEW_CREATION_FAILED",
+                                 error.message.c_str(), details, nullptr);
+    return;
+  }
 
   auto platform_view =
       std::make_unique<CustomPlatformView>(messenger_, texture_registrar_, webview);

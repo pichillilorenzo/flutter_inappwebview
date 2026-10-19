@@ -1,8 +1,11 @@
 #include <gtest/gtest.h>
 
 #include <memory>
+#include <string>
+#include <vector>
 
 #include "in_app_webview/browser_process_gate.h"
+#include "one_shot_callback_test_cases.h"
 #include "in_app_webview/webview_visibility_state.h"
 #include "types/base_callback_result.h"
 #include "types/lifetime_token.h"
@@ -116,6 +119,10 @@ TEST(BrowserProcessGateRegistry, InvalidateForcesFreshProbe) {
   h.gate.invalidate(7);
   h.gate.tryAcquire(7, &a);
   EXPECT_EQ(h.probeCount, 2);
+}
+
+TEST(OneShotCallback, CallbackOwnershipAndCompletionBehavior) {
+  runOneShotCallbackTests();
 }
 
 namespace {

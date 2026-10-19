@@ -25,14 +25,14 @@ namespace flutter_inappwebview_plugin
       const flutter::MethodCall<flutter::EncodableValue>& method_call,
       std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result);
 
-    std::optional<LRESULT> PlatformUtil::HandleWindowProc(
+    std::optional<LRESULT> HandleWindowProc(
       HWND hWnd,
       UINT message,
       WPARAM wParam,
       LPARAM lParam) noexcept;
 
   private:
-    void PlatformUtil::_EmitEvent(std::string eventName);
+    void _EmitEvent(std::string eventName);
     bool window_is_moving_ = false;
     bool window_start_move_sent_ = false;
   };

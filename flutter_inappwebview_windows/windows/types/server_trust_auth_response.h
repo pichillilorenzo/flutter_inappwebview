@@ -39,11 +39,11 @@ namespace flutter_inappwebview_plugin
     ServerTrustAuthResponse(const flutter::EncodableMap& map);
     ~ServerTrustAuthResponse() = default;
 
-    bool ServerTrustAuthResponse::operator==(const ServerTrustAuthResponse& other)
+    bool operator==(const ServerTrustAuthResponse& other)
     {
       return action == other.action;
     }
-    bool ServerTrustAuthResponse::operator!=(const ServerTrustAuthResponse& other)
+    bool operator!=(const ServerTrustAuthResponse& other)
     {
       return !(*this == other);
     }

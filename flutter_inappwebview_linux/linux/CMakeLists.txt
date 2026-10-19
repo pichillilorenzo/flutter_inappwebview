@@ -75,8 +75,13 @@ if(WPE_PLATFORM_FOUND AND WPE_PLATFORM_HEADLESS_FOUND)
   # The pkg-config file may exist but WebKit headers may not have the required functions
   # This happens when WPE WebKit is rebuilt without WPEPlatform support
   include(CheckCXXSourceCompiles)
+  include(CMakePushCheckState)
+  # The check's settings must not leak into later checks of the same build.
+  cmake_push_check_state(RESET)
   set(CMAKE_REQUIRED_INCLUDES ${WPE_WEBKIT_INCLUDE_DIRS} ${WPE_PLATFORM_INCLUDE_DIRS})
-  set(CMAKE_REQUIRED_LIBRARIES ${WPE_WEBKIT_LIBRARIES} ${WPE_PLATFORM_LIBRARIES})
+  # Full paths: WPE WebKit installed outside the linker's default directories
+  # (any PKG_CONFIG_PATH prefix) is otherwise not found, and the check fails.
+  set(CMAKE_REQUIRED_LIBRARIES ${WPE_WEBKIT_LINK_LIBRARIES} ${WPE_PLATFORM_LINK_LIBRARIES})
   check_cxx_source_compiles("
     #include <wpe/webkit.h>
     int main() {
@@ -85,6 +90,7 @@ if(WPE_PLATFORM_FOUND AND WPE_PLATFORM_HEADLESS_FOUND)
       return 0;
     }
   " WEBKIT_HAS_WPE_PLATFORM_API)
+  cmake_pop_check_state()
   
   if(WEBKIT_HAS_WPE_PLATFORM_API)
     message(STATUS "flutter_inappwebview_linux: Found wpe-platform-2.0 (WPEPlatform API - DEFAULT)")

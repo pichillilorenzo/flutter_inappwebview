@@ -1,5 +1,6 @@
 ## 0.7.0-beta.3
 
+- Implemented `getDefaultUserAgent` InAppWebViewController static method (reads the WebView2 default `UserAgent` from a throwaway controller and caches it)
 - Updated flutter_inappwebview_platform_interface version to ^1.4.0-beta.3
 - Updated Microsoft.Web.WebView2 SDK version from `1.0.2849.39` to `1.0.3650.58`
 - Implemented `getFrameId`, `getFavicon`, `showSaveAsUI`, `getMemoryUsageTargetLevel`, `setMemoryUsageTargetLevel` InAppWebViewController method

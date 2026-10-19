@@ -87,8 +87,19 @@ void InAppBrowserManager::HandleMethodCallImpl(FlMethodCall* method_call) {
   FlValue* args = fl_method_call_get_args(method_call);
 
   if (strcmp(method, "open") == 0) {
-    createInAppBrowser(args);
-    fl_method_call_respond_success(method_call, fl_value_new_bool(true), nullptr);
+    auto error = createInAppBrowser(args);
+    if (error.has_value()) {
+      const auto& creationError = error.value();
+      g_autoptr(FlValue) details = to_fl_map({
+          {"stage", make_fl_value(creationError.stage)},
+          {"nativeCode", make_fl_value(creationError.nativeCode)},
+          {"nativeDomain", make_fl_value(creationError.nativeDomain)},
+      });
+      fl_method_call_respond_error(method_call, "WEBVIEW_CREATION_FAILED",
+                                   creationError.message.c_str(), details, nullptr);
+    } else {
+      fl_method_call_respond_success(method_call, fl_value_new_bool(true), nullptr);
+    }
     return;
   }
 
@@ -106,16 +117,16 @@ void InAppBrowserManager::HandleMethodCallImpl(FlMethodCall* method_call) {
   fl_method_call_respond_not_implemented(method_call, nullptr);
 }
 
-void InAppBrowserManager::createInAppBrowser(FlValue* arguments) {
+std::optional<WebViewCreationError> InAppBrowserManager::createInAppBrowser(FlValue* arguments) {
   if (arguments == nullptr || fl_value_get_type(arguments) != FL_VALUE_TYPE_MAP) {
-    return;
+    return std::nullopt;
   }
 
   // Parse arguments
   std::string id = get_fl_map_value<std::string>(arguments, "id", "");
   if (id.empty()) {
     debugLog("InAppBrowserManager: Missing browser ID");
-    return;
+    return std::nullopt;
   }
 
   // Parse URL request
@@ -192,7 +203,11 @@ void InAppBrowserManager::createInAppBrowser(FlValue* arguments) {
 
   // Create the browser - pass cached messenger directly
   auto browser = std::make_unique<InAppBrowser>(this, messenger_, gtk_window_, params);
+  if (browser->creationError().has_value()) {
+    return browser->creationError();
+  }
   browsers_[id] = std::move(browser);
+  return std::nullopt;
 }
 
 void InAppBrowserManager::openWithSystemBrowser(const std::string& url,

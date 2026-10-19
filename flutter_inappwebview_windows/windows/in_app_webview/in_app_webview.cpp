@@ -52,6 +52,7 @@
 #include "browser_process_gate.h"
 #include "in_app_webview.h"
 #include "in_app_webview_manager.h"
+#include "../types/one_shot_callback.h"
 
 namespace flutter_inappwebview_plugin
 {
@@ -102,14 +103,12 @@ namespace flutter_inappwebview_plugin
     wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController)> completionHandler,
     std::shared_ptr<std::string> failureStage)
   {
-    auto fail = [completionHandler, failureStage](const char* stage, HRESULT hr)
+    auto completion = std::make_shared<OneShotCallback<decltype(completionHandler)>>(std::move(completionHandler));
+    auto fail = [completion, failureStage](const char* stage, HRESULT hr)
       {
-        if (failureStage) {
-          *failureStage = stage;
-        }
-        completionHandler(hr, nullptr, nullptr, nullptr);
+        completion->invokeWithFailureStage(failureStage, stage, hr, nullptr, nullptr, nullptr);
       };
-    auto callback = [parentWindow, willBeSurface, completionHandler, initialSettings, fail](HRESULT result, wil::com_ptr<ICoreWebView2Environment> env) -> HRESULT
+    auto callback = [parentWindow, willBeSurface, completion, initialSettings, fail](HRESULT result, wil::com_ptr<ICoreWebView2Environment> env) -> HRESULT
       {
         if (failedAndLog(result) || !env) {
           fail("CreateCoreWebView2EnvironmentWithOptions callback", FAILED(result) ? result : E_FAIL);
@@ -128,13 +127,14 @@ namespace flutter_inappwebview_plugin
           failedLog(env->QueryInterface(IID_PPV_ARGS(&webViewEnv3)));
         }
         if (willBeSurface && (webViewEnv10 || webViewEnv3)) {
+          const bool usingOptions = webViewEnv10 && options;
           auto compositionCallback = Callback<ICoreWebView2CreateCoreWebView2CompositionControllerCompletedHandler>(
-            [completionHandler, fail, env](HRESULT result, wil::com_ptr<ICoreWebView2CompositionController> compositionController) -> HRESULT
+            [completion, fail, env, usingOptions](HRESULT result, wil::com_ptr<ICoreWebView2CompositionController> compositionController) -> HRESULT
             {
               wil::com_ptr<ICoreWebView2Controller3> webViewController = compositionController.try_query<ICoreWebView2Controller3>();
 
               if (failedAndLog(result) || !webViewController) {
-                fail("CreateCoreWebView2CompositionController callback", FAILED(result) ? result : E_FAIL);
+                fail(usingOptions ? "CreateCoreWebView2CompositionControllerWithOptions callback" : "CreateCoreWebView2CompositionController callback", FAILED(result) ? result : E_FAIL);
                 return E_FAIL;
               }
 
@@ -145,35 +145,36 @@ namespace flutter_inappwebview_plugin
                 webViewController3->put_RasterizationScale(1.0);
               }
 
-              completionHandler(S_OK, std::move(env), std::move(webViewController), std::move(compositionController));
+              completion->invoke(S_OK, std::move(env), std::move(webViewController), std::move(compositionController));
               return S_OK;
             });
           // A synchronous failure never invokes the callback — without this
           // report the MethodResult would never complete and Dart would hang.
-          HRESULT createHr = webViewEnv10 && options
+          HRESULT createHr = usingOptions
             ? webViewEnv10->CreateCoreWebView2CompositionControllerWithOptions(parentWindow, options.get(), compositionCallback.Get())
             : webViewEnv3->CreateCoreWebView2CompositionController(parentWindow, compositionCallback.Get());
           if (failedAndLog(createHr)) {
-            fail("CreateCoreWebView2CompositionController", createHr);
+            fail(usingOptions ? "CreateCoreWebView2CompositionControllerWithOptions" : "CreateCoreWebView2CompositionController", createHr);
           }
         }
         else {
+          const bool usingOptions = webViewEnv10 && options;
           auto controllerCallback = Callback<ICoreWebView2CreateCoreWebView2ControllerCompletedHandler>(
-            [completionHandler, fail, env](HRESULT result, wil::com_ptr<ICoreWebView2Controller> controller) -> HRESULT
+            [completion, fail, env, usingOptions](HRESULT result, wil::com_ptr<ICoreWebView2Controller> controller) -> HRESULT
             {
               if (failedAndLog(result) || !controller) {
-                fail("CreateCoreWebView2Controller callback", FAILED(result) ? result : E_FAIL);
+                fail(usingOptions ? "CreateCoreWebView2ControllerWithOptions callback" : "CreateCoreWebView2Controller callback", FAILED(result) ? result : E_FAIL);
                 return E_FAIL;
               }
 
-              completionHandler(S_OK, std::move(env), std::move(controller), nullptr);
+              completion->invoke(S_OK, std::move(env), std::move(controller), nullptr);
               return S_OK;
             });
-          HRESULT createHr = webViewEnv10 && options
+          HRESULT createHr = usingOptions
             ? webViewEnv10->CreateCoreWebView2ControllerWithOptions(parentWindow, options.get(), controllerCallback.Get())
             : env->CreateCoreWebView2Controller(parentWindow, controllerCallback.Get());
           if (failedAndLog(createHr)) {
-            fail("CreateCoreWebView2Controller", createHr);
+            fail(usingOptions ? "CreateCoreWebView2ControllerWithOptions" : "CreateCoreWebView2Controller", createHr);
           }
         }
         return S_OK;

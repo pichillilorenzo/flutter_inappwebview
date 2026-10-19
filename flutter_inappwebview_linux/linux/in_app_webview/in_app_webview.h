@@ -69,6 +69,7 @@
 #include "../types/user_script.h"
 #include "../find_interaction/find_interaction_controller.h"
 #include "in_app_webview_settings.h"
+#include "webview_creation_error.h"
 
 // Forward declaration of WPE types in global scope to avoid namespace conflicts
 #ifdef HAVE_WPE_BACKEND_LEGACY
@@ -135,6 +136,7 @@ class InAppWebView : public TextureWebViewApi {
 
   int64_t id() const { return id_; }
   WebKitWebView* webview() const { return webview_; }
+  const std::optional<WebViewCreationError>& creationError() const { return creation_error_; }
   WebViewChannelDelegate* channel_delegate() const { return channel_delegate_.get(); }
   FlPluginRegistrar* registrar() const { return registrar_; }
 
@@ -496,6 +498,7 @@ class InAppWebView : public TextureWebViewApi {
   FlView* fl_view_ = nullptr;  // Cached FlView for focus restoration
   InAppWebViewManager* manager_ = nullptr;  // Manager reference for multi-window support
   int64_t id_ = 0;
+  std::optional<WebViewCreationError> creation_error_;
   int64_t channel_id_ = -1;
   std::string string_channel_id_;  // String-based channel ID for headless webviews
 
@@ -697,8 +700,11 @@ class InAppWebView : public TextureWebViewApi {
   bool pointer_locked_ = false;
 
   // === Initialization ===
-  void InitWpeBackend();
-  void InitWebView(const InAppWebViewCreationParams& params);
+  bool InitWpeBackend();
+  bool InitWebView(const InAppWebViewCreationParams& params);
+  void SetCreationError(const std::string& stage, const std::string& message,
+                        std::optional<int> nativeCode = std::nullopt,
+                        std::optional<std::string> nativeDomain = std::nullopt);
   void RegisterEventHandlers();
   void PrepareAndAddUserScripts();  // Add plugin scripts based on settings
   void SetupMonitorChangeHandlers();

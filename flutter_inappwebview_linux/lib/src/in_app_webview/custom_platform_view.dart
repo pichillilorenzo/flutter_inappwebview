@@ -110,6 +110,36 @@ PointerButton _getButton(int value) {
 
 const MethodChannel _pluginChannel = IN_APP_WEBVIEW_STATIC_CHANNEL;
 
+/// Reports native WebView creation failures from Linux platform views.
+///
+/// The widget handles the failure internally so it does not produce an
+/// unhandled asynchronous error. Applications can listen here to inspect the
+/// original channel error and its stack trace. Native failures are reported as
+/// [PlatformException] values with their stage and native error details.
+class LinuxWebViewCreationFailure {
+  const LinuxWebViewCreationFailure(this.error, this.stackTrace);
+
+  /// The original error returned by the platform channel.
+  final Object error;
+
+  /// The stack captured when creation failed.
+  final StackTrace stackTrace;
+}
+
+class LinuxWebViewCreationDiagnostics {
+  LinuxWebViewCreationDiagnostics._();
+
+  static final StreamController<LinuxWebViewCreationFailure> _errors =
+      StreamController<LinuxWebViewCreationFailure>.broadcast();
+
+  /// A broadcast stream of WebView creation failures.
+  static Stream<LinuxWebViewCreationFailure> get creationErrors =>
+      _errors.stream;
+
+  static void _report(Object error, StackTrace stackTrace) =>
+      _errors.add(LinuxWebViewCreationFailure(error, stackTrace));
+}
+
 class CustomFlutterViewControllerValue {
   const CustomFlutterViewControllerValue({required this.isInitialized});
 
@@ -130,6 +160,7 @@ class CustomPlatformViewController
   Completer<void> _creatingCompleter = Completer<void>();
   int _textureId = 0;
   bool _isDisposed = false;
+  Object? _creationError;
 
   Future<void> get ready => _creatingCompleter.future;
 
@@ -154,10 +185,30 @@ class CustomPlatformViewController
     if (_isDisposed) {
       return;
     }
-    _textureId = (await _pluginChannel.invokeMethod<int>(
-      'createInAppWebView',
-      arguments,
-    ))!;
+    try {
+      _textureId = (await _pluginChannel.invokeMethod<int>(
+        'createInAppWebView',
+        arguments,
+      ))!;
+    } catch (error, stackTrace) {
+      _creationError = error;
+      _isDisposed = true;
+      if (!_creatingCompleter.isCompleted) {
+        _creatingCompleter.complete();
+      }
+      LinuxWebViewCreationDiagnostics._report(error, stackTrace);
+      if (error is! PlatformException) {
+        FlutterError.reportError(
+          FlutterErrorDetails(
+            exception: error,
+            stack: stackTrace,
+            library: 'flutter_inappwebview_linux',
+            context: ErrorDescription('while creating a Linux WebView'),
+          ),
+        );
+      }
+      Error.throwWithStackTrace(error, stackTrace);
+    }
 
     _methodChannel = MethodChannel(
       'com.pichillilorenzo/custom_platform_view_$_textureId',
@@ -193,14 +244,16 @@ class CustomPlatformViewController
     if (!_isDisposed) {
       _isDisposed = true;
       await _eventStreamSubscription?.cancel();
-      await _pluginChannel.invokeMethod('dispose', {"id": _textureId});
+      if (_creationError == null) {
+        await _pluginChannel.invokeMethod('dispose', {"id": _textureId});
+      }
     }
     super.dispose();
   }
 
   /// Sets the surface size to the provided [size].
   Future<void> _setSize(Size size, double scaleFactor) async {
-    if (_isDisposed) {
+    if (_isDisposed || _creationError != null) {
       return;
     }
     assert(value.isInitialized);
@@ -213,7 +266,7 @@ class CustomPlatformViewController
 
   /// Sets the texture offset (position within the Flutter window).
   Future<void> _setTextureOffset(Offset offset) async {
-    if (_isDisposed) {
+    if (_isDisposed || _creationError != null) {
       return;
     }
     assert(value.isInitialized);
@@ -394,15 +447,19 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
 
-    _controller.initialize(
-      onPlatformViewCreated: (id) {
-        if (!mounted) {
-          return;
-        }
-        widget.onPlatformViewCreated?.call(id);
-        setState(() {});
-      },
-      arguments: widget.creationParams,
+    unawaited(
+      _controller
+          .initialize(
+            onPlatformViewCreated: (id) {
+              if (!mounted) {
+                return;
+              }
+              widget.onPlatformViewCreated?.call(id);
+              setState(() {});
+            },
+            arguments: widget.creationParams,
+          )
+          .catchError((Object _) {}),
     );
 
     _cursorSubscription = _controller._cursor.listen((cursor) {

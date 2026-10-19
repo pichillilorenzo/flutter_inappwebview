@@ -1,5 +1,6 @@
 ## 1.2.0-beta.3
 
+- Added creation-stage context to WebView constructor failures while preserving the original exception cause and Flutter error delivery.
 - Cancelled pending JavaScript callbacks and stale queued evaluations when their document is replaced or disposed.
 - Added `InAppWebViewController.setBackgroundColor`, retaining the selected
   native color across `transparentBackground` toggles.

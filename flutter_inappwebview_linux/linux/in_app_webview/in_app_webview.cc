@@ -251,8 +251,9 @@ InAppWebView::InAppWebView(FlPluginRegistrar* registrar, FlBinaryMessenger* mess
     context_menu_config_ = params.contextMenu.value();
   }
 
-  InitWpeBackend();
-  InitWebView(params);
+  if (!InitWpeBackend() || !InitWebView(params)) {
+    return;
+  }
   RegisterEventHandlers();
 
   // Set up monitor change handlers and initial refresh rate (like Cog browser does)
@@ -440,11 +441,11 @@ InAppWebView::~InAppWebView() {
     scale_changed_handler_ = 0;
   }
   
-  if (wpe_view_ != nullptr) {
+  if (wpe_view_ != nullptr && webview_ != nullptr) {
     wpe_view_focus_out(wpe_view_);
   }
   
-  if (wpe_view_ != nullptr) {
+  if (wpe_view_ != nullptr && webview_ != nullptr) {
     wpe_view_unmap(wpe_view_);
   }
   
@@ -465,7 +466,7 @@ InAppWebView::~InAppWebView() {
     current_buffer_height_ = 0;
   }
   
-  if (wpe_view_ != nullptr) {
+  if (wpe_view_ != nullptr && webview_ != nullptr) {
     wpe_view_closed(wpe_view_);
   }
   
@@ -500,10 +501,17 @@ InAppWebView::~InAppWebView() {
 #endif
 }
 
-void InAppWebView::InitWpeBackend() {
+void InAppWebView::SetCreationError(const std::string& stage, const std::string& message,
+                                    std::optional<int> nativeCode,
+                                    std::optional<std::string> nativeDomain) {
+  creation_error_ = WebViewCreationError{stage, message, nativeCode, nativeDomain};
+  errorLog("InAppWebView creation failed at " + stage + ": " + message);
+}
+
+bool InAppWebView::InitWpeBackend() {
   if (!IsWpeWebKitAvailable()) {
-    errorLog("InAppWebView: WPE WebKit not available");
-    return;
+    SetCreationError("wpe_loader_init", "WPE WebKit backend is not available");
+    return false;
   }
 
 #ifdef HAVE_WPE_PLATFORM
@@ -518,17 +526,20 @@ void InAppWebView::InitWpeBackend() {
   
   wpe_display_ = wpe_display_headless_new();
   if (wpe_display_ == nullptr) {
-    errorLog("InAppWebView: Failed to create WPEDisplayHeadless");
-    return;
+    SetCreationError("wpe_display_headless_new", "Failed to create WPEDisplayHeadless");
+    return false;
   }
   
   // Connect the display
   if (!wpe_display_connect(wpe_display_, &error)) {
-    errorLog("InAppWebView: Failed to connect WPEDisplay: " + 
-             std::string(error ? error->message : "unknown"));
+    const std::string message = error ? error->message : "Unknown WPE display connection error";
+    const std::optional<int> code = error ? std::optional<int>(error->code) : std::nullopt;
+    const std::optional<std::string> domain = error ?
+        std::optional<std::string>(g_quark_to_string(error->domain)) : std::nullopt;
     g_clear_error(&error);
     g_clear_object(&wpe_display_);
-    return;
+    SetCreationError("wpe_display_connect", message, code, domain);
+    return false;
   }
   
   // Get EGL display from WPEDisplay for texture operations
@@ -537,9 +548,10 @@ void InAppWebView::InitWpeBackend() {
     // Software rendering mode - no EGL display available
     g_clear_error(&error);
   }
-  
-  // Note: The WebView will be created in InitWebView() using the "display" property
-  // WPEView and WPEToplevel are obtained from the WebView after creation
+
+  // The WebView will be created in InitWebView() using the "display" property.
+  // WPEView and WPEToplevel are obtained from the WebView after creation.
+  return true;
   
 #elif defined(HAVE_WPE_BACKEND_LEGACY)
   // === WPEBackend-FDO API (Legacy) ===
@@ -585,10 +597,11 @@ void InAppWebView::InitWpeBackend() {
 
   // Initialize WPE FDO with the EGL display
   if (!wpe_fdo_initialize_for_egl_display(egl_display)) {
-    errorLog("InAppWebView: Failed to initialize WPE FDO");
     // Try again with headless mode
     if (!wpe_fdo_initialize_for_egl_display(EGL_NO_DISPLAY)) {
-      errorLog("InAppWebView: Failed to initialize WPE FDO in headless mode");
+      SetCreationError("wpe_fdo_initialize_for_egl_display",
+                       "WPE FDO initialization failed for both EGL and headless modes");
+      return false;
     }
   }
 
@@ -604,11 +617,19 @@ void InAppWebView::InitWpeBackend() {
       wpe_view_backend_exportable_fdo_egl_create(&exportable_client, this, width_, height_);
 
   if (exportable_ == nullptr) {
-    errorLog("InAppWebView: Failed to create WPE exportable backend");
-    return;
+    SetCreationError("wpe_view_backend_exportable_fdo_egl_create",
+                      "Failed to create WPE exportable backend");
+    return false;
   }
 
   wpe_backend_ = wpe_view_backend_exportable_fdo_get_view_backend(exportable_);
+  if (wpe_backend_ == nullptr) {
+    wpe_view_backend_exportable_fdo_destroy(exportable_);
+    exportable_ = nullptr;
+    SetCreationError("wpe_view_backend_exportable_fdo_get_view_backend",
+                      "Failed to get WPE view backend from exportable backend");
+    return false;
+  }
 
   // Create WebKit backend wrapper
   backend_ = webkit_web_view_backend_new(
@@ -618,6 +639,15 @@ void InAppWebView::InitWpeBackend() {
         wpe_view_backend_exportable_fdo_destroy(exportable);
       },
       exportable_);
+
+  if (backend_ == nullptr) {
+    wpe_view_backend_exportable_fdo_destroy(exportable_);
+    exportable_ = nullptr;
+    wpe_backend_ = nullptr;
+    SetCreationError("webkit_web_view_backend_new",
+                      "Failed to create WebKit web view backend");
+    return false;
+  }
 
   wpe_view_backend_dispatch_set_device_scale_factor(wpe_backend_, scale_factor_);
 
@@ -644,17 +674,19 @@ void InAppWebView::InitWpeBackend() {
       },
       this);
 #endif
+  return true;
 }
 
-void InAppWebView::InitWebView(const InAppWebViewCreationParams& params) {
+bool InAppWebView::InitWebView(const InAppWebViewCreationParams& params) {
 #ifdef HAVE_WPE_PLATFORM
   // === WPEPlatform API ===
   // With WPEPlatform, we pass the "display" property to create the WebView
   // The WPEView is automatically created by WebKit
   
   if (wpe_display_ == nullptr) {
-    errorLog("InAppWebView: Cannot create webview without WPEDisplay");
-    return;
+    SetCreationError("g_object_new(WEBKIT_TYPE_WEB_VIEW)",
+                      "Cannot create webview without WPEDisplay");
+    return false;
   }
   
   // Create WebKit settings
@@ -709,20 +741,22 @@ void InAppWebView::InitWebView(const InAppWebViewCreationParams& params) {
   g_object_unref(settings);
   
   if (webview_ == nullptr) {
-    errorLog("InAppWebView: Failed to create WebKitWebView with WPEPlatform");
+    SetCreationError("g_object_new(WEBKIT_TYPE_WEB_VIEW)",
+                      "Failed to create WebKitWebView with WPEPlatform");
     if (networkSession != nullptr) {
       g_object_unref(networkSession);
     }
-    return;
+    return false;
   }
   
   // Get WPEView from the WebView (created automatically by WebKit)
   wpe_view_ = webkit_web_view_get_wpe_view(webview_);
   if (wpe_view_ == nullptr) {
-    errorLog("InAppWebView: Failed to get WPEView from WebView");
+    SetCreationError("webkit_web_view_get_wpe_view",
+                      "Failed to get WPEView from WebKitWebView");
     g_object_unref(webview_);
     webview_ = nullptr;
-    return;
+    return false;
   }
   
   // Note: Scale factor in WPEPlatform is read from the display, not set directly
@@ -800,8 +834,8 @@ void InAppWebView::InitWebView(const InAppWebViewCreationParams& params) {
   // === WPEBackend-FDO API (Legacy) ===
   
   if (backend_ == nullptr) {
-    errorLog("InAppWebView: Cannot create webview without backend");
-    return;
+    SetCreationError("webkit_web_view_new", "Cannot create WebKitWebView without a backend");
+    return false;
   }
 
   // Check if we're creating a related webview (for multi-window support)
@@ -814,8 +848,9 @@ void InAppWebView::InitWebView(const InAppWebViewCreationParams& params) {
         nullptr));
     
     if (webview_ == nullptr) {
-      errorLog("InAppWebView: Failed to create related WebKitWebView");
-      return;
+      SetCreationError("g_object_new(WEBKIT_TYPE_WEB_VIEW)",
+                        "Failed to create related WebKitWebView");
+      return false;
     }
   } else {
     // Create WebKit settings for a standalone webview
@@ -858,14 +893,14 @@ void InAppWebView::InitWebView(const InAppWebViewCreationParams& params) {
     }
 
     if (webview_ == nullptr) {
-      errorLog("InAppWebView: Failed to create WebKitWebView");
+      SetCreationError("g_object_new(WEBKIT_TYPE_WEB_VIEW)", "Failed to create WebKitWebView");
       if (settings != nullptr) {
         g_object_unref(settings);
       }
       if (networkSession != nullptr) {
         g_object_unref(networkSession);
       }
-      return;
+      return false;
     }
 
     if (params.initialSettings != nullptr) {
@@ -895,6 +930,7 @@ void InAppWebView::InitWebView(const InAppWebViewCreationParams& params) {
   if (content_manager != nullptr) {
     content_blocker_handler_ = std::make_unique<ContentBlockerHandler>(content_manager);
   }
+  return true;
 }
 
 void InAppWebView::RegisterEventHandlers() {

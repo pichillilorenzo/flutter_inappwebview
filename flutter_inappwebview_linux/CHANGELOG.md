@@ -1,5 +1,6 @@
 ## 0.1.0-beta.1
 
+- Reported native WebView initialization failures with their stage and original diagnostics, and released Dart creation waiters after failures.
 - Coalesced surface size reports to one update per frame and kept texture offsets current before pointer input.
 - Batched console notifications while preserving message order and immediate warning/error delivery.
 - Released oversized fallback pixel buffers after substantial viewport reductions while reusing capacity for modest resizes.

@@ -32,8 +32,10 @@ void main() {
       source,
       contains(
         'DestroyWindow(hwnd);\n'
-        '          result_->Error("0", "Cannot create the HeadlessInAppWebView instance! '
-        'HRESULT " + getHRErrorString(errorCode));',
+        '          const std::string stage = failureStage->empty() ? "" : '
+        '" (" + *failureStage + ")";\n'
+        '          result_->Error("0", "Cannot create the HeadlessInAppWebView instance" '
+        '+ stage + "! HRESULT " + getHRErrorString(errorCode));',
       ),
     );
   });

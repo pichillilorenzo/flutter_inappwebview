@@ -68,9 +68,12 @@ namespace flutter_inappwebview_plugin
     bool windowMinimized_ = false;
     LifetimeToken alive_;
     inline static bool valid_ = false;
+    // The step that left composition unavailable; new views use HWND mode.
+    inline static std::string compositionUnavailableStage_;
     inline static std::size_t instance_count_ = 0;
     inline static std::mutex shared_resources_mutex_;
 
+    HWND createHostWindow() const;
     static ABI::Windows::System::IDispatcherQueueController* detachSharedResourcesForShutdown();
     static void shutdownDispatcherQueue(ABI::Windows::System::IDispatcherQueueController* dispatcherQueueController);
   };

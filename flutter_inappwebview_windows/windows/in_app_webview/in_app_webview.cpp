@@ -3452,10 +3452,45 @@ namespace flutter_inappwebview_plugin
 
   void InAppWebView::notifyVisibilityChanged(const bool wasVisible)
   {
+    syncHostWindowVisibility();
     const bool visible = visibilityState_.shouldBeVisible();
     if (visible != wasVisible && visibilityChangedCallback_) {
       visibilityChangedCallback_(visible);
     }
+  }
+
+  void InAppWebView::setHostWindow(const HWND hostWindow)
+  {
+    hostWindow_ = hostWindow;
+    // Its own drop target would bypass the file guard of WebViewDropTarget.
+    if (auto controller4 = webViewController.try_query<ICoreWebView2Controller4>()) {
+      failedLog(controller4->put_AllowExternalDrop(FALSE));
+    }
+    syncHostWindowVisibility();
+  }
+
+  void InAppWebView::setHostWindowHidden(const bool hidden)
+  {
+    hostWindowHidden_ = hidden;
+    syncHostWindowVisibility();
+  }
+
+  void InAppWebView::syncHostWindowVisibility()
+  {
+    if (!hostWindow_) {
+      return;
+    }
+    const bool show = visibilityState_.shouldBeVisible() && !hostWindowHidden_ &&
+                      hostWindowPlaced_ && surfaceSize_.cx > 0 &&
+                      surfaceSize_.cy > 0;
+    if (!show) {
+      // A hidden window keeps the keyboard focus; hand it back to Flutter.
+      const HWND focused = GetFocus();
+      if (focused == hostWindow_ || IsChild(hostWindow_, focused)) {
+        SetFocus(GetParent(hostWindow_));
+      }
+    }
+    ShowWindow(hostWindow_, show ? SW_SHOWNOACTIVATE : SW_HIDE);
   }
 
   void InAppWebView::setHostWindowMinimized(const bool minimized)
@@ -3909,6 +3944,20 @@ namespace flutter_inappwebview_plugin
       return;
     }
 
+    if (hostWindow_ && width > 0 && height > 0) {
+      scaleFactor_ = scale_factor;
+      const SIZE size = { static_cast<LONG>(width * scale_factor),
+                          static_cast<LONG>(height * scale_factor) };
+      if (size.cx != surfaceSize_.cx || size.cy != surfaceSize_.cy) {
+        surfaceSize_ = size;
+        ::SetWindowPos(hostWindow_, nullptr, 0, 0, size.cx, size.cy,
+                       SWP_NOZORDER | SWP_NOMOVE | SWP_NOACTIVATE);
+        failedLog(webViewController->put_Bounds({ 0, 0, size.cx, size.cy }));
+      }
+      syncHostWindowVisibility();
+      return;
+    }
+
     if (surface_ && width > 0 && height > 0) {
       scaleFactor_ = scale_factor;
       auto scaled_width = width * scale_factor;
@@ -3968,6 +4017,10 @@ namespace flutter_inappwebview_plugin
         scaled_y,
         0, 0,
         SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE);
+    }
+    if (hostWindow_ && !hostWindowPlaced_) {
+      hostWindowPlaced_ = true;
+      syncHostWindowVisibility();
     }
   }
 
@@ -4501,6 +4554,9 @@ namespace flutter_inappwebview_plugin
     }
     if (webViewController) {
       failedLog(webViewController->Close());
+    }
+    if (hostWindow_) {
+      DestroyWindow(hostWindow_);
     }
     for (auto& [channelId, channel] : webMessageChannels_) {
       if (channel) {

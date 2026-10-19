@@ -284,7 +284,9 @@ namespace flutter_inappwebview_plugin
   {
     if (currentWebView_) {
       auto controller = currentWebView_->webViewCompositionController
-        .try_query<ICoreWebView2CompositionController3>();
+        ? currentWebView_->webViewCompositionController
+          .try_query<ICoreWebView2CompositionController3>()
+        : nullptr;
       if (controller) {
         failedLog(controller->DragLeave());
       }
@@ -326,7 +328,7 @@ namespace flutter_inappwebview_plugin
     if (webView != currentWebView_) {
       forwardLeave();
     }
-    auto controller = webView
+    auto controller = webView && webView->webViewCompositionController
       ? webView->webViewCompositionController
         .try_query<ICoreWebView2CompositionController3>()
       : nullptr;
@@ -376,7 +378,7 @@ namespace flutter_inappwebview_plugin
     const DWORD allowedEffects = *effect;
     POINT webViewPoint;
     const auto webView = webViewAt(point, &webViewPoint);
-    auto controller = webView
+    auto controller = webView && webView->webViewCompositionController
       ? webView->webViewCompositionController
         .try_query<ICoreWebView2CompositionController3>()
       : nullptr;

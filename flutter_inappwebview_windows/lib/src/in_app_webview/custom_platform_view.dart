@@ -9,6 +9,7 @@ import 'package:flutter/widgets.dart';
 import '../platform_util.dart';
 import '_static_channel.dart';
 import 'webview_creation_failure.dart';
+import 'webview_render_mode.dart';
 
 const Map<String, SystemMouseCursor> _cursors = {
   'none': SystemMouseCursors.none,
@@ -137,6 +138,10 @@ class CustomPlatformViewController
   Completer<void> _creatingCompleter = Completer<void>();
   int _textureId = 0;
   bool _isDisposed = false;
+  WindowsWebViewRenderMode _renderMode = WindowsWebViewRenderMode.composition;
+
+  /// How the native view is hosted; known once [ready] completes.
+  WindowsWebViewRenderMode get renderMode => _renderMode;
 
   Future<void> get ready => _creatingCompleter.future;
 
@@ -163,10 +168,25 @@ class CustomPlatformViewController
       return;
     }
     try {
-      _textureId = (await _pluginChannel.invokeMethod<int>(
-        'createInAppWebView',
-        arguments,
-      ))!;
+      final created = WindowsWebViewCreationResult.fromNative(
+        await _pluginChannel.invokeMethod<Object?>(
+          'createInAppWebView',
+          arguments,
+        ),
+      );
+      _textureId = created.id;
+      _renderMode = created.renderMode;
+      final fallbackStage = created.fallbackStage;
+      if (fallbackStage != null) {
+        WindowsWebViewHwndFallbacks.report(
+          WindowsWebViewHwndFallback(
+            stage: fallbackStage,
+            hresult: created.fallbackHresult,
+            requestedUrl: _requestedUrlOf(arguments),
+            creationKey: creationKey,
+          ),
+        );
+      }
     } catch (error, stackTrace) {
       // No native view exists; release waiters and prevent channel calls.
       _isDisposed = true;
@@ -320,6 +340,15 @@ class CustomPlatformViewController
     ]);
   }
 
+  /// Hides or shows the native window of [WindowsWebViewRenderMode.hwnd].
+  Future<void> _setHostWindowHidden(bool hidden) async {
+    if (_isDisposed) {
+      return;
+    }
+    assert(value.isInitialized);
+    return _methodChannel.invokeMethod('setHostWindowHidden', hidden);
+  }
+
   /// Sets the surface size to the provided [size].
   Future<void> _setPosition(Offset position, double scaleFactor) async {
     if (_isDisposed) {
@@ -410,6 +439,13 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
 
   bool _surfaceSizeReportScheduled = false;
 
+  // HWND mode: the native window follows this view and hides while it is
+  // not shown. Read in build, so a change rebuilds and runs the tracker.
+  bool _tickerEnabled = true;
+  int? _viewId;
+  bool? _hostWindowHidden;
+  (Offset, Size, double)? _hostWindowPlacement;
+
   final _controller = CustomPlatformViewController();
   final _focusNode = FocusNode();
 
@@ -435,6 +471,9 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
             if (!mounted) return;
             widget.onPlatformViewCreated?.call(id);
             setState(() {});
+            if (_isHwndMode) {
+              SchedulerBinding.instance.addPostFrameCallback(_trackHostWindow);
+            }
           },
           creationKey: widget.creationKey,
           arguments: widget.creationParams,
@@ -476,6 +515,8 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
 
   @override
   Widget build(BuildContext context) {
+    _tickerEnabled = TickerMode.of(context);
+    _viewId = View.of(context).viewId;
     return Focus(
       autofocus: true,
       focusNode: _focusNode,
@@ -502,8 +543,13 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
         return true;
       },
       child: SizeChangedLayoutNotifier(
-        child: _controller.value.isInitialized
-            ? Listener(
+        child: !_controller.value.isInitialized
+            ? const SizedBox()
+            : _isHwndMode
+            // The native window takes the input itself. The opaque listener
+            // only makes this view a hit-test target for the coverage check.
+            ? const Listener(behavior: HitTestBehavior.opaque)
+            : Listener(
                 onPointerHover: (ev) {
                   // ev.kind is for whatever reason not set to touch
                   // even on touch input
@@ -708,8 +754,7 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
                     filterQuality: widget.filterQuality,
                   ),
                 ),
-              )
-            : const SizedBox(),
+              ),
       ),
     );
   }
@@ -826,7 +871,7 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
     final box = _key.currentContext?.findRenderObject() as RenderBox?;
     if (box != null) {
       await _controller.ready;
-      if (!mounted || !box.attached) return;
+      if (!mounted || !box.attached || _isHwndMode) return;
       final position = box.localToGlobal(Offset.zero);
       unawaited(
         _controller._setPosition(
@@ -835,6 +880,69 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
         ),
       );
     }
+  }
+
+  bool get _isHwndMode =>
+      _controller.value.isInitialized &&
+      _controller.renderMode == WindowsWebViewRenderMode.hwnd;
+
+  double get _scaleFactor => widget.scaleFactor ?? window.devicePixelRatio;
+
+  /// Runs after every frame while the view lives in HWND mode.
+  void _trackHostWindow(Duration _) {
+    if (!mounted || !_isHwndMode) return;
+    final box = _key.currentContext?.findRenderObject() as RenderBox?;
+    var hidden = !_tickerEnabled;
+    if (box == null || !box.attached || !box.hasSize) {
+      hidden = true;
+    } else {
+      final transform = box.getTransformTo(null);
+      // An unpainted kept-alive child (an inactive page) gets a zero transform.
+      if (transform.determinant() == 0) {
+        hidden = true;
+      } else {
+        final placement = (
+          MatrixUtils.transformPoint(transform, Offset.zero),
+          box.size,
+          _scaleFactor,
+        );
+        if (placement != _hostWindowPlacement) {
+          _hostWindowPlacement = placement;
+          unawaited(_controller._setSize(placement.$2, placement.$3));
+          unawaited(_controller._setPosition(placement.$1, placement.$3));
+        }
+        hidden = hidden || _isCoveredByFlutterContent(box, transform);
+      }
+    }
+    if (hidden != _hostWindowHidden) {
+      _hostWindowHidden = hidden;
+      unawaited(_controller._setHostWindowHidden(hidden));
+    }
+    SchedulerBinding.instance.addPostFrameCallback(_trackHostWindow);
+  }
+
+  static const _coverageSamples = [0.125, 0.375, 0.625, 0.875];
+
+  /// Flutter cannot paint over the native window, so a dialog barrier, a menu
+  /// or any other hit-testable content above a sample point hides it.
+  bool _isCoveredByFlutterContent(RenderBox box, Matrix4 transform) {
+    final viewId = _viewId;
+    if (viewId == null) return false;
+    for (final fx in _coverageSamples) {
+      for (final fy in _coverageSamples) {
+        final local = Offset(box.size.width * fx, box.size.height * fy);
+        final result = HitTestResult();
+        WidgetsBinding.instance.hitTestInView(
+          result,
+          MatrixUtils.transformPoint(transform, local),
+          viewId,
+        );
+        if (!result.path.any((entry) => identical(entry.target, box))) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   @override

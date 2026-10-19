@@ -633,8 +633,14 @@ namespace flutter_inappwebview_plugin
               callback->defaultBehaviour = [this, callHandlerID](const std::optional<const flutter::EncodableValue*> response)
                 {
                   std::string json = "null";
-                  if (response.has_value() && !response.value()->IsNull()) {
-                    json = std::get<std::string>(*(response.value()));
+                  // The Dart side replies `null` (a null pointer here, not an
+                  // EncodableValue holding null) when no handler is registered
+                  // for `handlerName`; dereferencing it crashed the app on the
+                  // first callHandler to an unknown name.
+                  if (response.has_value() && response.value() != nullptr && !response.value()->IsNull()) {
+                    if (const auto* str = std::get_if<std::string>(response.value())) {
+                      json = *str;
+                    }
                   }
 
                   evaluateJavascript("if (window." + JAVASCRIPT_BRIDGE_NAME + "[" + std::to_string(callHandlerID) + "] != null) { \
@@ -1681,6 +1687,21 @@ namespace flutter_inappwebview_plugin
     webViewCompositionController->SendMouseInput(
       COREWEBVIEW2_MOUSE_EVENT_KIND::COREWEBVIEW2_MOUSE_EVENT_KIND_MOVE,
       virtualKeys_.state(), 0, point);
+  }
+
+  void InAppWebView::setCursorLeave()
+  {
+    if (!webViewCompositionController) {
+      return;
+    }
+
+    // Composition-hosted WebView2 never receives WM_MOUSELEAVE on its own; the
+    // host must send Leave (in addition to Move) for CursorChanged and hover
+    // popups to behave:
+    // https://learn.microsoft.com/microsoft-edge/webview2/reference/win32/icorewebview2compositioncontroller#sendmouseinput
+    webViewCompositionController->SendMouseInput(
+      COREWEBVIEW2_MOUSE_EVENT_KIND::COREWEBVIEW2_MOUSE_EVENT_KIND_LEAVE,
+      virtualKeys_.state(), 0, lastCursorPos_);
   }
 
   void InAppWebView::setPointerUpdate(int32_t pointer,

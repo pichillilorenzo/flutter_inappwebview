@@ -13,3 +13,6 @@ analyzer:
     deprecated_member_use_from_same_package: ignore
     unnecessary_cast: ignore
     unnecessary_import: ignore
+  exclude:
+    - build/**
+    - windows/**

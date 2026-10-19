@@ -17,6 +17,7 @@ namespace flutter_inappwebview_plugin
   constexpr auto kMethodSetSize = "setSize";
   constexpr auto kMethodSetPosition = "setPosition";
   constexpr auto kMethodSetCursorPos = "setCursorPos";
+  constexpr auto kMethodSetCursorLeave = "setCursorLeave";
   constexpr auto kMethodSetPointerUpdate = "setPointerUpdate";
   constexpr auto kMethodSetPointerButton = "setPointerButton";
   constexpr auto kMethodSetScrollDelta = "setScrollDelta";
@@ -238,6 +239,14 @@ namespace flutter_inappwebview_plugin
       const auto point = GetPointFromArgs(method_call.arguments());
       if (point && view) {
         view->setCursorPos(point->first, point->second);
+        return result->Success();
+      }
+      return result->Error(kErrorInvalidArgs);
+    }
+
+    if (method_name.compare(kMethodSetCursorLeave) == 0) {
+      if (view) {
+        view->setCursorLeave();
         return result->Success();
       }
       return result->Error(kErrorInvalidArgs);

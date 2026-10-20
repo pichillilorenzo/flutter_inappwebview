@@ -200,7 +200,16 @@ namespace flutter_inappwebview_plugin
   {
     debugLog("dealloc CustomPlatformView");
     event_sink_ = nullptr;
-    texture_registrar_->UnregisterTexture(texture_id_, nullptr);
+    // Unregistration is asynchronous: the raster thread can still invoke the
+    // surface descriptor callback after this destructor returns. Stop the
+    // capture, then keep the texture sources alive until the engine confirms
+    // the texture is gone — destroying them right away is a use-after-free
+    // that surfaces as garbage handles ("Binding D3D surface failed") or
+    // crashes during webview disposal.
+    texture_bridge_->Stop();
+    std::shared_ptr<TextureBridge> bridge = std::move(texture_bridge_);
+    std::shared_ptr<flutter::TextureVariant> texture = std::move(flutter_texture_);
+    texture_registrar_->UnregisterTexture(texture_id_, [bridge, texture]() {});
   }
 
   void CustomPlatformView::RegisterEventHandlers()

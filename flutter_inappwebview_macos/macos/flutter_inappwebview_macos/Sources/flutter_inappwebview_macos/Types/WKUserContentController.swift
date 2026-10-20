@@ -7,11 +7,7 @@
 
 import Foundation
 import WebKit
-#if SWIFT_PACKAGE
 import Collections
-#else
-import OrderedSet
-#endif
 
 extension WKUserContentController {
     static var WINDOW_ID_PREFIX = "WINDOW-ID-"
@@ -61,7 +57,6 @@ extension WKUserContentController {
         if #available(macOS 11.0, *) {
             contentWorlds = Set([WKContentWorld.page])
         }
-        #if SWIFT_PACKAGE
         pluginScripts = [
             .atDocumentStart: [],
             .atDocumentEnd: [],
@@ -70,16 +65,6 @@ extension WKUserContentController {
             .atDocumentStart: [],
             .atDocumentEnd: [],
         ]
-        #else
-        pluginScripts = [
-            .atDocumentStart: OrderedSet(sequence: []),
-            .atDocumentEnd: OrderedSet(sequence: []),
-        ]
-        userOnlyScripts = [
-            .atDocumentStart: OrderedSet(sequence: []),
-            .atDocumentEnd: OrderedSet(sequence: []),
-        ]
-        #endif
     }
 
     public func dispose (windowId: Int64?) {
@@ -195,24 +180,15 @@ extension WKUserContentController {
 
     public func removeUserOnlyScript(at index: Int, injectionTime: WKUserScriptInjectionTime) {
         let scriptToRemove = userOnlyScripts[injectionTime]![index]
-        #if SWIFT_PACKAGE
         userOnlyScripts[injectionTime]!.remove(at: index)
-        #else
-        userOnlyScripts[injectionTime]!.removeObject(at: index)
-        #endif
         removeUserScript(scriptToRemove: scriptToRemove)
     }
 
     public func removeAllUserOnlyScripts() {
         let allUserOnlyScripts = Array(userOnlyScripts.compactMap({ $0.value }).joined())
 
-        #if SWIFT_PACKAGE
         userOnlyScripts[.atDocumentStart]!.removeAll()
         userOnlyScripts[.atDocumentEnd]!.removeAll()
-        #else
-        userOnlyScripts[.atDocumentStart]!.removeAllObjects()
-        userOnlyScripts[.atDocumentEnd]!.removeAllObjects()
-        #endif
 
         removeUserScripts(scriptsToRemove: allUserOnlyScripts)
     }
@@ -233,13 +209,8 @@ extension WKUserContentController {
     public func removeAllPluginScripts() {
         let allPluginScripts = Array(pluginScripts.compactMap({ $0.value }).joined())
 
-        #if SWIFT_PACKAGE
         pluginScripts[.atDocumentStart]!.removeAll()
         pluginScripts[.atDocumentEnd]!.removeAll()
-        #else
-        pluginScripts[.atDocumentStart]!.removeAllObjects()
-        pluginScripts[.atDocumentEnd]!.removeAllObjects()
-        #endif
 
         removeUserScripts(scriptsToRemove: allPluginScripts)
     }

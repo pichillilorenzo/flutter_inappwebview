@@ -1,3 +1,5 @@
+import 'dart:ui' show PlatformDispatcher;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
@@ -328,6 +330,12 @@ class WindowsInAppWebViewWidget extends PlatformInAppWebViewWidget {
       }
     }
 
+    // Multi-window aware: forward the hosting Flutter view + engine ids so
+    // the C++ side can resolve the correct RegularWindow HWND. Falls back
+    // to registrar->GetView() (single-window setup) when these are null.
+    final hostView = View.of(context);
+    final engineId = PlatformDispatcher.instance.engineId;
+
     return CustomPlatformView(
       onPlatformViewCreated: _onPlatformViewCreated,
       creationParams: <String, dynamic>{
@@ -344,6 +352,8 @@ class WindowsInAppWebViewWidget extends PlatformInAppWebViewWidget {
             params.initialUserScripts?.map((e) => e.toMap()).toList() ?? [],
         'keepAliveId': params.keepAlive?.id,
         'webViewEnvironmentId': params.webViewEnvironment?.id,
+        'flutterViewId': hostView.viewId,
+        'flutterEngineId': engineId,
       },
     );
   }

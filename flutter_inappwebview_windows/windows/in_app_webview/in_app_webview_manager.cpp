@@ -9,6 +9,7 @@
 #include "../types/url_request.h"
 #include "../types/user_script.h"
 #include "../utils/flutter.h"
+#include "../utils/host_window.h"
 #include "../utils/log.h"
 #include "../utils/string.h"
 #include "../utils/vector.h"
@@ -97,6 +98,9 @@ namespace flutter_inappwebview_plugin
     else if (string_equals(methodName, "getJavaScriptBridgeName")) {
       result->Success(JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME());
     }
+    else if (string_equals(methodName, "getDefaultUserAgent")) {
+      getDefaultUserAgent(std::move(result));
+    }
     else {
       result->NotImplemented();
     }
@@ -119,13 +123,29 @@ namespace flutter_inappwebview_plugin
     auto webViewEnvironmentId = get_optional_fl_map_value<std::string>(*arguments, "webViewEnvironmentId");
     auto keepAliveId = get_optional_fl_map_value<std::string>(*arguments, "keepAliveId");
     auto windowId = get_optional_fl_map_value<int64_t>(*arguments, "windowId");
+    // Multi-window aware: Dart can pass the hosting RegularWindow's
+    // viewId + engineId so we parent the WebView2 host HWND to the
+    // correct window. Falls back to registrar->GetView() (single-window
+    // C++ runner) or nullptr (multi-window with no view yet).
+    auto flutterViewId = get_optional_fl_map_value<int64_t>(*arguments, "flutterViewId");
+    auto flutterEngineId = get_optional_fl_map_value<int64_t>(*arguments, "flutterEngineId");
 
-    RECT bounds;
-    GetClientRect(plugin->registrar->GetView()->GetNativeWindow(), &bounds);
+    HWND parent = PickHostHwnd(plugin->registrar, flutterEngineId, flutterViewId);
+
+    RECT bounds = {};
+    if (parent) {
+      GetClientRect(parent, &bounds);
+    } else {
+      // No host window resolved — pick a reasonable default. The webview
+      // is rendered through CustomPlatformView's texture, so this size
+      // is just the initial WebView2 viewport; Dart resizes it via the
+      // platform view widget anyway.
+      bounds = {0, 0, 1280, 720};
+    }
 
     auto hwnd = CreateWindowEx(0, windowClass_.lpszClassName, L"", 0, 0,
       0, bounds.right - bounds.left, bounds.bottom - bounds.top,
-      plugin->registrar->GetView()->GetNativeWindow(),
+      parent,
       nullptr,
       windowClass_.hInstance, nullptr);
 
@@ -206,6 +226,56 @@ namespace flutter_inappwebview_plugin
         else {
           result_->Error("0", "Cannot create the InAppWebView instance!");
         }
+      }
+    );
+  }
+
+  void InAppWebViewManager::getDefaultUserAgent(std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result)
+  {
+    if (defaultUserAgent_.has_value()) {
+      result->Success(flutter::EncodableValue(defaultUserAgent_.value()));
+      return;
+    }
+
+    if (!plugin || !plugin->registrar || !plugin->registrar->GetView()) {
+      result->Success(flutter::EncodableValue(std::string{}));
+      return;
+    }
+
+    auto result_ = std::shared_ptr<flutter::MethodResult<flutter::EncodableValue>>(std::move(result));
+    auto parentWindow = plugin->registrar->GetView()->GetNativeWindow();
+    auto settings = std::make_shared<InAppWebViewSettings>();
+
+    // WebView2 has no static accessor for the default user agent, so spin up a
+    // throwaway (non-surface) controller, read its untouched UserAgent setting,
+    // cache it, then close it. Mirrors the WKWebView approach on iOS/macOS.
+    InAppWebView::createInAppWebViewEnv(parentWindow, false, nullptr, settings,
+      [result_](wil::com_ptr<ICoreWebView2Environment> webViewEnv,
+        wil::com_ptr<ICoreWebView2Controller> webViewController,
+        wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController)
+      {
+        if (!webViewController) {
+          result_->Success(flutter::EncodableValue(std::string{}));
+          return;
+        }
+
+        std::string userAgent;
+        wil::com_ptr<ICoreWebView2> webView;
+        if (succeededOrLog(webViewController->get_CoreWebView2(webView.put())) && webView) {
+          wil::com_ptr<ICoreWebView2Settings> webViewSettings;
+          if (succeededOrLog(webView->get_Settings(&webViewSettings))) {
+            if (auto settings2 = webViewSettings.try_query<ICoreWebView2Settings2>()) {
+              wil::unique_cotaskmem_string realUserAgent;
+              if (succeededOrLog(settings2->get_UserAgent(&realUserAgent))) {
+                userAgent = wide_to_utf8(realUserAgent.get());
+                defaultUserAgent_ = userAgent;
+              }
+            }
+          }
+        }
+
+        failedLog(webViewController->Close());
+        result_->Success(flutter::EncodableValue(userAgent));
       }
     );
   }

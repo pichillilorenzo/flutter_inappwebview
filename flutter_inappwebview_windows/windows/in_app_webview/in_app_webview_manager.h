@@ -4,6 +4,7 @@
 #include <flutter/method_channel.h>
 #include <flutter/standard_message_codec.h>
 #include <map>
+#include <optional>
 #include <string>
 #include <variant>
 #include <wil/com.h>
@@ -50,8 +51,10 @@ namespace flutter_inappwebview_plugin
       std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result);
 
     void createInAppWebView(const flutter::EncodableMap* arguments, std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result);
+    void getDefaultUserAgent(std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result);
     void disposeKeepAlive(const std::string& keepAliveId);
   private:
+    inline static std::optional<std::string> defaultUserAgent_;
     inline static std::shared_ptr<rx::RoHelper> rohelper_ = nullptr;
     inline static winrt::com_ptr<ABI::Windows::System::IDispatcherQueueController>
       dispatcher_queue_controller_;

@@ -58,6 +58,7 @@ list(APPEND PLUGIN_SOURCES
   "types/channel_delegate.h"
   "types/base_callback_result.h"
   "types/one_shot_callback.h"
+  "custom_platform_view/surface_pool_slot.h"
   "types/lifetime_token.h"
   "types/url_request.cpp"
   "types/url_request.h"

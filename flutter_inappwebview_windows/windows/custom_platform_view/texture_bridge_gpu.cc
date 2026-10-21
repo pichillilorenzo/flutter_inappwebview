@@ -12,6 +12,7 @@
 #include <utility>
 #include <vector>
 
+#include "surface_pool_slot.h"
 #include "util/direct3d11.interop.h"
 
 namespace flutter_inappwebview_plugin
@@ -238,8 +239,7 @@ void main(uint3 id : SV_DispatchThreadID) {
     const bool reference_created = !reference_ ||
       reference_size_.width != desc.Width ||
       reference_size_.height != desc.Height;
-    if (!EnsureSurfacePool(desc.Width, desc.Height) ||
-      (compare_shader_ && !EnsureReference(desc.Width, desc.Height))) {
+    if (!EnsureSurfacePool(desc.Width, desc.Height)) {
       return false;
     }
     // Several WebViews share one immediate context.
@@ -251,21 +251,18 @@ void main(uint3 id : SV_DispatchThreadID) {
     size_t writable_surface;
     {
       const std::lock_guard<std::mutex> pool_lock(pool->mutex);
-      writable_surface = pool->surfaces.size();
-      for (size_t i = 0; i < pool->surfaces.size(); ++i) {
-        if (!pool->surfaces[i].is_leased) {
-          writable_surface = i;
-          break;
-        }
-      }
+      writable_surface = FindWritableSurface(pool->surfaces,
+        pool->has_published_surface, pool->published_surface);
     }
-    // Flutter is still using every shared texture. Keep the reference frame
-    // unchanged so the next capture can publish the newest frame once a
-    // buffer is released.
+    // Keep the reference unchanged when only published or leased slots remain,
+    // so the next capture can retry after Flutter releases a buffer.
     if (writable_surface == pool->surfaces.size()) {
       return false;
     }
 
+    if (compare_shader_ && !EnsureReference(desc.Width, desc.Height)) {
+      return false;
+    }
     if (reference_created) {
       compare_gate_.reset();
     }

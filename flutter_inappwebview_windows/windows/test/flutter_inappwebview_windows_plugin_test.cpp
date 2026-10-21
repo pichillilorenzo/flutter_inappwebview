@@ -6,6 +6,7 @@
 
 #include "in_app_webview/browser_process_gate.h"
 #include "custom_platform_view/frame_compare_gate.h"
+#include "surface_pool_slot_test_cases.h"
 #include "one_shot_callback_test_cases.h"
 #include "in_app_webview/webview_visibility_state.h"
 #include "plugin_scripts_js/javascript_bridge_message.h"
@@ -281,6 +282,10 @@ TEST(JavaScriptBridgeMessage, ErrorsAreEscapedInBothPaths) {
       JavaScriptBridgeMessage::settleScript("b", 3, "null", message);
   EXPECT_NE(script.find(R"(new Error("bad 'quote'\nand \\ slash"))"),
             std::string::npos);
+}
+
+TEST(SurfacePoolSlot, PreservesOwnershipAcrossCaptureAndRasterThreads) {
+  EXPECT_NO_THROW(RunSurfacePoolSlotTests());
 }
 
 TEST(FrameCompareGate, KeepsComparingWhileIdenticalFramesArrive) {

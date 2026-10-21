@@ -1,5 +1,7 @@
 ## 1.4.0-beta.3
 
+- Added the Windows `ProcessFailedReason` values `NORMAL_EXIT`, `ABNORMAL_EXIT` and
+  `INTEGRITY_FAILURE` reported by newer WebView2 runtimes.
 - Added `PlatformInAppWebViewController.setBackgroundColor` for Android.
 - Added `PlatformWebAuthenticationSession.additionalHeaderFields`.
 - Added the Windows `PERSISTENT_STORAGE` permission resource and safe handling

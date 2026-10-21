@@ -28,7 +28,7 @@ struct JavaScriptBridgeJS {
   static func get_JAVASCRIPT_BRIDGE_NAME() -> String { "flutter_inappwebview" }
 }
 let cases = ["line\\nbreak\\r\\t", "quotes '\\" and backslash \\\\ and trailing \\\\",
-  "\\u{2028}\\u{2029}", "עברית 😃", "'); throw new Error('injected"]; 
+  "\\u{2028}\\u{2029}", "עברית 😃", "'); throw new Error('injected"];
 let code = "ERR"
 let _callHandlerID = 7
 var scripts: [String] = []

@@ -391,7 +391,10 @@ class CustomPlatformView extends StatefulWidget {
 }
 
 class _CustomPlatformViewState extends State<CustomPlatformView>
-    with PlatformUtilListener, SingleTickerProviderStateMixin {
+    with
+        PlatformUtilListener,
+        SingleTickerProviderStateMixin,
+        WidgetsBindingObserver {
   final GlobalKey _key = GlobalKey();
   final _downButtons = <int, PointerButton>{};
 
@@ -448,6 +451,7 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
     super.initState();
 
     _platformUtil.addListener(this);
+    WidgetsBinding.instance.addObserver(this);
 
     _listener = AppLifecycleListener(
       onStateChange: (state) {
@@ -521,6 +525,12 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
       _flutterView?.devicePixelRatio ??
       PlatformDispatcher.instance.implicitView?.devicePixelRatio ??
       1.0;
+
+  @override
+  void didChangeMetrics() {
+    _reportSurfaceSize();
+    _reportWidgetPosition();
+  }
 
   @override
   void onWindowMove() {
@@ -886,6 +896,7 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
     _tapFocusTimer?.cancel();
     _flingTicker?.dispose();
     _platformUtil.removeListener(this);
+    WidgetsBinding.instance.removeObserver(this);
     _cursorSubscription?.cancel();
     _controller.dispose();
     _focusNode.dispose();

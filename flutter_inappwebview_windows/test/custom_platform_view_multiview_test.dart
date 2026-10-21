@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
@@ -164,6 +165,94 @@ void main() {
     expect(
       pluginCalls.where((call) => call.method == 'createInAppWebView'),
       hasLength(1),
+    );
+  });
+
+  testWidgets(
+    'a pending creation follows the widget after its source view closes',
+    (tester) async {
+      final creation = Completer<int>();
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(IN_APP_WEBVIEW_STATIC_CHANNEL, (
+            call,
+          ) async {
+            pluginCalls.add(call);
+            return call.method == 'createInAppWebView' ? creation.future : null;
+          });
+      final key = GlobalKey();
+      final webView = Directionality(
+        key: key,
+        textDirection: TextDirection.ltr,
+        child: const CustomPlatformView(creationParams: <String, dynamic>{}),
+      );
+      final source = _SecondaryTestView(tester.view);
+      await tester.pumpWidget(
+        ViewCollection(
+          views: [
+            View(view: tester.view, child: const SizedBox()),
+            View(view: source, child: webView),
+          ],
+        ),
+        wrapWithView: false,
+      );
+      await tester.pump();
+      await tester.pumpWidget(
+        View(view: tester.view, child: webView),
+        wrapWithView: false,
+      );
+      expect(
+        viewCalls.where((call) => call.method == 'setFlutterViewId'),
+        isEmpty,
+      );
+
+      creation.complete(_kTextureId);
+      await tester.pumpAndSettle();
+
+      expect(
+        pluginCalls.where((call) => call.method == 'createInAppWebView'),
+        hasLength(1),
+      );
+      expect(
+        viewCalls
+            .where((call) => call.method == 'setFlutterViewId')
+            .single
+            .arguments,
+        tester.view.viewId,
+      );
+      expect(find.byType(Texture), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets('a scale change in the same view reports the new surface scale', (
+    tester,
+  ) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(800, 600);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.view.resetPhysicalSize);
+    await tester.pumpWidget(
+      const Directionality(
+        textDirection: TextDirection.ltr,
+        child: CustomPlatformView(creationParams: <String, dynamic>{}),
+      ),
+    );
+    await tester.pumpAndSettle();
+    viewCalls.clear();
+
+    tester.view.devicePixelRatio = 1.5;
+    tester.view.physicalSize = const Size(1200, 900);
+    await tester.pumpAndSettle();
+
+    final size = viewCalls.lastWhere((call) => call.method == 'setSize');
+    expect((size.arguments as List).last, 1.5);
+    final position = viewCalls.lastWhere(
+      (call) => call.method == 'setPosition',
+    );
+    expect((position.arguments as List).last, 1.5);
+    expect(
+      viewCalls.where((call) => call.method == 'setFlutterViewId'),
+      isEmpty,
     );
   });
 }

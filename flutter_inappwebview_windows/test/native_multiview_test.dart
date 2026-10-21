@@ -32,6 +32,16 @@ void main() {
 
   test('minimize only touches webviews of that top-level window', () {
     expect(manager, contains('webView->topLevelWindow() == topLevelHwnd'));
+    expect(
+      manager,
+      contains('if (!firstEvent && state->second == minimized) return;'),
+    );
+    expect(
+      manager,
+      contains(
+        'windowMinimizedStates_.erase(GetAncestor(flutterViewHwnd, GA_ROOT))',
+      ),
+    );
     final plugin = _readNativeSource(
       'windows/flutter_inappwebview_windows_plugin.cpp',
     );
@@ -42,6 +52,11 @@ void main() {
   test('hosts are parked when their view window is destroyed', () {
     expect(manager, contains('message == WM_DESTROY'));
     expect(manager, contains('webView->park(parkingWindow())'));
+    expect(manager, contains('pendingWebViewHosts_.insert(hwnd)'));
+    expect(manager, contains('pendingWebViewHosts_.erase(hwnd)'));
+    expect(manager, contains('ParkPendingWebViewHosts(pendingWebViewHosts_'));
+    expect(manager, contains('GetParent(hwnd) == parkingWindow_'));
+    expect(manager, contains('for (const auto host : pendingWebViewHosts_)'));
     expect(manager, contains('RemoveWindowSubclass'));
   });
 

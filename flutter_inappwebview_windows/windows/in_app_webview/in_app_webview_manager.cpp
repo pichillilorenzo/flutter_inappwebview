@@ -174,6 +174,8 @@ namespace flutter_inappwebview_plugin
     auto webViewEnvironment = webViewEnvironmentId.has_value() && map_contains(plugin->webViewEnvironmentManager->webViewEnvironments, webViewEnvironmentId.value())
       ? plugin->webViewEnvironmentManager->webViewEnvironments.at(webViewEnvironmentId.value()).get() : nullptr;
 
+    pendingWebViewHosts_.insert(hwnd);
+
     auto initialSettings = std::make_shared<InAppWebViewSettings>(settingsMap);
     auto failureStage = std::make_shared<std::string>();
 
@@ -191,6 +193,7 @@ namespace flutter_inappwebview_plugin
           }
           return;
         }
+        pendingWebViewHosts_.erase(hwnd);
         if (plugin && webViewEnv && webViewController && webViewCompositionController && IsWindow(hwnd)) {
           std::optional<std::vector<std::shared_ptr<UserScript>>> initialUserScripts = initialUserScriptList.has_value() ?
             functional_map(initialUserScriptList.value(), [](const flutter::EncodableValue& map) { return std::make_shared<UserScript>(std::get<flutter::EncodableMap>(map)); }) :
@@ -204,7 +207,8 @@ namespace flutter_inappwebview_plugin
 
           auto inAppWebView = std::make_unique<InAppWebView>(plugin, params, hwnd,
             std::move(webViewEnv), std::move(webViewController),
-            std::move(webViewCompositionController), isTopLevelMinimized(hwnd));
+            std::move(webViewCompositionController),
+            GetParent(hwnd) == parkingWindow_ || isTopLevelMinimized(hwnd));
           if (!inAppWebView->webView || !inAppWebView->surface()) {
             result_->Error("0", "Cannot create the InAppWebView surface!");
             return;
@@ -272,16 +276,14 @@ namespace flutter_inappwebview_plugin
     }
   }
 
-  // WebView2 keeps its own top-level input window (class Chrome_WidgetWin_1,
-  // owned by no window) over the widget area. It has no redirection bitmap, so
-  // it is invisible - but it still hit-tests, and minimizing the app leaves it
-  // on screen swallowing every mouse click over the region the app occupied.
-  // Hiding the controller hides that window. Each WebView keeps its requested
-  // pause state separate from this temporary host-window state, so resume()
-  // cannot expose it while minimized and restore cannot expose a paused view.
-  // Only webviews inside [topLevelHwnd] are affected: other windows keep rendering.
+  // Hide WebView2's input windows on minimize without changing the requested
+  // pause state or affecting webviews hosted by other top-level windows.
   void InAppWebViewManager::setWindowMinimized(const HWND topLevelHwnd, const bool minimized)
   {
+    const auto [state, firstEvent] = windowMinimizedStates_.try_emplace(topLevelHwnd, minimized);
+    if (!firstEvent && state->second == minimized) return;
+    state->second = minimized;
+
     const auto applyWindowState = [topLevelHwnd, minimized](const std::unique_ptr<CustomPlatformView>& platformView)
       {
         const auto webView = platformView ? platformView->view.get() : nullptr;
@@ -353,6 +355,7 @@ namespace flutter_inappwebview_plugin
 
   void InAppWebViewManager::onFlutterViewDestroyed(const HWND flutterViewHwnd)
   {
+    windowMinimizedStates_.erase(GetAncestor(flutterViewHwnd, GA_ROOT));
     const auto parkIfHosted = [this, flutterViewHwnd](const std::unique_ptr<CustomPlatformView>& platformView)
       {
         const auto webView = platformView ? platformView->view.get() : nullptr;
@@ -367,6 +370,9 @@ namespace flutter_inappwebview_plugin
     }
     for (const auto& [keepAliveId, platformView] : keepAliveWebViews) {
       parkIfHosted(platformView);
+    }
+    if (!pendingWebViewHosts_.empty()) {
+      ParkPendingWebViewHosts(pendingWebViewHosts_, flutterViewHwnd, parkingWindow());
     }
     if (plugin && plugin->fileDropManager) {
       plugin->fileDropManager->onFlutterViewDestroyed(flutterViewHwnd);
@@ -444,6 +450,10 @@ namespace flutter_inappwebview_plugin
   {
     debugLog("dealloc InAppWebViewManager");
     alive_.expire();
+    for (const auto host : pendingWebViewHosts_) {
+      DestroyWindow(host);
+    }
+    pendingWebViewHosts_.clear();
     webViews.clear();
     keepAliveWebViews.clear();
     windowWebViews.clear();

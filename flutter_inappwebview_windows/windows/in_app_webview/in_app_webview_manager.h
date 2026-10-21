@@ -70,6 +70,8 @@ namespace flutter_inappwebview_plugin
     inline static ABI::Windows::UI::Composition::ICompositor* compositor_ = nullptr;
     WNDCLASS windowClass_ = {};
     std::set<HWND> watchedFlutterViews_;
+    std::set<HWND> pendingWebViewHosts_;
+    std::map<HWND, bool> windowMinimizedStates_;
     HWND parkingWindow_ = nullptr;
     LifetimeToken alive_;
     inline static bool valid_ = false;

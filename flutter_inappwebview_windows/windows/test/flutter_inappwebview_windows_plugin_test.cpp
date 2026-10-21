@@ -9,6 +9,7 @@
 #include "in_app_webview/webview_visibility_state.h"
 #include "types/base_callback_result.h"
 #include "types/lifetime_token.h"
+#include "utils/flutter_view_hwnd.h"
 
 namespace flutter_inappwebview_plugin::test {
 
@@ -311,6 +312,38 @@ TEST(LifetimeToken, ExpireInvalidatesHandlesBeforeDestruction) {
   token.expire();
   EXPECT_TRUE(alive.expired());
   EXPECT_TRUE(token.expired());
+}
+
+}  // namespace flutter_inappwebview_plugin::test
+
+namespace flutter_inappwebview_plugin::test {
+
+TEST(PendingWebViewHosts, SurvivesSourceWindowClosureAndReattaches) {
+  const auto source = CreateWindowEx(0, L"STATIC", L"", WS_POPUP,
+    0, 0, 100, 100, nullptr, nullptr, nullptr, nullptr);
+  const auto destination = CreateWindowEx(0, L"STATIC", L"", WS_POPUP,
+    0, 0, 100, 100, nullptr, nullptr, nullptr, nullptr);
+  const auto parking = CreateWindowEx(0, L"STATIC", L"", WS_POPUP,
+    0, 0, 0, 0, nullptr, nullptr, nullptr, nullptr);
+  const auto pendingHost = CreateWindowEx(0, L"STATIC", L"", WS_CHILD,
+    0, 0, 50, 50, source, nullptr, nullptr, nullptr);
+  const auto otherHost = CreateWindowEx(0, L"STATIC", L"", WS_CHILD,
+    0, 0, 50, 50, destination, nullptr, nullptr, nullptr);
+  ASSERT_TRUE(source && destination && parking && pendingHost && otherHost);
+
+  const std::set<HWND> pending{ pendingHost, otherHost };
+  ParkPendingWebViewHosts(pending, source, parking);
+  DestroyWindow(source);
+  EXPECT_TRUE(IsWindow(pendingHost));
+  EXPECT_EQ(GetParent(pendingHost), parking);
+  EXPECT_EQ(GetParent(otherHost), destination);
+  SetParent(pendingHost, destination);
+  DestroyWindow(parking);
+  EXPECT_TRUE(IsWindow(pendingHost));
+  EXPECT_EQ(GetParent(pendingHost), destination);
+  DestroyWindow(destination);
+  EXPECT_FALSE(IsWindow(pendingHost));
+  EXPECT_FALSE(IsWindow(otherHost));
 }
 
 }  // namespace flutter_inappwebview_plugin::test

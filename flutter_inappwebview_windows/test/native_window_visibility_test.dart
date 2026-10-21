@@ -13,7 +13,8 @@ void main() {
     expect(
       source,
       contains(
-        'std::move(webViewCompositionController), isTopLevelMinimized(hwnd))',
+        'std::move(webViewCompositionController),\n'
+        '            GetParent(hwnd) == parkingWindow_ || isTopLevelMinimized(hwnd))',
       ),
     );
   });

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -386,7 +387,13 @@ void main() {
                   children: List.generate(
                     1000,
                     (_) => _TraversalProbe(
-                      onVisit: () => visited++,
+                      onVisit: () {
+                        // Exclude Flutter's own layout and semantics walks.
+                        if (SchedulerBinding.instance.schedulerPhase ==
+                            SchedulerPhase.postFrameCallbacks) {
+                          visited++;
+                        }
+                      },
                       child: const SizedBox(width: 1, height: 1),
                     ),
                   ),

@@ -4,6 +4,7 @@ import 'dart:ui';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 import '../platform_util.dart';
@@ -236,6 +237,9 @@ class CustomPlatformViewController
     await _creatingCompleter.future;
     _cursorTimer?.cancel();
     if (!_isDisposed) {
+      if (_renderMode == WindowsWebViewRenderMode.hwnd) {
+        await _setHostWindowHidden(true);
+      }
       _isDisposed = true;
       await _eventStreamSubscription?.cancel();
       await _pluginChannel.invokeMethod('dispose', {"id": _textureId});
@@ -968,26 +972,76 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
     SchedulerBinding.instance.addPostFrameCallback(_trackHostWindow);
   }
 
-  static const _coverageSamples = [0.125, 0.375, 0.625, 0.875];
-
-  /// Flutter cannot paint over the native window, so a dialog barrier, a menu
-  /// or any other hit-testable content above a sample point hides it.
+  /// Probe overlapping render bounds instead of a grid that misses small menus.
+  /// Custom hit shapes or paint ordering may require explicit pause/resume.
   bool _isCoveredByFlutterContent(RenderBox box, Matrix4 transform) {
     final viewId = _viewId;
     if (viewId == null) return false;
-    for (final fx in _coverageSamples) {
-      for (final fy in _coverageSamples) {
-        final local = Offset(box.size.width * fx, box.size.height * fy);
-        final result = HitTestResult();
-        WidgetsBinding.instance.hitTestInView(
-          result,
-          MatrixUtils.transformPoint(transform, local),
-          viewId,
-        );
-        if (!result.path.any((entry) => identical(entry.target, box))) {
-          return true;
+    final bounds = MatrixUtils.transformRect(transform, Offset.zero & box.size);
+    final testedBounds = <Rect>{bounds};
+    bool isCoveredAt(Offset position) {
+      final result = HitTestResult();
+      WidgetsBinding.instance.hitTestInView(result, position, viewId);
+      for (final entry in result.path) {
+        if (identical(entry.target, box)) return false;
+        RenderObject? ancestor = entry.target is RenderObject
+            ? entry.target as RenderObject
+            : null;
+        while (ancestor != null && !identical(ancestor, box)) {
+          ancestor = ancestor.parent;
         }
+        if (ancestor == null) return true;
       }
+      return true;
+    }
+
+    if (isCoveredAt(bounds.center)) return true;
+
+    bool overlaps(RenderObject object, Rect clip) {
+      if (object is RenderIgnorePointer && object.ignoring) return false;
+      final transform = object.getTransformTo(null);
+      if (transform.determinant() == 0) return false;
+      final overlap = MatrixUtils.transformRect(
+        transform,
+        object.paintBounds,
+      ).intersect(clip);
+      if (!overlap.isEmpty &&
+          testedBounds.add(overlap) &&
+          isCoveredAt(overlap.center)) {
+        return true;
+      }
+      var covered = false;
+      object.visitChildren((child) {
+        if (covered || !object.paintsChild(child)) return;
+        final childClip = object.describeApproximatePaintClip(child);
+        final clipped = childClip == null
+            ? clip
+            : clip.intersect(MatrixUtils.transformRect(transform, childClip));
+        if (!clipped.isEmpty) covered = overlaps(child, clipped);
+      });
+      return covered;
+    }
+
+    RenderObject child = box;
+    for (var parent = child.parent; parent != null; parent = child.parent) {
+      var covered = false;
+      var afterChild = false;
+      parent.visitChildren((sibling) {
+        if (identical(sibling, child)) {
+          afterChild = true;
+          return;
+        }
+        if (covered || !afterChild || !parent!.paintsChild(sibling)) return;
+        final clip = parent.describeApproximatePaintClip(sibling);
+        final clipped = clip == null
+            ? bounds
+            : bounds.intersect(
+                MatrixUtils.transformRect(parent.getTransformTo(null), clip),
+              );
+        if (!clipped.isEmpty) covered = overlaps(sibling, clipped);
+      });
+      if (covered) return true;
+      child = parent;
     }
     return false;
   }

@@ -1,4 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -203,8 +207,8 @@ void main() {
         builder: (_) => const Positioned(
           left: 40,
           top: 30,
-          width: 200,
-          height: 150,
+          width: 40,
+          height: 40,
           child: ColoredBox(color: Color(0xFF000000)),
         ),
       );
@@ -219,6 +223,259 @@ void main() {
       await tester.pump();
       await tester.pump();
       expect(hiddenCalls(), [false, true, false]);
+    });
+
+    for (final scenario in <(String, Widget, bool)>[
+      (
+        'a one-pixel corner overlap',
+        const Positioned(
+          left: 29,
+          top: 19,
+          width: 2,
+          height: 2,
+          child: ColoredBox(color: Colors.black),
+        ),
+        true,
+      ),
+      (
+        'a transformed overlay',
+        Positioned(
+          left: 0,
+          top: 0,
+          width: 10,
+          height: 10,
+          child: Transform.translate(
+            offset: const Offset(40, 30),
+            child: const ColoredBox(color: Colors.black),
+          ),
+        ),
+        true,
+      ),
+      (
+        'an overlay clipped outside the view',
+        Positioned(
+          left: 0,
+          top: 0,
+          width: 10,
+          height: 10,
+          child: ClipRect(
+            child: Transform.translate(
+              offset: const Offset(40, 30),
+              child: const ColoredBox(color: Colors.black),
+            ),
+          ),
+        ),
+        false,
+      ),
+      (
+        'an ignored tooltip',
+        const Positioned(
+          left: 40,
+          top: 30,
+          width: 40,
+          height: 40,
+          child: IgnorePointer(child: ColoredBox(color: Colors.black)),
+        ),
+        false,
+      ),
+      (
+        'an absorbing overlay',
+        const Positioned(
+          left: 40,
+          top: 30,
+          width: 40,
+          height: 40,
+          child: AbsorbPointer(child: SizedBox.expand()),
+        ),
+        true,
+      ),
+      (
+        'a translucent pointer overlay',
+        const Positioned(
+          left: 40,
+          top: 30,
+          width: 40,
+          height: 40,
+          child: Listener(behavior: HitTestBehavior.translucent),
+        ),
+        true,
+      ),
+      (
+        'an empty fullscreen overlay',
+        const Positioned.fill(child: SizedBox.expand()),
+        false,
+      ),
+      (
+        'an offstage overlay',
+        const Positioned.fill(
+          child: Offstage(child: ColoredBox(color: Colors.black)),
+        ),
+        false,
+      ),
+    ]) {
+      testWidgets('${scenario.$1} respects HWND visibility', (tester) async {
+        await pumpView(tester);
+        final overlay = Overlay.of(
+          tester.element(find.byType(CustomPlatformView)),
+        );
+        final entry = OverlayEntry(builder: (_) => scenario.$2);
+        overlay.insert(entry);
+        await tester.pump();
+        await tester.pump();
+        expect(hiddenCalls(), scenario.$3 ? [false, true] : [false]);
+
+        entry.remove();
+        entry.dispose();
+        await tester.pump();
+        await tester.pump();
+        expect(hiddenCalls(), scenario.$3 ? [false, true, false] : [false]);
+      });
+    }
+
+    testWidgets(
+      'moving a GlobalKey keeps the HWND visible and repositions it',
+      (tester) async {
+        final key = GlobalKey();
+        Widget host(bool moved) => MaterialApp(
+          home: Stack(
+            children: [
+              if (!moved)
+                Positioned.fill(
+                  child: KeyedSubtree(
+                    key: key,
+                    child: const CustomPlatformView(),
+                  ),
+                ),
+              if (moved)
+                Positioned(
+                  left: 30,
+                  top: 20,
+                  right: 0,
+                  bottom: 0,
+                  child: KeyedSubtree(
+                    key: key,
+                    child: const CustomPlatformView(),
+                  ),
+                ),
+            ],
+          ),
+        );
+        await tester.pumpWidget(host(false));
+        await tester.pump();
+        await tester.pump();
+        await tester.pumpWidget(host(true));
+        await tester.pump();
+        expect(hiddenCalls(), [false]);
+        expect(
+          viewCalls.lastWhere((call) => call.method == 'setPosition').arguments,
+          [30.0, 20.0, tester.view.devicePixelRatio],
+        );
+      },
+    );
+
+    testWidgets('coverage skips a thousand render objects behind the view', (
+      tester,
+    ) async {
+      var visited = 0;
+      var hitTests = 0;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Stack(
+            children: [
+              Positioned.fill(
+                child: Wrap(
+                  children: List.generate(
+                    1000,
+                    (_) => _TraversalProbe(
+                      onVisit: () {
+                        // Exclude Flutter's own layout and semantics walks.
+                        if (SchedulerBinding.instance.schedulerPhase ==
+                            SchedulerPhase.postFrameCallbacks) {
+                          visited++;
+                        }
+                      },
+                      child: const SizedBox(width: 1, height: 1),
+                    ),
+                  ),
+                ),
+              ),
+              Positioned.fill(
+                child: _TraversalProbe(
+                  onVisit: () {},
+                  onHitTest: () => hitTests++,
+                  child: const CustomPlatformView(),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+      await tester.pump();
+      await tester.pump();
+      visited = 0;
+      hitTests = 0;
+      final callCount = viewCalls.length;
+      tester.binding.scheduleFrame();
+      await tester.pump();
+      expect(visited, 0);
+      expect(hitTests, 1);
+      expect(viewCalls.length, callCount);
+
+      final overlay = Overlay.of(
+        tester.element(find.byType(CustomPlatformView)),
+      );
+      final entry = OverlayEntry(
+        builder: (_) => const Positioned(
+          left: 40,
+          top: 30,
+          width: 40,
+          height: 40,
+          child: ColoredBox(color: Colors.black),
+        ),
+      );
+      overlay.insert(entry);
+      await tester.pump();
+      visited = 0;
+      tester.binding.scheduleFrame();
+      await tester.pump();
+      expect(visited, 0);
+      expect(hiddenCalls(), [false, true]);
+      entry.remove();
+      entry.dispose();
+      await tester.pump();
+      expect(hiddenCalls(), [false, true, false]);
+    });
+
+    testWidgets('detaching a kept-alive HWND hides it before disposal', (
+      tester,
+    ) async {
+      await pumpView(tester);
+      await tester.pumpWidget(const SizedBox());
+      await tester.pump();
+
+      expect(hiddenCalls(), [false, true]);
+      await pumpView(tester);
+      expect(hiddenCalls(), [false, true, false]);
+    });
+
+    testWidgets('disposing while creation is pending hides the HWND', (
+      tester,
+    ) async {
+      final pending = Completer<Object?>();
+      final messenger =
+          TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
+      messenger.setMockMethodCallHandler(
+        IN_APP_WEBVIEW_STATIC_CHANNEL,
+        (call) async =>
+            call.method == 'createInAppWebView' ? pending.future : null,
+      );
+      await tester.pumpWidget(const MaterialApp(home: CustomPlatformView()));
+      await tester.pumpWidget(const SizedBox());
+      pending.complete(creationResult);
+      await tester.pump();
+      await tester.pump();
+
+      expect(hiddenCalls(), [true]);
     });
 
     testWidgets('a disabled TickerMode keeps the window hidden', (
@@ -246,4 +503,34 @@ void main() {
       expect(hiddenCalls(), isEmpty);
     });
   });
+}
+
+class _TraversalProbe extends SingleChildRenderObjectWidget {
+  const _TraversalProbe({required this.onVisit, this.onHitTest, super.child});
+
+  final VoidCallback onVisit;
+  final VoidCallback? onHitTest;
+
+  @override
+  RenderObject createRenderObject(BuildContext context) =>
+      _TraversalProbeBox(onVisit, onHitTest);
+}
+
+class _TraversalProbeBox extends RenderProxyBox {
+  _TraversalProbeBox(this.onVisit, this.onHitTest);
+
+  final VoidCallback onVisit;
+  final VoidCallback? onHitTest;
+
+  @override
+  bool hitTest(BoxHitTestResult result, {required Offset position}) {
+    onHitTest?.call();
+    return super.hitTest(result, position: position);
+  }
+
+  @override
+  void visitChildren(RenderObjectVisitor visitor) {
+    onVisit();
+    super.visitChildren(visitor);
+  }
 }

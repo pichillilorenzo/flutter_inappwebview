@@ -44,6 +44,40 @@ namespace flutter_inappwebview_plugin
     }
   }
 
+  HRESULT TextureBridge::ProbeCapture(
+    const GraphicsContext* graphics_context,
+    ABI::Windows::UI::Composition::IVisual* visual, const char** failed_stage)
+  {
+    const auto item = graphics_context->CreateGraphicsCaptureItemFromVisual(visual);
+    if (!item) {
+      *failed_stage = "CreateGraphicsCaptureItemFromVisual";
+      return E_FAIL;
+    }
+    const auto pool = graphics_context->CreateCaptureFramePool(
+      graphics_context->device(),
+      static_cast<ABI::Windows::Graphics::DirectX::DirectXPixelFormat>(
+        kPixelFormat),
+      kNumBuffers, { 1, 1 });
+    if (!pool) {
+      *failed_stage = "CreateCaptureFramePool";
+      return E_FAIL;
+    }
+    winrt::com_ptr<ABI::Windows::Graphics::Capture::IGraphicsCaptureSession>
+      session;
+    const HRESULT hr = pool->CreateCaptureSession(item.get(), session.put());
+    for (const auto closable :
+         { session.try_as<ABI::Windows::Foundation::IClosable>(),
+           pool.try_as<ABI::Windows::Foundation::IClosable>() }) {
+      if (closable) {
+        closable->Close();
+      }
+    }
+    if (FAILED(hr)) {
+      *failed_stage = "CreateCaptureSession";
+    }
+    return hr;
+  }
+
   bool TextureBridge::Start()
   {
     const std::lock_guard<std::mutex> lock(mutex_);

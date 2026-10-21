@@ -51,13 +51,13 @@ namespace flutter_inappwebview_plugin
     HttpAuthResponse(const flutter::EncodableMap& map);
     ~HttpAuthResponse() = default;
 
-    bool HttpAuthResponse::operator==(const HttpAuthResponse& other)
+    bool operator==(const HttpAuthResponse& other)
     {
       return username == other.username && password == other.password &&
         permanentPersistence == other.permanentPersistence &&
         action == other.action;
     }
-    bool HttpAuthResponse::operator!=(const HttpAuthResponse& other)
+    bool operator!=(const HttpAuthResponse& other)
     {
       return !(*this == other);
     }

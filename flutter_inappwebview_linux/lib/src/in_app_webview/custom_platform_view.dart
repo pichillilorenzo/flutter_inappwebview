@@ -241,6 +241,8 @@ class CustomPlatformViewController
   @override
   Future<void> dispose() async {
     await _creatingCompleter.future;
+    _cursorTimer?.cancel();
+    _pendingCursorPos = null;
     if (!_isDisposed) {
       _isDisposed = true;
       await _eventStreamSubscription?.cancel();
@@ -276,16 +278,47 @@ class CustomPlatformViewController
     ]);
   }
 
+  // A fast mouse reports up to ~1000 moves a second; each is a channel call
+  // plus browser IPC. Moves inside one interval collapse into the last one.
+  static const _cursorInterval = Duration(milliseconds: 8);
+  Offset? _pendingCursorPos;
+  Timer? _cursorTimer;
+
   /// Moves the virtual cursor to [position].
   Future<void> _setCursorPos(Offset position) async {
     if (_isDisposed) {
       return;
     }
     assert(value.isInitialized);
-    return _methodChannel.invokeMethod('setCursorPos', [
-      position.dx,
-      position.dy,
-    ]);
+    if (_cursorTimer != null) {
+      _pendingCursorPos = position;
+      return;
+    }
+    _sendCursorPos(position);
+    _cursorTimer = Timer(_cursorInterval, _onCursorInterval);
+  }
+
+  void _onCursorInterval() {
+    _cursorTimer = null;
+    final pending = _pendingCursorPos;
+    if (pending != null) {
+      _pendingCursorPos = null;
+      _setCursorPos(pending);
+    }
+  }
+
+  // Native input uses the last cursor position; flush before buttons or wheel.
+  void _flushCursorPos() {
+    final pending = _pendingCursorPos;
+    if (pending == null || _isDisposed) {
+      return;
+    }
+    _pendingCursorPos = null;
+    _sendCursorPos(pending);
+  }
+
+  void _sendCursorPos(Offset position) {
+    _methodChannel.invokeMethod('setCursorPos', [position.dx, position.dy]);
   }
 
   /// Indicates whether the specified [button] is currently down.
@@ -297,6 +330,7 @@ class CustomPlatformViewController
       return;
     }
     assert(value.isInitialized);
+    _flushCursorPos();
     return _methodChannel.invokeMethod('setPointerButton', <String, dynamic>{
       'kind': kind.index,
       'button': button.index,
@@ -314,6 +348,7 @@ class CustomPlatformViewController
       return;
     }
     assert(value.isInitialized);
+    _flushCursorPos();
     return _methodChannel.invokeMethod('setPointerButton', <String, dynamic>{
       'kind': kind.index,
       'button': button.index,
@@ -327,6 +362,7 @@ class CustomPlatformViewController
       return;
     }
     assert(value.isInitialized);
+    _flushCursorPos();
     return _methodChannel.invokeMethod('setScrollDelta', [dx, dy]);
   }
 
@@ -431,6 +467,7 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
   bool _textureOffsetReportWaitingForReady = false;
   bool _textureOffsetReportDirty = false;
   double? _lastObservedScaleFactor;
+  Size? _laidOutSize;
 
   // Track click timing for double-click detection
   DateTime? _lastClickTime;
@@ -516,10 +553,7 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
       canRequestFocus: true,
       debugLabel: "flutter_inappwebview_linux_custom_platform_view",
       onFocusChange: (focused) {
-        // Notify the native webview when focus changes.
-        // This is important for proper text input handling - without this,
-        // clicking inside text fields requires double-click because the
-        // webview doesn't know it has focus.
+        // WebKit must know the focus state before input reaches text fields.
         if (_controller.value.isInitialized) {
           _controller._setFocused(focused);
         }
@@ -575,6 +609,19 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
   }
 
   Widget _buildInner() {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (_laidOutSize != constraints.biggest) {
+          _laidOutSize = constraints.biggest;
+          _scheduleSurfaceSizeReport();
+          _scheduleTextureOffsetReport();
+        }
+        return _buildContent();
+      },
+    );
+  }
+
+  Widget _buildContent() {
     return NotificationListener<SizeChangedLayoutNotification>(
       onNotification: (notification) {
         _scheduleSurfaceSizeReport();
@@ -599,11 +646,8 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
 
                   final needsFocus = !_focusNode.hasFocus;
                   if (needsFocus) {
-                    // IMPORTANT: Set the native focus state BEFORE sending the click
-                    // and AWAIT it to ensure WebKit has processed the focus change.
-                    // Without awaiting, WebKit may receive the click before it has
-                    // the focused activity state, causing the click to only activate
-                    // the view rather than focusing the clicked element.
+                    // Await focus so WebKit applies this click to the element
+                    // instead of consuming it just to activate the view.
                     if (_controller.value.isInitialized) {
                       await _controller._setFocused(true);
                     }
@@ -798,7 +842,7 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
     // changes collapse to the latest logical size and scale factor.
     _surfaceSizeReportDirty = false;
     final box = _key.currentContext?.findRenderObject() as RenderBox?;
-    if (box != null) {
+    if (box != null && box.hasSize) {
       await _controller._setSize(box.size, _effectiveScaleFactor);
     }
 
@@ -847,7 +891,7 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
       return Future<void>.value();
     }
     final box = _key.currentContext?.findRenderObject() as RenderBox?;
-    if (box != null) {
+    if (box != null && box.hasSize) {
       // Invoke the channel synchronously so FIFO ordering puts this offset
       // ahead of pointer/touch messages, without waiting for the native reply.
       return _controller._setTextureOffset(box.localToGlobal(Offset.zero));

@@ -13,10 +13,10 @@
 #include "../types/user_script.h"
 #include "../utils/flutter.h"
 #include "../utils/flutter_view_hwnd.h"
+#include "../file_drop/file_drop_manager.h"
 #include "../utils/log.h"
 #include "../utils/string.h"
 #include "../utils/vector.h"
-#include "../file_drop/file_drop_manager.h"
 #include "../webview_environment/webview_environment_manager.h"
 #include "in_app_webview_manager.h"
 
@@ -26,7 +26,6 @@ namespace flutter_inappwebview_plugin
 {
   namespace
   {
-    // Subclass id for watching Flutter view windows that host webviews.
     constexpr UINT_PTR kFlutterViewSubclassId = 0x49415756;
   }
 
@@ -48,20 +47,26 @@ namespace flutter_inappwebview_plugin
           if (FAILED(rohelper_->CreateDispatcherQueueController(
             options, &dispatcher_queue_controller_))) {
             std::cerr << "Creating DispatcherQueueController failed." << std::endl;
-            return;
+            compositionUnavailableStage_ = "CreateDispatcherQueueController";
           }
-
-          if (!isGraphicsCaptureSessionSupported()) {
+          else if (!isGraphicsCaptureSessionSupported()) {
             std::cerr << "Windows::Graphics::Capture::GraphicsCaptureSession is not "
               "supported."
               << std::endl;
-            return;
+            compositionUnavailableStage_ = "isGraphicsCaptureSessionSupported";
           }
-
-          graphics_context_ = new GraphicsContext(rohelper_);
-          auto compositor = graphics_context_->CreateCompositor();
-          compositor_ = compositor.detach();
-          valid_ = graphics_context_->IsValid();
+          else {
+            graphics_context_ = new GraphicsContext(rohelper_);
+            auto compositor = graphics_context_->CreateCompositor();
+            compositor_ = compositor.detach();
+            valid_ = graphics_context_->IsValid();
+            if (!valid_) {
+              compositionUnavailableStage_ = "GraphicsContext";
+            }
+          }
+        }
+        else {
+          compositionUnavailableStage_ = "WinRtAvailable";
         }
       }
     }
@@ -80,12 +85,7 @@ namespace flutter_inappwebview_plugin
     auto& methodName = method_call.method_name();
 
     if (string_equals(methodName, "createInAppWebView")) {
-      if (isSupported()) {
-        createInAppWebView(arguments, std::move(result));
-      }
-      else {
-        result->Error("0", "Creating an InAppWebView instance is not supported! Graphics Context is not valid!");
-      }
+      createInAppWebView(arguments, std::move(result));
     }
     else if (string_equals(methodName, "dispose")) {
       auto id = get_fl_map_value<int64_t>(*arguments, "id");
@@ -116,6 +116,44 @@ namespace flutter_inappwebview_plugin
     }
   }
 
+  namespace
+  {
+    // Test hook: hosts every new InAppWebView in its child HWND.
+    bool isHwndModeForced()
+    {
+      wchar_t value[2] = {};
+      return GetEnvironmentVariableW(L"FLUTTER_INAPPWEBVIEW_WINDOWS_FORCE_HWND", value, 2) == 1 &&
+        value[0] == L'1';
+    }
+
+    flutter::EncodableValue creationResult(const int64_t id, const bool hostedInWindow,
+      const std::string& fallbackStage, const HRESULT fallbackHr)
+    {
+      flutter::EncodableMap result = {
+        { flutter::EncodableValue("id"), flutter::EncodableValue(id) },
+        { flutter::EncodableValue("renderMode"), flutter::EncodableValue(hostedInWindow ? "hwnd" : "composition") },
+      };
+      if (!fallbackStage.empty()) {
+        result.insert({ flutter::EncodableValue("fallbackStage"), flutter::EncodableValue(fallbackStage) });
+        result.insert({ flutter::EncodableValue("fallbackHresult"), flutter::EncodableValue(static_cast<int64_t>(fallbackHr)) });
+      }
+      return flutter::EncodableValue(result);
+    }
+  }
+
+  HWND InAppWebViewManager::createHostWindow(const HWND parent)
+  {
+    if (!IsWindow(parent)) return nullptr;
+    RECT bounds = {};
+    GetClientRect(parent, &bounds);
+    const DWORD windowStyle = WS_CHILD | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
+    const auto hwnd = CreateWindowEx(0, windowClass_.lpszClassName, L"", windowStyle, 0,
+      0, bounds.right - bounds.left, bounds.bottom - bounds.top, parent,
+      nullptr, windowClass_.hInstance, nullptr);
+    if (hwnd) pendingWebViewHosts_.insert(hwnd);
+    return hwnd;
+  }
+
   void InAppWebViewManager::createInAppWebView(const flutter::EncodableMap* arguments, std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result)
   {
     auto result_ = std::shared_ptr<flutter::MethodResult<flutter::EncodableValue>>(std::move(result));
@@ -130,12 +168,12 @@ namespace flutter_inappwebview_plugin
     auto initialFile = get_optional_fl_map_value<std::string>(*arguments, "initialFile");
     auto initialDataMap = get_optional_fl_map_value<flutter::EncodableMap>(*arguments, "initialData");
     auto initialUserScriptList = get_optional_fl_map_value<flutter::EncodableList>(*arguments, "initialUserScripts");
+    auto hasConsoleMessageListener = get_optional_fl_map_value<bool>(*arguments, "hasConsoleMessageListener").value_or(true);
     auto webViewEnvironmentId = get_optional_fl_map_value<std::string>(*arguments, "webViewEnvironmentId");
     auto keepAliveId = get_optional_fl_map_value<std::string>(*arguments, "keepAliveId");
     auto windowId = get_optional_fl_map_value<int64_t>(*arguments, "windowId");
-    // Absent for older callers: the implicit view, as before.
-    auto flutterViewId = get_optional_fl_map_value<int64_t>(*arguments, "flutterViewId");
 
+    const auto flutterViewId = get_optional_fl_map_value<int64_t>(*arguments, "flutterViewId");
     const auto flutterViewHwnd = ResolveFlutterViewHwnd(plugin->registrar, flutterViewId);
     if (!flutterViewHwnd) {
       result_->Error("0", "Cannot create the InAppWebView instance! No Flutter view.");
@@ -144,9 +182,9 @@ namespace flutter_inappwebview_plugin
     watchFlutterView(flutterViewHwnd);
 
     if (keepAliveId.has_value() && map_contains(keepAliveWebViews, keepAliveId.value())) {
-      // Reuse the existing host window, moved under the requesting view.
       auto webView = std::move(keepAliveWebViews.at(keepAliveId.value())->view);
       keepAliveWebViews.erase(keepAliveId.value());
+      webView->setHasConsoleMessageListener(hasConsoleMessageListener);
       webView->reparent(flutterViewHwnd);
       const auto hostHwnd = webView->hostWindow();
       auto customPlatformView = std::make_unique<CustomPlatformView>(plugin->registrar->messenger(),
@@ -156,30 +194,140 @@ namespace flutter_inappwebview_plugin
         std::move(webView),
         flutterViewResolver());
       auto textureId = customPlatformView->texture_id();
+      const bool hostedInWindow = customPlatformView->view->isHostedInWindow();
       keepAliveWebViews.insert({ keepAliveId.value(), std::move(customPlatformView) });
-      result_->Success(textureId);
+      result_->Success(creationResult(textureId, hostedInWindow, "", S_OK));
       return;
     }
 
-    RECT bounds;
-    GetClientRect(flutterViewHwnd, &bounds);
-
-    const DWORD windowStyle = WS_CHILD | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
-    auto hwnd = CreateWindowEx(0, windowClass_.lpszClassName, L"", windowStyle, 0,
-      0, bounds.right - bounds.left, bounds.bottom - bounds.top,
-      flutterViewHwnd,
-      nullptr,
-      windowClass_.hInstance, nullptr);
-
-    auto webViewEnvironment = webViewEnvironmentId.has_value() && map_contains(plugin->webViewEnvironmentManager->webViewEnvironments, webViewEnvironmentId.value())
-      ? plugin->webViewEnvironmentManager->webViewEnvironments.at(webViewEnvironmentId.value()).get() : nullptr;
-
-    pendingWebViewHosts_.insert(hwnd);
+    const auto hwnd = createHostWindow(flutterViewHwnd);
+    if (!hwnd) {
+      result_->Error("0", "Cannot create the InAppWebView host window!");
+      return;
+    }
 
     auto initialSettings = std::make_shared<InAppWebViewSettings>(settingsMap);
+    const auto creationParams = [initialSettings, initialUserScriptList, hasConsoleMessageListener]()
+      {
+        std::optional<std::vector<std::shared_ptr<UserScript>>> initialUserScripts = initialUserScriptList.has_value() ?
+          functional_map(initialUserScriptList.value(), [](const flutter::EncodableValue& map) { return std::make_shared<UserScript>(std::get<flutter::EncodableMap>(map)); }) :
+          std::optional<std::vector<std::shared_ptr<UserScript>>>{};
+
+        return InAppWebViewCreationParams{ "", initialSettings, initialUserScripts, hasConsoleMessageListener };
+      };
+    // Looked up per attempt: the environment may be disposed between them.
+    const auto environment = [this, webViewEnvironmentId]() -> WebViewEnvironment*
+      {
+        return plugin && webViewEnvironmentId.has_value() && map_contains(plugin->webViewEnvironmentManager->webViewEnvironments, webViewEnvironmentId.value())
+          ? plugin->webViewEnvironmentManager->webViewEnvironments.at(webViewEnvironmentId.value()).get() : nullptr;
+      };
+
+    const auto finish = [=](std::unique_ptr<InAppWebView> inAppWebView, const HWND hostWindow,
+      const std::string& fallbackStage, const HRESULT fallbackHr)
+      {
+        inAppWebView->setHostWindowMinimized(
+          GetParent(hostWindow) == parkingWindow_ || isTopLevelMinimized(hostWindow));
+        std::optional<std::shared_ptr<URLRequest>> urlRequest = urlRequestMap.has_value() ? std::make_shared<URLRequest>(urlRequestMap.value()) : std::optional<std::shared_ptr<URLRequest>>{};
+        if (urlRequest.has_value()) {
+          inAppWebView->loadUrl(urlRequest.value());
+        }
+        else if (initialFile.has_value()) {
+          inAppWebView->loadFile(initialFile.value());
+        }
+        else if (initialDataMap.has_value()) {
+          inAppWebView->loadData(get_fl_map_value<std::string>(initialDataMap.value(), "data"));
+        }
+
+        if (windowId.has_value() && map_contains(windowWebViews, windowId.value())) {
+          auto windowWebViewArgs = windowWebViews.at(windowId.value()).get();
+          windowWebViewArgs->args->put_NewWindow(inAppWebView->webView.get());
+          windowWebViewArgs->args->put_Handled(TRUE);
+          windowWebViewArgs->deferral->Complete();
+          windowWebViews.erase(windowId.value());
+        }
+
+        const bool hostedInWindow = inAppWebView->isHostedInWindow();
+        auto customPlatformView = std::make_unique<CustomPlatformView>(plugin->registrar->messenger(),
+          plugin->registrar->texture_registrar(),
+          graphics_context(),
+          hostWindow,
+          std::move(inAppWebView),
+          flutterViewResolver());
+
+        auto textureId = customPlatformView->texture_id();
+
+        if (keepAliveId.has_value()) {
+          customPlatformView->view->initChannel(keepAliveId.value(), std::nullopt);
+          keepAliveWebViews.insert({ keepAliveId.value(), std::move(customPlatformView) });
+        }
+        else {
+          customPlatformView->view->initChannel(textureId, std::nullopt);
+          webViews.insert({ textureId, std::move(customPlatformView) });
+        }
+        pendingWebViewHosts_.erase(hostWindow);
+        result_->Success(creationResult(textureId, hostedInWindow, fallbackStage, fallbackHr));
+      };
+
+    // HWND mode: a regular windowed controller renders into |hostWindow|.
+    const auto createInWindow = [=, alive = alive_.weak()](const HWND hostWindow,
+      const std::string& fallbackStage, const HRESULT fallbackHr)
+      {
+        if (!IsWindow(hostWindow)) {
+          pendingWebViewHosts_.erase(hostWindow);
+          result_->Error("0", "Cannot create the InAppWebView host window!");
+          return;
+        }
+        auto windowedFailureStage = std::make_shared<std::string>();
+        InAppWebView::createInAppWebViewEnv(hostWindow, false, environment(), initialSettings,
+          [=](HRESULT errorCode,
+            wil::com_ptr<ICoreWebView2Environment> webViewEnv,
+            wil::com_ptr<ICoreWebView2Controller> webViewController,
+            wil::com_ptr<ICoreWebView2CompositionController>)
+          {
+            if (alive.expired()) {
+              if (webViewController) {
+                failedLog(webViewController->Close());
+              }
+              return;
+            }
+            std::unique_ptr<InAppWebView> inAppWebView;
+            if (plugin && webViewEnv && webViewController && IsWindow(hostWindow)) {
+              inAppWebView = std::make_unique<InAppWebView>(plugin, creationParams(), hostWindow,
+                std::move(webViewEnv), std::move(webViewController), nullptr,
+                GetParent(hostWindow) == parkingWindow_ || isTopLevelMinimized(hostWindow));
+              inAppWebView->setHostWindow(hostWindow);
+            }
+            if (!inAppWebView || !inAppWebView->webView) {
+              pendingWebViewHosts_.erase(hostWindow);
+              // A constructed view owns |hostWindow| and destroys it itself.
+              if (!inAppWebView) {
+                if (webViewController) {
+                  failedLog(webViewController->Close());
+                }
+                DestroyWindow(hostWindow);
+              }
+              const std::string stage = windowedFailureStage->empty() ? "" : *windowedFailureStage + ", ";
+              result_->Error("0", "Cannot create the InAppWebView instance (" + stage + "HWND fallback after " +
+                fallbackStage + " HRESULT " + getHRErrorString(fallbackHr) + ")! HRESULT " + getHRErrorString(errorCode));
+              return;
+            }
+            finish(std::move(inAppWebView), hostWindow, fallbackStage, fallbackHr);
+          },
+          windowedFailureStage);
+      };
+
+    if (isHwndModeForced()) {
+      createInWindow(hwnd, "forced", S_OK);
+      return;
+    }
+    if (!isSupported()) {
+      createInWindow(hwnd, compositionUnavailableStage_, HRESULT_FROM_WIN32(ERROR_NOT_SUPPORTED));
+      return;
+    }
+
     auto failureStage = std::make_shared<std::string>();
 
-    InAppWebView::createInAppWebViewEnv(hwnd, true, webViewEnvironment, initialSettings,
+    InAppWebView::createInAppWebViewEnv(hwnd, true, environment(), initialSettings,
       [=, alive = alive_.weak()](HRESULT errorCode,
         wil::com_ptr<ICoreWebView2Environment> webViewEnv,
         wil::com_ptr<ICoreWebView2Controller> webViewController,
@@ -193,66 +341,36 @@ namespace flutter_inappwebview_plugin
           }
           return;
         }
-        pendingWebViewHosts_.erase(hwnd);
         if (plugin && webViewEnv && webViewController && webViewCompositionController && IsWindow(hwnd)) {
-          std::optional<std::vector<std::shared_ptr<UserScript>>> initialUserScripts = initialUserScriptList.has_value() ?
-            functional_map(initialUserScriptList.value(), [](const flutter::EncodableValue& map) { return std::make_shared<UserScript>(std::get<flutter::EncodableMap>(map)); }) :
-            std::optional<std::vector<std::shared_ptr<UserScript>>>{};
-
-          InAppWebViewCreationParams params = {
-            "",
-            std::move(initialSettings),
-            initialUserScripts
-          };
-
-          auto inAppWebView = std::make_unique<InAppWebView>(plugin, params, hwnd,
+          auto inAppWebView = std::make_unique<InAppWebView>(plugin, creationParams(), hwnd,
             std::move(webViewEnv), std::move(webViewController),
             std::move(webViewCompositionController),
             GetParent(hwnd) == parkingWindow_ || isTopLevelMinimized(hwnd));
-          if (!inAppWebView->webView || !inAppWebView->surface()) {
+          if (!inAppWebView->webView) {
+            pendingWebViewHosts_.erase(hwnd);
             result_->Error("0", "Cannot create the InAppWebView surface!");
             return;
           }
 
-          std::optional<std::shared_ptr<URLRequest>> urlRequest = urlRequestMap.has_value() ? std::make_shared<URLRequest>(urlRequestMap.value()) : std::optional<std::shared_ptr<URLRequest>>{};
-          if (urlRequest.has_value()) {
-            inAppWebView->loadUrl(urlRequest.value());
+          const char* captureStage = "createSurface";
+          const HRESULT captureHr = inAppWebView->surface()
+            ? TextureBridge::ProbeCapture(graphics_context(), inAppWebView->surface(), &captureStage)
+            : E_FAIL;
+          if (FAILED(captureHr)) {
+            // A source view may have closed while creation was pending.
+            const auto parent = GetParent(hwnd);
+            pendingWebViewHosts_.erase(hwnd);
+            inAppWebView.reset();
+            createInWindow(createHostWindow(parent), captureStage, captureHr);
+            return;
           }
-          else if (initialFile.has_value()) {
-            inAppWebView->loadFile(initialFile.value());
-          }
-          else if (initialDataMap.has_value()) {
-            inAppWebView->loadData(get_fl_map_value<std::string>(initialDataMap.value(), "data"));
-          }
-
-          if (windowId.has_value() && map_contains(windowWebViews, windowId.value())) {
-            auto windowWebViewArgs = windowWebViews.at(windowId.value()).get();
-            windowWebViewArgs->args->put_NewWindow(inAppWebView->webView.get());
-            windowWebViewArgs->args->put_Handled(TRUE);
-            windowWebViewArgs->deferral->Complete();
-            windowWebViews.erase(windowId.value());
-          }
-
-          auto customPlatformView = std::make_unique<CustomPlatformView>(plugin->registrar->messenger(),
-            plugin->registrar->texture_registrar(),
-            graphics_context(),
-            hwnd,
-            std::move(inAppWebView),
-            flutterViewResolver());
-
-          auto textureId = customPlatformView->texture_id();
-
-          if (keepAliveId.has_value()) {
-            customPlatformView->view->initChannel(keepAliveId.value(), std::nullopt);
-            keepAliveWebViews.insert({ keepAliveId.value(), std::move(customPlatformView) });
-          }
-          else {
-            customPlatformView->view->initChannel(textureId, std::nullopt);
-            webViews.insert({ textureId, std::move(customPlatformView) });
-          }
-          result_->Success(textureId);
+          finish(std::move(inAppWebView), hwnd, "", S_OK);
+        }
+        else if (plugin && failureStage->find("CompositionController") != std::string::npos) {
+          createInWindow(hwnd, *failureStage, errorCode);
         }
         else {
+          pendingWebViewHosts_.erase(hwnd);
           if (webViewController) {
             failedLog(webViewController->Close());
           }
@@ -387,6 +505,20 @@ namespace flutter_inappwebview_plugin
         WS_POPUP | WS_CLIPCHILDREN, 0, 0, 0, 0, nullptr, nullptr, windowClass_.hInstance, nullptr);
     }
     return parkingWindow_;
+  }
+
+  void InAppWebViewManager::notifyWindowMoved(const HWND topLevelHwnd) const
+  {
+    for (const auto& [id, platformView] : webViews) {
+      if (platformView && platformView->view && platformView->view->topLevelWindow() == topLevelHwnd) {
+        platformView->view->notifyParentWindowMoved();
+      }
+    }
+    for (const auto& [keepAliveId, platformView] : keepAliveWebViews) {
+      if (platformView && platformView->view && platformView->view->topLevelWindow() == topLevelHwnd) {
+        platformView->view->notifyParentWindowMoved();
+      }
+    }
   }
 
   bool InAppWebViewManager::isGraphicsCaptureSessionSupported()

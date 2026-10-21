@@ -28,6 +28,12 @@ namespace flutter_inappwebview_plugin
       ABI::Windows::UI::Composition::IVisual* visual);
     virtual ~TextureBridge();
 
+    // Opens and closes a capture session on |visual|, so a view that could
+    // never be captured is found before it is handed to Flutter.
+    static HRESULT ProbeCapture(const GraphicsContext* graphics_context,
+                                ABI::Windows::UI::Composition::IVisual* visual,
+                                const char** failed_stage);
+
     bool Start();
     void Stop();
     // Closes the capture session while the WebView is hidden and reopens it

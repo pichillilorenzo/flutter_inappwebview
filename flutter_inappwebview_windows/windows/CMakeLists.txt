@@ -58,6 +58,7 @@ list(APPEND PLUGIN_SOURCES
   "types/channel_delegate.h"
   "types/base_callback_result.h"
   "types/one_shot_callback.h"
+  "custom_platform_view/surface_pool_slot.h"
   "types/lifetime_token.h"
   "types/url_request.cpp"
   "types/url_request.h"
@@ -299,6 +300,8 @@ function(FLUTTER_INAPPWEBVIEW_WINDOWS_APPLY_STANDARD_SETTINGS TARGET)
   target_compile_features(${TARGET} PUBLIC cxx_std_17)
   target_compile_options(${TARGET} PRIVATE /W4 /wd"4100" /wd"4458")
   target_compile_options(${TARGET} PRIVATE /EHsc)
+  # Newer MSVC releases reject code that permissive mode still accepts.
+  target_compile_options(${TARGET} PRIVATE /permissive-)
   target_compile_options(${TARGET} PRIVATE /bigobj)
   target_compile_definitions(${TARGET} PRIVATE "_HAS_EXCEPTIONS=0")
   target_compile_definitions(${TARGET} PRIVATE "$<$<CONFIG:Debug>:_DEBUG>")
@@ -365,6 +368,7 @@ add_executable(${TEST_RUNNER}
 apply_standard_settings(${TEST_RUNNER})
 target_include_directories(${TEST_RUNNER} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 target_link_libraries(${TEST_RUNNER} PRIVATE flutter flutter_wrapper_plugin gtest_main)
+target_link_libraries(${TEST_RUNNER} PRIVATE ${CMAKE_BINARY_DIR}/packages/nlohmann.json/build/native/nlohmann.json.targets)
 
 # Enable automatic test discovery. The default 5s DISCOVERY_TIMEOUT is
 # marginal on cold CI runners (antivirus scans the fresh executable) and

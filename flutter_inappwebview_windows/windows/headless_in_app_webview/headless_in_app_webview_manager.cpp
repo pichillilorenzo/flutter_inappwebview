@@ -61,6 +61,7 @@ namespace flutter_inappwebview_plugin
     auto initialFile = get_optional_fl_map_value<std::string>(params, "initialFile");
     auto initialDataMap = get_optional_fl_map_value<flutter::EncodableMap>(params, "initialData");
     auto initialUserScriptList = get_optional_fl_map_value<flutter::EncodableList>(params, "initialUserScripts");
+    auto hasConsoleMessageListener = get_optional_fl_map_value<bool>(params, "hasConsoleMessageListener").value_or(true);
     auto webViewEnvironmentId = get_optional_fl_map_value<std::string>(params, "webViewEnvironmentId");
 
     RECT bounds;
@@ -104,7 +105,8 @@ namespace flutter_inappwebview_plugin
           InAppWebViewCreationParams params = {
             id,
             std::move(initialSettings),
-            initialUserScripts
+            initialUserScripts,
+            hasConsoleMessageListener
           };
 
           auto inAppWebView = std::make_unique<InAppWebView>(plugin, params, hwnd,

@@ -5,6 +5,7 @@
 #include <flutter/standard_method_codec.h>
 #include <memory>
 #include <optional>
+#include <type_traits>
 #include <utility>
 
 #include "../utils/log.h"
@@ -52,6 +53,12 @@ namespace flutter_inappwebview_plugin
             return;
           }
           std::optional<T> result = decodeResult ? decodeResult(val) : std::nullopt;
+          if constexpr (std::is_pointer_v<T>) {
+            // Dart's null reply arrives as a null pointer, which is not a value.
+            if (result.has_value() && result.value() == nullptr) {
+              result.reset();
+            }
+          }
           auto shouldRunDefaultBehaviour = false;
           if (result.has_value()) {
             shouldRunDefaultBehaviour = nonNullSuccess ? nonNullSuccess(result.value()) : shouldRunDefaultBehaviour;

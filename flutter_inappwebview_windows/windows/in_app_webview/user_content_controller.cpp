@@ -307,6 +307,8 @@ namespace flutter_inappwebview_plugin
       return;
     }
 
+    // Isolated worlds are tracked through Runtime.executionContextCreated.
+    webView_->ensureRuntimeDomain();
     auto& worldName = contentWorld->name;
     if (!map_contains(contentWorlds_, worldName)) {
       nlohmann::json parameters = {
@@ -406,6 +408,9 @@ namespace flutter_inappwebview_plugin
   void UserContentController::addPluginScriptsIfRequired(const std::shared_ptr<ContentWorld> contentWorld)
   {
     if (contentWorld && !ContentWorld::isPage(contentWorld)) {
+      if (webView_) {
+        webView_->ensureRuntimeDomain();
+      }
       std::vector<std::shared_ptr<PluginScript>> pluginScriptsRequiredInAllContentWorlds = getPluginScriptsRequiredInAllContentWorlds();
       for (auto& pluginScript : pluginScriptsRequiredInAllContentWorlds) {
         if (!containsPluginScript(pluginScript, contentWorld)) {

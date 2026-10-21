@@ -40,15 +40,12 @@ void main() {
     );
   });
 
-  test('invalid composition surface is returned as a creation error', () {
+  test('a webview without CoreWebView2 is returned as a creation error', () {
     final source = _readNativeSource(
       'windows/in_app_webview/in_app_webview_manager.cpp',
     );
 
-    expect(
-      source,
-      contains('if (!inAppWebView->webView || !inAppWebView->surface())'),
-    );
+    expect(source, contains('if (!inAppWebView->webView) {'));
     expect(
       source,
       contains(

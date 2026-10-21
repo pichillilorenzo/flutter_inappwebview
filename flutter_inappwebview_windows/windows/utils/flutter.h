@@ -139,13 +139,6 @@ namespace flutter_inappwebview_plugin
     return std::nullopt;
   }
 
-  template<typename T>
-  static inline T get_fl_map_value(const flutter::EncodableMap& map, const char* key, const T& defaultValue)
-  {
-    auto optional = get_optional_fl_map_value<T>(map, key);
-    return !optional.has_value() ? defaultValue : optional.value();
-  }
-
   template<typename T, typename std::enable_if<(is_mappish<T>::value && !std::is_same<T, flutter::EncodableMap>::value)>::type* = nullptr>
   static inline std::optional<T> get_optional_fl_map_value(const flutter::EncodableMap& map, const char* key)
   {
@@ -190,6 +183,15 @@ namespace flutter_inappwebview_plugin
   static inline std::vector<T> get_fl_map_value(const flutter::EncodableMap& map, const char* key, const std::vector<T>& defaultValue)
   {
     auto optional = get_optional_fl_map_value<std::vector<T>>(map, key);
+    return !optional.has_value() ? defaultValue : optional.value();
+  }
+
+  // After every get_optional_fl_map_value overload: two-phase lookup only
+  // sees the overloads declared before this template.
+  template<typename T>
+  static inline T get_fl_map_value(const flutter::EncodableMap& map, const char* key, const T& defaultValue)
+  {
+    auto optional = get_optional_fl_map_value<T>(map, key);
     return !optional.has_value() ? defaultValue : optional.value();
   }
 }

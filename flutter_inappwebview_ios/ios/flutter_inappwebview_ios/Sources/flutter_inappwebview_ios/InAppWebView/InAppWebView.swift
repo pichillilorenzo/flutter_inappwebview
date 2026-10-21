@@ -3386,10 +3386,13 @@ if(window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)] 
             callback.error = { (code: String, message: String?, details: Any?) in
                 let errorMessage = code + (message != nil ? ", " + (message ?? "") : "")
                 print(errorMessage)
+                let errorMessageJSON = Util.JSONStringify(value: [errorMessage])
+                    .replacingOccurrences(of: "\u{2028}", with: "\\u2028")
+                    .replacingOccurrences(of: "\u{2029}", with: "\\u2029")
                 
                 webView.evaluateJavaScript("""
 if(window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)] != null) {
-    window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)].reject(new Error('\(errorMessage.replacingOccurrences(of: "\'", with: "\\'"))'));
+    window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)].reject(new Error(\(errorMessageJSON)[0]));
     delete window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)];
 }
 """, completionHandler: nil)

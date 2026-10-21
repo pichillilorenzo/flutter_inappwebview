@@ -80,6 +80,10 @@ namespace flutter_inappwebview_plugin
       }
     }
 
+    if (message == WM_MOVE && inAppWebViewManager) {
+      inAppWebViewManager->notifyWindowMoved(hWnd);
+    }
+
     if (platformUtil) {
       result = platformUtil->HandleWindowProc(hWnd, message, wParam, lParam);
     }

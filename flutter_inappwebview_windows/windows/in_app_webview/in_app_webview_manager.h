@@ -58,6 +58,8 @@ namespace flutter_inappwebview_plugin
       const flutter::MethodCall<flutter::EncodableValue>& method_call,
       std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result);
 
+    // The top-level window moved; webviews must update popup placement.
+    void notifyWindowMoved(HWND topLevelHwnd) const;
     void createInAppWebView(const flutter::EncodableMap* arguments, std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result);
     void disposeKeepAlive(const std::string& keepAliveId);
     void setWindowMinimized(HWND topLevelHwnd, bool minimized);
@@ -75,6 +77,8 @@ namespace flutter_inappwebview_plugin
     HWND parkingWindow_ = nullptr;
     LifetimeToken alive_;
     inline static bool valid_ = false;
+    // The step that left composition unavailable; new views use HWND mode.
+    inline static std::string compositionUnavailableStage_;
     inline static std::size_t instance_count_ = 0;
     inline static std::mutex shared_resources_mutex_;
 
@@ -84,6 +88,7 @@ namespace flutter_inappwebview_plugin
     HWND parkingWindow();
     static LRESULT CALLBACK FlutterViewSubclassProc(HWND hwnd, UINT message,
       WPARAM wParam, LPARAM lParam, UINT_PTR subclassId, DWORD_PTR refData);
+    HWND createHostWindow(HWND parent);
     static ABI::Windows::System::IDispatcherQueueController* detachSharedResourcesForShutdown();
     static void shutdownDispatcherQueue(ABI::Windows::System::IDispatcherQueueController* dispatcherQueueController);
   };

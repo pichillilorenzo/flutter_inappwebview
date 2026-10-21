@@ -3,6 +3,7 @@
 #include <d3dcompiler.h>
 
 #include <cassert>
+#include <chrono>
 #include <cstdint>
 #include <iostream>
 #include <memory>
@@ -11,6 +12,7 @@
 #include <utility>
 #include <vector>
 
+#include "surface_pool_slot.h"
 #include "util/direct3d11.interop.h"
 
 namespace flutter_inappwebview_plugin
@@ -43,6 +45,9 @@ void main(uint3 id : SV_DispatchThreadID) {
       ID3DBlob**, ID3DBlob**);
 
     constexpr UINT kCompareResultBytes = 16;
+    // Longest wait for the comparison result before the frame is published
+    // unseen; 99% of results arrive sooner (fork measurements).
+    constexpr auto kCompareWait = std::chrono::microseconds(1000);
     constexpr size_t kSurfacePoolSize = 2;
 
     // The shader is identical for every comparer. Cache only immutable CPU
@@ -206,13 +211,19 @@ void main(uint3 id : SV_DispatchThreadID) {
     context->CSSetUnorderedAccessViews(0, 1, no_uavs, nullptr);
     context->CSSetShader(nullptr, nullptr, 0);
 
-    // Never block the capture dispatcher waiting for the GPU. When the flag
-    // is not ready, fail open and forward the frame, which is the previous
-    // behaviour and preserves correctness under GPU pressure.
+    // The commands must be submitted, or the result is never ready. A result
+    // that is late fails open: the frame is forwarded as changed.
     context->CopyResource(compare_staging_.get(), compare_result_.get());
+    context->Flush();
     D3D11_MAPPED_SUBRESOURCE mapped;
-    if (FAILED(context->Map(compare_staging_.get(), 0, D3D11_MAP_READ,
-      D3D11_MAP_FLAG_DO_NOT_WAIT, &mapped))) {
+    const auto deadline = std::chrono::steady_clock::now() + kCompareWait;
+    HRESULT mapped_hr;
+    while ((mapped_hr = context->Map(compare_staging_.get(), 0, D3D11_MAP_READ,
+      D3D11_MAP_FLAG_DO_NOT_WAIT, &mapped)) == DXGI_ERROR_WAS_STILL_DRAWING &&
+      std::chrono::steady_clock::now() < deadline) {
+      YieldProcessor();
+    }
+    if (FAILED(mapped_hr)) {
       return true;
     }
     const bool differ = *static_cast<const uint32_t*>(mapped.pData) != 0;
@@ -228,12 +239,10 @@ void main(uint3 id : SV_DispatchThreadID) {
     const bool reference_created = !reference_ ||
       reference_size_.width != desc.Width ||
       reference_size_.height != desc.Height;
-    if (!EnsureSurfacePool(desc.Width, desc.Height) ||
-      (compare_shader_ && !EnsureReference(desc.Width, desc.Height))) {
+    if (!EnsureSurfacePool(desc.Width, desc.Height)) {
       return false;
     }
-    // Several WebViews share one immediate context, and with the free-threaded
-    // frame pool their frames arrive on different threads.
+    // Several WebViews share one immediate context.
     const std::lock_guard<std::mutex> context_lock(
       graphics_context_->device_context_mutex());
     auto context = graphics_context_->d3d_device_context();
@@ -242,26 +251,28 @@ void main(uint3 id : SV_DispatchThreadID) {
     size_t writable_surface;
     {
       const std::lock_guard<std::mutex> pool_lock(pool->mutex);
-      writable_surface = pool->surfaces.size();
-      for (size_t i = 0; i < pool->surfaces.size(); ++i) {
-        if (!pool->surfaces[i].is_leased) {
-          writable_surface = i;
-          break;
-        }
-      }
+      writable_surface = FindWritableSurface(pool->surfaces,
+        pool->has_published_surface, pool->published_surface);
     }
-    // Flutter is still using every shared texture. Keep the reference frame
-    // unchanged so the next capture can publish the newest frame once a
-    // buffer is released.
+    // Keep the reference unchanged when only published or leased slots remain,
+    // so the next capture can retry after Flutter releases a buffer.
     if (writable_surface == pool->surfaces.size()) {
       return false;
     }
 
+    if (compare_shader_ && !EnsureReference(desc.Width, desc.Height)) {
+      return false;
+    }
+    if (reference_created) {
+      compare_gate_.reset();
+    }
     bool changed = true;
-    if (compare_shader_ && EnsureIncoming(desc.Width, desc.Height)) {
+    if (compare_shader_ && !reference_created && compare_gate_.shouldCompare() &&
+      EnsureIncoming(desc.Width, desc.Height)) {
       context->CopyResource(incoming_.get(), frame.get());
-      changed = reference_created || FramesDiffer(incoming_.get(),
-        reference_.get(), desc.Width, desc.Height);
+      changed = FramesDiffer(incoming_.get(), reference_.get(), desc.Width,
+        desc.Height);
+      compare_gate_.recordResult(changed);
       if (changed) {
         context->CopyResource(pool->surfaces[writable_surface].texture.get(),
           incoming_.get());
@@ -272,7 +283,7 @@ void main(uint3 id : SV_DispatchThreadID) {
       }
     }
     else {
-      // First frame, or no compare available.
+      // First frame, a paused compare, or no compare available.
       if (compare_shader_) {
         context->CopyResource(reference_.get(), frame.get());
       }
@@ -325,7 +336,10 @@ void main(uint3 id : SV_DispatchThreadID) {
         return false;
       }
     }
-    surface_pool_ = std::move(pool);
+    {
+      const std::lock_guard<std::mutex> lock(surface_pool_mutex_);
+      surface_pool_ = std::move(pool);
+    }
     return true;
   }
 
@@ -385,11 +399,15 @@ void main(uint3 id : SV_DispatchThreadID) {
   const FlutterDesktopGpuSurfaceDescriptor*
     TextureBridgeGpu::GetSurfaceDescriptor(size_t, size_t)
   {
-    const std::lock_guard<std::mutex> lock(mutex_);
-    if (!is_running_ || !surface_pool_) {
+    // Not |mutex_|: capture holds it while it waits for the frame comparison.
+    std::shared_ptr<SurfacePool> pool;
+    {
+      const std::lock_guard<std::mutex> lock(surface_pool_mutex_);
+      pool = surface_pool_;
+    }
+    if (!pool) {
       return nullptr;
     }
-    auto pool = surface_pool_;
     const std::lock_guard<std::mutex> pool_lock(pool->mutex);
     if (!pool->has_published_surface ||
       pool->surfaces[pool->published_surface].is_leased) {
@@ -438,7 +456,10 @@ void main(uint3 id : SV_DispatchThreadID) {
     TextureBridge::StopInternal();
     // Outstanding Flutter leases retain the old pool until their release
     // callbacks run; a resumed capture creates a new pool.
-    surface_pool_.reset();
+    {
+      const std::lock_guard<std::mutex> lock(surface_pool_mutex_);
+      surface_pool_.reset();
+    }
     OnCaptureSuspended();
   }
 }

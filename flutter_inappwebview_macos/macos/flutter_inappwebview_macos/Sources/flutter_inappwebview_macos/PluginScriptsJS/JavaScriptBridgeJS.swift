@@ -44,6 +44,7 @@ public class JavaScriptBridgeJS {
                 var _Promise;
                 var _UserMessageHandler;
                 var _postMessage;
+                var _Promise_then;
                 try {
                   _JSON_stringify = window.JSON.stringify;
                   _Array_slice = window.Array.prototype.slice;
@@ -53,17 +54,31 @@ public class JavaScriptBridgeJS {
                   _UserMessageHandler = window.webkit.messageHandlers['callHandler'];
                   _postMessage = _UserMessageHandler.postMessage;
                   _postMessage.call = window.Function.prototype.call;
+                  _Promise_then = window.Promise.prototype.then;
+                  _Promise_then.call = window.Function.prototype.call;
                 } catch (_) { return; }
                 window.\(get_JAVASCRIPT_BRIDGE_NAME()).callHandler = function() {
                     var _windowId = \(WindowIdJS.WINDOW_ID_VARIABLE_JS_SOURCE());
                     var _callHandlerID = _setTimeout(function(){});
-                    _postMessage.call(_UserMessageHandler, {
+                    var _postMessageResult = _postMessage.call(_UserMessageHandler, {
                         'handlerName': arguments[0],
                         '_callHandlerID': _callHandlerID,
                         '_bridgeSecret': bridgeSecret,
                         'args': _JSON_stringify(_Array_slice.call(arguments, 1)),
                         '_windowId': _windowId
                     });
+                    // WebKit's postMessage returns a Promise. It rejects with an InvalidAccessError when
+                    // the message handler has been removed (e.g. the WebView has been disposed while the
+                    // page is still running, so a blur event or a console message can still call this
+                    // function). Handle that rejection here: otherwise it is reported to the page as an
+                    // unhandledrejection that the caller has no way to catch.
+                    if (_postMessageResult != null && typeof _postMessageResult.then === 'function') {
+                        _Promise_then.call(_postMessageResult, null, function() {
+                            try {
+                                delete (window.top === window ? window : window.top).\(get_JAVASCRIPT_BRIDGE_NAME())[_callHandlerID];
+                            } catch (_) {}
+                        });
+                    }
                     return new _Promise(function(resolve, reject) {
                         try {
                             (window.top === window ? window : window.top).\(get_JAVASCRIPT_BRIDGE_NAME())[_callHandlerID] = {resolve: resolve, reject: reject};

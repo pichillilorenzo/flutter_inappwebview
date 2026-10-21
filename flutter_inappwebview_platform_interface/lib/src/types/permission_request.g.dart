@@ -41,14 +41,9 @@ class PermissionRequest {
       origin: WebUri(map['origin']),
     );
     if (map['resources'] != null) {
-      instance.resources = List<PermissionResourceType>.from(
-        map['resources'].map(
-          (e) => switch (enumMethod ?? EnumMethod.nativeValue) {
-            EnumMethod.nativeValue => PermissionResourceType.fromNativeValue(e),
-            EnumMethod.value => PermissionResourceType.fromValue(e),
-            EnumMethod.name => PermissionResourceType.byName(e),
-          }!,
-        ),
+      instance.resources = _deserializePermissionResources(
+        map['resources'],
+        enumMethod: enumMethod,
       );
     }
     return instance;

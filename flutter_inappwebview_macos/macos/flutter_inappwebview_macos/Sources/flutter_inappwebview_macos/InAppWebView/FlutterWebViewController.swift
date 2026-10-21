@@ -58,10 +58,11 @@ public class FlutterWebViewController: NSView, Disposable {
         webView!.findInteractionController = findInteractionController
         findInteractionController.prepare()
         
-        webView!.autoresizingMask = [.width, .height]
-        self.autoresizesSubviews = true
-        self.autoresizingMask = [.width, .height]
+        webView!.autoresizingMask = []
+        self.autoresizesSubviews = false
+        self.autoresizingMask = []
         self.addSubview(webView!)
+        syncWebViewFrameToBounds()
 
         webView!.settings = settings
         webView!.prepare()
@@ -70,6 +71,36 @@ public class FlutterWebViewController: NSView, Disposable {
     
     required init?(coder nsCoder: NSCoder) {
         super.init(coder: nsCoder)
+    }
+
+    public override func layout() {
+        super.layout()
+        syncWebViewFrameToBounds()
+    }
+
+    public override func setFrameSize(_ newSize: NSSize) {
+        super.setFrameSize(newSize)
+        syncWebViewFrameToBounds()
+    }
+
+    public override func setBoundsSize(_ newSize: NSSize) {
+        super.setBoundsSize(newSize)
+        syncWebViewFrameToBounds()
+    }
+
+    public override func resizeSubviews(withOldSize oldSize: NSSize) {
+        syncWebViewFrameToBounds()
+    }
+
+    private func syncWebViewFrameToBounds() {
+        guard bounds.width.isFinite,
+              bounds.height.isFinite,
+              let webView = webView(),
+              webView.frame != bounds else {
+            return
+        }
+        webView.frame = bounds
+        webView.needsLayout = true
     }
     
     public func webView() -> InAppWebView? {
@@ -98,35 +129,19 @@ public class FlutterWebViewController: NSView, Disposable {
         let initialData = params["initialData"] as? [String: String?]
         
         if windowId == nil {
-            if #available(macOS 10.13, *) {
-                webView.configuration.userContentController.removeAllContentRuleLists()
-                if let contentBlockers = webView.settings?.contentBlockers, contentBlockers.count > 0 {
-                    do {
-                        let jsonData = try JSONSerialization.data(withJSONObject: contentBlockers, options: [])
-                        let blockRules = String(data: jsonData, encoding: .utf8)
-                        WKContentRuleListStore.default().compileContentRuleList(
-                            forIdentifier: "ContentBlockingRules",
-                            encodedContentRuleList: blockRules) { (contentRuleList, error) in
-
-                                if let error = error {
-                                    print(error.localizedDescription)
-                                    return
-                                }
-
-                                let configuration = webView.configuration
-                                configuration.userContentController.add(contentRuleList!)
-
-                                self.load(initialUrlRequest: initialUrlRequest, initialFile: initialFile, initialData: initialData)
-                        }
+            if #available(macOS 10.13, *), let contentBlockers = webView.settings?.contentBlockers, !contentBlockers.isEmpty {
+                // Nothing loads before the rules are enforced, and nothing loads if they fail.
+                webView.applyContentBlockers(contentBlockers) { [weak self] applied in
+                    guard applied else {
                         return
-                    } catch {
-                        print(error.localizedDescription)
                     }
+                    self?.load(initialUrlRequest: initialUrlRequest, initialFile: initialFile, initialData: initialData)
                 }
+                return
             }
             load(initialUrlRequest: initialUrlRequest, initialFile: initialFile, initialData: initialData)
         }
-        else if let wId = windowId {
+        else if windowId != nil {
             webView.runWindowBeforeCreatedCallbacks()
         }
     }

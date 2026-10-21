@@ -28,8 +28,17 @@ namespace flutter_inappwebview_plugin
       ABI::Windows::UI::Composition::IVisual* visual);
     virtual ~TextureBridge();
 
+    // Opens and closes a capture session on |visual|, so a view that could
+    // never be captured is found before it is handed to Flutter.
+    static HRESULT ProbeCapture(const GraphicsContext* graphics_context,
+                                ABI::Windows::UI::Composition::IVisual* visual,
+                                const char** failed_stage);
+
     bool Start();
     void Stop();
+    // Closes the capture session while the WebView is hidden and reopens it
+    // when shown. Flutter keeps the last frame meanwhile.
+    void SetCaptureSuspended(bool suspended);
 
     void SetOnFrameAvailable(FrameAvailableCallback callback)
     {
@@ -46,6 +55,7 @@ namespace flutter_inappwebview_plugin
 
   protected:
     bool is_running_ = false;
+    bool capture_suspended_ = false;
 
     const GraphicsContext* graphics_context_;
     std::mutex mutex_;
@@ -64,13 +74,25 @@ namespace flutter_inappwebview_plugin
       frame_pool_;
     winrt::com_ptr<ABI::Windows::Graphics::Capture::IGraphicsCaptureSession>
       capture_session_;
+    ABI::Windows::Graphics::SizeInt32 pool_size_ = { 0, 0 };
 
     EventRegistrationToken on_closed_token_ = {};
     EventRegistrationToken on_frame_arrived_token_ = {};
 
     virtual void StopInternal();
+    // Called under |mutex_| after a suspend closed the capture session.
+    virtual void OnCaptureSuspended();
+    // Called under |mutex_| for every captured frame that survived the fps
+    // limit. Returning false skips the frame: Flutter is not notified and the
+    // frame is not drawn. The base bridge accepts everything; the GPU bridge
+    // rejects frames whose pixels equal the frame Flutter already shows, since
+    // Windows.Graphics.Capture delivers a frame on every compositor tick even
+    // when the captured visual has not changed.
+    virtual bool AcceptFrame(const winrt::com_ptr<ID3D11Texture2D>& frame);
     void OnFrameArrived();
     bool ShouldDropFrame();
+    bool StartCapture();
+    void StopCapture();
 
     // corresponds to DXGI_FORMAT_B8G8R8A8_UNORM
     static constexpr auto kPixelFormat = ABI::Windows::Graphics::DirectX::

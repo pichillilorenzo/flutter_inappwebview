@@ -1,6 +1,7 @@
 #include "webview_channel_delegate.h"
 
 #include <cstring>
+#include <utility>
 
 #include "../in_app_browser/in_app_browser.h"
 #include "../types/client_cert_challenge.h"
@@ -618,6 +619,62 @@ void WebViewChannelDelegate::HandleMethodCall(FlMethodCall* method_call) {
       }
       g_object_unref(method_call);
     });
+    return;
+  }
+
+  if (string_equals(methodName, "createPdf")) {
+    // ברירת מחדל: A4 עם שוליים 1 ס"מ. pdfConfiguration.settings עוקף —
+    // אותם שדות ויחידות (אינצ'ים) כמו במימוש של Windows.
+    double pageWidthIn = 8.2677, pageHeightIn = 11.6929;
+    double marginTopIn = 0.3937, marginRightIn = 0.3937;
+    double marginBottomIn = 0.3937, marginLeftIn = 0.3937;
+    bool landscape = false;
+
+    auto asDouble = [](FlValue* v, double fallback) -> double {
+      if (v == nullptr) return fallback;
+      if (fl_value_get_type(v) == FL_VALUE_TYPE_FLOAT) return fl_value_get_float(v);
+      if (fl_value_get_type(v) == FL_VALUE_TYPE_INT) return static_cast<double>(fl_value_get_int(v));
+      return fallback;
+    };
+
+    if (args != nullptr && fl_value_get_type(args) == FL_VALUE_TYPE_MAP) {
+      FlValue* config = fl_value_lookup_string(args, "pdfConfiguration");
+      FlValue* settings = (config != nullptr && fl_value_get_type(config) == FL_VALUE_TYPE_MAP)
+                              ? fl_value_lookup_string(config, "settings")
+                              : nullptr;
+      if (settings != nullptr && fl_value_get_type(settings) == FL_VALUE_TYPE_MAP) {
+        pageWidthIn = asDouble(fl_value_lookup_string(settings, "pageWidth"), pageWidthIn);
+        pageHeightIn = asDouble(fl_value_lookup_string(settings, "pageHeight"), pageHeightIn);
+        FlValue* orientation = fl_value_lookup_string(settings, "orientation");
+        if (orientation != nullptr && fl_value_get_type(orientation) == FL_VALUE_TYPE_INT) {
+          landscape = fl_value_get_int(orientation) == 1;
+        }
+        FlValue* margins = fl_value_lookup_string(settings, "margins");
+        if (margins != nullptr && fl_value_get_type(margins) == FL_VALUE_TYPE_MAP) {
+          marginTopIn = asDouble(fl_value_lookup_string(margins, "top"), marginTopIn);
+          marginRightIn = asDouble(fl_value_lookup_string(margins, "right"), marginRightIn);
+          marginBottomIn = asDouble(fl_value_lookup_string(margins, "bottom"), marginBottomIn);
+          marginLeftIn = asDouble(fl_value_lookup_string(margins, "left"), marginLeftIn);
+        }
+      }
+    }
+    if (landscape) {
+      std::swap(pageWidthIn, pageHeightIn);
+    }
+
+    g_object_ref(method_call);
+    webView->createPdf(
+        pageWidthIn * 72.0, pageHeightIn * 72.0, marginTopIn * 72.0, marginRightIn * 72.0,
+        marginBottomIn * 72.0, marginLeftIn * 72.0,
+        [method_call](const std::optional<std::vector<uint8_t>>& result) {
+          if (result.has_value() && !result->empty()) {
+            g_autoptr(FlValue) val = fl_value_new_uint8_list(result->data(), result->size());
+            fl_method_call_respond_success(method_call, val, nullptr);
+          } else {
+            fl_method_call_respond_success(method_call, nullptr, nullptr);
+          }
+          g_object_unref(method_call);
+        });
     return;
   }
 

@@ -1,9 +1,11 @@
 import 'package:flutter/services.dart';
+
 import 'dart:async';
 import 'dart:ui';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 
 import '_static_channel.dart';
@@ -108,6 +110,36 @@ PointerButton _getButton(int value) {
 
 const MethodChannel _pluginChannel = IN_APP_WEBVIEW_STATIC_CHANNEL;
 
+/// Reports native WebView creation failures from Linux platform views.
+///
+/// The widget handles the failure internally so it does not produce an
+/// unhandled asynchronous error. Applications can listen here to inspect the
+/// original channel error and its stack trace. Native failures are reported as
+/// [PlatformException] values with their stage and native error details.
+class LinuxWebViewCreationFailure {
+  const LinuxWebViewCreationFailure(this.error, this.stackTrace);
+
+  /// The original error returned by the platform channel.
+  final Object error;
+
+  /// The stack captured when creation failed.
+  final StackTrace stackTrace;
+}
+
+class LinuxWebViewCreationDiagnostics {
+  LinuxWebViewCreationDiagnostics._();
+
+  static final StreamController<LinuxWebViewCreationFailure> _errors =
+      StreamController<LinuxWebViewCreationFailure>.broadcast();
+
+  /// A broadcast stream of WebView creation failures.
+  static Stream<LinuxWebViewCreationFailure> get creationErrors =>
+      _errors.stream;
+
+  static void _report(Object error, StackTrace stackTrace) =>
+      _errors.add(LinuxWebViewCreationFailure(error, stackTrace));
+}
+
 class CustomFlutterViewControllerValue {
   const CustomFlutterViewControllerValue({required this.isInitialized});
 
@@ -128,6 +160,7 @@ class CustomPlatformViewController
   Completer<void> _creatingCompleter = Completer<void>();
   int _textureId = 0;
   bool _isDisposed = false;
+  Object? _creationError;
 
   Future<void> get ready => _creatingCompleter.future;
 
@@ -152,10 +185,30 @@ class CustomPlatformViewController
     if (_isDisposed) {
       return;
     }
-    _textureId = (await _pluginChannel.invokeMethod<int>(
-      'createInAppWebView',
-      arguments,
-    ))!;
+    try {
+      _textureId = (await _pluginChannel.invokeMethod<int>(
+        'createInAppWebView',
+        arguments,
+      ))!;
+    } catch (error, stackTrace) {
+      _creationError = error;
+      _isDisposed = true;
+      if (!_creatingCompleter.isCompleted) {
+        _creatingCompleter.complete();
+      }
+      LinuxWebViewCreationDiagnostics._report(error, stackTrace);
+      if (error is! PlatformException) {
+        FlutterError.reportError(
+          FlutterErrorDetails(
+            exception: error,
+            stack: stackTrace,
+            library: 'flutter_inappwebview_linux',
+            context: ErrorDescription('while creating a Linux WebView'),
+          ),
+        );
+      }
+      Error.throwWithStackTrace(error, stackTrace);
+    }
 
     _methodChannel = MethodChannel(
       'com.pichillilorenzo/custom_platform_view_$_textureId',
@@ -188,17 +241,21 @@ class CustomPlatformViewController
   @override
   Future<void> dispose() async {
     await _creatingCompleter.future;
+    _cursorTimer?.cancel();
+    _pendingCursorPos = null;
     if (!_isDisposed) {
       _isDisposed = true;
       await _eventStreamSubscription?.cancel();
-      await _pluginChannel.invokeMethod('dispose', {"id": _textureId});
+      if (_creationError == null) {
+        await _pluginChannel.invokeMethod('dispose', {"id": _textureId});
+      }
     }
     super.dispose();
   }
 
   /// Sets the surface size to the provided [size].
   Future<void> _setSize(Size size, double scaleFactor) async {
-    if (_isDisposed) {
+    if (_isDisposed || _creationError != null) {
       return;
     }
     assert(value.isInitialized);
@@ -211,7 +268,7 @@ class CustomPlatformViewController
 
   /// Sets the texture offset (position within the Flutter window).
   Future<void> _setTextureOffset(Offset offset) async {
-    if (_isDisposed) {
+    if (_isDisposed || _creationError != null) {
       return;
     }
     assert(value.isInitialized);
@@ -221,16 +278,47 @@ class CustomPlatformViewController
     ]);
   }
 
+  // A fast mouse reports up to ~1000 moves a second; each is a channel call
+  // plus browser IPC. Moves inside one interval collapse into the last one.
+  static const _cursorInterval = Duration(milliseconds: 8);
+  Offset? _pendingCursorPos;
+  Timer? _cursorTimer;
+
   /// Moves the virtual cursor to [position].
   Future<void> _setCursorPos(Offset position) async {
     if (_isDisposed) {
       return;
     }
     assert(value.isInitialized);
-    return _methodChannel.invokeMethod('setCursorPos', [
-      position.dx,
-      position.dy,
-    ]);
+    if (_cursorTimer != null) {
+      _pendingCursorPos = position;
+      return;
+    }
+    _sendCursorPos(position);
+    _cursorTimer = Timer(_cursorInterval, _onCursorInterval);
+  }
+
+  void _onCursorInterval() {
+    _cursorTimer = null;
+    final pending = _pendingCursorPos;
+    if (pending != null) {
+      _pendingCursorPos = null;
+      _setCursorPos(pending);
+    }
+  }
+
+  // Native input uses the last cursor position; flush before buttons or wheel.
+  void _flushCursorPos() {
+    final pending = _pendingCursorPos;
+    if (pending == null || _isDisposed) {
+      return;
+    }
+    _pendingCursorPos = null;
+    _sendCursorPos(pending);
+  }
+
+  void _sendCursorPos(Offset position) {
+    _methodChannel.invokeMethod('setCursorPos', [position.dx, position.dy]);
   }
 
   /// Indicates whether the specified [button] is currently down.
@@ -242,6 +330,7 @@ class CustomPlatformViewController
       return;
     }
     assert(value.isInitialized);
+    _flushCursorPos();
     return _methodChannel.invokeMethod('setPointerButton', <String, dynamic>{
       'kind': kind.index,
       'button': button.index,
@@ -259,6 +348,7 @@ class CustomPlatformViewController
       return;
     }
     assert(value.isInitialized);
+    _flushCursorPos();
     return _methodChannel.invokeMethod('setPointerButton', <String, dynamic>{
       'kind': kind.index,
       'button': button.index,
@@ -272,6 +362,7 @@ class CustomPlatformViewController
       return;
     }
     assert(value.isInitialized);
+    _flushCursorPos();
     return _methodChannel.invokeMethod('setScrollDelta', [dx, dy]);
   }
 
@@ -356,7 +447,8 @@ class CustomPlatformView extends StatefulWidget {
   _CustomPlatformViewState createState() => _CustomPlatformViewState();
 }
 
-class _CustomPlatformViewState extends State<CustomPlatformView> {
+class _CustomPlatformViewState extends State<CustomPlatformView>
+    with WidgetsBindingObserver {
   final GlobalKey _key = GlobalKey();
   final _downButtons = <int, PointerButton>{};
 
@@ -368,6 +460,14 @@ class _CustomPlatformViewState extends State<CustomPlatformView> {
   final _focusNode = FocusNode();
 
   StreamSubscription? _cursorSubscription;
+  bool _surfaceSizeReportScheduled = false;
+  bool _surfaceSizeReportWaitingForReady = false;
+  bool _surfaceSizeReportDirty = false;
+  bool _textureOffsetReportScheduled = false;
+  bool _textureOffsetReportWaitingForReady = false;
+  bool _textureOffsetReportDirty = false;
+  double? _lastObservedScaleFactor;
+  Size? _laidOutSize;
 
   // Track click timing for double-click detection
   DateTime? _lastClickTime;
@@ -382,26 +482,68 @@ class _CustomPlatformViewState extends State<CustomPlatformView> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
 
-    _controller.initialize(
-      onPlatformViewCreated: (id) {
-        widget.onPlatformViewCreated?.call(id);
-        setState(() {});
-      },
-      arguments: widget.creationParams,
+    unawaited(
+      _controller
+          .initialize(
+            onPlatformViewCreated: (id) {
+              if (!mounted) {
+                return;
+              }
+              widget.onPlatformViewCreated?.call(id);
+              setState(() {});
+            },
+            arguments: widget.creationParams,
+          )
+          .catchError((Object _) {}),
     );
 
-    // Report initial surface size
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _reportSurfaceSize();
-    });
-
     _cursorSubscription = _controller._cursor.listen((cursor) {
+      if (!mounted) {
+        return;
+      }
       setState(() {
         _cursor = cursor;
       });
     });
   }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final scaleFactor = _effectiveScaleFactor;
+    if (_lastObservedScaleFactor != scaleFactor) {
+      _lastObservedScaleFactor = scaleFactor;
+      _scheduleSurfaceSizeReport();
+      _scheduleTextureOffsetReport();
+    }
+  }
+
+  @override
+  void didChangeMetrics() {
+    super.didChangeMetrics();
+    if (widget.scaleFactor != null) {
+      return;
+    }
+    final scaleFactor = _effectiveScaleFactor;
+    if (_lastObservedScaleFactor != scaleFactor) {
+      _lastObservedScaleFactor = scaleFactor;
+      _scheduleSurfaceSizeReport();
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant CustomPlatformView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.scaleFactor != widget.scaleFactor) {
+      _lastObservedScaleFactor = _effectiveScaleFactor;
+      _scheduleSurfaceSizeReport();
+    }
+  }
+
+  double get _effectiveScaleFactor =>
+      widget.scaleFactor ?? View.of(context).devicePixelRatio;
 
   @override
   Widget build(BuildContext context) {
@@ -411,10 +553,7 @@ class _CustomPlatformViewState extends State<CustomPlatformView> {
       canRequestFocus: true,
       debugLabel: "flutter_inappwebview_linux_custom_platform_view",
       onFocusChange: (focused) {
-        // Notify the native webview when focus changes.
-        // This is important for proper text input handling - without this,
-        // clicking inside text fields requires double-click because the
-        // webview doesn't know it has focus.
+        // WebKit must know the focus state before input reaches text fields.
         if (_controller.value.isInitialized) {
           _controller._setFocused(focused);
         }
@@ -470,9 +609,23 @@ class _CustomPlatformViewState extends State<CustomPlatformView> {
   }
 
   Widget _buildInner() {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (_laidOutSize != constraints.biggest) {
+          _laidOutSize = constraints.biggest;
+          _scheduleSurfaceSizeReport();
+          _scheduleTextureOffsetReport();
+        }
+        return _buildContent();
+      },
+    );
+  }
+
+  Widget _buildContent() {
     return NotificationListener<SizeChangedLayoutNotification>(
       onNotification: (notification) {
-        _reportSurfaceSize();
+        _scheduleSurfaceSizeReport();
+        _scheduleTextureOffsetReport();
         return true;
       },
       child: SizeChangedLayoutNotifier(
@@ -486,15 +639,15 @@ class _CustomPlatformViewState extends State<CustomPlatformView> {
                   _controller._setCursorPos(ev.localPosition);
                 },
                 onPointerDown: (ev) async {
-                  _reportSurfaceSize();
+                  _scheduleSurfaceSizeReport();
+                  // Position-only moves do not trigger a size notification.
+                  // Send the current offset before forwarding this input.
+                  unawaited(_reportTextureOffset());
 
                   final needsFocus = !_focusNode.hasFocus;
                   if (needsFocus) {
-                    // IMPORTANT: Set the native focus state BEFORE sending the click
-                    // and AWAIT it to ensure WebKit has processed the focus change.
-                    // Without awaiting, WebKit may receive the click before it has
-                    // the focused activity state, causing the click to only activate
-                    // the view rather than focusing the clicked element.
+                    // Await focus so WebKit applies this click to the element
+                    // instead of consuming it just to activate the view.
                     if (_controller.value.isInitialized) {
                       await _controller._setFocused(true);
                     }
@@ -659,25 +812,96 @@ class _CustomPlatformViewState extends State<CustomPlatformView> {
     );
   }
 
-  void _reportSurfaceSize() async {
-    final box = _key.currentContext?.findRenderObject() as RenderBox?;
-    if (box != null) {
-      await _controller.ready;
-      unawaited(
-        _controller._setSize(
-          box.size,
-          widget.scaleFactor ?? window.devicePixelRatio,
-        ),
-      );
-
-      // Also report the texture offset (position within the window)
-      final globalPosition = box.localToGlobal(Offset.zero);
-      unawaited(_controller._setTextureOffset(globalPosition));
+  void _scheduleSurfaceSizeReport() {
+    _surfaceSizeReportDirty = true;
+    if (_surfaceSizeReportScheduled || _surfaceSizeReportWaitingForReady) {
+      return;
     }
+
+    _surfaceSizeReportScheduled = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _surfaceSizeReportScheduled = false;
+      unawaited(_flushSurfaceSizeReport());
+    });
+    SchedulerBinding.instance.ensureVisualUpdate();
+  }
+
+  Future<void> _flushSurfaceSizeReport() async {
+    if (!mounted || !_surfaceSizeReportDirty) {
+      return;
+    }
+
+    _surfaceSizeReportWaitingForReady = true;
+    await _controller.ready;
+    _surfaceSizeReportWaitingForReady = false;
+    if (!mounted) {
+      return;
+    }
+
+    // Read geometry only after creation completes so several pending layout
+    // changes collapse to the latest logical size and scale factor.
+    _surfaceSizeReportDirty = false;
+    final box = _key.currentContext?.findRenderObject() as RenderBox?;
+    if (box != null && box.hasSize) {
+      await _controller._setSize(box.size, _effectiveScaleFactor);
+    }
+
+    if (_surfaceSizeReportDirty) {
+      _scheduleSurfaceSizeReport();
+    }
+  }
+
+  void _scheduleTextureOffsetReport() {
+    _textureOffsetReportDirty = true;
+    if (_textureOffsetReportScheduled || _textureOffsetReportWaitingForReady) {
+      return;
+    }
+
+    _textureOffsetReportScheduled = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _textureOffsetReportScheduled = false;
+      unawaited(_flushTextureOffsetReport());
+    });
+    SchedulerBinding.instance.ensureVisualUpdate();
+  }
+
+  Future<void> _flushTextureOffsetReport() async {
+    if (!mounted || !_textureOffsetReportDirty) {
+      return;
+    }
+
+    if (!_controller.value.isInitialized) {
+      _textureOffsetReportWaitingForReady = true;
+      await _controller.ready;
+      _textureOffsetReportWaitingForReady = false;
+      if (!mounted || !_controller.value.isInitialized) {
+        return;
+      }
+    }
+
+    _textureOffsetReportDirty = false;
+    await _reportTextureOffset();
+    if (_textureOffsetReportDirty) {
+      _scheduleTextureOffsetReport();
+    }
+  }
+
+  Future<void> _reportTextureOffset() {
+    if (!mounted || !_controller.value.isInitialized) {
+      return Future<void>.value();
+    }
+    final box = _key.currentContext?.findRenderObject() as RenderBox?;
+    if (box != null && box.hasSize) {
+      // Invoke the channel synchronously so FIFO ordering puts this offset
+      // ahead of pointer/touch messages, without waiting for the native reply.
+      return _controller._setTextureOffset(box.localToGlobal(Offset.zero));
+    }
+    return Future<void>.value();
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
     _cursorSubscription?.cancel();
     _controller.dispose();

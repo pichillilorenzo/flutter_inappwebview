@@ -73,12 +73,23 @@ namespace flutter_inappwebview_plugin
 
     auto webViewEnvironment = params.webViewEnvironmentId.has_value() && map_contains(plugin->webViewEnvironmentManager->webViewEnvironments, params.webViewEnvironmentId.value())
       ? plugin->webViewEnvironmentManager->webViewEnvironments.at(params.webViewEnvironmentId.value()).get() : nullptr;
+    auto failureStage = std::make_shared<std::string>();
 
     InAppWebView::createInAppWebViewEnv(m_hWnd, false, webViewEnvironment, params.initialWebViewSettings,
-      [this, params, webViewParams](wil::com_ptr<ICoreWebView2Environment> webViewEnv, wil::com_ptr<ICoreWebView2Controller> webViewController, wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController) -> void
+      [this, params, webViewParams, failureStage, alive = alive_.weak()](HRESULT errorCode, wil::com_ptr<ICoreWebView2Environment> webViewEnv, wil::com_ptr<ICoreWebView2Controller> webViewController, wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController) -> void
       {
+        if (alive.expired()) {
+          // The engine was torn down while WebView2 was still creating the
+          // controller: this object, the registrar and result_ are all gone.
+          if (webViewController) {
+            failedLog(webViewController->Close());
+          }
+          return;
+        }
         if (webViewEnv && webViewController) {
-          webView = std::make_unique<InAppWebView>(this, this->plugin, webViewParams, m_hWnd, std::move(webViewEnv), std::move(webViewController), nullptr);
+          webView = std::make_unique<InAppWebView>(this, this->plugin, webViewParams,
+            m_hWnd, std::move(webViewEnv), std::move(webViewController), nullptr,
+            hostWindowMinimized_);
           webView->initChannel(std::nullopt, InAppBrowser::METHOD_CHANNEL_NAME_PREFIX + id);
 
           if (channelDelegate) {
@@ -96,10 +107,12 @@ namespace flutter_inappwebview_plugin
           }
         }
         else {
-          std::cerr << "Cannot create the InAppWebView instance!" << std::endl;
+          const std::string stage = failureStage->empty() ? "" : " (" + *failureStage + ")";
+          std::cerr << "Cannot create the InAppWebView instance" << stage << "! HRESULT " << getHRErrorString(errorCode) << std::endl;
           close();
         }
-      });
+      },
+      failureStage);
   }
 
   void InAppBrowser::close() const
@@ -228,9 +241,18 @@ namespace flutter_inappwebview_plugin
       return 0;
     }
     case WM_SIZE: {
-      RECT bounds;
-      GetClientRect(hwnd, &bounds);
+      if (wparam == SIZE_MINIMIZED) {
+        hostWindowMinimized_ = true;
+      }
+      else if (wparam == SIZE_RESTORED || wparam == SIZE_MAXIMIZED) {
+        hostWindowMinimized_ = false;
+      }
+
       if (webView) {
+        webView->setHostWindowMinimized(hostWindowMinimized_);
+
+        RECT bounds;
+        GetClientRect(hwnd, &bounds);
         webView->webViewController->put_Bounds(bounds);
       }
       return 0;
@@ -252,6 +274,7 @@ namespace flutter_inappwebview_plugin
   InAppBrowser::~InAppBrowser()
   {
     debugLog("dealloc InAppBrowser");
+    alive_.expire();
     webView.reset();
     SetWindowLongPtr(m_hWnd, GWLP_USERDATA, 0);
     plugin = nullptr;

@@ -479,6 +479,7 @@ class InAppWebView extends StatefulWidget {
   }) : this.fromPlatformCreationParams(
          key: key,
          params: PlatformInAppWebViewWidgetCreationParams(
+           key: key,
            controllerFromPlatform:
                (PlatformInAppWebViewController controller) =>
                    InAppWebViewController.fromPlatform(platform: controller),

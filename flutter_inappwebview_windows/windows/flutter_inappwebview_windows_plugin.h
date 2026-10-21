@@ -11,6 +11,7 @@ namespace flutter_inappwebview_plugin
   class HeadlessInAppWebViewManager;
   class CookieManager;
   class PlatformUtil;
+  class FileDropManager;
 
   class FlutterInappwebviewWindowsPlugin : public flutter::Plugin {
   public:
@@ -21,6 +22,7 @@ namespace flutter_inappwebview_plugin
     std::unique_ptr<HeadlessInAppWebViewManager> headlessInAppWebViewManager;
     std::unique_ptr<CookieManager> cookieManager;
     std::unique_ptr<PlatformUtil> platformUtil;
+    std::unique_ptr<FileDropManager> fileDropManager;
 
     static void RegisterWithRegistrar(flutter::PluginRegistrarWindows* registrar);
 
@@ -34,7 +36,7 @@ namespace flutter_inappwebview_plugin
   private:
     // The ID of the WindowProc delegate registration.
     int window_proc_id = -1;
-    std::optional<LRESULT> FlutterInappwebviewWindowsPlugin::HandleWindowProc(
+    std::optional<LRESULT> HandleWindowProc(
       HWND hWnd,
       UINT message,
       WPARAM wParam,

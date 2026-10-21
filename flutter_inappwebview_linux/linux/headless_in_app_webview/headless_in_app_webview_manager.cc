@@ -175,6 +175,17 @@ void HeadlessInAppWebViewManager::Run(FlMethodCall* method_call) {
   // Create the headless webview
   auto headlessWebView =
       std::make_unique<HeadlessInAppWebView>(this, headlessParams, webviewParams);
+  if (headlessWebView->creationError().has_value()) {
+    const auto& error = headlessWebView->creationError().value();
+    g_autoptr(FlValue) details = to_fl_map({
+        {"stage", make_fl_value(error.stage)},
+        {"nativeCode", make_fl_value(error.nativeCode)},
+        {"nativeDomain", make_fl_value(error.nativeDomain)},
+    });
+    fl_method_call_respond_error(method_call, "WEBVIEW_CREATION_FAILED",
+                                 error.message.c_str(), details, nullptr);
+    return;
+  }
 
   // Store it
   webviews_[id] = std::move(headlessWebView);

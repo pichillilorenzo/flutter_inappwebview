@@ -29,7 +29,13 @@ public class ConsoleLogJS {
     public static func CONSOLE_LOG_JS_SOURCE() -> String {
         return """
         (function(console) {
-        
+            var pendingMessages = [];
+            var maxBatchSize = 64;
+            var maxBatchCharacters = 65536;
+            var pendingCharacters = 0;
+            var flushTimer = null;
+            var flushInProgress = false;
+
             function _callHandler(logLevel, args) {
                 var message = '';
                 for (var i in args) {
@@ -37,10 +43,51 @@ public class ConsoleLogJS {
                         message += message === '' ? args[i] : ' ' + args[i];
                     } catch(_) {}
                 }
-                try {
-                    window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME()).callHandler('onConsoleMessage', {'level': logLevel, 'message': message})
-                } catch(_) {}
+                var messageSize = message.length + 48;
+                if (pendingMessages.length > 0 && pendingCharacters + messageSize > maxBatchCharacters) {
+                    _flushMessages();
+                }
+                pendingMessages.push({'level': logLevel, 'message': message});
+                pendingCharacters += messageSize;
+                if (logLevel === 'warn' || logLevel === 'error' || pendingMessages.length >= maxBatchSize || pendingCharacters >= maxBatchCharacters) {
+                    _flushMessages();
+                } else if (flushTimer === null) {
+                    flushTimer = window.setTimeout(_flushMessages, 25);
+                }
             }
+
+            function _flushMessages() {
+                if (flushTimer !== null) {
+                    window.clearTimeout(flushTimer);
+                    flushTimer = null;
+                }
+                if (flushInProgress || pendingMessages.length === 0) return;
+                var batchCount = 0;
+                var batchCharacters = 0;
+                while (batchCount < pendingMessages.length && batchCount < maxBatchSize) {
+                    var nextSize = pendingMessages[batchCount].message.length + 48;
+                    if (batchCount > 0 && batchCharacters + nextSize > maxBatchCharacters) break;
+                    batchCharacters += nextSize;
+                    batchCount++;
+                    if (batchCharacters >= maxBatchCharacters) break;
+                }
+                var batch = pendingMessages.splice(0, batchCount);
+                pendingCharacters -= batchCharacters;
+                flushInProgress = true;
+                try {
+                    window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())._callHandlerOneWay('onConsoleMessageBatch', {'messages': batch});
+                } catch(_) {} finally {
+                    flushInProgress = false;
+                }
+                if (pendingMessages.length > 0 && flushTimer === null) {
+                    flushTimer = window.setTimeout(_flushMessages, 50);
+                }
+            }
+
+            window.addEventListener('pagehide', _flushMessages);
+            window.document.addEventListener('visibilitychange', function() {
+                if (window.document.hidden) _flushMessages();
+            });
         
             var oldLogs = {
                 'consoleLog': console.log,

@@ -1386,7 +1386,7 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
           int? androidId = call.arguments["androidId"];
           String? iosId = call.arguments["iosId"];
           dynamic id = call.arguments["id"];
-          String title = call.arguments["title"];
+          String title = call.arguments["title"] ?? "";
 
           ContextMenuItem menuItemClicked = ContextMenuItem(
             id: id,
@@ -2160,6 +2160,13 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
   Future<void> reload() async {
     Map<String, dynamic> args = <String, dynamic>{};
     await channel?.invokeMethod('reload', args);
+  }
+
+  @override
+  Future<void> setBackgroundColor(Color color) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('color', () => color.toHex());
+    await channel?.invokeMethod('setBackgroundColor', args);
   }
 
   @override

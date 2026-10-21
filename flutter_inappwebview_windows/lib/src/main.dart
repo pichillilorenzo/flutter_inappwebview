@@ -3,6 +3,7 @@ export 'in_app_webview/main.dart';
 export 'in_app_browser/main.dart';
 export 'web_storage/main.dart';
 export 'cookie_manager.dart' hide InternalCookieManager;
+export 'file_drop_manager.dart';
 export 'http_auth_credentials_database.dart'
     hide InternalHttpAuthCredentialDatabase;
 export 'print_job/main.dart';

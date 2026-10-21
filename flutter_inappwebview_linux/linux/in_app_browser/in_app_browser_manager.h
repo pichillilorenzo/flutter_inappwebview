@@ -38,7 +38,7 @@ class InAppBrowserManager {
 
   /// Create a new InAppBrowser instance
   /// @param arguments The creation arguments from Dart
-  void createInAppBrowser(FlValue* arguments);
+  std::optional<WebViewCreationError> createInAppBrowser(FlValue* arguments);
 
   /// Open a URL with the system browser
   /// @param url The URL to open

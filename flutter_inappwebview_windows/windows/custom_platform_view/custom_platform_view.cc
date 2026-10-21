@@ -21,6 +21,10 @@ namespace flutter_inappwebview_plugin
   constexpr auto kMethodSetPointerButton = "setPointerButton";
   constexpr auto kMethodSetScrollDelta = "setScrollDelta";
   constexpr auto kMethodSetFpsLimit = "setFpsLimit";
+  constexpr auto kMethodRequestFocus = "requestFocus";
+  constexpr auto kMethodSetHostWindowHidden = "setHostWindowHidden";
+  constexpr auto kMethodClearFocus = "clearFocus";
+  constexpr auto kMethodSetFlutterViewId = "setFlutterViewId";
 
   constexpr auto kEventType = "type";
   constexpr auto kEventValue = "value";
@@ -116,38 +120,55 @@ namespace flutter_inappwebview_plugin
     flutter::TextureRegistrar* texture_registrar,
     GraphicsContext* graphics_context,
     HWND hwnd,
-    std::shared_ptr<flutter_inappwebview_plugin::InAppWebView> webView)
-    : hwnd_(hwnd), view(std::move(webView)), texture_registrar_(texture_registrar)
+    std::shared_ptr<flutter_inappwebview_plugin::InAppWebView> webView,
+    std::function<HWND(int64_t)> flutterViewResolver)
+    : hwnd_(hwnd), flutterViewResolver_(std::move(flutterViewResolver)),
+    view(std::move(webView)), texture_registrar_(texture_registrar)
   {
+    if (view->isHostedInWindow()) {
+      // Never drawn: the registration only gives this view a unique id.
+      flutter_texture_ =
+        std::make_unique<flutter::TextureVariant>(flutter::PixelBufferTexture(
+          [](size_t, size_t) -> const FlutterDesktopPixelBuffer* { return nullptr; }));
+      texture_id_ = texture_registrar->RegisterTexture(flutter_texture_.get());
+    }
+    else {
 #ifdef HAVE_FLUTTER_D3D_TEXTURE
-    texture_bridge_ =
-      std::make_unique<TextureBridgeGpu>(graphics_context, view->surface());
+      texture_bridge_ =
+        std::make_unique<TextureBridgeGpu>(graphics_context, view->surface());
 
-    flutter_texture_ =
-      std::make_unique<flutter::TextureVariant>(flutter::GpuSurfaceTexture(
-        kFlutterDesktopGpuSurfaceTypeDxgiSharedHandle,
-        [bridge = static_cast<TextureBridgeGpu*>(texture_bridge_.get())](
-          size_t width,
-          size_t height) -> const FlutterDesktopGpuSurfaceDescriptor*
-        {
-          return bridge->GetSurfaceDescriptor(width, height);
-        }));
+      flutter_texture_ =
+        std::make_unique<flutter::TextureVariant>(flutter::GpuSurfaceTexture(
+          kFlutterDesktopGpuSurfaceTypeDxgiSharedHandle,
+          [bridge = static_cast<TextureBridgeGpu*>(texture_bridge_.get())](
+            size_t width,
+            size_t height) -> const FlutterDesktopGpuSurfaceDescriptor*
+          {
+            return bridge->GetSurfaceDescriptor(width, height);
+          }));
 #else
-    texture_bridge_ = std::make_unique<TextureBridgeFallback>(
-      graphics_context, view->surface());
+      texture_bridge_ = std::make_unique<TextureBridgeFallback>(
+        graphics_context, view->surface());
 
-    flutter_texture_ =
-      std::make_unique<flutter::TextureVariant>(flutter::PixelBufferTexture(
-        [bridge = static_cast<TextureBridgeFallback*>(texture_bridge_.get())](
-          size_t width, size_t height) -> const FlutterDesktopPixelBuffer*
-        {
-          return bridge->CopyPixelBuffer(width, height);
-        }));
+      flutter_texture_ =
+        std::make_unique<flutter::TextureVariant>(flutter::PixelBufferTexture(
+          [bridge = static_cast<TextureBridgeFallback*>(texture_bridge_.get())](
+            size_t width, size_t height) -> const FlutterDesktopPixelBuffer*
+          {
+            return bridge->CopyPixelBuffer(width, height);
+          }));
 #endif
 
-    texture_id_ = texture_registrar->RegisterTexture(flutter_texture_.get());
-    texture_bridge_->SetOnFrameAvailable(
-      [this]() { texture_registrar_->MarkTextureFrameAvailable(texture_id_); });
+      texture_id_ = texture_registrar->RegisterTexture(flutter_texture_.get());
+      texture_bridge_->SetOnFrameAvailable(
+        [this]() { texture_registrar_->MarkTextureFrameAvailable(texture_id_); });
+      // A paused or minimized WebView needs no capture: stop paying for frames.
+      texture_bridge_->SetCaptureSuspended(!view->shouldBeVisible());
+      view->onVisibilityChanged([this](bool visible)
+        {
+          texture_bridge_->SetCaptureSuspended(!visible);
+        });
+    }
     // texture_bridge_->SetOnSurfaceSizeChanged([this](Size size) {
     //  view->SetSurfaceSize(size.width, size.height);
     //});
@@ -199,6 +220,9 @@ namespace flutter_inappwebview_plugin
   CustomPlatformView::~CustomPlatformView()
   {
     debugLog("dealloc CustomPlatformView");
+    if (view) {
+      view->onVisibilityChanged(nullptr);
+    }
     event_sink_ = nullptr;
     texture_registrar_->UnregisterTexture(texture_id_, nullptr);
   }
@@ -211,7 +235,9 @@ namespace flutter_inappwebview_plugin
 
     view->onSurfaceSizeChanged([this](size_t width, size_t height)
       {
-        texture_bridge_->NotifySurfaceSizeChanged();
+        if (texture_bridge_) {
+          texture_bridge_->NotifySurfaceSizeChanged();
+        }
       });
 
     view->onCursorChanged([this](const HCURSOR cursor)
@@ -307,7 +333,9 @@ namespace flutter_inappwebview_plugin
           static_cast<size_t>(height),
           static_cast<float>(scale_factor));
 
-        texture_bridge_->Start();
+        if (texture_bridge_) {
+          texture_bridge_->Start();
+        }
         return result->Success();
       }
       return result->Error(kErrorInvalidArgs);
@@ -327,10 +355,49 @@ namespace flutter_inappwebview_plugin
     }
     else if (method_name.compare(kMethodSetFpsLimit) == 0) {
       if (const auto value = std::get_if<int32_t>(method_call.arguments())) {
-        texture_bridge_->SetFpsLimit(*value == 0 ? std::nullopt
-          : std::make_optional(*value));
+        if (texture_bridge_) {
+          texture_bridge_->SetFpsLimit(*value == 0 ? std::nullopt
+            : std::make_optional(*value));
+        }
         return result->Success();
       }
+    }
+    else if (method_name.compare(kMethodSetHostWindowHidden) == 0) {
+      const auto hidden = std::get_if<bool>(method_call.arguments());
+      if (hidden && view) {
+        view->setHostWindowHidden(*hidden);
+        return result->Success();
+      }
+      return result->Error(kErrorInvalidArgs);
+    }
+    else if (method_name.compare(kMethodRequestFocus) == 0) {
+      if (view) {
+        view->requestFocus();
+        return result->Success();
+      }
+      return result->Error(kErrorInvalidArgs);
+    }
+    // setFlutterViewId: int viewId - the widget moved to another Flutter view.
+    else if (method_name.compare(kMethodSetFlutterViewId) == 0) {
+      const auto args = method_call.arguments();
+      if (view && flutterViewResolver_ && args &&
+        (std::holds_alternative<int32_t>(*args) || std::holds_alternative<int64_t>(*args))) {
+        const auto flutterViewHwnd = flutterViewResolver_(args->LongValue());
+        if (!flutterViewHwnd) {
+          return result->Error(kErrorInvalidArgs, "Unknown Flutter view id");
+        }
+        view->reparent(flutterViewHwnd);
+        hwnd_ = view->hostWindow();
+        return result->Success();
+      }
+      return result->Error(kErrorInvalidArgs);
+    }
+    else if (method_name.compare(kMethodClearFocus) == 0) {
+      if (view) {
+        view->clearFocus();
+        return result->Success();
+      }
+      return result->Error(kErrorInvalidArgs);
     }
 
     result->NotImplemented();

@@ -16,15 +16,17 @@ public class WebAuthenticationSession: NSObject, ASWebAuthenticationPresentation
     var plugin: InAppWebViewFlutterPlugin?
     var url: URL
     var callbackURLScheme: String?
+    var additionalHeaderFields: [String: String]?
     var settings: WebAuthenticationSessionSettings
     var session: Any?
     var channelDelegate: WebAuthenticationSessionChannelDelegate?
     private var _canStart = true
     
-    public init(plugin: InAppWebViewFlutterPlugin, id: String, url: URL, callbackURLScheme: String?, settings: WebAuthenticationSessionSettings) {
+    public init(plugin: InAppWebViewFlutterPlugin, id: String, url: URL, callbackURLScheme: String?, additionalHeaderFields: [String: String]?, settings: WebAuthenticationSessionSettings) {
         self.id = id
         self.plugin = plugin
         self.url = url
+        self.additionalHeaderFields = additionalHeaderFields
         self.settings = settings
         super.init()
         self.callbackURLScheme = callbackURLScheme
@@ -45,6 +47,10 @@ public class WebAuthenticationSession: NSObject, ASWebAuthenticationPresentation
     public func prepare() {
         if #available(iOS 13.0, *), let session = session as? ASWebAuthenticationSession {
             session.prefersEphemeralWebBrowserSession = settings.prefersEphemeralWebBrowserSession
+            if #available(iOS 17.4, *),
+               session.responds(to: Selector(("setAdditionalHeaderFields:"))) {
+                session.setValue(additionalHeaderFields, forKey: "additionalHeaderFields")
+            }
         }
     }
     

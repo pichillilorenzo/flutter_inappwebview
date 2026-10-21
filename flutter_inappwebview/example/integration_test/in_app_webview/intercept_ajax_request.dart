@@ -391,5 +391,77 @@ void interceptAjaxRequest() {
         true,
       );
     });
+
+    skippableTestWidgets('receive blob response', (WidgetTester tester) async {
+      final readyStateResponse = Completer<List<int>>();
+      final progressResponse = Completer<List<int>>();
+      List<int> responseBytes(dynamic response) {
+        if (response is List) return List<int>.from(response);
+        final entries = (response as Map).entries.toList()
+          ..sort(
+            (a, b) => int.parse(
+              a.key.toString(),
+            ).compareTo(int.parse(b.key.toString())),
+          );
+        return List<int>.from(entries.map((entry) => entry.value));
+      }
+
+      await tester.pumpWidget(
+        Directionality(
+          textDirection: TextDirection.ltr,
+          child: InAppWebView(
+            key: GlobalKey(),
+            initialData: InAppWebViewInitialData(
+              data: """
+<!doctype html>
+<html lang="en">
+  <body>
+    <script>
+      window.addEventListener('flutterInAppWebViewPlatformReady', function() {
+        const blob = new Blob([new Uint8Array([0, 1, 255])]);
+        const blobUrl = URL.createObjectURL(blob);
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', blobUrl);
+        xhr.responseType = 'blob';
+        xhr.addEventListener('loadend', function() {
+          URL.revokeObjectURL(blobUrl);
+        });
+        xhr.send();
+      });
+    </script>
+  </body>
+</html>
+""",
+            ),
+            shouldInterceptAjaxRequest: (controller, request) async => request,
+            onAjaxReadyStateChange: (controller, request) async {
+              if (request.readyState == AjaxRequestReadyState.DONE &&
+                  request.response != null &&
+                  !readyStateResponse.isCompleted) {
+                readyStateResponse.complete(responseBytes(request.response));
+              }
+              return AjaxRequestAction.PROCEED;
+            },
+            onAjaxProgress: (controller, request) async {
+              if (request.event?.type == AjaxRequestEventType.LOAD &&
+                  request.response != null &&
+                  !progressResponse.isCompleted) {
+                progressResponse.complete(responseBytes(request.response));
+              }
+              return AjaxRequestAction.PROCEED;
+            },
+          ),
+        ),
+      );
+
+      expect(
+        await readyStateResponse.future.timeout(const Duration(seconds: 10)),
+        [0, 1, 255],
+      );
+      expect(
+        await progressResponse.future.timeout(const Duration(seconds: 10)),
+        [0, 1, 255],
+      );
+    });
   }, skip: shouldSkip);
 }

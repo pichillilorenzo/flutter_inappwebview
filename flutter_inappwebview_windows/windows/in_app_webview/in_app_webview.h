@@ -2,6 +2,7 @@
 #define FLUTTER_INAPPWEBVIEW_PLUGIN_IN_APP_WEBVIEW_H_
 
 #include <functional>
+#include <memory>
 #include <WebView2.h>
 #include <wil/com.h>
 #include <windows.ui.composition.desktop.h>
@@ -21,6 +22,7 @@
 #include "../webview_environment/webview_environment.h"
 #include "in_app_webview_settings.h"
 #include "user_content_controller.h"
+#include "webview_visibility_state.h"
 #include "webview_channel_delegate.h"
 #include "../web_message/web_message_channel.h"
 #include "../web_message/web_message_listener.h"
@@ -44,6 +46,7 @@ namespace flutter_inappwebview_plugin
   typedef std::function<void(size_t width, size_t height)>
     SurfaceSizeChangedCallback;
   typedef std::function<void(const HCURSOR)> CursorChangedCallback;
+  typedef std::function<void(bool visible)> VisibilityChangedCallback;
   struct VirtualKeyState {
   public:
     inline void setIsLeftButtonDown(bool is_down)
@@ -93,6 +96,8 @@ namespace flutter_inappwebview_plugin
     const std::variant<std::string, int64_t> id;
     const std::shared_ptr<InAppWebViewSettings> initialSettings;
     const std::optional<std::vector<std::shared_ptr<UserScript>>> initialUserScripts;
+    // Without a listener, console calls are not reported at all.
+    const bool hasConsoleMessageListener = true;
   };
 
   class InAppWebView
@@ -116,16 +121,23 @@ namespace flutter_inappwebview_plugin
     InAppWebView(const FlutterInappwebviewWindowsPlugin* plugin, const InAppWebViewCreationParams& params, const HWND parentWindow,
       wil::com_ptr<ICoreWebView2Environment> webViewEnv,
       wil::com_ptr<ICoreWebView2Controller> webViewController,
-      wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController);
+      wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController,
+      bool hostWindowMinimized = false);
     InAppWebView(InAppBrowser* inAppBrowser, const FlutterInappwebviewWindowsPlugin* plugin, const InAppWebViewCreationParams& params, const HWND parentWindow,
       wil::com_ptr<ICoreWebView2Environment> webViewEnv,
       wil::com_ptr<ICoreWebView2Controller> webViewController,
-      wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController);
+      wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController,
+      bool hostWindowMinimized = false);
     ~InAppWebView();
 
-    static void createInAppWebViewEnv(const HWND parentWindow, const bool& willBeSurface, WebViewEnvironment* webViewEnvironment, const std::shared_ptr<InAppWebViewSettings> initialSettings, std::function<void(wil::com_ptr<ICoreWebView2Environment> webViewEnv,
+    // On failure the completionHandler receives the failing HRESULT and null
+    // pointers, so callers can surface the real error code to the Dart side.
+    // failureStage, when given, is set to the WebView2 call that failed.
+    static void createInAppWebViewEnv(const HWND parentWindow, const bool& willBeSurface, WebViewEnvironment* webViewEnvironment, const std::shared_ptr<InAppWebViewSettings> initialSettings, std::function<void(HRESULT errorCode,
+      wil::com_ptr<ICoreWebView2Environment> webViewEnv,
       wil::com_ptr<ICoreWebView2Controller> webViewController,
-      wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController)> completionHandler);
+      wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController)> completionHandler,
+      std::shared_ptr<std::string> failureStage = nullptr);
 
     // custom_platform_view
     ABI::Windows::UI::Composition::IVisual* const surface()
@@ -134,12 +146,20 @@ namespace flutter_inappwebview_plugin
     }
     void setSurfaceSize(size_t width, size_t height, float scale_factor);
     void setPosition(size_t x, size_t y, float scale_factor);
+    void notifyParentWindowMoved();
+    // A widget attached to a kept-alive WebView brings its own listener.
+    void setHasConsoleMessageListener(bool hasListener);
+    // Enable a DevTools domain once, before its first use.
+    void ensureRuntimeDomain() const;
+    void ensureNetworkDomain() const;
     void setCursorPos(double x, double y);
     void setPointerUpdate(int32_t pointer, InAppWebViewPointerEventKind eventKind,
       double x, double y, double size, double pressure);
     void setPointerButtonState(InAppWebViewPointerEventKind kind, InAppWebViewPointerButton button);
     void sendScroll(double offset, bool horizontal);
     void setScrollDelta(double delta_x, double delta_y);
+    void requestFocus();
+    void clearFocus();
     void onSurfaceSizeChanged(SurfaceSizeChangedCallback callback)
     {
       surfaceSizeChangedCallback_ = std::move(callback);
@@ -148,8 +168,35 @@ namespace flutter_inappwebview_plugin
     {
       cursorChangedCallback_ = std::move(callback);
     }
+    // Reports pause/resume and host minimize/restore as the visibility the
+    // WebView should have, before the deferred browser-side flip is delivered.
+    void onVisibilityChanged(VisibilityChangedCallback callback)
+    {
+      visibilityChangedCallback_ = std::move(callback);
+    }
+    bool shouldBeVisible() const
+    {
+      return visibilityState_.shouldBeVisible();
+    }
     bool createSurface(const HWND parentWindow,
       winrt::com_ptr<ABI::Windows::UI::Composition::ICompositor> compositor);
+    // HWND mode: the controller renders straight into this owned child window
+    // instead of a captured visual. Destroyed with the webview.
+    void setHostWindow(HWND hostWindow);
+    bool isHostedInWindow() const { return hostWindow_ != nullptr; }
+    // Hides the HWND-mode host window while Flutter content covers it.
+    void setHostWindowHidden(bool hidden);
+    // Widget origin and size inside the Flutter view, physical pixels —
+    // used by WebViewDropTarget to route OLE drag events to this webview.
+    POINT widgetOffset() const { return widgetOffset_; }
+    SIZE surfaceSize() const { return surfaceSize_; }
+    // The WS_CHILD window WebView2 uses as ParentWindow, and its top-level.
+    HWND hostWindow() const;
+    HWND topLevelWindow() const;
+    // Moves the host under another Flutter view (multi-window apps).
+    void reparent(HWND flutterViewHwnd);
+    // Hides the host under [parkingHwnd] while it has no Flutter view.
+    void park(HWND parkingHwnd);
 
     void initChannel(const std::optional<std::variant<std::string, int64_t>> viewId, const std::optional<std::string> channelName);
     void prepare(const InAppWebViewCreationParams& params);
@@ -157,7 +204,7 @@ namespace flutter_inappwebview_plugin
     std::optional<std::string> getTitle() const;
     std::optional<int64_t> getFrameId() const;
     std::optional<int64_t> getMemoryUsageTargetLevel() const;
-    void setMemoryUsageTargetLevel(const int64_t& level) const;
+    void setMemoryUsageTargetLevel(const int64_t& level);
     void getFavicon(const std::optional<std::string>& url, const std::optional<FaviconImageFormat>& faviconImageFormat,
       const std::function<void(const std::optional<std::vector<uint8_t>>)> completionHandler) const;
     void showSaveAsUI(const std::function<void(const std::optional<int64_t>)> completionHandler) const;
@@ -190,8 +237,9 @@ namespace flutter_inappwebview_plugin
     void callDevToolsProtocolMethod(const std::string& methodName, const std::optional<std::string>& parametersAsJson, const std::function<void(const HRESULT& errorCode, const std::optional<std::string>&)> completionHandler) const;
     void addDevToolsProtocolEventListener(const std::string& eventName);
     void removeDevToolsProtocolEventListener(const std::string& eventName);
-    void pause() const;
-    void resume() const;
+    void pause();
+    void resume();
+    void setHostWindowMinimized(bool minimized);
     void getCertificate(const std::function<void(const std::optional<std::unique_ptr<SslCertificate>>)> completionHandler) const;
     void clearSslPreferences(const std::function<void()> completionHandler) const;
     bool isInterfaceSupported(const std::string& interfaceName) const;
@@ -222,20 +270,20 @@ namespace flutter_inappwebview_plugin
     void closeWebMessagePort(const std::string& channelId, int portIndex);
     void disposeWebMessageChannel(const std::string& channelId);
 
-    void addWebNotificationController(const std::string& id, std::shared_ptr<WebNotificationController> controller);
-    WebNotificationController* getWebNotificationController(const std::string& id) const;
-    void eraseWebNotificationController(const std::string& id);
+    void addWebNotificationController(const std::string& controllerId, std::shared_ptr<WebNotificationController> controller);
+    WebNotificationController* getWebNotificationController(const std::string& controllerId) const;
+    void eraseWebNotificationController(const std::string& controllerId);
     void disposeAllWebNotificationControllers();
 
-    void addPrintJobController(const std::string& id, std::shared_ptr<PrintJobController> controller);
-    PrintJobController* getPrintJobController(const std::string& id) const;
-    void erasePrintJobController(const std::string& id);
+    void addPrintJobController(const std::string& controllerId, std::shared_ptr<PrintJobController> controller);
+    PrintJobController* getPrintJobController(const std::string& controllerId) const;
+    void erasePrintJobController(const std::string& controllerId);
     void disposeAllPrintJobControllers();
 
-    void printCurrentPage(std::shared_ptr<PrintJobSettings> settings,
+    void printCurrentPage(std::shared_ptr<PrintJobSettings> printJobSettings,
       const std::function<void(const std::optional<std::string>&)> completionHandler);
 
-    void createPdf(std::shared_ptr<PrintJobSettings> settings,
+    void createPdf(std::shared_ptr<PrintJobSettings> printJobSettings,
       const std::function<void(const std::optional<std::vector<uint8_t>>&)> completionHandler);
 
     std::string pageFrameId() const
@@ -243,15 +291,45 @@ namespace flutter_inappwebview_plugin
       return pageFrameId_;
     }
 
+    // Lifetime token for callbacks that round-trip through Dart: they outlive
+    // this webview when a tab closes mid-call, and must not touch it afterwards.
+    std::weak_ptr<void> aliveToken() const
+    {
+      return aliveToken_;
+    }
+
+    // Delivers a pending visibility flip / Resume / TrySuspend, or defers it
+    // through the shared per-browser-process gate while that process's UI
+    // thread is not answering. Re-entered by the gate's retry timer.
+    void applyPendingBrowserState();
+
     static bool isSslError(const COREWEBVIEW2_WEB_ERROR_STATUS& webErrorStatus);
   private:
     // custom_platform_view
     winrt::com_ptr<ABI::Windows::UI::Composition::IVisual> surface_;
     SurfaceSizeChangedCallback surfaceSizeChangedCallback_;
     CursorChangedCallback cursorChangedCallback_;
+    VisibilityChangedCallback visibilityChangedCallback_;
     float scaleFactor_ = 1.0;
     POINT lastCursorPos_ = { 0, 0 };
+    POINT widgetOffset_ = { 0, 0 };
+    SIZE surfaceSize_ = { 0, 0 };
+    float surfaceScaleFactor_ = 0;
     VirtualKeyState virtualKeys_;
+    WebViewVisibilityState visibilityState_;
+    bool hasConsoleMessageListener_ = true;
+    bool consoleReceiverRegistered_ = false;
+    bool pendingParentMoved_ = false;
+    mutable bool appEnabledFetch_ = false;
+    uint64_t mainDocumentGeneration_ = 0;
+    // Runtime.evaluate calls not completed yet; a reply waits behind them.
+    std::shared_ptr<int> pendingScripts_ = std::make_shared<int>(0);
+    mutable bool runtimeDomainEnabled_ = false;
+    mutable bool networkDomainEnabled_ = false;
+    HWND hostWindow_ = nullptr;
+    // Shown only once Dart has placed it, so it never flashes at the origin.
+    bool hostWindowHidden_ = true;
+    bool hostWindowPlaced_ = false;
 
     const std::string expectedBridgeSecret = get_uuid();
     bool javaScriptBridgeEnabled = true;
@@ -267,10 +345,31 @@ namespace flutter_inappwebview_plugin
     std::map<std::string, std::unique_ptr<WebMessageListener>> webMessageListeners_;
     std::map<std::string, std::shared_ptr<WebNotificationController>> webNotificationControllers_;
     std::map<std::string, std::shared_ptr<PrintJobController>> printJobControllers_;
+    std::shared_ptr<int> aliveToken_ = std::make_shared<int>(0);
+
+    // put_IsVisible and Resume are synchronous IPC served by the browser
+    // process UI thread; issuing them while it is not pumping (suspended,
+    // starved after long backgrounding) blocks the host platform thread for
+    // as long as that thread takes to wake.
+    bool pendingSuspend_ = false;
+    bool pendingResume_ = false;
+    std::optional<int64_t> pendingMemoryTarget_;
+    // Queried once and reused; refreshed only after the browser process exits,
+    // so no per-flip round-trip depends on it.
+    DWORD browserProcessId_ = 0;
 
     void registerEventHandlers();
     void registerSurfaceEventHandlers();
+    DWORD cachedBrowserProcessId();
+    void invalidateBrowserProcessCache();
+    void notifyVisibilityChanged(bool wasVisible);
+    void syncHostWindowVisibility();
     HRESULT onCallJsHandler(const bool& isMainFrame, ICoreWebView2WebMessageReceivedEventArgs* args);
+    void callDevToolsDomainMethod(const wchar_t* method, const wchar_t* parametersAsJson) const;
+    void setFetchDomainEnabled(bool enabled) const;
+    void settleJavaScriptHandler(int64_t callHandlerID, uint64_t documentGeneration, const std::string& resultJson, const std::optional<std::string>& error) const;
+    std::shared_ptr<void> trackPendingScript() const;
+    void registerConsoleMessageReceiver();
   };
 }
 #endif //FLUTTER_INAPPWEBVIEW_PLUGIN_IN_APP_WEBVIEW_H_

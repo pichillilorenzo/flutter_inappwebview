@@ -9,6 +9,7 @@
 
 #include "../flutter_inappwebview_windows_plugin.h"
 #include "../types/channel_delegate.h"
+#include "../types/lifetime_token.h"
 #include "headless_in_app_webview.h"
 
 namespace flutter_inappwebview_plugin
@@ -31,6 +32,7 @@ namespace flutter_inappwebview_plugin
     void run(const flutter::EncodableMap* arguments, std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result);
   private:
     WNDCLASS windowClass_ = {};
+    LifetimeToken alive_;
   };
 }
 #endif //FLUTTER_INAPPWEBVIEW_PLUGIN_HEADLESS_IN_APP_WEBVIEW_MANAGER_H_

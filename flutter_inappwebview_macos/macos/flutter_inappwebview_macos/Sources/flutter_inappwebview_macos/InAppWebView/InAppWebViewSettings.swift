@@ -14,7 +14,6 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
     var useShouldOverrideUrlLoading = false
     var useOnLoadResource = false
     var useOnDownloadStart = false
-    @available(*, deprecated, message: "Use InAppWebViewManager.clearAllCache instead.")
     var clearCache = false
     var userAgent = ""
     var applicationNameForUserAgent = ""
@@ -101,7 +100,7 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
             }
             realSettings["allowUniversalAccessFromFileURLs"] = configuration.value(forKey: "allowUniversalAccessFromFileURLs") as? Bool
             realSettings["allowFileAccessFromFileURLs"] = configuration.preferences.value(forKey: "allowFileAccessFromFileURLs") as? Bool
-            realSettings["javaScriptEnabled"] = configuration.preferences.javaScriptEnabled
+            realSettings["javaScriptEnabled"] = configuration.preferences.legacyJavaScriptEnabled
             if #available(macOS 11.0, *) {
                 realSettings["mediaType"] = webView.mediaType
                 realSettings["pageZoom"] = Float(webView.pageZoom)
@@ -110,7 +109,9 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
             }
             if #available(macOS 11.3, *) {
                 realSettings["isTextInteractionEnabled"] = configuration.preferences.isTextInteractionEnabled
-                realSettings["upgradeKnownHostsToHTTPS"] = configuration.upgradeKnownHostsToHTTPS
+                if configuration.responds(to: NSSelectorFromString("upgradeKnownHostsToHTTPS")) {
+                    realSettings["upgradeKnownHostsToHTTPS"] = configuration.upgradeKnownHostsToHTTPS
+                }
             }
             if #available(macOS 12.0, *) {
                 realSettings["underPageBackgroundColor"] = webView.underPageBackgroundColor.hexString
@@ -125,5 +126,20 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
             }
         }
         return realSettings
+    }
+}
+
+// Unlike allowsContentJavaScript, javaScriptEnabled also blocks the app's own scripts.
+// Going through a protocol keeps that deprecated behavior without the compiler warning.
+private protocol LegacyJavaScriptPreference: AnyObject {
+    var javaScriptEnabled: Bool { get set }
+}
+
+extension WKPreferences: LegacyJavaScriptPreference {}
+
+extension WKPreferences {
+    var legacyJavaScriptEnabled: Bool {
+        get { (self as LegacyJavaScriptPreference).javaScriptEnabled }
+        set { (self as LegacyJavaScriptPreference).javaScriptEnabled = newValue }
     }
 }

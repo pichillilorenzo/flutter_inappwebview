@@ -358,8 +358,6 @@ class _MyAppState extends State<MyApp> {
                           ''');
                           debugPrint('Notification JavaScript injected');
 
-                          debugPrint('Test print page silently');
-                          _printPage(showUI: false);
                         },
                         onPermissionRequest: (controller, permissionRequest) {
                           debugPrint(

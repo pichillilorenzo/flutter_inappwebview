@@ -17,6 +17,23 @@ class ProcessFailedReason {
     Function nativeValue,
   ) => ProcessFailedReason._internal(value, nativeValue());
 
+  ///The process exited with a non-zero exit code that is neither a crash nor a kill.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows WebView2 ([Official API - COREWEBVIEW2_PROCESS_FAILED_REASON_ABNORMAL_EXIT](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_process_failed_reason))
+  static final ABNORMAL_EXIT = ProcessFailedReason._internalMultiPlatform(
+    'ABNORMAL_EXIT',
+    () {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.windows:
+          return 8;
+        default:
+          break;
+      }
+      return null;
+    },
+  );
+
   ///The process crashed.
   ///
   ///**Officially Supported Platforms/Implementations**:
@@ -34,6 +51,23 @@ class ProcessFailedReason {
     },
   );
 
+  ///The OS terminated the process because a DLL failed Windows Code Integrity verification.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows WebView2 ([Official API - COREWEBVIEW2_PROCESS_FAILED_REASON_INTEGRITY_FAILURE](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_process_failed_reason))
+  static final INTEGRITY_FAILURE = ProcessFailedReason._internalMultiPlatform(
+    'INTEGRITY_FAILURE',
+    () {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.windows:
+          return 9;
+        default:
+          break;
+      }
+      return null;
+    },
+  );
+
   ///The process failed to launch.
   ///
   ///**Officially Supported Platforms/Implementations**:
@@ -44,6 +78,23 @@ class ProcessFailedReason {
       switch (defaultTargetPlatform) {
         case TargetPlatform.windows:
           return 4;
+        default:
+          break;
+      }
+      return null;
+    },
+  );
+
+  ///The process exited normally (exit code 0), typically a clean shutdown.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows WebView2 ([Official API - COREWEBVIEW2_PROCESS_FAILED_REASON_NORMAL_EXIT](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_process_failed_reason))
+  static final NORMAL_EXIT = ProcessFailedReason._internalMultiPlatform(
+    'NORMAL_EXIT',
+    () {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.windows:
+          return 7;
         default:
           break;
       }
@@ -121,8 +172,11 @@ class ProcessFailedReason {
 
   ///Set of all values of [ProcessFailedReason].
   static final Set<ProcessFailedReason> values = [
+    ProcessFailedReason.ABNORMAL_EXIT,
     ProcessFailedReason.CRASHED,
+    ProcessFailedReason.INTEGRITY_FAILURE,
     ProcessFailedReason.LAUNCH_FAILED,
+    ProcessFailedReason.NORMAL_EXIT,
     ProcessFailedReason.OUT_OF_MEMORY,
     ProcessFailedReason.TERMINATED,
     ProcessFailedReason.UNEXPECTED,
@@ -197,10 +251,16 @@ class ProcessFailedReason {
   ///Gets the name of the value.
   String name() {
     switch (_value) {
+      case 'ABNORMAL_EXIT':
+        return 'ABNORMAL_EXIT';
       case 'CRASHED':
         return 'CRASHED';
+      case 'INTEGRITY_FAILURE':
+        return 'INTEGRITY_FAILURE';
       case 'LAUNCH_FAILED':
         return 'LAUNCH_FAILED';
+      case 'NORMAL_EXIT':
+        return 'NORMAL_EXIT';
       case 'OUT_OF_MEMORY':
         return 'OUT_OF_MEMORY';
       case 'TERMINATED':

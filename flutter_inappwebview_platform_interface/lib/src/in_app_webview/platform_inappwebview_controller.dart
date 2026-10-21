@@ -723,6 +723,30 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
     );
   }
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.setBackgroundColor}
+  ///Sets the native WebView background color.
+  ///
+  ///On Android, the color is retained when [InAppWebViewSettings.transparentBackground]
+  ///is toggled off again. This runtime method is called after the controller is
+  ///created, so it cannot change a platform view's very first native frame.
+  ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.setBackgroundColor.supported_platforms}
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(
+        apiName: 'View.setBackgroundColor',
+        apiUrl:
+            'https://developer.android.com/reference/android/view/View#setBackgroundColor(int)',
+      ),
+    ],
+  )
+  Future<void> setBackgroundColor(Color color) {
+    throw UnimplementedError(
+      '${PlatformInAppWebViewControllerMethod.setBackgroundColor.name} is not implemented on the current platform',
+    );
+  }
+
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.goBack}
   ///Goes back in the history of the WebView.
   ///{@endtemplate}
@@ -1049,6 +1073,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///Instead, on Android, it will run the [source] code into an iframe, using `eval(source);` to get and return the result.
   ///This parameter doesn’t apply to changes you make to the underlying web content, such as the document’s DOM structure.
   ///Those changes remain visible to all scripts, regardless of which content world you specify.
+  ///On iOS 14 through 17, named content worlds are unavailable in popup WebViews; the page world remains supported.
   ///For more information about content worlds, see [ContentWorld].
   ///
   ///**NOTE**: This method shouldn't be called in the [PlatformWebViewCreationParams.onWebViewCreated] or [PlatformWebViewCreationParams.onLoadStart] events,
@@ -2476,6 +2501,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///Instead, on Android, it will run the [source] code into an iframe.
   ///This parameter doesn’t apply to changes you make to the underlying web content, such as the document’s DOM structure.
   ///Those changes remain visible to all scripts, regardless of which content world you specify.
+  ///On iOS 14 through 17, named content worlds are unavailable in popup WebViews; the page world remains supported.
   ///For more information about content worlds, see [ContentWorld].
   ///
   ///**NOTE**: This method shouldn't be called in the [PlatformWebViewCreationParams.onWebViewCreated] or [PlatformWebViewCreationParams.onLoadStart] events,
@@ -3214,6 +3240,10 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
         apiName: 'ICoreWebView2_16.PrintToPdfStream',
         apiUrl:
             'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_16#printtopdfstream',
+      ),
+      LinuxPlatform(
+        note:
+            'Requires the Otzaria-patched WPE runtime. With stock libWPEWebKit, this method returns null.',
       ),
     ],
   )

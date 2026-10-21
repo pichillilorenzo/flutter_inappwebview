@@ -153,11 +153,7 @@ public class JavaScriptBridgeInterface {
               JSONArray arguments = new JSONArray(args);
               JSONObject jsonObject = arguments.getJSONObject(0);
               String resultUuid = jsonObject.getString("resultUuid");
-              ValueCallback<String> callAsyncJavaScriptCallback = inAppWebView.callAsyncJavaScriptCallbacks.get(resultUuid);
-              if (callAsyncJavaScriptCallback != null) {
-                callAsyncJavaScriptCallback.onReceiveValue(jsonObject.toString());
-                inAppWebView.callAsyncJavaScriptCallbacks.remove(resultUuid);
-              }
+              inAppWebView.callAsyncJavaScriptCallbacks.complete(resultUuid, jsonObject.toString());
             } catch (JSONException e) {
               Log.e(LOG_TAG, "", e);
             }
@@ -167,11 +163,9 @@ public class JavaScriptBridgeInterface {
               JSONArray arguments = new JSONArray(args);
               JSONObject jsonObject = arguments.getJSONObject(0);
               String resultUuid = jsonObject.getString("resultUuid");
-              ValueCallback<String> evaluateJavaScriptCallback = inAppWebView.evaluateJavaScriptContentWorldCallbacks.get(resultUuid);
-              if (evaluateJavaScriptCallback != null) {
-                evaluateJavaScriptCallback.onReceiveValue(jsonObject.has("value") ? jsonObject.get("value").toString() : "null");
-                inAppWebView.evaluateJavaScriptContentWorldCallbacks.remove(resultUuid);
-              }
+              inAppWebView.evaluateJavaScriptContentWorldCallbacks.complete(
+                      resultUuid,
+                      jsonObject.has("value") ? jsonObject.get("value").toString() : "null");
             } catch (JSONException e) {
               Log.e(LOG_TAG, "", e);
             }

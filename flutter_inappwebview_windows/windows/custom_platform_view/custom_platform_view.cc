@@ -23,6 +23,7 @@ namespace flutter_inappwebview_plugin
   constexpr auto kMethodSetFpsLimit = "setFpsLimit";
   constexpr auto kMethodRequestFocus = "requestFocus";
   constexpr auto kMethodClearFocus = "clearFocus";
+  constexpr auto kMethodSetFlutterViewId = "setFlutterViewId";
 
   constexpr auto kEventType = "type";
   constexpr auto kEventValue = "value";
@@ -118,8 +119,10 @@ namespace flutter_inappwebview_plugin
     flutter::TextureRegistrar* texture_registrar,
     GraphicsContext* graphics_context,
     HWND hwnd,
-    std::shared_ptr<flutter_inappwebview_plugin::InAppWebView> webView)
-    : hwnd_(hwnd), view(std::move(webView)), texture_registrar_(texture_registrar)
+    std::shared_ptr<flutter_inappwebview_plugin::InAppWebView> webView,
+    std::function<HWND(int64_t)> flutterViewResolver)
+    : hwnd_(hwnd), flutterViewResolver_(std::move(flutterViewResolver)),
+    view(std::move(webView)), texture_registrar_(texture_registrar)
   {
 #ifdef HAVE_FLUTTER_D3D_TEXTURE
     texture_bridge_ =
@@ -346,6 +349,21 @@ namespace flutter_inappwebview_plugin
     else if (method_name.compare(kMethodRequestFocus) == 0) {
       if (view) {
         view->requestFocus();
+        return result->Success();
+      }
+      return result->Error(kErrorInvalidArgs);
+    }
+    // setFlutterViewId: int viewId - the widget moved to another Flutter view.
+    else if (method_name.compare(kMethodSetFlutterViewId) == 0) {
+      const auto args = method_call.arguments();
+      if (view && flutterViewResolver_ && args &&
+        (std::holds_alternative<int32_t>(*args) || std::holds_alternative<int64_t>(*args))) {
+        const auto flutterViewHwnd = flutterViewResolver_(args->LongValue());
+        if (!flutterViewHwnd) {
+          return result->Error(kErrorInvalidArgs, "Unknown Flutter view id");
+        }
+        view->reparent(flutterViewHwnd);
+        hwnd_ = view->hostWindow();
         return result->Success();
       }
       return result->Error(kErrorInvalidArgs);

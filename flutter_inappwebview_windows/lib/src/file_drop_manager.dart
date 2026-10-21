@@ -10,6 +10,7 @@ class WindowsFileDropEvent {
     required this.paths,
     required this.x,
     required this.y,
+    this.viewId = 0,
   });
 
   /// Absolute paths of the dragged files.
@@ -23,6 +24,9 @@ class WindowsFileDropEvent {
 
   /// Vertical position in Flutter-view client coordinates.
   final double y;
+
+  /// The [FlutterView] the drag is over; 0 is the implicit view.
+  final int viewId;
 }
 
 /// Decides whether a file drag at the event position may be dropped.
@@ -53,14 +57,13 @@ class WindowsFileDropManager {
     'com.pichillilorenzo/flutter_inappwebview_filedrop',
   );
 
-  /// Shared manager for the Flutter view associated with this plugin engine.
+  /// Shared manager for the Flutter views of this plugin engine.
   static final WindowsFileDropManager instance = WindowsFileDropManager._();
 
-  WindowsFileDragHandler? _onDrag;
-  WindowsFileDropHandler? _onDrop;
-  VoidCallback? _onLeave;
+  final Map<int, _FileDropHandlers> _handlers = {};
 
-  /// Starts receiving file drags.
+  /// Starts receiving file drags over the [FlutterView] [viewId] (the
+  /// implicit view when null). Each view has its own handlers.
   ///
   /// [onDrag] is called for `enter` and `over`. Return true only for the
   /// intended drop region and supported files. [onDrop] runs for the final
@@ -69,24 +72,28 @@ class WindowsFileDropManager {
     required WindowsFileDragHandler onDrag,
     required WindowsFileDropHandler onDrop,
     VoidCallback? onLeave,
+    int? viewId,
   }) async {
-    _onDrag = onDrag;
-    _onDrop = onDrop;
-    _onLeave = onLeave;
-    await _channel.invokeMethod<void>('setEnabled', <String, bool>{
-      'enabled': true,
-    });
+    _handlers[viewId ?? 0] = _FileDropHandlers(onDrag, onDrop, onLeave);
+    await _channel.invokeMethod<void>(
+      'setEnabled',
+      _withViewId(<String, Object>{'enabled': true}, viewId),
+    );
   }
 
-  /// Stops receiving file drags and restores the default refusal behaviour.
-  Future<void> stop() async {
-    _onDrag = null;
-    _onDrop = null;
-    _onLeave = null;
-    await _channel.invokeMethod<void>('setEnabled', <String, bool>{
-      'enabled': false,
-    });
+  /// Stops receiving file drags over [viewId] and restores the default
+  /// refusal behaviour there.
+  Future<void> stop({int? viewId}) async {
+    _handlers.remove(viewId ?? 0);
+    await _channel.invokeMethod<void>(
+      'setEnabled',
+      _withViewId(<String, Object>{'enabled': false}, viewId),
+    );
   }
+
+  // Calls without a view id keep the single-view wire format.
+  static Map<String, Object> _withViewId(Map<String, Object> args, int? id) =>
+      id == null ? args : (args..['viewId'] = id);
 
   Future<void> _handleMethodCall(MethodCall call) async {
     if (call.method != 'onFileDrop' || call.arguments is! Map) {
@@ -94,8 +101,11 @@ class WindowsFileDropManager {
     }
     final arguments = call.arguments as Map<dynamic, dynamic>;
     final eventName = arguments['event'];
+    final rawViewId = arguments['viewId'];
+    final viewId = rawViewId is int ? rawViewId : null;
+    final handlers = _handlers[viewId ?? 0];
     if (eventName == 'leave') {
-      _onLeave?.call();
+      handlers?.onLeave?.call();
       return;
     }
     if (eventName is! String ||
@@ -111,10 +121,11 @@ class WindowsFileDropManager {
       paths: paths,
       x: (arguments['x'] as num).toDouble(),
       y: (arguments['y'] as num).toDouble(),
+      viewId: viewId ?? 0,
     );
 
     if (eventName == 'drop') {
-      await _onDrop?.call(event);
+      await handlers?.onDrop.call(event);
       return;
     }
     if (eventName != 'enter' && eventName != 'over') {
@@ -123,13 +134,22 @@ class WindowsFileDropManager {
 
     var accepted = false;
     try {
-      accepted = _onDrag?.call(event) ?? false;
+      accepted = handlers?.onDrag(event) ?? false;
     } catch (_) {
       // Fail closed: an application callback must never leave the prior
       // accepted state active after it throws.
     }
-    await _channel.invokeMethod<void>('setAccepted', <String, bool>{
-      'accepted': accepted,
-    });
+    await _channel.invokeMethod<void>(
+      'setAccepted',
+      _withViewId(<String, Object>{'accepted': accepted}, viewId),
+    );
   }
+}
+
+class _FileDropHandlers {
+  const _FileDropHandlers(this.onDrag, this.onDrop, this.onLeave);
+
+  final WindowsFileDragHandler onDrag;
+  final WindowsFileDropHandler onDrop;
+  final VoidCallback? onLeave;
 }

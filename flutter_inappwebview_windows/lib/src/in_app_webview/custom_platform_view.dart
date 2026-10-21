@@ -154,13 +154,23 @@ class CustomPlatformViewController
     : super(CustomFlutterViewControllerValue.uninitialized());
 
   /// Initializes the underlying platform view.
+  ///
+  /// [flutterViewId] is the [FlutterView] that hosts the widget; the native
+  /// host window is parented under it. Null means the implicit view.
   Future<void> initialize({
     Function(int id)? onPlatformViewCreated,
     Key? creationKey,
     dynamic arguments,
+    int? flutterViewId,
   }) async {
     if (_isDisposed) {
       return;
+    }
+    if (flutterViewId != null && arguments is Map) {
+      arguments = <dynamic, dynamic>{
+        ...arguments,
+        'flutterViewId': flutterViewId,
+      };
     }
     try {
       _textureId = (await _pluginChannel.invokeMethod<int>(
@@ -238,6 +248,16 @@ class CustomPlatformViewController
     }
     assert(value.isInitialized);
     return _methodChannel.invokeMethod('requestFocus');
+  }
+
+  /// Moves the native host window under the [FlutterView] [viewId], after the
+  /// widget was reparented into another view.
+  Future<void> setFlutterViewId(int viewId) async {
+    await _creatingCompleter.future;
+    if (_isDisposed) {
+      return;
+    }
+    return _methodChannel.invokeMethod('setFlutterViewId', viewId);
   }
 
   /// Clears focus from the active element inside the WebView2 control.
@@ -419,27 +439,15 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
 
   PlatformUtil _platformUtil = PlatformUtil.instance();
 
+  // The view hosting this widget; null until the first dependency pass.
+  FlutterView? _flutterView;
+  bool _initializeRequested = false;
+
   @override
   void initState() {
     super.initState();
 
     _platformUtil.addListener(this);
-
-    // `initialize` reports native creation failures through
-    // WindowsWebViewCreationFailures, then rethrows for direct callers. This
-    // widget has no per-instance creation-error callback, so consume that
-    // rethrown Future here instead of producing an unhandled async error.
-    _controller
-        .initialize(
-          onPlatformViewCreated: (id) {
-            if (!mounted) return;
-            widget.onPlatformViewCreated?.call(id);
-            setState(() {});
-          },
-          creationKey: widget.creationKey,
-          arguments: widget.creationParams,
-        )
-        .ignore();
 
     _listener = AppLifecycleListener(
       onStateChange: (state) {
@@ -467,6 +475,52 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
       });
     });
   }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final view = View.maybeOf(context);
+    final previousViewId = _flutterView?.viewId;
+    _flutterView = view;
+    if (!_initializeRequested) {
+      _initializeRequested = true;
+      // `initialize` reports native creation failures through
+      // WindowsWebViewCreationFailures, then rethrows for direct callers. This
+      // widget has no per-instance creation-error callback, so consume that
+      // rethrown Future here instead of producing an unhandled async error.
+      _controller
+          .initialize(
+            onPlatformViewCreated: (id) {
+              if (!mounted) return;
+              widget.onPlatformViewCreated?.call(id);
+              setState(() {});
+            },
+            creationKey: widget.creationKey,
+            arguments: widget.creationParams,
+            // The implicit view keeps the single-window creation arguments.
+            flutterViewId:
+                view?.viewId == PlatformDispatcher.instance.implicitView?.viewId
+                ? null
+                : view?.viewId,
+          )
+          .ignore();
+      return;
+    }
+    if (view != null && view.viewId != previousViewId) {
+      // Reparented into another window (e.g. through a GlobalKey).
+      _controller.setFlutterViewId(view.viewId).then((_) {
+        if (!mounted) return;
+        _reportSurfaceSize();
+        _reportWidgetPosition();
+      }).ignore();
+    }
+  }
+
+  double get _scaleFactor =>
+      widget.scaleFactor ??
+      _flutterView?.devicePixelRatio ??
+      PlatformDispatcher.instance.implicitView?.devicePixelRatio ??
+      1.0;
 
   @override
   void onWindowMove() {
@@ -813,12 +867,7 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
     if (box != null) {
       await _controller.ready;
       if (!mounted || !box.attached) return;
-      unawaited(
-        _controller._setSize(
-          box.size,
-          widget.scaleFactor ?? window.devicePixelRatio,
-        ),
-      );
+      unawaited(_controller._setSize(box.size, _scaleFactor));
     }
   }
 
@@ -828,12 +877,7 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
       await _controller.ready;
       if (!mounted || !box.attached) return;
       final position = box.localToGlobal(Offset.zero);
-      unawaited(
-        _controller._setPosition(
-          position,
-          widget.scaleFactor ?? window.devicePixelRatio,
-        ),
-      );
+      unawaited(_controller._setPosition(position, _scaleFactor));
     }
   }
 

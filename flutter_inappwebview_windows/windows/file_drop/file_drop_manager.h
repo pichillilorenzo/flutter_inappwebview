@@ -3,6 +3,9 @@
 
 #include <flutter/method_channel.h>
 #include <flutter/standard_message_codec.h>
+#include <cstdint>
+#include <map>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -14,6 +17,8 @@ namespace flutter_inappwebview_plugin
   // Reports OS file drags over the Flutter window to the host app. The webview
   // drop target owns the window's only IDropTarget, so a host that needs file
   // drops has to receive them from here rather than registering its own.
+  // Each Flutter view is enabled separately; calls without a viewId use the
+  // implicit view.
   class FileDropManager : public ChannelDelegate
   {
   public:
@@ -28,11 +33,15 @@ namespace flutter_inappwebview_plugin
       const flutter::MethodCall<flutter::EncodableValue>& method_call,
       std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result) override;
 
-  private:
-    void setEnabled(bool enabled);
-    HWND flutterViewHwnd() const;
+    // Drops the sink of a Flutter view whose window is being destroyed.
+    void onFlutterViewDestroyed(HWND flutterViewHwnd);
 
-    bool enabled_ = false;
+  private:
+    void setEnabled(bool enabled, const std::optional<int64_t>& viewId);
+    HWND flutterViewHwnd(const std::optional<int64_t>& viewId) const;
+
+    // Enabled views by id (the implicit view is 0) and their window.
+    std::map<int64_t, HWND> enabledViews_;
   };
 }
 

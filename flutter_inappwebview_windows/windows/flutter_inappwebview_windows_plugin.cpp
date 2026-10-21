@@ -73,10 +73,10 @@ namespace flutter_inappwebview_plugin
     // Keep inline WebViews synchronized here while the message is available.
     if (message == WM_SIZE && inAppWebViewManager) {
       if (wParam == SIZE_MINIMIZED) {
-        inAppWebViewManager->setWindowMinimized(true);
+        inAppWebViewManager->setWindowMinimized(hWnd, true);
       }
       else if (wParam == SIZE_RESTORED || wParam == SIZE_MAXIMIZED) {
-        inAppWebViewManager->setWindowMinimized(false);
+        inAppWebViewManager->setWindowMinimized(hWnd, false);
       }
     }
 

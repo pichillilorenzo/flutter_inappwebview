@@ -176,6 +176,13 @@ namespace flutter_inappwebview_plugin
     // used by WebViewDropTarget to route OLE drag events to this webview.
     POINT widgetOffset() const { return widgetOffset_; }
     SIZE surfaceSize() const { return surfaceSize_; }
+    // The WS_CHILD window WebView2 uses as ParentWindow, and its top-level.
+    HWND hostWindow() const;
+    HWND topLevelWindow() const;
+    // Moves the host under another Flutter view (multi-window apps).
+    void reparent(HWND flutterViewHwnd);
+    // Hides the host under [parkingHwnd] while it has no Flutter view.
+    void park(HWND parkingHwnd);
 
     void initChannel(const std::optional<std::variant<std::string, int64_t>> viewId, const std::optional<std::string> channelName);
     void prepare(const InAppWebViewCreationParams& params);

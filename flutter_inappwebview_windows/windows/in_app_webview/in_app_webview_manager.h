@@ -4,8 +4,10 @@
 #include <flutter/method_channel.h>
 #include <flutter/standard_message_codec.h>
 #include <cstddef>
+#include <functional>
 #include <map>
 #include <mutex>
+#include <set>
 #include <string>
 #include <variant>
 #include <wil/com.h>
@@ -58,19 +60,28 @@ namespace flutter_inappwebview_plugin
 
     void createInAppWebView(const flutter::EncodableMap* arguments, std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result);
     void disposeKeepAlive(const std::string& keepAliveId);
-    void setWindowMinimized(bool minimized);
+    void setWindowMinimized(HWND topLevelHwnd, bool minimized);
+    // Parks webview hosts and drops file-drop sinks when the view is destroyed.
+    void watchFlutterView(HWND flutterViewHwnd);
   private:
     inline static rx::RoHelper* rohelper_ = nullptr;
     inline static ABI::Windows::System::IDispatcherQueueController* dispatcher_queue_controller_ = nullptr;
     inline static GraphicsContext* graphics_context_ = nullptr;
     inline static ABI::Windows::UI::Composition::ICompositor* compositor_ = nullptr;
     WNDCLASS windowClass_ = {};
-    bool windowMinimized_ = false;
+    std::set<HWND> watchedFlutterViews_;
+    HWND parkingWindow_ = nullptr;
     LifetimeToken alive_;
     inline static bool valid_ = false;
     inline static std::size_t instance_count_ = 0;
     inline static std::mutex shared_resources_mutex_;
 
+    static bool isTopLevelMinimized(HWND hwnd);
+    std::function<HWND(int64_t)> flutterViewResolver();
+    void onFlutterViewDestroyed(HWND flutterViewHwnd);
+    HWND parkingWindow();
+    static LRESULT CALLBACK FlutterViewSubclassProc(HWND hwnd, UINT message,
+      WPARAM wParam, LPARAM lParam, UINT_PTR subclassId, DWORD_PTR refData);
     static ABI::Windows::System::IDispatcherQueueController* detachSharedResourcesForShutdown();
     static void shutdownDispatcherQueue(ABI::Windows::System::IDispatcherQueueController* dispatcherQueueController);
   };

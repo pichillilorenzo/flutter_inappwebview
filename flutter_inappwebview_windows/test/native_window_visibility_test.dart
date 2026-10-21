@@ -12,7 +12,9 @@ void main() {
 
     expect(
       source,
-      contains('std::move(webViewCompositionController), windowMinimized_)'),
+      contains(
+        'std::move(webViewCompositionController), isTopLevelMinimized(hwnd))',
+      ),
     );
   });
 

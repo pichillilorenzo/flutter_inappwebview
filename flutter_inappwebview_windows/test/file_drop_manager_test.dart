@@ -90,4 +90,44 @@ void main() {
 
     expect(calls.last.arguments, <String, bool>{'accepted': false});
   });
+
+  testWidgets('routes each view to its own handlers', (_) async {
+    final calls = <MethodCall>[];
+    messenger.setMockMethodCallHandler(_channel, (call) async {
+      calls.add(call);
+      return null;
+    });
+    final dragged = <int>[];
+    await WindowsFileDropManager.instance.start(
+      onDrag: (event) {
+        dragged.add(event.viewId);
+        return false;
+      },
+      onDrop: (_) {},
+    );
+    await WindowsFileDropManager.instance.start(
+      viewId: 2,
+      onDrag: (event) {
+        dragged.add(event.viewId);
+        return true;
+      },
+      onDrop: (_) {},
+    );
+    await sendNativeCall(
+      const MethodCall('onFileDrop', <String, Object>{
+        'event': 'over',
+        'paths': <String>[],
+        'x': 1.0,
+        'y': 2.0,
+        'viewId': 2,
+      }),
+    );
+    await WindowsFileDropManager.instance.stop(viewId: 2);
+
+    expect(dragged, <int>[2]);
+    expect(calls[0].arguments, <String, Object>{'enabled': true});
+    expect(calls[1].arguments, <String, Object>{'enabled': true, 'viewId': 2});
+    expect(calls[2].arguments, <String, Object>{'accepted': true, 'viewId': 2});
+    expect(calls[3].arguments, <String, Object>{'enabled': false, 'viewId': 2});
+  });
 }

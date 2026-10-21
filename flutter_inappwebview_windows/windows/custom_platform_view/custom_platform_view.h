@@ -5,6 +5,7 @@
 #include <flutter/standard_method_codec.h>
 #include <flutter/texture_registrar.h>
 
+#include <functional>
 #include <memory>
 
 #include "../in_app_webview/in_app_webview.h"
@@ -23,7 +24,8 @@ namespace flutter_inappwebview_plugin
       flutter::TextureRegistrar* texture_registrar,
       GraphicsContext* graphics_context,
       HWND hwnd,
-      std::shared_ptr<flutter_inappwebview_plugin::InAppWebView> webView);
+      std::shared_ptr<flutter_inappwebview_plugin::InAppWebView> webView,
+      std::function<HWND(int64_t)> flutterViewResolver = nullptr);
     ~CustomPlatformView();
 
     TextureBridge* texture_bridge() const { return texture_bridge_.get(); }
@@ -33,6 +35,8 @@ namespace flutter_inappwebview_plugin
     void UnregisterMethodCallHandler() const;
   private:
     HWND hwnd_;
+    // Maps a Flutter view id to its HWND, for setFlutterViewId.
+    std::function<HWND(int64_t)> flutterViewResolver_;
     std::unique_ptr<flutter::TextureVariant> flutter_texture_;
     std::unique_ptr<TextureBridge> texture_bridge_;
     std::unique_ptr<flutter::EventSink<flutter::EncodableValue>> event_sink_;

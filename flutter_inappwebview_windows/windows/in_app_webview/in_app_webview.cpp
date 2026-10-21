@@ -4220,14 +4220,56 @@ namespace flutter_inappwebview_plugin
     }
     visibilityState_.markApplied();
 
-    // The Flutter view may detach while surface creation is still in flight.
-    if (plugin && plugin->registrar) {
-      if (auto* const view = plugin->registrar->GetView()) {
-        WebViewDropTarget::RegisterWebView(view->GetNativeWindow(), this);
-      }
+    // The host is a child of the requesting Flutter view; the view may have
+    // been destroyed while surface creation was still in flight.
+    if (const auto flutterViewHwnd = GetParent(parentWindow)) {
+      WebViewDropTarget::RegisterWebView(flutterViewHwnd, this);
     }
 
     return true;
+  }
+
+  HWND InAppWebView::hostWindow() const
+  {
+    HWND host = nullptr;
+    if (!webViewController || FAILED(webViewController->get_ParentWindow(&host))) {
+      return nullptr;
+    }
+    return host;
+  }
+
+  HWND InAppWebView::topLevelWindow() const
+  {
+    const auto host = hostWindow();
+    return host ? GetAncestor(host, GA_ROOT) : nullptr;
+  }
+
+  void InAppWebView::reparent(HWND flutterViewHwnd)
+  {
+    const auto host = hostWindow();
+    if (!host || !flutterViewHwnd || !webViewCompositionController) {
+      return;
+    }
+    if (GetParent(host) != flutterViewHwnd) {
+      WebViewDropTarget::UnregisterWebView(this);
+      ::SetParent(host, flutterViewHwnd);
+      ::SetWindowPos(host, nullptr, widgetOffset_.x, widgetOffset_.y, 0, 0,
+        SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE);
+      failedLog(webViewController->NotifyParentWindowPositionChanged());
+      WebViewDropTarget::RegisterWebView(flutterViewHwnd, this);
+    }
+    setHostWindowMinimized(IsIconic(GetAncestor(flutterViewHwnd, GA_ROOT)) != FALSE);
+  }
+
+  void InAppWebView::park(HWND parkingHwnd)
+  {
+    const auto host = hostWindow();
+    if (!host || !parkingHwnd || !webViewCompositionController) {
+      return;
+    }
+    WebViewDropTarget::UnregisterWebView(this);
+    ::SetParent(host, parkingHwnd);
+    setHostWindowMinimized(true);
   }
 
   bool InAppWebView::isSslError(const COREWEBVIEW2_WEB_ERROR_STATUS& webErrorStatus)

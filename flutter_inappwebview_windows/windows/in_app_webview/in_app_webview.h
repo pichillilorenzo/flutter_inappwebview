@@ -96,6 +96,8 @@ namespace flutter_inappwebview_plugin
     const std::variant<std::string, int64_t> id;
     const std::shared_ptr<InAppWebViewSettings> initialSettings;
     const std::optional<std::vector<std::shared_ptr<UserScript>>> initialUserScripts;
+    // Without a listener, console calls are not reported at all.
+    const bool hasConsoleMessageListener = true;
   };
 
   class InAppWebView
@@ -144,6 +146,12 @@ namespace flutter_inappwebview_plugin
     }
     void setSurfaceSize(size_t width, size_t height, float scale_factor);
     void setPosition(size_t x, size_t y, float scale_factor);
+    void notifyParentWindowMoved();
+    // A widget attached to a kept-alive WebView brings its own listener.
+    void setHasConsoleMessageListener(bool hasListener);
+    // Enable a DevTools domain once, before its first use.
+    void ensureRuntimeDomain() const;
+    void ensureNetworkDomain() const;
     void setCursorPos(double x, double y);
     void setPointerUpdate(int32_t pointer, InAppWebViewPointerEventKind eventKind,
       double x, double y, double size, double pressure);
@@ -302,6 +310,15 @@ namespace flutter_inappwebview_plugin
     float surfaceScaleFactor_ = 0;
     VirtualKeyState virtualKeys_;
     WebViewVisibilityState visibilityState_;
+    bool hasConsoleMessageListener_ = true;
+    bool consoleReceiverRegistered_ = false;
+    bool pendingParentMoved_ = false;
+    mutable bool appEnabledFetch_ = false;
+    uint64_t mainDocumentGeneration_ = 0;
+    // Runtime.evaluate calls not completed yet; a reply waits behind them.
+    std::shared_ptr<int> pendingScripts_ = std::make_shared<int>(0);
+    mutable bool runtimeDomainEnabled_ = false;
+    mutable bool networkDomainEnabled_ = false;
     HWND hostWindow_ = nullptr;
     // Shown only once Dart has placed it, so it never flashes at the origin.
     bool hostWindowHidden_ = true;
@@ -341,6 +358,11 @@ namespace flutter_inappwebview_plugin
     void notifyVisibilityChanged(bool wasVisible);
     void syncHostWindowVisibility();
     HRESULT onCallJsHandler(const bool& isMainFrame, ICoreWebView2WebMessageReceivedEventArgs* args);
+    void callDevToolsDomainMethod(const wchar_t* method, const wchar_t* parametersAsJson) const;
+    void setFetchDomainEnabled(bool enabled) const;
+    void settleJavaScriptHandler(int64_t callHandlerID, uint64_t documentGeneration, const std::string& resultJson, const std::optional<std::string>& error) const;
+    std::shared_ptr<void> trackPendingScript() const;
+    void registerConsoleMessageReceiver();
   };
 }
 #endif //FLUTTER_INAPPWEBVIEW_PLUGIN_IN_APP_WEBVIEW_H_

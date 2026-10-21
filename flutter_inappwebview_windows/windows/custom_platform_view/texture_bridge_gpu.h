@@ -5,6 +5,7 @@
 
 #include <memory>
 
+#include "frame_compare_gate.h"
 #include "texture_bridge.h"
 
 namespace flutter_inappwebview_plugin
@@ -41,6 +42,9 @@ namespace flutter_inappwebview_plugin
     // Flutter samples a buffer from this pool. A buffer is selected only when
     // it is not leased to Flutter; leases retain the pool through shutdown.
     std::shared_ptr<SurfacePool> surface_pool_;
+    // Guards |surface_pool_| for Flutter's raster thread, which must not wait
+    // on |mutex_|. The capture side writes it under both.
+    std::mutex surface_pool_mutex_;
     // Private copy of the last accepted frame. It is deliberately separate
     // from |surface_pool_| so it remains safe to compare while Flutter owns
     // the last published shared texture.
@@ -61,6 +65,7 @@ namespace flutter_inappwebview_plugin
     winrt::com_ptr<ID3D11Buffer> compare_result_;
     winrt::com_ptr<ID3D11UnorderedAccessView> compare_result_uav_;
     winrt::com_ptr<ID3D11Buffer> compare_staging_;
+    FrameCompareGate compare_gate_;
 
     bool EnsureSurfacePool(uint32_t width, uint32_t height);
     bool EnsureReference(uint32_t width, uint32_t height);

@@ -234,6 +234,7 @@ class CustomPlatformViewController
   @override
   Future<void> dispose() async {
     await _creatingCompleter.future;
+    _cursorTimer?.cancel();
     if (!_isDisposed) {
       _isDisposed = true;
       await _eventStreamSubscription?.cancel();
@@ -281,6 +282,7 @@ class CustomPlatformViewController
       return;
     }
     assert(value.isInitialized);
+    _flushCursorPos();
     return _methodChannel.invokeMethod('setPointerUpdate', [
       pointer,
       kind.index,
@@ -291,16 +293,48 @@ class CustomPlatformViewController
     ]);
   }
 
+  // A fast mouse reports up to ~1000 moves a second; each is a channel call
+  // plus browser IPC. Moves inside one interval collapse into the last one.
+  static const _cursorInterval = Duration(milliseconds: 8);
+  Offset? _pendingCursorPos;
+  Timer? _cursorTimer;
+
   /// Moves the virtual cursor to [position].
   Future<void> _setCursorPos(Offset position) async {
     if (_isDisposed) {
       return;
     }
     assert(value.isInitialized);
-    return _methodChannel.invokeMethod('setCursorPos', [
-      position.dx,
-      position.dy,
-    ]);
+    if (_cursorTimer != null) {
+      _pendingCursorPos = position;
+      return;
+    }
+    _sendCursorPos(position);
+    _cursorTimer = Timer(_cursorInterval, _onCursorInterval);
+  }
+
+  void _onCursorInterval() {
+    _cursorTimer = null;
+    final pending = _pendingCursorPos;
+    if (pending != null) {
+      _pendingCursorPos = null;
+      _setCursorPos(pending);
+    }
+  }
+
+  /// Sends a move still waiting for its interval, so that a click, wheel or
+  /// touch lands where the pointer is now: native uses the last position.
+  void _flushCursorPos() {
+    final pending = _pendingCursorPos;
+    if (pending == null || _isDisposed) {
+      return;
+    }
+    _pendingCursorPos = null;
+    _sendCursorPos(pending);
+  }
+
+  void _sendCursorPos(Offset position) {
+    _methodChannel.invokeMethod('setCursorPos', [position.dx, position.dy]);
   }
 
   /// Indicates whether the specified [button] is currently down.
@@ -312,6 +346,7 @@ class CustomPlatformViewController
       return;
     }
     assert(value.isInitialized);
+    _flushCursorPos();
     return _methodChannel.invokeMethod('setPointerButton', <String, dynamic>{
       'kind': kind.index,
       'button': button.index,
@@ -324,6 +359,7 @@ class CustomPlatformViewController
       return;
     }
     assert(value.isInitialized);
+    _flushCursorPos();
     return _methodChannel.invokeMethod('setScrollDelta', [dx, dy]);
   }
 
@@ -438,6 +474,7 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
   MouseCursor _cursor = SystemMouseCursors.basic;
 
   bool _surfaceSizeReportScheduled = false;
+  Size? _laidOutSize;
 
   // HWND mode: the native window follows this view and hides while it is
   // not shown. Read in build, so a change rebuilds and runs the tracker.
@@ -492,13 +529,6 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
       },
     );
 
-    // Report initial surface size and widget position
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      _sendSurfaceSize();
-      _reportWidgetPosition();
-    });
-
     _cursorSubscription = _controller._cursor.listen((cursor) {
       if (!mounted) return;
       setState(() {
@@ -536,6 +566,23 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
   }
 
   Widget _buildInner() {
+    // SizeChangedLayoutNotifier skips the first layout, which for a view built
+    // before it was laid out (a kept-alive hidden page) is the only one.
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.biggest != _laidOutSize) {
+          _laidOutSize = constraints.biggest;
+          _reportSurfaceSize();
+          SchedulerBinding.instance.addPostFrameCallback((_) {
+            if (mounted) _reportWidgetPosition();
+          });
+        }
+        return _buildContent();
+      },
+    );
+  }
+
+  Widget _buildContent() {
     return NotificationListener<SizeChangedLayoutNotification>(
       onNotification: (notification) {
         _reportSurfaceSize();
@@ -855,7 +902,7 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
 
   void _sendSurfaceSize() async {
     final box = _key.currentContext?.findRenderObject() as RenderBox?;
-    if (box != null) {
+    if (box != null && box.hasSize) {
       await _controller.ready;
       if (!mounted || !box.attached) return;
       unawaited(

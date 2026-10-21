@@ -1,5 +1,16 @@
 ## 0.7.0-beta.3
 
+- Fixed a crash of the whole app when a page called `callHandler` with a name that has no Dart handler.
+- Fixed `onProcessFailed`, `onAcceleratorKeyPressed` and `onShowFileChooser` never reaching Dart; `onShowFileChooser` has no WebView2 event and stays unsupported.
+- Fixed `ProcessFailedDetail.frameInfos` skipping the first and every second frame.
+- Fixed `<select>` popups and other WebView2 popups opening at the old position after the window moved without a drag.
+- Fixed a WebView created before its first layout (a kept-alive hidden page) keeping its initial size until clicked.
+- Sent `callHandler` results to visible pages as web messages and posted the arguments without a second JSON encoding, about 40% faster for large payloads; error messages are now escaped correctly. A result still goes through a script when the page is hidden or suspended, when the top document navigated since the call, or while an `evaluateJavascript`/`callAsyncJavaScript` call is pending, so it cannot reach another document or overtake an earlier script.
+- Enabled the DevTools `Network` domain only before the first `Network.*` command or listener, `Runtime` only with an `onConsoleMessage` listener, a `Runtime.*` listener or an isolated content world, and `Fetch` only with `useShouldOverrideUrlLoading`. Cookie commands do not need `Network.enable`. A `Fetch.*` listener added through `addDevToolsProtocolEventListener` is not enabled automatically, because `Fetch.enable` needs the app's request patterns; a `Fetch.enable` sent by the app is never replaced or disabled by a settings change.
+- Without `useShouldOverrideUrlLoading`, `onLoadStart` and `onProgressChanged(0)` are no longer sent twice for each main-frame navigation.
+- Restored the captured-frame comparison, which never completed since buffer leasing, with a wait of at most 1 ms and a pause while every frame differs; Flutter's raster thread no longer waits on the capture lock.
+- Collapsed mouse moves to one per 8 ms; a pending move is sent before any click, wheel or touch.
+- Fixed compilation with MSVC 14.51 (Visual Studio 18) and with `/permissive-`.
 - Reported the exact WebView2 creation stage in errors without copying initialization payloads for each callback.
 - Delivered `setMemoryUsageTargetLevel` through the browser responsiveness gate, avoiding waits on an unresponsive browser process when responsiveness data is available.
 - Stopped capturing frames of paused WebViews and of WebViews whose host window is minimized; the last frame stays on screen until capture resumes.

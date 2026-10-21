@@ -138,7 +138,8 @@ void main() {
         await tester.sendEventToBinding(
           mouse.move(Offset(view.center.dx, view.bottom + 30.0 * i)),
         );
-        await tester.pump();
+        // One move per frame, as a real drag delivers them.
+        await tester.pump(const Duration(milliseconds: 16));
       }
 
       // Local coordinates below the view's own height: Chromium needs them to

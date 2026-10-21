@@ -5,8 +5,10 @@
 #include <vector>
 
 #include "in_app_webview/browser_process_gate.h"
+#include "custom_platform_view/frame_compare_gate.h"
 #include "one_shot_callback_test_cases.h"
 #include "in_app_webview/webview_visibility_state.h"
+#include "plugin_scripts_js/javascript_bridge_message.h"
 #include "types/base_callback_result.h"
 #include "types/lifetime_token.h"
 
@@ -206,6 +208,121 @@ TEST(BaseCallbackResult, DoesNotRunOwnerGoneCleanupWhileOwnerIsAlive) {
   callback->Success(flutter::EncodableValue(true));
 
   EXPECT_EQ(cleanupCount, 0);
+}
+
+// Mirrors CallJsHandlerCallback: Dart replies null for an unregistered
+// handler, and the codec delivers it as Success() without a value.
+TEST(BaseCallbackResult, NullReplyToPointerResultHasNoValue) {
+  BaseCallbackResult<const flutter::EncodableValue*> callback;
+  callback.decodeResult = [](const flutter::EncodableValue* value) {
+    return std::optional<const flutter::EncodableValue*>(value);
+  };
+  auto ran = false;
+  auto hadValue = true;
+  callback.defaultBehaviour =
+      [&](const std::optional<const flutter::EncodableValue*> response) {
+        ran = true;
+        hadValue = response.has_value();
+      };
+
+  callback.Success();
+
+  EXPECT_TRUE(ran);
+  EXPECT_FALSE(hadValue);
+}
+
+TEST(BaseCallbackResult, PointerReplyKeepsItsValue) {
+  BaseCallbackResult<const flutter::EncodableValue*> callback;
+  callback.decodeResult = [](const flutter::EncodableValue* value) {
+    return std::optional<const flutter::EncodableValue*>(value);
+  };
+  std::string seen;
+  callback.defaultBehaviour =
+      [&](const std::optional<const flutter::EncodableValue*> response) {
+        if (response.has_value()) {
+          seen = std::get<std::string>(*response.value());
+        }
+      };
+
+  callback.Success(flutter::EncodableValue(std::string("\"ok\"")));
+
+  EXPECT_EQ(seen, "\"ok\"");
+}
+
+TEST(JavaScriptBridgeMessage, SplitsHeaderFromUnparsedArguments) {
+  const auto call = JavaScriptBridgeMessage::parseCall(
+      std::string(R"(fiaw1:{"name":"callHandler","body":{"handlerName":"h"}})") +
+      "\n" + R"(["line\nbreak",{"k":1}])");
+  ASSERT_TRUE(call.has_value());
+  EXPECT_EQ(call->header["body"]["handlerName"], "h");
+  EXPECT_EQ(call->argsJson, R"(["line\nbreak",{"k":1}])");
+}
+
+TEST(JavaScriptBridgeMessage, IgnoresStringsThatAreNotCalls) {
+  EXPECT_FALSE(JavaScriptBridgeMessage::parseCall("hello").has_value());
+  EXPECT_FALSE(
+      JavaScriptBridgeMessage::parseCall(R"(fiaw1:{"a":1})").has_value());
+  EXPECT_FALSE(
+      JavaScriptBridgeMessage::parseCall("fiaw1:not json\n[]").has_value());
+}
+
+TEST(JavaScriptBridgeMessage, ResolutionEmbedsTheDartJson) {
+  EXPECT_EQ(JavaScriptBridgeMessage::resolution("flutter_inappwebview", 7,
+                                                R"({"a":[1,2]})"),
+            R"({"flutter_inappwebview":{"id":7,"v":{"a":[1,2]}}})");
+}
+
+TEST(JavaScriptBridgeMessage, ErrorsAreEscapedInBothPaths) {
+  const std::string message = "bad 'quote'\nand \\ slash";
+  const auto rejection = nlohmann::json::parse(
+      JavaScriptBridgeMessage::rejection("b", 3, message));
+  EXPECT_EQ(rejection["b"]["e"], message);
+  const auto script =
+      JavaScriptBridgeMessage::settleScript("b", 3, "null", message);
+  EXPECT_NE(script.find(R"(new Error("bad 'quote'\nand \\ slash"))"),
+            std::string::npos);
+}
+
+TEST(FrameCompareGate, KeepsComparingWhileIdenticalFramesArrive) {
+  FrameCompareGate gate(4, 10);
+  for (int i = 0; i < 50; ++i) {
+    ASSERT_TRUE(gate.shouldCompare());
+    gate.recordResult(i % 3 == 0);
+  }
+}
+
+TEST(FrameCompareGate, PausesAfterARunOfChangedFramesAndRetries) {
+  FrameCompareGate gate(4, 10);
+  for (int i = 0; i < 4; ++i) {
+    ASSERT_TRUE(gate.shouldCompare());
+    gate.recordResult(true);
+  }
+  for (int i = 0; i < 10; ++i) {
+    EXPECT_FALSE(gate.shouldCompare());
+  }
+  EXPECT_TRUE(gate.shouldCompare());
+}
+
+TEST(FrameCompareGate, AnIdenticalFrameRestartsTheRun) {
+  FrameCompareGate gate(4, 10);
+  for (int i = 0; i < 3; ++i) {
+    gate.shouldCompare();
+    gate.recordResult(true);
+  }
+  gate.shouldCompare();
+  gate.recordResult(false);
+  gate.shouldCompare();
+  gate.recordResult(true);
+  EXPECT_TRUE(gate.shouldCompare());
+}
+
+TEST(FrameCompareGate, ResetEndsAPause) {
+  FrameCompareGate gate(1, 10);
+  gate.shouldCompare();
+  gate.recordResult(true);
+  EXPECT_FALSE(gate.shouldCompare());
+  gate.reset();
+  EXPECT_TRUE(gate.shouldCompare());
 }
 
 TEST(WebViewVisibilityState, StartsVisible) {

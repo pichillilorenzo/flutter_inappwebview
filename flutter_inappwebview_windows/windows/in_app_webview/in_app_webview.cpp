@@ -276,14 +276,12 @@ namespace flutter_inappwebview_plugin
       }
     }
 
-    // required to make Runtime events work
-    failedLog(webView->CallDevToolsProtocolMethod(L"Runtime.enable", L"{}", Callback<ICoreWebView2CallDevToolsProtocolMethodCompletedHandler>(
-      [this](HRESULT errorCode, LPCWSTR returnObjectAsJson)
-      {
-        failedLog(errorCode);
-        return S_OK;
-      }
-    ).Get()));
+    // Each enabled domain costs every page: Runtime serializes every console
+    // call, Fetch pauses every navigation. Enable them only for their users.
+    hasConsoleMessageListener_ = params.hasConsoleMessageListener;
+    if (hasConsoleMessageListener_) {
+      ensureRuntimeDomain();
+    }
 
     // required to make Page events work and to add User Scripts
     failedLog(webView->CallDevToolsProtocolMethod(L"Page.enable", L"{}", Callback<ICoreWebView2CallDevToolsProtocolMethodCompletedHandler>(
@@ -294,23 +292,7 @@ namespace flutter_inappwebview_plugin
       }
     ).Get()));
 
-    // required to use Network domain
-    failedLog(webView->CallDevToolsProtocolMethod(L"Network.enable", L"{}", Callback<ICoreWebView2CallDevToolsProtocolMethodCompletedHandler>(
-      [this](HRESULT errorCode, LPCWSTR returnObjectAsJson)
-      {
-        failedLog(errorCode);
-        return S_OK;
-      }
-    ).Get()));
-
-    // required to use Fetch domain and implement the shouldOverrideUrlLoading event correctly
-    failedLog(webView->CallDevToolsProtocolMethod(L"Fetch.enable", L"{\"patterns\": [{\"resourceType\": \"Document\", \"requestStage\": \"Request\"}]}", Callback<ICoreWebView2CallDevToolsProtocolMethodCompletedHandler>(
-      [this](HRESULT errorCode, LPCWSTR returnObjectAsJson)
-      {
-        failedLog(errorCode);
-        return S_OK;
-      }
-    ).Get()));
+    setFetchDomainEnabled(settings->useShouldOverrideUrlLoading);
 
     failedLog(webView->CallDevToolsProtocolMethod(L"Page.getFrameTree", L"{}", Callback<ICoreWebView2CallDevToolsProtocolMethodCompletedHandler>(
       [this](HRESULT errorCode, LPCWSTR returnObjectAsJson)
@@ -527,6 +509,7 @@ namespace flutter_inappwebview_plugin
         [this](ICoreWebView2* sender, ICoreWebView2NavigationStartingEventArgs* args)
         {
           isLoading_ = true;
+          ++mainDocumentGeneration_;
 
           if (!channelDelegate) {
             args->put_Cancel(false);
@@ -758,50 +741,8 @@ namespace flutter_inappwebview_plugin
     ).Get(), nullptr);
     failedLog(add_WebMessageReceived_HResult);
 
-    wil::com_ptr<ICoreWebView2DevToolsProtocolEventReceiver> consoleMessageReceiver;
-    if (succeededOrLog(webView->GetDevToolsProtocolEventReceiver(L"Runtime.consoleAPICalled", &consoleMessageReceiver))) {
-      auto consoleMessageReceiver_add_DevToolsProtocolEventReceived_HResult = consoleMessageReceiver->add_DevToolsProtocolEventReceived(
-        Callback<ICoreWebView2DevToolsProtocolEventReceivedEventHandler>(
-          [this](
-            ICoreWebView2* sender,
-            ICoreWebView2DevToolsProtocolEventReceivedEventArgs* args) -> HRESULT
-          {
-
-            if (!channelDelegate) {
-              return S_OK;
-            }
-
-            wil::unique_cotaskmem_string json;
-            if (succeededOrLog(args->get_ParameterObjectAsJson(&json))) {
-              auto consoleMessageJson = nlohmann::json::parse(wide_to_utf8(json.get()));
-
-              auto level = consoleMessageJson.at("type").get<std::string>();
-              int64_t messageLevel = 1;
-              if (string_equals(level, "log")) {
-                messageLevel = 1;
-              }
-              else if (string_equals(level, "debug")) {
-                messageLevel = 0;
-              }
-              else if (string_equals(level, "error")) {
-                messageLevel = 3;
-              }
-              else if (string_equals(level, "info")) {
-                messageLevel = 1;
-              }
-              else if (string_equals(level, "warn")) {
-                messageLevel = 2;
-              }
-
-              auto consoleArgs = consoleMessageJson.at("args").get<std::vector<nlohmann::json>>();
-              auto message = join(functional_map(consoleArgs, [](const nlohmann::json& json) { return json.contains("value") ? json.at("value").dump() : (json.contains("description") ? json.at("description").dump() : json.dump()); }), std::string{ " " });
-              channelDelegate->onConsoleMessage(message, messageLevel);
-            }
-
-            return S_OK;
-          })
-        .Get(), nullptr);
-      failedLog(consoleMessageReceiver_add_DevToolsProtocolEventReceived_HResult);
+    if (hasConsoleMessageListener_) {
+      registerConsoleMessageReceiver();
     }
 
     auto add_NewWindowRequested_HResult = webView->add_NewWindowRequested(
@@ -1102,13 +1043,14 @@ namespace flutter_inappwebview_plugin
             if (args2 && succeededOrLog(args2->get_FrameInfosForFailedProcess(&frameInfoCollection)) && frameInfoCollection && succeededOrLog(frameInfoCollection->GetIterator(&frameIterator))) {
               frameInfos = std::vector<std::shared_ptr<FrameInfo>>{};
               BOOL hasCurrent = FALSE;
-              while (SUCCEEDED(frameIterator->MoveNext(&hasCurrent)) && hasCurrent) {
+              while (SUCCEEDED(frameIterator->get_HasCurrent(&hasCurrent)) && hasCurrent) {
                 wil::com_ptr<ICoreWebView2FrameInfo> frameInfo;
                 if (SUCCEEDED(frameIterator->GetCurrent(&frameInfo))) {
                   frameInfos.value().push_back(std::move(FrameInfo::fromICoreWebView2FrameInfo(frameInfo)));
                 }
-                BOOL hasNext = FALSE;
-                failedLog(frameIterator->MoveNext(&hasNext));
+                if (failedAndLog(frameIterator->MoveNext(&hasCurrent))) {
+                  break;
+                }
               }
             }
 
@@ -2395,6 +2337,7 @@ namespace flutter_inappwebview_plugin
       return;
     }
 
+    const auto pendingScript = trackPendingScript();
     userContentController->createContentWorld(contentWorld,
       [=](const int& contextId)
       {
@@ -2408,7 +2351,7 @@ namespace flutter_inappwebview_plugin
         }
 
         auto hr = webView->CallDevToolsProtocolMethod(L"Runtime.evaluate", utf8_to_wide(parameters.dump()).c_str(), Callback<ICoreWebView2CallDevToolsProtocolMethodCompletedHandler>(
-          [this, completionHandler](HRESULT errorCode, LPCWSTR returnObjectAsJson)
+          [this, completionHandler, pendingScript](HRESULT errorCode, LPCWSTR returnObjectAsJson)
           {
             nlohmann::json result;
             if (succeededOrLog(errorCode)) {
@@ -2448,6 +2391,7 @@ namespace flutter_inappwebview_plugin
       return;
     }
 
+    const auto pendingScript = trackPendingScript();
     userContentController->createContentWorld(contentWorld,
       [=](const int& contextId)
       {
@@ -2475,7 +2419,7 @@ namespace flutter_inappwebview_plugin
         }
 
         auto hr = webView->CallDevToolsProtocolMethod(L"Runtime.evaluate", utf8_to_wide(parameters.dump()).c_str(), Callback<ICoreWebView2CallDevToolsProtocolMethodCompletedHandler>(
-          [this, completionHandler](HRESULT errorCode, LPCWSTR returnObjectAsJson)
+          [this, completionHandler, pendingScript](HRESULT errorCode, LPCWSTR returnObjectAsJson)
           {
             nlohmann::json result = {
               {"value", nlohmann::json{}},
@@ -2508,6 +2452,13 @@ namespace flutter_inappwebview_plugin
           completionHandler("null");
         }
       });
+  }
+
+  std::shared_ptr<void> InAppWebView::trackPendingScript() const
+  {
+    ++*pendingScripts_;
+    // Released with the CDP callback, also when it never runs.
+    return std::shared_ptr<void>(nullptr, [pending = pendingScripts_](void*) { --*pending; });
   }
 
   void InAppWebView::addUserScript(const std::shared_ptr<UserScript> userScript) const
@@ -3183,7 +3134,118 @@ namespace flutter_inappwebview_plugin
       }
     }
 
+    if (settings->useShouldOverrideUrlLoading != newSettings->useShouldOverrideUrlLoading) {
+      setFetchDomainEnabled(newSettings->useShouldOverrideUrlLoading);
+    }
+
     settings = newSettings;
+  }
+
+  void InAppWebView::registerConsoleMessageReceiver()
+  {
+    wil::com_ptr<ICoreWebView2DevToolsProtocolEventReceiver> consoleMessageReceiver;
+    if (consoleReceiverRegistered_ || !webView) {
+      return;
+    }
+    consoleReceiverRegistered_ = true;
+    if (succeededOrLog(webView->GetDevToolsProtocolEventReceiver(L"Runtime.consoleAPICalled", &consoleMessageReceiver))) {
+      auto consoleMessageReceiver_add_DevToolsProtocolEventReceived_HResult = consoleMessageReceiver->add_DevToolsProtocolEventReceived(
+        Callback<ICoreWebView2DevToolsProtocolEventReceivedEventHandler>(
+          [this](
+            ICoreWebView2* sender,
+            ICoreWebView2DevToolsProtocolEventReceivedEventArgs* args) -> HRESULT
+          {
+
+            if (!channelDelegate || !hasConsoleMessageListener_) {
+              return S_OK;
+            }
+
+            wil::unique_cotaskmem_string json;
+            if (succeededOrLog(args->get_ParameterObjectAsJson(&json))) {
+              auto consoleMessageJson = nlohmann::json::parse(wide_to_utf8(json.get()));
+
+              auto level = consoleMessageJson.at("type").get<std::string>();
+              int64_t messageLevel = 1;
+              if (string_equals(level, "log")) {
+                messageLevel = 1;
+              }
+              else if (string_equals(level, "debug")) {
+                messageLevel = 0;
+              }
+              else if (string_equals(level, "error")) {
+                messageLevel = 3;
+              }
+              else if (string_equals(level, "info")) {
+                messageLevel = 1;
+              }
+              else if (string_equals(level, "warn")) {
+                messageLevel = 2;
+              }
+
+              auto consoleArgs = consoleMessageJson.at("args").get<std::vector<nlohmann::json>>();
+              auto message = join(functional_map(consoleArgs, [](const nlohmann::json& json) { return json.contains("value") ? json.at("value").dump() : (json.contains("description") ? json.at("description").dump() : json.dump()); }), std::string{ " " });
+              channelDelegate->onConsoleMessage(message, messageLevel);
+            }
+
+            return S_OK;
+          })
+        .Get(), nullptr);
+      failedLog(consoleMessageReceiver_add_DevToolsProtocolEventReceived_HResult);
+    }
+  }
+
+  void InAppWebView::setHasConsoleMessageListener(const bool hasListener)
+  {
+    hasConsoleMessageListener_ = hasListener;
+    if (hasListener) {
+      ensureRuntimeDomain();
+      registerConsoleMessageReceiver();
+    }
+  }
+
+  void InAppWebView::callDevToolsDomainMethod(const wchar_t* method, const wchar_t* parametersAsJson) const
+  {
+    if (!webView) {
+      return;
+    }
+    failedLog(webView->CallDevToolsProtocolMethod(method, parametersAsJson, Callback<ICoreWebView2CallDevToolsProtocolMethodCompletedHandler>(
+      [](HRESULT errorCode, LPCWSTR returnObjectAsJson)
+      {
+        failedLog(errorCode);
+        return S_OK;
+      }
+    ).Get()));
+  }
+
+  void InAppWebView::ensureRuntimeDomain() const
+  {
+    if (!runtimeDomainEnabled_) {
+      runtimeDomainEnabled_ = true;
+      callDevToolsDomainMethod(L"Runtime.enable", L"{}");
+    }
+  }
+
+  void InAppWebView::ensureNetworkDomain() const
+  {
+    // Network.enable makes the renderer keep copies of response bodies.
+    if (!networkDomainEnabled_) {
+      networkDomainEnabled_ = true;
+      callDevToolsDomainMethod(L"Network.enable", L"{}");
+    }
+  }
+
+  void InAppWebView::setFetchDomainEnabled(const bool enabled) const
+  {
+    // The app's own Fetch.enable carries its patterns; do not replace or end it.
+    if (appEnabledFetch_) {
+      return;
+    }
+    if (enabled) {
+      callDevToolsDomainMethod(L"Fetch.enable", L"{\"patterns\": [{\"resourceType\": \"Document\", \"requestStage\": \"Request\"}]}");
+    }
+    else {
+      callDevToolsDomainMethod(L"Fetch.disable", L"{}");
+    }
   }
 
   flutter::EncodableValue InAppWebView::getSettings() const
@@ -3213,6 +3275,25 @@ namespace flutter_inappwebview_plugin
       return;
     }
 
+    if (methodName == "Network.enable") {
+      networkDomainEnabled_ = true;
+    }
+    else if (methodName == "Network.disable") {
+      networkDomainEnabled_ = false;
+    }
+    else if (methodName.rfind("Network.", 0) == 0) {
+      ensureNetworkDomain();
+    }
+    else if (methodName == "Runtime.enable") {
+      runtimeDomainEnabled_ = true;
+    }
+    else if (methodName == "Fetch.enable") {
+      appEnabledFetch_ = true;
+    }
+    else if (methodName == "Fetch.disable") {
+      appEnabledFetch_ = false;
+    }
+
     auto hr = webView->CallDevToolsProtocolMethod(
       utf8_to_wide(methodName).c_str(),
       !parametersAsJson.has_value() || parametersAsJson.value().empty() ? L"{}" : utf8_to_wide(parametersAsJson.value()).c_str(),
@@ -3236,6 +3317,14 @@ namespace flutter_inappwebview_plugin
   {
     if (map_contains(devToolsProtocolEventListener_, eventName)) {
       return;
+    }
+
+    // A domain reports its events only once enabled.
+    if (eventName.rfind("Network.", 0) == 0) {
+      ensureNetworkDomain();
+    }
+    else if (eventName.rfind("Runtime.", 0) == 0) {
+      ensureRuntimeDomain();
     }
 
     wil::com_ptr<ICoreWebView2DevToolsProtocolEventReceiver> eventReceiver;
@@ -3402,7 +3491,8 @@ namespace flutter_inappwebview_plugin
   {
     if (webViewController &&
       (visibilityState_.needsApply() || pendingResume_ || pendingSuspend_ ||
-        pendingMemoryTarget_.has_value())) {
+        pendingMemoryTarget_.has_value() ||
+        (pendingParentMoved_ && visibilityState_.shouldBeVisible()))) {
       const auto browserPid = cachedBrowserProcessId();
       if (browserPid && !browserGate().tryAcquire(browserPid, this)) {
         return;
@@ -3430,6 +3520,11 @@ namespace flutter_inappwebview_plugin
         else {
           pendingSuspend_ = false;
         }
+      }
+      // A hidden WebView keeps the move until it is shown again.
+      if (pendingParentMoved_ && visibilityState_.shouldBeVisible()) {
+        pendingParentMoved_ = false;
+        failedLog(webViewController->NotifyParentWindowPositionChanged());
       }
       if (pendingSuspend_) {
         pendingSuspend_ = false;
@@ -3536,6 +3631,7 @@ namespace flutter_inappwebview_plugin
       {"origin", url.value()}
     };
 
+    ensureNetworkDomain();
     auto hr = webView->CallDevToolsProtocolMethod(L"Network.getCertificate", utf8_to_wide(parameters.dump()).c_str(), Callback<ICoreWebView2CallDevToolsProtocolMethodCompletedHandler>(
       [this, completionHandler](HRESULT errorCode, LPCWSTR returnObjectAsJson)
       {
@@ -4005,6 +4101,7 @@ namespace flutter_inappwebview_plugin
     scaleFactor_ = scale_factor;
     auto scaled_x = static_cast<int>(x * scale_factor);
     auto scaled_y = static_cast<int>(y * scale_factor);
+    const bool moved = widgetOffset_.x != scaled_x || widgetOffset_.y != scaled_y;
     widgetOffset_ = { scaled_x, scaled_y };
 
     HWND webViewHWnd;
@@ -4018,10 +4115,21 @@ namespace flutter_inappwebview_plugin
         0, 0,
         SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE);
     }
+    if (moved) {
+      notifyParentWindowMoved();
+    }
     if (hostWindow_ && !hostWindowPlaced_) {
       hostWindowPlaced_ = true;
       syncHostWindowVisibility();
     }
+  }
+
+  void InAppWebView::notifyParentWindowMoved()
+  {
+    // Popups such as <select> and the IME window are placed from a cached
+    // parent position; a moved ancestor must be reported explicitly.
+    pendingParentMoved_ = true;
+    applyPendingBrowserState();
   }
 
   void InAppWebView::setCursorPos(double x, double y)
@@ -4288,21 +4396,50 @@ namespace flutter_inappwebview_plugin
     return webErrorStatus >= COREWEBVIEW2_WEB_ERROR_STATUS_CERTIFICATE_COMMON_NAME_IS_INCORRECT && webErrorStatus <= COREWEBVIEW2_WEB_ERROR_STATUS_CERTIFICATE_IS_INVALID;
   }
 
+  void InAppWebView::settleJavaScriptHandler(const int64_t callHandlerID, const uint64_t documentGeneration, const std::string& resultJson, const std::optional<std::string>& error) const
+  {
+    const auto bridgeName = JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME();
+    // A web message goes to whatever top document is loaded now, and may pass a
+    // script still queued in CDP. A suspended page gets it only once resumed.
+    if (webView && visibilityState_.shouldBeVisible() &&
+      documentGeneration == mainDocumentGeneration_ && *pendingScripts_ == 0) {
+      const auto message = error.has_value()
+        ? JavaScriptBridgeMessage::rejection(bridgeName, callHandlerID, error.value())
+        : JavaScriptBridgeMessage::resolution(bridgeName, callHandlerID, resultJson);
+      if (SUCCEEDED(webView->PostWebMessageAsJson(utf8_to_wide(message).c_str()))) {
+        return;
+      }
+    }
+    evaluateJavascript(JavaScriptBridgeMessage::settleScript(bridgeName, callHandlerID, resultJson, error), ContentWorld::page(), nullptr);
+  }
+
   HRESULT InAppWebView::onCallJsHandler(const bool& isMainFrame, ICoreWebView2WebMessageReceivedEventArgs* args)
   {
     if (!channelDelegate) {
       return S_OK;
     }
 
-    wil::unique_cotaskmem_string json;
-    if (succeededOrLog(args->get_WebMessageAsJson(&json))) {
-      nlohmann::basic_json<> message;
-      try {
-        message = nlohmann::json::parse(wide_to_utf8(json.get()));
+    nlohmann::basic_json<> message;
+    // The bridge posts a string so that its arguments are parsed once, by Dart.
+    std::optional<std::string> rawArgs;
+    wil::unique_cotaskmem_string rawMessage;
+    if (SUCCEEDED(args->TryGetWebMessageAsString(&rawMessage)) && rawMessage) {
+      if (auto call = JavaScriptBridgeMessage::parseCall(wide_to_utf8(rawMessage.get()))) {
+        message = std::move(call->header);
+        rawArgs = std::move(call->argsJson);
       }
-      catch (nlohmann::json::parse_error& ex) {
-        debugLog("Error parsing JSON message of callHandler method: " + std::string(ex.what()));
-        return S_OK;
+    }
+
+    wil::unique_cotaskmem_string json;
+    if (rawArgs.has_value() || succeededOrLog(args->get_WebMessageAsJson(&json))) {
+      if (!rawArgs.has_value()) {
+        try {
+          message = nlohmann::json::parse(wide_to_utf8(json.get()));
+        }
+        catch (nlohmann::json::parse_error& ex) {
+          debugLog("Error parsing JSON message of callHandler method: " + std::string(ex.what()));
+          return S_OK;
+        }
       }
 
       if (message.is_object() && message.contains("name") && message.at("name").is_string() && message.contains("body") && message.at("body").is_object()) {
@@ -4320,7 +4457,8 @@ namespace flutter_inappwebview_plugin
           auto callHandlerID = body.contains("_callHandlerID") && body.at("_callHandlerID").is_number_integer() ? body.at("_callHandlerID").get<int64_t>() : 0;
           auto origin = body.contains("origin") && body.at("origin").is_string() ? body.at("origin").get<std::string>() : "";
           auto requestUrl = body.contains("requestUrl") && body.at("requestUrl").is_string() ? body.at("requestUrl").get<std::string>() : "";
-          auto handlerArgs = body.contains("args") && body.at("args").is_string() ? body.at("args").get<std::string>() : "";
+          auto handlerArgs = rawArgs.has_value() ? std::move(rawArgs.value())
+            : body.contains("args") && body.at("args").is_string() ? body.at("args").get<std::string>() : "";
 
           wil::unique_cotaskmem_string sourceUrl;
           if (succeededOrLog(args->get_Source(&sourceUrl))) {
@@ -4333,12 +4471,10 @@ namespace flutter_inappwebview_plugin
             return S_OK;
           }
 
-          auto resolveInternalHandler = [this, callHandlerID]()
+          const auto documentGeneration = mainDocumentGeneration_;
+          auto resolveInternalHandler = [this, callHandlerID, documentGeneration]()
             {
-              evaluateJavascript("if (window." + JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + "[" + std::to_string(callHandlerID) + "] != null) { \
-                      window." + JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + "[" + std::to_string(callHandlerID) + "].resolve(null); \
-                      delete window." + JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + "[" + std::to_string(callHandlerID) + "]; \
-                    }", ContentWorld::page(), nullptr);
+              settleJavaScriptHandler(callHandlerID, documentGeneration, "null", std::nullopt);
             };
 
           if (handlerName == "onWebMessagePortMessageReceived") {
@@ -4499,27 +4635,16 @@ namespace flutter_inappwebview_plugin
 
           auto callback = std::make_unique<WebViewChannelDelegate::CallJsHandlerCallback>();
           callback->owner = aliveToken();
-          callback->defaultBehaviour = [this, callHandlerID](const std::optional<const flutter::EncodableValue*> response)
+          callback->defaultBehaviour = [this, callHandlerID, documentGeneration](const std::optional<const flutter::EncodableValue*> response)
             {
-              std::string json = "null";
-              if (response.has_value() && !response.value()->IsNull()) {
-                json = std::get<std::string>(*(response.value()));
-              }
-
-              evaluateJavascript("if (window." + JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + "[" + std::to_string(callHandlerID) + "] != null) { \
-                      window." + JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + "[" + std::to_string(callHandlerID) + "].resolve(" + json + "); \
-                      delete window." + JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + "[" + std::to_string(callHandlerID) + "]; \
-                    }", ContentWorld::page(), nullptr);
+              const std::string* json = response.has_value() ? std::get_if<std::string>(response.value()) : nullptr;
+              settleJavaScriptHandler(callHandlerID, documentGeneration, json ? *json : "null", std::nullopt);
             };
-          callback->error = [this, callHandlerID](const std::string& error_code, const std::string& error_message, const flutter::EncodableValue* error_details)
+          callback->error = [this, callHandlerID, documentGeneration](const std::string& error_code, const std::string& error_message, const flutter::EncodableValue* error_details)
             {
               auto errorMessage = error_code + ", " + error_message;
               debugLog(errorMessage);
-
-              evaluateJavascript("if (window." + JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + "[" + std::to_string(callHandlerID) + "] != null) { \
-                      window." + JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + "[" + std::to_string(callHandlerID) + "].reject(new Error('" + replace_all_copy(errorMessage, "\'", "\\'") + "')); \
-                      delete window." + JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + "[" + std::to_string(callHandlerID) + "]; \
-                    }", ContentWorld::page(), nullptr);
+              settleJavaScriptHandler(callHandlerID, documentGeneration, "null", errorMessage);
             };
 
           auto data = std::make_unique<JavaScriptHandlerFunctionData>(origin, requestUrl, isMainFrame, handlerArgs);

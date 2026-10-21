@@ -133,6 +133,9 @@ class WindowsInAppWebViewWidgetCreationParams
     super.onSaveAsUIShowing,
     super.onSaveFileSecurityCheckStarting,
     super.onScreenCaptureStarting,
+    super.onAcceleratorKeyPressed,
+    super.onProcessFailed,
+    super.onShowFileChooser,
     super.initialUrlRequest,
     super.initialFile,
     super.initialData,
@@ -259,6 +262,9 @@ class WindowsInAppWebViewWidgetCreationParams
         onSaveAsUIShowing: params.onSaveAsUIShowing,
         onSaveFileSecurityCheckStarting: params.onSaveFileSecurityCheckStarting,
         onScreenCaptureStarting: params.onScreenCaptureStarting,
+        onAcceleratorKeyPressed: params.onAcceleratorKeyPressed,
+        onProcessFailed: params.onProcessFailed,
+        onShowFileChooser: params.onShowFileChooser,
         initialUrlRequest: params.initialUrlRequest,
         initialFile: params.initialFile,
         initialData: params.initialData,
@@ -341,6 +347,7 @@ class WindowsInAppWebViewWidget extends PlatformInAppWebViewWidget {
         'headlessWebViewId': params.headlessWebView?.isRunning() ?? false
             ? params.headlessWebView?.id
             : null,
+        'hasConsoleMessageListener': params.onConsoleMessage != null,
         'initialUserScripts':
             params.initialUserScripts?.map((e) => e.toMap()).toList() ?? [],
         'keepAliveId': params.keepAlive?.id,

@@ -56,6 +56,8 @@ namespace flutter_inappwebview_plugin
       const flutter::MethodCall<flutter::EncodableValue>& method_call,
       std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result);
 
+    // The top-level window moved; webviews must update popup placement.
+    void notifyWindowMoved(HWND topLevelHwnd) const;
     void createInAppWebView(const flutter::EncodableMap* arguments, std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result);
     void disposeKeepAlive(const std::string& keepAliveId);
     void setWindowMinimized(bool minimized);

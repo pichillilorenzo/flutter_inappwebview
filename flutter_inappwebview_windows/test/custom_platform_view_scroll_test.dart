@@ -510,4 +510,43 @@ void main() {
       ]);
     });
   });
+
+  group('cursor moves', () {
+    testWidgets('moves inside one interval collapse into the last one', (
+      tester,
+    ) async {
+      final center = await pumpView(tester);
+      final mouse = TestPointer(1, PointerDeviceKind.mouse);
+      await tester.sendEventToBinding(mouse.hover(center));
+      for (var i = 1; i <= 5; i++) {
+        await tester.sendEventToBinding(
+          mouse.hover(center + Offset(i * 1.0, 0)),
+        );
+      }
+      expect(cursorPosCalls(), hasLength(1));
+
+      await tester.pump(const Duration(milliseconds: 16));
+
+      final calls = cursorPosCalls();
+      expect(calls, hasLength(2));
+      expect(calls.last.first, calls.first.first + 5);
+    });
+
+    testWidgets('a pending move is sent before the button goes down', (
+      tester,
+    ) async {
+      final center = await pumpView(tester);
+      final mouse = TestPointer(1, PointerDeviceKind.mouse);
+      await tester.sendEventToBinding(mouse.hover(center));
+      await tester.sendEventToBinding(mouse.hover(center + const Offset(7, 0)));
+      viewChannelCalls.clear();
+
+      await tester.sendEventToBinding(mouse.down(center + const Offset(7, 0)));
+
+      final methods = viewChannelCalls.map((call) => call.method).toList();
+      expect(methods.take(2), ['setCursorPos', 'setPointerButton']);
+      await tester.sendEventToBinding(mouse.up());
+      await tester.pump(const Duration(milliseconds: 16));
+    });
+  });
 }

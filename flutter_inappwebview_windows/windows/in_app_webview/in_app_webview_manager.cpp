@@ -158,6 +158,7 @@ namespace flutter_inappwebview_plugin
     auto initialFile = get_optional_fl_map_value<std::string>(*arguments, "initialFile");
     auto initialDataMap = get_optional_fl_map_value<flutter::EncodableMap>(*arguments, "initialData");
     auto initialUserScriptList = get_optional_fl_map_value<flutter::EncodableList>(*arguments, "initialUserScripts");
+    auto hasConsoleMessageListener = get_optional_fl_map_value<bool>(*arguments, "hasConsoleMessageListener").value_or(true);
     auto webViewEnvironmentId = get_optional_fl_map_value<std::string>(*arguments, "webViewEnvironmentId");
     auto keepAliveId = get_optional_fl_map_value<std::string>(*arguments, "keepAliveId");
     auto windowId = get_optional_fl_map_value<int64_t>(*arguments, "windowId");
@@ -167,6 +168,9 @@ namespace flutter_inappwebview_plugin
     if (keepAliveId.has_value() && map_contains(keepAliveWebViews, keepAliveId.value())) {
       auto webView = std::move(keepAliveWebViews.at(keepAliveId.value())->view);
       keepAliveWebViews.erase(keepAliveId.value());
+      if (webView) {
+        webView->setHasConsoleMessageListener(hasConsoleMessageListener);
+      }
       auto customPlatformView = std::make_unique<CustomPlatformView>(plugin->registrar->messenger(),
         plugin->registrar->texture_registrar(),
         graphics_context(),
@@ -180,13 +184,13 @@ namespace flutter_inappwebview_plugin
     }
 
     auto initialSettings = std::make_shared<InAppWebViewSettings>(settingsMap);
-    const auto creationParams = [initialSettings, initialUserScriptList]()
+    const auto creationParams = [initialSettings, initialUserScriptList, hasConsoleMessageListener]()
       {
         std::optional<std::vector<std::shared_ptr<UserScript>>> initialUserScripts = initialUserScriptList.has_value() ?
           functional_map(initialUserScriptList.value(), [](const flutter::EncodableValue& map) { return std::make_shared<UserScript>(std::get<flutter::EncodableMap>(map)); }) :
           std::optional<std::vector<std::shared_ptr<UserScript>>>{};
 
-        return InAppWebViewCreationParams{ "", initialSettings, initialUserScripts };
+        return InAppWebViewCreationParams{ "", initialSettings, initialUserScripts, hasConsoleMessageListener };
       };
     // Looked up per attempt: the environment may be disposed between them.
     const auto environment = [this, webViewEnvironmentId]() -> WebViewEnvironment*
@@ -369,6 +373,20 @@ namespace flutter_inappwebview_plugin
     }
     for (const auto& [keepAliveId, platformView] : keepAliveWebViews) {
       applyWindowState(platformView);
+    }
+  }
+
+  void InAppWebViewManager::notifyWindowMoved(const HWND) const
+  {
+    for (const auto& [id, platformView] : webViews) {
+      if (platformView && platformView->view) {
+        platformView->view->notifyParentWindowMoved();
+      }
+    }
+    for (const auto& [keepAliveId, platformView] : keepAliveWebViews) {
+      if (platformView && platformView->view) {
+        platformView->view->notifyParentWindowMoved();
+      }
     }
   }
 

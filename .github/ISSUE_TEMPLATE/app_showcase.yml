@@ -20,11 +20,11 @@ body:
       required: true
   - type: textarea
     attributes:
-      label: What is the reason of using flutter_inappwebview in your app?
+      label: What is the reason of using drago_inappwebview in your app?
       description: |
-        Explain why you are using the flutter_inappwebview plugin in your app.
+        Explain why you are using the drago_inappwebview plugin in your app.
       placeholder: |
-        I'm using the flutter_inappwebview plugin in my app to create a custom Browser, to use WebRTC feature, to display local HTML content, etc.
+        I'm using the drago_inappwebview plugin in my app to create a custom Browser, to use WebRTC feature, to display local HTML content, etc.
     validations:
       required: true
   - type: checkboxes

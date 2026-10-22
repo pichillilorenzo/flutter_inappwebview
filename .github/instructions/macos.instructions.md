@@ -1,5 +1,5 @@
 ---
-applyTo: "flutter_inappwebview_macos/**"
+applyTo: "drago_inappwebview/**"
 ---
 
 # macOS Platform Implementation Instructions
@@ -273,7 +273,7 @@ JavaScript files injected into WebViews for native-web communication:
 
 | Script | File | Description |
 |--------|------|-------------|
-| **JavaScriptBridgeJS** | `JavaScriptBridgeJS.swift` | Core bridge enabling `window.flutter_inappwebview.callHandler()` for Dart-JS communication. |
+| **JavaScriptBridgeJS** | `JavaScriptBridgeJS.swift` | Core bridge enabling `window.drago_inappwebview.callHandler()` for Dart-JS communication. |
 | **ConsoleLogJS** | `ConsoleLogJS.swift` | Intercepts `console.log/debug/error/info/warn` and forwards to `onConsoleMessage`. |
 | **InterceptAjaxRequestJS** | `InterceptAjaxRequestJS.swift` | Wraps `XMLHttpRequest` to intercept AJAX requests. |
 | **InterceptFetchRequestJS** | `InterceptFetchRequestJS.swift` | Wraps `window.fetch()` to intercept Fetch API requests. |
@@ -282,7 +282,7 @@ JavaScript files injected into WebViews for native-web communication:
 | **PrintJS** | `PrintJS.swift` | Overrides `window.print()` to trigger `onPrintRequest` callback. |
 | **PromisePolyfillJS** | `PromisePolyfillJS.swift` | Polyfill for `Promise` API on older WebKit versions. |
 | **FindTextHighlightJS** | `FindTextHighlightJS.swift` | JavaScript-based text search and highlighting. |
-| **WebMessageListenerJS** | `WebMessageListenerJS.swift` | Implements `FlutterInAppWebViewWebMessageListener` for `postMessage` API. |
+| **WebMessageListenerJS** | `WebMessageListenerJS.swift` | Implements `DragoInAppWebViewWebMessageListener` for `postMessage` API. |
 | **WebMessageChannelJS** | `WebMessageChannelJS.swift` | Variable definitions for `WebMessageChannel` ports. |
 | **EnableViewportScaleJS** | `EnableViewportScaleJS.swift` | Adds viewport meta tag for viewport scaling. |
 | **SupportZoomJS** | `SupportZoomJS.swift` | Modifies viewport meta tag for zoom control. |
@@ -300,7 +300,7 @@ JavaScript files injected into WebViews for native-web communication:
 ## Dart-Side Development
 
 For Dart-only changes:
-1. Implement platform interface from `flutter_inappwebview_platform_interface`
+1. Implement platform interface from `drago_inappwebview_platform_interface`
 2. Extend `Platform*CreationParams` for macOS-specific parameters
 3. Register in `MacOSInAppWebViewPlatform.registerWith()`
 4. Note: macOS lacks `ChromeSafariBrowser` and `WebAuthenticationSession`
@@ -316,7 +316,7 @@ When modifying Swift code:
 ## Build Commands
 
 ```bash
-cd flutter_inappwebview_macos && flutter pub get
+cd drago_inappwebview && flutter pub get
 cd example && flutter build macos --debug
 ```
 

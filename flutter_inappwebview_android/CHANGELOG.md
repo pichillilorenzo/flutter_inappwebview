@@ -1,3 +1,7 @@
+## Unreleased
+
+- Fixed app being killed ("Render process's crash wasn't handled by all associated webviews") when the WebView renderer goes away while an `InAppWebView` is being disposed [#2945](https://github.com/pichillilorenzo/flutter_inappwebview/issues/2945)
+
 ## 1.2.0-beta.3
 
 - Updated flutter_inappwebview_platform_interface version to ^1.4.0-beta.3

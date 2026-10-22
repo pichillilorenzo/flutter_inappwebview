@@ -2359,6 +2359,21 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         return identityAndTrust
     }
     
+    func presentDialog(_ dialog: UIAlertController, orElse fallback: () -> Void) {
+        var top: UIViewController? = inAppBrowserDelegate != nil ? inAppBrowserDelegate as? InAppBrowserWebViewController : window?.rootViewController
+        while let presented = top?.presentedViewController {
+            top = presented
+        }
+        guard let top = top, !top.isBeingDismissed else {
+            fallback()
+            return
+        }
+        top.present(dialog, animated: true, completion: nil)
+        if dialog.presentingViewController == nil {
+            fallback()
+        }
+    }
+    
     func createAlertDialog(message: String?, responseMessage: String?, confirmButtonTitle: String?, completionHandler: @escaping () -> Void) {
         let title = responseMessage != nil && !responseMessage!.isEmpty ? responseMessage : message
         let okButton = confirmButtonTitle != nil && !confirmButtonTitle!.isEmpty ? confirmButtonTitle : NSLocalizedString("Ok", comment: "")
@@ -2369,17 +2384,14 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
             _ in completionHandler()}
         )
         
-        guard let presentingViewController = inAppBrowserDelegate != nil ? inAppBrowserDelegate as? InAppBrowserWebViewController : window?.rootViewController else {
-            completionHandler()
-            return
-        }
-        presentingViewController.present(alertController, animated: true, completion: {})
+        presentDialog(alertController, orElse: completionHandler)
     }
     
     public func webView(_ webView: WKWebView, runJavaScriptAlertPanelWithMessage message: String,
                  initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping () -> Void) {
         
         if (isPausedTimers) {
+            isPausedTimersCompletionHandler?()
             isPausedTimersCompletionHandler = completionHandler
             return
         }
@@ -2407,7 +2419,11 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                 completionHandlerCalled = true
                 let responseMessage = response?.message
                 let confirmButtonTitle = response?.confirmButtonTitle
-                self?.createAlertDialog(message: message, responseMessage: responseMessage,
+                guard let self = self else {
+                    completionHandler()
+                    return
+                }
+                self.createAlertDialog(message: message, responseMessage: responseMessage,
                                        confirmButtonTitle: confirmButtonTitle, completionHandler: completionHandler)
             }
         }
@@ -2441,11 +2457,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
             completionHandler(false)
         }))
         
-        guard let presentingViewController = inAppBrowserDelegate != nil ? inAppBrowserDelegate as? InAppBrowserWebViewController : window?.rootViewController else {
-            completionHandler(false)
-            return
-        }
-        presentingViewController.present(confirmController, animated: true, completion: nil)
+        presentDialog(confirmController, orElse: { completionHandler(false) })
     }
     
     public func webView(_ webView: WKWebView, runJavaScriptConfirmPanelWithMessage message: String, initiatedByFrame frame: WKFrameInfo,
@@ -2477,7 +2489,11 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                 let responseMessage = response?.message
                 let confirmButtonTitle = response?.confirmButtonTitle
                 let cancelButtonTitle = response?.cancelButtonTitle
-                self?.createConfirmDialog(message: message, responseMessage: responseMessage, confirmButtonTitle: confirmButtonTitle, cancelButtonTitle: cancelButtonTitle, completionHandler: completionHandler)
+                guard let self = self else {
+                    completionHandler(false)
+                    return
+                }
+                self.createConfirmDialog(message: message, responseMessage: responseMessage, confirmButtonTitle: confirmButtonTitle, cancelButtonTitle: cancelButtonTitle, completionHandler: completionHandler)
             }
         }
         callback.error = { (code: String, message: String?, details: Any?) in
@@ -2521,11 +2537,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
             completionHandler(nil)
         }))
         
-        guard let presentingViewController = inAppBrowserDelegate != nil ? inAppBrowserDelegate as? InAppBrowserWebViewController : window?.rootViewController else {
-            completionHandler(nil)
-            return
-        }
-        presentingViewController.present(promptController, animated: true, completion: nil)
+        presentDialog(promptController, orElse: { completionHandler(nil) })
     }
     
     public func webView(_ webView: WKWebView, runJavaScriptTextInputPanelWithPrompt message: String, defaultText defaultValue: String?, initiatedByFrame frame: WKFrameInfo,
@@ -2559,7 +2571,11 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                 let confirmButtonTitle = response?.confirmButtonTitle
                 let cancelButtonTitle = response?.cancelButtonTitle
                 let value = response?.value
-                self?.createPromptDialog(message: message, defaultValue: defaultValue, responseMessage: responseMessage, confirmButtonTitle: confirmButtonTitle,
+                guard let self = self else {
+                    completionHandler(nil)
+                    return
+                }
+                self.createPromptDialog(message: message, defaultValue: defaultValue, responseMessage: responseMessage, confirmButtonTitle: confirmButtonTitle,
                                         cancelButtonTitle: cancelButtonTitle, value: value, completionHandler: completionHandler)
             }
         }

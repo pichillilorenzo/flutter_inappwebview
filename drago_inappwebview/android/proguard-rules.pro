@@ -14,7 +14,10 @@
      public *;
      private *;
 }
--keep class com.pichillilorenzo.drago_inappwebview.** { *; }
+# Class names only: the plugin reflects on framework classes, not its own, and
+# a full { *; } keep here blocked R8 optimisation of the whole package (Play
+# flags a low optimisation rate). The JS bridge is kept above.
+-keepnames class com.pichillilorenzo.drago_inappwebview.**
 
 -dontwarn android.window.BackEvent
 # Note: AGP 9.1.0 changed R8's default to repackage classes into the unnamed

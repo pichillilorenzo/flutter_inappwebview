@@ -19,6 +19,7 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.SearchView;
 
+import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
@@ -27,7 +28,6 @@ import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.pichillilorenzo.drago_inappwebview.R;
@@ -113,14 +113,13 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
 
     windowId = b.getInt("windowId");
 
+    // EdgeToEdge replaces setDecorFitsSystemWindows + setStatusBarColor, which
+    // Android 15 deprecates; the toolbar pads itself for the status bar below.
+    EdgeToEdge.enable(this);
     setContentView(R.layout.activity_web_view);
 
-    WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
     toolbar = findViewById(R.id.toolbar);
     setSupportActionBar(toolbar);
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-      getWindow().setStatusBarColor(Color.TRANSPARENT);
-    }
 
     ViewCompat.setOnApplyWindowInsetsListener(toolbar, (v, insets) -> {
       Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.statusBars());

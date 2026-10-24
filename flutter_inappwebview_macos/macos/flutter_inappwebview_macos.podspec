@@ -22,7 +22,7 @@ A new Flutter plugin project.
   # s.dependency 'swift-collections', '~>1.1.1'
   s.dependency 'OrderedSet', '~>6.0.3'
 
-  s.platform = :osx, '10.14'
+  s.platform = :osx, '10.15'
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES' }
   s.xcconfig = {
     'LIBRARY_SEARCH_PATHS' => '$(TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME)/ $(SDKROOT)/usr/lib/swift',

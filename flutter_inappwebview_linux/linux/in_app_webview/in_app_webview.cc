@@ -650,6 +650,59 @@ void InAppWebView::InitWpeBackend() {
 #endif
 }
 
+// WPE WebKit defaults to WEBKIT_COOKIE_POLICY_ACCEPT_NO_THIRD_PARTY, unlike the
+// chromium based ports, which breaks sign-in flows relying on cross site cookies.
+static void ApplyCookieAcceptPolicy(WebKitNetworkSession* session, bool allowThirdParty) {
+  WebKitCookieManager* cookieManager = webkit_network_session_get_cookie_manager(session);
+  if (cookieManager == nullptr) {
+    return;
+  }
+  webkit_cookie_manager_set_accept_policy(cookieManager,
+                                          allowThirdParty
+                                              ? WEBKIT_COOKIE_POLICY_ACCEPT_ALWAYS
+                                              : WEBKIT_COOKIE_POLICY_ACCEPT_NO_THIRD_PARTY);
+}
+
+// WPE WebKit keeps cookies in memory unless a storage file is given, so a login
+// would be gone on the next launch and nothing on disk holds the session.
+// The chromium based ports persist by default, so match them.
+void EnsurePersistentCookieStorage(WebKitNetworkSession* session) {
+  static bool applied = false;
+  if (applied || session == nullptr || webkit_network_session_is_ephemeral(session)) {
+    return;
+  }
+
+  WebKitCookieManager* cookieManager = webkit_network_session_get_cookie_manager(session);
+  if (cookieManager == nullptr) {
+    return;
+  }
+
+  gchar* directory = nullptr;
+  WebKitWebsiteDataManager* dataManager = webkit_network_session_get_website_data_manager(session);
+  if (dataManager != nullptr) {
+    const gchar* baseDirectory = webkit_website_data_manager_get_base_data_directory(dataManager);
+    if (baseDirectory != nullptr && baseDirectory[0] != '\0') {
+      directory = g_strdup(baseDirectory);
+    }
+  }
+  if (directory == nullptr) {
+    const gchar* programName = g_get_prgname();
+    directory = g_build_filename(g_get_user_data_dir(),
+                                 programName != nullptr ? programName : "flutter_inappwebview", nullptr);
+  }
+
+  if (g_mkdir_with_parents(directory, 0700) == 0) {
+    gchar* path = g_build_filename(directory, "cookies.sqlite", nullptr);
+    webkit_cookie_manager_set_persistent_storage(cookieManager, path,
+                                                 WEBKIT_COOKIE_PERSISTENT_STORAGE_SQLITE);
+    debugLog("InAppWebView: persisting cookies to " + std::string(path));
+    applied = true;
+    g_free(path);
+  }
+
+  g_free(directory);
+}
+
 void InAppWebView::InitWebView(const InAppWebViewCreationParams& params) {
 #ifdef HAVE_WPE_PLATFORM
   // === WPEPlatform API ===
@@ -792,11 +845,15 @@ void InAppWebView::InitWebView(const InAppWebViewCreationParams& params) {
     wpe_toplevel_resize(wpe_toplevel_, width_, height_);
   }
   
-  // Apply ITP setting if configured
+  // Apply session level settings if configured
   if (params.initialSettings != nullptr) {
     WebKitNetworkSession* session = webkit_web_view_get_network_session(webview_);
-    if (session != nullptr && params.initialSettings->itpEnabled) {
-      webkit_network_session_set_itp_enabled(session, TRUE);
+    if (session != nullptr) {
+      if (params.initialSettings->itpEnabled) {
+        webkit_network_session_set_itp_enabled(session, TRUE);
+      }
+      EnsurePersistentCookieStorage(session);
+      ApplyCookieAcceptPolicy(session, params.initialSettings->thirdPartyCookiesEnabled);
     }
   }
   
@@ -874,9 +931,13 @@ void InAppWebView::InitWebView(const InAppWebViewCreationParams& params) {
 
     if (params.initialSettings != nullptr) {
       WebKitNetworkSession* session = webkit_web_view_get_network_session(webview_);
-      if (session != nullptr && params.initialSettings->itpEnabled) {
-        webkit_network_session_set_itp_enabled(session, TRUE);
-        debugLog("InAppWebView: ITP enabled");
+      if (session != nullptr) {
+        if (params.initialSettings->itpEnabled) {
+          webkit_network_session_set_itp_enabled(session, TRUE);
+          debugLog("InAppWebView: ITP enabled");
+        }
+        EnsurePersistentCookieStorage(session);
+      ApplyCookieAcceptPolicy(session, params.initialSettings->thirdPartyCookiesEnabled);
       }
     }
 
@@ -3917,11 +3978,33 @@ gboolean InAppWebView::OnDecidePolicy(WebKitWebView* web_view, WebKitPolicyDecis
         is_for_main_frame = false;
       }
 
+      // Note: the `Cookie` header is added by libsoup after this point, it is
+      // never part of the navigation action's request.
+      std::optional<std::map<std::string, std::string>> headers_map = std::nullopt;
+      SoupMessageHeaders* request_headers = webkit_uri_request_get_http_headers(request);
+      if (request_headers != nullptr) {
+        std::map<std::string, std::string> hdrs;
+        SoupMessageHeadersIter iter;
+        const char* name;
+        const char* value;
+        soup_message_headers_iter_init(&iter, request_headers);
+        while (soup_message_headers_iter_next(&iter, &name, &value)) {
+          if (name != nullptr && value != nullptr) {
+            hdrs[name] = value;
+          }
+        }
+        if (!hdrs.empty()) {
+          headers_map = hdrs;
+        }
+      }
+
+      const gchar* http_method = webkit_uri_request_get_http_method(request);
+
       // Create URLRequest
       auto urlRequest = std::make_shared<URLRequest>(
           uri != nullptr ? std::optional<std::string>(uri) : std::nullopt,
-          std::optional<std::string>("GET"),
-          std::nullopt,  // headers
+          std::optional<std::string>(http_method != nullptr ? http_method : "GET"),
+          headers_map,
           std::nullopt   // body
       );
 

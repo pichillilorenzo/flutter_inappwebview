@@ -46,6 +46,7 @@ import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.CookieManager;
 import android.webkit.DownloadListener;
+import android.webkit.RenderProcessGoneDetail;
 import android.webkit.URLUtil;
 import android.webkit.ValueCallback;
 import android.webkit.WebBackForwardList;
@@ -2190,6 +2191,17 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     setWebViewClient(new WebViewClient() {
       public void onPageFinished(WebView view, String url) {
         destroy();
+      }
+
+      @RequiresApi(api = Build.VERSION_CODES.O)
+      @Override
+      public boolean onRenderProcessGone(WebView view, RenderProcessGoneDetail detail) {
+        // The renderer went away before about:blank finished loading, so onPageFinished
+        // (and therefore destroy()) may never run. This WebView is still alive, so Chromium
+        // asks it whether it handled the crash: returning false (the default) makes the
+        // WebView kill the whole app. It is being disposed anyway, so destroy it now.
+        destroy();
+        return true;
       }
     });
     interceptOnlyAsyncAjaxRequestsPluginScript = null;

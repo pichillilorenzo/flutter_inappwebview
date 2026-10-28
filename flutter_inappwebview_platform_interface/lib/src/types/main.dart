@@ -65,7 +65,8 @@ export 'javascript_handler_callback.dart'
     show
         JavaScriptHandlerCallback,
         JavaScriptHandlerFunction,
-        JavaScriptHandlerFunctionData;
+        JavaScriptHandlerFunctionData,
+        JavaScriptHandlerJsonResult;
 export 'js_alert_request.dart' show JsAlertRequest;
 export 'js_alert_response.dart' show JsAlertResponse;
 export 'js_alert_response_action.dart' show JsAlertResponseAction;

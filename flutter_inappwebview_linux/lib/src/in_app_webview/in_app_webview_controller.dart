@@ -1182,7 +1182,7 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
             } else {
               jsHandlerResult = await _javaScriptHandlersMap[handlerName]!();
             }
-            return jsonEncode(jsHandlerResult);
+            return JavaScriptHandlerJsonResult.encode(jsHandlerResult);
           } catch (error, stacktrace) {
             developer.log(
               error.toString() + '\n' + stacktrace.toString(),

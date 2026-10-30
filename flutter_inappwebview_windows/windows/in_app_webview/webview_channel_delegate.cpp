@@ -34,8 +34,17 @@ namespace flutter_inappwebview_plugin
 
   WebViewChannelDelegate::CallJsHandlerCallback::CallJsHandlerCallback()
   {
-    decodeResult = [](const flutter::EncodableValue* value)
+    decodeResult = [](const flutter::EncodableValue* value) -> std::optional<const flutter::EncodableValue*>
       {
+        // A Dart handler that returns null produces Success() with no
+        // payload, which reaches this decoder as a null pointer. Returning
+        // it as-is would wrap nullptr inside an *engaged* optional, and
+        // downstream consumers dereference the optional's value — a
+        // guaranteed access violation for every JS handler returning null
+        // (e.g. fire-and-forget bridge handlers).
+        if (!value) {
+          return std::nullopt;
+        }
         return value;
       };
   }

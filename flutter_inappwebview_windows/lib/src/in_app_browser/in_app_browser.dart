@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:collection';
+import 'dart:ui' show PlatformDispatcher;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -190,6 +191,17 @@ class WindowsInAppBrowser extends PlatformInAppBrowser with ChannelController {
     args.putIfAbsent(
       'webViewEnvironmentId',
       () => _windowsParams.webViewEnvironment?.id,
+    );
+    // Multi-window aware. InAppBrowser opens as a top-level window so any
+    // implicit view's HWND works as a screen-space anchor; the C++ side
+    // falls back to nullptr (top-level window) if neither resolves.
+    args.putIfAbsent(
+      'flutterViewId',
+      () => PlatformDispatcher.instance.implicitView?.viewId,
+    );
+    args.putIfAbsent(
+      'flutterEngineId',
+      () => PlatformDispatcher.instance.engineId,
     );
     return args;
   }

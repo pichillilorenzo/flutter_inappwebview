@@ -94,11 +94,7 @@ public class InAppBrowserManager: ChannelDelegate {
     }
     
     public func presentViewController(webViewController: InAppBrowserWebViewController) {
-        #if SWIFT_PACKAGE
-            let storyboard = UIStoryboard(name: InAppBrowserManager.WEBVIEW_STORYBOARD, bundle: Bundle.module)
-        #else
-            let storyboard = UIStoryboard(name: InAppBrowserManager.WEBVIEW_STORYBOARD, bundle: Bundle(for: InAppWebViewFlutterPlugin.self))
-        #endif
+        let storyboard = UIStoryboard(name: InAppBrowserManager.WEBVIEW_STORYBOARD, bundle: Bundle.module)
         let navController = storyboard.instantiateViewController(withIdentifier: InAppBrowserManager.NAV_STORYBOARD_CONTROLLER_ID) as! InAppBrowserNavigationController
         webViewController.edgesForExtendedLayout = []
         navController.pushViewController(webViewController, animated: false)

@@ -281,9 +281,11 @@ public class InAppWebView: WKWebView, WKUIDelegate,
                 configuration.websiteDataStore = WKWebsiteDataStore.default()
             }
             if !settings.applicationNameForUserAgent.isEmpty {
-                if let applicationNameForUserAgent = configuration.applicationNameForUserAgent {
-                    configuration.applicationNameForUserAgent = applicationNameForUserAgent + " " + settings.applicationNameForUserAgent
-                }
+                // WKWebViewConfiguration.applicationNameForUserAgent is nil by default on macOS,
+                // so the name must be applied on its own rather than only appended to a default.
+                configuration.applicationNameForUserAgent = [configuration.applicationNameForUserAgent, settings.applicationNameForUserAgent]
+                    .compactMap { $0 }
+                    .joined(separator: " ")
             }
             
             if #available(macOS 10.12, *) {

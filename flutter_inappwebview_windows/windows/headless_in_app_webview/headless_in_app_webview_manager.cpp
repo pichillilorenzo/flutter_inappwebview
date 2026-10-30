@@ -9,6 +9,7 @@
 #include "../types/url_request.h"
 #include "../types/user_script.h"
 #include "../utils/flutter.h"
+#include "../utils/host_window.h"
 #include "../utils/log.h"
 #include "../utils/map.h"
 #include "../utils/string.h"
@@ -62,16 +63,27 @@ namespace flutter_inappwebview_plugin
     auto initialDataMap = get_optional_fl_map_value<flutter::EncodableMap>(params, "initialData");
     auto initialUserScriptList = get_optional_fl_map_value<flutter::EncodableList>(params, "initialUserScripts");
     auto webViewEnvironmentId = get_optional_fl_map_value<std::string>(params, "webViewEnvironmentId");
+    // Multi-window aware: see notes in InAppWebViewManager. For headless
+    // webviews the parent HWND is purely an attachment point — content is
+    // not rendered to screen — so a null parent is acceptable.
+    auto flutterViewId = get_optional_fl_map_value<int64_t>(params, "flutterViewId");
+    auto flutterEngineId = get_optional_fl_map_value<int64_t>(params, "flutterEngineId");
 
-    RECT bounds;
-    GetClientRect(plugin->registrar->GetView()->GetNativeWindow(), &bounds);
+    HWND parent = PickHostHwnd(plugin->registrar, flutterEngineId, flutterViewId);
+
+    RECT bounds = {};
+    if (parent) {
+      GetClientRect(parent, &bounds);
+    } else {
+      bounds = {0, 0, 1280, 720};
+    }
 
     auto initialWidth = initialSize->width >= 0 ? initialSize->width : bounds.right - bounds.left;
     auto initialHeight = initialSize->height >= 0 ? initialSize->height : bounds.bottom - bounds.top;
 
     auto hwnd = CreateWindowEx(0, windowClass_.lpszClassName, L"", 0, 0,
       0, (int)initialWidth, (int)initialHeight,
-      plugin->registrar->GetView()->GetNativeWindow(),
+      parent,
       nullptr,
       windowClass_.hInstance, nullptr);
 

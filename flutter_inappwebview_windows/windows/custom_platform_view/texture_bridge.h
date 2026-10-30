@@ -54,6 +54,12 @@ namespace flutter_inappwebview_plugin
     FrameAvailableCallback frame_available_;
     SurfaceSizeChangedCallback surface_size_changed_;
     std::atomic<bool> needs_update_ = false;
+    // Size of the visual content within the last captured frame. The frame
+    // pool buffer can be larger (it is only recreated lazily on the next
+    // FrameArrived after a resize), so consumers must treat this as the
+    // visible region of |last_frame_| rather than assuming the content
+    // fills the whole buffer.
+    ABI::Windows::Graphics::SizeInt32 last_content_size_ = {};
     winrt::com_ptr<ID3D11Texture2D> last_frame_;
     std::optional<std::chrono::high_resolution_clock::time_point>
       last_frame_timestamp_;

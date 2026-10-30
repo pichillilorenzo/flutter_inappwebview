@@ -24,6 +24,11 @@ namespace flutter_inappwebview_plugin
     const std::shared_ptr<InAppWebViewSettings> initialWebViewSettings;
     const std::optional<std::vector<std::shared_ptr<UserScript>>> initialUserScripts;
     const std::optional<std::string> webViewEnvironmentId;
+    // Multi-window aware: Flutter view + engine ids forwarded from Dart so
+    // we can resolve the hosting RegularWindow's HWND. Both null means
+    // "use the registrar's view (single-window setup) or nullptr".
+    const std::optional<int64_t> flutterViewId;
+    const std::optional<int64_t> flutterEngineId;
   };
 
   class InAppBrowser {

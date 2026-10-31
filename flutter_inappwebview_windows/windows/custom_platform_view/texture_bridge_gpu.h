@@ -59,18 +59,23 @@ namespace flutter_inappwebview_plugin
     // are resized.
     winrt::com_ptr<ID3D11ShaderResourceView> reference_view_{ nullptr };
     winrt::com_ptr<ID3D11ShaderResourceView> incoming_view_{ nullptr };
-    // Compare pass. Null when the compute shader could not be built; every
-    // frame is then treated as changed (the previous behaviour).
+    // Compare pass. Null until the worker has built it, or when it could not
+    // be built; every frame is then treated as changed.
     winrt::com_ptr<ID3D11ComputeShader> compare_shader_;
     winrt::com_ptr<ID3D11Buffer> compare_result_;
     winrt::com_ptr<ID3D11UnorderedAccessView> compare_result_uav_;
     winrt::com_ptr<ID3D11Buffer> compare_staging_;
     FrameCompareGate compare_gate_;
+    struct ComparerBuild;
+    // Shared with the worker building the compare pass; capture takes the
+    // result on its first frame after the build finished.
+    std::shared_ptr<ComparerBuild> comparer_build_;
 
     bool EnsureSurfacePool(uint32_t width, uint32_t height);
     bool EnsureReference(uint32_t width, uint32_t height);
     bool EnsureIncoming(uint32_t width, uint32_t height);
-    bool InitComparer();
+    static bool InitComparer(ID3D11Device* device, ComparerBuild& out);
+    void TakeBuiltComparer();
     static void ReleaseSurface(void* release_context);
     // GPU compare of two same-sized B8G8R8A8 textures. Returns true when any
     // pixel differs, and also when the compare itself could not run.

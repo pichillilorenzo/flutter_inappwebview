@@ -1,6 +1,11 @@
 #include <gtest/gtest.h>
 
+#include <atomic>
+#include <chrono>
+#include <future>
 #include <memory>
+#include <stdexcept>
+#include <thread>
 #include <string>
 #include <vector>
 
@@ -10,6 +15,7 @@
 #include "one_shot_callback_test_cases.h"
 #include "prewarm_operation_test_cases.h"
 #include "async_resource_build_test_cases.h"
+#include "custom_platform_view/background_probe.h"
 #include "in_app_webview/webview_visibility_state.h"
 #include "plugin_scripts_js/javascript_bridge_message.h"
 #include "types/base_callback_result.h"
@@ -142,6 +148,54 @@ TEST(AsyncResourceBuild, CloseDuringFailedInitializationReleasesPartialResources
 
 TEST(AsyncResourceBuild, FailedInitializationRemainsUnavailable) {
   async_resource_build_test::unavailableComparer();
+}
+
+TEST(BackgroundProbe, ConstructionDoesNotWaitAndRunsOffCallingThread) {
+  auto release = std::make_shared<std::promise<void>>();
+  auto released = release->get_future().share();
+  auto probeThread = std::make_shared<std::thread::id>();
+  BackgroundProbe<bool> probe([released, probeThread]() {
+    *probeThread = std::this_thread::get_id();
+    released.wait();
+    return true;
+  });
+  // Reaching here proves the constructor did not wait for the blocked probe.
+  release->set_value();
+  EXPECT_TRUE(probe.get());
+  EXPECT_NE(*probeThread, std::this_thread::get_id());
+}
+
+TEST(BackgroundProbe, RunsOnceAndCachesTheResult) {
+  auto calls = std::make_shared<std::atomic<int>>(0);
+  BackgroundProbe<bool> probe([calls]() {
+    ++*calls;
+    return false;
+  });
+  EXPECT_FALSE(probe.get());
+  EXPECT_FALSE(probe.get());
+  EXPECT_EQ(calls->load(), 1);
+}
+
+TEST(BackgroundProbe, ThrowingProbeYieldsDefaultResult) {
+  BackgroundProbe<bool> probe([]() -> bool { throw std::runtime_error("probe"); });
+  EXPECT_FALSE(probe.get());
+}
+
+TEST(BackgroundProbe, DestroyedBeforeCompletionLetsTheProbeFinish) {
+  auto release = std::make_shared<std::promise<void>>();
+  auto released = release->get_future().share();
+  auto finished = std::make_shared<std::promise<void>>();
+  auto finishedFuture = finished->get_future();
+  {
+    BackgroundProbe<bool> probe([released, finished]() {
+      released.wait();
+      finished->set_value();
+      return true;
+    });
+  }
+  release->set_value();
+  EXPECT_EQ(finishedFuture.wait_for(std::chrono::seconds(10)),
+            std::future_status::ready);
 }
 
 TEST(OneShotCallback, CallbackOwnershipAndCompletionBehavior) {

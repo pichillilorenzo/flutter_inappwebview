@@ -37,37 +37,13 @@ namespace flutter_inappwebview_plugin
       const std::lock_guard<std::mutex> lock(shared_resources_mutex_);
       ++instance_count_;
 
-      if (!rohelper_) {
-        rohelper_ = new rx::RoHelper(RO_INIT_SINGLETHREADED);
-
-        if (rohelper_->WinRtAvailable()) {
-          DispatcherQueueOptions options{ sizeof(DispatcherQueueOptions),
-                                         DQTYPE_THREAD_CURRENT, DQTAT_COM_STA };
-
-          if (FAILED(rohelper_->CreateDispatcherQueueController(
-            options, &dispatcher_queue_controller_))) {
-            std::cerr << "Creating DispatcherQueueController failed." << std::endl;
-            compositionUnavailableStage_ = "CreateDispatcherQueueController";
-          }
-          else if (!isGraphicsCaptureSessionSupported()) {
-            std::cerr << "Windows::Graphics::Capture::GraphicsCaptureSession is not "
-              "supported."
-              << std::endl;
-            compositionUnavailableStage_ = "isGraphicsCaptureSessionSupported";
-          }
-          else {
-            graphics_context_ = new GraphicsContext(rohelper_);
-            auto compositor = graphics_context_->CreateCompositor();
-            compositor_ = compositor.detach();
-            valid_ = graphics_context_->IsValid();
-            if (!valid_) {
-              compositionUnavailableStage_ = "GraphicsContext";
-            }
-          }
-        }
-        else {
-          compositionUnavailableStage_ = "WinRtAvailable";
-        }
+      if (!captureSupportProbe_) {
+        // Static WinRT activation; the MTA thread owns its own RoHelper.
+        captureSupportProbe_ = std::make_unique<BackgroundProbe<bool>>([]()
+          {
+            rx::RoHelper rohelper(RO_INIT_MULTITHREADED);
+            return rohelper.WinRtAvailable() && isGraphicsCaptureSessionSupported(rohelper);
+          });
       }
     }
 
@@ -187,14 +163,14 @@ namespace flutter_inappwebview_plugin
       webView->setHasConsoleMessageListener(hasConsoleMessageListener);
       webView->reparent(flutterViewHwnd);
       const auto hostHwnd = webView->hostWindow();
+      const bool hostedInWindow = webView->isHostedInWindow();
       auto customPlatformView = std::make_unique<CustomPlatformView>(plugin->registrar->messenger(),
         plugin->registrar->texture_registrar(),
-        graphics_context(),
+        hostedInWindow ? nullptr : graphics_context(),
         hostHwnd,
         std::move(webView),
         flutterViewResolver());
       auto textureId = customPlatformView->texture_id();
-      const bool hostedInWindow = customPlatformView->view->isHostedInWindow();
       keepAliveWebViews.insert({ keepAliveId.value(), std::move(customPlatformView) });
       result_->Success(creationResult(textureId, hostedInWindow, "", S_OK));
       return;
@@ -249,7 +225,7 @@ namespace flutter_inappwebview_plugin
         const bool hostedInWindow = inAppWebView->isHostedInWindow();
         auto customPlatformView = std::make_unique<CustomPlatformView>(plugin->registrar->messenger(),
           plugin->registrar->texture_registrar(),
-          graphics_context(),
+          hostedInWindow ? nullptr : graphics_context(),
           hostWindow,
           std::move(inAppWebView),
           flutterViewResolver());
@@ -521,12 +497,52 @@ namespace flutter_inappwebview_plugin
     }
   }
 
-  bool InAppWebViewManager::isGraphicsCaptureSessionSupported()
+  // The DispatcherQueue is bound to the calling thread, so this must run on the UI thread.
+  void InAppWebViewManager::ensureCompositionResources()
+  {
+    const std::lock_guard<std::mutex> lock(shared_resources_mutex_);
+    if (compositionInitialized_) {
+      return;
+    }
+    compositionInitialized_ = true;
+    rohelper_ = new rx::RoHelper(RO_INIT_SINGLETHREADED);
+
+    if (rohelper_->WinRtAvailable()) {
+      DispatcherQueueOptions options{ sizeof(DispatcherQueueOptions),
+                                     DQTYPE_THREAD_CURRENT, DQTAT_COM_STA };
+
+      if (FAILED(rohelper_->CreateDispatcherQueueController(
+        options, &dispatcher_queue_controller_))) {
+        std::cerr << "Creating DispatcherQueueController failed." << std::endl;
+        compositionUnavailableStage_ = "CreateDispatcherQueueController";
+      }
+      else if (!captureSupportProbe_->get()) {
+        std::cerr << "Windows::Graphics::Capture::GraphicsCaptureSession is not "
+          "supported."
+          << std::endl;
+        compositionUnavailableStage_ = "isGraphicsCaptureSessionSupported";
+      }
+      else {
+        graphics_context_ = new GraphicsContext(rohelper_);
+        auto compositor = graphics_context_->CreateCompositor();
+        compositor_ = compositor.detach();
+        valid_ = graphics_context_->IsValid();
+        if (!valid_) {
+          compositionUnavailableStage_ = "GraphicsContext";
+        }
+      }
+    }
+    else {
+      compositionUnavailableStage_ = "WinRtAvailable";
+    }
+  }
+
+  bool InAppWebViewManager::isGraphicsCaptureSessionSupported(rx::RoHelper& rohelper)
   {
     HSTRING className;
     HSTRING_HEADER classNameHeader;
 
-    if (FAILED(rohelper_->GetStringReference(
+    if (FAILED(rohelper.GetStringReference(
       RuntimeClass_Windows_Graphics_Capture_GraphicsCaptureSession,
       &className, &classNameHeader))) {
       return false;
@@ -534,7 +550,7 @@ namespace flutter_inappwebview_plugin
 
     ABI::Windows::Graphics::Capture::IGraphicsCaptureSessionStatics*
       capture_session_statics;
-    if (FAILED(rohelper_->GetActivationFactory(
+    if (FAILED(rohelper.GetActivationFactory(
       className,
       __uuidof(
         ABI::Windows::Graphics::Capture::IGraphicsCaptureSessionStatics),
@@ -543,11 +559,9 @@ namespace flutter_inappwebview_plugin
     }
 
     boolean is_supported = false;
-    if (FAILED(capture_session_statics->IsSupported(&is_supported))) {
-      return false;
-    }
-
-    return !!is_supported;
+    const HRESULT hr = capture_session_statics->IsSupported(&is_supported);
+    capture_session_statics->Release();
+    return SUCCEEDED(hr) && is_supported;
   }
 
   ABI::Windows::System::IDispatcherQueueController* InAppWebViewManager::detachSharedResourcesForShutdown()
@@ -557,6 +571,8 @@ namespace flutter_inappwebview_plugin
     // WinRT DLLs while they are unloading. Null the cached pointers so the
     // plugin won't use them again; the OS will reclaim them at process exit.
     valid_ = false;
+    compositionInitialized_ = false;
+    compositionUnavailableStage_.clear();
     const auto dispatcherQueueController = dispatcher_queue_controller_;
     dispatcher_queue_controller_ = nullptr;
     compositor_ = nullptr;

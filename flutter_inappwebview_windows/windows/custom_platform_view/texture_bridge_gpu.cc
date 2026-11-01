@@ -7,7 +7,6 @@
 #include <iostream>
 #include <memory>
 #include <mutex>
-#include <thread>
 #include <utility>
 #include <vector>
 
@@ -46,11 +45,7 @@ namespace flutter_inappwebview_plugin
     FlutterDesktopGpuSurfaceDescriptor descriptor = {};
   };
 
-  struct TextureBridgeGpu::ComparerBuild {
-    // Guards |done|. The worker fills the resources before setting it, and
-    // capture reads them only after seeing it.
-    std::mutex mutex;
-    bool done = false;
+  struct TextureBridgeGpu::ComparerResources {
     winrt::com_ptr<ID3D11ComputeShader> shader;
     winrt::com_ptr<ID3D11Buffer> result;
     winrt::com_ptr<ID3D11UnorderedAccessView> result_uav;
@@ -60,22 +55,19 @@ namespace flutter_inappwebview_plugin
   TextureBridgeGpu::TextureBridgeGpu(
     GraphicsContext* graphics_context,
     ABI::Windows::UI::Composition::IVisual* visual)
-    : TextureBridge(graphics_context, visual),
-    comparer_build_(std::make_shared<ComparerBuild>())
+    : TextureBridge(graphics_context, visual)
   {
     // Runs on the platform thread; creating the compare resources can block
     // inside the GPU driver for seconds, so it happens on a worker.
     winrt::com_ptr<ID3D11Device> device;
     device.copy_from(graphics_context_->d3d_device());
     try {
-      std::thread([build = comparer_build_, device]() {
-        if (!InitComparer(device.get(), *build)) {
+      comparer_build_.emplace([device](ComparerResources& resources) {
+        if (!InitComparer(device.get(), resources)) {
           std::cerr << "WebView frame compare unavailable; every captured "
             "frame is forwarded to Flutter." << std::endl;
         }
-        const std::lock_guard<std::mutex> lock(build->mutex);
-        build->done = true;
-      }).detach();
+      });
     }
     catch (const std::exception&) {
       comparer_build_.reset();
@@ -86,21 +78,19 @@ namespace flutter_inappwebview_plugin
 
   void TextureBridgeGpu::TakeBuiltComparer()
   {
-    {
-      const std::lock_guard<std::mutex> lock(comparer_build_->mutex);
-      if (!comparer_build_->done) {
-        return;
-      }
+    ComparerResources resources;
+    if (!comparer_build_->tryTake(resources)) {
+      return;
     }
-    compare_shader_ = std::move(comparer_build_->shader);
-    compare_result_ = std::move(comparer_build_->result);
-    compare_result_uav_ = std::move(comparer_build_->result_uav);
-    compare_staging_ = std::move(comparer_build_->staging);
+    compare_shader_ = std::move(resources.shader);
+    compare_result_ = std::move(resources.result);
+    compare_result_uav_ = std::move(resources.result_uav);
+    compare_staging_ = std::move(resources.staging);
     comparer_build_.reset();
   }
 
   bool TextureBridgeGpu::InitComparer(ID3D11Device* device,
-    ComparerBuild& out)
+    ComparerResources& out)
   {
     if (!device || device->GetFeatureLevel() < D3D_FEATURE_LEVEL_11_0) {
       return false;

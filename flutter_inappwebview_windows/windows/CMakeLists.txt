@@ -59,6 +59,7 @@ list(APPEND PLUGIN_SOURCES
   "types/base_callback_result.h"
   "types/one_shot_callback.h"
   "custom_platform_view/surface_pool_slot.h"
+  "custom_platform_view/async_resource_build.h"
   "types/lifetime_token.h"
   "types/url_request.cpp"
   "types/url_request.h"
@@ -379,7 +380,8 @@ target_link_libraries(${TEST_RUNNER} PRIVATE ${CMAKE_BINARY_DIR}/packages/nlohma
 # marginal on cold CI runners (antivirus scans the fresh executable) and
 # was observed killing --gtest_list_tests mid-print.
 include(GoogleTest)
-gtest_discover_tests(${TEST_RUNNER} DISCOVERY_TIMEOUT 60)
+gtest_discover_tests(${TEST_RUNNER} DISCOVERY_TIMEOUT 60
+  PROPERTIES TIMEOUT 30)
 
 # Exercise the shipped bytecode on software Direct3D, independently of Flutter
 # and of whether the build uses the GPU or PixelBuffer bridge.

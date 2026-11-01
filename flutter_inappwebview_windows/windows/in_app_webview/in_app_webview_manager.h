@@ -13,6 +13,7 @@
 #include <wil/com.h>
 #include <winrt/base.h>
 
+#include "../custom_platform_view/background_probe.h"
 #include "../custom_platform_view/custom_platform_view.h"
 #include "../custom_platform_view/graphics_context.h"
 #include "../custom_platform_view/util/rohelper.h"
@@ -35,15 +36,20 @@ namespace flutter_inappwebview_plugin
     std::map<int64_t, std::unique_ptr<NewWindowRequestedArgs>> windowWebViews;
     int64_t windowAutoincrementId = 0;
 
-    bool isSupported() const { return valid_; }
-    bool isGraphicsCaptureSessionSupported();
-    GraphicsContext* graphics_context() const
+    // Composition resources are created on first use, on the calling (UI) thread.
+    bool isSupported()
     {
+      ensureCompositionResources();
+      return valid_;
+    }
+    GraphicsContext* graphics_context()
+    {
+      ensureCompositionResources();
       return graphics_context_;
     };
-    rx::RoHelper* rohelper() const { return rohelper_; }
-    winrt::com_ptr<ABI::Windows::UI::Composition::ICompositor> compositor() const
+    winrt::com_ptr<ABI::Windows::UI::Composition::ICompositor> compositor()
     {
+      ensureCompositionResources();
       winrt::com_ptr<ABI::Windows::UI::Composition::ICompositor> compositor;
       if (compositor_) {
         compositor.copy_from(compositor_);
@@ -77,12 +83,18 @@ namespace flutter_inappwebview_plugin
     HWND parkingWindow_ = nullptr;
     LifetimeToken alive_;
     inline static bool valid_ = false;
+    inline static bool compositionInitialized_ = false;
+    // Process-wide: IsSupported can block in RPC for seconds (Otzaria/otzaria#3756).
+    inline static std::unique_ptr<BackgroundProbe<bool>> captureSupportProbe_;
     // The step that left composition unavailable; new views use HWND mode.
     inline static std::string compositionUnavailableStage_;
     inline static std::size_t instance_count_ = 0;
     inline static std::mutex shared_resources_mutex_;
 
     static bool isTopLevelMinimized(HWND hwnd);
+    static void startCaptureSupportProbe();
+    static void ensureCompositionResources();
+    static bool isGraphicsCaptureSessionSupported(rx::RoHelper& rohelper);
     std::function<HWND(int64_t)> flutterViewResolver();
     void onFlutterViewDestroyed(HWND flutterViewHwnd);
     HWND parkingWindow();

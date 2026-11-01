@@ -1,6 +1,11 @@
 #include <gtest/gtest.h>
 
+#include <atomic>
+#include <chrono>
+#include <future>
 #include <memory>
+#include <stdexcept>
+#include <thread>
 #include <string>
 #include <vector>
 
@@ -10,6 +15,9 @@
 #include "one_shot_callback_test_cases.h"
 #include "prewarm_operation_test_cases.h"
 #include "async_resource_build_test_cases.h"
+#include "background_probe_test_cases.h"
+#include "module_probe_launcher_test_cases.h"
+#include "custom_platform_view/util/rohelper.h"
 #include "in_app_webview/webview_visibility_state.h"
 #include "plugin_scripts_js/javascript_bridge_message.h"
 #include "types/base_callback_result.h"
@@ -142,6 +150,48 @@ TEST(AsyncResourceBuild, CloseDuringFailedInitializationReleasesPartialResources
 
 TEST(AsyncResourceBuild, FailedInitializationRemainsUnavailable) {
   async_resource_build_test::unavailableComparer();
+}
+
+TEST(BackgroundProbe, PendingDoesNotWaitOrCacheUnsupported) {
+  background_probe_test::pendingThenReady();
+}
+
+TEST(BackgroundProbe, UnsupportedIsReady) {
+  background_probe_test::unsupportedIsReady();
+}
+
+TEST(BackgroundProbe, ThrowingProbeYieldsDefaultResult) {
+  background_probe_test::throwingProbe();
+}
+
+TEST(BackgroundProbe, FailedLaunchDoesNotRunInline) {
+  background_probe_test::failedLaunch();
+}
+
+TEST(BackgroundProbe, OffThreadAndDestroyedBeforeCompletion) {
+  background_probe_test::offThreadAndDestroyedWhilePending();
+}
+
+TEST(ModuleProbeLauncher, KeepsDllLoadedUntilCallbackReturns) {
+  module_probe_launcher_test::dllLifetime();
+}
+
+TEST(RoHelper, ChangedModeDoesNotUninitializeExistingApartment) {
+  bool retainedApartment = false;
+  std::thread worker([&]() {
+    const HRESULT initialized = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
+    if (FAILED(initialized)) return;
+    {
+      rx::RoHelper helper(RO_INIT_MULTITHREADED);
+    }
+    APTTYPE type;
+    APTTYPEQUALIFIER qualifier;
+    retainedApartment = SUCCEEDED(CoGetApartmentType(&type, &qualifier)) &&
+      (type == APTTYPE_STA || type == APTTYPE_MAINSTA);
+    CoUninitialize();
+  });
+  worker.join();
+  EXPECT_TRUE(retainedApartment);
 }
 
 TEST(OneShotCallback, CallbackOwnershipAndCompletionBehavior) {

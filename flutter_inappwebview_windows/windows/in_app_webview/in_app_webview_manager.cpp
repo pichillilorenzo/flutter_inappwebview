@@ -19,6 +19,7 @@
 #include "../utils/vector.h"
 #include "../webview_environment/webview_environment_manager.h"
 #include "in_app_webview_manager.h"
+#include "../custom_platform_view/module_probe_launcher.h"
 
 #pragma comment(lib, "Comctl32.lib")
 
@@ -27,6 +28,14 @@ namespace flutter_inappwebview_plugin
   namespace
   {
     constexpr UINT_PTR kFlutterViewSubclassId = 0x49415756;
+
+    // Test hook: hosts every new InAppWebView in its child HWND.
+    bool isHwndModeForced()
+    {
+      wchar_t value[2] = {};
+      return GetEnvironmentVariableW(L"FLUTTER_INAPPWEBVIEW_WINDOWS_FORCE_HWND", value, 2) == 1 &&
+        value[0] == L'1';
+    }
   }
 
   InAppWebViewManager::InAppWebViewManager(const FlutterInappwebviewWindowsPlugin* plugin)
@@ -37,13 +46,8 @@ namespace flutter_inappwebview_plugin
       const std::lock_guard<std::mutex> lock(shared_resources_mutex_);
       ++instance_count_;
 
-      if (!captureSupportProbe_) {
-        // Static WinRT activation; the MTA thread owns its own RoHelper.
-        captureSupportProbe_ = std::make_unique<BackgroundProbe<bool>>([]()
-          {
-            rx::RoHelper rohelper(RO_INIT_MULTITHREADED);
-            return rohelper.WinRtAvailable() && isGraphicsCaptureSessionSupported(rohelper);
-          });
+      if (!isHwndModeForced()) {
+        startCaptureSupportProbe();
       }
     }
 
@@ -94,14 +98,6 @@ namespace flutter_inappwebview_plugin
 
   namespace
   {
-    // Test hook: hosts every new InAppWebView in its child HWND.
-    bool isHwndModeForced()
-    {
-      wchar_t value[2] = {};
-      return GetEnvironmentVariableW(L"FLUTTER_INAPPWEBVIEW_WINDOWS_FORCE_HWND", value, 2) == 1 &&
-        value[0] == L'1';
-    }
-
     flutter::EncodableValue creationResult(const int64_t id, const bool hostedInWindow,
       const std::string& fallbackStage, const HRESULT fallbackHr)
     {
@@ -497,6 +493,19 @@ namespace flutter_inappwebview_plugin
     }
   }
 
+  void InAppWebViewManager::startCaptureSupportProbe()
+  {
+    // Caller holds shared_resources_mutex_. A forced-HWND registration skips
+    // this entirely; removing the override later starts the probe on demand.
+    if (!captureSupportProbe_) {
+      captureSupportProbe_ = std::make_unique<BackgroundProbe<bool>>([]()
+        {
+          rx::RoHelper rohelper(RO_INIT_MULTITHREADED);
+          return rohelper.WinRtAvailable() && isGraphicsCaptureSessionSupported(rohelper);
+        }, ModuleProbeLauncher{});
+    }
+  }
+
   // The DispatcherQueue is bound to the calling thread, so this must run on the UI thread.
   void InAppWebViewManager::ensureCompositionResources()
   {
@@ -504,7 +513,21 @@ namespace flutter_inappwebview_plugin
     if (compositionInitialized_) {
       return;
     }
+    startCaptureSupportProbe();
+    const auto supported = captureSupportProbe_->tryGet();
+    if (!supported.has_value()) {
+      // Only this view falls back to HWND. Do not cache pending as unsupported:
+      // a later view can initialize composition once the probe has completed.
+      compositionUnavailableStage_ = "captureSupportProbePending";
+      return;
+    }
     compositionInitialized_ = true;
+    compositionUnavailableStage_.clear();
+    // Unsupported/failed probes need no UI-thread COM or graphics resources.
+    if (!*supported) {
+      compositionUnavailableStage_ = "isGraphicsCaptureSessionSupported";
+      return;
+    }
     rohelper_ = new rx::RoHelper(RO_INIT_SINGLETHREADED);
 
     if (rohelper_->WinRtAvailable()) {
@@ -515,12 +538,6 @@ namespace flutter_inappwebview_plugin
         options, &dispatcher_queue_controller_))) {
         std::cerr << "Creating DispatcherQueueController failed." << std::endl;
         compositionUnavailableStage_ = "CreateDispatcherQueueController";
-      }
-      else if (!captureSupportProbe_->get()) {
-        std::cerr << "Windows::Graphics::Capture::GraphicsCaptureSession is not "
-          "supported."
-          << std::endl;
-        compositionUnavailableStage_ = "isGraphicsCaptureSessionSupported";
       }
       else {
         graphics_context_ = new GraphicsContext(rohelper_);

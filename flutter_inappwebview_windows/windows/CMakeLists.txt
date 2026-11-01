@@ -61,6 +61,7 @@ list(APPEND PLUGIN_SOURCES
   "custom_platform_view/surface_pool_slot.h"
   "custom_platform_view/async_resource_build.h"
   "custom_platform_view/background_probe.h"
+  "custom_platform_view/module_probe_launcher.h"
   "types/lifetime_token.h"
   "types/url_request.cpp"
   "types/url_request.h"
@@ -368,8 +369,13 @@ FetchContent_MakeAvailable(googletest)
 
 add_executable(${TEST_RUNNER}
   test/flutter_inappwebview_windows_plugin_test.cpp
+  custom_platform_view/util/rohelper.cc
   types/custom_scheme_registration.cpp
 )
+# A real dynamically loaded DLL exercises the background callback's module lease.
+add_library(probe_fixture SHARED test/module_probe_launcher_fixture.cpp)
+apply_standard_settings(probe_fixture)
+add_dependencies(${TEST_RUNNER} probe_fixture)
 apply_standard_settings(${TEST_RUNNER})
 target_include_directories(${TEST_RUNNER} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 target_link_libraries(${TEST_RUNNER} PRIVATE flutter flutter_wrapper_plugin gtest_main)

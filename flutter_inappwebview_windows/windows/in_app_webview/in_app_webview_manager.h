@@ -92,6 +92,7 @@ namespace flutter_inappwebview_plugin
     inline static std::mutex shared_resources_mutex_;
 
     static bool isTopLevelMinimized(HWND hwnd);
+    static void startCaptureSupportProbe();
     static void ensureCompositionResources();
     static bool isGraphicsCaptureSessionSupported(rx::RoHelper& rohelper);
     std::function<HWND(int64_t)> flutterViewResolver();

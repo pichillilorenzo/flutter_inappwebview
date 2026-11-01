@@ -3,6 +3,7 @@
 #include <cassert>
 #include <chrono>
 #include <cstdint>
+#include <exception>
 #include <iostream>
 #include <memory>
 #include <mutex>
@@ -44,26 +45,59 @@ namespace flutter_inappwebview_plugin
     FlutterDesktopGpuSurfaceDescriptor descriptor = {};
   };
 
+  struct TextureBridgeGpu::ComparerResources {
+    winrt::com_ptr<ID3D11ComputeShader> shader;
+    winrt::com_ptr<ID3D11Buffer> result;
+    winrt::com_ptr<ID3D11UnorderedAccessView> result_uav;
+    winrt::com_ptr<ID3D11Buffer> staging;
+  };
+
   TextureBridgeGpu::TextureBridgeGpu(
     GraphicsContext* graphics_context,
     ABI::Windows::UI::Composition::IVisual* visual)
     : TextureBridge(graphics_context, visual)
   {
-    if (!InitComparer()) {
+    // Runs on the platform thread; creating the compare resources can block
+    // inside the GPU driver for seconds, so it happens on a worker.
+    winrt::com_ptr<ID3D11Device> device;
+    device.copy_from(graphics_context_->d3d_device());
+    try {
+      comparer_build_.emplace([device](ComparerResources& resources) {
+        if (!InitComparer(device.get(), resources)) {
+          std::cerr << "WebView frame compare unavailable; every captured "
+            "frame is forwarded to Flutter." << std::endl;
+        }
+      });
+    }
+    catch (const std::exception&) {
+      comparer_build_.reset();
       std::cerr << "WebView frame compare unavailable; every captured frame "
         "is forwarded to Flutter." << std::endl;
     }
   }
 
-  bool TextureBridgeGpu::InitComparer()
+  void TextureBridgeGpu::TakeBuiltComparer()
   {
-    auto device = graphics_context_->d3d_device();
+    ComparerResources resources;
+    if (!comparer_build_->tryTake(resources)) {
+      return;
+    }
+    compare_shader_ = std::move(resources.shader);
+    compare_result_ = std::move(resources.result);
+    compare_result_uav_ = std::move(resources.result_uav);
+    compare_staging_ = std::move(resources.staging);
+    comparer_build_.reset();
+  }
+
+  bool TextureBridgeGpu::InitComparer(ID3D11Device* device,
+    ComparerResources& out)
+  {
     if (!device || device->GetFeatureLevel() < D3D_FEATURE_LEVEL_11_0) {
       return false;
     }
 
     if (FAILED(device->CreateComputeShader(kFrameCompareCs,
-      sizeof(kFrameCompareCs), nullptr, compare_shader_.put()))) {
+      sizeof(kFrameCompareCs), nullptr, out.shader.put()))) {
       return false;
     }
 
@@ -73,8 +107,8 @@ namespace flutter_inappwebview_plugin
     result_desc.BindFlags = D3D11_BIND_UNORDERED_ACCESS;
     result_desc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_ALLOW_RAW_VIEWS;
     if (FAILED(device->CreateBuffer(&result_desc, nullptr,
-      compare_result_.put()))) {
-      compare_shader_ = nullptr;
+      out.result.put()))) {
+      out.shader = nullptr;
       return false;
     }
     D3D11_UNORDERED_ACCESS_VIEW_DESC uav_desc = {};
@@ -83,9 +117,9 @@ namespace flutter_inappwebview_plugin
     uav_desc.Buffer.FirstElement = 0;
     uav_desc.Buffer.NumElements = kCompareResultBytes / 4;
     uav_desc.Buffer.Flags = D3D11_BUFFER_UAV_FLAG_RAW;
-    if (FAILED(device->CreateUnorderedAccessView(compare_result_.get(),
-      &uav_desc, compare_result_uav_.put()))) {
-      compare_shader_ = nullptr;
+    if (FAILED(device->CreateUnorderedAccessView(out.result.get(),
+      &uav_desc, out.result_uav.put()))) {
+      out.shader = nullptr;
       return false;
     }
     D3D11_BUFFER_DESC staging_desc = {};
@@ -93,8 +127,8 @@ namespace flutter_inappwebview_plugin
     staging_desc.Usage = D3D11_USAGE_STAGING;
     staging_desc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
     if (FAILED(device->CreateBuffer(&staging_desc, nullptr,
-      compare_staging_.put()))) {
-      compare_shader_ = nullptr;
+      out.staging.put()))) {
+      out.shader = nullptr;
       return false;
     }
     return true;
@@ -166,6 +200,10 @@ namespace flutter_inappwebview_plugin
     const std::lock_guard<std::mutex> context_lock(
       graphics_context_->device_context_mutex());
     auto context = graphics_context_->d3d_device_context();
+
+    if (comparer_build_) {
+      TakeBuiltComparer();
+    }
 
     std::shared_ptr<SurfacePool> pool = surface_pool_;
     size_t writable_surface;

@@ -9,6 +9,7 @@
 #include "surface_pool_slot_test_cases.h"
 #include "one_shot_callback_test_cases.h"
 #include "prewarm_operation_test_cases.h"
+#include "async_resource_build_test_cases.h"
 #include "in_app_webview/webview_visibility_state.h"
 #include "plugin_scripts_js/javascript_bridge_message.h"
 #include "types/base_callback_result.h"
@@ -125,6 +126,22 @@ TEST(BrowserProcessGateRegistry, InvalidateForcesFreshProbe) {
   h.gate.invalidate(7);
   h.gate.tryAcquire(7, &a);
   EXPECT_EQ(h.probeCount, 2);
+}
+
+TEST(AsyncResourceBuild, AdoptsLateCompletionExactlyOnce) {
+  async_resource_build_test::lateCompletion();
+}
+
+TEST(AsyncResourceBuild, CloseDuringInitializationKeepsWorkerAlive) {
+  async_resource_build_test::closeDuringInitialization();
+}
+
+TEST(AsyncResourceBuild, CloseDuringFailedInitializationReleasesPartialResources) {
+  async_resource_build_test::closeDuringInitialization(true);
+}
+
+TEST(AsyncResourceBuild, FailedInitializationRemainsUnavailable) {
+  async_resource_build_test::unavailableComparer();
 }
 
 TEST(OneShotCallback, CallbackOwnershipAndCompletionBehavior) {

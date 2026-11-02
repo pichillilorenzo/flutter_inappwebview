@@ -234,6 +234,7 @@ list(APPEND PLUGIN_SOURCES
   "in_app_webview/in_app_webview.cpp"
   "in_app_webview/in_app_webview.h"
   "in_app_webview/webview_visibility_state.h"
+  "in_app_webview/native_focus.h"
   "in_app_webview/in_app_webview_manager.cpp"
   "in_app_webview/in_app_webview_manager.h"
   "in_app_webview/webview_channel_delegate.cpp"

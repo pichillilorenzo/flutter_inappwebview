@@ -159,6 +159,13 @@ namespace flutter_inappwebview_plugin
     void sendScroll(double offset, bool horizontal);
     void setScrollDelta(double delta_x, double delta_y);
     void requestFocus();
+    // Whether the Win32 keyboard focus is inside this WebView's own input
+    // window. Unlike GotFocus/LostFocus and document.hasFocus(), it stays
+    // false after put_IsVisible(TRUE) until the focus really returns.
+    bool hasNativeFocus() const;
+    // MoveFocus only when hasNativeFocus() is false, so it is safe to fire
+    // after a click already focused the page. Returns whether it moved.
+    bool requestFocusIfNeeded();
     void clearFocus();
     void onSurfaceSizeChanged(SurfaceSizeChangedCallback callback)
     {

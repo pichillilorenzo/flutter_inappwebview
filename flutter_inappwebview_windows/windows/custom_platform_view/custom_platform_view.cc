@@ -23,7 +23,6 @@ namespace flutter_inappwebview_plugin
   constexpr auto kMethodSetFpsLimit = "setFpsLimit";
   constexpr auto kMethodRequestFocus = "requestFocus";
   constexpr auto kMethodRequestFocusIfNeeded = "requestFocusIfNeeded";
-  constexpr auto kMethodHasNativeFocus = "hasNativeFocus";
   constexpr auto kMethodSetHostWindowHidden = "setHostWindowHidden";
   constexpr auto kMethodClearFocus = "clearFocus";
   constexpr auto kMethodSetFlutterViewId = "setFlutterViewId";
@@ -384,12 +383,6 @@ namespace flutter_inappwebview_plugin
     else if (method_name.compare(kMethodRequestFocusIfNeeded) == 0) {
       if (view) {
         return result->Success(flutter::EncodableValue(view->requestFocusIfNeeded()));
-      }
-      return result->Error(kErrorInvalidArgs);
-    }
-    else if (method_name.compare(kMethodHasNativeFocus) == 0) {
-      if (view) {
-        return result->Success(flutter::EncodableValue(view->hasNativeFocus()));
       }
       return result->Error(kErrorInvalidArgs);
     }

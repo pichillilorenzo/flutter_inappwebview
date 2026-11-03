@@ -1,5 +1,4 @@
 import 'package:flutter/services.dart';
-
 import 'dart:async';
 import 'dart:ui';
 
@@ -8,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
-
 import '../platform_util.dart';
 import '_static_channel.dart';
 import 'webview_creation_failure.dart';
@@ -291,15 +289,6 @@ class CustomPlatformViewController
     assert(value.isInitialized);
     return await _methodChannel.invokeMethod<bool>('requestFocusIfNeeded') ??
         false;
-  }
-
-  /// Whether the Win32 keyboard focus is inside this WebView2 instance.
-  Future<bool> hasNativeFocus() async {
-    if (_isDisposed) {
-      return false;
-    }
-    assert(value.isInitialized);
-    return await _methodChannel.invokeMethod<bool>('hasNativeFocus') ?? false;
   }
 
   /// Moves the native host window under the [FlutterView] [viewId], after the

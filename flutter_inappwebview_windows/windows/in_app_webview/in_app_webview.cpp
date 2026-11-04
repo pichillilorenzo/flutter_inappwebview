@@ -51,6 +51,7 @@
 #include "../print_job/print_job_manager.h"
 #include "browser_process_gate.h"
 #include "in_app_webview.h"
+#include "native_focus.h"
 #include "in_app_webview_manager.h"
 #include "../types/one_shot_callback.h"
 
@@ -4223,6 +4224,24 @@ namespace flutter_inappwebview_plugin
       failedLog(webViewController->MoveFocus(
         COREWEBVIEW2_MOVE_FOCUS_REASON_PROGRAMMATIC));
     }
+  }
+
+  bool InAppWebView::hasNativeFocus() const
+  {
+    return focusIsInsideHost(hostWindow(), GetFocus());
+  }
+
+  bool InAppWebView::requestFocusIfNeeded()
+  {
+    // A MoveFocus that lands after a click toggles the clicked element's
+    // focus off again (upstream #2736). A click forwarded by SendMouseInput
+    // sets the Win32 focus before the call returns, on this same thread, so
+    // the check cannot miss one that was already delivered.
+    if (!webViewController || hasNativeFocus()) {
+      return false;
+    }
+    requestFocus();
+    return true;
   }
 
   void InAppWebView::clearFocus()

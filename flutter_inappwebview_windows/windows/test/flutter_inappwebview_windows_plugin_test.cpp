@@ -17,6 +17,7 @@
 #include "async_resource_build_test_cases.h"
 #include "background_probe_test_cases.h"
 #include "module_probe_launcher_test_cases.h"
+#include "native_focus_test_cases.h"
 #include "custom_platform_view/util/rohelper.h"
 #include "in_app_webview/webview_visibility_state.h"
 #include "plugin_scripts_js/javascript_bridge_message.h"
@@ -170,6 +171,10 @@ TEST(BackgroundProbe, FailedLaunchDoesNotRunInline) {
 
 TEST(BackgroundProbe, OffThreadAndDestroyedBeforeCompletion) {
   background_probe_test::offThreadAndDestroyedWhilePending();
+}
+
+TEST(NativeFocus, FocusInsideHostOnly) {
+  native_focus_test::focusInsideHostOnly();
 }
 
 TEST(ModuleProbeLauncher, KeepsDllLoadedUntilCallbackReturns) {

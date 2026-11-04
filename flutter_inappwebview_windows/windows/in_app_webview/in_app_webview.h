@@ -164,7 +164,8 @@ namespace flutter_inappwebview_plugin
     // false after put_IsVisible(TRUE) until the focus really returns.
     bool hasNativeFocus() const;
     // MoveFocus only when hasNativeFocus() is false, so it is safe to fire
-    // after a click already focused the page. Returns whether it moved.
+    // after a click already focused the page. Returns whether MoveFocus was
+    // attempted, not whether it succeeded.
     bool requestFocusIfNeeded();
     void clearFocus();
     void onSurfaceSizeChanged(SurfaceSizeChangedCallback callback)

@@ -68,6 +68,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 
 import io.flutter.plugin.common.PluginRegistry;
 
@@ -80,6 +82,9 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
   private static final int PICKER_LEGACY = 3;
   final String DEFAULT_MIME_TYPES = "*/*";
   final Map<DialogInterface, JsResult> dialogs = new HashMap<>();
+  // Prompt requests awaiting Flutter have no native dialog yet, but still block JS.
+  // Track them separately so disposal can cancel requests with no Dart reply.
+  final Set<JsResult> pendingJsResults = new HashSet<>();
 
   protected static final FrameLayout.LayoutParams FULLSCREEN_LAYOUT_PARAMS = new FrameLayout.LayoutParams(
           ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, Gravity.CENTER);
@@ -408,10 +413,18 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
   public boolean onJsPrompt(final WebView view, String url, final String message,
                             final String defaultValue, final JsPromptResult result) {
     if (inAppWebView != null && inAppWebView.channelDelegate != null) {
+      // Register before dispatch: the WebView may be disposed while Dart is awaiting.
+      pendingJsResults.add(result);
       inAppWebView.channelDelegate.onJsPrompt(url, message, defaultValue, null, new WebViewChannelDelegate.JsPromptCallback() {
         @Override
         public boolean nonNullSuccess(@NonNull JsPromptResponse response) {
+          // Ignore late replies after disposal or an earlier completion.
+          if (!pendingJsResults.contains(result)) {
+            return false;
+          }
           if (response.isHandledByClient()) {
+            // Flutter owns this response; do not apply the native UI setting.
+            pendingJsResults.remove(result);
             Integer action = response.getAction();
             action = action != null ? action : 1;
             switch (action) {
@@ -429,6 +442,10 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
 
         @Override
         public void defaultBehaviour(@Nullable JsPromptResponse response) {
+          // Transfer ownership to the fallback only once; disposal may already have cancelled it.
+          if (!pendingJsResults.remove(result)) {
+            return;
+          }
           String responseMessage = null;
           String responseDefaultValue = null;
           String value = null;
@@ -446,6 +463,10 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
 
         @Override
         public void error(String errorCode, @Nullable String errorMessage, @Nullable Object errorDetails) {
+          // A late channel error must not complete a cancelled request again.
+          if (!pendingJsResults.remove(result)) {
+            return;
+          }
           Log.e(LOG_TAG, errorCode + ", " + ((errorMessage != null) ? errorMessage : ""));
           result.cancel();
         }
@@ -458,6 +479,12 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
   }
 
   public void createPromptDialog(WebView view, String message, String defaultValue, final JsPromptResult result, String responseMessage, String responseDefaultValue, String value, String cancelButtonTitle, String confirmButtonTitle) {
+    // Suppress only the native fallback UI. Cancellation returns null to JS and
+    // releases the prompt wait; skipping UI without completing the result would hang JS.
+    if (inAppWebView != null && !inAppWebView.customSettings.enableNativePromptDialog) {
+      result.cancel();
+      return;
+    }
     FrameLayout layout = new FrameLayout(view.getContext());
 
     final EditText input = new EditText(view.getContext());
@@ -1362,6 +1389,13 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
   }
 
   public void dispose() {
+    // Clear first so late/reentrant callbacks cannot complete these requests twice.
+    // Cancel regardless of the UI setting: this WebView is being destroyed.
+    Set<JsResult> pending = new HashSet<>(pendingJsResults);
+    pendingJsResults.clear();
+    for (JsResult result : pending) {
+      result.cancel();
+    }
     for (Map.Entry<DialogInterface, JsResult> dialog : dialogs.entrySet()) {
       dialog.getValue().cancel();
       dialog.getKey().dismiss();

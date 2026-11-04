@@ -2186,7 +2186,16 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && WebViewFeature.isFeatureSupported(WebViewFeature.WEB_VIEW_RENDERER_CLIENT_BASIC_USAGE)) {
       WebViewCompat.setWebViewRenderProcessClient(this, null);
     }
-    setWebChromeClient(new WebChromeClient());
+    // Disposal is unconditional: even when native prompts are enabled, a closing
+    // WebView must finish queued prompts instead of opening UI during about:blank.
+    setWebChromeClient(new WebChromeClient() {
+      @Override
+      public boolean onJsPrompt(WebView view, String url, String message, String defaultValue, android.webkit.JsPromptResult result) {
+        // Complete queued prompts and prevent the system from showing its own dialog.
+        result.cancel();
+        return true;
+      }
+    });
     setWebViewClient(new WebViewClient() {
       public void onPageFinished(WebView view, String url) {
         destroy();

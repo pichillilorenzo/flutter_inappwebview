@@ -3295,7 +3295,7 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
     this.userAgent = "",
     this.applicationNameForUserAgent = "",
     this.javaScriptEnabled = true,
-    this.enableNativePromptDialog = true,
+    this.enableNativePromptDialog = false,
     this.javaScriptCanOpenWindowsAutomatically = false,
     this.mediaPlaybackRequiresUserGesture = true,
     this.minimumFontSize,

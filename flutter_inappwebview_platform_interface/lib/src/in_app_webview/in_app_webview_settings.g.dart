@@ -2028,7 +2028,7 @@ class InAppWebViewSettings {
     this.userAgent = "",
     this.applicationNameForUserAgent = "",
     this.javaScriptEnabled = true,
-    this.enableNativePromptDialog = true,
+    this.enableNativePromptDialog = false,
     this.javaScriptCanOpenWindowsAutomatically = false,
     this.mediaPlaybackRequiresUserGesture = true,
     this.minimumFontSize,

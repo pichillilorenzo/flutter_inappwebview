@@ -21,7 +21,7 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
     var javaScriptEnabled = true
     // ISettings uses this property name for KVC parsing and settings serialization.
     // Keep native prompt UI enabled by default for existing callers.
-    var enableNativePromptDialog = true
+    var enableNativePromptDialog = false
     var javaScriptCanOpenWindowsAutomatically = false
     var mediaPlaybackRequiresUserGesture = true
     var verticalScrollBarEnabled = true

@@ -41,7 +41,7 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
   public String applicationNameForUserAgent = "";
   public Boolean javaScriptEnabled = true;
   // Preserve default prompt UI unless Flutter explicitly disables the native fallback.
-  public Boolean enableNativePromptDialog = true;
+  public Boolean enableNativePromptDialog = false;
   public Boolean javaScriptCanOpenWindowsAutomatically = false;
   public Boolean mediaPlaybackRequiresUserGesture = true;
   public Integer minimumFontSize = 8;

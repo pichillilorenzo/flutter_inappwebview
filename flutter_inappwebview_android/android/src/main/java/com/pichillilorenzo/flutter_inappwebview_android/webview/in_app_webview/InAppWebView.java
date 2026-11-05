@@ -46,6 +46,7 @@ import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.CookieManager;
 import android.webkit.DownloadListener;
+import android.webkit.RenderProcessGoneDetail;
 import android.webkit.URLUtil;
 import android.webkit.ValueCallback;
 import android.webkit.WebBackForwardList;
@@ -185,6 +186,9 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
   @NonNull
   private final String expectedBridgeSecret = UUID.randomUUID().toString();
   private boolean javaScriptBridgeEnabled = true;
+  private boolean rendererGone;
+  private boolean disposed;
+  private boolean destroyed;
 
   public InAppWebView(Context context) {
     super(context);
@@ -526,10 +530,12 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
       checkContextMenuShouldBeClosedTask = new Runnable() {
         @Override
         public void run() {
+          if (disposed || rendererGone) return;
           if (floatingContextMenu != null) {
             evaluateJavascript(PluginScriptsUtil.CHECK_CONTEXT_MENU_SHOULD_BE_HIDDEN_JS_SOURCE, new ValueCallback<String>() {
               @Override
               public void onReceiveValue(String value) {
+                if (disposed || rendererGone) return;
                 if (value == null || value.equals("true")) {
                   if (floatingContextMenu != null) {
                     hideContextMenu();
@@ -1225,6 +1231,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     evaluateJavascript("((window.top == null || window.top === window) ? window : window.top)." + flagVariable, null, new ValueCallback<String>() {
       @Override
       public void onReceiveValue(String value) {
+        if (disposed || rendererGone) return;
         boolean alreadyLoaded = value != null && !value.equalsIgnoreCase("null");
         if (alreadyLoaded) {
           String enableSource = "((window.top == null || window.top === window) ? window : window.top)." + flagVariable + " = " + enable + ";";
@@ -1241,7 +1248,12 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
   }
 
   public void injectDeferredObject(String source, @Nullable final ContentWorld contentWorld, String jsWrapper, @Nullable final ValueCallback<String> resultCallback) {
-    final String resultUuid = contentWorld != null && !contentWorld.equals(ContentWorld.PAGE) ? UUID.randomUUID().toString() : null;
+    if (disposed || rendererGone) {
+      if (resultCallback != null) resultCallback.onReceiveValue("null");
+      return;
+    }
+    final boolean usesContentWorld = contentWorld != null && !contentWorld.equals(ContentWorld.PAGE);
+    final String resultUuid = resultCallback != null ? UUID.randomUUID().toString() : null;
     String scriptToInject = source;
     if (jsWrapper != null) {
       org.json.JSONArray jsonEsc = new org.json.JSONArray();
@@ -1250,8 +1262,10 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
       String jsonSourceString = jsonRepr.substring(1, jsonRepr.length() - 1);
       scriptToInject = String.format(jsWrapper, jsonSourceString);
     }
-    if (resultUuid != null && resultCallback != null) {
+    if (resultCallback != null) {
       evaluateJavaScriptContentWorldCallbacks.put(resultUuid, resultCallback::onReceiveValue);
+    }
+    if (usesContentWorld && resultCallback != null) {
       scriptToInject = Util.replaceAll(PluginScriptsUtil.EVALUATE_JAVASCRIPT_WITH_CONTENT_WORLD_WRAPPER_JS_SOURCE(),
                       PluginScriptsUtil.VAR_RANDOM_NAME, "_" + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + "_" + Math.round(Math.random() * 1000000))
               .replace(PluginScriptsUtil.VAR_PLACEHOLDER_VALUE, UserContentController.escapeCode(source))
@@ -1265,11 +1279,11 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
         if (!documentJavaScriptGeneration.runIfCurrent(
                 evaluationDocumentGeneration,
                 evaluateJavaScriptContentWorldCallbacks,
-                resultUuid != null && resultCallback != null ? resultUuid : null,
+                resultUuid,
                 new Runnable() {
                   @Override
                   public void run() {
-                    injectDeferredObjectOnMainLooper(finalScriptToInject, contentWorld, resultUuid, resultCallback);
+                    injectDeferredObjectOnMainLooper(finalScriptToInject, contentWorld, resultUuid, usesContentWorld);
                   }
                 })) {
           return;
@@ -1282,16 +1296,31 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
       String finalScriptToInject,
       @Nullable ContentWorld contentWorld,
       @Nullable String resultUuid,
-      @Nullable ValueCallback<String> resultCallback) {
+      boolean usesContentWorld) {
     String scriptToInject = userContentController.generateCodeForScriptEvaluation(finalScriptToInject, contentWorld);
-    evaluateJavascript(scriptToInject, new ValueCallback<String>() {
+    super.evaluateJavascript(scriptToInject, new ValueCallback<String>() {
       @Override
       public void onReceiveValue(String s) {
-        if (resultUuid != null || resultCallback == null)
+        if (usesContentWorld || resultUuid == null)
           return;
-        resultCallback.onReceiveValue(s);
+        evaluateJavaScriptContentWorldCallbacks.complete(resultUuid, s);
       }
     });
+  }
+
+  @Override
+  public void evaluateJavascript(String source, @Nullable ValueCallback<String> resultCallback) {
+    if (disposed || rendererGone) {
+      if (resultCallback != null) resultCallback.onReceiveValue("null");
+      return;
+    }
+    if (resultCallback == null) {
+      super.evaluateJavascript(source, null);
+      return;
+    }
+    final String resultUuid = UUID.randomUUID().toString();
+    evaluateJavaScriptContentWorldCallbacks.put(resultUuid, resultCallback::onReceiveValue);
+    super.evaluateJavascript(source, value -> evaluateJavaScriptContentWorldCallbacks.complete(resultUuid, value));
   }
 
   public void evaluateJavascript(String source, @Nullable ContentWorld contentWorld, @Nullable ValueCallback<String> resultCallback) {
@@ -1797,6 +1826,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
 
         @Override
         public void onGlobalLayout() {
+          if (disposed || rendererGone) return;
           if (floatingContextMenu != null) {
             floatingContextMenu.getViewTreeObserver().removeOnGlobalLayoutListener(this);
             if (getSettings().getJavaScriptEnabled()) {
@@ -1884,6 +1914,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
             "})();", new ValueCallback<String>() {
       @Override
       public void onReceiveValue(String value) {
+        if (disposed || rendererGone) return;
         if (floatingContextMenu != null) {
           if (value != null && !value.equalsIgnoreCase("null")) {
             int x = contextMenuPoint.x;
@@ -1946,6 +1977,12 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
 
   @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
   public void callAsyncJavaScript(String functionBody, Map<String, Object> arguments, @Nullable ContentWorld contentWorld, @Nullable ValueCallback<String> resultCallback) {
+    if (disposed || rendererGone) {
+      if (resultCallback != null) {
+        resultCallback.onReceiveValue("{\"value\":null,\"error\":\"WebView is no longer available\"}");
+      }
+      return;
+    }
     String resultUuid = UUID.randomUUID().toString();
     if (resultCallback != null) {
       callAsyncJavaScriptCallbacks.put(resultUuid, resultCallback::onReceiveValue);
@@ -2219,28 +2256,62 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
   }
 
 
+  @RequiresApi(api = Build.VERSION_CODES.O)
+  public boolean onRenderProcessGone(RenderProcessGoneDetail detail) {
+    rendererGone = true;
+    if (!customSettings.useOnRenderProcessGone && !disposed) {
+      cancelPendingJavaScriptCallbacks("WebView renderer exited");
+      return false;
+    }
+    try {
+      if (channelDelegate != null) {
+        channelDelegate.onRenderProcessGone(detail.didCrash(), detail.rendererPriorityAtExit());
+      }
+    } finally {
+      try {
+        dispose();
+      } finally {
+        destroy();
+      }
+    }
+    return true;
+  }
+
   @Override
   public void dispose() {
-    cancelPendingJavaScriptCallbacks("WebView disposed");
+    if (Looper.myLooper() != mainLooperHandler.getLooper()) {
+      mainLooperHandler.post(this::dispose);
+      return;
+    }
+    if (disposed) return;
+    disposed = true;
     if (channelDelegate != null) {
       channelDelegate.dispose();
       channelDelegate = null;
     }
     super.dispose();
-    WebSettings settings = getSettings();
-    settings.setJavaScriptEnabled(false);
-    removeJavascriptInterface(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME());
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && WebViewFeature.isFeatureSupported(WebViewFeature.WEB_VIEW_RENDERER_CLIENT_BASIC_USAGE)) {
-      WebViewCompat.setWebViewRenderProcessClient(this, null);
-    }
-    setWebChromeClient(new WebChromeClient());
-    setWebViewClient(new WebViewClient() {
-      public void onPageFinished(WebView view, String url) {
-        destroy();
+    if (!rendererGone) {
+      WebSettings settings = getSettings();
+      settings.setJavaScriptEnabled(false);
+      removeJavascriptInterface(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME());
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && WebViewFeature.isFeatureSupported(WebViewFeature.WEB_VIEW_RENDERER_CLIENT_BASIC_USAGE)) {
+        WebViewCompat.setWebViewRenderProcessClient(this, null);
       }
-    });
+      setWebChromeClient(new WebChromeClient());
+      setWebViewClient(new WebViewClient() {
+        public void onPageFinished(WebView view, String url) {
+          destroy();
+        }
+
+        @RequiresApi(api = Build.VERSION_CODES.O)
+        @Override
+        public boolean onRenderProcessGone(WebView view, RenderProcessGoneDetail detail) {
+          return InAppWebView.this.onRenderProcessGone(detail);
+        }
+      });
+    }
     interceptOnlyAsyncAjaxRequestsPluginScript = null;
-    userContentController.dispose();
+    userContentController.dispose(!rendererGone);
     if (findInteractionController != null) {
       findInteractionController.dispose();
       findInteractionController = null;
@@ -2256,6 +2327,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     mHandler.removeCallbacksAndMessages(null);
     disposeWebMessageChannels();
     disposeWebMessageListeners();
+    floatingContextMenu = null;
     removeAllViews();
     if (checkContextMenuShouldBeClosedTask != null)
       removeCallbacks(checkContextMenuShouldBeClosedTask);
@@ -2283,11 +2355,29 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
       javaScriptBridgeInterface = null;
     }
     plugin = null;
-    loadUrl("about:blank");
+    boolean callbacksCompleted = false;
+    try {
+      cancelPendingJavaScriptCallbacks(rendererGone ? "WebView renderer exited" : "WebView disposed");
+      callbacksCompleted = true;
+    } finally {
+      if (rendererGone || !callbacksCompleted) {
+        destroy();
+      } else {
+        loadUrl("about:blank");
+      }
+    }
   }
 
   @Override
   public void destroy() {
+    if (Looper.myLooper() != mainLooperHandler.getLooper()) {
+      mainLooperHandler.post(this::destroy);
+      return;
+    }
+    if (destroyed) return;
+    destroyed = true;
+    final ViewParent parent = getParent();
+    if (parent instanceof ViewGroup) ((ViewGroup) parent).removeView(this);
     super.destroy();
   }
 }

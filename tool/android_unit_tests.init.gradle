@@ -1,0 +1,16 @@
+// Flutter normally supplies these values and the embedding dependency.
+gradle.beforeProject { project ->
+    project.ext.flutter = [compileSdkVersion: 36]
+    project.afterEvaluate {
+        def engineVersion = project.findProperty('flutterEngineVersion')
+        if (engineVersion == null) {
+            throw new GradleException('Pass -PflutterEngineVersion from the Flutter SDK engine.version')
+        }
+        project.repositories {
+            maven { url 'https://storage.googleapis.com/download.flutter.io' }
+        }
+        def embedding = "io.flutter:flutter_embedding_debug:1.0.0-${engineVersion}"
+        project.dependencies.add('compileOnly', embedding)
+        project.dependencies.add('testImplementation', embedding)
+    }
+}

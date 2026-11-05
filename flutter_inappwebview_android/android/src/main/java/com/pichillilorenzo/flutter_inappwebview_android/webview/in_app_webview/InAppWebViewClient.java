@@ -794,17 +794,7 @@ public class InAppWebViewClient extends WebViewClient {
   @RequiresApi(api = Build.VERSION_CODES.O)
   @Override
   public boolean onRenderProcessGone(WebView view, RenderProcessGoneDetail detail) {
-    final InAppWebView webView = (InAppWebView) view;
-    webView.cancelPendingJavaScriptCallbacks("WebView renderer exited");
-
-    if (webView.customSettings.useOnRenderProcessGone && webView.channelDelegate != null) {
-      boolean didCrash = detail.didCrash();
-      int rendererPriorityAtExit = detail.rendererPriorityAtExit();
-      webView.channelDelegate.onRenderProcessGone(didCrash, rendererPriorityAtExit);
-      return true;
-    }
-
-    return super.onRenderProcessGone(view, detail);
+    return ((InAppWebView) view).onRenderProcessGone(detail);
   }
 
   @Override

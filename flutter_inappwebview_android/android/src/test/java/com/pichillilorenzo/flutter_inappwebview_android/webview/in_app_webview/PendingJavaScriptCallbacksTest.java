@@ -1,10 +1,33 @@
 package com.pichillilorenzo.flutter_inappwebview_android.webview.in_app_webview;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThrows;
 
 import org.junit.Test;
 
 public class PendingJavaScriptCallbacksTest {
+  @Test
+  public void cancellationDrainsBothRegistriesBeforeRethrowingHostErrors() {
+    PendingJavaScriptCallbacks first = new PendingJavaScriptCallbacks();
+    PendingJavaScriptCallbacks second = new PendingJavaScriptCallbacks();
+    RuntimeException failure = new IllegalStateException("first host error");
+    Error laterFailure = new AssertionError("second host error");
+    final int[] completions = {0};
+    first.put("throws", value -> { throw failure; });
+    first.put("remaining-first", value -> completions[0]++);
+    second.put("also-throws", value -> { throw laterFailure; });
+    second.put("remaining-second", value -> completions[0]++);
+    RuntimeException actual = assertThrows(RuntimeException.class, () ->
+        PendingJavaScriptCallbacks.cancelBoth(first, "cancelled", second, "null"));
+    assertSame(failure, actual);
+    assertEquals(2, completions[0]);
+    assertEquals(1, actual.getSuppressed().length);
+    assertSame(laterFailure, actual.getSuppressed()[0]);
+    assertEquals(0, first.size());
+    assertEquals(0, second.size());
+  }
+
   @Test
   public void cancelAllCompletesPendingCallbacksAndAllowsReentrantRequests() {
     PendingJavaScriptCallbacks callbacks = new PendingJavaScriptCallbacks();

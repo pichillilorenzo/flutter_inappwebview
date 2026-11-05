@@ -3390,15 +3390,28 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
   }
 
   @override
-  Future<void> pause() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    await channel?.invokeMethod('pause', args);
-  }
+  Future<void> pause() => _performLifecycleOperation('pause');
 
   @override
-  Future<void> resume() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    await channel?.invokeMethod('resume', args);
+  Future<void> resume() => _performLifecycleOperation('resume');
+
+  Future<void> _performLifecycleOperation(String method) async {
+    if (disposed) {
+      throw PlatformException(code: 'WEBVIEW_DISPOSED');
+    }
+    final confirmed = await channel!.invokeMethod<bool>(
+      method,
+      <String, dynamic>{},
+    );
+    if (disposed) {
+      throw PlatformException(code: 'WEBVIEW_DISPOSED');
+    }
+    if (confirmed != true) {
+      throw PlatformException(
+        code: 'WEBVIEW_LIFECYCLE_FAILED',
+        message: 'The native WebView did not confirm $method.',
+      );
+    }
   }
 
   @override

@@ -58,6 +58,7 @@ list(APPEND PLUGIN_SOURCES
   "types/channel_delegate.h"
   "types/base_callback_result.h"
   "types/one_shot_callback.h"
+  "in_app_webview/webview_lifecycle_state.h"
   "custom_platform_view/surface_pool_slot.h"
   "custom_platform_view/async_resource_build.h"
   "custom_platform_view/background_probe.h"

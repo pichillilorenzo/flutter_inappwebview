@@ -11,6 +11,13 @@ permissions:
   contents: read
 
 jobs:
+  lifecycle-state:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test native lifecycle without a WebView runtime
+        run: sh flutter_inappwebview_windows/windows/test/run_webview_lifecycle_tests.sh
+
   test:
     runs-on: windows-latest
     steps:

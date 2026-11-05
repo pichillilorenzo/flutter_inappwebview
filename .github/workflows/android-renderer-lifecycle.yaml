@@ -25,6 +25,9 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: ''
       - uses: subosito/flutter-action@v2
         with:
           channel: stable

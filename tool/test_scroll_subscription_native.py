@@ -75,6 +75,7 @@ if args.source_checks_only:
 
 harness = r'''
 import Foundation
+import CoreGraphics
 
 class Settings {
     var disableVerticalScroll = false

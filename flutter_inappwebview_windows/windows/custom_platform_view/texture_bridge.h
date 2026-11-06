@@ -8,7 +8,9 @@
 #include <functional>
 #include <mutex>
 #include <optional>
+#include <vector>
 
+#include "delayed_texture_trim.h"
 #include "graphics_context.h"
 
 namespace flutter_inappwebview_plugin
@@ -82,6 +84,11 @@ namespace flutter_inappwebview_plugin
     virtual void StopInternal();
     // Called under |mutex_| after a suspend closed the capture session.
     virtual void OnCaptureSuspended();
+    // Detach only resources not held by Flutter. |retired| is destroyed after
+    // |mutex_| is released, so final driver releases cannot hold a raster lock.
+    // Return true to retry later when a consumer still holds a spare resource.
+    virtual bool TrimHiddenResources(
+      std::vector<winrt::com_ptr<ID3D11Texture2D>>& retired);
     // Called under |mutex_| for every captured frame that survived the fps
     // limit. Returning false skips the frame: Flutter is not notified and the
     // frame is not drawn. The base bridge accepts everything; the GPU bridge
@@ -97,5 +104,9 @@ namespace flutter_inappwebview_plugin
     // corresponds to DXGI_FORMAT_B8G8R8A8_UNORM
     static constexpr auto kPixelFormat = ABI::Windows::Graphics::DirectX::
       DirectXPixelFormat::DirectXPixelFormat_B8G8R8A8UIntNormalized;
+
+  private:
+    void ScheduleHiddenTrim();
+    DelayedTextureTrim hidden_trim_;
   };
 }

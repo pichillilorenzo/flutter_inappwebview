@@ -25,6 +25,7 @@ namespace flutter_inappwebview_plugin
   public:
     TextureBridgeGpu(GraphicsContext* graphics_context,
       ABI::Windows::UI::Composition::IVisual* visual);
+    ~TextureBridgeGpu() override;
 
     // Called by Flutter on its raster thread. The returned buffer is leased
     // until Flutter invokes its release callback, so capture never writes a
@@ -35,6 +36,8 @@ namespace flutter_inappwebview_plugin
   protected:
     void StopInternal() override;
     void OnCaptureSuspended() override;
+    bool TrimHiddenResources(
+      std::vector<winrt::com_ptr<ID3D11Texture2D>>& retired) override;
     bool AcceptFrame(const winrt::com_ptr<ID3D11Texture2D>& frame) override;
 
   private:

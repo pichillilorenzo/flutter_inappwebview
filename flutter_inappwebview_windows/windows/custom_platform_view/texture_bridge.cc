@@ -8,6 +8,7 @@
 #include <iostream>
 
 #include "util/direct3d11.interop.h"
+#include "../utils/timer.h"
 
 namespace flutter_inappwebview_plugin
 {
@@ -15,7 +16,12 @@ namespace flutter_inappwebview_plugin
 
   TextureBridge::TextureBridge(GraphicsContext* graphics_context,
     ABI::Windows::UI::Composition::IVisual* visual)
-    : graphics_context_(graphics_context)
+    : graphics_context_(graphics_context),
+      hidden_trim_(
+        [](std::function<void()> callback, uint32_t delay) {
+          return Timer::setTimeout(std::move(callback), delay);
+        },
+        [](DelayedTextureTrim::TimerId id) { Timer::clearTimeout(id); })
   {
     capture_item_ =
       graphics_context_->CreateGraphicsCaptureItemFromVisual(visual);
@@ -88,6 +94,9 @@ namespace flutter_inappwebview_plugin
       return false;
     }
     is_running_ = true;
+    if (capture_suspended_) {
+      ScheduleHiddenTrim();
+    }
     return true;
   }
 
@@ -98,6 +107,9 @@ namespace flutter_inappwebview_plugin
       return;
     }
     capture_suspended_ = suspended;
+    if (!suspended) {
+      hidden_trim_.CancelPending();
+    }
     if (!is_running_) {
       return;
     }
@@ -105,6 +117,7 @@ namespace flutter_inappwebview_plugin
       StopCapture();
       last_frame_ = nullptr;
       OnCaptureSuspended();
+      ScheduleHiddenTrim();
     }
     else if (!StartCapture()) {
       // Keep the bridge running and retain the last published frame. A later
@@ -187,6 +200,7 @@ namespace flutter_inappwebview_plugin
 
   void TextureBridge::StopInternal()
   {
+    hidden_trim_.CancelPending();
     if (is_running_) {
       is_running_ = false;
       StopCapture();
@@ -194,6 +208,33 @@ namespace flutter_inappwebview_plugin
   }
 
   void TextureBridge::OnCaptureSuspended() {}
+
+  bool TextureBridge::TrimHiddenResources(
+    std::vector<winrt::com_ptr<ID3D11Texture2D>>&)
+  {
+    return false;
+  }
+
+  void TextureBridge::ScheduleHiddenTrim()
+  {
+    // Visibility, Stop and this timer run on the owning platform thread.
+    hidden_trim_.Start([this] {
+      std::vector<winrt::com_ptr<ID3D11Texture2D>> retired;
+      // Allocate before the capture lock, also used by the CPU raster path.
+      retired.reserve(2);
+      bool retry = false;
+      {
+        const std::lock_guard<std::mutex> lock(mutex_);
+        if (!is_running_ || !capture_suspended_) {
+          return false;
+        }
+        retry = TrimHiddenResources(retired);
+      }
+      // The last published GPU texture / CPU pixel buffer was not detached.
+      // Its consumer never waits for these final driver releases.
+      return retry;
+    });
+  }
 
   void TextureBridge::OnFrameArrived()
   {

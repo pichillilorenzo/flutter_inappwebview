@@ -21,6 +21,8 @@
 - Reported the exact WebView2 creation stage in errors without copying initialization payloads for each callback.
 - Delivered `setMemoryUsageTargetLevel` through the browser responsiveness gate, avoiding waits on an unresponsive browser process when responsiveness data is available.
 - Stopped capturing frames of paused WebViews and of WebViews whose host window is minimized; the last frame stays on screen until capture resumes.
+- Released unused composition shared textures and CPU readback staging after 30 seconds hidden. Short tab switches keep their buffers; the last published frame and outstanding Flutter leases survive trim, resize and disposal. Resources are rebuilt at the current size on the next frame. HWND rendering is unchanged.
+- Kept the previous CPU frame when readback texture allocation fails, and corrected array ownership of the CPU pixel buffer during resize/disposal.
 - Coalesced surface size reports to at most one per frame, skipped unchanged sizes natively, and rebuilt the capture frame pool only when the captured size actually changed.
 - Shipped the captured-frame comparison shader precompiled instead of compiling it with `d3dcompiler_47.dll` on the platform thread when the first WebView starts capturing; on slow disks loading and compiling it blocked the app for seconds.
 - Saved one full-frame GPU copy per changed WebView frame by swapping the comparison textures instead of copying between them.

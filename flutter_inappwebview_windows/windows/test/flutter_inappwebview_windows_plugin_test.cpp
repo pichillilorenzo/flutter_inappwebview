@@ -12,6 +12,7 @@
 #include "in_app_webview/browser_process_gate.h"
 #include "custom_platform_view/frame_compare_gate.h"
 #include "surface_pool_slot_test_cases.h"
+#include "delayed_texture_trim_test_cases.h"
 #include "one_shot_callback_test_cases.h"
 #include "prewarm_operation_test_cases.h"
 #include "async_resource_build_test_cases.h"
@@ -28,6 +29,10 @@
 #include "utils/flutter_view_hwnd.h"
 
 namespace flutter_inappwebview_plugin::test {
+
+TEST(DelayedTextureTrim, QuietIntervalCancellationAndOwnership) {
+  delayed_texture_trim_test::RunAll();
+}
 
 TEST(WebViewLifecycle, WaitsForNativeSuspendCallback) {
   webview_lifecycle_test::waitsForSuspendCallback();

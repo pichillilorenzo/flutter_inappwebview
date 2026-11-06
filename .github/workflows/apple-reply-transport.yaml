@@ -39,6 +39,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Complete Swift source extraction without an Apple SDK
         run: python3 tool/test_swift_source.py
+      - name: Ownership fixture generation and strict negative-control contracts
+        run: python3 tool/test_apple_bridge_ownership_source.py
       - name: Shared authorization and one-way source invariants
         run: node tool/test_apple_bridge_source_invariants.js
 

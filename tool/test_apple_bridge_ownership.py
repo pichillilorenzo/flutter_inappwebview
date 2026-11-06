@@ -3,6 +3,9 @@
 
 Uses small WebKit doubles to make ownership/retention observable. The current
 stateless adapters and weak-owner registries are compiled from their real files.
+Each close phase drains a local autorelease pool before checking weak references.
+The current-source run also requires an intentionally retaining handler to fail
+that same check. --emit-source writes these inputs without compiling/running them.
 --source-ref selects older native source, and --expect-regression requires that
 its parent-first cleanup actually loses the live popup's handler. This is not
 an Apple SDK or live WebKit test; the separate workflow runs those as well.
@@ -16,16 +19,20 @@ import tempfile
 from swift_source import extract_swift_block as method
 
 ROOT = Path(__file__).resolve().parents[1]
-p = argparse.ArgumentParser(description=__doc__)
-p.add_argument('--source-ref')
-p.add_argument('--expect-regression', action='store_true')
-args = p.parse_args()
+BASELINE_FAILURE = 'live popup lost callHandler when parent closed first'
+RETENTION_FAILURE = 'shared message handler retained disposed parent'
+STATELESS_SELECTION = '''        let registeredHandler: WKScriptMessageHandler = scriptMessageHandler is InAppWebView ?
+            JavaScriptBridgeMessageHandler() : scriptMessageHandler'''
+RETAINING_SELECTION = '''        let registeredHandler: WKScriptMessageHandler = scriptMessageHandler'''
 
 
-def source(path):
-    if args.source_ref:
-        return subprocess.check_output(['git', 'show', f'{args.source_ref}:{path}'], cwd=ROOT, text=True)
-    return (ROOT / path).read_text()
+def source(path, source_ref=None):
+    if source_ref:
+        return subprocess.check_output(
+            ['git', 'show', f'{source_ref}:{path}'],
+            cwd=ROOT, text=True, encoding='utf-8',
+        )
+    return (ROOT / path).read_text(encoding='utf-8')
 
 
 stubs = r'''
@@ -103,92 +110,190 @@ final class WKContentWorld: NSObject { static let page = WKContentWorld() }
 tests = r'''
 @main struct Run {
     @MainActor static func main() {
+        var completedCases = 0
         for enabled in [[false, false], [true, false], [false, true], [true, true]] {
             for parentFirst in [true, false] {
                 let controller = WKUserContentController()
-                var parent: InAppWebView? = InAppWebView(controller, windowId: nil, enabled: enabled[0])
-                let popup = InAppWebView(controller, windowId: 7, enabled: enabled[1])
-                controller.install(parent!)
-                weak var weakParent = parent
+                var parent: InAppWebView? = nil
+                var popup: InAppWebView? = nil
+                weak var weakParent: InAppWebView? = nil
+                weak var weakPopup: InAppWebView? = nil
+                var firstOwnerAliveBeforeDrain = false
+                var lastOwnerAliveBeforeDrain = false
+                let label = "parentOptIn=\(enabled[0]) popupOptIn=\(enabled[1]) parentFirst=\(parentFirst)"
+                // This Foundation command-line process has no UIKit/AppKit event
+                // loop to drain temporary Cocoa objects. Include registration:
+                // reading a weak NSHashTable may retain owners until this drain.
+                autoreleasepool {
+                    parent = InAppWebView(controller, windowId: nil, enabled: enabled[0])
+                    popup = InAppWebView(controller, windowId: 7, enabled: enabled[1])
+                    weakParent = parent
+                    weakPopup = popup
+                    controller.install(parent!)
+                    if parentFirst {
+                        parent!.releaseJavaScriptBridgeOwner()
+                        parent = nil
+                    } else {
+                        popup!.releaseJavaScriptBridgeOwner()
+                        popup = nil
+                    }
+                    firstOwnerAliveBeforeDrain = parentFirst ? weakParent != nil : weakPopup != nil
+                }
+                let firstOwnerAliveAfterDrain = parentFirst ? weakParent != nil : weakPopup != nil
+                print("OWNERSHIP \(label) firstClose beforeDrain=\(firstOwnerAliveBeforeDrain) afterDrain=\(firstOwnerAliveAfterDrain)")
                 if parentFirst {
-                    parent!.releaseJavaScriptBridgeOwner()
-                    parent = nil
                     require(controller.oneWay["callHandler"] != nil, "live popup lost callHandler when parent closed first")
                     require(weakParent == nil, "shared message handler retained disposed parent")
                     require(controller.scripts == ["bridge", "console", "scroll"], "parent removed live popup scripts")
-                    for kind in ["rpc", "console-one-way", "scroll-one-way", "window-focus-one-way"] {
-                        controller.oneWay["callHandler"]!.userContentController(controller, didReceive: WKScriptMessage(popup, kind))
-                        require(popup.events.last == kind, "surviving popup did not receive \(kind)")
+                    autoreleasepool {
+                        for kind in ["rpc", "console-one-way", "scroll-one-way", "window-focus-one-way"] {
+                            controller.oneWay["callHandler"]!.userContentController(controller, didReceive: WKScriptMessage(popup!, kind))
+                            require(popup!.events.last == kind, "surviving popup did not receive \(kind)")
+                        }
+                        require(controller.completeDisposals == 0, "controller destroyed while popup alive")
+                        // A new document still has bootstrap scripts and handlers.
+                        require(controller.scripts.contains("bridge"), "popup navigation lost bootstrap")
+                        // REPLY_SURVIVES_POPUP
+                        popup!.releaseJavaScriptBridgeOwner()
+                        popup!.releaseJavaScriptBridgeOwner()
+                        popup = nil
+                        lastOwnerAliveBeforeDrain = weakPopup != nil
                     }
-                    require(controller.completeDisposals == 0, "controller destroyed while popup alive")
-                    // A new document still has bootstrap scripts and handlers.
-                    require(controller.scripts.contains("bridge"), "popup navigation lost bootstrap")
-                    // REPLY_SURVIVES_POPUP
-                    popup.releaseJavaScriptBridgeOwner()
-                    popup.releaseJavaScriptBridgeOwner()
                 } else {
-                    popup.releaseJavaScriptBridgeOwner()
+                    require(weakPopup == nil, "shared message handler retained disposed popup")
                     require(controller.scripts.count == 3 && controller.oneWay["callHandler"] != nil, "popup removed live parent resources")
-                    for kind in ["rpc", "console-one-way", "scroll-one-way", "window-focus-one-way"] {
-                        controller.oneWay["callHandler"]!.userContentController(controller, didReceive: WKScriptMessage(parent!, kind))
-                        require(parent!.events.last == kind, "surviving parent did not receive \(kind)")
+                    autoreleasepool {
+                        for kind in ["rpc", "console-one-way", "scroll-one-way", "window-focus-one-way"] {
+                            controller.oneWay["callHandler"]!.userContentController(controller, didReceive: WKScriptMessage(parent!, kind))
+                            require(parent!.events.last == kind, "surviving parent did not receive \(kind)")
+                        }
+                        // REPLY_SURVIVES_PARENT
+                        parent!.releaseJavaScriptBridgeOwner()
+                        parent = nil
+                        lastOwnerAliveBeforeDrain = weakParent != nil
                     }
-                    // REPLY_SURVIVES_PARENT
-                    parent!.releaseJavaScriptBridgeOwner()
-                    parent = nil
                 }
+                let lastOwnerAliveAfterDrain = parentFirst ? weakPopup != nil : weakParent != nil
+                print("OWNERSHIP \(label) lastClose beforeDrain=\(lastOwnerAliveBeforeDrain) afterDrain=\(lastOwnerAliveAfterDrain)")
+                require(weakParent == nil, "last-owner cleanup retained parent")
+                require(weakPopup == nil, "last-owner cleanup retained popup")
                 require(controller.oneWay.isEmpty && controller.replies.isEmpty && controller.scripts.isEmpty, "last owner did not release shared resources")
                 require(controller.completeDisposals == 1, "shared controller cleanup must happen once")
+                completedCases += 1
             }
         }
-        print("production ownership: both close orders, four opt-in combinations, weak parent, bootstrap, RPC/one-way routes and final cleanup passed")
+        require(completedCases == 8, "ownership matrix did not complete all eight cases")
+        print("production ownership: eight cases, both close orders, four opt-in combinations, weak parent/popup after pool drain, bootstrap, RPC/one-way routes and final cleanup passed")
     }
 }
 '''
 
-with tempfile.TemporaryDirectory(prefix='apple-bridge-owners-') as directory:
-    for platform in ['ios', 'macos']:
-        base = f'flutter_inappwebview_{platform}/{platform}/flutter_inappwebview_{platform}/Sources/flutter_inappwebview_{platform}'
-        native = source(f'{base}/InAppWebView/InAppWebView.swift')
-        controller = source(f'{base}/Types/WKUserContentController.swift')
-        current = '    func releaseJavaScriptBridgeOwner()' in native
-        sync = method(controller, '    public func sync(')
-        selection = sync[sync.index('{') + 1:sync.index('        let pluginScriptsList')]
-        registration = re.search(r'(                    removeScriptMessageHandler\(forName: messageHandlerName\)\n                    add\([^\n]+)', sync).group(1)
-        registration = selection + '\nlet messageHandlerName = "callHandler"\n' + registration
-        lifetime = (ROOT / f'{base}/Types/JavaScriptBridgeReply.swift').read_text()
-        production = lifetime
-        code = stubs.replace('        // REGISTRATION', registration)
-        if current:
-            for filename in ['JavaScriptBridgeMessageHandler.swift', 'JavaScriptBridgeReplyHandler.swift']:
-                production += '\n' + source(f'{base}/Types/{filename}').replace('import WebKit\n', '')
-            code = code.replace('        // OWNER_REGISTRATION', '''
+
+def retaining_handler_control(swift):
+    """Change only production handler selection; keep all lifecycle assertions."""
+    if swift.count(STATELESS_SELECTION) != 1:
+        raise ValueError('expected exactly one stateless registration to mutate')
+    return swift.replace(STATELESS_SELECTION, RETAINING_SELECTION)
+
+
+def build_source(platform, source_ref=None):
+    if platform not in ['ios', 'macos']:
+        raise ValueError(f'unsupported ownership platform: {platform}')
+    base = f'flutter_inappwebview_{platform}/{platform}/flutter_inappwebview_{platform}/Sources/flutter_inappwebview_{platform}'
+    native = source(f'{base}/InAppWebView/InAppWebView.swift', source_ref)
+    controller = source(f'{base}/Types/WKUserContentController.swift', source_ref)
+    current = '    func releaseJavaScriptBridgeOwner()' in native
+    sync = method(controller, '    public func sync(')
+    selection = sync[sync.index('{') + 1:sync.index('        let pluginScriptsList')]
+    registration = re.search(r'(                    removeScriptMessageHandler\(forName: messageHandlerName\)\n                    add\([^\n]+)', sync).group(1)
+    registration = selection + '\nlet messageHandlerName = "callHandler"\n' + registration
+    # The reply lifetime type supplies fields used by the common doubles even
+    # for the old source. Selected registration and cleanup always come from ref.
+    production = source(f'{base}/Types/JavaScriptBridgeReply.swift')
+    code = stubs.replace('        // REGISTRATION', registration)
+    if current:
+        for filename in ['JavaScriptBridgeMessageHandler.swift', 'JavaScriptBridgeReplyHandler.swift']:
+            production += '\n' + source(f'{base}/Types/{filename}', source_ref).replace('import WebKit\n', '')
+        code = code.replace('        // OWNER_REGISTRATION', '''
         controller.registerJavaScriptBridgeOwner(self)
         if enabled { controller.registerJavaScriptBridgeReplyOwner(self) }
 ''')
-            cleanup = method(native, '    func releaseJavaScriptBridgeOwner()')
-            current_tests = tests.replace('// REPLY_SURVIVES_POPUP', 'require(controller.replies.isEmpty == !enabled[1], "popup reply opt-in leaked or was removed")')
-            current_tests = current_tests.replace('// REPLY_SURVIVES_PARENT', 'require(controller.replies.isEmpty == !enabled[0], "parent reply opt-in leaked or was removed")')
-            # The actual constructor must register unprepared/pending popups too.
-            assert 'self.configuration.userContentController.registerJavaScriptBridgeOwner(self)' in native
-            assert 'windowWebView?.releaseJavaScriptBridgeOwner()' in native
-        else:
-            dispose = method(native, '    public func dispose()')
-            start = dispose.index('        if windowId == nil {')
-            end = dispose.index('        NotificationCenter.default.removeObserver(self)', start)
-            cleanup = '    func releaseJavaScriptBridgeOwner() {\n' + dispose[start:end] + '\n    }\n'
-            current_tests = tests
-        code = code.replace('    // CLEANUP', cleanup)
-        # Every source path is compiled, not reimplemented as ownership flags.
-        swift = Path(directory) / f'{platform}.swift'
-        swift.write_text(code + '\n' + production + '\n' + current_tests)
-        binary = Path(directory) / platform
-        subprocess.run(['swiftc', '-swift-version', '5', '-parse-as-library', str(swift), '-o', str(binary)], check=True)
-        result = subprocess.run([str(binary)], text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        print(result.stdout, end='')
-        if args.expect_regression:
-            if result.returncode == 0 or 'REGRESSION: live popup lost callHandler when parent closed first' not in result.stdout:
-                raise RuntimeError('expected the specific baseline ownership regression, not another failure')
-            print(f'{platform}: reproduced expected parent-first ownership regression at {args.source_ref}')
-        elif result.returncode:
-            raise SystemExit(result.returncode)
+        cleanup = method(native, '    func releaseJavaScriptBridgeOwner()')
+        current_tests = tests.replace('// REPLY_SURVIVES_POPUP', 'require(controller.replies.isEmpty == !enabled[1], "popup reply opt-in leaked or was removed")')
+        current_tests = current_tests.replace('// REPLY_SURVIVES_PARENT', 'require(controller.replies.isEmpty == !enabled[0], "parent reply opt-in leaked or was removed")')
+        # The actual constructor must register unprepared/pending popups too.
+        assert 'self.configuration.userContentController.registerJavaScriptBridgeOwner(self)' in native
+        assert 'windowWebView?.releaseJavaScriptBridgeOwner()' in native
+    else:
+        dispose = method(native, '    public func dispose()')
+        start = dispose.index('        if windowId == nil {')
+        end = dispose.index('        NotificationCenter.default.removeObserver(self)', start)
+        cleanup = '    func releaseJavaScriptBridgeOwner() {\n' + dispose[start:end] + '\n    }\n'
+        current_tests = tests
+    return code.replace('    // CLEANUP', cleanup) + '\n' + production + '\n' + current_tests
+
+
+def require_expected_failure(result, reason):
+    """Only our specific runtime assertion is evidence for a negative control."""
+    lines = result.stdout.rstrip().splitlines()
+    if result.returncode != 1 or not lines or lines[-1] != 'REGRESSION: ' + reason:
+        raise RuntimeError(f'expected the specific regression "{reason}", not another failure')
+
+
+def compile_and_run(swift, expected_failure=None):
+    binary = swift.with_suffix('')
+    # A compiler failure or timeout is never accepted as a control's failure.
+    subprocess.run(
+        ['swiftc', '-swift-version', '5', '-parse-as-library', str(swift), '-o', str(binary)],
+        check=True, timeout=120,
+    )
+    result = subprocess.run(
+        [str(binary)], text=True, encoding='utf-8', stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT, timeout=30,
+    )
+    print(result.stdout, end='')
+    if expected_failure:
+        require_expected_failure(result, expected_failure)
+    elif result.returncode:
+        raise SystemExit(result.returncode)
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--source-ref')
+    parser.add_argument('--expect-regression', action='store_true')
+    parser.add_argument('--emit-source', type=Path, help='empty directory; do not compile or run Swift')
+    args = parser.parse_args(argv)
+    if args.expect_regression and not args.source_ref:
+        parser.error('--expect-regression requires --source-ref')
+    if args.emit_source:
+        args.emit_source.mkdir(parents=True, exist_ok=True)
+        if any(args.emit_source.iterdir()):
+            parser.error('--emit-source requires an empty directory')
+
+    with tempfile.TemporaryDirectory(prefix='apple-bridge-owners-') as temporary:
+        directory = args.emit_source or Path(temporary)
+        for platform in ['ios', 'macos']:
+            swift = directory / f'{platform}.swift'
+            swift.write_text(build_source(platform, args.source_ref), encoding='utf-8')
+            if args.emit_source:
+                print(f'{platform}: emitted production ownership source only; Swift not compiled or run')
+            else:
+                compile_and_run(swift, BASELINE_FAILURE if args.expect_regression else None)
+                if args.expect_regression:
+                    print(f'{platform}: reproduced expected parent-first ownership regression at {args.source_ref}')
+
+            if not args.expect_regression:
+                # Keep the disposed parent in the shared controller deliberately.
+                # The unchanged post-drain weak assertion must reject this leak.
+                negative = directory / f'{platform}-retaining-handler.swift'
+                negative.write_text(retaining_handler_control(swift.read_text(encoding='utf-8')), encoding='utf-8')
+                if args.emit_source:
+                    print(f'{platform}: emitted retaining-handler control only; Swift not compiled or run')
+                else:
+                    compile_and_run(negative, RETENTION_FAILURE)
+                    print(f'{platform}: retaining-handler control rejected after autorelease pool drain')
+
+
+if __name__ == '__main__':
+    main()

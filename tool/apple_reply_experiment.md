@@ -104,10 +104,11 @@ handling of a denied request remains unchanged.
 | Layer | Command / CI | What it establishes |
 | --- | --- | --- |
 | Swift source boundaries (Linux/macOS) | `python3 tool/test_swift_source.py` | Reproduces the original embedded-JavaScript truncation, verifies complete production routing/callback/ownership/console blocks, and checks literals/interpolation/comments; does not replace Swift compilation or SDK checks |
+| Ownership fixture source and failure contracts (Linux/macOS) | `python3 tool/test_apple_bridge_ownership_source.py` | Checks pool boundaries, intact production bodies, all eight cases, mandatory retaining-handler control, and rejection of compiler errors/crashes/unrelated assertions as expected failures; does not execute native ownership |
 | Shared source invariants (Linux/macOS) | `node tool/test_apple_bridge_source_invariants.js` | Runs the same actual-sender/secret/origin and one-way early-return checks as the scroll/console harnesses; negative mutations verify that removing a protection fails; native behavior is still tested separately |
 | Production JavaScript | `node tool/test_apple_reply_transport.js` | JSON/prototype/Unicode parity; 256 concurrent out-of-order replies; separate frame/world closures; one-way routing; missing API; default disabled; mixed popup policies; reinjection; navigation; probe timeout, late answers, pending owner; no duplicate dispatch |
 | Production Swift route | `python3 tool/test_apple_reply_native.py` | Compiles the actual common authorization/probe and Dart callback bodies, plus reply/registry classes; exercises origin/frame/world/controller/window denials, both popup policy directions, 256 replies, errors, nil/JSON text, cancellation and late callbacks |
-| Shared-controller ownership | `python3 tool/test_apple_bridge_ownership.py` | Compiles production registration selection, weak-owner registries, adapters and cleanup; tests both closing orders, all four opt-in combinations, parent retention, surviving RPC/one-way routes, bootstrap retention, and last-owner cleanup |
+| Shared-controller ownership | `python3 tool/test_apple_bridge_ownership.py` | Compiles production registration selection, weak-owner registries, adapters and cleanup; tests both closing orders, all four opt-in combinations, parent/popup release after pool drain, surviving RPC/one-way routes, bootstrap retention, and last-owner cleanup; requires an intentionally retaining handler to fail the same post-drain parent-release check |
 | SDK protocol conformance | `python3 tool/test_apple_reply_native.py --sdk-check` | Also typechecks the production reply adapter against actual macOS and iOS simulator WebKit SDKs, including availability and actor-isolated reply signatures |
 | Existing reply regressions | `node tool/test_javascript_handler_json_replies.js apple` and `node tool/test_apple_bridge_errors.js` | Existing raw-text, argument, old-OS script, popup fallback, malformed JSON and error quoting paths remain tested |
 | Flutter settings / callbacks | `flutter test` in platform interface, iOS and macOS; public subscription regression tests | Serialization/defaults plus existing Dart raw JSON and lifecycle contracts |
@@ -122,6 +123,31 @@ not just an assertion that the new source contains a guard. The live macOS
 probe additionally tests both closing orders and navigation with **no opt-in**,
 and all mixed/enabled combinations, including console/scroll/focus one-way
 notifications and a surviving owner's already-pending reply.
+
+The ownership executable is a Foundation command-line harness. Its setup,
+registration and first close run in one `autoreleasepool`; surviving-sibling
+delivery and last close run in another. Weak references are checked **after**
+each pool drains, with before/after diagnostics for each matrix case. Foundation
+temporary objects, including objects obtained through weak-owner enumeration,
+can otherwise live until a later pool drain. A check immediately after assigning
+`nil` does not distinguish that temporary retention from an owning cycle. This
+fixture change does not establish the cause of an earlier failed native run:
+the candidate must pass all eight cases on Apple CI.
+
+The same command then recompiles each platform with exactly one mutation:
+register the original parent WebView as its handler instead of the production
+stateless adapter. This deliberately retains the disposed parent while a popup
+still owns the controller. It must exit with the specific parent-retention
+assertion **after** pool drainage. Both this control and the historical-baseline
+control require runtime exit code 1 and the exact expected final assertion;
+compilation errors, timeouts, crashes, or other failures cannot satisfy them.
+The controls do not change or skip the candidate's weak-reference assertions.
+
+For source inspection on a host without Swift/Apple SDKs, run
+`python3 tool/test_apple_bridge_ownership.py --emit-source /path/to/empty-directory`.
+It emits the two production harnesses and their two retaining-handler controls,
+explicitly without compiling or executing them. Add the documented baseline
+`--source-ref` and `--expect-regression` to emit the two historical harnesses.
 
 The Swift route harness substitutes only the unrelated internal-handler switch
 with a sentinel and uses small WebKit/Flutter doubles. It parameterizes OS
@@ -185,6 +211,8 @@ Verified against Apple's documentation and WebKit's public headers:
 - [Reply callback](https://developer.apple.com/documentation/webkit/wkscriptmessagehandlerwithreply/usercontentcontroller(_:didreceive:replyhandler:))
 - [WebKit protocol header](https://github.com/WebKit/WebKit/blob/main/Source/WebKit/UIProcess/API/Cocoa/WKScriptMessageHandlerWithReply.h)
 - [WKUserContentController registration header](https://github.com/WebKit/WebKit/blob/main/Source/WebKit/UIProcess/API/Cocoa/WKUserContentController.h)
+- [Apple: using autorelease pool blocks](https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/MemoryMgmt/Articles/mmAutoreleasePools.html)
+- [Clang ARC weak-load ownership semantics](https://clang.llvm.org/docs/AutomaticReferenceCounting.html#arc-runtime-objc-loadweak)
 
 The public headers declare the reply callback and registration API available
 from iOS 14.0 and macOS 11.0. Apple documents `NSString` as a supported result,

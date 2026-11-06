@@ -1,3 +1,8 @@
+## Unreleased
+
+- Keep inline scroll subscriptions disabled until a live controller attaches, so cancelling pending keep-alive creation cannot leave a listener or interfere with its next owner.
+- Suppress scroll channel messages without a listener, update callbacks on widget rebuilds, and resynchronize headless/keep-alive subscriptions without recreating the WebView.
+
 ## 1.2.0-beta.3
 
 - Added opt-in `WebViewEnvironment.prewarm` using AndroidX 1.14's experimental

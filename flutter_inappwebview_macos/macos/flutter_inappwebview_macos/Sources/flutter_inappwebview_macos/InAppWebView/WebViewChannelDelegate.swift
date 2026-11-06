@@ -159,6 +159,10 @@ public class WebViewChannelDelegate: ChannelDelegate {
                 result(nil)
             }
             break
+        case .setScrollChangedListener:
+            webView?.setScrollChangedListener(hasListener: arguments?["hasListener"] as? Bool ?? false)
+            result(true)
+            break
         case .setSettings:
             if let iabController = webView?.inAppBrowserDelegate as? InAppBrowserWebViewController {
                 let inAppBrowserSettings = InAppBrowserSettings()

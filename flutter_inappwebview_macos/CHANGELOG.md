@@ -1,3 +1,9 @@
+## Unreleased
+
+- Reconcile programmatic scrolling before a document receives its subscription and while detached, without repeating unchanged positions on attachment.
+- Keep inline scroll subscriptions disabled until a live controller attaches, so cancelling pending keep-alive creation cannot leave a listener or interfere with its next owner.
+- Attach and detach the scroll publisher with the current Dart listener, retaining final-coordinate flushing and independent popup state across rebuilds and navigation.
+
 ## 1.2.0-beta.3
 
 - Present file chooser and JavaScript dialogs as sheets attached to the hosting window.

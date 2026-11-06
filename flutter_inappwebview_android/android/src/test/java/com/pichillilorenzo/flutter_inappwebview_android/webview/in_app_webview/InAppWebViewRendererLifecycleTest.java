@@ -96,6 +96,51 @@ public class InAppWebViewRendererLifecycleTest {
   }
 
   @Test
+  public void disabledScrollSubscriptionStillHidesTheContextMenu() {
+    InAppWebView view = newView();
+    view.floatingContextMenu = new LinearLayout(view.getContext());
+    setScrollSubscription(view, false);
+    for (int i = 1; i <= 10000; i++) {
+      view.onScrollChanged(i, i * 2, i - 1, (i - 1) * 2);
+    }
+    assertTrue(messenger.calls.isEmpty());
+    assertEquals(View.GONE, view.floatingContextMenu.getVisibility());
+    assertEquals(0.0f, view.floatingContextMenu.getAlpha(), 0.0f);
+  }
+
+  @Test
+  public void scrollSubscriptionUpdatesInPlaceAndKeepsFinalCoordinates() {
+    InAppWebView view = newView();
+    assertTrue(view.hasScrollChangedListener); // Legacy and InAppBrowser default.
+    setScrollSubscription(view, false);
+    view.onScrollChanged(1, 2, 0, 0);
+    setScrollSubscription(view, true);
+    view.onScrollChanged(37, 53, 1, 2);
+    view.onScrollChanged(41, 59, 37, 53);
+    assertEquals(2, messenger.calls.size());
+    assertEquals("onScrollChanged", messenger.calls.get(1).method);
+    assertEquals(Integer.valueOf(41), messenger.calls.get(1).argument("x"));
+    assertEquals(Integer.valueOf(59), messenger.calls.get(1).argument("y"));
+    setScrollSubscription(view, false);
+    view.onScrollChanged(61, 67, 41, 59);
+    assertEquals(2, messenger.calls.size());
+  }
+
+  private void setScrollSubscription(InAppWebView view, boolean enabled) {
+    AtomicReference<Object> result = new AtomicReference<>();
+    view.channelDelegate.onMethodCall(new MethodCall("setScrollChangedListener",
+        Collections.singletonMap("hasListener", enabled)), new MethodChannel.Result() {
+      @Override public void success(Object value) { result.set(value); }
+      @Override public void error(String code, String message, Object details) {
+        throw new AssertionError(code + ": " + message);
+      }
+      @Override public void notImplemented() { throw new AssertionError("missing scroll gate"); }
+    });
+    assertEquals(true, result.get());
+    assertEquals(enabled, view.hasScrollChangedListener);
+  }
+
+  @Test
   public void compatClientDetachesAndDestroysHandledRendererOnce() {
     verifyClient(new InAppWebViewClientCompat(null));
   }

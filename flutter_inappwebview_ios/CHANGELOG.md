@@ -1,3 +1,8 @@
+## Unreleased
+
+- Keep inline scroll subscriptions disabled until a live controller attaches, so cancelling pending keep-alive creation cannot leave a listener or interfere with its next owner.
+- Suppress scroll channel messages without a listener while preserving axis constraints, scroll bookkeeping and overscroll events; update callback subscriptions on the existing WebView.
+
 ## 1.2.0-beta.3
 
 - Presented in-app and Safari browsers from the calling Flutter engine's window in apps with multiple scenes.

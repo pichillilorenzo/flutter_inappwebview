@@ -65,6 +65,10 @@ public class FlutterWebViewFactory: NSObject, FlutterPlatformViewFactory {
         
         flutterWebView?.webView()?.preventGestureDelay = preventGestureDelay
         
+        // Reused headless and kept-alive views adopt the attaching widget's gate.
+        flutterWebView?.webView()?.setScrollChangedListener(
+            hasListener: arguments?["hasScrollChangedListener"] as? Bool ?? true)
+
         if shouldMakeInitialLoad {
             flutterWebView?.makeInitialLoad(params: arguments!)
         }

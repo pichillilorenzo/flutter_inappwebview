@@ -227,6 +227,12 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
         } else
           result.success(null);
         break;
+      case setScrollChangedListener:
+        if (webView != null) {
+          webView.hasScrollChangedListener = Boolean.TRUE.equals(call.argument("hasListener"));
+        }
+        result.success(true);
+        break;
       case setSettings:
         if (webView != null && webView.getInAppBrowserDelegate() instanceof InAppBrowserActivity) {
           InAppBrowserActivity inAppBrowserActivity = (InAppBrowserActivity) webView.getInAppBrowserDelegate();

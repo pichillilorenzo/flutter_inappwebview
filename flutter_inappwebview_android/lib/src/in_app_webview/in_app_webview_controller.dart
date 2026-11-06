@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
 import 'dart:core';
@@ -71,6 +72,7 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
       _inAppBrowser?.eventHandler;
 
   dynamic _controllerFromPlatform;
+  void Function(dynamic controller, int x, int y)? _onScrollChanged;
 
   @override
   late AndroidWebStorage webStorage;
@@ -149,6 +151,7 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
   }
 
   void _init(PlatformInAppWebViewControllerCreationParams params) {
+    _onScrollChanged = params.webviewParams?.onScrollChanged;
     _controllerFromPlatform =
         params.webviewParams?.controllerFromPlatform?.call(this) ?? this;
 
@@ -372,12 +375,11 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
         }
         break;
       case "onScrollChanged":
-        if ((webviewParams != null && webviewParams!.onScrollChanged != null) ||
-            _inAppBrowserEventHandler != null) {
+        if (_onScrollChanged != null || _inAppBrowserEventHandler != null) {
           int x = call.arguments["x"];
           int y = call.arguments["y"];
-          if (webviewParams != null && webviewParams!.onScrollChanged != null)
-            webviewParams!.onScrollChanged!(_controllerFromPlatform, x, y);
+          if (_onScrollChanged != null)
+            _onScrollChanged!(_controllerFromPlatform, x, y);
           else
             _inAppBrowserEventHandler!.onScrollChanged(x, y);
         }
@@ -3212,6 +3214,10 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
 
   @override
   void dispose({bool isKeepAlive = false}) {
+    if (isKeepAlive) {
+      unawaited(updateScrollChangedCallback(null));
+    }
+    _onScrollChanged = null;
     disposeChannel(removeMethodCallHandler: !isKeepAlive);
     _inAppBrowser = null;
     webStorage.dispose();
@@ -3234,5 +3240,21 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
 }
 
 extension InternalInAppWebViewController on AndroidInAppWebViewController {
+  /// Updates this subscription without replacing the controller's creation params.
+  Future<void> updateScrollChangedCallback(
+    void Function(dynamic controller, int x, int y)? callback, {
+    bool forceNativeUpdate = false,
+  }) async {
+    if (disposed) return;
+    final hadListener = _onScrollChanged != null;
+    _onScrollChanged = callback;
+    final hasListener = callback != null;
+    if (forceNativeUpdate || hadListener != hasListener) {
+      await channel?.invokeMethod<void>('setScrollChangedListener', {
+        'hasListener': hasListener,
+      });
+    }
+  }
+
   get handleMethod => _handleMethod;
 }

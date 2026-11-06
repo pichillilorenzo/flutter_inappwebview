@@ -117,13 +117,21 @@ try {
   window.window = window;
   window.top = window;
   window.addEventListener = (name, callback) => { listeners[name] = callback; };
+  window.removeEventListener = (name, callback) => {
+    if (listeners[name] === callback) delete listeners[name];
+  };
   window.dispatchEvent = () => {};
   window.document = {
     hidden: false,
     addEventListener(name, callback) { listeners[`document:${name}`] = callback; },
+    removeEventListener(name, callback) {
+      if (listeners[`document:${name}`] === callback) delete listeners[`document:${name}`];
+    },
   };
 
   vm.runInNewContext(`${bridgeSource}\n${scrollSource}`, window);
+  assert.equal(listeners['document:scroll'], undefined, 'publisher starts detached');
+  window.flutter_inappwebview._setScrollChangedListener(true);
   assert.equal(typeof listeners['document:scroll'], 'function', 'scroll listener installed');
 
   for (const [x, y] of [[2, 3], [4, 5], [8, 13]]) {

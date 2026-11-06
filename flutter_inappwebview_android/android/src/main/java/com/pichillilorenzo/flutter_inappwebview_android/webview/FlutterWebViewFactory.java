@@ -71,6 +71,11 @@ public class FlutterWebViewFactory extends PlatformViewFactory {
       inAppWebViewManager.keepAliveWebViews.put(keepAliveId, flutterWebView);
     }
 
+    // Reused headless and kept-alive views must adopt the attaching widget's gate.
+    if (flutterWebView.webView != null) {
+      flutterWebView.webView.hasScrollChangedListener = !Boolean.FALSE.equals(params.get("hasScrollChangedListener"));
+    }
+
     if (shouldMakeInitialLoad) {
       flutterWebView.makeInitialLoad(params);
     }

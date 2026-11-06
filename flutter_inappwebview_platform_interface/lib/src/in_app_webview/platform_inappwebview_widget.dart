@@ -328,6 +328,27 @@ abstract class PlatformInAppWebViewWidget extends PlatformInterface
   /// The parameters used to initialize the [PlatformInAppWebViewWidget].
   final PlatformInAppWebViewWidgetCreationParams params;
 
+  PlatformInAppWebViewWidgetCreationParams? _widgetParams;
+
+  /// The latest widget parameters, for layout and supported callback updates.
+  ///
+  /// Creation-only values such as initial settings, the keep-alive handle and
+  /// the headless WebView remain in [params]. Rebuilding does not apply those
+  /// values to an existing native WebView.
+  PlatformInAppWebViewWidgetCreationParams get widgetParams =>
+      _widgetParams ?? params;
+
+  /// Updates an existing widget delegate without recreating its native view.
+  ///
+  /// Implementations may update supported event subscriptions here. They must
+  /// keep the original [params] for creation and disposal, and must not apply
+  /// initial settings or other creation-only values to the existing WebView.
+  /// The default implementation only records the latest widget parameters.
+  @mustCallSuper
+  void updateParams(PlatformInAppWebViewWidgetCreationParams params) {
+    _widgetParams = params;
+  }
+
   /// Builds a new WebView.
   ///
   /// Returns a Widget tree that embeds the created web view.

@@ -64,6 +64,7 @@ public class FlutterWebViewController: NSView, Disposable {
         self.addSubview(webView!)
         syncWebViewFrameToBounds()
 
+        webView!.hasScrollChangedListener = params["hasScrollChangedListener"] as? Bool ?? true
         webView!.settings = settings
         webView!.prepare()
         webView!.windowCreated = true

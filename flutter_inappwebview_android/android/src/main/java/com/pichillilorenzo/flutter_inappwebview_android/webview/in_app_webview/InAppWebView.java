@@ -138,6 +138,8 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
   public InAppWebViewRenderProcessClient inAppWebViewRenderProcessClient;
   @Nullable
   public WebViewChannelDelegate channelDelegate;
+  // Older clients and InAppBrowser keep the existing event delivery by default.
+  public boolean hasScrollChangedListener = true;
   @Nullable
   public JavaScriptBridgeInterface javaScriptBridgeInterface;
   public InAppWebViewSettings customSettings = new InAppWebViewSettings();
@@ -1471,7 +1473,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
       floatingContextMenu.setVisibility(View.GONE);
     }
 
-    if (channelDelegate != null) channelDelegate.onScrollChanged(x, y);
+    if (hasScrollChangedListener && channelDelegate != null) channelDelegate.onScrollChanged(x, y);
   }
 
   public void scrollTo(Integer x, Integer y, Boolean animated) {

@@ -1,7 +1,9 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
+
 import '../webview_environment/webview_environment.dart';
 import 'headless_in_app_webview.dart';
 
@@ -9,6 +11,7 @@ import '../find_interaction/find_interaction_controller.dart';
 import 'in_app_webview_controller.dart';
 
 import 'custom_platform_view.dart';
+import 'webview_render_mode.dart';
 
 /// Object specifying creation parameters for creating a [PlatformInAppWebViewWidget].
 ///
@@ -304,6 +307,7 @@ class WindowsInAppWebViewWidget extends PlatformInAppWebViewWidget {
       params as WindowsInAppWebViewWidgetCreationParams;
 
   WindowsInAppWebViewController? _controller;
+  WindowsWebViewCreationDetails? _creationDetails;
   bool _disposed = false;
 
   WindowsHeadlessInAppWebView? get _windowsHeadlessInAppWebView =>
@@ -345,6 +349,9 @@ class WindowsInAppWebViewWidget extends PlatformInAppWebViewWidget {
     }
 
     return CustomPlatformView(
+      onPlatformViewCreationDetails: (details) {
+        if (!_disposed) _creationDetails = details;
+      },
       onPlatformViewCreated: _onPlatformViewCreated,
       creationKey: widgetParams.key,
       creationParams: <String, dynamic>{
@@ -375,12 +382,19 @@ class WindowsInAppWebViewWidget extends PlatformInAppWebViewWidget {
     }
     viewId = params.keepAlive?.id ?? viewId ?? id;
     _windowsHeadlessInAppWebView?.internalDispose();
-    _controller = WindowsInAppWebViewController(
-      PlatformInAppWebViewControllerCreationParams(
+    final controller = WindowsInAppWebViewController(
+      WindowsInAppWebViewControllerCreationParams(
         id: viewId,
         webviewParams: params,
+        creationDetails: _creationDetails,
       ),
     );
+    // controllerFromPlatform runs during construction and may detach its owner.
+    if (_disposed) {
+      controller.dispose(isKeepAlive: params.keepAlive != null);
+      return;
+    }
+    _controller = controller;
     unawaited(
       _controller!.updateConsoleMessageCallback(
         widgetParams.onConsoleMessage,
@@ -396,9 +410,9 @@ class WindowsInAppWebViewWidget extends PlatformInAppWebViewWidget {
       args: [],
     );
     if (params.onWebViewCreated != null) {
-      params.onWebViewCreated!(
-        params.controllerFromPlatform?.call(_controller!) ?? _controller!,
-      );
+      final wrappedController =
+          params.controllerFromPlatform?.call(controller) ?? controller;
+      if (!_disposed) params.onWebViewCreated!(wrappedController);
     }
   }
 
@@ -450,6 +464,7 @@ class WindowsInAppWebViewWidget extends PlatformInAppWebViewWidget {
   @override
   void dispose() {
     _disposed = true;
+    _creationDetails = null;
     dynamic viewId = _controller?.getViewId();
     debugLog(
       className: runtimeType.toString(),

@@ -1,4 +1,5 @@
 import 'package:flutter/services.dart';
+
 import 'dart:async';
 import 'dart:ui';
 
@@ -7,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
+
 import '../platform_util.dart';
 import '_static_channel.dart';
 import 'webview_creation_failure.dart';
@@ -136,12 +138,17 @@ String? _requestedUrlOf(dynamic arguments) {
 /// Controls a WebView and provides streams for various change events.
 class CustomPlatformViewController
     extends ValueNotifier<CustomFlutterViewControllerValue> {
-  Completer<void> _creatingCompleter = Completer<void>();
+  final Completer<void> _creatingCompleter = Completer<void>();
+  bool _initializeRequested = false;
+  Future<void>? _disposeFuture;
   int _textureId = 0;
   bool _isDisposed = false;
+  bool _disposeRequested = false;
   WindowsWebViewRenderMode _renderMode = WindowsWebViewRenderMode.composition;
 
-  /// How the native view is hosted; known once [ready] completes.
+  /// The rendering path, including the legacy composition compatibility default.
+  ///
+  /// Use the creation-details callback to obtain a verified native observation.
   WindowsWebViewRenderMode get renderMode => _renderMode;
 
   Future<void> get ready => _creatingCompleter.future;
@@ -165,21 +172,25 @@ class CustomPlatformViewController
   /// host window is parented under it. Null means the implicit view.
   Future<void> initialize({
     Function(int id)? onPlatformViewCreated,
+    ValueChanged<WindowsWebViewCreationDetails>? onPlatformViewCreationDetails,
     Key? creationKey,
     dynamic arguments,
     int? flutterViewId,
   }) async {
-    if (_isDisposed) {
+    if (_isDisposed || _disposeRequested) {
       return;
     }
+    if (_initializeRequested) return _creatingCompleter.future;
+    _initializeRequested = true;
     if (flutterViewId != null && arguments is Map) {
       arguments = <dynamic, dynamic>{
         ...arguments,
         'flutterViewId': flutterViewId,
       };
     }
+    late final WindowsWebViewCreationResult created;
     try {
-      final created = WindowsWebViewCreationResult.fromNative(
+      created = WindowsWebViewCreationResult.fromNative(
         await _pluginChannel.invokeMethod<Object?>(
           'createInAppWebView',
           arguments,
@@ -239,11 +250,26 @@ class CustomPlatformViewController
 
     _creatingCompleter.complete();
 
-    onPlatformViewCreated?.call(_textureId);
+    if (!_disposeRequested) {
+      onPlatformViewCreationDetails?.call(created.creationDetails!);
+      // The details callback may synchronously dispose its owner.
+      if (!_disposeRequested) onPlatformViewCreated?.call(_textureId);
+    }
   }
 
   @override
-  Future<void> dispose() async {
+  Future<void> dispose() {
+    _disposeRequested = true;
+    return _disposeFuture ??= _dispose().then((_) {
+      super.dispose();
+    });
+  }
+
+  Future<void> _dispose() async {
+    if (!_initializeRequested) {
+      _isDisposed = true;
+      _creatingCompleter.complete();
+    }
     await _creatingCompleter.future;
     _cursorTimer?.cancel();
     if (!_isDisposed) {
@@ -254,7 +280,6 @@ class CustomPlatformViewController
       await _eventStreamSubscription?.cancel();
       await _pluginChannel.invokeMethod('dispose', {"id": _textureId});
     }
-    super.dispose();
   }
 
   /// Limits the number of frames per second to the given value.
@@ -460,6 +485,13 @@ class CustomPlatformView extends StatefulWidget {
 
   final Function(int id)? onPlatformViewCreated;
 
+  /// Supplies the native observation before [onPlatformViewCreated].
+  ///
+  /// It is not delivered for a failed or abandoned creation. The existing
+  /// integer callback remains unchanged.
+  final ValueChanged<WindowsWebViewCreationDetails>?
+  onPlatformViewCreationDetails;
+
   /// The caller-supplied key that identifies this creation attempt.
   ///
   /// It is carried on [WindowsWebViewCreationFailure] so listeners on the
@@ -470,6 +502,7 @@ class CustomPlatformView extends StatefulWidget {
   const CustomPlatformView({
     this.creationParams,
     this.onPlatformViewCreated,
+    this.onPlatformViewCreationDetails,
     this.creationKey,
     this.scaleFactor,
     this.filterQuality = FilterQuality.none,
@@ -584,6 +617,10 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
       // has no creation-error callback, so consume the reported failure.
       _controller
           .initialize(
+            onPlatformViewCreationDetails: (details) {
+              if (!mounted) return;
+              widget.onPlatformViewCreationDetails?.call(details);
+            },
             onPlatformViewCreated: (id) {
               if (!mounted) return;
               widget.onPlatformViewCreated?.call(id);

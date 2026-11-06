@@ -59,3 +59,7 @@ jobs:
         run: flutter_inappwebview_linux/linux/test/run_wpe_probe_link_test.sh
       - name: Test bundled WPE runtime path selection
         run: flutter_inappwebview_linux/linux/test/run_wpe_bundle_paths_test.sh
+      - name: Test pixel conversion and FDO buffer capacity
+        run: |
+          flutter_inappwebview_linux/linux/test/run_pixel_buffer_conversion_test.sh
+          python3 flutter_inappwebview_linux/linux/test/run_fdo_pixel_buffer_test.py

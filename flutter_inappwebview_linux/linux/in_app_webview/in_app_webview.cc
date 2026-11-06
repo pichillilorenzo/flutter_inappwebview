@@ -1681,9 +1681,7 @@ void InAppWebView::ReadPixelsFromEglImage(void* egl_image, uint32_t width, uint3
   size_t write_idx = write_buffer_index_.load(std::memory_order_relaxed);
   auto& buffer = pixel_buffers_[write_idx];
 
-  if (buffer.data.size() != buffer_size) {
-    buffer.data.resize(buffer_size);
-  }
+  ResizeByteBuffer(buffer.data, buffer_size);
 
   buffer.width = width;
   buffer.height = height;
@@ -8290,9 +8288,7 @@ void InAppWebView::OnExportShmBuffer(struct wpe_fdo_shm_exported_buffer* buffer)
     size_t output_row_size = static_cast<size_t>(width) * 4;
     size_t output_size = static_cast<size_t>(height) * output_row_size;
 
-    if (pixel_buffer.data.size() != output_size) {
-      pixel_buffer.data.resize(output_size);
-    }
+    ResizeByteBuffer(pixel_buffer.data, output_size);
 
     pixel_buffer.width = static_cast<size_t>(width);
     pixel_buffer.height = static_cast<size_t>(height);

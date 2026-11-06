@@ -13,6 +13,7 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
     
     var useShouldOverrideUrlLoading = false
     var useOnLoadResource = false
+    var consoleMessageLevels: [Int]? = nil
     var useOnDownloadStart = false
     var clearCache = false
     var userAgent = ""

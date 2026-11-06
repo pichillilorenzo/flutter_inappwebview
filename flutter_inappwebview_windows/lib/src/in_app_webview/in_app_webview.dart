@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
@@ -303,6 +304,7 @@ class WindowsInAppWebViewWidget extends PlatformInAppWebViewWidget {
       params as WindowsInAppWebViewWidgetCreationParams;
 
   WindowsInAppWebViewController? _controller;
+  bool _disposed = false;
 
   WindowsHeadlessInAppWebView? get _windowsHeadlessInAppWebView =>
       params.headlessWebView as WindowsHeadlessInAppWebView?;
@@ -312,6 +314,14 @@ class WindowsInAppWebViewWidget extends PlatformInAppWebViewWidget {
 
   factory WindowsInAppWebViewWidget.static() {
     return _staticValue;
+  }
+
+  @override
+  void updateParams(PlatformInAppWebViewWidgetCreationParams params) {
+    super.updateParams(params);
+    unawaited(
+      _controller?.updateConsoleMessageCallback(params.onConsoleMessage),
+    );
   }
 
   @override
@@ -347,7 +357,8 @@ class WindowsInAppWebViewWidget extends PlatformInAppWebViewWidget {
         'headlessWebViewId': params.headlessWebView?.isRunning() ?? false
             ? params.headlessWebView?.id
             : null,
-        'hasConsoleMessageListener': params.onConsoleMessage != null,
+        // Attach the publisher only once a live Dart controller owns it.
+        'hasConsoleMessageListener': false,
         'initialUserScripts':
             params.initialUserScripts?.map((e) => e.toMap()).toList() ?? [],
         'keepAliveId': params.keepAlive?.id,
@@ -357,6 +368,7 @@ class WindowsInAppWebViewWidget extends PlatformInAppWebViewWidget {
   }
 
   void _onPlatformViewCreated(int id) {
+    if (_disposed) return;
     dynamic viewId = id;
     if (params.headlessWebView?.isRunning() ?? false) {
       viewId = params.headlessWebView?.id;
@@ -367,6 +379,12 @@ class WindowsInAppWebViewWidget extends PlatformInAppWebViewWidget {
       PlatformInAppWebViewControllerCreationParams(
         id: viewId,
         webviewParams: params,
+      ),
+    );
+    unawaited(
+      _controller!.updateConsoleMessageCallback(
+        widgetParams.onConsoleMessage,
+        forceNativeUpdate: true,
       ),
     );
     _windowsParams.findInteractionController?.init(viewId);
@@ -431,6 +449,7 @@ class WindowsInAppWebViewWidget extends PlatformInAppWebViewWidget {
 
   @override
   void dispose() {
+    _disposed = true;
     dynamic viewId = _controller?.getViewId();
     debugLog(
       className: runtimeType.toString(),

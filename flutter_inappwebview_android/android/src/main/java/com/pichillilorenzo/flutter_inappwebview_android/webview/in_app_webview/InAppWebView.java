@@ -143,6 +143,18 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
   @Nullable
   public JavaScriptBridgeInterface javaScriptBridgeInterface;
   public InAppWebViewSettings customSettings = new InAppWebViewSettings();
+  private boolean hasConsoleMessageListener = true;
+
+  public boolean acceptsConsoleMessage(int level) {
+    return hasConsoleMessageListener && (customSettings.consoleMessageLevels == null ||
+        customSettings.consoleMessageLevels.contains(level));
+  }
+
+  public void setConsoleMessageListener(boolean hasListener) {
+    hasConsoleMessageListener = hasListener;
+    if (!hasListener && channelDelegate != null) channelDelegate.clearConsoleMessages();
+  }
+
   public boolean isLoading = false;
   private boolean inFullscreen = false;
   @Nullable

@@ -66,8 +66,10 @@ public class FlutterWebViewController: NSView, Disposable {
 
         webView!.hasScrollChangedListener = params["hasScrollChangedListener"] as? Bool ?? true
         webView!.settings = settings
+        webView!.hasConsoleMessageListener = params["hasConsoleMessageListener"] as? Bool ?? true
         webView!.prepare()
         webView!.windowCreated = true
+        webView!.updateConsoleMessagePolicy()
     }
     
     required init?(coder nsCoder: NSCoder) {

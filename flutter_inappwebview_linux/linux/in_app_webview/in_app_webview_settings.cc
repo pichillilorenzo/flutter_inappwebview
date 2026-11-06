@@ -30,6 +30,13 @@ InAppWebViewSettings::InAppWebViewSettings(FlValue* map) : InAppWebViewSettings(
   useShouldOverrideUrlLoading =
       get_fl_map_value(map, "useShouldOverrideUrlLoading", useShouldOverrideUrlLoading);
   useOnLoadResource = get_fl_map_value(map, "useOnLoadResource", useOnLoadResource);
+  if (FlValue* levels = fl_value_lookup_string(map, "consoleMessageLevels");
+      levels && fl_value_get_type(levels) == FL_VALUE_TYPE_LIST) {
+    consoleMessageLevels = std::vector<int64_t>{};
+    for (size_t i = 0; i < fl_value_get_length(levels); ++i) {
+      consoleMessageLevels->push_back(fl_value_get_int(fl_value_get_list_value(levels, i)));
+    }
+  }
   useOnDownloadStart = get_fl_map_value(map, "useOnDownloadStart", useOnDownloadStart);
   useOnNavigationResponse = get_fl_map_value(map, "useOnNavigationResponse", useOnNavigationResponse);
   useShouldInterceptRequest =
@@ -502,6 +509,7 @@ FlValue* InAppWebViewSettings::toFlValue() const {
       // === Event flags ===
       {"useShouldOverrideUrlLoading", make_fl_value(useShouldOverrideUrlLoading)},
       {"useOnLoadResource", make_fl_value(useOnLoadResource)},
+      {"consoleMessageLevels", make_fl_value(consoleMessageLevels)},
       {"useOnDownloadStart", make_fl_value(useOnDownloadStart)},
       {"useOnNavigationResponse", make_fl_value(useOnNavigationResponse)},
       {"useShouldInterceptRequest", make_fl_value(useShouldInterceptRequest)},

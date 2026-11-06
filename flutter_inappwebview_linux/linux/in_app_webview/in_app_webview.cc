@@ -242,6 +242,7 @@ InAppWebView::InAppWebView(FlPluginRegistrar* registrar, FlBinaryMessenger* mess
                            const InAppWebViewCreationParams& params)
     : plugin_(params.plugin), registrar_(registrar), messenger_(messenger), gtk_window_(params.gtkWindow), fl_view_(params.flView), manager_(params.manager), id_(id), settings_(params.initialSettings),
       initial_user_scripts_(params.initialUserScripts) {
+  has_console_message_listener_ = params.hasConsoleMessageListener;
   js_bridge_secret_ = GenerateRandomSecret();
   
   if (params.windowId.has_value()) {
@@ -365,6 +366,7 @@ void InAppWebView::AttachChannel(FlBinaryMessenger* messenger, const std::string
 }
 
 InAppWebView::~InAppWebView() {
+  has_console_message_listener_ = false;
   debugLog("dealloc InAppWebView");
   is_disposing_.store(true);
   CancelHiddenPixelBufferTrim();
@@ -1061,7 +1063,8 @@ void InAppWebView::PrepareAndAddUserScripts() {
   // === Add Console Log Interception Script ===
   // Note: Console log is always for main frame only to avoid issues
   // (see https://github.com/pichillilorenzo/flutter_inappwebview/issues/1738)
-  auto consoleLogScript = ConsoleLogJS::CONSOLE_LOG_JS_PLUGIN_SCRIPT(pluginScriptsOriginAllowList);
+  auto consoleLogScript = ConsoleLogJS::CONSOLE_LOG_JS_PLUGIN_SCRIPT(
+      pluginScriptsOriginAllowList);
   user_content_controller_->addPluginScript(std::move(consoleLogScript));
 
   // === Add Color Input Interception Script ===
@@ -2978,6 +2981,27 @@ FlValue* InAppWebView::getSettings() const {
   return fl_value_new_null();
 }
 
+bool InAppWebView::acceptsConsoleMessage(int64_t level) const {
+  const auto& levels = settings_->consoleMessageLevels;
+  return has_console_message_listener_ &&
+      (!levels || std::find(levels->begin(), levels->end(), level) != levels->end());
+}
+
+void InAppWebView::setConsoleMessageListener(bool hasListener) {
+  if (has_console_message_listener_ == hasListener) return;
+  has_console_message_listener_ = hasListener;
+  updateConsoleMessagePolicy();
+}
+
+void InAppWebView::updateConsoleMessagePolicy() {
+  if (!user_content_controller_ || !settings_->javaScriptBridgeEnabled) return;
+  // Related views share their user-content manager in both backends. Keep
+  // its bootstrap neutral and change only this WebView's current document.
+  // The setter cannot install a publisher when the bootstrap is absent.
+  evaluateJavascript(ConsoleLogJS::CONSOLE_POLICY_JS_SOURCE(
+      has_console_message_listener_, settings_->consoleMessageLevels), std::nullopt, nullptr);
+}
+
 void InAppWebView::setSettings(const std::shared_ptr<InAppWebViewSettings> newSettings,
                                FlValue* newSettingsMap) {
   if (newSettings && webview_) {
@@ -2991,8 +3015,10 @@ void InAppWebView::setSettings(const std::shared_ptr<InAppWebViewSettings> newSe
       content_blocker_handler_->setContentBlockers(newContentBlockers, nullptr);
     }
 
+    bool consolePolicyChanged = settings_->consoleMessageLevels != newSettings->consoleMessageLevels;
     settings_ = newSettings;
     settings_->applyToWebView(webview_);
+    if (consolePolicyChanged) updateConsoleMessagePolicy();
 #ifdef HAVE_WPE_PLATFORM
     // Apply WPE Platform settings (dark mode, font settings, etc.)
     if (wpe_display_ != nullptr) {
@@ -4304,10 +4330,15 @@ void InAppWebView::OnLoadChanged(WebKitWebView* web_view, WebKitLoadEvent load_e
       // Redirects are handled internally by WebKit
       break;
     case WEBKIT_LOAD_COMMITTED:
+      // Each navigation starts with the shared, neutral console bootstrap.
+      // Push this view's policy without rewriting a sibling's future scripts.
+      self->updateConsoleMessagePolicy();
       // Notify that page content is starting to be visible
       self->channel_delegate_->onPageCommitVisible(self->getUrl().value_or(""));
       break;
     case WEBKIT_LOAD_FINISHED:
+      // Retry if the committed event preceded bootstrap installation.
+      self->updateConsoleMessagePolicy();
       self->channel_delegate_->onLoadStop(self->getUrl().value_or(""));
       break;
     default:
@@ -7891,6 +7922,12 @@ bool InAppWebView::handleScriptMessageWithReply(const std::string& body, WebKitS
   
   if (handlerName == "onConsoleMessage" ||
       handlerName == "onConsoleMessageBatch") {
+    // Ignore late messages from a detached publisher before parsing its payload.
+    if (!targetWebView->has_console_message_listener_ ||
+        (targetWebView->settings_->consoleMessageLevels && targetWebView->settings_->consoleMessageLevels->empty())) {
+      ResolveInternalHandlerWithReply(reply, "null");
+      return true;
+    }
     // Handle console message interception
     std::vector<json> consoleMessages;
     if (!argsJsonStr.empty()) {
@@ -7916,12 +7953,9 @@ bool InAppWebView::handleScriptMessageWithReply(const std::string& body, WebKitS
     }
 
     if (targetWebView->channel_delegate_) {
+      std::vector<std::pair<std::string, int64_t>> entries;
+      entries.reserve(64);
       for (const auto& consoleMessage : consoleMessages) {
-        const std::string message =
-            consoleMessage.contains("message") &&
-                    consoleMessage["message"].is_string()
-                ? consoleMessage["message"].get<std::string>()
-                : "";
         const std::string level =
             consoleMessage.contains("level") && consoleMessage["level"].is_string()
                 ? consoleMessage["level"].get<std::string>()
@@ -7934,9 +7968,19 @@ bool InAppWebView::handleScriptMessageWithReply(const std::string& body, WebKitS
         } else if (level == "error") {
           messageLevel = 3;
         }
-        targetWebView->channel_delegate_->onConsoleMessage(message,
-                                                           messageLevel);
+        if (!targetWebView->acceptsConsoleMessage(messageLevel)) continue;
+        const std::string message =
+            consoleMessage.contains("message") &&
+                    consoleMessage["message"].is_string()
+                ? consoleMessage["message"].get<std::string>()
+                : "";
+        entries.emplace_back(message, messageLevel);
+        if (entries.size() == 64) {
+          targetWebView->channel_delegate_->onConsoleMessages(entries);
+          entries.clear();
+        }
       }
+      targetWebView->channel_delegate_->onConsoleMessages(entries);
     }
     ResolveInternalHandlerWithReply(reply, "null");
     return true;

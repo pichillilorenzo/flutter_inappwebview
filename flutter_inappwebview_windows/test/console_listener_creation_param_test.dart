@@ -26,8 +26,8 @@ void main() {
         .setMockMethodCallHandler(IN_APP_WEBVIEW_STATIC_CHANNEL, null);
   });
 
-  // Native skips Runtime.enable, and with it the cost of every console call,
-  // when nobody listens.
+  // Creation starts with no Dart controller. The widget attaches its listener
+  // in onPlatformViewCreated; an abandoned keepAlive creation stays silent.
   Future<Object?> consoleFlag(
     WidgetTester tester,
     WindowsInAppWebViewWidgetCreationParams params,
@@ -47,7 +47,9 @@ void main() {
     return (view.creationParams as Map)['hasConsoleMessageListener'];
   }
 
-  testWidgets('a console listener is announced to native', (tester) async {
+  testWidgets('a pending console listener waits for its Dart owner', (
+    tester,
+  ) async {
     expect(
       await consoleFlag(
         tester,
@@ -55,7 +57,7 @@ void main() {
           onConsoleMessage: (controller, message) {},
         ),
       ),
-      isTrue,
+      isFalse,
     );
   });
 

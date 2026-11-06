@@ -353,6 +353,26 @@ class InAppWebViewSettings {
   @Deprecated('Use CookieManager.removeSessionCookies instead')
   bool? clearSessionCache;
 
+  ///Console levels forwarded to [PlatformWebViewCreationParams.onConsoleMessage].
+  ///A null value forwards all levels; an empty list disables console forwarding.
+  ///This does not suppress messages in the browser's own developer tools.
+  ///Levels are matched individually, not by numeric severity. On WebKit and
+  ///Windows, JavaScript `console.debug` uses [ConsoleMessageLevel.TIP] and
+  ///`console.info` uses [ConsoleMessageLevel.LOG], matching Android's console API.
+  ///Use [PlatformInAppWebViewController.setSettings] to change the policy.
+  ///
+  ///Accepted messages may travel in bounded batches, but the console callback
+  ///still runs once per message in order. An exception in one callback is
+  ///reported through [FlutterError.reportError] without dropping later messages.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android WebView
+  ///- iOS WKWebView
+  ///- macOS WKWebView
+  ///- Windows WebView2
+  ///- Linux WPE WebKit
+  List<ConsoleMessageLevel>? consoleMessageLevels;
+
   ///List of [ContentBlocker] that are a set of rules used to block content in the browser window.
   ///
   ///**Officially Supported Platforms/Implementations**:
@@ -2021,6 +2041,7 @@ class InAppWebViewSettings {
   ///- Web \<iframe\>
   ///- Windows WebView2
   InAppWebViewSettings({
+    this.consoleMessageLevels,
     this.useShouldOverrideUrlLoading,
     this.useOnLoadResource,
     this.useOnDownloadStart,
@@ -2265,6 +2286,19 @@ class InAppWebViewSettings {
           : null,
       alpha: map['alpha'],
       appCachePath: map['appCachePath'],
+      consoleMessageLevels: map['consoleMessageLevels'] != null
+          ? List<ConsoleMessageLevel>.from(
+              map['consoleMessageLevels'].map(
+                (e) => switch (enumMethod ?? EnumMethod.nativeValue) {
+                  EnumMethod.nativeValue => ConsoleMessageLevel.fromNativeValue(
+                    e,
+                  ),
+                  EnumMethod.value => ConsoleMessageLevel.fromValue(e),
+                  EnumMethod.name => ConsoleMessageLevel.byName(e),
+                }!,
+              ),
+            )
+          : null,
       corsAllowlist: map['corsAllowlist'] != null
           ? List<String>.from(map['corsAllowlist']!.cast<String>())
           : null,
@@ -2760,6 +2794,15 @@ class InAppWebViewSettings {
       },
       "clearCache": clearCache,
       "clearSessionCache": clearSessionCache,
+      "consoleMessageLevels": consoleMessageLevels
+          ?.map(
+            (e) => switch (enumMethod ?? EnumMethod.nativeValue) {
+              EnumMethod.nativeValue => e.toNativeValue(),
+              EnumMethod.value => e.toValue(),
+              EnumMethod.name => e.name(),
+            },
+          )
+          .toList(),
       "contentBlockers": contentBlockers
           ?.map((e) => e.toMap(enumMethod: enumMethod))
           .toList(),
@@ -3042,7 +3085,7 @@ class InAppWebViewSettings {
 
   @override
   String toString() {
-    return 'InAppWebViewSettings{accessibilityIgnoresInvertColors: $accessibilityIgnoresInvertColors, algorithmicDarkeningAllowed: $algorithmicDarkeningAllowed, allowBackgroundAudioPlaying: $allowBackgroundAudioPlaying, allowContentAccess: $allowContentAccess, allowFileAccess: $allowFileAccess, allowFileAccessFromFileURLs: $allowFileAccessFromFileURLs, allowModalDialogs: $allowModalDialogs, allowTopNavigationToDataUrls: $allowTopNavigationToDataUrls, allowUniversalAccessFromFileURLs: $allowUniversalAccessFromFileURLs, allowingReadAccessTo: $allowingReadAccessTo, allowsAirPlayForMediaPlayback: $allowsAirPlayForMediaPlayback, allowsBackForwardNavigationGestures: $allowsBackForwardNavigationGestures, allowsInlineMediaPlayback: $allowsInlineMediaPlayback, allowsLinkPreview: $allowsLinkPreview, allowsPictureInPictureMediaPlayback: $allowsPictureInPictureMediaPlayback, alpha: $alpha, alwaysBounceHorizontal: $alwaysBounceHorizontal, alwaysBounceVertical: $alwaysBounceVertical, appCachePath: $appCachePath, applePayAPIEnabled: $applePayAPIEnabled, applicationNameForUserAgent: $applicationNameForUserAgent, automaticallyAdjustsScrollIndicatorInsets: $automaticallyAdjustsScrollIndicatorInsets, blockNetworkImage: $blockNetworkImage, blockNetworkLoads: $blockNetworkLoads, browserAcceleratorKeysEnabled: $browserAcceleratorKeysEnabled, builtInZoomControls: $builtInZoomControls, cacheEnabled: $cacheEnabled, cacheMode: $cacheMode, contentBlockers: $contentBlockers, contentInsetAdjustmentBehavior: $contentInsetAdjustmentBehavior, corsAllowlist: $corsAllowlist, cursiveFontFamily: $cursiveFontFamily, cursorBlinkTime: $cursorBlinkTime, darkMode: $darkMode, dataDetectorTypes: $dataDetectorTypes, databaseEnabled: $databaseEnabled, decelerationRate: $decelerationRate, defaultFixedFontSize: $defaultFixedFontSize, defaultFontSize: $defaultFontSize, defaultTextEncodingName: $defaultTextEncodingName, defaultVideoPoster: $defaultVideoPoster, disableAnimations: $disableAnimations, disableContextMenu: $disableContextMenu, disableDefaultErrorPage: $disableDefaultErrorPage, disableHorizontalScroll: $disableHorizontalScroll, disableInputAccessoryView: $disableInputAccessoryView, disableLongPressContextMenuOnLinks: $disableLongPressContextMenuOnLinks, disableVerticalScroll: $disableVerticalScroll, disableWebSecurity: $disableWebSecurity, disabledActionModeMenuItems: $disabledActionModeMenuItems, disallowOverScroll: $disallowOverScroll, displayZoomControls: $displayZoomControls, domStorageEnabled: $domStorageEnabled, doubleClickDistance: $doubleClickDistance, doubleClickTime: $doubleClickTime, dragThreshold: $dragThreshold, drawCompositingIndicators: $drawCompositingIndicators, enable2DCanvasAcceleration: $enable2DCanvasAcceleration, enableCaretBrowsing: $enableCaretBrowsing, enableEncryptedMedia: $enableEncryptedMedia, enableJavaScriptMarkup: $enableJavaScriptMarkup, enableMedia: $enableMedia, enableMediaCapabilities: $enableMediaCapabilities, enableMockCaptureDevices: $enableMockCaptureDevices, enablePageCache: $enablePageCache, enableResizableTextAreas: $enableResizableTextAreas, enableSmoothScrolling: $enableSmoothScrolling, enableSpatialNavigation: $enableSpatialNavigation, enableTabsToLinks: $enableTabsToLinks, enableViewportScale: $enableViewportScale, enableWebRTC: $enableWebRTC, enableWriteConsoleMessagesToStdout: $enableWriteConsoleMessagesToStdout, enterpriseAuthenticationAppLinkPolicyEnabled: $enterpriseAuthenticationAppLinkPolicyEnabled, fantasyFontFamily: $fantasyFontFamily, fixedFontFamily: $fixedFontFamily, fontAntialias: $fontAntialias, fontDPI: $fontDPI, fontHintingStyle: $fontHintingStyle, fontSubpixelLayout: $fontSubpixelLayout, generalAutofillEnabled: $generalAutofillEnabled, geolocationEnabled: $geolocationEnabled, handleAcceleratorKeyPressed: $handleAcceleratorKeyPressed, hardwareAcceleration: $hardwareAcceleration, hiddenPdfToolbarItems: $hiddenPdfToolbarItems, horizontalScrollBarEnabled: $horizontalScrollBarEnabled, horizontalScrollbarThumbColor: $horizontalScrollbarThumbColor, horizontalScrollbarTrackColor: $horizontalScrollbarTrackColor, iframeAllow: $iframeAllow, iframeAllowFullscreen: $iframeAllowFullscreen, iframeAriaHidden: $iframeAriaHidden, iframeCsp: $iframeCsp, iframeName: $iframeName, iframeReferrerPolicy: $iframeReferrerPolicy, iframeRole: $iframeRole, iframeSandbox: $iframeSandbox, ignoresViewportScaleLimits: $ignoresViewportScaleLimits, incognito: $incognito, initialScale: $initialScale, interceptOnlyAsyncAjaxRequests: $interceptOnlyAsyncAjaxRequests, isDirectionalLockEnabled: $isDirectionalLockEnabled, isElementFullscreenEnabled: $isElementFullscreenEnabled, isFindInteractionEnabled: $isFindInteractionEnabled, isFraudulentWebsiteWarningEnabled: $isFraudulentWebsiteWarningEnabled, isInspectable: $isInspectable, isPagingEnabled: $isPagingEnabled, isSiteSpecificQuirksModeEnabled: $isSiteSpecificQuirksModeEnabled, isTextInteractionEnabled: $isTextInteractionEnabled, isUserInteractionEnabled: $isUserInteractionEnabled, itpEnabled: $itpEnabled, javaScriptBridgeEnabled: $javaScriptBridgeEnabled, javaScriptBridgeForMainFrameOnly: $javaScriptBridgeForMainFrameOnly, javaScriptBridgeOriginAllowList: $javaScriptBridgeOriginAllowList, javaScriptCanAccessClipboard: $javaScriptCanAccessClipboard, javaScriptCanOpenWindowsAutomatically: $javaScriptCanOpenWindowsAutomatically, javaScriptEnabled: $javaScriptEnabled, javaScriptHandlersForMainFrameOnly: $javaScriptHandlersForMainFrameOnly, javaScriptHandlersOriginAllowList: $javaScriptHandlersOriginAllowList, keyRepeatDelay: $keyRepeatDelay, keyRepeatInterval: $keyRepeatInterval, layoutAlgorithm: $layoutAlgorithm, limitsNavigationsToAppBoundDomains: $limitsNavigationsToAppBoundDomains, loadWithOverviewMode: $loadWithOverviewMode, loadsImagesAutomatically: $loadsImagesAutomatically, maximumViewportInset: $maximumViewportInset, maximumZoomScale: $maximumZoomScale, mediaContentTypesRequiringHardwareSupport: $mediaContentTypesRequiringHardwareSupport, mediaPlaybackRequiresUserGesture: $mediaPlaybackRequiresUserGesture, mediaType: $mediaType, minimumFontSize: $minimumFontSize, minimumLogicalFontSize: $minimumLogicalFontSize, minimumViewportInset: $minimumViewportInset, minimumZoomScale: $minimumZoomScale, mixedContentMode: $mixedContentMode, needInitialFocus: $needInitialFocus, networkAvailable: $networkAvailable, nonClientRegionSupportEnabled: $nonClientRegionSupportEnabled, offscreenPreRaster: $offscreenPreRaster, overScrollMode: $overScrollMode, pageZoom: $pageZoom, passwordAutosaveEnabled: $passwordAutosaveEnabled, pictographFontFamily: $pictographFontFamily, pinchZoomEnabled: $pinchZoomEnabled, pluginScriptsForMainFrameOnly: $pluginScriptsForMainFrameOnly, pluginScriptsOriginAllowList: $pluginScriptsOriginAllowList, preferredColorScheme: $preferredColorScheme, preferredContentMode: $preferredContentMode, regexToAllowSyncUrlLoading: $regexToAllowSyncUrlLoading, regexToCancelSubFramesLoading: $regexToCancelSubFramesLoading, rendererPriorityPolicy: $rendererPriorityPolicy, reputationCheckingRequired: $reputationCheckingRequired, requestedWithHeaderOriginAllowList: $requestedWithHeaderOriginAllowList, resourceCustomSchemes: $resourceCustomSchemes, safeBrowsingEnabled: $safeBrowsingEnabled, sansSerifFontFamily: $sansSerifFontFamily, scrollBarDefaultDelayBeforeFade: $scrollBarDefaultDelayBeforeFade, scrollBarFadeDuration: $scrollBarFadeDuration, scrollBarStyle: $scrollBarStyle, scrollMultiplier: $scrollMultiplier, scrollbarFadingEnabled: $scrollbarFadingEnabled, scrollsToTop: $scrollsToTop, selectionGranularity: $selectionGranularity, serifFontFamily: $serifFontFamily, sharedCookiesEnabled: $sharedCookiesEnabled, shouldPrintBackgrounds: $shouldPrintBackgrounds, standardFontFamily: $standardFontFamily, statusBarEnabled: $statusBarEnabled, supportMultipleWindows: $supportMultipleWindows, supportZoom: $supportZoom, suppressesIncrementalRendering: $suppressesIncrementalRendering, textZoom: $textZoom, thirdPartyCookiesEnabled: $thirdPartyCookiesEnabled, transparentBackground: $transparentBackground, underPageBackgroundColor: $underPageBackgroundColor, upgradeKnownHostsToHTTPS: $upgradeKnownHostsToHTTPS, useHybridComposition: $useHybridComposition, useOnAjaxProgress: $useOnAjaxProgress, useOnAjaxReadyStateChange: $useOnAjaxReadyStateChange, useOnDownloadStart: $useOnDownloadStart, useOnLoadResource: $useOnLoadResource, useOnNavigationResponse: $useOnNavigationResponse, useOnRenderProcessGone: $useOnRenderProcessGone, useOnShowFileChooser: $useOnShowFileChooser, useShouldInterceptAjaxRequest: $useShouldInterceptAjaxRequest, useShouldInterceptFetchRequest: $useShouldInterceptFetchRequest, useShouldInterceptRequest: $useShouldInterceptRequest, useShouldOverrideUrlLoading: $useShouldOverrideUrlLoading, useWideViewPort: $useWideViewPort, userAgent: $userAgent, verticalScrollBarEnabled: $verticalScrollBarEnabled, verticalScrollbarPosition: $verticalScrollbarPosition, verticalScrollbarThumbColor: $verticalScrollbarThumbColor, verticalScrollbarTrackColor: $verticalScrollbarTrackColor, webRTCUdpPortsRange: $webRTCUdpPortsRange, webViewAssetLoader: $webViewAssetLoader}';
+    return 'InAppWebViewSettings{accessibilityIgnoresInvertColors: $accessibilityIgnoresInvertColors, algorithmicDarkeningAllowed: $algorithmicDarkeningAllowed, allowBackgroundAudioPlaying: $allowBackgroundAudioPlaying, allowContentAccess: $allowContentAccess, allowFileAccess: $allowFileAccess, allowFileAccessFromFileURLs: $allowFileAccessFromFileURLs, allowModalDialogs: $allowModalDialogs, allowTopNavigationToDataUrls: $allowTopNavigationToDataUrls, allowUniversalAccessFromFileURLs: $allowUniversalAccessFromFileURLs, allowingReadAccessTo: $allowingReadAccessTo, allowsAirPlayForMediaPlayback: $allowsAirPlayForMediaPlayback, allowsBackForwardNavigationGestures: $allowsBackForwardNavigationGestures, allowsInlineMediaPlayback: $allowsInlineMediaPlayback, allowsLinkPreview: $allowsLinkPreview, allowsPictureInPictureMediaPlayback: $allowsPictureInPictureMediaPlayback, alpha: $alpha, alwaysBounceHorizontal: $alwaysBounceHorizontal, alwaysBounceVertical: $alwaysBounceVertical, appCachePath: $appCachePath, applePayAPIEnabled: $applePayAPIEnabled, applicationNameForUserAgent: $applicationNameForUserAgent, automaticallyAdjustsScrollIndicatorInsets: $automaticallyAdjustsScrollIndicatorInsets, blockNetworkImage: $blockNetworkImage, blockNetworkLoads: $blockNetworkLoads, browserAcceleratorKeysEnabled: $browserAcceleratorKeysEnabled, builtInZoomControls: $builtInZoomControls, cacheEnabled: $cacheEnabled, cacheMode: $cacheMode, consoleMessageLevels: $consoleMessageLevels, contentBlockers: $contentBlockers, contentInsetAdjustmentBehavior: $contentInsetAdjustmentBehavior, corsAllowlist: $corsAllowlist, cursiveFontFamily: $cursiveFontFamily, cursorBlinkTime: $cursorBlinkTime, darkMode: $darkMode, dataDetectorTypes: $dataDetectorTypes, databaseEnabled: $databaseEnabled, decelerationRate: $decelerationRate, defaultFixedFontSize: $defaultFixedFontSize, defaultFontSize: $defaultFontSize, defaultTextEncodingName: $defaultTextEncodingName, defaultVideoPoster: $defaultVideoPoster, disableAnimations: $disableAnimations, disableContextMenu: $disableContextMenu, disableDefaultErrorPage: $disableDefaultErrorPage, disableHorizontalScroll: $disableHorizontalScroll, disableInputAccessoryView: $disableInputAccessoryView, disableLongPressContextMenuOnLinks: $disableLongPressContextMenuOnLinks, disableVerticalScroll: $disableVerticalScroll, disableWebSecurity: $disableWebSecurity, disabledActionModeMenuItems: $disabledActionModeMenuItems, disallowOverScroll: $disallowOverScroll, displayZoomControls: $displayZoomControls, domStorageEnabled: $domStorageEnabled, doubleClickDistance: $doubleClickDistance, doubleClickTime: $doubleClickTime, dragThreshold: $dragThreshold, drawCompositingIndicators: $drawCompositingIndicators, enable2DCanvasAcceleration: $enable2DCanvasAcceleration, enableCaretBrowsing: $enableCaretBrowsing, enableEncryptedMedia: $enableEncryptedMedia, enableJavaScriptMarkup: $enableJavaScriptMarkup, enableMedia: $enableMedia, enableMediaCapabilities: $enableMediaCapabilities, enableMockCaptureDevices: $enableMockCaptureDevices, enablePageCache: $enablePageCache, enableResizableTextAreas: $enableResizableTextAreas, enableSmoothScrolling: $enableSmoothScrolling, enableSpatialNavigation: $enableSpatialNavigation, enableTabsToLinks: $enableTabsToLinks, enableViewportScale: $enableViewportScale, enableWebRTC: $enableWebRTC, enableWriteConsoleMessagesToStdout: $enableWriteConsoleMessagesToStdout, enterpriseAuthenticationAppLinkPolicyEnabled: $enterpriseAuthenticationAppLinkPolicyEnabled, fantasyFontFamily: $fantasyFontFamily, fixedFontFamily: $fixedFontFamily, fontAntialias: $fontAntialias, fontDPI: $fontDPI, fontHintingStyle: $fontHintingStyle, fontSubpixelLayout: $fontSubpixelLayout, generalAutofillEnabled: $generalAutofillEnabled, geolocationEnabled: $geolocationEnabled, handleAcceleratorKeyPressed: $handleAcceleratorKeyPressed, hardwareAcceleration: $hardwareAcceleration, hiddenPdfToolbarItems: $hiddenPdfToolbarItems, horizontalScrollBarEnabled: $horizontalScrollBarEnabled, horizontalScrollbarThumbColor: $horizontalScrollbarThumbColor, horizontalScrollbarTrackColor: $horizontalScrollbarTrackColor, iframeAllow: $iframeAllow, iframeAllowFullscreen: $iframeAllowFullscreen, iframeAriaHidden: $iframeAriaHidden, iframeCsp: $iframeCsp, iframeName: $iframeName, iframeReferrerPolicy: $iframeReferrerPolicy, iframeRole: $iframeRole, iframeSandbox: $iframeSandbox, ignoresViewportScaleLimits: $ignoresViewportScaleLimits, incognito: $incognito, initialScale: $initialScale, interceptOnlyAsyncAjaxRequests: $interceptOnlyAsyncAjaxRequests, isDirectionalLockEnabled: $isDirectionalLockEnabled, isElementFullscreenEnabled: $isElementFullscreenEnabled, isFindInteractionEnabled: $isFindInteractionEnabled, isFraudulentWebsiteWarningEnabled: $isFraudulentWebsiteWarningEnabled, isInspectable: $isInspectable, isPagingEnabled: $isPagingEnabled, isSiteSpecificQuirksModeEnabled: $isSiteSpecificQuirksModeEnabled, isTextInteractionEnabled: $isTextInteractionEnabled, isUserInteractionEnabled: $isUserInteractionEnabled, itpEnabled: $itpEnabled, javaScriptBridgeEnabled: $javaScriptBridgeEnabled, javaScriptBridgeForMainFrameOnly: $javaScriptBridgeForMainFrameOnly, javaScriptBridgeOriginAllowList: $javaScriptBridgeOriginAllowList, javaScriptCanAccessClipboard: $javaScriptCanAccessClipboard, javaScriptCanOpenWindowsAutomatically: $javaScriptCanOpenWindowsAutomatically, javaScriptEnabled: $javaScriptEnabled, javaScriptHandlersForMainFrameOnly: $javaScriptHandlersForMainFrameOnly, javaScriptHandlersOriginAllowList: $javaScriptHandlersOriginAllowList, keyRepeatDelay: $keyRepeatDelay, keyRepeatInterval: $keyRepeatInterval, layoutAlgorithm: $layoutAlgorithm, limitsNavigationsToAppBoundDomains: $limitsNavigationsToAppBoundDomains, loadWithOverviewMode: $loadWithOverviewMode, loadsImagesAutomatically: $loadsImagesAutomatically, maximumViewportInset: $maximumViewportInset, maximumZoomScale: $maximumZoomScale, mediaContentTypesRequiringHardwareSupport: $mediaContentTypesRequiringHardwareSupport, mediaPlaybackRequiresUserGesture: $mediaPlaybackRequiresUserGesture, mediaType: $mediaType, minimumFontSize: $minimumFontSize, minimumLogicalFontSize: $minimumLogicalFontSize, minimumViewportInset: $minimumViewportInset, minimumZoomScale: $minimumZoomScale, mixedContentMode: $mixedContentMode, needInitialFocus: $needInitialFocus, networkAvailable: $networkAvailable, nonClientRegionSupportEnabled: $nonClientRegionSupportEnabled, offscreenPreRaster: $offscreenPreRaster, overScrollMode: $overScrollMode, pageZoom: $pageZoom, passwordAutosaveEnabled: $passwordAutosaveEnabled, pictographFontFamily: $pictographFontFamily, pinchZoomEnabled: $pinchZoomEnabled, pluginScriptsForMainFrameOnly: $pluginScriptsForMainFrameOnly, pluginScriptsOriginAllowList: $pluginScriptsOriginAllowList, preferredColorScheme: $preferredColorScheme, preferredContentMode: $preferredContentMode, regexToAllowSyncUrlLoading: $regexToAllowSyncUrlLoading, regexToCancelSubFramesLoading: $regexToCancelSubFramesLoading, rendererPriorityPolicy: $rendererPriorityPolicy, reputationCheckingRequired: $reputationCheckingRequired, requestedWithHeaderOriginAllowList: $requestedWithHeaderOriginAllowList, resourceCustomSchemes: $resourceCustomSchemes, safeBrowsingEnabled: $safeBrowsingEnabled, sansSerifFontFamily: $sansSerifFontFamily, scrollBarDefaultDelayBeforeFade: $scrollBarDefaultDelayBeforeFade, scrollBarFadeDuration: $scrollBarFadeDuration, scrollBarStyle: $scrollBarStyle, scrollMultiplier: $scrollMultiplier, scrollbarFadingEnabled: $scrollbarFadingEnabled, scrollsToTop: $scrollsToTop, selectionGranularity: $selectionGranularity, serifFontFamily: $serifFontFamily, sharedCookiesEnabled: $sharedCookiesEnabled, shouldPrintBackgrounds: $shouldPrintBackgrounds, standardFontFamily: $standardFontFamily, statusBarEnabled: $statusBarEnabled, supportMultipleWindows: $supportMultipleWindows, supportZoom: $supportZoom, suppressesIncrementalRendering: $suppressesIncrementalRendering, textZoom: $textZoom, thirdPartyCookiesEnabled: $thirdPartyCookiesEnabled, transparentBackground: $transparentBackground, underPageBackgroundColor: $underPageBackgroundColor, upgradeKnownHostsToHTTPS: $upgradeKnownHostsToHTTPS, useHybridComposition: $useHybridComposition, useOnAjaxProgress: $useOnAjaxProgress, useOnAjaxReadyStateChange: $useOnAjaxReadyStateChange, useOnDownloadStart: $useOnDownloadStart, useOnLoadResource: $useOnLoadResource, useOnNavigationResponse: $useOnNavigationResponse, useOnRenderProcessGone: $useOnRenderProcessGone, useOnShowFileChooser: $useOnShowFileChooser, useShouldInterceptAjaxRequest: $useShouldInterceptAjaxRequest, useShouldInterceptFetchRequest: $useShouldInterceptFetchRequest, useShouldInterceptRequest: $useShouldInterceptRequest, useShouldOverrideUrlLoading: $useShouldOverrideUrlLoading, useWideViewPort: $useWideViewPort, userAgent: $userAgent, verticalScrollBarEnabled: $verticalScrollBarEnabled, verticalScrollbarPosition: $verticalScrollbarPosition, verticalScrollbarThumbColor: $verticalScrollbarThumbColor, verticalScrollbarTrackColor: $verticalScrollbarTrackColor, webRTCUdpPortsRange: $webRTCUdpPortsRange, webViewAssetLoader: $webViewAssetLoader}';
   }
 }
 
@@ -3405,6 +3448,21 @@ enum InAppWebViewSettingsProperty {
   ///{@endtemplate}
   @Deprecated('Use CookieManager.removeSessionCookies instead')
   clearSessionCache,
+
+  ///Can be used to check if the [InAppWebViewSettings.consoleMessageLevels] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.InAppWebViewSettings.consoleMessageLevels.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android WebView
+  ///- iOS WKWebView
+  ///- macOS WKWebView
+  ///- Windows WebView2
+  ///- Linux WPE WebKit
+  ///
+  ///Use the [InAppWebViewSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  consoleMessageLevels,
 
   ///Can be used to check if the [InAppWebViewSettings.contentBlockers] property is supported at runtime.
   ///
@@ -5576,6 +5634,15 @@ extension _InAppWebViewSettingsPropertySupported on InAppWebViewSettings {
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
+      case InAppWebViewSettingsProperty.consoleMessageLevels:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [
+              TargetPlatform.android,
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+              TargetPlatform.windows,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case InAppWebViewSettingsProperty.contentBlockers:
         return ((kIsWeb && platform != null) || !kIsWeb) &&

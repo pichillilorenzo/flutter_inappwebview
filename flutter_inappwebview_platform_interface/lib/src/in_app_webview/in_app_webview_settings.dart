@@ -5,6 +5,7 @@ import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_pla
 
 import '../types/action_mode_menu_item.dart';
 import '../types/cache_mode.dart';
+import '../types/console_message_level.dart';
 import '../types/data_detector_types.dart';
 import '../types/font_hinting_style.dart';
 import '../types/font_subpixel_layout.dart';
@@ -75,6 +76,28 @@ class InAppWebViewSettings_ {
     ],
   )
   bool? useShouldOverrideUrlLoading;
+
+  ///Console levels forwarded to [PlatformWebViewCreationParams.onConsoleMessage].
+  ///A null value forwards all levels; an empty list disables console forwarding.
+  ///This does not suppress messages in the browser's own developer tools.
+  ///Levels are matched individually, not by numeric severity. On WebKit and
+  ///Windows, JavaScript `console.debug` uses [ConsoleMessageLevel.TIP] and
+  ///`console.info` uses [ConsoleMessageLevel.LOG], matching Android's console API.
+  ///Use [PlatformInAppWebViewController.setSettings] to change the policy.
+  ///
+  ///Accepted messages may travel in bounded batches, but the console callback
+  ///still runs once per message in order. An exception in one callback is
+  ///reported through [FlutterError.reportError] without dropping later messages.
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(),
+      IOSPlatform(),
+      MacOSPlatform(),
+      WindowsPlatform(),
+      LinuxPlatform(),
+    ],
+  )
+  List<ConsoleMessageLevel_>? consoleMessageLevels;
 
   ///Set to `true` to be able to listen at the [PlatformWebViewCreationParams.onLoadResource] event.
   ///
@@ -3299,6 +3322,7 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
 
   @ExchangeableObjectConstructor()
   InAppWebViewSettings_({
+    this.consoleMessageLevels,
     this.useShouldOverrideUrlLoading,
     this.useOnLoadResource,
     this.useOnDownloadStart,

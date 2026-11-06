@@ -24,6 +24,7 @@ class InAppWebViewSettings {
   // === Event flags ===
   bool useShouldOverrideUrlLoading = false;
   bool useOnLoadResource = false;
+  std::optional<std::vector<int64_t>> consoleMessageLevels;
   bool useOnDownloadStart = false;
   bool useOnNavigationResponse = false;
   bool useShouldInterceptRequest = false;

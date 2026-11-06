@@ -117,6 +117,7 @@ void HeadlessInAppWebViewManager::Run(FlMethodCall* method_call) {
 
   // Create InAppWebView params
   InAppWebViewCreationParams webviewParams;
+  webviewParams.hasConsoleMessageListener = get_fl_map_value(params, "hasConsoleMessageListener", true);
   webviewParams.id = 0;  // Not used for headless
   webviewParams.plugin = plugin_;  // Pass plugin instance for accessing managers
   webviewParams.gtkWindow = plugin_->gtkWindow();  // May be nullptr for headless/destroyed host.

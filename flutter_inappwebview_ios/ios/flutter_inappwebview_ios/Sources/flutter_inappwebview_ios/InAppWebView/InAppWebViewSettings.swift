@@ -13,6 +13,7 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
     
     var useShouldOverrideUrlLoading = false
     var useOnLoadResource = false
+    var consoleMessageLevels: [Int]? = nil
     var useOnDownloadStart = false
     @available(*, deprecated, message: "Use InAppWebViewManager.clearAllCache instead.")
     var clearCache = false

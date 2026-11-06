@@ -3369,6 +3369,52 @@ namespace flutter_inappwebview_plugin
   {
     constexpr UINT kBrowserProbeTimeoutMs = 50;
     constexpr UINT kBrowserStateRetryIntervalMs = 250;
+    constexpr UINT kLifecycleCompletionTimeoutMs = 5000;
+
+    struct LifecycleDeadline
+    {
+      ULONGLONG started;
+      std::function<void()> callback;
+    };
+    // SetTimer belongs to the calling platform thread. A queued WM_TIMER can
+    // survive KillTimer and its id can be reused, so check the new deadline's
+    // monotonic start time before running it. Remove its callback before
+    // invocation so completion can safely dispose or start another request.
+    thread_local std::map<UINT_PTR, LifecycleDeadline> gLifecycleDeadlines;
+
+    void CALLBACK LifecycleDeadlineProc(HWND, UINT, UINT_PTR timerId, DWORD)
+    {
+      const auto it = gLifecycleDeadlines.find(timerId);
+      if (it == gLifecycleDeadlines.end()) {
+        // A stale message may now refer to another component's reused id.
+        return;
+      }
+      if (GetTickCount64() - it->second.started < kLifecycleCompletionTimeoutMs) {
+        return;
+      }
+      auto callback = std::move(it->second.callback);
+      gLifecycleDeadlines.erase(it);
+      KillTimer(nullptr, timerId);
+      callback();
+    }
+
+    UINT_PTR startLifecycleDeadlineTimer(std::function<void()> callback)
+    {
+      const auto started = GetTickCount64();
+      const auto timerId = SetTimer(nullptr, 0, kLifecycleCompletionTimeoutMs,
+        LifecycleDeadlineProc);
+      if (timerId) {
+        gLifecycleDeadlines.emplace(timerId,
+          LifecycleDeadline{ started, std::move(callback) });
+      }
+      return timerId;
+    }
+
+    void clearLifecycleDeadlineTimer(UINT_PTR timerId)
+    {
+      gLifecycleDeadlines.erase(timerId);
+      KillTimer(nullptr, timerId);
+    }
 
     // Probe-window and retry-timer bookkeeping, keyed by browser process id.
     // Platform-thread only, like every other call into this file.
@@ -3490,20 +3536,31 @@ namespace flutter_inappwebview_plugin
 
   void InAppWebView::applyPendingBrowserState()
   {
+    if (!webViewController) {
+      lifecycleState_.failPending({ WebViewLifecycleStatus::unavailable });
+      clearLifecycleDeadline();
+      browserGate().removeWaiter(this);
+      return;
+    }
     if (webViewController &&
-      (visibilityState_.needsApply() || pendingResume_ || pendingSuspend_ ||
+      (visibilityState_.needsApply() || lifecycleState_.needsApply() ||
         pendingMemoryTarget_.has_value() ||
         (pendingParentMoved_ && visibilityState_.shouldBeVisible()))) {
       const auto browserPid = cachedBrowserProcessId();
       if (browserPid && !browserGate().tryAcquire(browserPid, this)) {
         return;
       }
-      if (pendingResume_) {
-        pendingResume_ = false;
+      const bool resuming = lifecycleState_.needsResume();
+      WebViewLifecycleState::OperationPtr resumeOperation;
+      HRESULT resumeResult = S_OK;
+      if (resuming) {
+        resumeOperation = lifecycleState_.beginResume();
         wil::com_ptr<ICoreWebView2_3> webView3;
-        if (webView && SUCCEEDED(webView->QueryInterface(IID_PPV_ARGS(&webView3)))) {
-          failedLog(webView3->Resume());
+        resumeResult = webView ? webView->QueryInterface(IID_PPV_ARGS(&webView3)) : E_POINTER;
+        if (SUCCEEDED(resumeResult)) {
+          resumeResult = webView3->Resume();
         }
+        failedLog(resumeResult);
       }
       if (pendingMemoryTarget_.has_value()) {
         const auto level = pendingMemoryTarget_.value();
@@ -3514,34 +3571,69 @@ namespace flutter_inappwebview_plugin
         }
       }
       if (visibilityState_.needsApply()) {
-        if (succeededOrLog(webViewController->put_IsVisible(
-          visibilityState_.shouldBeVisible() ? TRUE : FALSE))) {
+        const auto visibilityResult = webViewController->put_IsVisible(
+          visibilityState_.shouldBeVisible() ? TRUE : FALSE);
+        if (succeededOrLog(visibilityResult)) {
           visibilityState_.markApplied();
         }
         else {
-          pendingSuspend_ = false;
+          lifecycleState_.failPending({ WebViewLifecycleStatus::nativeError,
+            static_cast<std::int32_t>(visibilityResult) });
         }
+      }
+      if (resuming) {
+        lifecycleState_.resumeCompleted(resumeOperation,
+          { SUCCEEDED(resumeResult) ? WebViewLifecycleStatus::succeeded :
+            WebViewLifecycleStatus::nativeError,
+            static_cast<std::int32_t>(resumeResult) });
       }
       // A hidden WebView keeps the move until it is shown again.
       if (pendingParentMoved_ && visibilityState_.shouldBeVisible()) {
         pendingParentMoved_ = false;
         failedLog(webViewController->NotifyParentWindowPositionChanged());
       }
-      if (pendingSuspend_) {
-        pendingSuspend_ = false;
+      if (lifecycleState_.needsSuspend()) {
         if (!visibilityState_.shouldBeVisible() && !visibilityState_.needsApply()) {
+          const auto operation = lifecycleState_.beginSuspend();
           wil::com_ptr<ICoreWebView2_3> webView3;
-          if (webView && SUCCEEDED(webView->QueryInterface(IID_PPV_ARGS(&webView3)))) {
-            failedLog(webView3->TrySuspend(Callback<ICoreWebView2TrySuspendCompletedHandler>(
-              [this](HRESULT errorCode, BOOL isSuccessful) -> HRESULT
+          const auto queryResult = webView ? webView->QueryInterface(IID_PPV_ARGS(&webView3)) : E_POINTER;
+          if (SUCCEEDED(queryResult)) {
+            const auto weak = aliveToken();
+            const auto suspendResult = webView3->TrySuspend(Callback<ICoreWebView2TrySuspendCompletedHandler>(
+              [this, weak, operation](HRESULT errorCode, BOOL isSuccessful) -> HRESULT
               {
+                if (weak.expired()) {
+                  return S_OK;
+                }
                 failedLog(errorCode);
+                lifecycleState_.suspendCompleted(operation,
+                  WebViewLifecycleResult::suspendResult(
+                    static_cast<std::int32_t>(errorCode), isSuccessful != FALSE));
+                // A newer pause waits behind this native operation. A late
+                // success after resume requires a corrective Resume instead.
+                if (!weak.expired()) {
+                  applyPendingBrowserState();
+                }
                 return S_OK;
               })
-              .Get()));
+              .Get());
+            if (FAILED(suspendResult)) {
+              failedLog(suspendResult);
+              lifecycleState_.suspendCompleted(operation,
+                WebViewLifecycleResult::suspendResult(
+                  static_cast<std::int32_t>(suspendResult), false));
+            }
+          }
+          else {
+            lifecycleState_.suspendCompleted(operation,
+              { WebViewLifecycleStatus::unavailable,
+                static_cast<std::int32_t>(queryResult) });
           }
         }
       }
+    }
+    if (!lifecycleState_.hasPendingCompletion()) {
+      clearLifecycleDeadline();
     }
     browserGate().removeWaiter(this);
   }
@@ -3597,22 +3689,57 @@ namespace flutter_inappwebview_plugin
     notifyVisibilityChanged(wasVisible);
   }
 
-  void InAppWebView::pause()
+  void InAppWebView::startLifecycleDeadline()
+  {
+    clearLifecycleDeadline();
+    if (!lifecycleState_.hasPendingCompletion()) {
+      return;
+    }
+    const auto weak = aliveToken();
+    const auto operation = lifecycleState_.current();
+    // Includes time spent waiting at the browser-process gate. Do not keep a
+    // MethodResult (or an application awaiting it) alive forever if WebView2
+    // stops answering. All completion and timeout paths run on the UI thread.
+    lifecycleDeadlineTimer_ = startLifecycleDeadlineTimer([this, weak, operation]() {
+      if (weak.expired()) {
+        return;
+      }
+      lifecycleDeadlineTimer_ = 0;
+      if (lifecycleState_.isCurrent(operation)) {
+        browserGate().removeWaiter(this);
+        lifecycleState_.failPending({ WebViewLifecycleStatus::timedOut });
+      }
+    });
+    if (!lifecycleDeadlineTimer_) {
+      lifecycleState_.failPending({ WebViewLifecycleStatus::nativeError,
+        static_cast<std::int32_t>(E_FAIL) });
+    }
+  }
+
+  void InAppWebView::clearLifecycleDeadline()
+  {
+    if (lifecycleDeadlineTimer_) {
+      clearLifecycleDeadlineTimer(lifecycleDeadlineTimer_);
+      lifecycleDeadlineTimer_ = 0;
+    }
+  }
+
+  void InAppWebView::pause(WebViewLifecycleState::Completion completionHandler)
   {
     const bool wasVisible = visibilityState_.shouldBeVisible();
     visibilityState_.setPaused(true);
-    pendingResume_ = false;
-    pendingSuspend_ = true;
+    lifecycleState_.request(true, std::move(completionHandler));
+    startLifecycleDeadline();
     applyPendingBrowserState();
     notifyVisibilityChanged(wasVisible);
   }
 
-  void InAppWebView::resume()
+  void InAppWebView::resume(WebViewLifecycleState::Completion completionHandler)
   {
     const bool wasVisible = visibilityState_.shouldBeVisible();
     visibilityState_.setPaused(false);
-    pendingSuspend_ = false;
-    pendingResume_ = true;
+    lifecycleState_.request(false, std::move(completionHandler));
+    startLifecycleDeadline();
     applyPendingBrowserState();
     notifyVisibilityChanged(wasVisible);
   }
@@ -4728,6 +4855,8 @@ namespace flutter_inappwebview_plugin
     // Expire before tearing anything down: a Dart reply arriving from here on
     // must find a dead token and drop the call.
     aliveToken_.reset();
+    clearLifecycleDeadline();
+    lifecycleState_.dispose();
     browserGate().removeWaiter(this);
     WebViewDropTarget::UnregisterWebView(this);
     userContentController = nullptr;

@@ -3004,8 +3004,21 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.pause}
-  ///Does a best-effort attempt to pause any processing that can be paused safely, such as animations and geolocation. Note that this call does not pause JavaScript.
-  ///To pause JavaScript globally, use [PlatformInAppWebViewController.pauseTimers]. To resume WebView, call [resume].
+  ///Attempts to pause processing in this WebView. To resume it, call [resume].
+  ///
+  ///On Android, this calls `WebView.onPause`: it pauses processing such as
+  ///animations and geolocation on a best-effort basis, but does not pause
+  ///JavaScript. [pauseTimers] affects **all** WebViews in the process and must
+  ///not be used to suspend an individual tab.
+  ///
+  ///On Windows, this hides the WebView and awaits the asynchronous WebView2
+  ///`TrySuspend` result. It completes successfully only when the callback
+  ///reports both a successful HRESULT and `isSuccessful == true`. Suspension
+  ///is still best effort: currently running script may finish before it takes
+  ///effect. Refusal, native errors, superseding requests, disposal, or a
+  ///five-second completion timeout throw a `PlatformException`; a hidden
+  ///WebView alone does not confirm suspension. A failed request remains
+  ///hidden until [resume] is called.
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.pause.supported_platforms}
@@ -3031,6 +3044,10 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
 
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.resume}
   ///Resumes a WebView after a previous call to [pause].
+  ///On Windows, completion waits for the native Resume and visibility update
+  ///to be delivered, and supersedes an outstanding pause. Native errors,
+  ///disposal, supersession, or a completion timeout throw a
+  ///`PlatformException`. A minimized host remains hidden after resuming.
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.resume.supported_platforms}

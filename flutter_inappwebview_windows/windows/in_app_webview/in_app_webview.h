@@ -22,6 +22,7 @@
 #include "../webview_environment/webview_environment.h"
 #include "in_app_webview_settings.h"
 #include "user_content_controller.h"
+#include "webview_lifecycle_state.h"
 #include "webview_visibility_state.h"
 #include "webview_channel_delegate.h"
 #include "../web_message/web_message_channel.h"
@@ -245,8 +246,8 @@ namespace flutter_inappwebview_plugin
     void callDevToolsProtocolMethod(const std::string& methodName, const std::optional<std::string>& parametersAsJson, const std::function<void(const HRESULT& errorCode, const std::optional<std::string>&)> completionHandler) const;
     void addDevToolsProtocolEventListener(const std::string& eventName);
     void removeDevToolsProtocolEventListener(const std::string& eventName);
-    void pause();
-    void resume();
+    void pause(WebViewLifecycleState::Completion completionHandler);
+    void resume(WebViewLifecycleState::Completion completionHandler);
     void setHostWindowMinimized(bool minimized);
     void getCertificate(const std::function<void(const std::optional<std::unique_ptr<SslCertificate>>)> completionHandler) const;
     void clearSslPreferences(const std::function<void()> completionHandler) const;
@@ -359,8 +360,8 @@ namespace flutter_inappwebview_plugin
     // process UI thread; issuing them while it is not pumping (suspended,
     // starved after long backgrounding) blocks the host platform thread for
     // as long as that thread takes to wake.
-    bool pendingSuspend_ = false;
-    bool pendingResume_ = false;
+    WebViewLifecycleState lifecycleState_;
+    UINT_PTR lifecycleDeadlineTimer_ = 0;
     std::optional<int64_t> pendingMemoryTarget_;
     // Queried once and reused; refreshed only after the browser process exits,
     // so no per-flip round-trip depends on it.
@@ -372,6 +373,8 @@ namespace flutter_inappwebview_plugin
     void invalidateBrowserProcessCache();
     void notifyVisibilityChanged(bool wasVisible);
     void syncHostWindowVisibility();
+    void startLifecycleDeadline();
+    void clearLifecycleDeadline();
     HRESULT onCallJsHandler(const bool& isMainFrame, ICoreWebView2WebMessageReceivedEventArgs* args);
     void callDevToolsDomainMethod(const wchar_t* method, const wchar_t* parametersAsJson) const;
     void setFetchDomainEnabled(bool enabled) const;

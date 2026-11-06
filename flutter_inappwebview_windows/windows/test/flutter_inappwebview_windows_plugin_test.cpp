@@ -18,6 +18,7 @@
 #include "background_probe_test_cases.h"
 #include "module_probe_launcher_test_cases.h"
 #include "native_focus_test_cases.h"
+#include "webview_lifecycle_test_cases.h"
 #include "custom_platform_view/util/rohelper.h"
 #include "in_app_webview/webview_visibility_state.h"
 #include "plugin_scripts_js/javascript_bridge_message.h"
@@ -27,6 +28,78 @@
 #include "utils/flutter_view_hwnd.h"
 
 namespace flutter_inappwebview_plugin::test {
+
+TEST(WebViewLifecycle, WaitsForNativeSuspendCallback) {
+  webview_lifecycle_test::waitsForSuspendCallback();
+}
+
+TEST(WebViewLifecycle, SuccessfulHresultCanRejectSuspend) {
+  webview_lifecycle_test::successfulHresultCanRejectSuspend();
+}
+
+TEST(WebViewLifecycle, FailedHresultCannotConfirmSuspend) {
+  webview_lifecycle_test::failedHresultCannotConfirmSuspend();
+}
+
+TEST(WebViewLifecycle, ResumePreemptsPauseWaitingAtGate) {
+  webview_lifecycle_test::resumePreemptsPauseWaitingAtGate();
+}
+
+TEST(WebViewLifecycle, LateSuspendSuccessRequiresCorrectiveResume) {
+  webview_lifecycle_test::lateSuspendSuccessRequiresCorrectiveResume();
+}
+
+TEST(WebViewLifecycle, LateRefusalDoesNotResumeAgain) {
+  webview_lifecycle_test::lateRefusalDoesNotResumeAgain();
+}
+
+TEST(WebViewLifecycle, RapidPauseResumePausePreservesNewestRequest) {
+  webview_lifecycle_test::rapidPauseResumePausePreservesNewestRequest();
+}
+
+TEST(WebViewLifecycle, DuplicatePausesWaitForOneNativeOperation) {
+  webview_lifecycle_test::duplicatePausesWaitForOneNativeOperation();
+}
+
+TEST(WebViewLifecycle, TimeoutBeforeDispatchClearsPendingWork) {
+  webview_lifecycle_test::timeoutBeforeDispatchClearsPendingWork();
+}
+
+TEST(WebViewLifecycle, TimeoutDuringSuspendIgnoresLateSuccess) {
+  webview_lifecycle_test::timeoutDuringSuspendIgnoresLateSuccess();
+}
+
+TEST(WebViewLifecycle, LostCallbackCanRecoverAfterSuccessfulResume) {
+  webview_lifecycle_test::lostCallbackCanRecoverAfterSuccessfulResume();
+}
+
+TEST(WebViewLifecycle, RetiredCompletionCanResumeOnlyOnce) {
+  webview_lifecycle_test::retiredCompletionCanResumeOnlyOnce();
+}
+
+TEST(WebViewLifecycle, FailedResumeDoesNotRetirePendingSuspend) {
+  webview_lifecycle_test::failedResumeDoesNotRetirePendingSuspend();
+}
+
+TEST(WebViewLifecycle, DisposalCompletesAndPreventsLateAccess) {
+  webview_lifecycle_test::disposalCompletesAndPreventsLateAccess();
+}
+
+TEST(WebViewLifecycle, VisibilityOrResumeFailureCannotSucceed) {
+  webview_lifecycle_test::visibilityOrResumeFailureCannotSucceed();
+}
+
+TEST(WebViewLifecycle, IndependentViewsNeverCancelEachOther) {
+  webview_lifecycle_test::independentViewsNeverCancelEachOther();
+}
+
+TEST(WebViewLifecycle, CompletionCanStartAnotherRequest) {
+  webview_lifecycle_test::completionCanStartAnotherRequest();
+}
+
+TEST(WebViewLifecycle, RepeatedLifecyclesReleaseReplyOwners) {
+  webview_lifecycle_test::repeatedLifecyclesReleaseReplyOwners();
+}
 
 namespace {
 

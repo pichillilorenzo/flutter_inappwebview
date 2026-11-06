@@ -17,9 +17,18 @@ jobs:
       - uses: actions/checkout@v4
       - name: Test native lifecycle without a WebView runtime
         run: sh flutter_inappwebview_windows/windows/test/run_webview_lifecycle_tests.sh
+      - name: Test delayed trim cancellation without a real-time wait
+        run: sh flutter_inappwebview_windows/windows/test/run_delayed_texture_trim_tests.sh
+      - name: Test production GPU and CPU trim methods with platform doubles
+        run: python3 flutter_inappwebview_windows/tool/test_hidden_texture_trim.py --sanitize
 
   test:
+    name: Windows checks (texture fallback ${{ matrix.texture_fallback }})
     runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        texture_fallback: ["OFF", "ON"]
     steps:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
@@ -54,6 +63,7 @@ jobs:
         run: >-
           cmake -S windows -B build/windows/x64
           -Dinclude_flutter_inappwebview_windows_tests=TRUE
+          -DFLUTTER_WEBVIEW_WINDOWS_USE_TEXTURE_FALLBACK=${{ matrix.texture_fallback }}
 
       - name: Build example and native tests
         working-directory: flutter_inappwebview_windows/example
@@ -64,3 +74,10 @@ jobs:
         run: >-
           ctest --test-dir build/windows/x64 -C Debug
           --output-on-failure --no-tests=error
+      - name: Preserve native test observations
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-native-texture-fallback-${{ matrix.texture_fallback }}
+          path: flutter_inappwebview_windows/example/build/windows/x64/Testing/Temporary/*.log
+          if-no-files-found: warn

@@ -60,6 +60,8 @@ list(APPEND PLUGIN_SOURCES
   "types/one_shot_callback.h"
   "in_app_webview/webview_lifecycle_state.h"
   "custom_platform_view/surface_pool_slot.h"
+  "custom_platform_view/delayed_texture_trim.h"
+  "custom_platform_view/shared_texture_surface_pool.h"
   "custom_platform_view/async_resource_build.h"
   "custom_platform_view/background_probe.h"
   "custom_platform_view/module_probe_launcher.h"
@@ -397,9 +399,15 @@ gtest_discover_tests(${TEST_RUNNER} DISCOVERY_TIMEOUT 60
 # MSVC repeats the target name in intermediate manifest paths. Including the
 # full plugin name here exceeds MAX_PATH in the example's nested CI build.
 set(SHADER_TEST_RUNNER "inappwebview_frame_compare_test")
-add_executable(${SHADER_TEST_RUNNER} test/frame_compare_shader_test.cpp)
+add_executable(${SHADER_TEST_RUNNER}
+  test/frame_compare_shader_test.cpp
+  test/shared_texture_surface_pool_test.cpp
+)
 apply_standard_settings(${SHADER_TEST_RUNNER})
 target_include_directories(${SHADER_TEST_RUNNER} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 target_link_libraries(${SHADER_TEST_RUNNER} PRIVATE d3d11 gtest_main)
+target_link_libraries(${SHADER_TEST_RUNNER} PRIVATE windowsapp)
+target_compile_definitions(${SHADER_TEST_RUNNER} PRIVATE
+  "_SILENCE_EXPERIMENTAL_COROUTINE_DEPRECATION_WARNINGS")
 gtest_discover_tests(${SHADER_TEST_RUNNER} DISCOVERY_TIMEOUT 60)
 endif()

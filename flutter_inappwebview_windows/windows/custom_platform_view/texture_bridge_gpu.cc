@@ -11,6 +11,7 @@
 #include <vector>
 
 #include "frame_compare_cs.h"
+#include "shared_texture_surface_pool.h"
 #include "surface_pool_slot.h"
 #include "util/direct3d11.interop.h"
 
@@ -22,21 +23,10 @@ namespace flutter_inappwebview_plugin
     // Longest wait for the comparison result before the frame is published
     // unseen; 99% of results arrive sooner (fork measurements).
     constexpr auto kCompareWait = std::chrono::microseconds(1000);
-    constexpr size_t kSurfacePoolSize = 2;
   }
 
-  struct TextureBridgeGpu::SurfacePool {
-    struct Surface {
-      winrt::com_ptr<ID3D11Texture2D> texture;
-      HANDLE shared_handle = nullptr;
-      bool is_leased = false;
-    };
-
-    std::mutex mutex;
-    Size size = { 0, 0 };
-    std::vector<Surface> surfaces;
-    size_t published_surface = 0;
-    bool has_published_surface = false;
+  struct TextureBridgeGpu::SurfacePool : SharedTextureSurfacePool {
+    using SharedTextureSurfacePool::SharedTextureSurfacePool;
   };
 
   struct TextureBridgeGpu::FrameLease {
@@ -74,6 +64,12 @@ namespace flutter_inappwebview_plugin
       std::cerr << "WebView frame compare unavailable; every captured frame "
         "is forwarded to Flutter." << std::endl;
     }
+  }
+
+  TextureBridgeGpu::~TextureBridgeGpu()
+  {
+    // Cancel the owner-thread timer and capture before derived members die.
+    Stop();
   }
 
   void TextureBridgeGpu::TakeBuiltComparer()
@@ -261,42 +257,16 @@ namespace flutter_inappwebview_plugin
   {
     if (surface_pool_ && surface_pool_->size.width == width &&
       surface_pool_->size.height == height) {
-      return true;
+      return surface_pool_->EnsureTextures(graphics_context_->d3d_device());
     }
-    D3D11_TEXTURE2D_DESC dstDesc = {};
-    dstDesc.ArraySize = 1;
-    dstDesc.MipLevels = 1;
-    dstDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
-    dstDesc.CPUAccessFlags = 0;
-    dstDesc.Format = static_cast<DXGI_FORMAT>(kPixelFormat);
-    dstDesc.Width = width;
-    dstDesc.Height = height;
-    dstDesc.MiscFlags = D3D11_RESOURCE_MISC_SHARED;
-    dstDesc.SampleDesc.Count = 1;
-    dstDesc.SampleDesc.Quality = 0;
-    dstDesc.Usage = D3D11_USAGE_DEFAULT;
-
-    auto pool = std::make_shared<SurfacePool>();
-    pool->size = { width, height };
-    pool->surfaces.resize(kSurfacePoolSize);
-    for (auto& surface : pool->surfaces) {
-      if (FAILED(graphics_context_->d3d_device()->CreateTexture2D(
-        &dstDesc, nullptr, surface.texture.put()))) {
-        std::cerr << "Creating intermediate texture failed" << std::endl;
-        return false;
-      }
-      winrt::com_ptr<IDXGIResource> dxgi_surface;
-      surface.texture.try_as(dxgi_surface);
-      assert(dxgi_surface);
-      if (FAILED(dxgi_surface->GetSharedHandle(&surface.shared_handle)) ||
-        !surface.shared_handle) {
-        std::cerr << "Creating shared texture handle failed" << std::endl;
-        return false;
-      }
+    auto pool = std::make_shared<SurfacePool>(width, height);
+    if (!pool->EnsureTextures(graphics_context_->d3d_device())) {
+      std::cerr << "Creating intermediate shared textures failed" << std::endl;
+      return false;
     }
     {
       const std::lock_guard<std::mutex> lock(surface_pool_mutex_);
-      surface_pool_ = std::move(pool);
+      surface_pool_.swap(pool);
     }
     return true;
   }
@@ -409,15 +379,24 @@ namespace flutter_inappwebview_plugin
     incoming_size_ = { 0, 0 };
   }
 
+  bool TextureBridgeGpu::TrimHiddenResources(
+    std::vector<winrt::com_ptr<ID3D11Texture2D>>& retired)
+  {
+    return surface_pool_ && surface_pool_->DetachUnusedTextures(retired);
+  }
+
   void TextureBridgeGpu::StopInternal()
   {
     TextureBridge::StopInternal();
     // Outstanding Flutter leases retain the old pool until their release
     // callbacks run; a resumed capture creates a new pool.
+    std::shared_ptr<SurfacePool> retired_pool;
     {
       const std::lock_guard<std::mutex> lock(surface_pool_mutex_);
-      surface_pool_.reset();
+      retired_pool.swap(surface_pool_);
     }
+    // Pool destruction may call into the driver. Keep it outside the mutex
+    // used by GetSurfaceDescriptor, including during resize and Stop.
     OnCaptureSuspended();
   }
 }

@@ -43,4 +43,12 @@ jobs:
             -PflutterEngineVersion="$(cat "$FLUTTER_ROOT/bin/internal/engine.version")" \
             --no-daemon --max-workers=2 testDebugUnitTest \
             --tests '*InAppWebViewRendererLifecycleTest' \
-            --tests '*PendingJavaScriptCallbacksTest'
+            --tests '*PendingJavaScriptCallbacksTest' \
+            --tests '*ConsoleMessageBatchTest'
+      - name: Preserve native console measurements and test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-console-and-lifecycle-reports
+          path: flutter_inappwebview_android/android/build/test-results/testDebugUnitTest/
+          if-no-files-found: warn

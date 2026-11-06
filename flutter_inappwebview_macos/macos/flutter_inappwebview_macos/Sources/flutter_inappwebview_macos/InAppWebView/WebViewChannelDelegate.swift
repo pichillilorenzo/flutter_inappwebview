@@ -163,6 +163,10 @@ public class WebViewChannelDelegate: ChannelDelegate {
             webView?.setScrollChangedListener(hasListener: arguments?["hasListener"] as? Bool ?? false)
             result(true)
             break
+        case .setConsoleMessageListener:
+            webView?.setConsoleMessageListener(arguments?["hasListener"] as? Bool ?? false)
+            result(true)
+            break
         case .setSettings:
             if let iabController = webView?.inAppBrowserDelegate as? InAppBrowserWebViewController {
                 let inAppBrowserSettings = InAppBrowserSettings()
@@ -834,13 +838,31 @@ public class WebViewChannelDelegate: ChannelDelegate {
     }
     
     public func onConsoleMessage(message: String, messageLevel: Int) {
-        let arguments: [String: Any?] = [
-            "message": message,
-            "messageLevel": messageLevel
-        ]
-        channel?.invokeMethod("onConsoleMessage", arguments: arguments)
+        onConsoleMessages([(message, messageLevel)])
     }
-    
+
+    public func onConsoleMessages(_ messages: [(String, Int)]) {
+        guard let webView = webView, let channel = channel else { return }
+        var batch: [[String: Any]] = []
+        var characters = 0
+        func flush() {
+            if batch.isEmpty { return }
+            channel.invokeMethod("onConsoleMessageBatch", arguments: ["messages": batch])
+            batch.removeAll(keepingCapacity: true)
+            characters = 0
+        }
+        for (message, level) in messages {
+            guard webView.acceptsConsoleMessage(level) else { continue }
+            let size = message.utf16.count + 48
+            if !batch.isEmpty && (batch.count >= 64 || characters + size > 65536) { flush() }
+            batch.append(["message": message, "messageLevel": level])
+            characters += size
+            // Preserve oversized messages intact as singleton batches.
+            if batch.count >= 64 || characters >= 65536 { flush() }
+        }
+        flush()
+    }
+
     public func onProgressChanged(progress: Int) {
         let arguments: [String: Any?] = [
             "progress": progress

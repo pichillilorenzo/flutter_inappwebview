@@ -26,6 +26,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
     var inAppBrowserDelegate: InAppBrowserDelegate?
     var channelDelegate: WebViewChannelDelegate?
     var settings: InAppWebViewSettings?
+    var hasConsoleMessageListener = true
     var pullToRefreshControl: PullToRefreshControl?
     var findInteractionController: FindInteractionController?
     var webMessageChannels: [String: WebMessageChannel] = [:]
@@ -614,6 +615,30 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         }
     }
     
+    public func acceptsConsoleMessage(_ level: Int) -> Bool {
+        return hasConsoleMessageListener && (settings?.consoleMessageLevels?.contains(level) ?? true)
+    }
+
+    public func setConsoleMessageListener(_ hasListener: Bool) {
+        hasConsoleMessageListener = hasListener
+        updateConsoleMessagePolicy()
+    }
+
+    public func updateConsoleMessagePolicy() {
+        guard javaScriptBridgeEnabled, windowId == nil || windowCreated else { return }
+        let source = ConsoleLogJS.CONSOLE_POLICY_JS_SOURCE(enabled: hasConsoleMessageListener,
+                                                         levels: settings?.consoleMessageLevels)
+        // WKUserContentController may be shared with a popup. Evaluate only in
+        // this WebView; never remove or replace the parent's shared scripts.
+        if #available(iOS 14.0, *) {
+            for world in configuration.userContentController.getContentWorlds(with: windowId) {
+                super.evaluateJavaScript(source, in: nil, in: world, completionHandler: nil)
+            }
+        } else {
+            super.evaluateJavaScript(source, completionHandler: nil)
+        }
+    }
+
     public func prepareAndAddUserScripts() -> Void {
         if windowId != nil {
             // The new created window webview has the same WKWebViewConfiguration variable reference.
@@ -1541,6 +1566,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         scrollView.isScrollEnabled = !(newSettings.disableVerticalScroll && newSettings.disableHorizontalScroll)
         
         self.settings = newSettings
+        updateConsoleMessagePolicy()
     }
     
     func getSettings() -> [String: Any?]? {
@@ -3226,7 +3252,12 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                         webView.channelDelegate?.onPrintRequest(url: webView.url, printJobId: printJobId, callback: callback)
                     }
                     break
+                case "onConsoleMessagePolicy":
+                    (message.webView as? InAppWebView ?? webView).updateConsoleMessagePolicy()
+                    break
                 case "onConsoleMessage", "onConsoleMessageBatch":
+                    let consoleWebView = message.webView as? InAppWebView ?? webView
+                    if !consoleWebView.hasConsoleMessageListener || consoleWebView.settings?.consoleMessageLevels?.isEmpty == true { break }
                     if let args = body["args"] as? String, let data = args.data(using: .utf8) {
                         let jsonArgs = try? JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? [[String: Any]]
                         var consoleMessages: [[String: Any]] = []
@@ -3235,6 +3266,8 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                         } else if let jsonData = jsonArgs?.first {
                             consoleMessages = [jsonData]
                         }
+                        var entries: [(String, Int)] = []
+                        entries.reserveCapacity(64)
                         for jsonData in consoleMessages {
                             var messageLevel = 1
                             switch (jsonData["level"] as? String) {
@@ -3259,6 +3292,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                                 messageLevel = 1
                                 break
                             }
+                            if !consoleWebView.acceptsConsoleMessage(messageLevel) { continue }
                             let consoleMessage: String
                             if let message = jsonData["message"] as? String {
                                 consoleMessage = message
@@ -3268,8 +3302,13 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                                 consoleMessage = ""
                             }
 
-                            webView.channelDelegate?.onConsoleMessage(message: consoleMessage, messageLevel: messageLevel)
+                            entries.append((consoleMessage, messageLevel))
+                            if entries.count == 64 {
+                                consoleWebView.channelDelegate?.onConsoleMessages(entries)
+                                entries.removeAll(keepingCapacity: true)
+                            }
                         }
+                        consoleWebView.channelDelegate?.onConsoleMessages(entries)
                     }
                     break
                 case "onFindResultReceived":
@@ -3779,6 +3818,7 @@ if(window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)] 
     }
     
     public func dispose() {
+        setConsoleMessageListener(false)
         channelDelegate?.dispose()
         channelDelegate = nil
         runWindowBeforeCreatedCallbacks()

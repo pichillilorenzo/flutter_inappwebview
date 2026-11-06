@@ -80,8 +80,10 @@ public class FlutterWebViewController: NSObject, FlutterPlatformView, Disposable
 
         webView!.hasScrollChangedListener = params["hasScrollChangedListener"] as? Bool ?? true
         webView!.settings = settings
+        webView!.hasConsoleMessageListener = params["hasConsoleMessageListener"] as? Bool ?? true
         webView!.prepare()
         webView!.windowCreated = true
+        webView!.updateConsoleMessagePolicy()
     }
     
     public func webView() -> InAppWebView? {

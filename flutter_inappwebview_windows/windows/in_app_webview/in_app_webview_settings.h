@@ -3,6 +3,7 @@
 
 #include <optional>
 #include <string>
+#include <vector>
 #include <WebView2.h>
 
 namespace flutter_inappwebview_plugin
@@ -14,6 +15,7 @@ namespace flutter_inappwebview_plugin
   public:
     bool useShouldOverrideUrlLoading = false;
     bool useOnLoadResource = false;
+    std::optional<std::vector<int64_t>> consoleMessageLevels;
     bool useOnDownloadStart = false;
     bool useShouldInterceptRequest = false;
     std::string userAgent;

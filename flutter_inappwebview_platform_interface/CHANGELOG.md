@@ -1,5 +1,6 @@
 ## Unreleased
 
+- Add nullable `InAppWebViewSettings.consoleMessageLevels`: null preserves all levels, an empty list disables forwarding, and explicit levels match by identity.
 - Add a backward-compatible widget update hook; creation parameters stay immutable while layout and supported subscriptions can follow rebuilds.
 
 ## 1.4.0-beta.3

@@ -184,6 +184,7 @@ void InAppWebViewManager::CreateInAppWebView(FlMethodCall* method_call) {
       // A kept-alive webview may come back in another window than before.
       if (existingView->webview() != nullptr) {
         existingView->webview()->SetHostView(host_window, host_view);
+        existingView->webview()->setConsoleMessageListener(get_fl_map_value(args, "hasConsoleMessageListener", true));
       }
       int64_t texture_id = existingView->texture_id();
       platform_views_[texture_id] = std::move(existingView);
@@ -196,6 +197,7 @@ void InAppWebViewManager::CreateInAppWebView(FlMethodCall* method_call) {
 
   InAppWebViewCreationParams params;
   params.id = next_id_++;
+  params.hasConsoleMessageListener = get_fl_map_value(args, "hasConsoleMessageListener", true);
   params.plugin = plugin_;  // Pass plugin instance for accessing managers
   // The host window's handles, or the cached GTK window and FlView.
   params.gtkWindow = host_window != nullptr ? host_window : plugin_->gtkWindow();

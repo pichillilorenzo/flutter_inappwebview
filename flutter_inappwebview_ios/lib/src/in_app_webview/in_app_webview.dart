@@ -295,6 +295,9 @@ class IOSInAppWebViewWidget extends PlatformInAppWebViewWidget {
   void updateParams(PlatformInAppWebViewWidgetCreationParams params) {
     super.updateParams(params);
     unawaited(_controller?.updateScrollChangedCallback(params.onScrollChanged));
+    unawaited(
+      _controller?.updateConsoleMessageCallback(params.onConsoleMessage),
+    );
   }
 
   @override
@@ -331,6 +334,8 @@ class IOSInAppWebViewWidget extends PlatformInAppWebViewWidget {
         'initialUrlRequest': params.initialUrlRequest?.toMap(),
         'initialFile': params.initialFile,
         'initialData': params.initialData?.toMap(),
+        // Attach the publisher only once a live Dart controller owns it.
+        'hasConsoleMessageListener': false,
         'initialSettings': settingsMap,
         // Subscribe only once a live Dart controller has attached.
         // A cancelled keepAlive creation may never report completion.
@@ -362,6 +367,12 @@ class IOSInAppWebViewWidget extends PlatformInAppWebViewWidget {
       PlatformInAppWebViewControllerCreationParams(
         id: viewId,
         webviewParams: params,
+      ),
+    );
+    unawaited(
+      _controller!.updateConsoleMessageCallback(
+        widgetParams.onConsoleMessage,
+        forceNativeUpdate: true,
       ),
     );
     _iosParams.pullToRefreshController?.init(viewId);

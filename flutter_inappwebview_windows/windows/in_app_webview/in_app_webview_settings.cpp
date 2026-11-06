@@ -15,6 +15,12 @@ namespace flutter_inappwebview_plugin
   {
     useShouldOverrideUrlLoading = get_fl_map_value(encodableMap, "useShouldOverrideUrlLoading", useShouldOverrideUrlLoading);
     useOnLoadResource = get_fl_map_value(encodableMap, "useOnLoadResource", useOnLoadResource);
+    if (fl_map_contains_not_null(encodableMap, "consoleMessageLevels")) {
+      consoleMessageLevels = std::vector<int64_t>{};
+      for (const auto& level : std::get<flutter::EncodableList>(encodableMap.at(flutter::EncodableValue("consoleMessageLevels")))) {
+        consoleMessageLevels->push_back(level.LongValue());
+      }
+    }
     useOnDownloadStart = get_fl_map_value(encodableMap, "useOnDownloadStart", useOnDownloadStart);
     useShouldInterceptRequest = get_fl_map_value(encodableMap, "useShouldInterceptRequest", useShouldInterceptRequest);
     userAgent = get_fl_map_value(encodableMap, "userAgent", userAgent);
@@ -61,6 +67,7 @@ namespace flutter_inappwebview_plugin
     return flutter::EncodableMap{
       {"useShouldOverrideUrlLoading", useShouldOverrideUrlLoading},
       {"useOnLoadResource", useOnLoadResource},
+      {"consoleMessageLevels", make_fl_value(consoleMessageLevels)},
       {"useOnDownloadStart", useOnDownloadStart},
       {"useShouldInterceptRequest", useShouldInterceptRequest},
       {"userAgent", userAgent},

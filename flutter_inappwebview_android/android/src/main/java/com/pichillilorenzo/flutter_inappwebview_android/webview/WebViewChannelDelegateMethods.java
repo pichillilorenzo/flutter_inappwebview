@@ -24,6 +24,7 @@ public enum WebViewChannelDelegateMethods {
   takeScreenshot,
   setScrollChangedListener,
   setSettings,
+  setConsoleMessageListener,
   getSettings,
   close,
   show,

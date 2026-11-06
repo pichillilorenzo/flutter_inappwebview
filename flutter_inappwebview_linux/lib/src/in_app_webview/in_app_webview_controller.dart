@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
 import 'dart:core';
@@ -69,6 +70,7 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
       _inAppBrowser?.eventHandler;
 
   dynamic _controllerFromPlatform;
+  void Function(dynamic controller, ConsoleMessage message)? _onConsoleMessage;
 
   @override
   late LinuxWebStorage webStorage;
@@ -147,6 +149,7 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
   }
 
   void _init(PlatformInAppWebViewControllerCreationParams params) {
+    _onConsoleMessage = params.webviewParams?.onConsoleMessage;
     _controllerFromPlatform =
         params.webviewParams?.controllerFromPlatform?.call(this) ?? this;
 
@@ -261,19 +264,39 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
         }
         break;
       case "onConsoleMessage":
-        if ((webviewParams != null &&
-                webviewParams!.onConsoleMessage != null) ||
-            _inAppBrowserEventHandler != null) {
-          Map<String, dynamic> arguments = call.arguments
-              .cast<String, dynamic>();
-          ConsoleMessage consoleMessage = ConsoleMessage.fromMap(arguments)!;
-          if (webviewParams != null && webviewParams!.onConsoleMessage != null)
-            webviewParams!.onConsoleMessage!(
-              _controllerFromPlatform,
-              consoleMessage,
+      case "onConsoleMessageBatch":
+        if (disposed) break;
+        final List<dynamic> messages = call.method == "onConsoleMessageBatch"
+            ? (call.arguments["messages"] as List<dynamic>)
+            : [call.arguments];
+        for (final entry in messages) {
+          // Consult the live callback for each entry: it may be removed or the
+          // controller disposed by an earlier callback in this same batch.
+          if (disposed) break;
+          final callback = _onConsoleMessage;
+          final browser = _inAppBrowserEventHandler;
+          if (callback == null && browser == null) break;
+          try {
+            final message = ConsoleMessage.fromMap(
+              Map<String, dynamic>.from(entry as Map),
+            )!;
+            if (callback != null) {
+              callback(_controllerFromPlatform, message);
+            } else {
+              browser!.onConsoleMessage(message);
+            }
+          } catch (error, stack) {
+            // A failed callback must not discard the other messages that would
+            // previously have arrived as independent method calls.
+            FlutterError.reportError(
+              FlutterErrorDetails(
+                exception: error,
+                stack: stack,
+                library: 'flutter_inappwebview',
+                context: ErrorDescription('while dispatching onConsoleMessage'),
+              ),
             );
-          else
-            _inAppBrowserEventHandler!.onConsoleMessage(consoleMessage);
+          }
         }
         break;
       case "onLoadResource":
@@ -2357,6 +2380,10 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
 
   @override
   void dispose({bool isKeepAlive = false}) {
+    if (isKeepAlive) {
+      unawaited(updateConsoleMessageCallback(null));
+    }
+    _onConsoleMessage = null;
     if (!isKeepAlive) {
       for (final webMessageListener in _webMessageListeners) {
         webMessageListener.dispose();
@@ -2374,5 +2401,20 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
 }
 
 extension InternalInAppWebViewController on LinuxInAppWebViewController {
+  /// Updates this subscription without replacing the controller's creation params.
+  Future<void> updateConsoleMessageCallback(
+    void Function(dynamic controller, ConsoleMessage message)? callback, {
+    bool forceNativeUpdate = false,
+  }) async {
+    if (disposed) return;
+    final hadListener = _onConsoleMessage != null;
+    _onConsoleMessage = callback;
+    if (forceNativeUpdate || hadListener != (callback != null)) {
+      await channel?.invokeMethod<void>('setConsoleMessageListener', {
+        'hasListener': callback != null,
+      });
+    }
+  }
+
   get handleMethod => _handleMethod;
 }

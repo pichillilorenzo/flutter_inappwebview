@@ -87,6 +87,7 @@ class WebMessageListener;
 class WebViewChannelDelegate;
 
 struct InAppWebViewCreationParams {
+  bool hasConsoleMessageListener = true;
   int64_t id;
   PluginInstance* plugin = nullptr;  // Plugin instance for accessing managers
   GtkWindow* gtkWindow = nullptr;  // Cached GTK window from manager
@@ -256,6 +257,9 @@ class InAppWebView : public TextureWebViewApi {
   FindInteractionController* findInteractionController() const { return findInteractionController_.get(); }
 
   // Settings
+  bool acceptsConsoleMessage(int64_t level) const;
+  void setConsoleMessageListener(bool hasListener);
+  void updateConsoleMessagePolicy();
   std::shared_ptr<InAppWebViewSettings> settings() const { return settings_; }
   FlValue* getSettings() const;
   void setSettings(const std::shared_ptr<InAppWebViewSettings> newSettings,
@@ -719,6 +723,7 @@ class InAppWebView : public TextureWebViewApi {
 
   // === Initialization ===
   bool InitWpeBackend();
+  bool has_console_message_listener_ = true;
   bool InitWebView(const InAppWebViewCreationParams& params);
   void SetCreationError(const std::string& stage, const std::string& message,
                         std::optional<int> nativeCode = std::nullopt,

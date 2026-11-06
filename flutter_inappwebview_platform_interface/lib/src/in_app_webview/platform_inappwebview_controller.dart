@@ -30,6 +30,8 @@ part 'platform_inappwebview_controller.g.dart';
 final kJavaScriptHandlerForbiddenNames = UnmodifiableListView<String>([
   "onLoadResource",
   "onConsoleMessage",
+  "onConsoleMessageBatch",
+  "onConsoleMessagePolicy",
   "shouldInterceptAjaxRequest",
   "onAjaxReadyStateChange",
   "onAjaxProgress",

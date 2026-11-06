@@ -150,6 +150,7 @@ namespace flutter_inappwebview_plugin
     void notifyParentWindowMoved();
     // A widget attached to a kept-alive WebView brings its own listener.
     void setHasConsoleMessageListener(bool hasListener);
+    bool acceptsConsoleMessage(int64_t level) const;
     // Enable a DevTools domain once, before its first use.
     void ensureRuntimeDomain() const;
     void ensureNetworkDomain() const;

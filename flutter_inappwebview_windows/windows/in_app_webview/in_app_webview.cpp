@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <cstring>
 #include <filesystem>
 #include <nlohmann/json.hpp>
@@ -3160,6 +3161,7 @@ namespace flutter_inappwebview_plugin
             if (!channelDelegate || !hasConsoleMessageListener_) {
               return S_OK;
             }
+            if (settings->consoleMessageLevels && settings->consoleMessageLevels->empty()) return S_OK;
 
             wil::unique_cotaskmem_string json;
             if (succeededOrLog(args->get_ParameterObjectAsJson(&json))) {
@@ -3183,6 +3185,7 @@ namespace flutter_inappwebview_plugin
                 messageLevel = 2;
               }
 
+              if (!acceptsConsoleMessage(messageLevel)) return S_OK;
               auto consoleArgs = consoleMessageJson.at("args").get<std::vector<nlohmann::json>>();
               auto message = join(functional_map(consoleArgs, [](const nlohmann::json& json) { return json.contains("value") ? json.at("value").dump() : (json.contains("description") ? json.at("description").dump() : json.dump()); }), std::string{ " " });
               channelDelegate->onConsoleMessage(message, messageLevel);
@@ -3195,12 +3198,21 @@ namespace flutter_inappwebview_plugin
     }
   }
 
+  bool InAppWebView::acceptsConsoleMessage(int64_t level) const
+  {
+    return hasConsoleMessageListener_ && (!settings->consoleMessageLevels ||
+      std::find(settings->consoleMessageLevels->begin(), settings->consoleMessageLevels->end(), level) != settings->consoleMessageLevels->end());
+  }
+
   void InAppWebView::setHasConsoleMessageListener(const bool hasListener)
   {
     hasConsoleMessageListener_ = hasListener;
     if (hasListener) {
       ensureRuntimeDomain();
       registerConsoleMessageReceiver();
+    }
+    else if (channelDelegate) {
+      channelDelegate->clearConsoleMessages();
     }
   }
 

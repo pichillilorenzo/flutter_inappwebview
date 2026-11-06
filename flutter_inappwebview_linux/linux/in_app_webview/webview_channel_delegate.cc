@@ -423,6 +423,12 @@ void WebViewChannelDelegate::HandleMethodCall(FlMethodCall* method_call) {
     return;
   }
 
+  if (string_equals(methodName, "setConsoleMessageListener")) {
+    if (webView) webView->setConsoleMessageListener(get_fl_map_value(args, "hasListener", false));
+    fl_method_call_respond_success(method_call, nullptr, nullptr);
+    return;
+  }
+
   if (string_equals(methodName, "setSettings")) {
     FlValue* settings_value = get_fl_map_value_raw(args, "settings");
     if (settings_value != nullptr && fl_value_get_type(settings_value) == FL_VALUE_TYPE_MAP) {
@@ -1266,14 +1272,33 @@ void WebViewChannelDelegate::shouldOverrideUrlLoading(
 
 void WebViewChannelDelegate::onConsoleMessage(const std::string& message,
                                               int64_t messageLevel) const {
-  if (!channel_) {
-    return;
+  onConsoleMessages({{message, messageLevel}});
+}
+
+void WebViewChannelDelegate::onConsoleMessages(
+    const std::vector<std::pair<std::string, int64_t>>& messages) const {
+  if (!channel_ || !webView) return;
+  g_autoptr(FlValue) batch = fl_value_new_list();
+  size_t bytes = 0;
+  auto flush = [&]() {
+    if (fl_value_get_length(batch) == 0) return;
+    g_autoptr(FlValue) args = to_fl_map({{"messages", fl_value_ref(batch)}});
+    invokeMethod("onConsoleMessageBatch", args);
+    fl_value_unref(batch);
+    batch = fl_value_new_list();
+    bytes = 0;
+  };
+  for (const auto& entry : messages) {
+    if (!webView->acceptsConsoleMessage(entry.second)) continue;
+    const size_t size = entry.first.size() + 48;
+    if (fl_value_get_length(batch) > 0 &&
+        (fl_value_get_length(batch) >= 64 || bytes + size > 65536)) flush();
+    fl_value_append_take(batch, to_fl_map({{"message", make_fl_value(entry.first)},
+                                         {"messageLevel", make_fl_value(entry.second)}}));
+    bytes += size;
+    if (fl_value_get_length(batch) >= 64 || bytes >= 65536) flush();
   }
-
-  g_autoptr(FlValue) args =
-      to_fl_map({{"message", make_fl_value(message)}, {"messageLevel", make_fl_value(messageLevel)}});
-
-  invokeMethod("onConsoleMessage", args);
+  flush();
 }
 
 void WebViewChannelDelegate::onLoadResource(const std::string& url,

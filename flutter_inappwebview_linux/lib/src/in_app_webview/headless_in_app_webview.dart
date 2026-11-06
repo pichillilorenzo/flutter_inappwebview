@@ -348,6 +348,7 @@ class LinuxHeadlessInAppWebView extends PlatformHeadlessInAppWebView
         'initialUrlRequest': params.initialUrlRequest?.toMap(),
         'initialFile': params.initialFile,
         'initialData': params.initialData?.toMap(),
+        'hasConsoleMessageListener': params.onConsoleMessage != null,
         'initialSettings': settingsMap,
         'contextMenu': params.contextMenu?.toMap() ?? {},
         'windowId': params.windowId,

@@ -140,6 +140,19 @@ abstract class PlatformWebViewEnvironment extends PlatformInterface
 
   ///{@template flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.getProcessInfos}
   ///Returns a list of all process using same user data folder except for crashpad process.
+  ///
+  ///On Windows, an empty list means collection succeeded with no processes.
+  ///Failures are reported as a `PlatformException`: `process_info_unsupported`
+  ///when the runtime has no process enumeration API,
+  ///`webview_environment_unavailable` before creation or after disposal, or
+  ///`process_info_collection_failed` when the snapshot cannot be collected.
+  ///Native failures include the failing `stage` and signed `hresult` in the
+  ///exception details. A failed collection is never returned as a partial list.
+  ///Process IDs and frame details remain nullable when WebView2 cannot read them.
+  ///Failure to read a process kind, which is required by the model, fails the
+  ///snapshot. If the environment is disposed while awaiting a native callback,
+  ///that callback reports `webview_environment_unavailable`.
+  ///Older runtimes use the basic process API without associated frame details.
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.getProcessInfos.supported_platforms}
@@ -159,7 +172,7 @@ abstract class PlatformWebViewEnvironment extends PlatformInterface
     );
   }
 
-  ///{@template flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.getProcessInfos}
+  ///{@template flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.getFailureReportFolderPath}
   ///Returns the path of the folder where minidump files are written.
   ///
   ///Whenever a WebView2 process crashes, a crash dump file will be created in the crash dump folder.

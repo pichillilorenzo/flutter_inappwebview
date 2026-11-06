@@ -15,6 +15,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Test process snapshot failures against native production code
+        run: python3 flutter_inappwebview_windows/windows/test/run_process_infos_tests.py --sanitize
       - name: Test native lifecycle without a WebView runtime
         run: sh flutter_inappwebview_windows/windows/test/run_webview_lifecycle_tests.sh
       - name: Test delayed trim cancellation without a real-time wait

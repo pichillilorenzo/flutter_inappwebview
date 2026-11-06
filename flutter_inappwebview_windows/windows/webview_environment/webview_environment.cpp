@@ -1,3 +1,4 @@
+#include <atomic>
 #include <WebView2EnvironmentOptions.h>
 #include <wil/wrl.h>
 
@@ -266,46 +267,73 @@ namespace flutter_inappwebview_plugin
     return false;
   }
 
-  void WebViewEnvironment::getProcessInfos(const std::function<void(std::vector<std::shared_ptr<BrowserProcessInfo>>)> completionHandler) const
+  void WebViewEnvironment::getProcessInfos(const std::function<void(ProcessInfosResult)> completionHandler) const
   {
+    auto completed = std::make_shared<std::atomic<bool>>(false);
+    auto finish = [completionHandler, completed, weakAlive = alive_.weak()](ProcessInfosResult result)
+      {
+        if (!completed->exchange(true) && completionHandler) {
+          if (weakAlive.expired()) {
+            result = ProcessInfosResult::failure(E_UNEXPECTED, "environment",
+              "webview_environment_unavailable");
+          }
+          completionHandler(std::move(result));
+        }
+      };
     if (!environment_) {
-      if (completionHandler) {
-        completionHandler({});
-      }
+      finish(ProcessInfosResult::failure(E_UNEXPECTED, "environment",
+        "webview_environment_unavailable"));
       return;
     }
 
-    if (auto environment13 = environment_.try_query<ICoreWebView2Environment13>()) {
-      auto hr = environment13->GetProcessExtendedInfos(Callback<ICoreWebView2GetProcessExtendedInfosCompletedHandler>(
-        [completionHandler](HRESULT error, wil::com_ptr<ICoreWebView2ProcessExtendedInfoCollection> processCollection) -> HRESULT
+    wil::com_ptr<ICoreWebView2Environment13> environment13;
+    auto extendedError = environment_->QueryInterface(IID_PPV_ARGS(&environment13));
+    std::string extendedStage = "QueryInterface.Environment13";
+    if (SUCCEEDED(extendedError) && environment13) {
+      extendedStage = "GetProcessExtendedInfos";
+      extendedError = environment13->GetProcessExtendedInfos(Callback<ICoreWebView2GetProcessExtendedInfosCompletedHandler>(
+        [finish](HRESULT error, wil::com_ptr<ICoreWebView2ProcessExtendedInfoCollection> processCollection) -> HRESULT
         {
-          std::vector<std::shared_ptr<BrowserProcessInfo>> processInfos = {};
-          if (succeededOrLog(error) && processCollection) {
-            auto browserProcessInfosChangedDetail = BrowserProcessInfosChangedDetail::fromICoreWebView2ProcessExtendedInfoCollection(processCollection);
-            processInfos = browserProcessInfosChangedDetail->infos;
+          if (FAILED(error)) {
+            finish(ProcessInfosResult::failure(error, "GetProcessExtendedInfos.callback"));
           }
-          if (completionHandler) {
-            completionHandler(processInfos);
+          else {
+            finish(readProcessInfoCollection<ICoreWebView2ProcessExtendedInfo>(processCollection,
+              "GetProcessExtendedInfos", BrowserProcessInfo::fromICoreWebView2ProcessExtendedInfo));
           }
           return S_OK;
         }).Get());
-
-      if (succeededOrLog(hr)) {
+      if (SUCCEEDED(extendedError) || completed->load()) {
         return;
       }
     }
-    std::vector<std::shared_ptr<BrowserProcessInfo>> processInfos = {};
-    if (auto environment8 = environment_.try_query<ICoreWebView2Environment8>()) {
-      wil::com_ptr<ICoreWebView2ProcessInfoCollection> processCollection;
-      if (succeededOrLog(environment8->GetProcessInfos(&processCollection))) {
-        auto browserProcessInfosChangedDetail = BrowserProcessInfosChangedDetail::fromICoreWebView2ProcessInfoCollection(processCollection);
-        processInfos = browserProcessInfosChangedDetail->infos;
-      }
+    else if (SUCCEEDED(extendedError)) {
+      extendedError = E_POINTER;
     }
 
-    if (completionHandler) {
-      completionHandler(processInfos);
+    // Keep support for older runtimes and the existing basic-API fallback when
+    // the extended request cannot start. An asynchronous failure stays an error.
+    wil::com_ptr<ICoreWebView2Environment8> environment8;
+    auto hr = environment_->QueryInterface(IID_PPV_ARGS(&environment8));
+    if (FAILED(hr) || !environment8) {
+      if (hr == E_NOINTERFACE && extendedError != E_NOINTERFACE) {
+        finish(ProcessInfosResult::failure(extendedError, extendedStage));
+      }
+      else {
+        finish(ProcessInfosResult::failure(FAILED(hr) ? hr : E_POINTER,
+          "QueryInterface.Environment8", hr == E_NOINTERFACE
+            ? "process_info_unsupported" : "process_info_collection_failed"));
+      }
+      return;
     }
+    wil::com_ptr<ICoreWebView2ProcessInfoCollection> processCollection;
+    hr = environment8->GetProcessInfos(&processCollection);
+    if (FAILED(hr)) {
+      finish(ProcessInfosResult::failure(hr, "GetProcessInfos"));
+      return;
+    }
+    finish(readProcessInfoCollection<ICoreWebView2ProcessInfo>(processCollection,
+      "GetProcessInfos", BrowserProcessInfo::fromICoreWebView2ProcessInfo));
   }
 
   std::optional<std::string> WebViewEnvironment::getFailureReportFolderPath() const

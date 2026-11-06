@@ -18,7 +18,14 @@ namespace flutter_inappwebview_plugin
     std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result)
   {
     if (!webViewEnvironment) {
-      result->Success();
+      if (string_equals(method_call.method_name(), "getProcessInfos")) {
+        result->Error("webview_environment_unavailable", "The WebView environment is unavailable.",
+          make_fl_value(flutter::EncodableMap{ { "stage", make_fl_value("channelDelegate") },
+            { "hresult", make_fl_value(static_cast<int64_t>(E_UNEXPECTED)) } }));
+      }
+      else {
+        result->Success();
+      }
       return;
     }
 
@@ -41,9 +48,15 @@ namespace flutter_inappwebview_plugin
     }
     else if (string_equals(methodName, "getProcessInfos")) {
       auto result_ = std::shared_ptr<flutter::MethodResult<flutter::EncodableValue>>(std::move(result));
-      webViewEnvironment->getProcessInfos([result_ = std::move(result_)](std::vector<std::shared_ptr<BrowserProcessInfo>> processInfos)
+      webViewEnvironment->getProcessInfos([result_ = std::move(result_)](ProcessInfosResult snapshot)
         {
-          result_->Success(make_fl_value(functional_map(processInfos, [](const std::shared_ptr<BrowserProcessInfo>& info) { return info->toEncodableMap(); })));
+          if (FAILED(snapshot.error)) {
+            result_->Error(snapshot.code, "Cannot collect WebView2 processes: " + getHRMessage(snapshot.error),
+              make_fl_value(flutter::EncodableMap{ { "stage", make_fl_value(snapshot.stage) },
+                { "hresult", make_fl_value(static_cast<int64_t>(snapshot.error)) } }));
+            return;
+          }
+          result_->Success(make_fl_value(functional_map(snapshot.infos, [](const std::shared_ptr<BrowserProcessInfo>& info) { return info->toEncodableMap(); })));
         });
     }
     else if (string_equals(methodName, "getFailureReportFolderPath")) {

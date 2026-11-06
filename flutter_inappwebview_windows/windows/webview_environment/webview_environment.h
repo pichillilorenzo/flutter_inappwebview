@@ -11,6 +11,7 @@
 #include "../types/lifetime_token.h"
 #include "webview_environment_channel_delegate.h"
 #include "webview_environment_settings.h"
+#include "process_infos_result.h"
 
 namespace flutter_inappwebview_plugin
 {
@@ -37,7 +38,7 @@ namespace flutter_inappwebview_plugin
     // without using a "temp" ICoreWebView2 for CookieManager and other possible usage, the onBrowserProcessExited event will never be called
     void useTempWebView(const std::function<void(wil::com_ptr<ICoreWebView2Controller>, wil::com_ptr<ICoreWebView2>)> completionHandler) const;
     bool isInterfaceSupported(const std::string& interfaceName) const;
-    void getProcessInfos(const std::function<void(std::vector<std::shared_ptr<BrowserProcessInfo>>)> completionHandler) const;
+    void getProcessInfos(const std::function<void(ProcessInfosResult)> completionHandler) const;
     std::optional<std::string> getFailureReportFolderPath() const;
 
   private:

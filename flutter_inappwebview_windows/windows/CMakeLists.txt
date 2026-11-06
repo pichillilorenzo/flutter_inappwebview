@@ -225,6 +225,7 @@ list(APPEND PLUGIN_SOURCES
   "webview_environment/webview_environment_settings.h"
   "webview_environment/webview_environment.cpp"
   "webview_environment/webview_environment.h"
+  "webview_environment/process_infos_result.h"
   "webview_environment/webview_environment_manager.cpp"
   "webview_environment/webview_environment_manager.h"
   "webview_environment/prewarm_operation.h"

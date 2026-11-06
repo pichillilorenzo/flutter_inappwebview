@@ -10,6 +10,7 @@
 - Native JavaScript handler replies parse JSON as data, preserving `__proto__` keys and rejecting malformed JSON; modern Apple WebViews pass the text as an argument to avoid native quoting.
 - Added the Windows `ProcessFailedReason` values `NORMAL_EXIT`, `ABNORMAL_EXIT` and
   `INTEGRITY_FAILURE` reported by newer WebView2 runtimes.
+- Documented process snapshot errors, nullable fields and older-runtime fallback for `WebViewEnvironment.getProcessInfos`.
 - Added `PlatformInAppWebViewController.setBackgroundColor` for Android.
 - Added `PlatformWebAuthenticationSession.additionalHeaderFields`.
 - Added the Windows `PERSISTENT_STORAGE` permission resource and safe handling

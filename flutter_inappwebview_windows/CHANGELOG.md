@@ -10,6 +10,7 @@
 - Fixed a crash of the whole app when a page called `callHandler` with a name that has no Dart handler.
 - Fixed `onProcessFailed`, `onAcceleratorKeyPressed` and `onShowFileChooser` never reaching Dart; `onShowFileChooser` has no WebView2 event and stays unsupported.
 - Fixed `ProcessFailedDetail.frameInfos` skipping the first and every second frame.
+- Preserved Windows process enumeration failures as structured errors instead of empty or partial process snapshots; successful empty snapshots remain empty lists.
 - Fixed `<select>` popups and other WebView2 popups opening at the old position after the window moved without a drag.
 - Fixed a WebView created before its first layout (a kept-alive hidden page) keeping its initial size until clicked.
 - Sent `callHandler` results to visible pages as web messages and posted the arguments without a second JSON encoding, about 40% faster for large payloads; error messages are now escaped correctly. A result still goes through a script when the page is hidden or suspended, when the top document navigated since the call, or while an `evaluateJavascript`/`callAsyncJavaScript` call is pending, so it cannot reach another document or overtake an earlier script.

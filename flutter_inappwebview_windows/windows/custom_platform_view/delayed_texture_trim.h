@@ -20,7 +20,7 @@ namespace flutter_inappwebview_plugin
     static constexpr uint32_t kDelayMs = 30000;
 
     DelayedTextureTrim(Schedule schedule, Cancel cancel,
-      Now now = [] { return Clock::now(); })
+      Now now = [] { return std::chrono::steady_clock::now(); })
       : schedule_(std::move(schedule)), cancel_(std::move(cancel)),
         now_(std::move(now)) {}
 

@@ -18,6 +18,7 @@ class ProbeView {
   late final HeadlessInAppWebView view;
   late InAppWebViewController controller;
   final loaded = Completer<void>();
+  final loadEvents = <String>[];
   Completer<ProbeView>? nextPopup;
   bool popupEnabled = false;
   int dartCalls = 0;
@@ -63,6 +64,7 @@ class ProbeView {
         ),
       ]),
       onWebViewCreated: (value) {
+        recordLoad('controller created');
         controller = value;
         controller.addJavaScriptHandler(
           handlerName: 'raw',
@@ -108,9 +110,20 @@ class ProbeView {
           },
         );
       },
+      onLoadStart: (controller, url) => recordLoad('load started: $url'),
       onLoadStop: (controller, url) {
+        recordLoad('load stopped: $url');
         if (!loaded.isCompleted) loaded.complete();
         if (nextLoad != null && !nextLoad!.isCompleted) nextLoad!.complete();
+      },
+      onReceivedError: (controller, request, error) {
+        recordLoad(
+          'load error: ${request.url}, mainFrame=${request.isForMainFrame}, '
+          '${error.type}: ${error.description}',
+        );
+      },
+      onWebContentProcessDidTerminate: (controller) {
+        recordLoad('WebKit content process terminated');
       },
       onConsoleMessage: (controller, message) {
         consoleEvents++;
@@ -134,9 +147,26 @@ class ProbeView {
     );
   }
 
+  void recordLoad(String event) {
+    loadEvents.add(event);
+    stderr.writeln('APPLE_REPLY_LOAD: $owner: $event');
+  }
+
+  Future<void> waitForLoad(Completer<void> completion, String phase) async {
+    try {
+      await completion.future.timeout(const Duration(seconds: 30));
+    } on TimeoutException {
+      throw StateError(
+        '$owner: $phase did not finish within 30 seconds; '
+        'load events: ${loadEvents.join(' | ')}',
+      );
+    }
+  }
+
   Future<void> start() async {
     await view.run();
-    await loaded.future.timeout(const Duration(seconds: 30));
+    recordLoad('headless run completed');
+    await waitForLoad(loaded, 'initial document');
     await js(
       "await window.flutter_inappwebview.callHandler('raw', 'null'); return true;",
     );
@@ -190,7 +220,7 @@ class ProbeView {
           "window.open('about:blank', 'reply-probe-${DateTime.now().microsecondsSinceEpoch}'); null;",
     );
     final popup = await nextPopup!.future.timeout(const Duration(seconds: 30));
-    await popup.loaded.future.timeout(const Duration(seconds: 30));
+    await popup.waitForLoad(popup.loaded, 'popup document');
     await popup.js(
       "await window.flutter_inappwebview.callHandler('raw', 'null'); return true;",
     );
@@ -336,7 +366,7 @@ Future<void> verifySurvivor(ProbeView view) async {
     data: '<!DOCTYPE html><title>surviving document</title>',
     baseUrl: WebUri('https://allowed.test/survivor'),
   );
-  await view.nextLoad!.future.timeout(const Duration(seconds: 30));
+  await view.waitForLoad(view.nextLoad!, 'replacement document');
   final afterNavigation = await view.js(
     "return await window.flutter_inappwebview.callHandler('meta');",
   );

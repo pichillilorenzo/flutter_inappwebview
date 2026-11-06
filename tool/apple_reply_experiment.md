@@ -162,6 +162,17 @@ The live probe's Dart source can still be analyzed on Linux. Its runner creates
 an isolated temporary app and uses the same checked-in JSON fixture file as the
 other tests.
 
+The generated macOS app retains App Sandbox and all Flutter template
+entitlements, and adds `com.apple.security.network.client` to both entitlement
+files, as required by the [plugin's macOS setup](https://inappwebview.dev/docs/intro/#setup-macos)
+and [Flutter's sandbox guidance](https://docs.flutter.dev/platform-integration/macos/building#entitlements-and-the-app-sandbox).
+The configuration is recorded as `releaseEntitlements` in a successful report.
+This corrects a difference from the fork's macOS example; it is not by itself
+proof of the cause of a previous load timeout. The live WKWebView gate remains
+mandatory. Load start/stop, load errors and content-process termination are
+logged per owner, and a 30-second load failure includes those events. No timeout
+or compatibility assertion is relaxed.
+
 ## Measurements and acceptance
 
 Two commands intentionally produce different kinds of evidence:

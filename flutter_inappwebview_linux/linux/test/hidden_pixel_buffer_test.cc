@@ -188,6 +188,8 @@ class InAppWebView {
   std::atomic<bool> skip_pixel_readback_{false};
   std::atomic<bool> inline_flutter_texture_consumer_{false};
   std::atomic<bool> is_disposing_{false};
+  // Production teardown also clears console subscriptions in combined builds.
+  bool has_console_message_listener_ = false;
   bool is_visible_ = true;
   int width_ = 800;
   int height_ = 600;

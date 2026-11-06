@@ -3,6 +3,7 @@
 - Resolved current Linux host handles after pending creation and queued rehosts, avoiding destroyed or replaced native windows.
 
 - Attached popups and dialogs to each WebView's Flutter window, including keep-alive reuse, host destruction, and fractional-scale moves between windows.
+- Kept FDO focus requests independent of visibility so hidden views remain hidden until explicitly shown.
 - Reported native WebView initialization failures with their stage and original diagnostics, and released Dart creation waiters after failures.
 - Coalesced surface size reports to one update per frame and kept texture offsets current before pointer input.
 - Batched console notifications while preserving message order and immediate warning/error delivery.

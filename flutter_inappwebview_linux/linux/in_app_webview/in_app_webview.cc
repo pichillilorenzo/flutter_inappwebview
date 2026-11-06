@@ -3062,13 +3062,9 @@ void InAppWebView::setFocused(bool focused) {
 #elif defined(HAVE_WPE_BACKEND_LEGACY)
   if (wpe_backend_ != nullptr) {
     if (focused) {
-      // Add focused state - also ensure visible and in_window are set
+      // Retain focus while hidden; only setVisible may change visibility.
       wpe_view_backend_add_activity_state(wpe_backend_, wpe_view_activity_state_focused);
-      wpe_view_backend_add_activity_state(wpe_backend_, wpe_view_activity_state_visible);
-      wpe_view_backend_add_activity_state(wpe_backend_, wpe_view_activity_state_in_window);
     } else {
-      // Remove only the focused state, keep visible and in_window so the webview
-      // continues to render and process basic events
       wpe_view_backend_remove_activity_state(wpe_backend_, wpe_view_activity_state_focused);
     }
   }

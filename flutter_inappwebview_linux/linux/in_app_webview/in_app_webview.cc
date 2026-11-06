@@ -18,6 +18,7 @@
 #include <cstring>
 #include <filesystem>
 #include <limits>
+#include <new>
 #include <nlohmann/json.hpp>
 #include <random>
 #include <set>
@@ -365,6 +366,8 @@ void InAppWebView::AttachChannel(FlBinaryMessenger* messenger, const std::string
 
 InAppWebView::~InAppWebView() {
   debugLog("dealloc InAppWebView");
+  is_disposing_.store(true);
+  CancelHiddenPixelBufferTrim();
   CancelHostBoundPopups();
   lifetime_token_.reset();
 
@@ -433,9 +436,6 @@ InAppWebView::~InAppWebView() {
 
 #ifdef HAVE_WPE_PLATFORM
   // === WPEPlatform proper shutdown sequence ===
-  // Mark as disposing to prevent buffer callbacks from processing
-  is_disposing_.store(true);
-  
   // 1. First disconnect signals to stop receiving callbacks
   if (wpe_view_ != nullptr && buffer_rendered_handler_ != 0) {
     g_signal_handler_disconnect(wpe_view_, buffer_rendered_handler_);
@@ -1510,100 +1510,106 @@ void InAppWebView::OnWpePlatformBufferRendered(WPEBuffer* buffer) {
       }
     }
     
-    // === Priority 2: Direct SHM buffer access (no GBM required) ===
-    // WPEBufferSHM provides direct pixel access without requiring GBM device
-    if (!buffer_handled && is_shm) {
-      WPEBufferSHM* shm_buffer = WPE_BUFFER_SHM(buffer);
-      GBytes* data = wpe_buffer_shm_get_data(shm_buffer);
-      
-      if (data != nullptr) {
-        guint stride = wpe_buffer_shm_get_stride(shm_buffer);
-        WPEPixelFormat format = wpe_buffer_shm_get_format(shm_buffer);
-        
-        gsize size;
-        const uint8_t* pixels = static_cast<const uint8_t*>(g_bytes_get_data(data, &size));
-        
-        if (pixels != nullptr && size > 0) {
-          // Store in pixel buffer for software rendering
-          size_t write_idx = write_buffer_index_.load(std::memory_order_relaxed);
-          auto& pixel_buffer = pixel_buffers_[write_idx];
+    try {
+      std::lock_guard<std::mutex> writer_lock(pixel_buffer_write_mutex_);
+      // === Priority 2: Direct SHM buffer access (no GBM required) ===
+      // WPEBufferSHM provides direct pixel access without requiring GBM device
+      if (!buffer_handled && is_shm) {
+        WPEBufferSHM* shm_buffer = WPE_BUFFER_SHM(buffer);
+        GBytes* data = wpe_buffer_shm_get_data(shm_buffer);
 
-          // WPE SHM buffers use ARGB8888 format (BGRA in memory on little-endian)
-          // Flutter expects RGBA8888, so we need to convert
-          // ConvertARGB32ToRGBA handles the BGRA -> RGBA conversion
-          bool pixels_valid = true;
-          if (format == WPE_PIXEL_FORMAT_ARGB8888) {
-            pixels_valid = ConvertARGB32ToRGBAVector(
-                pixels, size, pixel_buffer.data, buf_width, buf_height, stride);
-          } else {
-            // Keep the original bytes for formats without an ARGB conversion.
-            ResizeByteBuffer(pixel_buffer.data, size);
-            memcpy(pixel_buffer.data.data(), pixels, size);
-          }
-
-          if (pixels_valid) {
-            pixel_buffer.width = buf_width;
-            pixel_buffer.height = buf_height;
-
-            // Swap buffers
-            {
-              std::lock_guard<std::mutex> swap_lock(buffer_swap_mutex_);
-              read_buffer_index_.store(write_idx, std::memory_order_release);
-              write_buffer_index_.store((write_idx + 1) % kNumBuffers,
-                                        std::memory_order_relaxed);
-            }
-
-            current_buffer_width_ = buf_width;
-            current_buffer_height_ = buf_height;
-            buffer_handled = true;
-          }
-        }
-        // Note: Don't unref data - it's borrowed from the buffer
-      }
-    }
-    
-    // === Priority 3: Generic pixel import (works for DMA-BUF with GBM device) ===
-    // This is a fallback for DMA-BUF when EGL failed but GBM device is available
-    if (!buffer_handled) {
-      GError* error = nullptr;
-      GBytes* pixels = wpe_buffer_import_to_pixels(buffer, &error);
-      if (pixels != nullptr) {
-        gsize size;
-        const uint8_t* data = static_cast<const uint8_t*>(g_bytes_get_data(pixels, &size));
-        
         if (data != nullptr) {
-          // Store the imported ARGB8888 pixels directly as packed RGBA.
-          size_t write_idx = write_buffer_index_.load(std::memory_order_relaxed);
-          auto& pixel_buffer = pixel_buffers_[write_idx];
-          const size_t stride = static_cast<size_t>(buf_width) * 4;
-          if (ConvertARGB32ToRGBAVector(data, size, pixel_buffer.data, buf_width,
-                                        buf_height, stride)) {
-            pixel_buffer.width = buf_width;
-            pixel_buffer.height = buf_height;
+          guint stride = wpe_buffer_shm_get_stride(shm_buffer);
+          WPEPixelFormat format = wpe_buffer_shm_get_format(shm_buffer);
 
-            // Swap buffers
-            {
-              std::lock_guard<std::mutex> swap_lock(buffer_swap_mutex_);
-              read_buffer_index_.store(write_idx, std::memory_order_release);
-              write_buffer_index_.store((write_idx + 1) % kNumBuffers,
-                                        std::memory_order_relaxed);
+          gsize size;
+          const uint8_t* pixels = static_cast<const uint8_t*>(g_bytes_get_data(data, &size));
+
+          if (pixels != nullptr && size > 0) {
+            // Store in pixel buffer for software rendering
+            size_t write_idx = write_buffer_index_.load(std::memory_order_relaxed);
+            auto& pixel_buffer = pixel_buffers_[write_idx];
+
+            // WPE SHM buffers use ARGB8888 format (BGRA in memory on little-endian)
+            // Flutter expects RGBA8888, so we need to convert
+            // ConvertARGB32ToRGBA handles the BGRA -> RGBA conversion
+            bool pixels_valid = true;
+            if (format == WPE_PIXEL_FORMAT_ARGB8888) {
+              pixels_valid = ConvertARGB32ToRGBAVector(
+                  pixels, size, pixel_buffer.data, buf_width, buf_height, stride);
+            } else {
+              // Keep the original bytes for formats without an ARGB conversion.
+              ResizeByteBuffer(pixel_buffer.data, size);
+              memcpy(pixel_buffer.data.data(), pixels, size);
             }
 
-            current_buffer_width_ = buf_width;
-            current_buffer_height_ = buf_height;
-            buffer_handled = true;
-          }
-        }
+            if (pixels_valid) {
+              pixel_buffer.width = buf_width;
+              pixel_buffer.height = buf_height;
 
-        // The imported GBytes is owned by the WPEBuffer (transfer none).
-        // WPE releases it when the buffer is disposed.
-      } else {
-        if (error != nullptr) {
-          g_clear_error(&error);
+              // Swap buffers
+              {
+                std::lock_guard<std::mutex> swap_lock(buffer_swap_mutex_);
+                read_buffer_index_.store(write_idx, std::memory_order_release);
+                write_buffer_index_.store((write_idx + 1) % kNumBuffers,
+                                          std::memory_order_relaxed);
+              }
+
+              current_buffer_width_ = buf_width;
+              current_buffer_height_ = buf_height;
+              buffer_handled = true;
+            }
+          }
+          // Note: Don't unref data - it's borrowed from the buffer
         }
       }
+
+      // === Priority 3: Generic pixel import (works for DMA-BUF with GBM device) ===
+      // This is a fallback for DMA-BUF when EGL failed but GBM device is available
+      if (!buffer_handled) {
+        GError* error = nullptr;
+        GBytes* pixels = wpe_buffer_import_to_pixels(buffer, &error);
+        if (pixels != nullptr) {
+          gsize size;
+          const uint8_t* data = static_cast<const uint8_t*>(g_bytes_get_data(pixels, &size));
+
+          if (data != nullptr) {
+            // Store the imported ARGB8888 pixels directly as packed RGBA.
+            size_t write_idx = write_buffer_index_.load(std::memory_order_relaxed);
+            auto& pixel_buffer = pixel_buffers_[write_idx];
+            const size_t stride = static_cast<size_t>(buf_width) * 4;
+            if (ConvertARGB32ToRGBAVector(data, size, pixel_buffer.data, buf_width,
+                                          buf_height, stride)) {
+              pixel_buffer.width = buf_width;
+              pixel_buffer.height = buf_height;
+
+              // Swap buffers
+              {
+                std::lock_guard<std::mutex> swap_lock(buffer_swap_mutex_);
+                read_buffer_index_.store(write_idx, std::memory_order_release);
+                write_buffer_index_.store((write_idx + 1) % kNumBuffers,
+                                          std::memory_order_relaxed);
+              }
+
+              current_buffer_width_ = buf_width;
+              current_buffer_height_ = buf_height;
+              buffer_handled = true;
+            }
+          }
+
+          // The imported GBytes is owned by the WPEBuffer (transfer none).
+          // WPE releases it when the buffer is disposed.
+        } else {
+          if (error != nullptr) {
+            g_clear_error(&error);
+          }
+        }
+      }
+    } catch (const std::bad_alloc&) {
+      // Keep the published CPU frame if rebuilding a trimmed spare fails.
+      // WPE buffer ownership and release ordering below still run normally.
     }
-    
+
     if (!buffer_handled) {
       debugLog("ERROR: No rendering method succeeded!");
     }
@@ -1613,6 +1619,10 @@ void InAppWebView::OnWpePlatformBufferRendered(WPEBuffer* buffer) {
     current_buffer_ = buffer;
   }
   
+  // Late frames can arrive after unmapping. Once the grace period has elapsed,
+  // retain only their published CPU frame as well.
+  TrimUnusedPixelBuffers();
+
   // Release the PREVIOUS buffer now that we have a new one
   // WPE will dispose of the previous buffer's EGL image when appropriate.
   if (previous_buffer != nullptr && wpe_view_ != nullptr && WPE_IS_BUFFER(previous_buffer)) {
@@ -1675,27 +1685,34 @@ void InAppWebView::ReadPixelsFromEglImage(void* egl_image, uint32_t width, uint3
     return;
   }
 
-  size_t buffer_size = width * height * 4;  // RGBA
+  try {
+    std::lock_guard<std::mutex> writer_lock(pixel_buffer_write_mutex_);
+    size_t buffer_size = width * height * 4;  // RGBA
 
-  // Use triple buffering
-  size_t write_idx = write_buffer_index_.load(std::memory_order_relaxed);
-  auto& buffer = pixel_buffers_[write_idx];
+    // Use triple buffering
+    size_t write_idx = write_buffer_index_.load(std::memory_order_relaxed);
+    auto& buffer = pixel_buffers_[write_idx];
 
-  ResizeByteBuffer(buffer.data, buffer_size);
+    ResizeByteBuffer(buffer.data, buffer_size);
 
-  buffer.width = width;
-  buffer.height = height;
+    buffer.width = width;
+    buffer.height = height;
 
-  glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, buffer.data.data());
+    glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, buffer.data.data());
 
-  {
-    std::lock_guard<std::mutex> lock(buffer_swap_mutex_);
-    read_buffer_index_.store(write_idx, std::memory_order_release);
-    write_buffer_index_.store((write_idx + 1) % kNumBuffers, std::memory_order_relaxed);
+    {
+      std::lock_guard<std::mutex> lock(buffer_swap_mutex_);
+      read_buffer_index_.store(write_idx, std::memory_order_release);
+      write_buffer_index_.store((write_idx + 1) % kNumBuffers, std::memory_order_relaxed);
+    }
+  } catch (const std::bad_alloc&) {
+    // Rebuilding a trimmed spare may fail. Keep the published frame and still
+    // restore GL state so the export callback can release/complete normally.
   }
 
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
   glBindTexture(GL_TEXTURE_2D, 0);
+  TrimUnusedPixelBuffers();
 }
 
 // === Navigation Methods ===
@@ -3074,6 +3091,10 @@ void InAppWebView::setVisible(bool visible) {
     return;
   is_visible_ = visible;
 
+  if (visible) {
+    CancelHiddenPixelBufferTrim();
+  }
+
 #ifdef HAVE_WPE_PLATFORM
   // WPEPlatform: Use wpe_view_set_visible and map/unmap
   if (wpe_view_ != nullptr) {
@@ -3095,6 +3116,86 @@ void InAppWebView::setVisible(bool visible) {
     }
   }
 #endif
+
+  if (!visible) {
+    ScheduleHiddenPixelBufferTrim();
+  }
+}
+
+void InAppWebView::ScheduleHiddenPixelBufferTrim() {
+  CancelHiddenPixelBufferTrim();
+  if (is_visible_ || is_disposing_.load()) {
+    return;
+  }
+
+  struct PendingTrim {
+    InAppWebView* webview;
+    std::weak_ptr<int> lifetime;
+    uint64_t generation;
+  };
+  auto* pending = new (std::nothrow) PendingTrim{
+      this, lifetime_token_, hidden_pixel_buffer_trim_generation_};
+  if (pending == nullptr) {
+    return;  // Trimming is optional; keep the existing rendering buffers.
+  }
+
+  // A conservative grace period avoids reallocating on quick tab switches.
+  // No GPU/WPE resource is released here: its consumer can still need it.
+  hidden_pixel_buffer_trim_source_ = g_timeout_add_full(
+      G_PRIORITY_DEFAULT, kHiddenPixelBufferTrimDelayMs,
+      [](gpointer data) -> gboolean {
+        auto* pending = static_cast<PendingTrim*>(data);
+        if (pending->lifetime.expired()) {
+          return G_SOURCE_REMOVE;
+        }
+        auto* self = pending->webview;
+        if (pending->generation != self->hidden_pixel_buffer_trim_generation_) {
+          return G_SOURCE_REMOVE;
+        }
+        self->hidden_pixel_buffer_trim_source_ = 0;
+        if (!self->is_visible_ && !self->is_disposing_.load()) {
+          self->trim_unused_pixel_buffers_.store(true, std::memory_order_release);
+          self->TrimUnusedPixelBuffers();
+        }
+        return G_SOURCE_REMOVE;
+      },
+      pending, [](gpointer data) { delete static_cast<PendingTrim*>(data); });
+}
+
+void InAppWebView::CancelHiddenPixelBufferTrim() {
+  ++hidden_pixel_buffer_trim_generation_;
+  trim_unused_pixel_buffers_.store(false, std::memory_order_release);
+  if (hidden_pixel_buffer_trim_source_ != 0) {
+    const guint source = hidden_pixel_buffer_trim_source_;
+    hidden_pixel_buffer_trim_source_ = 0;
+    g_source_remove(source);
+  }
+}
+
+void InAppWebView::TrimUnusedPixelBuffers() {
+  if (!trim_unused_pixel_buffers_.load(std::memory_order_acquire)) {
+    return;
+  }
+
+  // Keep the published CPU frame (and the texture's separate staging copy).
+  // Detach spare allocations under the locks, but free them after unlocking so
+  // neither Flutter's raster copy nor the next producer waits for deallocation.
+  std::array<std::vector<uint8_t>, kNumBuffers> retired;
+  {
+    std::lock_guard<std::mutex> writer_lock(pixel_buffer_write_mutex_);
+    if (!trim_unused_pixel_buffers_.load(std::memory_order_acquire)) {
+      return;
+    }
+    std::lock_guard<std::mutex> swap_lock(buffer_swap_mutex_);
+    const size_t read_idx = read_buffer_index_.load(std::memory_order_acquire);
+    for (size_t i = 0; i < kNumBuffers; ++i) {
+      if (i != read_idx) {
+        retired[i].swap(pixel_buffers_[i].data);
+        pixel_buffers_[i].width = 0;
+        pixel_buffers_[i].height = 0;
+      }
+    }
+  }
 }
 
 uint32_t InAppWebView::getActivityState() const {
@@ -8278,38 +8379,45 @@ void InAppWebView::OnExportShmBuffer(struct wpe_fdo_shm_exported_buffer* buffer)
   void* data = wl_shm_buffer_get_data(shm_buffer);
 
   if (data != nullptr && width > 0 && height > 0) {
-    // Copy to our pixel buffer
-    // Note: stride is the row pitch in bytes (may include padding)
+    try {
+      std::lock_guard<std::mutex> writer_lock(pixel_buffer_write_mutex_);
+      // Copy to our pixel buffer
+      // Note: stride is the row pitch in bytes (may include padding)
 
-    size_t write_idx = write_buffer_index_.load(std::memory_order_relaxed);
-    auto& pixel_buffer = pixel_buffers_[write_idx];
+      size_t write_idx = write_buffer_index_.load(std::memory_order_relaxed);
+      auto& pixel_buffer = pixel_buffers_[write_idx];
 
-    // Use width*4 for tightly packed RGBA output (no stride padding)
-    size_t output_row_size = static_cast<size_t>(width) * 4;
-    size_t output_size = static_cast<size_t>(height) * output_row_size;
+      // Use width*4 for tightly packed RGBA output (no stride padding)
+      size_t output_row_size = static_cast<size_t>(width) * 4;
+      size_t output_size = static_cast<size_t>(height) * output_row_size;
 
-    ResizeByteBuffer(pixel_buffer.data, output_size);
+      ResizeByteBuffer(pixel_buffer.data, output_size);
 
-    pixel_buffer.width = static_cast<size_t>(width);
-    pixel_buffer.height = static_cast<size_t>(height);
+      pixel_buffer.width = static_cast<size_t>(width);
+      pixel_buffer.height = static_cast<size_t>(height);
 
-    // Convert from BGRA (WL_SHM_FORMAT_ARGB8888 in memory) to RGBA
-    // Using SIMD-optimized conversion for better performance on ARM (NEON) and x86 (SSE2/SSSE3)
-    uint8_t* src = static_cast<uint8_t*>(data);
-    uint8_t* dst = pixel_buffer.data.data();
+      // Convert from BGRA (WL_SHM_FORMAT_ARGB8888 in memory) to RGBA
+      // Using SIMD-optimized conversion for better performance on ARM (NEON) and x86 (SSE2/SSSE3)
+      uint8_t* src = static_cast<uint8_t*>(data);
+      uint8_t* dst = pixel_buffer.data.data();
 
-    ConvertARGB32ToRGBA(src, dst, width, height, stride);
+      ConvertARGB32ToRGBA(src, dst, width, height, stride);
 
-    // Swap buffers
-    {
-      std::lock_guard<std::mutex> lock(buffer_swap_mutex_);
-      read_buffer_index_.store(write_idx, std::memory_order_release);
-      write_buffer_index_.store((write_idx + 1) % kNumBuffers, std::memory_order_relaxed);
+      // Swap buffers
+      {
+        std::lock_guard<std::mutex> lock(buffer_swap_mutex_);
+        read_buffer_index_.store(write_idx, std::memory_order_release);
+        write_buffer_index_.store((write_idx + 1) % kNumBuffers, std::memory_order_relaxed);
+      }
+    } catch (const std::bad_alloc&) {
+      // Preserve the last published frame, and always end SHM access and
+      // release/complete the export below, even when a spare cannot be rebuilt.
     }
   }
 
   // End access
   wl_shm_buffer_end_access(shm_buffer);
+  TrimUnusedPixelBuffers();
 
   // Release the buffer back to WPE
   if (exportable_ != nullptr) {

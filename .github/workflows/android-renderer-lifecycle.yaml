@@ -1,0 +1,46 @@
+name: Android renderer lifecycle
+
+on:
+  pull_request:
+    paths:
+      - 'flutter_inappwebview_android/android/**'
+      - 'tool/android_unit_tests.init.gradle'
+      - '.github/workflows/android-renderer-lifecycle.yaml'
+  push:
+    branches: [master]
+    paths:
+      - 'flutter_inappwebview_android/android/**'
+      - 'tool/android_unit_tests.init.gradle'
+      - '.github/workflows/android-renderer-lifecycle.yaml'
+
+permissions:
+  contents: read
+
+jobs:
+  android:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: ''
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: '3.47.7'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.13'
+      - run: sdkmanager 'platforms;android-36' 'build-tools;35.0.0'
+      - name: Compile Android plugin and run lifecycle regressions
+        run: |
+          gradle -p flutter_inappwebview_android/android \
+            -I "$PWD/tool/android_unit_tests.init.gradle" \
+            -PflutterEngineVersion="$(cat "$FLUTTER_ROOT/bin/internal/engine.version")" \
+            --no-daemon --max-workers=2 testDebugUnitTest \
+            --tests '*InAppWebViewRendererLifecycleTest' \
+            --tests '*PendingJavaScriptCallbacksTest'

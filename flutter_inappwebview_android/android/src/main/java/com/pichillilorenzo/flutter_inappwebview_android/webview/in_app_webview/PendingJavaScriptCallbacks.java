@@ -28,7 +28,7 @@ public final class PendingJavaScriptCallbacks {
   }
 
   public void cancelAll(String value) {
-    completeAll(removeAll(), value);
+    rethrow(completeAll(removeAll(), value, null));
   }
 
   /** Detach both sets before invoking a callback from either set. */
@@ -37,8 +37,8 @@ public final class PendingJavaScriptCallbacks {
       PendingJavaScriptCallbacks second, String secondValue) {
     List<Callback> firstPending = first.removeAll();
     List<Callback> secondPending = second.removeAll();
-    completeAll(firstPending, firstValue);
-    completeAll(secondPending, secondValue);
+    Throwable failure = completeAll(firstPending, firstValue, null);
+    rethrow(completeAll(secondPending, secondValue, failure));
   }
 
   private synchronized List<Callback> removeAll() {
@@ -47,10 +47,21 @@ public final class PendingJavaScriptCallbacks {
     return pending;
   }
 
-  private static void completeAll(List<Callback> pending, String value) {
+  private static Throwable completeAll(List<Callback> pending, String value, Throwable failure) {
     for (Callback callback : pending) {
-      callback.onComplete(value);
+      try {
+        callback.onComplete(value);
+      } catch (RuntimeException | Error error) {
+        if (failure == null) failure = error;
+        else if (failure != error) failure.addSuppressed(error);
+      }
     }
+    return failure;
+  }
+
+  private static void rethrow(Throwable failure) {
+    if (failure instanceof RuntimeException) throw (RuntimeException) failure;
+    if (failure instanceof Error) throw (Error) failure;
   }
 
   public synchronized boolean contains(String id) {

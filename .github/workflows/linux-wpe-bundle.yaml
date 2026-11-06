@@ -63,3 +63,7 @@ jobs:
         run: |
           flutter_inappwebview_linux/linux/test/run_pixel_buffer_conversion_test.sh
           python3 flutter_inappwebview_linux/linux/test/run_fdo_pixel_buffer_test.py
+      - name: Test hidden pixel buffer lifetime on both Linux backends
+        env:
+          CXXFLAGS: -fsanitize=address,undefined -fno-omit-frame-pointer
+        run: python3 flutter_inappwebview_linux/linux/test/run_hidden_pixel_buffer_test.py

@@ -29,6 +29,8 @@ methods = between(
     source, "void InAppWebView::OnExportShmBuffer(", "#endif  // HAVE_WPE_BACKEND_LEGACY"
 ) + between(
     source, "size_t InAppWebView::GetPixelBufferSize(", "bool InAppWebView::HasDmaBufExport()"
+) + between(
+    source, "void InAppWebView::TrimUnusedPixelBuffers()", "uint32_t InAppWebView::getActivityState()"
 )
 members = between(
     header, "static constexpr size_t kNumBuffers =", "// Flag to skip pixel readback"

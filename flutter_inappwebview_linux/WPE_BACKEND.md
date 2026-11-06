@@ -586,6 +586,62 @@ InAppWebView (C++)
 
 ## Troubleshooting
 
+### Render buffers in hidden views
+
+`setVisible(false)` starts a 30-second grace period. If the view stays hidden,
+the plugin releases the two unused CPU buffers in its triple-buffered fallback
+ring. Brief tab switches reuse the existing allocations. Showing or disposing
+the view cancels the pending trim; repeated hidden notifications do not restart
+the grace period. The delay is a conservative default, not a measured optimum.
+
+The published CPU frame stays available until a new frame replaces it. The
+texture's separate staging buffer also stays valid for an outstanding Flutter
+consumer. Resizing while hidden still updates the native backend dimensions;
+the last frame keeps its original dimensions until WPE submits a replacement.
+The new CPU frame is allocated from that replacement's dimensions, rather than
+from dimensions captured when the timer was started. If allocation fails, the
+last published CPU frame remains readable and the native export still completes.
+
+This applies to the WPEPlatform SHM/import-to-pixels paths and the FDO SHM/EGL
+readback paths. A late frame arriving after the deadline retains only its
+published CPU buffer too. CPU producers and trimming share a writer mutex; a
+trim detaches spare vectors under the short publication lock and frees their
+storage after both locks have been released.
+
+The trim deliberately retains the current `WPEBuffer`, borrowed `EGLImage`, FDO
+exported image, Flutter GL texture and texture staging allocation. These can
+still back the last displayed frame or an outstanding consumer. Hiding alone
+does not acknowledge or release a native frame. The existing replacement and
+dispose paths retain responsibility for `buffer_released` and FDO export
+release/completion. A view using only zero-copy DMA-BUF may therefore have no
+CPU spare allocation to reclaim; this change makes no claim of GPU savings.
+
+The production-method harness can run without a WPE SDK:
+
+```bash
+python3 linux/test/run_hidden_pixel_buffer_test.py
+CXXFLAGS='-fsanitize=address,undefined -fno-omit-frame-pointer' \
+  python3 linux/test/run_hidden_pixel_buffer_test.py
+```
+
+It compiles the real visibility/timer/trim methods, CPU producers, pixel access
+and pixel texture callback for both backend definitions. Fake native APIs and a
+deterministic clock check short/long hides, cancellation, stale callbacks, late
+exports, native image retention, hidden resize, first replacement frame,
+allocation failure, concurrent copies/writes, disposal cancellation and freeing
+outside the raster lock. The destructor's timer/lifetime prologue is included;
+full WebKit, GTK, EGL and Flutter registrar teardown are not emulated.
+
+For release validation, compare the parent and changed builds on real
+WPEPlatform and FDO installations, with multiple large high-DPI tabs. Record
+process RSS/PSS, available per-process GPU allocation data, and time to the first
+newly rendered frame after showing. Exercise hides shorter and longer than the
+grace period, hidden resize and disposal while a texture consumer is active.
+Check that the last frame stays stable until its replacement, with no flicker
+or stale-size frame. Vector capacities and test allocation counts establish
+which plugin-owned buffers were freed; they do not establish an RSS or GPU
+reduction or a latency bound.
+
 ### Blank texture with otherwise working WebKit
 
 DMA-BUF import depends on the EGL display and driver used by Flutter, as well as

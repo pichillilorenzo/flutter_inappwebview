@@ -569,6 +569,10 @@ class InAppWebView : public TextureWebViewApi {
   std::atomic<size_t> write_buffer_index_{0};
   std::atomic<size_t> read_buffer_index_{1};
   mutable std::mutex buffer_swap_mutex_;
+  // Serializes CPU producers with hidden-view trimming. Raster copies only
+  // take buffer_swap_mutex_; allocation and freeing stay outside that lock.
+  std::mutex pixel_buffer_write_mutex_;
+  std::atomic<bool> trim_unused_pixel_buffers_{false};
   
   // Flag to skip pixel readback when using zero-copy EGL texture mode
   // When true, OnExportDmaBuf won't call ReadPixelsFromEglImage
@@ -679,6 +683,12 @@ class InAppWebView : public TextureWebViewApi {
   bool is_focused_ = true;
   bool is_visible_ = true;
 
+  // GLib source and generation are owned by the platform/main thread, like
+  // setVisible() and destruction. The generation also rejects stale callbacks.
+  static constexpr guint kHiddenPixelBufferTrimDelayMs = 30000;
+  guint hidden_pixel_buffer_trim_source_ = 0;
+  uint64_t hidden_pixel_buffer_trim_generation_ = 0;
+
   // Target refresh rate (0 = default)
   uint32_t target_refresh_rate_ = 0;
 
@@ -776,6 +786,10 @@ class InAppWebView : public TextureWebViewApi {
 
  private:
   static void OnFrameDisplayed(void* data);
+
+  void ScheduleHiddenPixelBufferTrim();
+  void CancelHiddenPixelBufferTrim();
+  void TrimUnusedPixelBuffers();
 
   // Read pixels from EGL image to CPU buffer
   void ReadPixelsFromEglImage(void* egl_image, uint32_t width, uint32_t height);

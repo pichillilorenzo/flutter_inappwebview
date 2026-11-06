@@ -11,11 +11,15 @@ import subprocess
 import sys
 import tempfile
 
+from swift_source import extract_swift_block
+
 ROOT = Path(__file__).resolve().parents[1]
 
 
 def method(path, signature):
     source = (ROOT / path).read_text()
+    if path.endswith('.swift'):
+        return extract_swift_block(source, signature)
     start = source.index(signature)
     opening = source.index('{', start)
     depth = 1

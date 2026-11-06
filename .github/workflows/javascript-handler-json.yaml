@@ -6,6 +6,8 @@ on:
       - 'flutter_inappwebview_*/**'
       - 'tool/*javascript_handler_json*'
       - 'tool/*console*'
+      - 'tool/swift_source.py'
+      - 'tool/test_apple_bridge_source_invariants.js'
       - '.github/workflows/javascript-handler-json.yaml'
   push:
     branches: [master]
@@ -13,6 +15,8 @@ on:
       - 'flutter_inappwebview_*/**'
       - 'tool/*javascript_handler_json*'
       - 'tool/*console*'
+      - 'tool/swift_source.py'
+      - 'tool/test_apple_bridge_source_invariants.js'
       - '.github/workflows/javascript-handler-json.yaml'
 
 permissions:

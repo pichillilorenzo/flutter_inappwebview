@@ -1,5 +1,7 @@
 ## Unreleased
 
+- Preserve shared bridge scripts/handlers until the final native parent/popup owner closes; stateless message adapters avoid retaining a disposed parent, including with the experiment disabled.
+- Add default-OFF `WKScriptMessageHandlerWithReply` with raw JSON text, per-view popup ownership, bounded capability probing, and exactly-once lifecycle cancellation. Both transports now authorize the actual native sender and enforce `javaScriptHandlersForMainFrameOnly`.
 - Apply document-local console policies without changing shared popup scripts, retain bounded native-to-Dart batches, and keep callbacks current across rebuilds. Inline publishers stay disabled until a live Dart controller attaches, including delayed keep-alive creation.
 - Keep inline scroll subscriptions disabled until a live controller attaches, so cancelling pending keep-alive creation cannot leave a listener or interfere with its next owner.
 - Suppress scroll channel messages without a listener while preserving axis constraints, scroll bookkeeping and overscroll events; update callback subscriptions on the existing WebView.

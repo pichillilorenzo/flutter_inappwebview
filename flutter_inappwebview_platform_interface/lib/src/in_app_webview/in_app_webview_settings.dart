@@ -2209,6 +2209,46 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
   )
   bool? javaScriptBridgeEnabled;
 
+  ///Experimental opt-in to WebKit's Promise-based reply transport for
+  ///JavaScript `callHandler` requests. The default value is `false`.
+  ///
+  ///Set this in [PlatformWebViewCreationParams.initialSettings]. Changes through
+  ///`setSettings` are ignored; a popup uses its own initial setting and a
+  ///keep-alive WebView retains its original setting.
+  ///
+  ///The JavaScript Promise, Dart handler arguments, and JSON results are
+  ///unchanged. One-way messages continue to use the one-way bridge. Older
+  ///operating systems and missing native support use the existing transport.
+  ///When the native API exists, the first calls wait for a per-document
+  ///capability probe before choosing a transport. The probe has a one-second
+  ///deadline and may select the existing transport before sending any request.
+  ///A popup whose Flutter owner is not ready yet rejects that call; a later
+  ///call can check again. Once a request is dispatched, failures are never
+  ///retried on the other transport.
+  ///
+  ///A shared Apple user-content controller exposes the reply API only while
+  ///at least one of its WebViews has opted in. Each frame and content world
+  ///then checks the policy of its own native WebView. Navigation or disposal
+  ///rejects outstanding experimental replies; late Dart results are ignored.
+  ///This experiment does not imply a measured application performance gain.
+  @SupportedPlatforms(
+    platforms: [
+      IOSPlatform(
+        available: "14.0",
+        apiName: "WKScriptMessageHandlerWithReply",
+        apiUrl:
+            "https://developer.apple.com/documentation/webkit/wkscriptmessagehandlerwithreply",
+      ),
+      MacOSPlatform(
+        available: "11.0",
+        apiName: "WKScriptMessageHandlerWithReply",
+        apiUrl:
+            "https://developer.apple.com/documentation/webkit/wkscriptmessagehandlerwithreply",
+      ),
+    ],
+  )
+  bool? useScriptMessageHandlerWithReply;
+
   ///A [Set] of patterns that will be used to match the allowed origins where
   ///the JavaScript Bridge could be used.
   ///If [pluginScriptsOriginAllowList] is present, then this value will override
@@ -3465,6 +3505,7 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
     this.javaScriptHandlersOriginAllowList,
     this.javaScriptHandlersForMainFrameOnly,
     this.javaScriptBridgeEnabled = true,
+    this.useScriptMessageHandlerWithReply = false,
     this.javaScriptBridgeOriginAllowList,
     this.javaScriptBridgeForMainFrameOnly,
     this.pluginScriptsOriginAllowList,

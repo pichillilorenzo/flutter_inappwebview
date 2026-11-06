@@ -17,13 +17,19 @@ try {
     const util = fs.readFileSync(path.join(sources, 'Util.swift'), 'utf8');
     const jsonFunction = util.slice(util.indexOf('    public static func JSONStringify('),
       util.indexOf('    @available', util.indexOf('    public static func JSONStringify(')));
-    const errorBranch = native.slice(native.indexOf('            callback.error = { (code: String, message: String?, details: Any?) in'));
-    const declaration = errorBranch.slice(errorBranch.indexOf('                let errorMessage ='),
-      errorBranch.indexOf('                webView.evaluateJavaScript(')).replace('                print(errorMessage)', '');
-    const reply = errorBranch.match(/webView\.evaluateJavaScript\("""([\s\S]*?)""", completionHandler: nil\)/)[1];
+    const errorStart = native.indexOf('            callback.error = { [weak webView] (code: String, message: String?, details: Any?) in', native.indexOf('    func handleScriptMessage('));
+    const errorBranch = native.slice(errorStart, native.indexOf('            if let channelDelegate = webView.channelDelegate', errorStart));
+    const callback = errorBranch.replace('                print(errorMessage)', '');
+    const lifetime = fs.readFileSync(path.join(sources, 'Types/JavaScriptBridgeReply.swift'), 'utf8');
     const harness = `
 import Foundation
+${lifetime}
 struct Util { ${jsonFunction} }
+class WebView {
+  var script = ""
+  func evaluateJavaScript(_ source: String, completionHandler: (() -> Void)?) { script = source }
+}
+class Callback { var error: ((String, String?, Any?) -> Void)? }
 struct JavaScriptBridgeJS {
   static func get_JAVASCRIPT_BRIDGE_NAME() -> String { "flutter_inappwebview" }
 }
@@ -34,8 +40,12 @@ let _callHandlerID = 7
 var scripts: [String] = []
 for input in cases {
   let message: String? = input
-${declaration}
-  scripts.append("""${reply}""")
+  let reply: JavaScriptBridgeReply? = nil
+  let webView = WebView()
+  let callback = Callback()
+${callback}
+  callback.error!(code, message, nil)
+  scripts.append(webView.script)
 }
 let data = try! JSONSerialization.data(withJSONObject: [cases, scripts])
 print(String(data: data, encoding: .utf8)!)

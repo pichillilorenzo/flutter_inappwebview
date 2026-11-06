@@ -9,6 +9,7 @@ on:
       - 'flutter_inappwebview_ios/**'
       - 'flutter_inappwebview_macos/**'
       - 'tool/test_scroll_subscription_native.py'
+      - 'tool/test_apple_bridge_source_invariants.js'
       - '.github/workflows/scroll-subscriptions.yaml'
   push:
     branches: [master]
@@ -19,6 +20,7 @@ on:
       - 'flutter_inappwebview_ios/**'
       - 'flutter_inappwebview_macos/**'
       - 'tool/test_scroll_subscription_native.py'
+      - 'tool/test_apple_bridge_source_invariants.js'
       - '.github/workflows/scroll-subscriptions.yaml'
 
 permissions:

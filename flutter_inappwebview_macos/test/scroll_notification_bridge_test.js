@@ -4,6 +4,8 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 const vm = require('node:vm');
+const { assertHandlerAuthorization, assertInternalOneWay } =
+  require('../../tool/test_apple_bridge_source_invariants.js');
 
 const packageRoot = path.resolve(__dirname, '..');
 const sourceRoot = path.join(
@@ -210,19 +212,8 @@ try {
   assert.equal(messages[5]._callHandlerOneWay, undefined, 'public envelope remains unchanged');
 
   const nativeSource = fs.readFileSync(nativePath, 'utf8');
-  const secretCheck = nativeSource.indexOf('guard let bridgeSecret = body["_bridgeSecret"]');
-  const originCheck = nativeSource.indexOf('if !isOriginAllowed {', secretCheck);
-  const dispatch = nativeSource.indexOf('if message.name == "callHandler" {', originCheck);
-  assert.ok(secretCheck >= 0 && secretCheck < originCheck && originCheck < dispatch,
-    'native source keeps secret and origin gates before callHandler dispatch');
-  const oneWayBranch = nativeSource.indexOf('if body["_callHandlerOneWay"] as? Bool == true {', dispatch);
-  const resolveReply = nativeSource.indexOf('evaluateJavaScript("""', oneWayBranch);
-  assert.ok(oneWayBranch > dispatch && oneWayBranch < resolveReply,
-    'native source checks the one-way marker before internal Promise resolution');
-  assert.match(nativeSource.slice(oneWayBranch, resolveReply), /return/,
-    'marked internal notifications return without evaluating a Promise reply');
-  assert.match(nativeSource, /windowWebViews\[wId\]/,
-    'native source retains popup routing through _windowId');
+  assertHandlerAuthorization(nativeSource);
+  assertInternalOneWay(nativeSource);
 
   console.log('macOS scroll notification JavaScript regression and native source invariant checks passed');
 } finally {

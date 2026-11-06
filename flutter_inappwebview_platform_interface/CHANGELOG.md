@@ -1,5 +1,6 @@
 ## Unreleased
 
+- Add experimental, creation-only `useScriptMessageHandlerWithReply` for iOS 14+/macOS 11+, default OFF, with documented bounded capability selection and existing-transport fallback.
 - Add nullable `InAppWebViewSettings.consoleMessageLevels`: null preserves all levels, an empty list disables forwarding, and explicit levels match by identity.
 - Add a backward-compatible widget update hook; creation parameters stay immutable while layout and supported subscriptions can follow rebuilds.
 

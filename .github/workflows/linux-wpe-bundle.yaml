@@ -49,6 +49,8 @@ jobs:
         run: git -c core.whitespace=cr-at-eol diff --check HEAD^
       - name: Test native WebView creation failures and software fallback
         run: python3 flutter_inappwebview_linux/linux/test/run_creation_backend_test.py
+      - name: Test independent WPE focus and visibility
+        run: python3 flutter_inappwebview_linux/linux/test/run_activity_state_test.py
       - name: Test host lifetime and asynchronous dialogs
         run: python3 flutter_inappwebview_linux/linux/test/run_host_lifetime_test.py
       - name: Test explicit GDK scale parsing

@@ -17,6 +17,7 @@ import '../web_notification/main.dart';
 import '../web_storage/web_storage.dart';
 import '_static_channel.dart';
 import 'headless_in_app_webview.dart';
+import 'webview_render_mode.dart';
 
 /// Object specifying creation parameters for creating a [WindowsInAppWebViewController].
 ///
@@ -30,7 +31,11 @@ class WindowsInAppWebViewControllerCreationParams
   const WindowsInAppWebViewControllerCreationParams({
     required super.id,
     super.webviewParams,
+    this.creationDetails,
   });
+
+  /// Native observation for this widget attachment, when supplied by its owner.
+  final WindowsWebViewCreationDetails? creationDetails;
 
   /// Creates a [WindowsInAppWebViewControllerCreationParams] instance based on [PlatformInAppWebViewControllerCreationParams].
   factory WindowsInAppWebViewControllerCreationParams.fromPlatformInAppWebViewControllerCreationParams(
@@ -41,6 +46,9 @@ class WindowsInAppWebViewControllerCreationParams
     return WindowsInAppWebViewControllerCreationParams(
       id: params.id,
       webviewParams: params.webviewParams,
+      creationDetails: params is WindowsInAppWebViewControllerCreationParams
+          ? params.creationDetails
+          : null,
     );
   }
 }
@@ -77,13 +85,34 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
 
   dynamic _controllerFromPlatform;
   void Function(dynamic controller, ConsoleMessage message)? _onConsoleMessage;
+  _ControllerChannelBinding? _channelBinding;
+
+  final WindowsWebViewCreationDetails? _creationDetails;
+
+  /// Native creation or reattachment details for this live widget controller.
+  ///
+  /// Available before `onWebViewCreated` and `controllerFromPlatform` callbacks.
+  /// Returns `null` when no widget creation result was supplied (including
+  /// static, headless and InAppBrowser controllers), or after disposal, even
+  /// when the native WebView is kept alive. A subsequent attachment owns a new
+  /// observation. Retained snapshots describe their original attachment only.
+  ///
+  /// A non-null result may still have an unverified render mode; inspect
+  /// [WindowsWebViewCreationDetails.isRenderModeVerified] before comparing
+  /// backends. No platform call, rendering default, or fallback event is used
+  /// to infer the result.
+  WindowsWebViewCreationDetails? get creationDetails =>
+      disposed ? null : _creationDetails;
 
   @override
   late WindowsWebStorage webStorage;
 
   WindowsInAppWebViewController(
     PlatformInAppWebViewControllerCreationParams params,
-  ) : super.implementation(
+  ) : _creationDetails = params is WindowsInAppWebViewControllerCreationParams
+          ? params.creationDetails
+          : null,
+      super.implementation(
         params is WindowsInAppWebViewControllerCreationParams
             ? params
             : WindowsInAppWebViewControllerCreationParams.fromPlatformInAppWebViewControllerCreationParams(
@@ -92,7 +121,7 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
       ) {
     channel = MethodChannel('com.pichillilorenzo/flutter_inappwebview_$id');
     handler = handleMethod;
-    initMethodCallHandler();
+    _channelBinding = _ControllerChannelBinding(this);
 
     final initialUserScripts = webviewParams?.initialUserScripts;
     if (initialUserScripts != null) {
@@ -127,7 +156,8 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
     MethodChannel channel,
     WindowsInAppBrowser inAppBrowser,
     UnmodifiableListView<UserScript>? initialUserScripts,
-  ) : super.implementation(
+  ) : _creationDetails = null,
+      super.implementation(
         params is WindowsInAppWebViewControllerCreationParams
             ? params
             : WindowsInAppWebViewControllerCreationParams.fromPlatformInAppWebViewControllerCreationParams(
@@ -156,8 +186,22 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
 
   void _init(PlatformInAppWebViewControllerCreationParams params) {
     _onConsoleMessage = params.webviewParams?.onConsoleMessage;
-    _controllerFromPlatform =
-        params.webviewParams?.controllerFromPlatform?.call(this) ?? this;
+    try {
+      _controllerFromPlatform =
+          params.webviewParams?.controllerFromPlatform?.call(this) ?? this;
+    } catch (_) {
+      // The factory may have captured this controller or installed a newer
+      // owner on the same keepAlive channel before throwing. Release only our
+      // Dart binding: webStorage is not initialized yet, and neither removing
+      // the channel handler nor changing a native subscription is safe here.
+      _channelBinding?.dispose();
+      _channelBinding = null;
+      _onConsoleMessage = null;
+      _controllerFromPlatform = null;
+      _inAppBrowser = null;
+      disposeChannel(removeMethodCallHandler: false);
+      rethrow;
+    }
 
     webStorage = WindowsWebStorage(
       WindowsWebStorageCreationParams(
@@ -3515,10 +3559,13 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
 
   @override
   void dispose({bool isKeepAlive = false}) {
+    if (disposed) return;
     if (isKeepAlive) {
       unawaited(updateConsoleMessageCallback(null));
     }
     _onConsoleMessage = null;
+    _channelBinding?.dispose();
+    _channelBinding = null;
     disposeChannel(removeMethodCallHandler: !isKeepAlive);
     _inAppBrowser = null;
     webStorage.dispose();
@@ -3538,6 +3585,26 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
       _injectedScriptsFromURL.clear();
       _devToolsProtocolEventListenerMap.clear();
     }
+  }
+}
+
+// The registered channel callback captures this binding, not the controller.
+// Clearing the binding's handler releases its only reference to the owner;
+// an inert callback left on the messenger cannot retain a failed controller.
+// Detaching never removes a replacement owner's handler for the same name.
+class _ControllerChannelBinding with ChannelController {
+  _ControllerChannelBinding(WindowsInAppWebViewController owner) {
+    channel = owner.channel;
+    handler = (call) {
+      if (owner.disposed) return Future<dynamic>.value(null);
+      return owner.handler!(call);
+    };
+    initMethodCallHandler();
+  }
+
+  @override
+  void dispose() {
+    disposeChannel(removeMethodCallHandler: false);
   }
 }
 

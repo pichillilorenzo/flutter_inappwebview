@@ -5,6 +5,8 @@
 
 ## 0.7.0-beta.3
 
+- Added per-controller Windows widget creation diagnostics: verified native render mode, platform view id, and available selection stage/unsigned HRESULT. Legacy or unknown modes remain unverified; keepAlive reattachment does not invent a missing reason. Disposed owners cannot acquire another attachment's observation.
+- Detached partial Dart controller bindings when a controller wrapper factory throws, preserving its original error and leaving replacement/keepAlive owners subscribed.
 - Added best-effort WebView2 runtime prewarming with shared in-flight work, a total deadline, and completion that survives worker or message-delivery failures.
 - Kept custom scheme origins alive during conversion and released temporary registration references.
 - Serialized native host changes and skipped closed intermediate windows while WebView creation is pending.

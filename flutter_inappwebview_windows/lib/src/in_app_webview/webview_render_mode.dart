@@ -15,13 +15,67 @@ enum WindowsWebViewRenderMode {
   hwnd,
 }
 
+/// An immutable observation from one native widget creation or reattachment.
+///
+/// Unlike [WindowsWebViewCreationResult.renderMode], [renderMode] never uses a
+/// compatibility default. An older native implementation returning only an id,
+/// or a map without a recognized mode, leaves the backend unverified.
+@immutable
+class WindowsWebViewCreationDetails {
+  /// The native platform view/texture id returned for this attachment.
+  ///
+  /// This can differ from the controller's channel id for keepAlive/headless
+  /// views. It is not a process id or a permanent WebView identity; native ids
+  /// can be reused after disposal.
+  final int nativeViewId;
+
+  /// The mode explicitly reported by native code, or `null` if unverified.
+  final WindowsWebViewRenderMode? renderMode;
+
+  /// The reported selection stage, including `forced` for the HWND test hook.
+  ///
+  /// A missing value does not mean that no fallback occurred. In particular,
+  /// keepAlive reattachment reports the current mode without its original
+  /// selection reason. Use [isFallbackReasonAvailable] for a complete reason.
+  final String? fallbackStage;
+
+  /// The reported creation HRESULT, normalized to an unsigned 32-bit value.
+  ///
+  /// This is independent of the signed HRESULTs in process-enumeration errors.
+  /// Missing, non-integer, or out-of-range values remain `null`.
+  final int? fallbackHresult;
+
+  const WindowsWebViewCreationDetails._({
+    required this.nativeViewId,
+    this.renderMode,
+    this.fallbackStage,
+    this.fallbackHresult,
+  });
+
+  /// Whether native code explicitly identified a supported render mode.
+  bool get isRenderModeVerified => renderMode != null;
+
+  /// Whether both parts of the native selection reason were reported.
+  ///
+  /// A partial or absent reason stays unavailable, even when the render mode
+  /// itself is verified. This never infers "no fallback" from absent fields.
+  bool get isFallbackReasonAvailable =>
+      fallbackStage != null && fallbackHresult != null;
+}
+
 /// The native result of `createInAppWebView`.
 @immutable
 class WindowsWebViewCreationResult {
   /// The view id, used for the per-view channels.
   final int id;
 
+  /// The mode used for rendering, with a composition compatibility default.
+  ///
+  /// Use [creationDetails] to distinguish an observed mode from that default.
   final WindowsWebViewRenderMode renderMode;
+
+  /// The observation parsed from native code, absent for manually built results.
+  final WindowsWebViewCreationDetails? creationDetails;
 
   /// The native step whose failure selected [WindowsWebViewRenderMode.hwnd],
   /// or `forced` when the test hook requested it.
@@ -35,22 +89,52 @@ class WindowsWebViewCreationResult {
     this.renderMode = WindowsWebViewRenderMode.composition,
     this.fallbackStage,
     this.fallbackHresult,
+  }) : creationDetails = null;
+
+  const WindowsWebViewCreationResult._({
+    required this.id,
+    required this.renderMode,
+    required this.creationDetails,
+    this.fallbackStage,
+    this.fallbackHresult,
   });
 
   /// Accepts both the map result and the bare id of older native code.
   factory WindowsWebViewCreationResult.fromNative(Object? value) {
-    if (value is int) return WindowsWebViewCreationResult(id: value);
+    if (value is int) {
+      return WindowsWebViewCreationResult._(
+        id: value,
+        renderMode: WindowsWebViewRenderMode.composition,
+        creationDetails: WindowsWebViewCreationDetails._(nativeViewId: value),
+      );
+    }
     if (value is! Map) {
       throw ArgumentError.value(value, 'value', 'Not a creation result');
     }
+    final id = value['id'] as int;
+    final observedMode = switch (value['renderMode']) {
+      'composition' => WindowsWebViewRenderMode.composition,
+      'hwnd' => WindowsWebViewRenderMode.hwnd,
+      _ => null,
+    };
+    final stage = value['fallbackStage'];
+    final fallbackStage = stage is String && stage.isNotEmpty ? stage : null;
     final hresult = value['fallbackHresult'];
-    return WindowsWebViewCreationResult(
-      id: value['id'] as int,
-      renderMode: value['renderMode'] == 'hwnd'
-          ? WindowsWebViewRenderMode.hwnd
-          : WindowsWebViewRenderMode.composition,
-      fallbackStage: value['fallbackStage'] as String?,
-      fallbackHresult: hresult is int ? hresult & 0xFFFFFFFF : null,
+    final fallbackHresult =
+        hresult is int && hresult >= -0x80000000 && hresult <= 0xFFFFFFFF
+        ? hresult & 0xFFFFFFFF
+        : null;
+    return WindowsWebViewCreationResult._(
+      id: id,
+      renderMode: observedMode ?? WindowsWebViewRenderMode.composition,
+      fallbackStage: fallbackStage,
+      fallbackHresult: fallbackHresult,
+      creationDetails: WindowsWebViewCreationDetails._(
+        nativeViewId: id,
+        renderMode: observedMode,
+        fallbackStage: fallbackStage,
+        fallbackHresult: fallbackHresult,
+      ),
     );
   }
 }

@@ -76,6 +76,9 @@ class InAppWebView {
   bool clearFocus();
   bool requestFocus();
   void HideAllPopups() { ++popup_hides; }
+  // Resource timers are outside this activity-state API test's boundary.
+  void ScheduleHiddenPixelBufferTrim() {}
+  void CancelHiddenPixelBufferTrim() {}
 };
 
 #include "activity_state_under_test.inc"

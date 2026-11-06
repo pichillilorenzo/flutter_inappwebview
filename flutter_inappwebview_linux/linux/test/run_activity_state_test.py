@@ -10,14 +10,30 @@ import tempfile
 
 test_dir = Path(__file__).resolve().parent
 source = (test_dir.parent / "in_app_webview/in_app_webview.cc").read_text()
-sections = []
-for first, following in [
-    ("void InAppWebView::setFocused(", "// === Refresh Rate Management ==="),
-    ("bool InAppWebView::isVisible()", "// === Fullscreen Control ==="),
-    ("bool InAppWebView::clearFocus()", "// === Web Archive ==="),
-]:
-    start = source.index(first)
-    sections.append(source[start:source.index(following, start)])
+def extract_method(signature):
+    start = source.index(signature)
+    opening = source.index("{", start)
+    depth = 1
+    for position in range(opening + 1, len(source)):
+        if source[position] == "{":
+            depth += 1
+        elif source[position] == "}":
+            depth -= 1
+            if depth == 0:
+                return source[start:position + 1]
+    raise ValueError("Unclosed method: " + signature)
+
+
+# Select activity methods only; adjacent resource/lifetime helpers have their
+# own harness and should not become dependencies of this focused API test.
+sections = [extract_method(signature) for signature in (
+    "void InAppWebView::setFocused(",
+    "void InAppWebView::setVisible(",
+    "uint32_t InAppWebView::getActivityState()",
+    "bool InAppWebView::isVisible()",
+    "bool InAppWebView::clearFocus()",
+    "bool InAppWebView::requestFocus()",
+)]
 
 with tempfile.TemporaryDirectory(prefix="webview-activity-state-test-") as directory:
     build_dir = Path(directory)

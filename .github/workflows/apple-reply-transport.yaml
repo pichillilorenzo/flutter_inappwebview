@@ -1,0 +1,67 @@
+name: Experimental Apple reply transport
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'flutter_inappwebview_ios/**'
+      - 'flutter_inappwebview_macos/**'
+      - 'flutter_inappwebview_platform_interface/**'
+      - 'tool/*apple_reply*'
+      - 'tool/apple_reply_probe/**'
+      - 'tool/*javascript_handler_json*'
+      - 'tool/*apple_bridge*'
+      - '.github/workflows/apple-reply-transport.yaml'
+  push:
+    branches: [master]
+    paths:
+      - 'flutter_inappwebview_ios/**'
+      - 'flutter_inappwebview_macos/**'
+      - 'flutter_inappwebview_platform_interface/**'
+      - 'tool/*apple_reply*'
+      - 'tool/apple_reply_probe/**'
+      - 'tool/*javascript_handler_json*'
+      - 'tool/*apple_bridge*'
+      - '.github/workflows/apple-reply-transport.yaml'
+
+permissions:
+  contents: read
+
+jobs:
+  apple:
+    runs-on: macos-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Production JavaScript parity and transition harness
+        run: |
+          node tool/test_apple_reply_transport.js
+          node tool/test_apple_reply_transport.js --benchmark > apple-reply-v8-harness.json
+      - name: Production Swift route, lifecycle and both real SDK signatures
+        run: python3 tool/test_apple_reply_native.py --sdk-check
+      - name: Shared-controller lifetime and baseline failure reproduction
+        run: |
+          python3 tool/test_apple_bridge_ownership.py
+          python3 tool/test_apple_bridge_ownership.py --source-ref 782b4389440336966f1f05f7a32ae8302ac91a32 --expect-regression
+      - name: Existing Apple raw JSON and error regressions
+        run: |
+          node tool/test_javascript_handler_json_replies.js apple
+          node tool/test_apple_bridge_errors.js
+          python3 tool/test_console_native.py apple
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: '3.47.2'
+      - name: Public opt-in settings regression
+        working-directory: flutter_inappwebview_platform_interface
+        run: flutter pub get --no-example && flutter test --no-pub test/apple_reply_settings_test.dart
+      - name: Build and run actual macOS WebKit plus Flutter release probe
+        run: python3 tool/run_apple_reply_flutter_probe.py --output apple-reply-live-macos.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: apple-reply-experiment
+          path: apple-reply-*.json
+          if-no-files-found: warn

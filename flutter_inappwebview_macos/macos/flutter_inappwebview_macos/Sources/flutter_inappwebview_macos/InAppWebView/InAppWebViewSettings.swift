@@ -57,6 +57,8 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
     var isInspectable = false
     var shouldPrintBackgrounds = false
     var javaScriptHandlersOriginAllowList: [String]? = nil
+    var javaScriptHandlersForMainFrameOnly = false
+    var useScriptMessageHandlerWithReply = false
     var javaScriptBridgeEnabled = true
     var javaScriptBridgeOriginAllowList: [String]? = nil
     var javaScriptBridgeForMainFrameOnly = false

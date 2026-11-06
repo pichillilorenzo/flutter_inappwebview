@@ -58,16 +58,18 @@ function apple() {
     const util = fs.readFileSync(path.join(sources, 'Util.swift'), 'utf8');
     const jsonStart = util.indexOf('    public static func JSONStringify(');
     const jsonFunction = util.slice(jsonStart, util.indexOf('    @available', jsonStart));
-    const start = native.indexOf('            callback.defaultBehaviour = { (response: Any?) in',
+    const start = native.indexOf('            callback.defaultBehaviour = { [weak webView] (response: Any?) in',
       native.indexOf('if message.name == "callHandler"'));
     const branch = native.slice(start, native.indexOf('            callback.error = ', start));
     // Compile the entire callback, including the argument path and the legacy
     // path. Replace only OS availability checks to exercise both on this host.
     const callback = branch.replace(/if #available\([^)]*\)/g, 'if modern');
+    const lifetime = fs.readFileSync(path.join(sources, 'Types/JavaScriptBridgeReply.swift'), 'utf8');
     const swift = path.join(temp, `${platform}.swift`);
     const binary = path.join(temp, platform);
     fs.writeFileSync(swift, `
 import Foundation
+${lifetime}
 struct Util { ${jsonFunction} }
 struct JavaScriptBridgeJS {
   static func get_JAVASCRIPT_BRIDGE_NAME() -> String { "flutter_inappwebview" }
@@ -91,6 +93,7 @@ for mode in 0..<${platform === 'ios' ? 3 : 2} {
   let modern = mode != 1
   for input in cases {
     let callback = Callback()
+    let reply: JavaScriptBridgeReply? = nil
     let webView = WebView()
     webView.windowId = mode == 2 ? 1 : nil
 ${callback}

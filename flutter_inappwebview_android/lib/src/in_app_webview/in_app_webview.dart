@@ -337,8 +337,13 @@ class AndroidInAppWebViewWidget extends PlatformInAppWebViewWidget {
             : params.initialOptions?.android.useHybridComposition) ??
         true;
 
+    final platformViewKey = widgetParams.key;
     return PlatformViewLink(
-      key: widgetParams.key,
+      // A GlobalKey already attached to the building widget belongs to that
+      // owner, not its child. Preserve separately supplied platform-view keys.
+      key: platformViewKey is GlobalKey && platformViewKey == context.widget.key
+          ? null
+          : platformViewKey,
       viewType: 'com.pichillilorenzo/flutter_inappwebview',
       surfaceFactory:
           (BuildContext context, PlatformViewController controller) {

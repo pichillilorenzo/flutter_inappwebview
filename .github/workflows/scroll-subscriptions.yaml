@@ -40,6 +40,7 @@ jobs:
       - run: >-
           flutter test --no-pub
           test/in_app_webview_widget_updates_test.dart
+          test/android_widget_key_ownership_test.dart
           test/scroll_subscriptions_test.dart
           test/keep_alive_scroll_ownership_test.dart
         working-directory: flutter_inappwebview

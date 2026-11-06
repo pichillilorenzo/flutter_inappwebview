@@ -1,5 +1,6 @@
 ## Unreleased
 
+- Cover keyed Android WebView rebuilds, reparenting and disposal through the public widget without changing Windows creation-failure key identity.
 - Expose console level allowlists and update console subscriptions on the existing WebView across widget rebuilds. Inline publishers stay disabled until a live Dart controller attaches, including delayed keep-alive creation.
 - Verified cancelled keep-alive creation and reattachment in either completion order without an orphaned scroll subscription.
 - Preserve the native widget delegate across rebuilds so supported event callbacks update on the existing controller and the owning delegate is disposed.

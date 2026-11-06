@@ -22,6 +22,7 @@ public enum WebViewChannelDelegateMethods {
   stopLoading,
   isLoading,
   takeScreenshot,
+  setScrollChangedListener,
   setSettings,
   getSettings,
   close,

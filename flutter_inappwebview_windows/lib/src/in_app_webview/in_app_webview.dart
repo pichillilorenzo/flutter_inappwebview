@@ -336,7 +336,7 @@ class WindowsInAppWebViewWidget extends PlatformInAppWebViewWidget {
 
     return CustomPlatformView(
       onPlatformViewCreated: _onPlatformViewCreated,
-      creationKey: params.key,
+      creationKey: widgetParams.key,
       creationParams: <String, dynamic>{
         'initialUrlRequest': params.initialUrlRequest?.toMap(),
         'initialFile': params.initialFile,

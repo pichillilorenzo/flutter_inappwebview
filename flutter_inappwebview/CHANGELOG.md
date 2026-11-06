@@ -1,3 +1,8 @@
+## Unreleased
+
+- Verified cancelled keep-alive creation and reattachment in either completion order without an orphaned scroll subscription.
+- Preserve the native widget delegate across rebuilds so supported event callbacks update on the existing controller and the owning delegate is disposed.
+
 ## 6.2.0-beta.3
 
 - Exposed optional Android WebView startup prewarming and verified public dispatch and unsupported-platform behavior.

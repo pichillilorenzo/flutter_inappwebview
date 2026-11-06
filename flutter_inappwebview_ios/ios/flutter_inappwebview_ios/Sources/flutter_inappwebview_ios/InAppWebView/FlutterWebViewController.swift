@@ -78,6 +78,7 @@ public class FlutterWebViewController: NSObject, FlutterPlatformView, Disposable
         myView!.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         myView!.addSubview(webView!)
 
+        webView!.hasScrollChangedListener = params["hasScrollChangedListener"] as? Bool ?? true
         webView!.settings = settings
         webView!.prepare()
         webView!.windowCreated = true

@@ -63,6 +63,10 @@ public class FlutterWebViewFactory: NSObject, FlutterPlatformViewFactory {
             plugin.inAppWebViewManager?.keepAliveWebViews[keepAliveId] = flutterWebView!
         }
         
+        // Reused headless and kept-alive views adopt the attaching widget's gate.
+        flutterWebView?.webView()?.setScrollChangedListener(
+            hasListener: arguments?["hasScrollChangedListener"] as? Bool ?? true)
+
         if shouldMakeInitialLoad {
             flutterWebView?.makeInitialLoad(params: arguments!)
         }

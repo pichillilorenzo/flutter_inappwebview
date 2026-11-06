@@ -20,6 +20,8 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
     var plugin: InAppWebViewFlutterPlugin?
     var windowId: Int64?
     var windowCreated = false
+    // Older clients and InAppBrowser retain event delivery by default.
+    var hasScrollChangedListener = true
     var windowBeforeCreatedCallbacks: [() -> ()] = []
     var inAppBrowserDelegate: InAppBrowserDelegate?
     var channelDelegate: WebViewChannelDelegate?
@@ -2775,6 +2777,10 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         }
     }
     
+    public func setScrollChangedListener(hasListener: Bool) {
+        hasScrollChangedListener = hasListener
+    }
+
     /// UIScrollViewDelegate is somehow bugged:
     /// if InAppWebView implements the UIScrollViewDelegate protocol and implement the scrollViewDidScroll event,
     /// then, when the user scrolls the content, the webview content is not rendered (just white space).
@@ -2804,9 +2810,11 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         if (!disableVerticalScroll && !disableHorizontalScroll) ||
             (disableVerticalScroll && scrollView.contentOffset.x != oldContentOffset?.x) ||
             (disableHorizontalScroll && scrollView.contentOffset.y != oldContentOffset?.y) {
-            let x = Int(scrollView.contentOffset.x / scrollView.contentScaleFactor)
-            let y = Int(scrollView.contentOffset.y / scrollView.contentScaleFactor)
-            channelDelegate?.onScrollChanged(x: x, y: y)
+            if hasScrollChangedListener {
+                let x = Int(scrollView.contentOffset.x / scrollView.contentScaleFactor)
+                let y = Int(scrollView.contentOffset.y / scrollView.contentScaleFactor)
+                channelDelegate?.onScrollChanged(x: x, y: y)
+            }
         }
         lastScrollX = scrollView.contentOffset.x
         lastScrollY = scrollView.contentOffset.y

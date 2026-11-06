@@ -912,14 +912,28 @@ class InAppWebView extends StatefulWidget {
 }
 
 class _InAppWebViewState extends State<InAppWebView> {
+  late final PlatformInAppWebViewWidget _platform;
+
+  @override
+  void initState() {
+    super.initState();
+    _platform = widget.platform;
+  }
+
+  @override
+  void didUpdateWidget(covariant InAppWebView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _platform.updateParams(widget.platform.params);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return widget.platform.build(context);
+    return _platform.build(context);
   }
 
   @override
   void dispose() {
-    widget.platform.dispose();
+    _platform.dispose();
     super.dispose();
   }
 }

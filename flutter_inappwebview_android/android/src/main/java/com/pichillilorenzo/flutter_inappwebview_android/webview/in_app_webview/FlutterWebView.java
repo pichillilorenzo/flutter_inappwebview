@@ -84,6 +84,7 @@ public class FlutterWebView implements PlatformWebView {
     webView.findInteractionController = findInteractionController;
     findInteractionController.prepare();
 
+    webView.hasScrollChangedListener = !Boolean.FALSE.equals(params.get("hasScrollChangedListener"));
     webView.prepare();
   }
 

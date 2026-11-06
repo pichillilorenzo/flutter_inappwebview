@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -272,6 +273,7 @@ class MacOSInAppWebViewWidget extends PlatformInAppWebViewWidget {
       params as MacOSInAppWebViewWidgetCreationParams;
 
   MacOSInAppWebViewController? _controller;
+  bool _disposed = false;
 
   MacOSHeadlessInAppWebView? get _macosHeadlessInAppWebView =>
       params.headlessWebView as MacOSHeadlessInAppWebView?;
@@ -282,6 +284,12 @@ class MacOSInAppWebViewWidget extends PlatformInAppWebViewWidget {
 
   factory MacOSInAppWebViewWidget.static() {
     return _staticValue;
+  }
+
+  @override
+  void updateParams(PlatformInAppWebViewWidgetCreationParams params) {
+    super.updateParams(params);
+    unawaited(_controller?.updateScrollChangedCallback(params.onScrollChanged));
   }
 
   @override
@@ -313,12 +321,15 @@ class MacOSInAppWebViewWidget extends PlatformInAppWebViewWidget {
     return AppKitView(
       viewType: 'com.pichillilorenzo/flutter_inappwebview',
       onPlatformViewCreated: _onPlatformViewCreated,
-      gestureRecognizers: params.gestureRecognizers,
+      gestureRecognizers: widgetParams.gestureRecognizers,
       creationParams: <String, dynamic>{
         'initialUrlRequest': params.initialUrlRequest?.toMap(),
         'initialFile': params.initialFile,
         'initialData': params.initialData?.toMap(),
         'initialSettings': settingsMap,
+        // Subscribe only once a live Dart controller has attached.
+        // A cancelled keepAlive creation may never report completion.
+        'hasScrollChangedListener': false,
         'contextMenu': params.contextMenu?.toMap() ?? {},
         'windowId': params.windowId,
         'headlessWebViewId': params.headlessWebView?.isRunning() ?? false
@@ -335,6 +346,7 @@ class MacOSInAppWebViewWidget extends PlatformInAppWebViewWidget {
   }
 
   void _onPlatformViewCreated(int id) {
+    if (_disposed) return;
     dynamic viewId = id;
     if (params.headlessWebView?.isRunning() ?? false) {
       viewId = params.headlessWebView?.id;
@@ -345,6 +357,14 @@ class MacOSInAppWebViewWidget extends PlatformInAppWebViewWidget {
       PlatformInAppWebViewControllerCreationParams(
         id: viewId,
         webviewParams: params,
+      ),
+    );
+    // Creation may finish after a rebuild, or attach a headless/kept-alive view.
+    // Refresh both the Dart callback and the native gate before exposing it.
+    unawaited(
+      _controller!.updateScrollChangedCallback(
+        widgetParams.onScrollChanged,
+        forceNativeUpdate: true,
       ),
     );
     _macosParams.findInteractionController?.init(viewId);
@@ -409,6 +429,7 @@ class MacOSInAppWebViewWidget extends PlatformInAppWebViewWidget {
 
   @override
   void dispose() {
+    _disposed = true;
     dynamic viewId = _controller?.getViewId();
     debugLog(
       className: runtimeType.toString(),

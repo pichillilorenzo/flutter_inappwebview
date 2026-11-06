@@ -1,3 +1,7 @@
+## Unreleased
+
+- Keep creation parameters immutable while the retained widget delegate reads the latest widget key during rebuilds.
+
 ## 0.7.0-beta.3
 
 - Added best-effort WebView2 runtime prewarming with shared in-flight work, a total deadline, and completion that survives worker or message-delivery failures.

@@ -1,0 +1,56 @@
+name: Scroll subscriptions
+
+on:
+  pull_request:
+    paths:
+      - 'flutter_inappwebview/**'
+      - 'flutter_inappwebview_platform_interface/**'
+      - 'flutter_inappwebview_android/**'
+      - 'flutter_inappwebview_ios/**'
+      - 'flutter_inappwebview_macos/**'
+      - 'tool/test_scroll_subscription_native.py'
+      - '.github/workflows/scroll-subscriptions.yaml'
+  push:
+    branches: [master]
+    paths:
+      - 'flutter_inappwebview/**'
+      - 'flutter_inappwebview_platform_interface/**'
+      - 'flutter_inappwebview_android/**'
+      - 'flutter_inappwebview_ios/**'
+      - 'flutter_inappwebview_macos/**'
+      - 'tool/test_scroll_subscription_native.py'
+      - '.github/workflows/scroll-subscriptions.yaml'
+
+permissions:
+  contents: read
+
+jobs:
+  dart:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: '3.47.7'
+      - run: flutter pub get --no-example
+        working-directory: flutter_inappwebview
+      - run: >-
+          flutter test --no-pub
+          test/in_app_webview_widget_updates_test.dart
+          test/scroll_subscriptions_test.dart
+          test/keep_alive_scroll_ownership_test.dart
+        working-directory: flutter_inappwebview
+      - run: node flutter_inappwebview_macos/test/scroll_subscription_test.js
+      - run: python3 tool/test_scroll_subscription_native.py --source-checks-only
+
+  apple:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile production Apple scroll methods and check native behavior
+        run: python3 tool/test_scroll_subscription_native.py
+      - name: Compile production Swift scripts and execute the JavaScript bridge
+        run: node flutter_inappwebview_macos/test/scroll_notification_bridge_test.js
+      - name: Verify publisher subscription lifecycle
+        run: node flutter_inappwebview_macos/test/scroll_subscription_test.js

@@ -19,6 +19,8 @@ public class InAppWebView: WKWebView, WKUIDelegate,
     var plugin: InAppWebViewFlutterPlugin?
     var windowId: Int64?
     var windowCreated = false
+    // Older clients and InAppBrowser retain event delivery by default.
+    var hasScrollChangedListener = true
     var windowBeforeCreatedCallbacks: [() -> ()] = []
     var inAppBrowserDelegate: InAppBrowserDelegate?
     var channelDelegate: WebViewChannelDelegate?
@@ -206,6 +208,21 @@ public class InAppWebView: WKWebView, WKUIDelegate,
         }
     }
     
+    public func setScrollChangedListener(hasListener: Bool) {
+        hasScrollChangedListener = hasListener
+        updateScrollChangedListener()
+    }
+
+    private func updateScrollChangedListener() {
+        guard javaScriptBridgeEnabled, windowId == nil || windowCreated else { return }
+        // Update only this document. Popups share their parent's user content
+        // controller, so changing its scripts would change the parent's policy.
+        let source = OnScrollChangedJS.ON_SCROLL_CHANGED_EVENT_JS_PLUGIN_SCRIPT(
+            allowedOriginRules: settings?.pluginScriptsOriginAllowList,
+            enabled: hasScrollChangedListener).source
+        evaluateJavaScript(source, completionHandler: nil)
+    }
+
     public func prepareAndAddUserScripts() -> Void {
         if windowId != nil {
             // The new created window webview has the same WKWebViewConfiguration variable reference.
@@ -1447,6 +1464,7 @@ public class InAppWebView: WKWebView, WKUIDelegate,
     
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         initializeWindowIdJS()
+        updateScrollChangedListener()
         
         InAppWebView.credentialsProposed = []
         evaluateJavaScript(JavaScriptBridgeJS.PLATFORM_READY_JS_SOURCE, completionHandler: nil)
@@ -2148,6 +2166,8 @@ public class InAppWebView: WKWebView, WKUIDelegate,
     
     public func webView(_ webView: WKWebView,
                         didCommit navigation: WKNavigation!) {
+        initializeWindowIdJS()
+        updateScrollChangedListener()
         channelDelegate?.onPageCommitVisible(url: url?.absoluteString)
     }
     
@@ -2558,7 +2578,8 @@ public class InAppWebView: WKWebView, WKUIDelegate,
                     }
                     break
                 case "onScrollChanged":
-                    if let args = body["args"] as? String, let data = args.data(using: .utf8) {
+                    if webView.hasScrollChangedListener,
+                       let args = body["args"] as? String, let data = args.data(using: .utf8) {
                         let jsonArgs = try? JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? [[String: Any]]
                         if let jsonData = jsonArgs?.first,
                            let x = jsonData["x"] as? Int,

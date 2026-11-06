@@ -1,3 +1,7 @@
+## Unreleased
+
+- Add a backward-compatible widget update hook; creation parameters stay immutable while layout and supported subscriptions can follow rebuilds.
+
 ## 1.4.0-beta.3
 
 - Documented Android background startup support and platform-specific prewarm settings, caching and deadlines.

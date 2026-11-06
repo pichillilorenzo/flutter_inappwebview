@@ -11,6 +11,8 @@ on:
       - 'tool/apple_reply_probe/**'
       - 'tool/*javascript_handler_json*'
       - 'tool/*apple_bridge*'
+      - 'tool/swift_source.py'
+      - 'tool/test_swift_source.py'
       - '.github/workflows/apple-reply-transport.yaml'
   push:
     branches: [master]
@@ -22,12 +24,24 @@ on:
       - 'tool/apple_reply_probe/**'
       - 'tool/*javascript_handler_json*'
       - 'tool/*apple_bridge*'
+      - 'tool/swift_source.py'
+      - 'tool/test_swift_source.py'
       - '.github/workflows/apple-reply-transport.yaml'
 
 permissions:
   contents: read
 
 jobs:
+  source-extraction:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Complete Swift source extraction without an Apple SDK
+        run: python3 tool/test_swift_source.py
+      - name: Shared authorization and one-way source invariants
+        run: node tool/test_apple_bridge_source_invariants.js
+
   apple:
     runs-on: macos-latest
     timeout-minutes: 30

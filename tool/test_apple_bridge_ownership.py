@@ -13,6 +13,8 @@ import re
 import subprocess
 import tempfile
 
+from swift_source import extract_swift_block as method
+
 ROOT = Path(__file__).resolve().parents[1]
 p = argparse.ArgumentParser(description=__doc__)
 p.add_argument('--source-ref')
@@ -24,11 +26,6 @@ def source(path):
     if args.source_ref:
         return subprocess.check_output(['git', 'show', f'{args.source_ref}:{path}'], cwd=ROOT, text=True)
     return (ROOT / path).read_text()
-
-
-def method(text, signature):
-    start = text.index(signature)
-    return text[start:text.index('\n    }\n', start) + len('\n    }\n')]
 
 
 stubs = r'''

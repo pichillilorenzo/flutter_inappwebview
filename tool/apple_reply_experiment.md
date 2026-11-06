@@ -103,6 +103,8 @@ handling of a denied request remains unchanged.
 
 | Layer | Command / CI | What it establishes |
 | --- | --- | --- |
+| Swift source boundaries (Linux/macOS) | `python3 tool/test_swift_source.py` | Reproduces the original embedded-JavaScript truncation, verifies complete production routing/callback/ownership/console blocks, and checks literals/interpolation/comments; does not replace Swift compilation or SDK checks |
+| Shared source invariants (Linux/macOS) | `node tool/test_apple_bridge_source_invariants.js` | Runs the same actual-sender/secret/origin and one-way early-return checks as the scroll/console harnesses; negative mutations verify that removing a protection fails; native behavior is still tested separately |
 | Production JavaScript | `node tool/test_apple_reply_transport.js` | JSON/prototype/Unicode parity; 256 concurrent out-of-order replies; separate frame/world closures; one-way routing; missing API; default disabled; mixed popup policies; reinjection; navigation; probe timeout, late answers, pending owner; no duplicate dispatch |
 | Production Swift route | `python3 tool/test_apple_reply_native.py` | Compiles the actual common authorization/probe and Dart callback bodies, plus reply/registry classes; exercises origin/frame/world/controller/window denials, both popup policy directions, 256 replies, errors, nil/JSON text, cancellation and late callbacks |
 | Shared-controller ownership | `python3 tool/test_apple_bridge_ownership.py` | Compiles production registration selection, weak-owner registries, adapters and cleanup; tests both closing orders, all four opt-in combinations, parent retention, surviving RPC/one-way routes, bootstrap retention, and last-owner cleanup |

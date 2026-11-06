@@ -2,6 +2,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
+const {assertInternalOneWay} = require('../../../tool/test_apple_bridge_source_invariants.js');
 
 const repoRoot = path.resolve(__dirname, '../../..');
 const linuxSourcePath = path.join(repoRoot, 'flutter_inappwebview_linux/linux/plugin_scripts_js/console_log_js.h');
@@ -295,7 +296,7 @@ for (const [platform, root] of [['iOS', iosRoot], ['macOS', macosRoot]]) {
   const native = fs.readFileSync(path.join(root, 'InAppWebView/InAppWebView.swift'), 'utf8');
   assert.match(native, /case "onConsoleMessage", "onConsoleMessageBatch"/, `${platform}: batch stays on the internal console dispatcher`);
   assert.match(native, /for jsonData in consoleMessages/, `${platform}: native dispatch preserves every callback`);
-  assert.match(native, /if body\["_callHandlerOneWay"\] as\? Bool == true \{\s*return\s*\}\s*evaluateJavaScript/, `${platform}: internal one-way calls skip promise reply evaluation`);
+  assertInternalOneWay(native);
 }
 const linuxNative = fs.readFileSync(path.join(repoRoot, 'flutter_inappwebview_linux/linux/in_app_webview/in_app_webview.cc'), 'utf8');
 assert.match(linuxNative, /handlerName == "onConsoleMessageBatch"/, 'Linux recognizes the internal batch handler');

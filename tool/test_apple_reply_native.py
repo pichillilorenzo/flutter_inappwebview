@@ -13,15 +13,12 @@ from pathlib import Path
 import subprocess
 import tempfile
 
+from swift_source import extract_swift_block as method
+
 ROOT = Path(__file__).resolve().parents[1]
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--sdk-check', action='store_true')
 args = parser.parse_args()
-
-
-def method(text, signature):
-    start = text.index(signature)
-    return text[start:text.index('\n    }\n', start) + len('\n    }\n')]
 
 
 stubs = r'''
@@ -81,6 +78,7 @@ final class InAppWebView {
     let javaScriptBridgeReplies = JavaScriptBridgeReplyRegistry()
     var settings: Settings? = Settings()
     var channelDelegate: WebViewChannelDelegate? = WebViewChannelDelegate()
+    var internalHandlerCalls = 0
     var evaluations = 0
     var scripts: [String] = []
     func evaluateJavaScript(_ source: String, completionHandler: (() -> Void)?) { evaluations += 1; scripts.append(source) }
@@ -131,6 +129,32 @@ require(dartFailure.calls == 1 && dartFailure.error == "ERR, quotes '\" \\ עב�
 let internalAnswer = receive(root, WKScriptMessage(root, body(["handlerName": "internal"])))
 require(internalAnswer.calls == 1 && internalAnswer.value == nil && internalAnswer.error == nil, "internal undefined result")
 
+// Exercise the production one-way early return on the default-OFF transport.
+// A successful notification must dispatch internally but never evaluate a reply.
+let notificationOwner = InAppWebView()
+notificationOwner.settings!.javaScriptHandlersOriginAllowList = ["^https://allowed\\.test$"]
+let notification = WKScriptMessage(notificationOwner, body(["handlerName": "internal", "_callHandlerOneWay": true]))
+notification.name = "callHandler"
+let noReply = receive(notificationOwner, notification, reply: false)
+require(notificationOwner.internalHandlerCalls == 1, "authorized one-way notification reaches the internal handler")
+require(notificationOwner.evaluations == 0 && noReply.calls == 0 && notificationOwner.javaScriptBridgeReplies.count == 0, "one-way notification has no native reply or JavaScript evaluation")
+require(notificationOwner.channelDelegate!.requests.isEmpty, "internal notification does not dispatch an application RPC")
+let ordinaryInternal = WKScriptMessage(notificationOwner, body(["handlerName": "internal"]))
+ordinaryInternal.name = "callHandler"
+receive(notificationOwner, ordinaryInternal, reply: false)
+require(notificationOwner.internalHandlerCalls == 2 && notificationOwner.evaluations == 1, "ordinary internal Promise still receives its legacy evaluation")
+for invalidSecret in [false, true] {
+    let deniedOwner = InAppWebView()
+    let deniedBody = body(["handlerName": "internal", "_callHandlerOneWay": true,
+                           "_bridgeSecret": invalidSecret ? "wrong" : "secret"])
+    if !invalidSecret { deniedOwner.settings!.javaScriptHandlersOriginAllowList = [] }
+    let deniedNotification = WKScriptMessage(deniedOwner, deniedBody)
+    deniedNotification.name = "callHandler"
+    receive(deniedOwner, deniedNotification, reply: false)
+    require(deniedOwner.internalHandlerCalls == 0 && deniedOwner.channelDelegate!.requests.isEmpty, "secret/origin gates precede internal one-way dispatch")
+    require(deniedOwner.evaluations == 0 && deniedOwner.javaScriptBridgeReplies.count == 0, "denied one-way notification produces no reply evaluation")
+}
+
 for scenario in 0..<12 {
     let owner = InAppWebView(); owner.scriptMessageReplyPolicy = true
     let message = WKScriptMessage(owner, body())
@@ -151,10 +175,12 @@ for scenario in 0..<12 {
     let denied = receive(owner, message)
     require(denied.calls == 1 && denied.error != nil && owner.channelDelegate!.requests.isEmpty, "denied once: \(scenario)")
     require(owner.javaScriptBridgeReplies.count == 0, "denied reply removed")
+    require(owner.evaluations == 0, "denied reply cannot evaluate a legacy completion")
     message.name = "callHandler"
     if scenario != 9 && scenario != 11 { // one-way and document IDs are transport-specific
         receive(owner, message, reply: false)
         require(owner.channelDelegate!.requests.isEmpty, "legacy uses same authorization: \(scenario)")
+        require(owner.evaluations == 0, "denied legacy request cannot evaluate a completion")
     }
 }
 let otherController = WKUserContentController()
@@ -268,12 +294,13 @@ with tempfile.TemporaryDirectory(prefix='apple-reply-native-') as directory:
         route = method(native, '    func handleScriptMessage(')
         switch_start = route.index('            var isInternalHandler = true')
         switch_end = route.index('            let _callHandlerID =', switch_start)
-        route = route[:switch_start] + '            let isInternalHandler = handlerName == "internal"\n' + route[switch_end:]
+        route = route[:switch_start] + '''            let isInternalHandler = handlerName == "internal"
+            if isInternalHandler { webView.internalHandlerCalls += 1 }
+''' + route[switch_end:]
         import re
         route = re.sub(r'if #available\([^)]*\)', 'if modern', route)
         util = (sources / 'Util.swift').read_text()
-        util_start = util.index('    public static func JSONStringify(')
-        util_func = util[util_start:util.index('    @available', util_start)]
+        util_func = method(util, '    public static func JSONStringify(')
         lifetime = (sources / 'Types/JavaScriptBridgeReply.swift').read_text()
         code = stubs.replace('    // PRODUCTION_ROUTE', route)
         code += '\nstruct Util {\n' + util_func + '\n}\n' + lifetime + tests

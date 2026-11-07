@@ -1815,6 +1815,48 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController
   }
 
   @override
+  Future<AppleWebViewActivitySnapshot> getAppleWebViewActivitySnapshot() async {
+    if (disposed) {
+      return AppleWebViewActivitySnapshot.unavailable(
+        AppleWebViewActivityAvailability.disposed,
+      );
+    }
+    if (id == null) {
+      return AppleWebViewActivitySnapshot.unavailable(
+        AppleWebViewActivityAvailability.noNativeView,
+      );
+    }
+    try {
+      final result = await channel!.invokeMethod<Object?>(
+        'getAppleWebViewActivitySnapshot',
+      );
+      // A keepAlive detachment also invalidates this controller's observation.
+      if (disposed) {
+        return AppleWebViewActivitySnapshot.unavailable(
+          AppleWebViewActivityAvailability.disposed,
+        );
+      }
+      if (result is! Map) {
+        throw const FormatException('Invalid Apple activity snapshot response');
+      }
+      return AppleWebViewActivitySnapshot.fromMap(result);
+    } on MissingPluginException {
+      return AppleWebViewActivitySnapshot.unavailable(
+        disposed
+            ? AppleWebViewActivityAvailability.disposed
+            : AppleWebViewActivityAvailability.methodUnavailable,
+      );
+    } catch (_) {
+      if (disposed) {
+        return AppleWebViewActivitySnapshot.unavailable(
+          AppleWebViewActivityAvailability.disposed,
+        );
+      }
+      rethrow;
+    }
+  }
+
+  @override
   Future<WebUri?> getUrl() async {
     Map<String, dynamic> args = <String, dynamic>{};
     String? url = await channel?.invokeMethod<String?>('getUrl', args);

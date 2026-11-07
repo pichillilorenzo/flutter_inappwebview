@@ -82,6 +82,14 @@ dependencies:
 Do not combine these packages with overrides pointing to published platform
 implementations or a different Git revision.
 
+### Apple view activity metadata
+
+`controller.getAppleWebViewActivitySnapshot()` reads public view, window,
+application and scheduling-preference metadata on iOS/macOS without evaluating
+JavaScript or changing WebKit policy. Missing/unsupported/disposed observations
+stay explicit. These flags do not establish actual JavaScript suspension or
+WebContent process liveness. See the [API semantics and native CI probes](tool/apple_activity_snapshot.md).
+
 ### Preparing WebView startup
 
 Call `await WebViewEnvironment.prewarm()` before creating the first WebView to

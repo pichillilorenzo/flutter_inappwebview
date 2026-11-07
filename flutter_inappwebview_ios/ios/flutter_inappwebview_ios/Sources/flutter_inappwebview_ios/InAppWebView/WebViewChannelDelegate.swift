@@ -26,6 +26,17 @@ public class WebViewChannelDelegate: ChannelDelegate {
         }
         
         switch method {
+        case .getAppleWebViewActivitySnapshot:
+            // Queue one native read; do not retain a view while it waits. A
+            // disposed delegate has no view, including an already queued call.
+            DispatchQueue.main.async { [weak self] in
+                guard let webView = self?.webView else {
+                    result(["availability": "noNativeView"])
+                    return
+                }
+                result(webView.getAppleWebViewActivitySnapshot())
+            }
+            break
         case .getUrl:
             result(webView?.url?.absoluteString)
             break

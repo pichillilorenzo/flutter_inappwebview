@@ -39,6 +39,8 @@ jobs:
         run: python3 flutter_inappwebview_windows/windows/test/run_process_infos_tests.py --sanitize
       - name: Test native lifecycle without a WebView runtime
         run: sh flutter_inappwebview_windows/windows/test/run_webview_lifecycle_tests.sh
+      - name: Test browser process ownership and last-view cleanup
+        run: sh flutter_inappwebview_windows/windows/test/run_browser_process_gate_tests.sh
       - name: Test delayed trim cancellation without a real-time wait
         run: sh flutter_inappwebview_windows/windows/test/run_delayed_texture_trim_tests.sh
       - name: Test production GPU and CPU trim methods with platform doubles

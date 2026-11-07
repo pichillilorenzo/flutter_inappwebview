@@ -20,6 +20,7 @@
 #include "module_probe_launcher_test_cases.h"
 #include "native_focus_test_cases.h"
 #include "webview_lifecycle_test_cases.h"
+#include "browser_process_gate_test_cases.h"
 #include "custom_platform_view/util/rohelper.h"
 #include "in_app_webview/webview_visibility_state.h"
 #include "plugin_scripts_js/javascript_bridge_message.h"
@@ -173,9 +174,9 @@ TEST(BrowserProcessGateRegistry, ResponsiveVerdictCachedWithinInterval) {
 
 TEST(BrowserProcessGateRegistry, SeparateBrowsersProbeIndependently) {
   GateHarness h;
-  int a = 0;
+  int a = 0, b = 0;
   h.gate.tryAcquire(7, &a);
-  h.gate.tryAcquire(8, &a);
+  h.gate.tryAcquire(8, &b);
   EXPECT_EQ(h.probeCount, 2);
   EXPECT_EQ(h.scheduled, 2);
 }
@@ -213,6 +214,50 @@ TEST(BrowserProcessGateRegistry, InvalidateForcesFreshProbe) {
   h.gate.invalidate(7);
   h.gate.tryAcquire(7, &a);
   EXPECT_EQ(h.probeCount, 2);
+}
+
+TEST(BrowserProcessGateRegistry, ResponsiveOwnersOutlivePendingWork) {
+  browser_process_gate_test::responsiveOwnersOutlivePendingWork();
+}
+
+TEST(BrowserProcessGateRegistry, ClosingOnePreservesSharedRetry) {
+  browser_process_gate_test::closingOnePreservesSharedRetry();
+}
+
+TEST(BrowserProcessGateRegistry, LastOwnerCancelsAndReleasesCaches) {
+  browser_process_gate_test::lastOwnerCancelsAndReleasesCaches();
+}
+
+TEST(BrowserProcessGateRegistry, TimeoutRetainsOwnership) {
+  browser_process_gate_test::timeoutRetainsOwnership();
+}
+
+TEST(BrowserProcessGateRegistry, PidReuseRequiresFreshProbe) {
+  browser_process_gate_test::pidReuseRequiresFreshProbe();
+}
+
+TEST(BrowserProcessGateRegistry, MovingOwnerPreservesOtherOwners) {
+  browser_process_gate_test::movingOwnerPreservesOtherOwners();
+}
+
+TEST(BrowserProcessGateRegistry, ProcessFailurePreservesOtherOwners) {
+  browser_process_gate_test::processFailurePreservesOtherOwners();
+}
+
+TEST(BrowserProcessGateRegistry, DrainedWaitersRecheckOwnership) {
+  browser_process_gate_test::drainedWaitersRecheckOwnership();
+}
+
+TEST(BrowserProcessGateRegistry, ReleaseHooksObserveConsistentOwnership) {
+  browser_process_gate_test::releaseHooksObserveConsistentOwnership();
+}
+
+TEST(BrowserProcessGateRegistry, RetryCancellationCanReleaseLastOwner) {
+  browser_process_gate_test::retryCancellationCanReleaseLastOwner();
+}
+
+TEST(BrowserProcessGateRegistry, RepeatedCloseReleasesBookkeeping) {
+  browser_process_gate_test::repeatedCloseReleasesBookkeeping();
 }
 
 TEST(AsyncResourceBuild, AdoptsLateCompletionExactlyOnce) {

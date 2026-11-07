@@ -3509,7 +3509,12 @@ namespace flutter_inappwebview_plugin
           gGateTimerPids.erase(it->second);
           gGateRetryTimers.erase(it);
         },
-        kBrowserStateRetryIntervalMs);
+        kBrowserStateRetryIntervalMs,
+        [](const unsigned long pid)
+        {
+          // Chromium owns this HWND; only forget our borrowed handle.
+          gBrowserProbeWindows.erase(pid);
+        });
       return gate;
     }
 
@@ -3517,11 +3522,17 @@ namespace flutter_inappwebview_plugin
     {
       const auto it = gGateTimerPids.find(timerId);
       if (it == gGateTimerPids.end()) {
-        KillTimer(nullptr, timerId);
+        // A queued WM_TIMER can outlive cancellation and its id may have
+        // been reused by another component. We no longer own that timer.
         return;
       }
-      for (const auto waiter : browserGate().takeWaitersIfResponsive(it->second)) {
-        static_cast<InAppWebView*>(waiter)->applyPendingBrowserState();
+      // Draining cancels the timer and invalidates the iterator above.
+      const auto pid = it->second;
+      for (const auto waiter : browserGate().takeWaitersIfResponsive(pid)) {
+        // Applying an earlier waiter may close or move another view.
+        if (browserGate().owns(pid, waiter)) {
+          static_cast<InAppWebView*>(waiter)->applyPendingBrowserState();
+        }
       }
     }
   }
@@ -3543,6 +3554,7 @@ namespace flutter_inappwebview_plugin
       browserGate().invalidate(browserProcessId_);
       gBrowserProbeWindows.erase(browserProcessId_);
     }
+    browserGate().releaseOwner(this);
     browserProcessId_ = 0;
   }
 
@@ -4869,7 +4881,7 @@ namespace flutter_inappwebview_plugin
     aliveToken_.reset();
     clearLifecycleDeadline();
     lifecycleState_.dispose();
-    browserGate().removeWaiter(this);
+    browserGate().releaseOwner(this);
     WebViewDropTarget::UnregisterWebView(this);
     userContentController = nullptr;
     if (webView) {

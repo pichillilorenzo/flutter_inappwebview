@@ -91,6 +91,7 @@ final class ProbeApplication: NSObject, NSApplicationDelegate {
         try await recorder.observe(view, "owner-after-other-capture", expected: ["windowAttached": true])
         try await recorder.checkLifecycle(view)
         try await recorder.checkPolicies()
+        try await recorder.checkCallbackBoundary(view)
     }
 }
 

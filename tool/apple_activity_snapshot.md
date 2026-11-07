@@ -117,6 +117,37 @@ a request originating off the main thread. Three test-owned views verify all
 three policy values and that capture leaves their preferences unchanged. These
 fixture policy assignments are not production settings or performance results.
 
+### Comparing the same callback boundary
+
+The fixture reads its independent framework reference inside the production
+route's synchronous result callback, before resuming the awaiting caller. It
+compares the saved native result with that saved reference. It does not reread
+app, window, occlusion or scene state after `await` to judge an earlier snapshot:
+those values can change between the callback and task resumption. This removes
+that async comparison gap; it does not make all OS properties an atomic snapshot.
+The phase's expected values and all visibility, scene, availability and lifecycle
+assertions remain enforced.
+
+Each observation is retained **before** validation, including its case, unmodified
+`nativeResult`, `callbackReference`, phase expectations, callback/main-thread
+metadata, wall-clock boundaries and elapsed call interval. The report marks the
+row passed or failed and retains the assertion error. A failure on the first
+observation therefore still leaves the actual and reference values in the
+artifact; a partial or failed report cannot pass the runner's checks.
+
+A separate comparison control changes a test-owned view's hidden flag after
+callback-side capture but before the suspended caller resumes. The saved
+comparison must still pass, while a comparison using the later reference must
+fail. It also corrupts each observed Boolean field (including adding false for
+an unavailable field) and requires every incorrect result to be rejected. Each
+intentional failure uses a separate recorder's ordinary observation path and
+must retain the unmodified result, reference and timing alongside its error. The
+original view flag is restored. These controls have their own evidence array;
+they do not replace any of the 17 macOS / 14 iOS observations on policy-capable
+OS versions or the three lifecycle cases on each platform. They run in the real
+native jobs; Python dictionary controls and source checks alone do not execute
+Swift, WebKit or these UI transitions.
+
 The macOS fixture has no App Sandbox entitlement. The iOS fixture runs in an
 iOS Simulator application container. Both load only local static HTML, never
 wait for a network load or call `evaluateJavaScript`. They test the getter and

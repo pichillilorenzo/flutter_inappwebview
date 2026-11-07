@@ -2,12 +2,48 @@
 """Source/JSON negative controls only; these do not run Swift or WebKit."""
 
 import copy
+import json
 from pathlib import Path
 import tempfile
 import unittest
 from unittest.mock import patch
 
 import test_apple_activity_snapshot as activity
+
+
+def capture_evidence(row, expected=None):
+    """Synthetic dictionaries only, never evidence of a native execution."""
+    native_keys = ["schemaVersion", "availability", "platform", "capturedAtMillisecondsSinceEpoch",
+        "applicationState", "windowSceneState", "inactiveSchedulingPolicy",
+        "inactiveSchedulingPolicyRawValue"] + activity.REFERENCE_BOOLEAN_FIELDS
+    native = {key: row[key] for key in native_keys if key in row}
+    row.update(nativeResult=native,
+               callbackReference={key: native[key] for key in activity.REFERENCE_FIELDS if key in native},
+               expected={"windowAttached": row["windowAttached"]} if expected is None else expected,
+               callbackAt=101, callbackElapsedSeconds=.1,
+               referenceBoundary="native-result-callback-before-resume", validationStatus="passed")
+
+
+def comparison_control(row):
+    captured = copy.deepcopy(row)
+    captured["case"] = "callback-state-change"
+    capture_evidence(captured, expected={})
+    captured.pop("validationStatus")
+    late = dict(captured["callbackReference"], viewIsHidden=True, viewOrAncestorIsHidden=True)
+    error = "callback-state-change: reference mismatch: viewIsHidden"
+    control = {"case": "callback-state-change", "validationStatus": "passed", "observation": captured,
+        "viewIsHiddenAfterResume": True, "lateReference": late, "lateReferenceRejected": error,
+        "lateReferenceFailure": dict(captured, callbackReference=late, validationStatus="failed",
+                                     validationError=error), "wrongNativeValuesRejected": []}
+    for field in activity.REFERENCE_BOOLEAN_FIELDS:
+        wrong = copy.deepcopy(captured)
+        value = not wrong["nativeResult"].get(field, True)
+        wrong["nativeResult"][field] = wrong[field] = value
+        error = "callback-state-change: reference mismatch: " + field
+        wrong.update(validationStatus="failed", validationError=error)
+        control["wrongNativeValuesRejected"].append(
+            {"field": field, "value": value, "error": error, "failedObservation": wrong})
+    return control
 
 
 def report(apple_platform="macos"):
@@ -41,6 +77,8 @@ def report(apple_platform="macos"):
             row["windowIsHidden"] = row["case"] == "window-hidden"
             if row["case"] != "window-without-scene":
                 row["windowSceneState"] = "foregroundActive"
+        capture_evidence(row)
+    result["comparisonControls"] = [comparison_control(result["observations"][0])]
     return result
 
 
@@ -89,27 +127,115 @@ class ReportContracts(unittest.TestCase):
                     activity.validate_report(value, "macos")
 
     def test_incomplete_policy_observations_are_rejected(self):
+        for apple_platform in ("ios", "macos"):
+            value = report(apple_platform)
+            template = next(row for row in value["observations"] if row["case"] == "never-attached")
+            for name in ("suspend", "throttle", "none"):
+                row = copy.deepcopy(template)
+                row["case"] = "policy-" + name
+                value["observations"].append(row)
+            for row in value["observations"]:
+                row.update(inactiveSchedulingPolicyIsSupported=True,
+                           inactiveSchedulingPolicy="suspend", inactiveSchedulingPolicyRawValue=0)
+                if row["case"].startswith("policy-"):
+                    row["inactiveSchedulingPolicy"] = row["case"][len("policy-"):]
+                    row["inactiveSchedulingPolicyRawValue"] = ("suspend", "throttle", "none").index(
+                        row["inactiveSchedulingPolicy"])
+                capture_evidence(row)
+            value["comparisonControls"] = [comparison_control(value["observations"][0])]
+            activity.validate_report(value, apple_platform)
+            for changes in ({"inactiveSchedulingPolicy": None},
+                            {"inactiveSchedulingPolicyRawValue": None},
+                            {"inactiveSchedulingPolicyRawValue": True}):
+                modified = copy.deepcopy(value)
+                modified["observations"][0].update(changes)
+                with self.assertRaises(AssertionError):
+                    activity.validate_report(modified, apple_platform)
+
+    def test_wrong_native_flags_still_fail_at_the_callback_reference(self):
+        for apple_platform in ("ios", "macos"):
+            captured = report(apple_platform)["comparisonControls"][0]["observation"]
+            for field in activity.REFERENCE_BOOLEAN_FIELDS:
+                with self.subTest(platform=apple_platform, field=field):
+                    wrong = copy.deepcopy(captured)
+                    # Change both the raw result and its display copy. Rejection
+                    # must come from comparison with the independent reference.
+                    value = not wrong["nativeResult"].get(field, True)
+                    wrong["nativeResult"][field] = value
+                    wrong[field] = value
+                    with self.assertRaisesRegex(AssertionError, "Callback reference mismatch: " + field):
+                        activity.validate_capture_evidence(wrong, apple_platform)
+
+    def test_wrong_application_scene_and_policy_values_still_fail(self):
+        for apple_platform in ("ios", "macos"):
+            for field, value in (("applicationState", "inactive"),
+                                 ("windowSceneState", "background"),
+                                 ("inactiveSchedulingPolicyRawValue", 123)):
+                with self.subTest(platform=apple_platform, field=field):
+                    wrong = copy.deepcopy(report(apple_platform)["comparisonControls"][0]["observation"])
+                    wrong["nativeResult"][field] = wrong[field] = value
+                    with self.assertRaisesRegex(AssertionError, "Callback reference mismatch: " + field):
+                        activity.validate_capture_evidence(wrong, apple_platform)
+
+    def test_saved_callback_data_survives_a_simulated_change_before_resumption(self):
+        for apple_platform in ("ios", "macos"):
+            control = report(apple_platform)["comparisonControls"][0]
+            captured = control["observation"]
+            self.assertIs(captured["nativeResult"]["viewIsHidden"], False)
+            self.assertIs(control["viewIsHiddenAfterResume"], True)
+            activity.validate_comparison_controls([control], apple_platform)
+            changed = dict(captured, callbackReference=control["lateReference"])
+            with self.assertRaisesRegex(AssertionError, "Callback reference mismatch: viewIsHidden"):
+                activity.validate_capture_evidence(changed, apple_platform)
+
+    def test_missing_boundary_evidence_and_unvalidated_rows_are_rejected(self):
+        changes = [{"nativeResult": None}, {"callbackReference": None}, {"expected": None},
+                   {"referenceBoundary": "after-await"}, {"callbackAt": 99}, {"callbackAt": 103},
+                   {"callbackAt": True}, {"callbackElapsedSeconds": .3},
+                   {"callbackElapsedSeconds": float("nan")}, {"validationStatus": "pending"},
+                   {"validationStatus": "failed"}, {"validationError": "window mismatch"}]
+        for change in changes:
+            with self.subTest(change=change):
+                value = report()
+                value["observations"][0].update(change)
+                with self.assertRaises(AssertionError):
+                    activity.validate_report(value, "macos")
+
+    def test_comparison_controls_cannot_be_omitted_or_faked(self):
+        mutations = [
+            lambda r: r.update(comparisonControls=[]),
+            lambda r: r["comparisonControls"][0].update(validationStatus="failed"),
+            lambda r: r["comparisonControls"][0].update(viewIsHiddenAfterResume=False),
+            lambda r: r["comparisonControls"][0]["lateReference"].update(viewIsHidden=False),
+            lambda r: r["comparisonControls"][0].update(lateReferenceRejected=""),
+            lambda r: r["comparisonControls"][0]["wrongNativeValuesRejected"].pop(),
+            lambda r: r["comparisonControls"][0]["wrongNativeValuesRejected"][0].update(value=False),
+            lambda r: r["comparisonControls"][0]["wrongNativeValuesRejected"][0].update(error=""),
+            lambda r: r["comparisonControls"][0]["lateReferenceFailure"].pop("nativeResult"),
+            lambda r: r["comparisonControls"][0]["wrongNativeValuesRejected"][0]["failedObservation"].pop("callbackReference"),
+            lambda r: r["comparisonControls"][0]["wrongNativeValuesRejected"][0]["failedObservation"].update(callbackAt=102),
+        ]
+        for mutate in mutations:
+            value = report()
+            mutate(value)
+            with self.subTest(mutation=mutate), self.assertRaises(AssertionError):
+                activity.validate_report(value, "macos")
+
+    def test_failed_report_preserves_raw_native_reference_and_timing(self):
         value = report()
-        template = next(row for row in value["observations"] if row["case"] == "never-attached")
-        for name in ("suspend", "throttle", "none"):
-            row = copy.deepcopy(template)
-            row["case"] = "policy-" + name
-            value["observations"].append(row)
-        for row in value["observations"]:
-            row.update(inactiveSchedulingPolicyIsSupported=True,
-                       inactiveSchedulingPolicy="suspend", inactiveSchedulingPolicyRawValue=0)
-            if row["case"].startswith("policy-"):
-                row["inactiveSchedulingPolicy"] = row["case"][len("policy-"):]
-                row["inactiveSchedulingPolicyRawValue"] = ("suspend", "throttle", "none").index(
-                    row["inactiveSchedulingPolicy"])
-        activity.validate_report(value, "macos")
-        for changes in ({"inactiveSchedulingPolicy": None},
-                        {"inactiveSchedulingPolicyRawValue": None},
-                        {"inactiveSchedulingPolicyRawValue": True}):
-            modified = copy.deepcopy(value)
-            modified["observations"][0].update(changes)
-            with self.assertRaises(AssertionError):
-                activity.validate_report(modified, "macos")
+        value.update(status="failed", error="wrong native window occlusion flag")
+        row = value["observations"][0]
+        row["nativeResult"]["windowIsOcclusionVisible"] = row["windowIsOcclusionVisible"] = False
+        row.update(validationStatus="failed", validationError=value["error"])
+        encoded = json.dumps(value)
+        with self.assertRaises(AssertionError):
+            activity.validate_report(value, "macos")
+        self.assertEqual(json.dumps(value), encoded)
+        saved = json.loads(encoded)["observations"][0]
+        self.assertEqual(saved["case"], "visible")
+        self.assertIs(saved["nativeResult"]["windowIsOcclusionVisible"], False)
+        self.assertIs(saved["callbackReference"]["windowIsOcclusionVisible"], True)
+        self.assertEqual((saved["wallBefore"], saved["callbackAt"], saved["wallAfter"]), (100, 101, 102))
 
     def test_stale_window_fields_on_detached_view_are_rejected(self):
         value = report()

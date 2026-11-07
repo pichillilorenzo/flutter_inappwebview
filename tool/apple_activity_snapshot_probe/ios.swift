@@ -84,6 +84,7 @@ final class ProbeSceneDelegate: UIResponder, UIWindowSceneDelegate {
         legacyView.removeFromSuperview()
         try await recorder.checkLifecycle(view)
         try await recorder.checkPolicies()
+        try await recorder.checkCallbackBoundary(view)
     }
 }
 

@@ -29,6 +29,11 @@ BASE_CASES = ["visible", "view-hidden", "ancestor-hidden", "ancestor-restored",
 LIFECYCLE_CASES = ["dispose-before-main-queue-capture",
                    "release-before-main-queue-capture",
                    "background-request-main-thread-capture"]
+REFERENCE_BOOLEAN_FIELDS = ["viewIsHidden", "viewOrAncestorIsHidden", "windowAttached",
+    "applicationIsHidden", "windowIsVisible", "windowIsMiniaturized",
+    "windowIsOcclusionVisible", "windowIsHidden", "inactiveSchedulingPolicyIsSupported"]
+REFERENCE_FIELDS = REFERENCE_BOOLEAN_FIELDS + ["platform", "applicationState", "windowSceneState",
+                                               "inactiveSchedulingPolicyRawValue"]
 
 
 def source_dir(apple_platform):
@@ -105,6 +110,97 @@ final class ActivityProbeDelegate {
     return manifest
 
 
+def validate_capture_evidence(row, apple_platform):
+    """Recheck saved callback data, never compare with a later framework state."""
+    def require(condition, reason):
+        if not condition:
+            raise AssertionError(reason)
+    native = row.get("nativeResult")
+    reference = row.get("callbackReference")
+    expected = row.get("expected")
+    require(isinstance(native, dict) and isinstance(reference, dict) and isinstance(expected, dict),
+            "Missing native result/reference/phase evidence")
+    require(native.get("availability") == "available" and native.get("platform") == apple_platform,
+            "Unobserved callback data")
+    require(type(native.get("schemaVersion")) is int and native["schemaVersion"] == 1,
+            "Invalid callback observation schema")
+    require(row.get("callbackOnMain") is True and
+            row.get("referenceBoundary") == "native-result-callback-before-resume",
+            "Reference was not captured at the main-thread native callback")
+    for key, value in native.items():
+        require(type(row.get(key)) is type(value) and row.get(key) == value,
+                "Displayed observation differs from raw native result: " + key)
+    for key in ("wallBefore", "callbackAt", "wallAfter"):
+        require(type(row.get(key)) is int, "Missing callback boundary: " + key)
+    captured = native.get("capturedAtMillisecondsSinceEpoch")
+    require(type(captured) is int and
+            row["wallBefore"] <= captured <= row["callbackAt"] <= row["wallAfter"],
+            "Capture outside native callback boundary")
+    callback_elapsed = row.get("callbackElapsedSeconds")
+    elapsed = row.get("requestElapsedSeconds")
+    require(all(type(value) in (int, float) and math.isfinite(value)
+                for value in (callback_elapsed, elapsed)) and 0 <= callback_elapsed <= elapsed,
+            "Invalid callback/resumption interval")
+    for key, value in expected.items():
+        require(type(value) is bool and type(native.get(key)) is bool and native[key] == value,
+                "Unexpected phase value: " + key)
+    for key in REFERENCE_FIELDS:
+        actual, wanted = native.get(key), reference.get(key)
+        require(type(actual) is type(wanted) and actual == wanted,
+                "Callback reference mismatch: " + key)
+
+
+def validate_comparison_controls(controls, apple_platform):
+    def require(condition, reason):
+        if not condition:
+            raise AssertionError(reason)
+    require(isinstance(controls, list) and len(controls) == 1, "Missing callback comparison control")
+    control = controls[0]
+    require(control.get("case") == "callback-state-change" and
+            control.get("validationStatus") == "passed" and control.get("validationError") is None,
+            "Callback comparison control failed")
+    captured = control.get("observation")
+    require(isinstance(captured, dict), "Missing control observation")
+    validate_capture_evidence(captured, apple_platform)
+    require(captured["nativeResult"].get("viewIsHidden") is False and
+            control.get("viewIsHiddenAfterResume") is True,
+            "Control did not change state after callback capture")
+    late_reference = control.get("lateReference")
+    require(isinstance(late_reference, dict) and late_reference.get("viewIsHidden") is True,
+            "Missing changed reference after resumption")
+
+    def require_rejected(changed, field, recorded_error, failed):
+        require(isinstance(recorded_error, str) and field in recorded_error,
+                "Missing native rejection evidence: " + field)
+        require(isinstance(failed, dict) and failed.get("validationStatus") == "failed" and
+                failed.get("validationError") == recorded_error, "Missing retained failure: " + field)
+        retained = {key: value for key, value in failed.items()
+                    if key not in ("validationStatus", "validationError")}
+        require(json.dumps(retained, sort_keys=True) == json.dumps(changed, sort_keys=True),
+                "Failed comparison changed or lost raw evidence: " + field)
+        try:
+            validate_capture_evidence(changed, apple_platform)
+        except AssertionError as error:
+            require(field in str(error), "Control failed for an unrelated field")
+        else:
+            raise AssertionError("Comparison accepted a wrong value for " + field)
+
+    later = dict(captured, callbackReference=late_reference)
+    require_rejected(later, "viewIsHidden", control.get("lateReferenceRejected"),
+                     control.get("lateReferenceFailure"))
+    rejections = control.get("wrongNativeValuesRejected")
+    require(isinstance(rejections, list) and
+            [item.get("field") for item in rejections] == REFERENCE_BOOLEAN_FIELDS,
+            "Incomplete wrong-native-value controls")
+    for rejection in rejections:
+        field, value = rejection["field"], rejection.get("value")
+        require(type(value) is bool, "Missing incorrect native flag")
+        wrong = dict(captured)
+        wrong["nativeResult"] = dict(captured["nativeResult"], **{field: value})
+        wrong[field] = value
+        require_rejected(wrong, field, rejection.get("error"), rejection.get("failedObservation"))
+
+
 def validate_report(report, apple_platform):
     def require(condition, reason):
         if not condition:
@@ -121,6 +217,7 @@ def validate_report(report, apple_platform):
             "Missing host PID")
     require(isinstance(report.get("os"), str) and report["os"], "Missing OS metadata")
     require(report.get("lifecycleCases") == LIFECYCLE_CASES, "Incomplete lifecycle cases")
+    validate_comparison_controls(report.get("comparisonControls"), apple_platform)
     rows = report.get("observations", [])
     require(isinstance(rows, list) and rows, "No observations")
     labels = [row.get("case") for row in rows]
@@ -134,6 +231,9 @@ def validate_report(report, apple_platform):
         expected += ["policy-suspend", "policy-throttle", "policy-none"]
     require(set(labels) == set(expected), "Incomplete or unexpected native phase set")
     for row in rows:
+        require(row.get("validationStatus") == "passed" and row.get("validationError") is None,
+                "Observation was not validated successfully")
+        validate_capture_evidence(row, apple_platform)
         require(row.get("availability") == "available" and row.get("platform") == apple_platform,
                 "Unobserved or wrong-platform snapshot")
         require(type(row.get("schemaVersion")) is int and row["schemaVersion"] == 1,

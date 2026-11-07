@@ -774,6 +774,12 @@ class InAppWebViewController {
   Future<void> setScreenScale({required double scale}) =>
       platform.setScreenScale(scale: scale);
 
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getAppleWebViewActivitySnapshot}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getAppleWebViewActivitySnapshot.supported_platforms}
+  Future<AppleWebViewActivitySnapshot> getAppleWebViewActivitySnapshot() =>
+      platform.getAppleWebViewActivitySnapshot();
+
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.isVisible}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.isVisible.supported_platforms}

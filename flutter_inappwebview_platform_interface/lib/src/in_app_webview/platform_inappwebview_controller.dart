@@ -3596,6 +3596,30 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
     );
   }
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getAppleWebViewActivitySnapshot}
+  ///Reads public native Apple view/window/application metadata once on the main
+  ///thread, without evaluating JavaScript or changing scheduling preferences.
+  ///
+  ///This observation does not establish actual JavaScript suspension, process
+  ///liveness, work progress, or complete rendered visibility. Read it outside
+  ///timed quiet intervals; even a native method call adds host-side work.
+  ///
+  ///Unsupported platforms return an explicit `unsupportedPlatform` result.
+  ///Apple controllers return `disposed` after disposal/keepAlive detachment,
+  ///`noNativeView` for a static controller or absent native view, and
+  ///`methodUnavailable` when the native channel/method is not registered (for
+  ///example an older native plugin). Failed native calls and malformed results
+  ///throw; they never produce an observed `false` or a stale cached snapshot.
+  ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getAppleWebViewActivitySnapshot.supported_platforms}
+  @SupportedPlatforms(platforms: [IOSPlatform(), MacOSPlatform()])
+  Future<AppleWebViewActivitySnapshot> getAppleWebViewActivitySnapshot() async {
+    return AppleWebViewActivitySnapshot.unavailable(
+      AppleWebViewActivityAvailability.unsupportedPlatform,
+    );
+  }
+
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.isVisible}
   ///Returns whether the WebView is currently visible.
   ///
@@ -4786,6 +4810,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
       WindowsPlatform(),
     ],
   )
+  @override
   void dispose({bool isKeepAlive = false}) {
     throw UnimplementedError(
       '${PlatformInAppWebViewControllerMethod.dispose.name} is not implemented on the current platform',

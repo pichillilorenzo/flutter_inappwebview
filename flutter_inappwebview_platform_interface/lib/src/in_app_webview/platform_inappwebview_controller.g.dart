@@ -632,6 +632,18 @@ enum PlatformInAppWebViewControllerMethod {
   @Deprecated('Use FindInteractionController.findNext instead')
   findNext,
 
+  ///Can be used to check if the [PlatformInAppWebViewController.getAppleWebViewActivitySnapshot] method is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getAppleWebViewActivitySnapshot.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- iOS WKWebView
+  ///- macOS WKWebView
+  ///
+  ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
+  ///{@endtemplate}
+  getAppleWebViewActivitySnapshot,
+
   ///Can be used to check if the [PlatformInAppWebViewController.getCameraCaptureState] method is supported at runtime.
   ///
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getCameraCaptureState.supported_platforms}
@@ -2811,6 +2823,12 @@ extension _PlatformInAppWebViewControllerMethodSupported
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
+      case PlatformInAppWebViewControllerMethod.getAppleWebViewActivitySnapshot:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [
               TargetPlatform.iOS,
               TargetPlatform.macOS,
             ].contains(platform ?? defaultTargetPlatform);

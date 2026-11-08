@@ -443,6 +443,92 @@ void CheckDisposeAndTimerAllocationFailure(Producer producer) {
   std::free(texture.staging_buffer);
 }
 
+void CheckClosingPeerPreservesVisibleConsumer(Producer producer) {
+  Fixture closing;
+  Fixture surviving;
+  closing.Prime(producer);
+  surviving.Prime(producer);
+  auto& peer = *surviving.view;
+  const auto& published = *surviving.frames.back();
+  const size_t peer_capacity = Capacity(peer);
+  const size_t peer_read = peer.read_buffer_index_.load();
+  const auto* peer_pixels = peer.pixel_buffers_[peer_read].data.data();
+  InAppWebViewTexture texture{};
+  texture.webview = &peer;
+  const auto* staging = CopyTexture(texture, published);
+
+  closing.view->setVisible(false);
+  auto late = sources.at(closing.view->hidden_pixel_buffer_trim_source_);
+  AdvanceTime(30000);
+  CheckOnlyPublishedFrame(*closing.view);
+  assert(peer.is_visible_ && peer.hidden_pixel_buffer_trim_source_ == 0);
+#ifdef HAVE_WPE_PLATFORM
+  assert(surviving.native_view.visible && surviving.native_view.mapped);
+#else
+  assert(surviving.legacy_view.activity ==
+      (wpe_view_activity_state_visible | wpe_view_activity_state_in_window));
+#endif
+  assert(!peer.trim_unused_pixel_buffers_.load());
+  assert(Capacity(peer) == peer_capacity);
+  assert(peer.pixel_buffers_[peer_read].data.data() == peer_pixels);
+  CheckFrame(peer, published);
+
+  closing.view.reset();
+  // A callback retained before disposal must reject the dead owner without
+  // changing a live peer's frame, timer or texture's independent staging copy.
+  assert(late->callback(late->data) == G_SOURCE_REMOVE);
+  assert(CopyTexture(texture, published) == staging);
+  assert(Capacity(peer) == peer_capacity);
+  const size_t notifications = surviving.notifications;
+  CheckFrame(peer, surviving.Submit(producer, 73, 37, 61));
+  assert(surviving.notifications == notifications + 1);
+  CopyTexture(texture, *surviving.frames.back());
+  assert(sources.empty());
+  std::free(texture.staging_buffer);
+}
+
+void CheckPeerTimerSurvivesResumeAndClose(Producer producer) {
+  Fixture first;
+  Fixture second;
+  first.Prime(producer);
+  second.Prime(producer);
+  const auto& second_frame = *second.frames.back();
+  const size_t second_capacity = Capacity(*second.view);
+  first.view->setVisible(false);
+  auto canceled = sources.at(first.view->hidden_pixel_buffer_trim_source_);
+  second.view->setVisible(false);
+  const guint peer_source = second.view->hidden_pixel_buffer_trim_source_;
+  assert(sources.size() == 2);
+
+  first.view->setVisible(true);
+  assert(sources.size() == 1 && sources.count(peer_source) == 1);
+#ifdef HAVE_WPE_PLATFORM
+  assert(!second.native_view.visible && !second.native_view.mapped);
+#else
+  assert(second.legacy_view.activity == 0);
+#endif
+  assert(canceled->callback(canceled->data) == G_SOURCE_REMOVE);
+  assert(second.view->hidden_pixel_buffer_trim_source_ == peer_source);
+  assert(!second.view->trim_unused_pixel_buffers_.load());
+  first.view->setVisible(false);
+  auto disposed = sources.at(first.view->hidden_pixel_buffer_trim_source_);
+  first.view.reset();  // Runs the real destructor's timer/lifetime prologue.
+  assert(sources.size() == 1 && sources.count(peer_source) == 1);
+  assert(disposed->callback(disposed->data) == G_SOURCE_REMOVE);
+  assert(second.view->hidden_pixel_buffer_trim_source_ == peer_source);
+
+  AdvanceTime(29999);
+  assert(Capacity(*second.view) == second_capacity);
+  AdvanceTime(1);
+  assert(sources.empty() && second.view->hidden_pixel_buffer_trim_source_ == 0);
+  assert(second.view->trim_unused_pixel_buffers_.load());
+  CheckOnlyPublishedFrame(*second.view);
+  CheckFrame(*second.view, second_frame);
+  second.view->setVisible(true);
+  CheckFrame(*second.view, second.Submit(producer, 71, 35, 62));
+  assert(!second.view->trim_unused_pixel_buffers_.load());
+}
+
 InAppWebView* deallocation_view = nullptr;
 std::array<void*, 3> retired_addresses{};
 size_t observed_retirements = 0;
@@ -569,6 +655,8 @@ int main() {
     CheckDelayResumeAndLateFrames(producer);
     CheckAllocationFailure(producer);
     CheckDisposeAndTimerAllocationFailure(producer);
+    CheckClosingPeerPreservesVisibleConsumer(producer);
+    CheckPeerTimerSurvivesResumeAndClose(producer);
     CheckFreeOutsideRasterLock(producer);
     assert(sources.empty());
   }
@@ -585,5 +673,5 @@ int main() {
   }
   assert(sources.empty());
   std::printf("%s: delay/cancel/stale/dispose, last frame, resize/resume, allocation "
-              "failure, late exports, native leases and concurrent consumers passed\n", backend);
+              "failure, late exports, native leases, two-view isolation and concurrent consumers passed\n", backend);
 }

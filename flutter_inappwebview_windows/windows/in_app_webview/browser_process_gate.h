@@ -2,9 +2,11 @@
 #define FLUTTER_INAPPWEBVIEW_PLUGIN_BROWSER_PROCESS_GATE_H_
 
 #include <algorithm>
+#include <cstddef>
 #include <functional>
 #include <map>
 #include <optional>
+#include <utility>
 #include <vector>
 
 namespace flutter_inappwebview_plugin
@@ -17,19 +19,23 @@ namespace flutter_inappwebview_plugin
   class BrowserProcessGateRegistry
   {
   public:
-    using Waiter = void*;
+    using Owner = void*;
+    using Waiter = Owner;
     using ProbeFn = std::function<bool(unsigned long pid)>;
     using ClockFn = std::function<unsigned long long()>;
     using ScheduleRetryFn = std::function<void(unsigned long pid)>;
     using CancelRetryFn = std::function<void(unsigned long pid)>;
+    using ReleaseProcessFn = std::function<void(unsigned long pid)>;
 
     BrowserProcessGateRegistry(ProbeFn probe, ClockFn clock,
       ScheduleRetryFn scheduleRetry, CancelRetryFn cancelRetry,
-      const unsigned long long probeValidityMs)
+      const unsigned long long probeValidityMs,
+      ReleaseProcessFn releaseProcess = {})
       : probe_(std::move(probe)), clock_(std::move(clock)),
       scheduleRetry_(std::move(scheduleRetry)),
       cancelRetry_(std::move(cancelRetry)),
-      probeValidityMs_(probeValidityMs)
+      probeValidityMs_(probeValidityMs),
+      releaseProcess_(std::move(releaseProcess))
     {}
 
     // True: the browser answered a probe at most probeValidityMs ago and the
@@ -37,6 +43,14 @@ namespace flutter_inappwebview_plugin
     // and handed back by takeWaitersIfResponsive on a retry tick.
     bool tryAcquire(const unsigned long pid, const Waiter waiter)
     {
+      // Ownership outlives pending work, including a responsive acquisition.
+      // A view moving to another browser must release its previous process.
+      const auto owner = owners_.find(waiter);
+      if (owner == owners_.end() || owner->second != pid) {
+        releaseOwner(waiter);
+        owners_.emplace(waiter, pid);
+        ++entries_[pid].ownerCount;
+      }
       auto& entry = entries_[pid];
       if (verdict(pid, entry)) {
         return true;
@@ -65,20 +79,69 @@ namespace flutter_inappwebview_plugin
       if (!verdict(pid, entry)) {
         return {};
       }
-      stopRetry(pid);
       std::vector<Waiter> drained;
       drained.swap(entry.waiters);
+      stopRetry(pid);
       return drained;
     }
 
+    // Completing or timing out a request only removes its pending work. The
+    // live view still owns the process cache until releaseOwner is called.
     void removeWaiter(const Waiter waiter)
     {
-      for (auto& [pid, entry] : entries_) {
-        entry.waiters.erase(
-          std::remove(entry.waiters.begin(), entry.waiters.end(), waiter),
-          entry.waiters.end());
+      const auto owner = owners_.find(waiter);
+      if (owner == owners_.end()) {
+        return;
+      }
+      const auto pid = owner->second;
+      auto& entry = entries_.at(pid);
+      entry.waiters.erase(
+        std::remove(entry.waiters.begin(), entry.waiters.end(), waiter),
+        entry.waiters.end());
+      if (entry.waiters.empty()) {
+        stopRetry(pid);
       }
     }
+
+    // Last-view cleanup drops the verdict and any borrowed platform cache.
+    // Remove our ownership before invoking hooks so they see a consistent
+    // registry, and so a reused PID always starts with a fresh probe.
+    void releaseOwner(const Owner owner)
+    {
+      const auto ownerIt = owners_.find(owner);
+      if (ownerIt == owners_.end()) {
+        return;
+      }
+      const auto pid = ownerIt->second;
+      owners_.erase(ownerIt);
+      const auto entryIt = entries_.find(pid);
+      auto& entry = entryIt->second;
+      entry.waiters.erase(
+        std::remove(entry.waiters.begin(), entry.waiters.end(), owner),
+        entry.waiters.end());
+      if (--entry.ownerCount == 0) {
+        const bool cancelRetry = entry.retryScheduled;
+        entries_.erase(entryIt);
+        if (cancelRetry) {
+          cancelRetry_(pid);
+        }
+        if (releaseProcess_) {
+          releaseProcess_(pid);
+        }
+      }
+      else if (entry.waiters.empty()) {
+        stopRetry(pid);
+      }
+    }
+
+    bool owns(const unsigned long pid, const Owner owner) const
+    {
+      const auto it = owners_.find(owner);
+      return it != owners_.end() && it->second == pid;
+    }
+
+    size_t processCount() const { return entries_.size(); }
+    size_t ownerCount() const { return owners_.size(); }
 
     // The browser process exited: its cached verdict no longer means anything.
     void invalidate(const unsigned long pid)
@@ -94,6 +157,7 @@ namespace flutter_inappwebview_plugin
     {
       std::optional<bool> lastVerdict;
       unsigned long long verdictTick = 0;
+      size_t ownerCount = 0;
       std::vector<Waiter> waiters;
       bool retryScheduled = false;
     };
@@ -123,7 +187,9 @@ namespace flutter_inappwebview_plugin
     ScheduleRetryFn scheduleRetry_;
     CancelRetryFn cancelRetry_;
     unsigned long long probeValidityMs_;
+    ReleaseProcessFn releaseProcess_;
     std::map<unsigned long, Entry> entries_;
+    std::map<Owner, unsigned long> owners_;
   };
 }
 

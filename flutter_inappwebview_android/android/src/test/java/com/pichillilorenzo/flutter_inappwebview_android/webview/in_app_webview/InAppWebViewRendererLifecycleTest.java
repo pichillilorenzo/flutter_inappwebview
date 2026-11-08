@@ -225,6 +225,127 @@ public class InAppWebViewRendererLifecycleTest {
   }
 
   @Test
+  public void healthyDisposePreservesAnotherViewsQueuedEvaluation() {
+    InAppWebView closing = newView();
+    InAppWebView surviving = newView();
+    List<String> closingResults = new ArrayList<>();
+    List<String> survivingResults = new ArrayList<>();
+    closing.evaluateJavascript("closingDocument()", null, closingResults::add);
+    surviving.evaluateJavascript("survivingDocument()", null, survivingResults::add);
+
+    closing.dispose();
+    closing.getWebViewClient().onPageFinished(closing, "about:blank");
+    shadowOf(Looper.getMainLooper()).idle();
+
+    assertEquals(Collections.singletonList("null"), closingResults);
+    assertTrue(shadow(closing).scripts.isEmpty());
+    assertEquals(1, shadow(closing).destroyCount);
+    assertEquals(Collections.singletonList("survivingDocument()"), shadow(surviving).scripts);
+    assertEquals(0, shadow(surviving).destroyCount);
+    assertEquals(1, surviving.evaluateJavaScriptContentWorldCallbacks.size());
+    assertTrue(survivingResults.isEmpty());
+    shadow(surviving).getLastEvaluatedJavascriptCallback().onReceiveValue("41");
+    assertEquals(Collections.singletonList("41"), survivingResults);
+    assertEquals(0, surviving.evaluateJavaScriptContentWorldCallbacks.size());
+  }
+
+  @Test
+  public void healthyDisposeIgnoresLateRepliesWithoutCancellingPeerBridgeWork() {
+    InAppWebView closing = newView();
+    InAppWebView surviving = newView();
+    List<String> closingResults = new ArrayList<>();
+    List<String> survivingResults = new ArrayList<>();
+    List<String> survivingAsyncResults = new ArrayList<>();
+    closing.evaluateJavascript("closing()", closingResults::add);
+    ValueCallback<String> closingReply = shadow(closing).getLastEvaluatedJavascriptCallback();
+    surviving.evaluateJavascript("surviving()", survivingResults::add);
+    ValueCallback<String> survivingReply = shadow(surviving).getLastEvaluatedJavascriptCallback();
+    surviving.callAsyncJavaScript("return await pending();", Collections.emptyMap(), null,
+        survivingAsyncResults::add);
+    String asyncId = callbackId(surviving.callAsyncJavaScriptCallbacks);
+
+    closing.dispose();
+    closing.dispose();
+    closingReply.onReceiveValue("late closing reply");
+    shadowOf(Looper.getMainLooper()).idle();
+    assertEquals(Collections.singletonList("null"), closingResults);
+    assertTrue(survivingResults.isEmpty());
+    assertTrue(survivingAsyncResults.isEmpty());
+    assertEquals(1, surviving.callAsyncJavaScriptCallbacks.size());
+    survivingReply.onReceiveValue("42");
+    surviving.callAsyncJavaScriptCallbacks.complete(asyncId, "{\"value\":43}");
+    assertEquals(Collections.singletonList("42"), survivingResults);
+    assertEquals(Collections.singletonList("{\"value\":43}"), survivingAsyncResults);
+    assertEquals(0, surviving.callAsyncJavaScriptCallbacks.size());
+    assertEquals(0, surviving.evaluateJavaScriptContentWorldCallbacks.size());
+    assertEquals(0, shadow(surviving).destroyCount);
+  }
+
+  @Test
+  public void pauseAndResumeChannelCallsTargetOnlyTheirOwnView() {
+    InAppWebView first = newView();
+    InAppWebView second = newView();
+    callLifecycle(first, "pause");
+    assertEquals(1, shadow(first).pauseCount);
+    assertEquals(0, shadow(second).pauseCount);
+    callLifecycle(first, "resume");
+    assertEquals(1, shadow(first).resumeCount);
+    assertEquals(0, shadow(second).resumeCount);
+
+    first.dispose();
+    callLifecycle(second, "pause");
+    callLifecycle(second, "resume");
+    assertEquals(1, shadow(first).pauseCount);
+    assertEquals(1, shadow(first).resumeCount);
+    assertEquals(1, shadow(second).pauseCount);
+    assertEquals(1, shadow(second).resumeCount);
+    assertEquals(0, shadow(second).destroyCount);
+    // pauseTimers/resumeTimers intentionally have process-wide Android semantics.
+    // This checks per-view onPause/onResume routing, not native JS timer progress.
+  }
+
+  @Test
+  public void repeatedPeerCloseCyclesRetainTheSurvivorsPendingReply() {
+    InAppWebView surviving = newView();
+    List<String> survivingResults = new ArrayList<>();
+    surviving.evaluateJavascript("sameDocument()", survivingResults::add);
+    ValueCallback<String> survivingReply = shadow(surviving).getLastEvaluatedJavascriptCallback();
+    for (int cycle = 0; cycle < 25; cycle++) {
+      InAppWebView closing = newView();
+      List<String> closingResults = new ArrayList<>();
+      closing.evaluateJavascript("pending()", null, closingResults::add);
+      closing.dispose();
+      closing.getWebViewClient().onPageFinished(closing, "about:blank");
+      closing.dispose();
+      closing.destroy();
+      shadowOf(Looper.getMainLooper()).idle();
+      assertEquals(Collections.singletonList("null"), closingResults);
+      assertEquals(0, closing.evaluateJavaScriptContentWorldCallbacks.size());
+      assertEquals(0, closing.callAsyncJavaScriptCallbacks.size());
+      assertEquals(1, shadow(closing).destroyCount);
+      assertEquals(1, surviving.evaluateJavaScriptContentWorldCallbacks.size());
+      assertTrue(survivingResults.isEmpty());
+      assertEquals(0, shadow(surviving).destroyCount);
+      assertEquals(Collections.singletonList("sameDocument()"), shadow(surviving).scripts);
+    }
+    survivingReply.onReceiveValue("44");
+    assertEquals(Collections.singletonList("44"), survivingResults);
+    assertEquals(0, surviving.evaluateJavaScriptContentWorldCallbacks.size());
+  }
+
+  private void callLifecycle(InAppWebView view, String method) {
+    AtomicReference<Object> result = new AtomicReference<>();
+    view.channelDelegate.onMethodCall(new MethodCall(method, null), new MethodChannel.Result() {
+      @Override public void success(Object value) { result.set(value); }
+      @Override public void error(String code, String message, Object details) {
+        throw new AssertionError(code + ": " + message);
+      }
+      @Override public void notImplemented() { throw new AssertionError("missing " + method); }
+    });
+    assertEquals(true, result.get());
+  }
+
+  @Test
   public void navigationCancelsScheduledEvaluationButAllowsNewDocumentWork() {
     InAppWebView view = newView();
     List<String> oldResults = new ArrayList<>();
@@ -448,10 +569,16 @@ public class InAppWebViewRendererLifecycleTest {
   public static class CountingShadowWebView extends ShadowWebView {
     final List<String> scripts = new ArrayList<>();
     int destroyCount;
+    int pauseCount;
+    int resumeCount;
     int settingsReads;
     Looper destroyLooper;
     @Implementation(minSdk = 28)
     public Looper getWebViewLooper() { return Looper.getMainLooper(); }
+    @Implementation
+    protected void onPause() { pauseCount++; }
+    @Implementation
+    protected void onResume() { resumeCount++; }
     @Implementation
     @Override protected WebSettings getSettings() {
       settingsReads++;

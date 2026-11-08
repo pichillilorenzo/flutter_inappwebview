@@ -73,6 +73,20 @@ class OwnershipSourceTests(unittest.TestCase):
                     self.assertIn(production, generated)
                 self.assertIn(ownership.STATELESS_SELECTION, generated)
 
+    def test_extended_lifecycles_are_executed_for_both_platforms(self):
+        for platform in ['ios', 'macos']:
+            with self.subTest(platform=platform):
+                generated = ownership.build_source(platform)
+                main = extract_swift_block(generated, '    @MainActor static func main()')
+                for name in [
+                    'pendingRepliesSurviveSiblingClose',
+                    'independentControllersReleaseIndependently',
+                    'repeatedPopupClosePreservesLiveOwner',
+                ]:
+                    self.assertIn(name + '()', main)
+                    self.assertIn(extract_swift_block(ownership.additional_lifecycle_tests,
+                                                     '@MainActor func ' + name + '()'), generated)
+
     def test_retention_control_changes_only_actual_handler_selection(self):
         for platform in ['ios', 'macos']:
             with self.subTest(platform=platform):

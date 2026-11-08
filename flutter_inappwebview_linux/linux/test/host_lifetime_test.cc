@@ -153,7 +153,8 @@ struct InAppWebView {
   void HideAllPopups() { HideColorPicker(); }
   void HideFileChooser(bool force = false);
   void CancelHostBoundPopups();
-  void UpdateMonitorRefreshRate() {}
+  unsigned monitor_updates = 0;
+  void UpdateMonitorRefreshRate() { ++monitor_updates; }
   void SetHostView(GtkWindow*, FlView*);
   void ConnectHostWindowDestroyHandler();
   void DisconnectHostWindowDestroyHandler();
@@ -182,6 +183,69 @@ void ShowNativeFileChooser(InAppWebView*, WebKitFileChooserRequest*, bool,
 #include "plugin_instance_under_test.inc"
 #include "host_under_test.inc"
 #include "chooser_under_test.inc"
+
+void CheckSharedHostSignalsAndIndependentReplies() {
+  GtkWindow shared_window, replacement_window;
+  FlView shared_view, replacement_view;
+  auto first = std::make_unique<InAppWebView>();
+  auto second = std::make_unique<InAppWebView>();
+  first->SetHostView(&shared_window, &shared_view);
+  second->SetHostView(&shared_window, &shared_view);
+  first->channel_delegate_ = std::make_unique<Delegate>();
+  second->channel_delegate_ = std::make_unique<Delegate>();
+  const auto peer_destroy_handler = second->host_destroy_handler_id_;
+  const auto peer_view_handler = second->host_view_destroy_handler_id_;
+  const auto peer_configure_handler = second->configure_event_handler_id_;
+  assert(peer_destroy_handler && peer_view_handler && peer_configure_handler);
+
+  WebKitFileChooserRequest first_request, peer_request;
+  InAppWebView::OnRunFileChooser(nullptr, &first_request, first.get());
+  InAppWebView::OnRunFileChooser(nullptr, &peer_request, second.get());
+  auto late_reply = first->channel_delegate_->reply;
+  assert(first_request.refs == 2 && peer_request.refs == 2);
+
+  // Detaching one borrower must disconnect only its own host handlers. The
+  // production methods below are also used by native host teardown/rehosting.
+  first->SetHostView(nullptr, nullptr);
+  first->DisconnectHostWindowDestroyHandler();
+  first->DisconnectHostViewDestroyHandler();  // Repeated detach is harmless.
+  first.reset();
+  assert(second->gtk_window_ == &shared_window && second->fl_view_ == &shared_view);
+  assert(second->host_destroy_handler_id_ == peer_destroy_handler);
+  assert(second->host_view_destroy_handler_id_ == peer_view_handler);
+  assert(second->configure_event_handler_id_ == peer_configure_handler);
+  for (const auto& signal : shared_window.signals) assert(signal.data == second.get());
+  assert(shared_view.signals.size() == 1 && shared_view.signals.front().data == second.get());
+
+  const auto updates = second->monitor_updates;
+  for (const auto& signal : shared_window.signals) {
+    if (signal.name == "configure-event") {
+      reinterpret_cast<gboolean (*)(GtkWidget*, GdkEventConfigure*, gpointer)>(signal.callback)(
+          &shared_window, nullptr, signal.data);
+    }
+  }
+  assert(second->monitor_updates == updates + 1);
+  late_reply({true, std::vector<std::string>{"/closed-owner.txt"}});
+  assert(first_request.cancels == 1 && first_request.selections == 0 && first_request.refs == 1);
+  second->channel_delegate_->reply({true, std::vector<std::string>{"/surviving-owner.txt"}});
+  assert(peer_request.cancels == 0 && peer_request.selections == 1 && peer_request.refs == 1);
+
+  // The remaining borrower's signal must still run on real host invalidation,
+  // and that view can subsequently attach and service work on another host.
+  emit_destroy(&shared_window);
+  assert(second->gtk_window_ == nullptr && second->fl_view_ == nullptr);
+  assert(shared_window.signals.empty() && shared_view.signals.empty());
+  second->SetHostView(&replacement_window, &replacement_view);
+  WebKitFileChooserRequest replacement_request;
+  InAppWebView::OnRunFileChooser(nullptr, &replacement_request, second.get());
+  const auto dialogs = native_file_chooser_count;
+  second->channel_delegate_->reply({false, std::nullopt});
+  assert(native_file_chooser_count == dialogs + 1 && observed_file_parent == &replacement_window);
+  assert(replacement_request.cancels == 0 && replacement_request.refs == 1);
+  second->SetHostView(nullptr, nullptr);
+  assert(replacement_window.signals.empty() && replacement_view.signals.empty());
+  assert(destroyed_accesses == 0);
+}
 
 int main() {
   FlPluginRegistrar registrar;
@@ -275,5 +339,6 @@ int main() {
   assert(main_window.signals.empty());
   assert(main_view.signals.empty());
   assert(destroyed_accesses == 0);
-  std::cout << "Compiled Linux native host lifetime and chooser tests passed\n";
+  CheckSharedHostSignalsAndIndependentReplies();
+  std::cout << "Compiled Linux native host lifetime, chooser and two-view isolation tests passed\n";
 }

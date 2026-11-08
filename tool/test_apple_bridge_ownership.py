@@ -4,6 +4,9 @@
 Uses small WebKit doubles to make ownership/retention observable. The current
 stateless adapters and weak-owner registries are compiled from their real files.
 Each close phase drains a local autorelease pool before checking weak references.
+Additional cases keep sibling replies pending across either closing order, reject
+late completion after disposal, isolate independent controllers, and close 1,000
+opted-in popups while a sibling retains the shared scripts and one-way route.
 The current-source run also requires an intentionally retaining handler to fail
 that same check. --emit-source writes these inputs without compiling/running them.
 --source-ref selects older native source, and --expect-regression requires that
@@ -183,8 +186,146 @@ tests = r'''
             }
         }
         require(completedCases == 8, "ownership matrix did not complete all eight cases")
+        // ADDITIONAL_LIFECYCLES
         print("production ownership: eight cases, both close orders, four opt-in combinations, weak parent/popup after pool drain, bootstrap, RPC/one-way routes and final cleanup passed")
     }
+}
+'''
+
+
+additional_lifecycle_tests = r'''
+// Compile the real release method together with the real per-view reply
+// registry: closing one owner must cancel only its outstanding native replies.
+@MainActor func pendingRepliesSurviveSiblingClose() {
+    for parentFirst in [true, false] {
+        let controller = WKUserContentController()
+        var parent: InAppWebView?
+        var popup: InAppWebView?
+        weak var weakParent: InAppWebView?
+        weak var weakPopup: InAppWebView?
+        var closedCalls = 0
+        var closedError: String?
+        var survivingCalls = 0
+        var survivingValue: String?
+        let closedReply = JavaScriptBridgeReply { _, error in
+            closedCalls += 1
+            closedError = error
+        }
+        let survivingReply = JavaScriptBridgeReply { value, error in
+            require(error == nil, "sibling disposal canceled the surviving reply")
+            survivingCalls += 1
+            survivingValue = value as? String
+        }
+        autoreleasepool {
+            parent = InAppWebView(controller, windowId: nil, enabled: true)
+            popup = InAppWebView(controller, windowId: 7, enabled: true)
+            weakParent = parent
+            weakPopup = popup
+            controller.install(parent!)
+            let closing = parentFirst ? parent! : popup!
+            let surviving = parentFirst ? popup! : parent!
+            closing.javaScriptBridgeReplies.track(closedReply, documentId: "same-document-id")
+            surviving.javaScriptBridgeReplies.track(survivingReply, documentId: "same-document-id")
+            closing.releaseJavaScriptBridgeOwner()
+            closing.releaseJavaScriptBridgeOwner()
+            require(closedCalls == 1 && closedError != nil,
+                    "closed owner's reply did not terminate exactly once")
+            require(closing.javaScriptBridgeReplies.count == 0,
+                    "closed owner retained a canceled reply")
+            require(survivingCalls == 0 && surviving.javaScriptBridgeReplies.count == 1,
+                    "shared controller cleanup touched a sibling's pending reply")
+            closedReply.succeed("late-success")
+            closedReply.fail("late-error")
+            require(closedCalls == 1, "late completion settled a disposed owner's reply twice")
+            if parentFirst { parent = nil } else { popup = nil }
+        }
+        require(parentFirst ? weakParent == nil : weakPopup == nil,
+                "pending reply retained the disposed owner after pool drain")
+        autoreleasepool {
+            let surviving = parentFirst ? popup! : parent!
+            require(controller.oneWay["callHandler"] != nil && !controller.replies.isEmpty,
+                    "pending survivor lost its shared handlers")
+            survivingReply.succeed("42")
+            require(survivingCalls == 1 && survivingValue == "42" &&
+                    surviving.javaScriptBridgeReplies.count == 0,
+                    "survivor's already-pending reply could not finish normally")
+            surviving.releaseJavaScriptBridgeOwner()
+            surviving.releaseJavaScriptBridgeOwner()
+            survivingReply.fail("late-after-final-close")
+            require(survivingCalls == 1, "final disposal repeated an already completed reply")
+            if parentFirst { popup = nil } else { parent = nil }
+        }
+        require(weakParent == nil && weakPopup == nil,
+                "reply cleanup retained a shared-controller owner")
+        require(controller.oneWay.isEmpty && controller.replies.isEmpty &&
+                controller.scripts.isEmpty && controller.completeDisposals == 1,
+                "pending-reply scenario did not release the last owner's resources once")
+    }
+}
+
+@MainActor func independentControllersReleaseIndependently() {
+    let firstController = WKUserContentController()
+    let secondController = WKUserContentController()
+    autoreleasepool {
+        let first = InAppWebView(firstController, windowId: nil, enabled: true)
+        let second = InAppWebView(secondController, windowId: nil, enabled: true)
+        firstController.install(first)
+        secondController.install(second)
+        first.releaseJavaScriptBridgeOwner()
+        require(firstController.oneWay.isEmpty && firstController.replies.isEmpty &&
+                firstController.scripts.isEmpty && firstController.completeDisposals == 1,
+                "independent controller did not release its final owner")
+        require(secondController.oneWay["callHandler"] != nil &&
+                !secondController.replies.isEmpty && secondController.scripts.count == 3 &&
+                secondController.completeDisposals == 0,
+                "last-owner cleanup leaked across independent controllers")
+        secondController.oneWay["callHandler"]!.userContentController(
+            secondController, didReceive: WKScriptMessage(second, "independent-survivor"))
+        require(second.events == ["independent-survivor"],
+                "independent survivor stopped routing messages")
+        second.releaseJavaScriptBridgeOwner()
+        require(secondController.completeDisposals == 1 && secondController.oneWay.isEmpty &&
+                secondController.replies.isEmpty && secondController.scripts.isEmpty,
+                "second independent controller retained resources")
+    }
+}
+
+@MainActor func repeatedPopupClosePreservesLiveOwner() {
+    let controller = WKUserContentController()
+    var anchor: InAppWebView?
+    weak var weakAnchor: InAppWebView?
+    autoreleasepool {
+        anchor = InAppWebView(controller, windowId: nil, enabled: false)
+        weakAnchor = anchor
+        controller.install(anchor!)
+    }
+    for cycle in 0..<1000 {
+        weak var weakPopup: InAppWebView?
+        autoreleasepool {
+            let popup = InAppWebView(controller, windowId: Int64(cycle), enabled: true)
+            weakPopup = popup
+            require(!controller.replies.isEmpty, "new opted-in popup did not restore reply registration")
+            popup.releaseJavaScriptBridgeOwner()
+            popup.releaseJavaScriptBridgeOwner()
+        }
+        require(weakPopup == nil, "repeated close retained a popup after pool drain")
+        require(controller.replies.isEmpty && controller.oneWay["callHandler"] != nil &&
+                controller.scripts.count == 3 && controller.completeDisposals == 0,
+                "repeated popup close removed a live sibling's shared resources")
+        require(controller.releasedWindows.count == cycle + 1,
+                "repeated popup cleanup was skipped or duplicated")
+    }
+    autoreleasepool {
+        controller.oneWay["callHandler"]!.userContentController(
+            controller, didReceive: WKScriptMessage(anchor!, "after-1000-closes"))
+        require(anchor!.events == ["after-1000-closes"], "live owner lost routing after repeated popup closes")
+        anchor!.releaseJavaScriptBridgeOwner()
+        anchor!.releaseJavaScriptBridgeOwner()
+        anchor = nil
+    }
+    require(weakAnchor == nil && controller.oneWay.isEmpty && controller.replies.isEmpty &&
+            controller.scripts.isEmpty && controller.completeDisposals == 1,
+            "repeated popup scenario retained the last owner's resources")
 }
 '''
 
@@ -221,6 +362,13 @@ def build_source(platform, source_ref=None):
         cleanup = method(native, '    func releaseJavaScriptBridgeOwner()')
         current_tests = tests.replace('// REPLY_SURVIVES_POPUP', 'require(controller.replies.isEmpty == !enabled[1], "popup reply opt-in leaked or was removed")')
         current_tests = current_tests.replace('// REPLY_SURVIVES_PARENT', 'require(controller.replies.isEmpty == !enabled[0], "parent reply opt-in leaked or was removed")')
+        current_tests = current_tests.replace('// ADDITIONAL_LIFECYCLES', '''
+        pendingRepliesSurviveSiblingClose()
+        independentControllersReleaseIndependently()
+        repeatedPopupClosePreservesLiveOwner()
+        print("production ownership: pending replies and late completions, independent controllers and 1,000 shared-controller popup close cycles passed")
+''')
+        current_tests += '\n' + additional_lifecycle_tests
         # The actual constructor must register unprepared/pending popups too.
         assert 'self.configuration.userContentController.registerJavaScriptBridgeOwner(self)' in native
         assert 'windowWebView?.releaseJavaScriptBridgeOwner()' in native

@@ -1,0 +1,17 @@
+name: Windows JavaScript callback lifecycle
+on:
+  pull_request:
+    paths:
+      - 'flutter_inappwebview_windows/**'
+      - '.github/workflows/windows-javascript-lifecycle.yaml'
+  workflow_dispatch:
+jobs:
+  callback-regression:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run pending JavaScript request regression with ASan and UBSan
+        run: |
+          g++ -std=c++17 -Wall -Wextra -Werror -fsanitize=address,undefined -fno-omit-frame-pointer \
+            flutter_inappwebview_windows/windows/test/pending_script_requests_test.cpp -o /tmp/pending_script_requests_test
+          ASAN_OPTIONS=detect_leaks=1 /tmp/pending_script_requests_test

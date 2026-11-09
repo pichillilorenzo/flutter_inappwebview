@@ -70,6 +70,7 @@
 #include "../find_interaction/find_interaction_controller.h"
 #include "in_app_webview_settings.h"
 #include "javascript_origin_policy.h"
+#include "pending_webkit_javascript_calls.h"
 #include "webview_creation_error.h"
 
 // Forward declaration of WPE types in global scope to avoid namespace conflicts
@@ -664,6 +665,9 @@ class InAppWebView : public TextureWebViewApi {
 
   // Disposing flag to prevent callbacks during destruction
   std::atomic<bool> is_disposing_{false};
+  // Per-instance: no sibling WebView is cancelled when this instance exits.
+  std::shared_ptr<PendingWebKitJavaScriptCalls> pending_java_script_calls_ =
+      std::make_shared<PendingWebKitJavaScriptCalls>();
 
   // Mouse state
   double cursor_x_ = 0;

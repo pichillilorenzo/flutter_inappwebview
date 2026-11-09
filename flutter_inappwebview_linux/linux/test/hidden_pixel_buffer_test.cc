@@ -1,5 +1,6 @@
 #include "pixel_buffer_test_support.h"
 #include "../in_app_webview/dma_buf_import_policy.h"
+#include "../in_app_webview/pending_webkit_javascript_calls.h"
 
 #include <chrono>
 #include <condition_variable>
@@ -188,6 +189,8 @@ class InAppWebView {
   std::atomic<bool> skip_pixel_readback_{false};
   std::atomic<bool> inline_flutter_texture_consumer_{false};
   std::atomic<bool> is_disposing_{false};
+  std::shared_ptr<PendingWebKitJavaScriptCalls> pending_java_script_calls_ =
+      std::make_shared<PendingWebKitJavaScriptCalls>();
   // Production teardown also clears console subscriptions in combined builds.
   bool has_console_message_listener_ = false;
   bool is_visible_ = true;

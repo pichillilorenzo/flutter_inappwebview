@@ -9,6 +9,7 @@
 #include "../plugin_scripts_js/javascript_bridge_js.h"
 #include "../plugin_scripts_js/plugin_scripts_util.h"
 #include "../types/content_world.h"
+#include "content_world_execution_contexts.h"
 #include "../types/plugin_script.h"
 #include "../types/user_script.h"
 
@@ -50,7 +51,7 @@ namespace flutter_inappwebview_plugin
     InAppWebView* webView_;
 
     // used to track Content World names -> Execution Context ID
-    std::map<std::string, int> contentWorlds_;
+    ContentWorldExecutionContexts contentWorlds_;
     // used only to track plugin script to inject inside new Content Worlds
     std::map<std::string, std::vector<std::shared_ptr<PluginScript>>> pluginScriptsInContentWorlds_;
 

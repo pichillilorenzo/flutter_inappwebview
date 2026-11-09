@@ -331,13 +331,20 @@ namespace flutter_inappwebview_plugin
         {"worldName", worldName}
       };
       auto hr = webView_->webView->CallDevToolsProtocolMethod(L"Page.createIsolatedWorld", utf8_to_wide(parameters.dump()).c_str(), Callback<ICoreWebView2CallDevToolsProtocolMethodCompletedHandler>(
-        [this, completionHandler, worldName](HRESULT errorCode, LPCWSTR returnObjectAsJson)
+        [this, alive = webView_->aliveToken(), completionHandler, worldName](HRESULT errorCode, LPCWSTR returnObjectAsJson)
         {
-          if (succeededOrLog(errorCode) && completionHandler) {
-            auto id = nlohmann::json::parse(wide_to_utf8(returnObjectAsJson))["executionContextId"].get<int>();
-            addPluginScriptsIfRequired(std::make_shared<ContentWorld>(worldName));
-            completionHandler(id);
+          // WebView2 may reply after the owning view and this controller were freed.
+          if (alive.expired()) return S_OK;
+          int contextId = -1;
+          if (succeededOrLog(errorCode) && returnObjectAsJson) {
+            const auto response = nlohmann::json::parse(wide_to_utf8(returnObjectAsJson), nullptr, false);
+            if (response.is_object() && response.contains("executionContextId") &&
+                response["executionContextId"].is_number_integer()) {
+              contextId = response["executionContextId"].get<int>();
+              addPluginScriptsIfRequired(std::make_shared<ContentWorld>(worldName));
+            }
           }
+          if (completionHandler) completionHandler(contextId);
           return S_OK;
         }
       ).Get());

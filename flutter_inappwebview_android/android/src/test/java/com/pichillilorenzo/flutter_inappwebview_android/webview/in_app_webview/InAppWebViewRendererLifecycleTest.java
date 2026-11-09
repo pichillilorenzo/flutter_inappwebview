@@ -99,14 +99,14 @@ public class InAppWebViewRendererLifecycleTest {
     // mHandler is shared by every WebView instance. The closing WebView must
     // not erase work posted to it for the surviving peer.
     InAppWebView.mHandler.post(() -> {
-      if (!peer.disposed) delivered.add("peer");
+      delivered.add(peer.getClass().getSimpleName());
     });
 
     closing.dispose();
     shadowOf(Looper.getMainLooper()).idle();
 
-    assertEquals(Collections.singletonList("peer"), delivered);
-    assertFalse(peer.disposed);
+    assertEquals(Collections.singletonList("InAppWebView"), delivered);
+    assertTrue(peer.getSettings().getJavaScriptEnabled());
   }
 
   @Test

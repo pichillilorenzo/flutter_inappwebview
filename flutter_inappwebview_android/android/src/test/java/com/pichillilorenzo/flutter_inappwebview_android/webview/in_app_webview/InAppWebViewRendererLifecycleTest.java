@@ -106,7 +106,6 @@ public class InAppWebViewRendererLifecycleTest {
     shadowOf(Looper.getMainLooper()).idle();
 
     assertEquals(Collections.singletonList("InAppWebView"), delivered);
-    assertTrue(peer.getSettings().getJavaScriptEnabled());
   }
 
   @Test

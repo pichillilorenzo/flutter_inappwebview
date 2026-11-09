@@ -1,0 +1,19 @@
+name: Web listener lifecycle regression
+on:
+  pull_request:
+    paths:
+      - 'flutter_inappwebview_web/**'
+      - '.github/workflows/web-listener-lifecycle.yaml'
+  workflow_dispatch:
+jobs:
+  listener-lifecycle:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate bundle syntax and run listener teardown regressions
+        run: |
+          node --check flutter_inappwebview_web/lib/assets/web/web_support.js
+          node --test flutter_inappwebview_web/test/web_support_lifecycle_test.cjs

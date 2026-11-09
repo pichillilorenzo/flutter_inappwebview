@@ -16,12 +16,24 @@
         functionMap: {},
         settings: {},
         javaScriptBridgeEnabled: true,
+        listenerAbortController: new AbortController(),
+        dispose: function() {
+          // Otherwise the document listener retains this WebView and its iframe
+          // even after Dart removes the tab from the DOM.
+          webView.listenerAbortController.abort();
+          webView.iframe = null;
+          webView.iframeContainer = null;
+          webView.functionMap = {};
+        },
         disableContextMenuHandler: function(event) {
           event.preventDefault();
           event.stopPropagation();
           return false;
         },
         prepare: function(settings) {
+          // A re-prepare must not register another document or iframe listener.
+          webView.listenerAbortController.abort();
+          webView.listenerAbortController = new AbortController();
           webView.settings = settings;
           webView.javaScriptBridgeEnabled = webView.settings.javaScriptBridgeEnabled ?? true;
           const javaScriptBridgeOriginAllowList = webView.settings.javaScriptBridgeOriginAllowList;
@@ -40,7 +52,7 @@
             } else {
               webView.isFullscreen = false;
             }
-          });
+          }, { signal: webView.listenerAbortController.signal });
           if (iframe != null) {
             webView.iframe = iframe;
             webView.iframeContainer = iframeContainer;
@@ -290,7 +302,7 @@
               } catch (e) {
                 console.log(e);
               }
-            });
+            }, { signal: webView.listenerAbortController.signal });
           }
         },
         setSettings: function(newSettings) {

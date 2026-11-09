@@ -370,6 +370,7 @@ InAppWebView::~InAppWebView() {
   has_console_message_listener_ = false;
   debugLog("dealloc InAppWebView");
   is_disposing_.store(true);
+  pending_java_script_calls_->cancelAll();
   CancelHiddenPixelBufferTrim();
   CancelHostBoundPopups();
   lifetime_token_.reset();
@@ -2112,175 +2113,159 @@ HitTestResult InAppWebView::getHitTestResult() const {
 }
 
 // === JavaScript ===
-
+// WebKit runs these GAsync callbacks on the UI main context. The registry
+// resolves Dart on dispose, process loss or document replacement, while
+// GCancellable releases WebKit work that no longer has a consumer.
 void InAppWebView::evaluateJavascript(
     const std::string& source,
     const std::optional<std::string>& worldName,
     std::function<void(const std::optional<std::string>&)> callback) {
-  if (webview_ == nullptr) {
-    if (callback)
-      callback(std::nullopt);
+  if (!webview_) {
+    if (callback) callback(std::nullopt);
     return;
   }
 
+  using EvalCallback = std::function<void(const std::optional<std::string>&)>;
   struct CallbackData {
-    std::function<void(const std::optional<std::string>&)> callback;
+    std::shared_ptr<PendingWebKitJavaScriptCalls> requests;
+    uint64_t id;
+    EvalCallback callback;
+    std::shared_ptr<GCancellable> cancellable;
   };
 
-  auto* cb_data = new CallbackData{std::move(callback)};
-
-  const char* world = worldName.has_value() ? worldName->c_str() : nullptr;
+  const auto requests = pending_java_script_calls_;
+  auto cancellable = std::shared_ptr<GCancellable>(g_cancellable_new(),
+      [](GCancellable* value) { g_object_unref(value); });
+  const auto requestId = requests->add([cancellable, callback]() {
+    g_cancellable_cancel(cancellable.get());
+    if (callback) callback(std::nullopt);
+  });
+  auto* data = new CallbackData{requests, requestId, std::move(callback), cancellable};
+  const char* world = worldName ? worldName->c_str() : nullptr;
 
   webkit_web_view_evaluate_javascript(
-      webview_, source.c_str(), source.length(),
-      world,    // world name (for content world support)
-      nullptr,  // source URI
-      nullptr,  // cancellable
+      webview_, source.c_str(), source.length(), world, nullptr,
+      cancellable.get(),
       [](GObject* source, GAsyncResult* result, gpointer user_data) {
-        auto* data = static_cast<CallbackData*>(user_data);
+        std::unique_ptr<CallbackData> data(static_cast<CallbackData*>(user_data));
         GError* error = nullptr;
-        JSCValue* js_result =
-            webkit_web_view_evaluate_javascript_finish(WEBKIT_WEB_VIEW(source), result, &error);
+        JSCValue* jsResult = webkit_web_view_evaluate_javascript_finish(
+            WEBKIT_WEB_VIEW(source), result, &error);
 
-        if (error != nullptr) {
-          if (data->callback)
-            data->callback(std::nullopt);
-          g_error_free(error);
-        } else if (js_result != nullptr) {
-          // Use JSON.stringify on the result via JSC to get proper JSON
-          JSCContext* context = jsc_value_get_context(js_result);
-          g_autoptr(JSCValue) json_stringify = jsc_context_evaluate(
-              context,
-              "(function(v) { return JSON.stringify(v); })",
-              -1);
-          g_autoptr(JSCValue) json_value = jsc_value_function_call(
-              json_stringify, JSC_TYPE_VALUE, js_result, G_TYPE_NONE);
-          
-          if (json_value != nullptr && jsc_value_is_string(json_value)) {
-            g_autofree gchar* str = jsc_value_to_string(json_value);
-            if (data->callback) {
-              if (str) {
-                data->callback(std::string(str));
-              } else {
-                data->callback(std::nullopt);
-              }
-            }
-          } else {
-            if (data->callback)
-              data->callback(std::nullopt);
-          }
-          g_object_unref(js_result);
-        } else {
-          if (data->callback)
-            data->callback(std::nullopt);
+        // Late replies, including after rehosting, cannot resolve a second time.
+        if (!data->requests->finish(data->id)) {
+          if (error) g_error_free(error);
+          if (jsResult) g_object_unref(jsResult);
+          return;
         }
 
-        delete data;
+        std::optional<std::string> value;
+        if (!error && jsResult) {
+          JSCContext* context = jsc_value_get_context(jsResult);
+          g_autoptr(JSCValue) stringify = jsc_context_evaluate(
+              context, "(function(v) { return JSON.stringify(v); })", -1);
+          g_autoptr(JSCValue) serialized = stringify
+              ? jsc_value_function_call(stringify, JSC_TYPE_VALUE, jsResult, G_TYPE_NONE)
+              : nullptr;
+          if (serialized && jsc_value_is_string(serialized)) {
+            g_autofree gchar* utf8 = jsc_value_to_string(serialized);
+            if (utf8) value = std::string(utf8);
+          }
+        }
+        if (error) g_error_free(error);
+        if (jsResult) g_object_unref(jsResult);
+        if (data->callback) data->callback(value);
       },
-      cb_data);
+      data);
 }
 
-// Helper function to convert FlValue to GVariant
 void InAppWebView::callAsyncJavaScript(
     const std::string& functionBody,
     const std::string& argumentsJson,
     const std::vector<std::string>& argumentKeys,
     const std::optional<std::string>& worldName,
     std::function<void(const std::string&)> callback) {
-  if (webview_ == nullptr) {
-    if (callback) {
-      callback(R"({"value":null,"error":"WebView not available"})");
-    }
+  const std::string cancelled =
+      R"({"value":null,"error":"WebView JavaScript request cancelled"})";
+  if (!webview_) {
+    if (callback) callback(cancelled);
     return;
   }
 
-  // Build the wrapped function body that:
-  // 1. Parses the JSON-encoded arguments
-  // 2. Destructures them into local variables
-  // 3. Executes the user's function body
   std::string wrappedBody;
-  
   if (!argumentKeys.empty()) {
-    // Build destructuring: const {key1, key2, ...} = JSON.parse(__args__);
     wrappedBody = "const {";
-    for (size_t i = 0; i < argumentKeys.size(); i++) {
-      if (i > 0) wrappedBody += ", ";
+    for (size_t i = 0; i < argumentKeys.size(); ++i) {
+      if (i) wrappedBody += ", ";
       wrappedBody += argumentKeys[i];
     }
     wrappedBody += "} = JSON.parse(__args__);\n";
   }
   wrappedBody += functionBody;
 
-  // Pass the JSON string as a single __args__ argument
   GVariantBuilder builder;
   g_variant_builder_init(&builder, G_VARIANT_TYPE("a{sv}"));
-  g_variant_builder_add(&builder, "{sv}", "__args__", g_variant_new_string(argumentsJson.c_str()));
-  GVariant* gvariant_args = g_variant_builder_end(&builder);
+  g_variant_builder_add(&builder, "{sv}", "__args__",
+                        g_variant_new_string(argumentsJson.c_str()));
+  GVariant* args = g_variant_ref_sink(g_variant_builder_end(&builder));
 
-  const char* world = worldName.has_value() ? worldName->c_str() : nullptr;
-
+  using AsyncCallback = std::function<void(const std::string&)>;
   struct CallbackData {
-    std::function<void(const std::string&)> callback;
+    std::shared_ptr<PendingWebKitJavaScriptCalls> requests;
+    uint64_t id;
+    AsyncCallback callback;
+    std::shared_ptr<GCancellable> cancellable;
   };
-  auto* cb_data = new CallbackData{std::move(callback)};
+  const auto requests = pending_java_script_calls_;
+  auto cancellable = std::shared_ptr<GCancellable>(g_cancellable_new(),
+      [](GCancellable* value) { g_object_unref(value); });
+  const auto requestId = requests->add([cancellable, callback, cancelled]() {
+    g_cancellable_cancel(cancellable.get());
+    if (callback) callback(cancelled);
+  });
+  auto* data = new CallbackData{requests, requestId, std::move(callback), cancellable};
+  const char* world = worldName ? worldName->c_str() : nullptr;
 
   webkit_web_view_call_async_javascript_function(
-      webview_, wrappedBody.c_str(), -1,  // length: null-terminated
-      gvariant_args, world,
-      nullptr,  // source_uri
-      nullptr,  // cancellable
+      webview_, wrappedBody.c_str(), -1, args, world, nullptr,
+      cancellable.get(),
       [](GObject* source, GAsyncResult* result, gpointer user_data) {
-        auto* data = static_cast<CallbackData*>(user_data);
+        std::unique_ptr<CallbackData> data(static_cast<CallbackData*>(user_data));
         GError* error = nullptr;
-        JSCValue* js_result = webkit_web_view_call_async_javascript_function_finish(
+        JSCValue* jsResult = webkit_web_view_call_async_javascript_function_finish(
             WEBKIT_WEB_VIEW(source), result, &error);
 
-        std::string json_result;
-
-        if (error != nullptr) {
-          // Escape the error message for JSON
-          std::string error_msg = error->message ? error->message : "Unknown error";
-          // Simple JSON escaping for the error message
-          std::string escaped_error;
-          for (char c : error_msg) {
-            switch (c) {
-              case '"': escaped_error += "\\\""; break;
-              case '\\': escaped_error += "\\\\"; break;
-              case '\n': escaped_error += "\\n"; break;
-              case '\r': escaped_error += "\\r"; break;
-              case '\t': escaped_error += "\\t"; break;
-              default: escaped_error += c; break;
-            }
-          }
-          json_result = "{\"value\":null,\"error\":\"" + escaped_error + "\"}";
-          g_error_free(error);
-        } else if (js_result != nullptr) {
-          // Use JSON.stringify on the result via JSC to get proper JSON
-          JSCContext* context = jsc_value_get_context(js_result);
-          g_autoptr(JSCValue) json_stringify = jsc_context_evaluate(
-              context,
-              "(function(v) { return JSON.stringify({value: v, error: null}); })",
-              -1);
-          g_autoptr(JSCValue) json_value = jsc_value_function_call(
-              json_stringify, JSC_TYPE_VALUE, js_result, G_TYPE_NONE);
-          
-          if (json_value != nullptr && jsc_value_is_string(json_value)) {
-            g_autofree gchar* str = jsc_value_to_string(json_value);
-            json_result = str ? str : "{\"value\":null,\"error\":null}";
-          } else {
-            json_result = "{\"value\":null,\"error\":null}";
-          }
-          g_object_unref(js_result);
-        } else {
-          json_result = "{\"value\":null,\"error\":null}";
+        if (!data->requests->finish(data->id)) {
+          if (error) g_error_free(error);
+          if (jsResult) g_object_unref(jsResult);
+          return;
         }
 
-        if (data->callback) {
-          data->callback(json_result);
+        std::string json = R"({"value":null,"error":null})";
+        if (error) {
+          // JSON serialization also escapes control bytes in GLib errors.
+          const auto message = error->message ? error->message : "Unknown error";
+          json = nlohmann::json{{"value", nullptr}, {"error", message}}.dump();
+        } else if (jsResult) {
+          JSCContext* context = jsc_value_get_context(jsResult);
+          g_autoptr(JSCValue) stringify = jsc_context_evaluate(
+              context, "(function(v) { return JSON.stringify({value: v, error: null}); })", -1);
+          g_autoptr(JSCValue) serialized = stringify
+              ? jsc_value_function_call(stringify, JSC_TYPE_VALUE, jsResult, G_TYPE_NONE)
+              : nullptr;
+          if (serialized && jsc_value_is_string(serialized)) {
+            g_autofree gchar* utf8 = jsc_value_to_string(serialized);
+            if (utf8) json = utf8;
+          }
         }
-        delete data;
+        if (error) g_error_free(error);
+        if (jsResult) g_object_unref(jsResult);
+        if (data->callback) data->callback(json);
       },
-      cb_data);
+      data);
+  // WebKit parses arguments synchronously; the floating builder result is
+  // caller-owned, and must not accumulate for repeated plugin calls.
+  g_variant_unref(args);
 }
 
 void InAppWebView::injectJavascriptFileFromUrl(const std::string& urlFile) {
@@ -4332,6 +4317,8 @@ void InAppWebView::OnLoadChanged(WebKitWebView* web_view, WebKitLoadEvent load_e
       // Redirects are handled internally by WebKit
       break;
     case WEBKIT_LOAD_COMMITTED:
+      // Only committed replacement documents cancel; same-document navigation does not.
+      self->pending_java_script_calls_->cancelAll();
       // Each navigation starts with the shared, neutral console bootstrap.
       // Push this view's policy without rewriting a sibling's future scripts.
       self->updateConsoleMessagePolicy();
@@ -7263,6 +7250,7 @@ void InAppWebView::OnWebProcessTerminated(WebKitWebView* web_view,
 
   g_warning("InAppWebView[%ld]: WebProcess terminated (reason=%s, didCrash=%s)",
             self->id_, reason_str, didCrash ? "true" : "false");
+  self->pending_java_script_calls_->cancelAll();
 
 #ifdef HAVE_WPE_BACKEND_LEGACY
   // IMPORTANT: When WebProcess crashes (especially from "Failed to bind wl_compositor"),

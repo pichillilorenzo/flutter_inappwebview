@@ -1,0 +1,14 @@
+name: ios pending legacy JavaScript lifecycle
+on:
+  pull_request:
+    paths:
+      - 'flutter_inappwebview_ios/**'
+      - '.github/workflows/ios-pending-legacy-javascript.yaml'
+  workflow_dispatch:
+jobs:
+  swift-callback-regression:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile callback state tests and parse platform source
+        run: sh flutter_inappwebview_ios/test/run_pending_legacy_javascript_callbacks_test.sh

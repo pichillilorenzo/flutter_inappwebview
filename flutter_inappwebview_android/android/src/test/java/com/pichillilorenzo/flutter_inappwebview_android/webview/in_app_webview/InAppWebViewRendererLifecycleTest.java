@@ -91,6 +91,25 @@ public class InAppWebViewRendererLifecycleTest {
   }
 
   @Test
+  public void disposingOneWebViewPreservesMessagesScheduledForItsPeer() {
+    InAppWebView closing = newView();
+    InAppWebView peer = newView();
+    List<String> delivered = new ArrayList<>();
+
+    // mHandler is shared by every WebView instance. The closing WebView must
+    // not erase work posted to it for the surviving peer.
+    InAppWebView.mHandler.post(() -> {
+      if (!peer.disposed) delivered.add("peer");
+    });
+
+    closing.dispose();
+    shadowOf(Looper.getMainLooper()).idle();
+
+    assertEquals(Collections.singletonList("peer"), delivered);
+    assertFalse(peer.disposed);
+  }
+
+  @Test
   public void platformClientDetachesAndDestroysHandledRendererOnce() {
     verifyClient(new InAppWebViewClient(null));
   }

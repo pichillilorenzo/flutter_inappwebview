@@ -25,7 +25,7 @@ void main() {
       contains(
         'if (webView && visibilityState_.shouldBeVisible() &&\n'
         '      documentGeneration == mainDocumentGeneration_ && '
-        '*pendingScripts_ == 0) {',
+        'pendingScripts_->count() == 0) {',
       ),
     );
     expect(

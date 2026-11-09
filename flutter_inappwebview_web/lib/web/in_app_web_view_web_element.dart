@@ -264,6 +264,7 @@ class InAppWebViewWebElement implements Disposable {
           initialFile = webView.initialFile;
           initialUserScripts = webView.initialUserScripts;
 
+          jsWebView?.dispose();
           jsWebView = flutterInAppWebView?.createFlutterInAppWebView(
             _viewId is int ? (_viewId as int).toJS : _viewId.toString().toJS,
             iframe,
@@ -787,6 +788,8 @@ class InAppWebViewWebElement implements Disposable {
 
   @override
   void dispose() {
+    jsWebView?.dispose();
+    jsWebView = null;
     _channel?.setMethodCallHandler(null);
     _channel = null;
     if (windowId != null &&

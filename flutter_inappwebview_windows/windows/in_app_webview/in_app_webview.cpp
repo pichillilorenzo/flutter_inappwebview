@@ -616,6 +616,8 @@ namespace flutter_inappwebview_plugin
       Callback<ICoreWebView2ContentLoadingEventHandler>(
         [this](ICoreWebView2* sender, ICoreWebView2ContentLoadingEventArgs* args)
         {
+          // ContentLoading follows a committed new document, not a same-document navigation.
+          pendingScripts_->cancelAll();
           if (channelDelegate) {
             wil::unique_cotaskmem_string uri;
             std::optional<std::string> url = SUCCEEDED(webView->get_Source(&uri)) ? wide_to_utf8(uri.get()) : std::optional<std::string>{};
@@ -1025,6 +1027,10 @@ namespace flutter_inappwebview_plugin
 
           COREWEBVIEW2_PROCESS_FAILED_KIND kind;
           if (succeededOrLog(args->get_ProcessFailedKind(&kind))) {
+            if (kind == COREWEBVIEW2_PROCESS_FAILED_KIND_BROWSER_PROCESS_EXITED ||
+                kind == COREWEBVIEW2_PROCESS_FAILED_KIND_RENDER_PROCESS_EXITED) {
+              pendingScripts_->cancelAll();
+            }
             if (kind == COREWEBVIEW2_PROCESS_FAILED_KIND_BROWSER_PROCESS_EXITED) {
               invalidateBrowserProcessCache();
               auto didCrash = reason == COREWEBVIEW2_PROCESS_FAILED_REASON_CRASHED;
@@ -2334,134 +2340,144 @@ namespace flutter_inappwebview_plugin
   void InAppWebView::evaluateJavascript(const std::string& source, const std::shared_ptr<ContentWorld> contentWorld, const std::function<void(std::string)> completionHandler) const
   {
     if (!webView || !userContentController) {
-      if (completionHandler) {
-        completionHandler("null");
-      }
+      if (completionHandler) completionHandler("null");
       return;
     }
 
-    const auto pendingScript = trackPendingScript();
+    const auto requests = pendingScripts_;
+    const auto requestId = requests->add(completionHandler, "null");
+    const auto weakAlive = aliveToken();
+    const auto requestWebView = webView;
+    const auto self = this;
     userContentController->createContentWorld(contentWorld,
-      [=](const int& contextId)
+      [requests, requestId, weakAlive, requestWebView, source, self](const int& contextId)
       {
+        if (weakAlive.expired() || !requests->contains(requestId)) return;
         nlohmann::json parameters = {
           {"expression", source},
-          { "returnByValue", true }
+          {"returnByValue", true}
         };
+        if (contextId >= 0) parameters["contextId"] = contextId;
 
-        if (contextId >= 0) {
-          parameters["contextId"] = contextId;
-        }
-
-        auto hr = webView->CallDevToolsProtocolMethod(L"Runtime.evaluate", utf8_to_wide(parameters.dump()).c_str(), Callback<ICoreWebView2CallDevToolsProtocolMethodCompletedHandler>(
-          [this, completionHandler, pendingScript](HRESULT errorCode, LPCWSTR returnObjectAsJson)
-          {
-            nlohmann::json result;
-            if (succeededOrLog(errorCode)) {
-              nlohmann::json json = nlohmann::json::parse(wide_to_utf8(returnObjectAsJson));
-              result = json["result"].contains("value") ? json["result"]["value"] : nlohmann::json{};
-              if (json.contains("exceptionDetails")) {
-                nlohmann::json exceptionDetails = json["exceptionDetails"];
-                auto errorMessage = exceptionDetails.contains("exception") && exceptionDetails["exception"].contains("value")
-                  ? exceptionDetails["exception"]["value"].dump() :
-                  (result["value"].is_null() ? exceptionDetails["text"].get<std::string>() : result["value"].dump());
-                result = nlohmann::json{};
-                debugLog(exceptionDetails.dump());
-                if (channelDelegate) {
-                  channelDelegate->onConsoleMessage(errorMessage, 3);
+        const auto hr = requestWebView->CallDevToolsProtocolMethod(
+          L"Runtime.evaluate", utf8_to_wide(parameters.dump()).c_str(),
+          Callback<ICoreWebView2CallDevToolsProtocolMethodCompletedHandler>(
+            [requests, requestId, weakAlive, self](HRESULT errorCode, LPCWSTR returnObjectAsJson) -> HRESULT
+            {
+              // A cancelled request must not parse a stale result or touch a replacement view.
+              if (!requests->contains(requestId)) return S_OK;
+              nlohmann::json value = nullptr;
+              if (succeededOrLog(errorCode) && returnObjectAsJson) {
+                const auto json = nlohmann::json::parse(wide_to_utf8(returnObjectAsJson), nullptr, false);
+                if (json.is_object()) {
+                  if (json.contains("result") && json["result"].is_object()) {
+                    const auto& result = json["result"];
+                    if (result.contains("value")) value = result["value"];
+                  }
+                  if (json.contains("exceptionDetails") && json["exceptionDetails"].is_object()) {
+                    const auto& details = json["exceptionDetails"];
+                    std::string message = details.value("text", std::string("JavaScript evaluation failed"));
+                    if (details.contains("exception") && details["exception"].is_object()) {
+                      const auto& exception = details["exception"];
+                      if (exception.contains("value")) message = exception["value"].dump();
+                    }
+                    value = nullptr;
+                    debugLog(details.dump());
+                    if (!weakAlive.expired() && self->channelDelegate) {
+                      self->channelDelegate->onConsoleMessage(message, 3);
+                    }
+                  }
                 }
               }
-            }
-            if (completionHandler) {
-              completionHandler(result.dump());
-            }
-            return S_OK;
-          }
-        ).Get());
-
-        if (failedAndLog(hr) && completionHandler) {
-          completionHandler("null");
-        }
+              requests->complete(requestId, value.dump());
+              return S_OK;
+            }).Get());
+        if (failedAndLog(hr)) requests->complete(requestId, "null");
       });
   }
 
   void InAppWebView::callAsyncJavaScript(const std::string& functionBody, const std::string& argumentsAsJson, const std::shared_ptr<ContentWorld> contentWorld, const std::function<void(std::string)> completionHandler) const
   {
+    const std::string cancelled = R"({"value":null,"error":"WebView JavaScript request cancelled"})";
     if (!webView || !userContentController) {
-      if (completionHandler) {
-        completionHandler("null");
-      }
+      if (completionHandler) completionHandler(cancelled);
       return;
     }
 
-    const auto pendingScript = trackPendingScript();
+    const auto requests = pendingScripts_;
+    const auto requestId = requests->add(completionHandler, cancelled);
+    const auto weakAlive = aliveToken();
+    const auto requestWebView = webView;
+    const auto self = this;
     userContentController->createContentWorld(contentWorld,
-      [=](const int& contextId)
+      [requests, requestId, weakAlive, requestWebView, functionBody, argumentsAsJson, self](const int& contextId)
       {
-        std::vector<std::string> functionArgumentNamesList;
-        std::vector<std::string> functionArgumentValuesList;
-
-        auto jsonVal = nlohmann::json::parse(argumentsAsJson);
-        for (auto const& [key, val] : jsonVal.items()) {
-          functionArgumentNamesList.push_back(key);
-          functionArgumentValuesList.push_back(val.dump());
+        if (weakAlive.expired() || !requests->contains(requestId)) return;
+        const auto arguments = nlohmann::json::parse(argumentsAsJson, nullptr, false);
+        if (!arguments.is_object()) {
+          requests->complete(requestId, R"({"value":null,"error":"Invalid JavaScript arguments"})");
+          return;
+        }
+        std::vector<std::string> names;
+        std::vector<std::string> values;
+        names.reserve(arguments.size());
+        values.reserve(arguments.size());
+        for (const auto& [key, value] : arguments.items()) {
+          names.push_back(key);
+          values.push_back(value.dump());
         }
 
-        auto source = replace_all_copy(CALL_ASYNC_JAVASCRIPT_WRAPPER_JS, VAR_FUNCTION_ARGUMENT_NAMES, join(functionArgumentNamesList, ", "));
-        replace_all(source, VAR_FUNCTION_ARGUMENT_VALUES, join(functionArgumentValuesList, ", "));
+        auto source = replace_all_copy(CALL_ASYNC_JAVASCRIPT_WRAPPER_JS, VAR_FUNCTION_ARGUMENT_NAMES, join(names, ", "));
+        replace_all(source, VAR_FUNCTION_ARGUMENT_VALUES, join(values, ", "));
         replace_all(source, VAR_FUNCTION_BODY, functionBody);
 
         nlohmann::json parameters = {
           {"expression", source},
           {"awaitPromise", true},
-          { "returnByValue", true }
+          {"returnByValue", true}
         };
+        if (contextId >= 0) parameters["contextId"] = contextId;
 
-        if (contextId >= 0) {
-          parameters["contextId"] = contextId;
-        }
-
-        auto hr = webView->CallDevToolsProtocolMethod(L"Runtime.evaluate", utf8_to_wide(parameters.dump()).c_str(), Callback<ICoreWebView2CallDevToolsProtocolMethodCompletedHandler>(
-          [this, completionHandler, pendingScript](HRESULT errorCode, LPCWSTR returnObjectAsJson)
-          {
-            nlohmann::json result = {
-              {"value", nlohmann::json{}},
-              {"error", nlohmann::json{}}
-            };
-            if (succeededOrLog(errorCode)) {
-              nlohmann::json json = nlohmann::json::parse(wide_to_utf8(returnObjectAsJson));
-              result["value"] = json["result"].contains("value") ? json["result"]["value"] : nlohmann::json{};
-              if (json.contains("exceptionDetails")) {
-                nlohmann::json exceptionDetails = json["exceptionDetails"];
-                auto errorMessage = exceptionDetails.contains("exception") && exceptionDetails["exception"].contains("value")
-                  ? exceptionDetails["exception"]["value"].dump() :
-                  (result["value"].is_null() ? exceptionDetails["text"].get<std::string>() : result["value"].dump());
-                result["value"] = nlohmann::json{};
-                result["error"] = errorMessage;
-                debugLog(exceptionDetails.dump());
-                if (channelDelegate) {
-                  channelDelegate->onConsoleMessage(errorMessage, 3);
+        const auto hr = requestWebView->CallDevToolsProtocolMethod(
+          L"Runtime.evaluate", utf8_to_wide(parameters.dump()).c_str(),
+          Callback<ICoreWebView2CallDevToolsProtocolMethodCompletedHandler>(
+            [requests, requestId, weakAlive, self](HRESULT errorCode, LPCWSTR returnObjectAsJson) -> HRESULT
+            {
+              if (!requests->contains(requestId)) return S_OK;
+              nlohmann::json result = {{"value", nullptr}, {"error", nullptr}};
+              if (succeededOrLog(errorCode) && returnObjectAsJson) {
+                const auto json = nlohmann::json::parse(wide_to_utf8(returnObjectAsJson), nullptr, false);
+                if (json.is_object()) {
+                  if (json.contains("result") && json["result"].is_object()) {
+                    const auto& value = json["result"];
+                    if (value.contains("value")) result["value"] = value["value"];
+                  }
+                  if (json.contains("exceptionDetails") && json["exceptionDetails"].is_object()) {
+                    const auto& details = json["exceptionDetails"];
+                    std::string message = details.value("text", std::string("JavaScript evaluation failed"));
+                    if (details.contains("exception") && details["exception"].is_object()) {
+                      const auto& exception = details["exception"];
+                      if (exception.contains("value")) message = exception["value"].dump();
+                    }
+                    result["value"] = nullptr;
+                    result["error"] = message;
+                    debugLog(details.dump());
+                    if (!weakAlive.expired() && self->channelDelegate) {
+                      self->channelDelegate->onConsoleMessage(message, 3);
+                    }
+                  }
                 }
               }
-            }
-            if (completionHandler) {
-              completionHandler(result.dump());
-            }
-            return S_OK;
-          }
-        ).Get());
-
-        if (failedAndLog(hr) && completionHandler) {
-          completionHandler("null");
+              else {
+                result["error"] = "JavaScript execution failed";
+              }
+              requests->complete(requestId, result.dump());
+              return S_OK;
+            }).Get());
+        if (failedAndLog(hr)) {
+          requests->complete(requestId, R"({"value":null,"error":"JavaScript request failed"})");
         }
       });
-  }
-
-  std::shared_ptr<void> InAppWebView::trackPendingScript() const
-  {
-    ++*pendingScripts_;
-    // Released with the CDP callback, also when it never runs.
-    return std::shared_ptr<void>(nullptr, [pending = pendingScripts_](void*) { --*pending; });
   }
 
   void InAppWebView::addUserScript(const std::shared_ptr<UserScript> userScript) const
@@ -4618,7 +4634,7 @@ namespace flutter_inappwebview_plugin
     // A web message goes to whatever top document is loaded now, and may pass a
     // script still queued in CDP. A suspended page gets it only once resumed.
     if (webView && visibilityState_.shouldBeVisible() &&
-      documentGeneration == mainDocumentGeneration_ && *pendingScripts_ == 0) {
+      documentGeneration == mainDocumentGeneration_ && pendingScripts_->count() == 0) {
       const auto message = error.has_value()
         ? JavaScriptBridgeMessage::rejection(bridgeName, callHandlerID, error.value())
         : JavaScriptBridgeMessage::resolution(bridgeName, callHandlerID, resultJson);
@@ -4870,6 +4886,7 @@ namespace flutter_inappwebview_plugin
     // Expire before tearing anything down: a Dart reply arriving from here on
     // must find a dead token and drop the call.
     aliveToken_.reset();
+    pendingScripts_->cancelAll();
     clearLifecycleDeadline();
     lifecycleState_.dispose();
     browserGate().releaseOwner(this);

@@ -48,7 +48,7 @@ public class InAppWebView: WKWebView, WKUIDelegate,
     
     var customIMPs: [IMP] = []
     
-    var callAsyncJavaScriptBelowMacOS11Results: [String:((Any?) -> Void)] = [:]
+    private let pendingLegacyJavaScriptCallbacks = PendingLegacyJavaScriptCallbacks()
     
     var currentOpenPanel: NSOpenPanel?
     private var currentOpenPanelCompletion: JavaScriptDialogCompletion<[URL]?>?
@@ -1133,7 +1133,7 @@ public class InAppWebView: WKWebView, WKUIDelegate,
         
         let resultUuid = NSUUID().uuidString
         if let completionHandler = completionHandler {
-            callAsyncJavaScriptBelowMacOS11Results[resultUuid] = completionHandler
+            pendingLegacyJavaScriptCallbacks.register(completionHandler, for: resultUuid)
         }
         
         var functionArgumentNamesList: [String] = []
@@ -1154,16 +1154,17 @@ public class InAppWebView: WKWebView, WKUIDelegate,
             .replacingOccurrences(of: PluginScriptsUtil.VAR_FUNCTION_BODY, with: jsToInject)
             .replacingOccurrences(of: PluginScriptsUtil.VAR_RESULT_UUID, with: resultUuid)
         
-        evaluateJavaScript(jsToInject) { (value, error) in
-            if let error = error {
-                let userInfo = (error as NSError).userInfo
-                let errorMessage = userInfo["WKJavaScriptExceptionMessage"] ??
-                                   userInfo["NSLocalizedDescription"] as? String ??
-                                   error.localizedDescription
-                self.channelDelegate?.onConsoleMessage(message: String(describing: errorMessage), messageLevel: 3)
-                completionHandler?(nil)
-                self.callAsyncJavaScriptBelowMacOS11Results.removeValue(forKey: resultUuid)
-            }
+        evaluateJavaScript(jsToInject) { [weak self] (_, error) in
+            guard let self = self, let error = error else { return }
+            let userInfo = (error as NSError).userInfo
+            let errorMessage = userInfo["WKJavaScriptExceptionMessage"] ??
+                               userInfo["NSLocalizedDescription"] as? String ??
+                               error.localizedDescription
+            self.channelDelegate?.onConsoleMessage(message: String(describing: errorMessage), messageLevel: 3)
+            self.pendingLegacyJavaScriptCallbacks.complete(resultUuid, with: [
+                "value": NSNull(),
+                "error": String(describing: errorMessage)
+            ])
         }
     }
     
@@ -2208,12 +2209,14 @@ public class InAppWebView: WKWebView, WKUIDelegate,
     
     public func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
         javaScriptBridgeReplies.cancel(error: "JavaScript bridge web content process terminated")
+        pendingLegacyJavaScriptCallbacks.cancelAll(reason: "Web content process terminated")
         channelDelegate?.onWebContentProcessDidTerminate()
     }
     
     public func webView(_ webView: WKWebView,
                         didCommit navigation: WKNavigation!) {
         javaScriptBridgeReplies.cancel(error: "JavaScript bridge document replaced")
+        pendingLegacyJavaScriptCallbacks.cancelAll(reason: "JavaScript document replaced")
         initializeWindowIdJS()
         updateScrollChangedListener()
         channelDelegate?.onPageCommitVisible(url: url?.absoluteString)
@@ -2641,13 +2644,11 @@ public class InAppWebView: WKWebView, WKUIDelegate,
                     if let args = body["args"] as? String, let data = args.data(using: .utf8) {
                         let jsonArgs = try? JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? [[String: Any]]
                         if let jsonData = jsonArgs?.first,
-                           let resultUuid = jsonData["resultUuid"] as? String,
-                           let result = webView.callAsyncJavaScriptBelowMacOS11Results[resultUuid] {
-                            result([
+                           let resultUuid = jsonData["resultUuid"] as? String {
+                            webView.pendingLegacyJavaScriptCallbacks.complete(resultUuid, with: [
                                 "value": jsonData["value"],
                                 "error": jsonData["error"]
                             ])
-                            webView.callAsyncJavaScriptBelowMacOS11Results.removeValue(forKey: resultUuid)
                         }
                     }
                     break
@@ -3231,6 +3232,7 @@ if(window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)] 
     public func dispose() {
         javaScriptBridgeDisposed = true
         javaScriptBridgeReplies.cancel(error: "JavaScript bridge WebView disposed")
+        pendingLegacyJavaScriptCallbacks.cancelAll(reason: "WebView disposed")
         setConsoleMessageListener(false)
         channelDelegate?.dispose()
         channelDelegate = nil
@@ -3268,7 +3270,6 @@ if(window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)] 
         uiDelegate = nil
         navigationDelegate = nil
         isPausedTimersCompletionHandler = nil
-        callAsyncJavaScriptBelowMacOS11Results.removeAll()
         plugin = nil
     }
     

@@ -77,6 +77,7 @@ final class InAppWebView {
     var usesScriptMessageHandlerWithReply: Bool { scriptMessageReplyPolicy == true }
     let javaScriptBridgeReplies = JavaScriptBridgeReplyRegistry()
     var settings: Settings? = Settings()
+    let javaScriptHandlerOriginRules = JavaScriptHandlerOriginRules()
     var channelDelegate: WebViewChannelDelegate? = WebViewChannelDelegate()
     var internalHandlerCalls = 0
     var evaluations = 0
@@ -302,8 +303,9 @@ with tempfile.TemporaryDirectory(prefix='apple-reply-native-') as directory:
         util = (sources / 'Util.swift').read_text()
         util_func = method(util, '    public static func JSONStringify(')
         lifetime = (sources / 'Types/JavaScriptBridgeReply.swift').read_text()
+        origin_rules = (sources / 'Types/JavaScriptHandlerOriginRules.swift').read_text()
         code = stubs.replace('    // PRODUCTION_ROUTE', route)
-        code += '\nstruct Util {\n' + util_func + '\n}\n' + lifetime + tests
+        code += '\nstruct Util {\n' + util_func + '\n}\n' + origin_rules + lifetime + tests
         file = temp / f'{platform}.swift'
         file.write_text(code)
         binary = temp / platform

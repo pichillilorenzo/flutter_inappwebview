@@ -243,6 +243,7 @@ InAppWebView::InAppWebView(FlPluginRegistrar* registrar, FlBinaryMessenger* mess
     : plugin_(params.plugin), registrar_(registrar), messenger_(messenger), gtk_window_(params.gtkWindow), fl_view_(params.flView), manager_(params.manager), id_(id), settings_(params.initialSettings),
       initial_user_scripts_(params.initialUserScripts) {
   has_console_message_listener_ = params.hasConsoleMessageListener;
+  if (settings_) javaScriptOriginPolicy_.configure(settings_->javaScriptHandlersOriginAllowList);
   js_bridge_secret_ = GenerateRandomSecret();
   
   if (params.windowId.has_value()) {
@@ -3017,6 +3018,7 @@ void InAppWebView::setSettings(const std::shared_ptr<InAppWebViewSettings> newSe
 
     bool consolePolicyChanged = settings_->consoleMessageLevels != newSettings->consoleMessageLevels;
     settings_ = newSettings;
+    javaScriptOriginPolicy_.configure(settings_->javaScriptHandlersOriginAllowList);
     settings_->applyToWebView(webview_);
     if (consolePolicyChanged) updateConsoleMessagePolicy();
 #ifdef HAVE_WPE_PLATFORM
@@ -7872,19 +7874,9 @@ bool InAppWebView::handleScriptMessageWithReply(const std::string& body, WebKitS
   }
 
   // === Security Check 3: Origin Allow List ===
-  bool isOriginAllowed = true;
-  if (settings_ && settings_->javaScriptHandlersOriginAllowList.has_value()) {
-    const auto& allowList = settings_->javaScriptHandlersOriginAllowList.value();
-    if (!allowList.empty()) {
-      isOriginAllowed = false;
-      for (const auto& allowedOrigin : allowList) {
-        if (!sourceOrigin.empty() && sourceOrigin.find(allowedOrigin) != std::string::npos) {
-          isOriginAllowed = true;
-          break;
-        }
-      }
-    }
-  }
+  // Dart specifies regular expressions: null allows, empty denies. Never
+  // use a substring check (e.g. trusted.example.evil must not match).
+  const bool isOriginAllowed = javaScriptOriginPolicy_.allows(sourceOrigin);
 
   if (!isOriginAllowed) {
     errorLog("InAppWebView: Bridge access attempt from origin not allowed: " + sourceOrigin);

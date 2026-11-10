@@ -1,3 +1,7 @@
+## Unreleased
+
+- Tab and Shift+Tab move keyboard focus into the page (at its first or last focusable element) and back out to the next or previous Flutter widget, and VoiceOver can read the page: Flutter focus reaching the web view now makes it AppKit's first responder
+
 ## 1.2.0-beta.3
 
 - Updated flutter_inappwebview_platform_interface version to ^1.4.0-beta.3

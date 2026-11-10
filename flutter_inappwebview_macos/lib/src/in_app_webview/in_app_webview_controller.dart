@@ -204,11 +204,55 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController
     );
   }
 
+  /// Used internally by [MacOSInAppWebViewWidget] to move keyboard and
+  /// VoiceOver focus into and out of the page.
+  ///
+  /// Called when Tab went past the last focusable element of the page
+  /// (`forward`) or Shift+Tab before the first one.
+  void Function(bool forward)? internalOnTakeFocus;
+
+  /// Used internally by [MacOSInAppWebViewWidget]: the web view became
+  /// AppKit's first responder.
+  void Function()? internalOnBecomeFirstResponder;
+
+  /// Used internally by [MacOSInAppWebViewWidget]: whether Flutter's focus is
+  /// on the web view.
+  bool Function()? internalHasFocus;
+
+  /// Used internally by [MacOSInAppWebViewWidget]: gives the page AppKit's
+  /// keyboard focus. [direction] `next` starts at the first focusable element
+  /// of the page, `previous` at the last one, `null` at the page itself.
+  Future<void> internalFocusPage(String? direction) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('direction', () => direction);
+    await channel?.invokeMethod('_focusPage', args);
+  }
+
+  /// Used internally by [MacOSInAppWebViewWidget]: gives the keyboard focus
+  /// back to Flutter.
+  Future<void> internalReleasePage() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    await channel?.invokeMethod('_releasePage', args);
+  }
+
   Future<dynamic> _handleMethod(MethodCall call) async {
     if (call.method == "_onMouseDown") {
       // Workaround for https://github.com/pichillilorenzo/flutter_inappwebview/issues/2380
       // TODO: remove when Flutter fixes this
+      if (internalHasFocus?.call() ?? false) {
+        // Flutter's focus is already on the web view: no Flutter text field
+        // holds the keyboard, and unfocusing would take the keys from the page.
+        return;
+      }
       FocusManager.instance.primaryFocus?.unfocus();
+      return;
+    }
+    if (call.method == "_onTakeFocus") {
+      internalOnTakeFocus?.call(call.arguments["forward"] == true);
+      return;
+    }
+    if (call.method == "_onBecomeFirstResponder") {
+      internalOnBecomeFirstResponder?.call();
       return;
     }
 

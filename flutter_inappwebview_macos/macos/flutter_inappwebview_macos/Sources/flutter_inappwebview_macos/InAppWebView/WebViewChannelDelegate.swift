@@ -376,6 +376,14 @@ public class WebViewChannelDelegate: ChannelDelegate {
         case .requestFocus:
             result(webView?.requestFocus())
             break
+        case .focusPage:
+            webView?.focusPage(direction: arguments?["direction"] as? String)
+            result(true)
+            break
+        case .releasePage:
+            webView?.releasePage()
+            result(true)
+            break
         case .getCertificate:
             result(webView?.getCertificate()?.toMap())
             break

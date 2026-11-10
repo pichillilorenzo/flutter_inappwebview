@@ -2633,7 +2633,13 @@ if(window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)] 
     private var _isFirstResponder = true
     override open func becomeFirstResponder() -> Bool {
         _isFirstResponder = true
-        return super.becomeFirstResponder()
+        let became = super.becomeFirstResponder()
+        if became {
+            // The page took the keyboard (a click, a page focusing an element as it opens, Tab):
+            // Flutter's focus moves onto the web view too (InAppWebView+KeyboardFocus.swift).
+            channelDelegate?.channel?.invokeMethod("_onBecomeFirstResponder", arguments: nil)
+        }
+        return became
     }
     private func _fixFocus(callback: @escaping () -> Void) {
         if _isFirstResponder, let channelDelegate = channelDelegate {

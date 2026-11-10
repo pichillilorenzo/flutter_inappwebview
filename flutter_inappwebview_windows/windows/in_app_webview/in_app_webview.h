@@ -21,6 +21,7 @@
 #include "../utils/uuid.h"
 #include "../webview_environment/webview_environment.h"
 #include "in_app_webview_settings.h"
+#include "javascript_origin_rules.h"
 #include "user_content_controller.h"
 #include "webview_lifecycle_state.h"
 #include "webview_visibility_state.h"
@@ -334,6 +335,7 @@ namespace flutter_inappwebview_plugin
     uint64_t mainDocumentGeneration_ = 0;
     // Runtime.evaluate calls not completed yet; a reply waits behind them.
     std::shared_ptr<int> pendingScripts_ = std::make_shared<int>(0);
+    JavaScriptOriginRules javaScriptOriginRules_;
     mutable bool runtimeDomainEnabled_ = false;
     mutable bool networkDomainEnabled_ = false;
     HWND hostWindow_ = nullptr;

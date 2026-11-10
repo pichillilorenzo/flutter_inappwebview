@@ -3,6 +3,7 @@ on:
   pull_request:
     paths:
       - 'flutter_inappwebview_web/**'
+      - 'web_support/**'
       - '.github/workflows/web-listener-lifecycle.yaml'
   workflow_dispatch:
 jobs:
@@ -13,6 +14,14 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Build the JavaScript bundle from its TypeScript source
+        run: |
+          npm ci
+          npx tsc --noEmit --incremental false
+          npm run build
+        working-directory: web_support
+      - name: Verify the checked-in bundle matches its source
+        run: git diff --exit-code -- flutter_inappwebview_web/lib/assets/web/web_support.js
       - name: Validate bundle syntax and run listener teardown regressions
         run: |
           node --check flutter_inappwebview_web/lib/assets/web/web_support.js

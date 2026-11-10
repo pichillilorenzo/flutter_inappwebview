@@ -21,6 +21,8 @@ export interface InAppWebView {
   },
   settings: InAppWebViewSettings,
   javaScriptBridgeEnabled: boolean,
+  listenerAbortController: AbortController,
+  dispose: () => void,
   disableContextMenuHandler: (event: Event) => boolean,
   prepare: (settings: { [key: string]: any }) => void,
   setSettings: (newSettings: InAppWebViewSettings) => void,

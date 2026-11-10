@@ -62,5 +62,5 @@ jobs:
         run: flutter pub get --no-example && flutter test --no-pub test/console_subscriptions_test.dart test/console_desktop_subscriptions_test.dart test/console_keep_alive_creation_test.dart test/scroll_subscriptions_test.dart
         working-directory: flutter_inappwebview
       - name: Test browser Dart handler
-        run: flutter pub get --no-example && flutter test --no-pub --platform chrome test/javascript_handler_json_result_test.dart
+        run: flutter pub get --no-example && flutter test --no-pub --platform chrome test/javascript_handler_json_result_test.dart test/webview_disposal_test.dart
         working-directory: flutter_inappwebview_web

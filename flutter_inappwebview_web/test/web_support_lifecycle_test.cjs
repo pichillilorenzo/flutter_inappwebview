@@ -56,6 +56,8 @@ test('reprepare adds one global listener and dispose removes it and iframe load'
   webView.dispose();
   assert.equal(document.count('fullscreenchange'), 0);
   assert.equal(iframe.count('load'), 0);
+  assert.equal(webView.iframe, null);
+  assert.equal(webView.iframeContainer, null);
   document.fullscreenElement = null;
   document.dispatch('fullscreenchange');
   assert.deepEqual(events, [['onEnterFullscreen', 1]]);
@@ -77,4 +79,26 @@ test('closing one WebView preserves the other WebView listener', () => {
   assert.deepEqual(events, [['onEnterFullscreen', 'new']]);
   newView.dispose();
   assert.equal(document.count('fullscreenchange'), 0);
+});
+
+test('rehosting an iframe delivers events only to its new owner', () => {
+  const {bridge, document, events} = harness();
+  const iframe = new EventTargetStub(); iframe.id = 'headless';
+  const headless = bridge.createFlutterInAppWebView('headless', iframe, {}, 'secret');
+  headless.prepare({});
+  headless.dispose();
+
+  iframe.id = 'visible';
+  const visible = bridge.createFlutterInAppWebView('visible', iframe, {}, 'new-secret');
+  visible.prepare({});
+  headless.dispose();
+  assert.equal(document.count('fullscreenchange'), 1);
+  assert.equal(iframe.count('load'), 1);
+
+  document.fullscreenElement = {id: 'visible'};
+  document.dispatch('fullscreenchange');
+  assert.deepEqual(events, [['onEnterFullscreen', 'visible']]);
+  visible.dispose();
+  assert.equal(document.count('fullscreenchange'), 0);
+  assert.equal(iframe.count('load'), 0);
 });

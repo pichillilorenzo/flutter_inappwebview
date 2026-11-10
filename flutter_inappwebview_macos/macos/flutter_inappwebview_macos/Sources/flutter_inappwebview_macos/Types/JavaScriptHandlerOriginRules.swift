@@ -8,8 +8,31 @@ final class JavaScriptHandlerOriginRules {
     private var compiled: [NSRegularExpression]?
     private var configured = false
 
+    private func hasSamePatterns(_ patterns: [String]?) -> Bool {
+        switch (cachedPatterns, patterns) {
+        case (nil, nil):
+            return true
+        case let (cached?, current?):
+            guard cached.count == current.count else { return false }
+            return cached.withUnsafeBufferPointer { cachedBuffer in
+                current.withUnsafeBufferPointer { currentBuffer in
+                    // Unchanged settings retain the same COW storage. Both
+                    // pointers stay valid only within these nested closures.
+                    if cachedBuffer.baseAddress == currentBuffer.baseAddress { return true }
+                    // Swift String equality folds canonically equivalent Unicode,
+                    // but [A-\u{212A}] and [A-K] have different regex meanings.
+                    return zip(cachedBuffer, currentBuffer).allSatisfy {
+                        $0.0.utf8.elementsEqual($0.1.utf8)
+                    }
+                }
+            }
+        default:
+            return false
+        }
+    }
+
     func allows(origin: String?, patterns: [String]?) -> Bool {
-        if !configured || cachedPatterns != patterns {
+        if !configured || !hasSamePatterns(patterns) {
             cachedPatterns = patterns
             configured = true
             compiled = patterns?.compactMap { try? NSRegularExpression(pattern: $0) }

@@ -3,6 +3,7 @@
 
 #include <functional>
 #include <map>
+#include <optional>
 #include <vector>
 
 #include "../plugin_scripts_js/javascript_bridge_js.h"
@@ -45,7 +46,10 @@ namespace flutter_inappwebview_plugin
     std::vector<std::shared_ptr<PluginScript>> getPluginScriptsRequiredInAllContentWorlds() const;
 
     void registerEventHandlers();
-    void createContentWorld(const std::shared_ptr<ContentWorld> contentWorld, const std::function<void(int)> completionHandler);
+    // An empty result means creation failed; -1 is reserved for the page world.
+    void createContentWorld(const std::shared_ptr<ContentWorld> contentWorld,
+      const std::function<bool()> isRequestPending,
+      const std::function<void(std::optional<int>)> completionHandler);
 
   private:
     InAppWebView* webView_;

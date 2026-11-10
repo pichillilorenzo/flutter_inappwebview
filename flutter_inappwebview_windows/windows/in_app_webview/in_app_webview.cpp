@@ -2350,14 +2350,21 @@ namespace flutter_inappwebview_plugin
     const auto requestWebView = webView;
     const auto self = this;
     userContentController->createContentWorld(contentWorld,
-      [requests, requestId, weakAlive, requestWebView, source, self](const int& contextId)
+      [requests, requestId, weakAlive]() {
+        return !weakAlive.expired() && requests->contains(requestId);
+      },
+      [requests, requestId, weakAlive, requestWebView, source, self](const std::optional<int>& contextId)
       {
         if (weakAlive.expired() || !requests->contains(requestId)) return;
+        if (!contextId) {
+          requests->complete(requestId, "null");
+          return;
+        }
         nlohmann::json parameters = {
           {"expression", source},
           {"returnByValue", true}
         };
-        if (contextId >= 0) parameters["contextId"] = contextId;
+        if (*contextId >= 0) parameters["contextId"] = *contextId;
 
         const auto hr = requestWebView->CallDevToolsProtocolMethod(
           L"Runtime.evaluate", utf8_to_wide(parameters.dump()).c_str(),
@@ -2410,9 +2417,16 @@ namespace flutter_inappwebview_plugin
     const auto requestWebView = webView;
     const auto self = this;
     userContentController->createContentWorld(contentWorld,
-      [requests, requestId, weakAlive, requestWebView, functionBody, argumentsAsJson, self](const int& contextId)
+      [requests, requestId, weakAlive]() {
+        return !weakAlive.expired() && requests->contains(requestId);
+      },
+      [requests, requestId, weakAlive, requestWebView, functionBody, argumentsAsJson, self](const std::optional<int>& contextId)
       {
         if (weakAlive.expired() || !requests->contains(requestId)) return;
+        if (!contextId) {
+          requests->complete(requestId, R"({"value":null,"error":"JavaScript content world creation failed"})");
+          return;
+        }
         const auto arguments = nlohmann::json::parse(argumentsAsJson, nullptr, false);
         if (!arguments.is_object()) {
           requests->complete(requestId, R"({"value":null,"error":"Invalid JavaScript arguments"})");
@@ -2436,7 +2450,7 @@ namespace flutter_inappwebview_plugin
           {"awaitPromise", true},
           {"returnByValue", true}
         };
-        if (contextId >= 0) parameters["contextId"] = contextId;
+        if (*contextId >= 0) parameters["contextId"] = *contextId;
 
         const auto hr = requestWebView->CallDevToolsProtocolMethod(
           L"Runtime.evaluate", utf8_to_wide(parameters.dump()).c_str(),

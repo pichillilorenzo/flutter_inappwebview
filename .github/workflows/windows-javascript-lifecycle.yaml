@@ -10,8 +10,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Install JSON headers for production CDP method tests
+        run: sudo apt-get update && sudo apt-get install -y nlohmann-json3-dev
       - name: Run pending JavaScript request regression with ASan and UBSan
         run: |
           g++ -std=c++17 -Wall -Wextra -Werror -fsanitize=address,undefined -fno-omit-frame-pointer \
             flutter_inappwebview_windows/windows/test/pending_script_requests_test.cpp -o /tmp/pending_script_requests_test
           ASAN_OPTIONS=detect_leaks=1 /tmp/pending_script_requests_test
+      - name: Test production content-world creation and request cancellation
+        env:
+          ASAN_OPTIONS: detect_leaks=1
+        run: python3 flutter_inappwebview_windows/windows/test/run_javascript_content_world_tests.py --sanitize

@@ -1,3 +1,4 @@
+#include <limits>
 #include <nlohmann/json.hpp>
 #include <wil/wrl.h>
 
@@ -312,9 +313,16 @@ namespace flutter_inappwebview_plugin
     return res;
   }
 
-  void UserContentController::createContentWorld(const std::shared_ptr<ContentWorld> contentWorld, const std::function<void(int)> completionHandler)
+  void UserContentController::createContentWorld(const std::shared_ptr<ContentWorld> contentWorld,
+    const std::function<bool()> isRequestPending,
+    const std::function<void(std::optional<int>)> completionHandler)
   {
-    if (!webView_ || !(webView_->webView) || ContentWorld::isPage(contentWorld)) {
+    if (!isRequestPending()) return;
+    if (!webView_ || !(webView_->webView) || !contentWorld) {
+      if (completionHandler) completionHandler(std::nullopt);
+      return;
+    }
+    if (ContentWorld::isPage(contentWorld)) {
       if (completionHandler) {
         completionHandler(-1);
       }
@@ -331,17 +339,21 @@ namespace flutter_inappwebview_plugin
         {"worldName", worldName}
       };
       auto hr = webView_->webView->CallDevToolsProtocolMethod(L"Page.createIsolatedWorld", utf8_to_wide(parameters.dump()).c_str(), Callback<ICoreWebView2CallDevToolsProtocolMethodCompletedHandler>(
-        [this, alive = webView_->aliveToken(), completionHandler, worldName](HRESULT errorCode, LPCWSTR returnObjectAsJson)
+        [this, alive = webView_->aliveToken(), isRequestPending, completionHandler, worldName](HRESULT errorCode, LPCWSTR returnObjectAsJson)
         {
-          // WebView2 may reply after the owning view and this controller were freed.
-          if (alive.expired()) return S_OK;
-          int contextId = -1;
+          // A stale world reply must not install scripts into a replacement document.
+          // Check the lifetime before touching this controller, which may be freed.
+          if (alive.expired() || !isRequestPending()) return S_OK;
+          std::optional<int> contextId;
           if (succeededOrLog(errorCode) && returnObjectAsJson) {
             const auto response = nlohmann::json::parse(wide_to_utf8(returnObjectAsJson), nullptr, false);
             if (response.is_object() && response.contains("executionContextId") &&
                 response["executionContextId"].is_number_integer()) {
-              contextId = response["executionContextId"].get<int>();
-              addPluginScriptsIfRequired(std::make_shared<ContentWorld>(worldName));
+              const auto id = response["executionContextId"].get<int64_t>();
+              if (id >= 0 && id <= (std::numeric_limits<int>::max)()) {
+                contextId = static_cast<int>(id);
+                addPluginScriptsIfRequired(std::make_shared<ContentWorld>(worldName));
+              }
             }
           }
           if (completionHandler) completionHandler(contextId);
@@ -349,7 +361,7 @@ namespace flutter_inappwebview_plugin
         }
       ).Get());
       if (failedAndLog(hr) && completionHandler) {
-        completionHandler(-1);
+        completionHandler(std::nullopt);
       }
     }
     else if (completionHandler) {

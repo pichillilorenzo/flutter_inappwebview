@@ -1,5 +1,6 @@
 ## Unreleased
 
+- Resolve content-blocker top-URL conditions from the current document once per request, cap background lookup waits at 200 ms, and avoid waiting on the WebView's own looper.
 - Avoid registering an outer widget's GlobalKey again on its Android platform view, while preserving separately supplied inner keys, LocalKeys, composition settings and controller ownership.
 - Filter console levels before Flutter IPC and send bounded native batches, preserving per-message callbacks, order, immediate warning/error flushes, and subscription/disposal cleanup. Inline publishers stay disabled until a live Dart controller attaches, including delayed keep-alive creation.
 - Keep inline scroll subscriptions disabled until a live controller attaches, so cancelling pending keep-alive creation cannot leave a listener or interfere with its next owner.

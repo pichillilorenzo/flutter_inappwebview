@@ -1093,7 +1093,6 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
   }
 
   public void onLoadStart(String url) {
-    if (webView != null) webView.setContentBlockerTopUrl(url);
     flushConsoleMessages();
     MethodChannel channel = getChannel();
     if (channel == null) return;
@@ -1103,7 +1102,6 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
   }
 
   public void onLoadStop(String url) {
-    if (webView != null) webView.setContentBlockerTopUrl(url);
     MethodChannel channel = getChannel();
     if (channel == null) return;
     Map<String, Object> obj = new HashMap<>();
@@ -1112,7 +1110,6 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
   }
 
   public void onUpdateVisitedHistory(String url, boolean isReload) {
-    if (webView != null) webView.setContentBlockerTopUrl(url);
     MethodChannel channel = getChannel();
     if (channel == null) return;
     Map<String, Object> obj = new HashMap<>();
@@ -1239,7 +1236,6 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
   }
 
   public void onPageCommitVisible(String url) {
-    if (webView != null) webView.setContentBlockerTopUrl(url);
     MethodChannel channel = getChannel();
     if (channel == null) return;
     Map<String, Object> obj = new HashMap<>();

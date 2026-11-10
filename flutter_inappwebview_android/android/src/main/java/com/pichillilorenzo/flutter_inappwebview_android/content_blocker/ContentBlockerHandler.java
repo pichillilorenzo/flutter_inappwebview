@@ -77,6 +77,10 @@ public class ContentBlockerHandler {
         String host = u.getHost();
         int port = u.getPort();
         String scheme = u.getScheme();
+        // Resolve lazily once per request, including an unavailable result. A URL
+        // retained across requests can describe a pending or previous document.
+        boolean topLevelUrlResolved = false;
+        String topLevelUrl = null;
         // A snapshot is captured by the COW iterator; no per-request array copying.
         rulesLoop: for (ContentBlocker contentBlocker : rules) {
             ContentBlockerTrigger trigger =  contentBlocker.getTrigger();
@@ -112,35 +116,12 @@ public class ContentBlockerHandler {
                             continue rulesLoop;
                 }
 
-                // Most network requests arrive off-thread. Reading the volatile
-                // top-level URL avoids a UI roundtrip per resource and avoids
-                // unbounded waits when a tab is closing or Flutter is busy.
                 final boolean needsTopUrl = !trigger.getLoadType().isEmpty()
                         || !trigger.getIfTopUrl().isEmpty()
                         || !trigger.getUnlessTopUrl().isEmpty();
-                String topLevelUrl = webView.getContentBlockerTopUrl();
-                if (needsTopUrl && topLevelUrl == null) {
-                    if (Looper.myLooper() == webView.getWebViewLooper()) {
-                        // No self-deadlock when intercepting on the WebView looper.
-                        topLevelUrl = webView.getUrl();
-                    } else {
-                        final String[] fetched = new String[1];
-                        final CountDownLatch latch = new CountDownLatch(1);
-                        final Handler handler = new Handler(webView.getWebViewLooper());
-                        final Runnable lookup = () -> {
-                            try {
-                                fetched[0] = webView.getUrl();
-                            } finally {
-                                latch.countDown();
-                            }
-                        };
-                        if (handler.post(lookup)) {
-                            if (!latch.await(200, TimeUnit.MILLISECONDS)) {
-                                handler.removeCallbacks(lookup);
-                            }
-                        }
-                        topLevelUrl = fetched[0];
-                    }
+                if (needsTopUrl && !topLevelUrlResolved) {
+                    topLevelUrlResolved = true;
+                    topLevelUrl = getTopLevelUrl(webView);
                 }
                 // A constrained rule cannot be evaluated without its top-level URL.
                 if (needsTopUrl && topLevelUrl == null) continue rulesLoop;
@@ -298,6 +279,34 @@ public class ContentBlockerHandler {
             }
         }
         return null;
+    }
+
+    @Nullable
+    private String getTopLevelUrl(final InAppWebView webView) throws InterruptedException {
+        final Looper webViewLooper = webView.getWebViewLooper();
+        if (Looper.myLooper() == webViewLooper) {
+            // Posting and waiting on this same looper would deadlock.
+            return webView.getContentBlockerTopUrl();
+        }
+
+        final String[] fetched = new String[1];
+        final CountDownLatch latch = new CountDownLatch(1);
+        final Handler handler = new Handler(webViewLooper);
+        final Runnable lookup = () -> {
+            try {
+                fetched[0] = webView.getContentBlockerTopUrl();
+            } finally {
+                latch.countDown();
+            }
+        };
+        if (!handler.post(lookup)) return null;
+        try {
+            // Read the result only after the latch publishes it. A late lookup
+            // cannot change this request's decision after timeout or interruption.
+            return latch.await(200, TimeUnit.MILLISECONDS) ? fetched[0] : null;
+        } finally {
+            handler.removeCallbacks(lookup);
+        }
     }
     
     @Nullable

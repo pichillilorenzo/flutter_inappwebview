@@ -202,19 +202,14 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
   private boolean javaScriptBridgeEnabled = true;
   private boolean rendererGone;
   private boolean disposed;
-  // Updated on the WebView looper during main-frame navigation; read from
-  // background request interception without a blocking UI-thread roundtrip.
-  @Nullable private volatile String contentBlockerTopUrl;
+  private boolean destroyed;
 
-  public void setContentBlockerTopUrl(@Nullable String url) {
-    contentBlockerTopUrl = url;
-  }
-
+  // Called only on the WebView looper. Navigation callbacks may describe a
+  // pending or previous page, so getUrl() remains the source of truth.
   @Nullable
   public String getContentBlockerTopUrl() {
-    return contentBlockerTopUrl;
+    return disposed || rendererGone || destroyed ? null : getUrl();
   }
-  private boolean destroyed;
 
   public InAppWebView(Context context) {
     super(context);
@@ -2313,7 +2308,6 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     }
     if (disposed) return;
     disposed = true;
-    contentBlockerTopUrl = null;
     if (channelDelegate != null) {
       channelDelegate.dispose();
       channelDelegate = null;

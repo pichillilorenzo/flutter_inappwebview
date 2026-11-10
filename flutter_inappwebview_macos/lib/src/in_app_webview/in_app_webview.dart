@@ -310,27 +310,32 @@ class MacOSInAppWebViewWidget extends PlatformInAppWebViewWidget {
       }
     }
 
-    return AppKitView(
-      viewType: 'com.pichillilorenzo/flutter_inappwebview',
-      onPlatformViewCreated: _onPlatformViewCreated,
-      gestureRecognizers: params.gestureRecognizers,
-      creationParams: <String, dynamic>{
-        'initialUrlRequest': params.initialUrlRequest?.toMap(),
-        'initialFile': params.initialFile,
-        'initialData': params.initialData?.toMap(),
-        'initialSettings': settingsMap,
-        'contextMenu': params.contextMenu?.toMap() ?? {},
-        'windowId': params.windowId,
-        'headlessWebViewId': params.headlessWebView?.isRunning() ?? false
-            ? params.headlessWebView?.id
-            : null,
-        'initialUserScripts':
-            params.initialUserScripts?.map((e) => e.toMap()).toList() ?? [],
-        'pullToRefreshSettings': pullToRefreshSettings,
-        'keepAliveId': params.keepAlive?.id,
-        'preventGestureDelay': params.preventGestureDelay,
-      },
-      creationParamsCodec: const StandardMessageCodec(),
+    return _WebViewKeyboardFocus(
+      builder: (keyboardFocus) => AppKitView(
+        viewType: 'com.pichillilorenzo/flutter_inappwebview',
+        onPlatformViewCreated: (id) {
+          _onPlatformViewCreated(id);
+          keyboardFocus.attach(_controller!);
+        },
+        gestureRecognizers: params.gestureRecognizers,
+        creationParams: <String, dynamic>{
+          'initialUrlRequest': params.initialUrlRequest?.toMap(),
+          'initialFile': params.initialFile,
+          'initialData': params.initialData?.toMap(),
+          'initialSettings': settingsMap,
+          'contextMenu': params.contextMenu?.toMap() ?? {},
+          'windowId': params.windowId,
+          'headlessWebViewId': params.headlessWebView?.isRunning() ?? false
+              ? params.headlessWebView?.id
+              : null,
+          'initialUserScripts':
+              params.initialUserScripts?.map((e) => e.toMap()).toList() ?? [],
+          'pullToRefreshSettings': pullToRefreshSettings,
+          'keepAliveId': params.keepAlive?.id,
+          'preventGestureDelay': params.preventGestureDelay,
+        },
+        creationParamsCodec: const StandardMessageCodec(),
+      ),
     );
   }
 
@@ -428,4 +433,152 @@ class MacOSInAppWebViewWidget extends PlatformInAppWebViewWidget {
     // unused
     throw UnimplementedError();
   }
+}
+
+/// Keyboard and VoiceOver focus going into and out of the page.
+///
+/// The web view is a platform view. Flutter's focus can stand on it, but
+/// nothing moved AppKit's first responder there, so Tab stopped on it without
+/// getting into the page, and VoiceOver, which follows the first responder and
+/// finds only an empty group for the view in the semantics tree, could not
+/// read the page. Once the web view is first responder VoiceOver reads the
+/// page as in any other app.
+///
+/// - Flutter's focus reaching the web view gives the page the keyboard: at its
+///   first focusable element after Tab, at its last one after Shift+Tab, at the
+///   page itself otherwise (for example, VoiceOver moved onto it, with keyboard
+///   focus following the VoiceOver cursor).
+/// - Tab past the last element of the page (Shift+Tab before the first one)
+///   continues in Flutter's focus order.
+/// - Flutter's focus leaving the web view some other way gives the keyboard
+///   back to Flutter.
+/// - The page taking the keyboard by itself (a click, a page focusing an
+///   element as it opens) moves Flutter's focus onto the web view too.
+class _WebViewKeyboardFocus extends StatefulWidget {
+  const _WebViewKeyboardFocus({required this.builder});
+
+  final Widget Function(_WebViewKeyboardFocusState keyboardFocus) builder;
+
+  @override
+  State<_WebViewKeyboardFocus> createState() => _WebViewKeyboardFocusState();
+}
+
+class _WebViewKeyboardFocusState extends State<_WebViewKeyboardFocus> {
+  /// Watches the focus node of the platform view below, without taking focus
+  /// itself.
+  final FocusNode _watch = FocusNode(
+    debugLabel: 'flutter_inappwebview_macos keyboard focus',
+    canRequestFocus: false,
+    skipTraversal: true,
+  );
+
+  MacOSInAppWebViewController? _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _TabKeyTracker.install();
+  }
+
+  void attach(MacOSInAppWebViewController controller) {
+    _controller = controller;
+    controller.internalOnTakeFocus = _onTakeFocus;
+    controller.internalOnBecomeFirstResponder = _onBecomeFirstResponder;
+    controller.internalHasFocus = () => _watch.hasFocus;
+    // Focus may have arrived before the platform view was created.
+    if (_watch.hasFocus) controller.internalFocusPage(null);
+  }
+
+  void _onFocusChange(bool focused) {
+    final controller = _controller;
+    if (controller == null) return;
+    if (focused) {
+      final tab = _TabKeyTracker.recentTraversal();
+      controller.internalFocusPage(
+        tab == null ? null : (tab ? 'next' : 'previous'),
+      );
+    } else {
+      controller.internalReleasePage();
+    }
+  }
+
+  /// The focus node of the platform view.
+  FocusNode? get _viewNode {
+    for (final node in _watch.descendants) {
+      if (node.canRequestFocus) return node;
+    }
+    return null;
+  }
+
+  /// The page took the keyboard without Flutter's focus coming here: put
+  /// Flutter's focus on the web view as well, or Tab out of the page would go
+  /// on from wherever it was left. [_onFocusChange] then asks the page for the
+  /// keyboard it already has, which does nothing.
+  void _onBecomeFirstResponder() {
+    if (!mounted || _watch.hasFocus) return;
+    _viewNode?.requestFocus();
+  }
+
+  /// Flutter's focus stood on the web view all the while the page had the
+  /// keyboard: go on from there.
+  void _onTakeFocus(bool forward) {
+    if (!mounted || !_watch.hasFocus) return;
+    final from = FocusManager.instance.primaryFocus;
+    if (from == null) return;
+    if (forward) {
+      from.nextFocus();
+    } else {
+      from.previousFocus();
+    }
+  }
+
+  @override
+  void dispose() {
+    final controller = _controller;
+    if (controller != null && controller.internalOnTakeFocus == _onTakeFocus) {
+      controller.internalOnTakeFocus = null;
+      controller.internalOnBecomeFirstResponder = null;
+      controller.internalHasFocus = null;
+    }
+    _watch.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => Focus(
+    focusNode: _watch,
+    includeSemantics: false,
+    onFocusChange: _onFocusChange,
+    child: widget.builder(this),
+  );
+}
+
+/// Remembers the last Tab key press.
+///
+/// Focus changes are reported after the key event has been handled, when
+/// [HardwareKeyboard] no longer lists Tab as pressed, so a focus change that
+/// arrives right after a Tab press is taken as Tab traversal.
+class _TabKeyTracker {
+  static DateTime _pressedAt = DateTime(0);
+  static bool _shift = false;
+  static bool _installed = false;
+
+  static void install() {
+    if (_installed) return;
+    _installed = true;
+    HardwareKeyboard.instance.addHandler((event) {
+      if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.tab) {
+        _pressedAt = DateTime.now();
+        _shift = HardwareKeyboard.instance.isShiftPressed;
+      }
+      return false;
+    });
+  }
+
+  /// `true` for Tab, `false` for Shift+Tab, `null` if the current focus change
+  /// did not come from Tab traversal.
+  static bool? recentTraversal() =>
+      DateTime.now().difference(_pressedAt) < const Duration(milliseconds: 300)
+      ? !_shift
+      : null;
 }

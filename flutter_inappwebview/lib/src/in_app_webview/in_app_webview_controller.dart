@@ -154,6 +154,12 @@ class InAppWebViewController {
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.reload.supported_platforms}
   Future<void> reload() => platform.reload();
 
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.setBackgroundColor}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.setBackgroundColor.supported_platforms}
+  Future<void> setBackgroundColor(Color color) =>
+      platform.setBackgroundColor(color);
+
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.goBack}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.goBack.supported_platforms}
@@ -767,6 +773,12 @@ class InAppWebViewController {
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.setScreenScale.supported_platforms}
   Future<void> setScreenScale({required double scale}) =>
       platform.setScreenScale(scale: scale);
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getAppleWebViewActivitySnapshot}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getAppleWebViewActivitySnapshot.supported_platforms}
+  Future<AppleWebViewActivitySnapshot> getAppleWebViewActivitySnapshot() =>
+      platform.getAppleWebViewActivitySnapshot();
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.isVisible}
   ///

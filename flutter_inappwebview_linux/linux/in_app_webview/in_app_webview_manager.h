@@ -14,10 +14,9 @@
 #include "custom_platform_view.h"
 #include "in_app_webview.h"
 #include "in_app_webview_settings.h"
+#include "../plugin_instance.h"
 
 namespace flutter_inappwebview_plugin {
-
-class PluginInstance;
 
 class InAppWebViewManager {
  public:
@@ -29,8 +28,8 @@ class InAppWebViewManager {
 
   PluginInstance* plugin() const { return plugin_; }
   FlPluginRegistrar* registrar() const;
-  GtkWindow* gtk_window() const { return gtk_window_; }
-  FlView* fl_view() const { return fl_view_; }
+  GtkWindow* gtk_window() const { return plugin_ ? plugin_->gtkWindow() : nullptr; }
+  FlView* fl_view() const { return plugin_ ? plugin_->flView() : nullptr; }
 
   CustomPlatformView* GetPlatformView(int64_t id) const;
 
@@ -51,8 +50,6 @@ class InAppWebViewManager {
  private:
   PluginInstance* plugin_ = nullptr;
   FlPluginRegistrar* registrar_ = nullptr;
-  GtkWindow* gtk_window_ = nullptr;  // Cached during plugin registration
-  FlView* fl_view_ = nullptr;  // Cached FlView for focus restoration
   FlMethodChannel* method_channel_ = nullptr;
   FlTextureRegistrar* texture_registrar_ = nullptr;
   FlBinaryMessenger* messenger_ = nullptr;

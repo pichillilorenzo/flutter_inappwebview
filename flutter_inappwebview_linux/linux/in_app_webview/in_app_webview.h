@@ -27,6 +27,9 @@
 
 #include <flutter_linux/flutter_linux.h>
 
+#include "dma_buf_import_policy.h"
+#include "texture_webview_api.h"
+
 // WPE WebKit core includes (always available)
 #include <wpe/webkit.h>
 #include <jsc/jsc.h>
@@ -66,6 +69,10 @@
 #include "../types/user_script.h"
 #include "../find_interaction/find_interaction_controller.h"
 #include "in_app_webview_settings.h"
+#include "deferred_post_url_script.h"
+#include "javascript_origin_policy.h"
+#include "pending_webkit_javascript_calls.h"
+#include "webview_creation_error.h"
 
 // Forward declaration of WPE types in global scope to avoid namespace conflicts
 #ifdef HAVE_WPE_BACKEND_LEGACY
@@ -83,6 +90,7 @@ class WebMessageListener;
 class WebViewChannelDelegate;
 
 struct InAppWebViewCreationParams {
+  bool hasConsoleMessageListener = true;
   int64_t id;
   PluginInstance* plugin = nullptr;  // Plugin instance for accessing managers
   GtkWindow* gtkWindow = nullptr;  // Cached GTK window from manager
@@ -121,7 +129,7 @@ enum class WpePointerButton { None = 0, Primary = 1, Secondary = 2, Tertiary = 3
 /// This class provides offscreen web rendering using WPE WebKit.
 /// Unlike WebKitGTK, WPE doesn't require a GTK widget hierarchy
 /// and can render directly to GPU textures via the FDO backend.
-class InAppWebView {
+class InAppWebView : public TextureWebViewApi {
  public:
   static constexpr const char* METHOD_CHANNEL_NAME_PREFIX =
       "com.pichillilorenzo/flutter_inappwebview_";
@@ -132,6 +140,7 @@ class InAppWebView {
 
   int64_t id() const { return id_; }
   WebKitWebView* webview() const { return webview_; }
+  const std::optional<WebViewCreationError>& creationError() const { return creation_error_; }
   WebViewChannelDelegate* channel_delegate() const { return channel_delegate_.get(); }
   FlPluginRegistrar* registrar() const { return registrar_; }
 
@@ -219,6 +228,14 @@ class InAppWebView {
   // Screenshot - captures the current visible content as PNG data
   void takeScreenshot(std::function<void(const std::optional<std::vector<uint8_t>>&)> callback);
 
+  // PDF export via the Otzaria WPE runtime patch (webkit_otzaria_web_view_print_to_pdf,
+  // resolved with dlsym). Sizes are in PDF points; yields nullopt when the
+  // running libWPEWebKit lacks the symbol (unpatched build).
+  void createPdf(double pageWidthPt, double pageHeightPt,
+                 double marginTopPt, double marginRightPt,
+                 double marginBottomPt, double marginLeftPt,
+                 std::function<void(const std::optional<std::vector<uint8_t>>&)> callback);
+
   // Session state - save and restore navigation state
   std::optional<std::vector<uint8_t>> saveState() const;
   bool restoreState(const std::vector<uint8_t>& stateData);
@@ -243,6 +260,9 @@ class InAppWebView {
   FindInteractionController* findInteractionController() const { return findInteractionController_.get(); }
 
   // Settings
+  bool acceptsConsoleMessage(int64_t level) const;
+  void setConsoleMessageListener(bool hasListener);
+  void updateConsoleMessagePolicy();
   std::shared_ptr<InAppWebViewSettings> settings() const { return settings_; }
   FlValue* getSettings() const;
   void setSettings(const std::shared_ptr<InAppWebViewSettings> newSettings,
@@ -292,9 +312,10 @@ class InAppWebView {
                       const std::vector<std::tuple<int, double, double, int>>& touchPoints);
 
   // Texture pixel buffer access (called by texture classes)
-  size_t GetPixelBufferSize(uint32_t* out_width, uint32_t* out_height) const;
+  size_t GetPixelBufferSize(uint32_t* out_width,
+                            uint32_t* out_height) const override;
   bool CopyPixelBufferTo(uint8_t* dst, size_t dst_size, uint32_t* out_width,
-                         uint32_t* out_height) const;
+                         uint32_t* out_height) const override;
 
   // DMA-BUF export (WPE-specific, for zero-copy GPU texture sharing)
   bool HasDmaBufExport() const;
@@ -305,9 +326,38 @@ class InAppWebView {
   // The EGL image is owned by WPE and remains valid until the next frame.
   void* GetCurrentEglImage(uint32_t* out_width, uint32_t* out_height) const;
 
+  // Re-import the current frame's DMA-BUF planes directly into
+  // target_display (Flutter's EGLDisplay), instead of reusing the
+  // EGLImageKHR WPE created against its own headless EGLDisplay. A DMA-BUF
+  // itself is display-agnostic; the EGLImageKHR wrapping it is not, so an
+  // image created in WPE's display cannot be bound to a texture while a
+  // different EGLDisplay is current (glEGLImageTargetTexture2DOES fails
+  // with GL_INVALID_VALUE). Caller owns the returned EGLImageKHR and must
+  // eglDestroyImageKHR it — safe to do immediately after binding the image
+  // to a texture via glEGLImageTargetTexture2DOES. Returns nullptr if the
+  // current frame is not a DMA-BUF buffer (e.g. SHM/software mode).
+  void* ImportCurrentBufferToEglImage(void* target_display, uint32_t* out_width,
+                                      uint32_t* out_height,
+                                      bool* out_is_dma_buf_frame = nullptr) const override;
+  bool HasCurrentDmaBufBuffer() const override;
+  bool ShouldAttemptFlutterEglImport() const override;
+  void ReportFlutterEglImageImportFailure(bool current_frame_is_dma_buf) override;
+
   // Skip pixel readback - when using zero-copy EGL texture mode, we don't need
   // to read pixels back to CPU. This improves performance and avoids GL context issues.
-  void SetSkipPixelReadback(bool skip) { skip_pixel_readback_ = skip; }
+  void SetSkipPixelReadback(bool skip) {
+    skip_pixel_readback_.store(skip, std::memory_order_release);
+  }
+
+  // Inline Flutter textures import DMA-BUFs on Flutter's EGLDisplay. InAppBrowser
+  // instead consumes the EGL image created by WPE, so it leaves this disabled.
+  void SetInlineFlutterTextureConsumer(bool enabled) {
+    inline_flutter_texture_consumer_.store(enabled, std::memory_order_release);
+  }
+
+  void SetInlineFlutterEglImportEnabled(bool enabled) {
+    inline_flutter_import_state_.SetEnabled(enabled);
+  }
 
   // Frame available callback (called when new frame is ready)
   void SetOnFrameAvailable(std::function<void()> callback);
@@ -345,7 +395,7 @@ class InAppWebView {
   // Hide and cleanup any visible color picker
   void HideColorPicker();
   // Hide and cleanup any visible file chooser dialog
-  void HideFileChooser();
+  void HideFileChooser(bool force = false);
   // Hide and cleanup any visible option menu (HTML <select>)
   void HideOptionMenu();
 
@@ -355,7 +405,7 @@ class InAppWebView {
                       const std::string& min, const std::string& max,
                       const std::string& step, int x, int y);
   // Hide and cleanup any visible date picker
-  void HideDatePicker();
+  void HideDatePicker(bool force = false);
 
   // Resolve an internal handler's Promise with a JSON result via WebKitScriptMessageReply
   // Used by color/date picker dialogs to send the result back to JavaScript (works for iframes)
@@ -371,6 +421,7 @@ class InAppWebView {
   // Hide all custom popups (context menu, color picker, file chooser, option menu, etc.)
   // Use this when the webview state changes (resize, scroll, load, focus loss, etc.)
   void HideAllPopups();
+  void CancelHostBoundPopups();
 
   // Clipboard operations (syncs WPE WebKit clipboard with system clipboard)
   void copyToClipboard();
@@ -447,6 +498,11 @@ class InAppWebView {
   // Get the FlView (for focus restoration after popup dialogs)
   FlView* getFlView() const { return fl_view_; }
 
+  // Multi-window support: rehosts the webview on another window after the
+  // Flutter view showing it moved (popups, dialogs, scale and refresh rate).
+  // A null window means the window cached at plugin registration.
+  void SetHostView(GtkWindow* window, FlView* fl_view);
+
  private:
   PluginInstance* plugin_ = nullptr;  // Plugin instance for accessing managers
   FlPluginRegistrar* registrar_ = nullptr;
@@ -455,11 +511,13 @@ class InAppWebView {
   FlView* fl_view_ = nullptr;  // Cached FlView for focus restoration
   InAppWebViewManager* manager_ = nullptr;  // Manager reference for multi-window support
   int64_t id_ = 0;
+  std::optional<WebViewCreationError> creation_error_;
   int64_t channel_id_ = -1;
   std::string string_channel_id_;  // String-based channel ID for headless webviews
 
   // Settings
   std::shared_ptr<InAppWebViewSettings> settings_;
+  JavaScriptOriginPolicy javaScriptOriginPolicy_;
 
   // Context menu configuration
   std::shared_ptr<ContextMenu> context_menu_config_;
@@ -475,7 +533,7 @@ class InAppWebView {
   
   // Buffer rendering for WPEPlatform
   WPEBuffer* current_buffer_ = nullptr;   // Current frame buffer (borrowed, not owned)
-  void* current_egl_image_ = nullptr;     // EGL image created from current buffer
+  void* current_egl_image_ = nullptr;     // Borrowed from current WPEBuffer; never destroy here
   uint32_t current_buffer_width_ = 0;     // Width of current buffer
   uint32_t current_buffer_height_ = 0;    // Height of current buffer
   gulong buffer_rendered_handler_ = 0;    // Signal handler ID for buffer-rendered
@@ -519,10 +577,16 @@ class InAppWebView {
   std::atomic<size_t> write_buffer_index_{0};
   std::atomic<size_t> read_buffer_index_{1};
   mutable std::mutex buffer_swap_mutex_;
+  // Serializes CPU producers with hidden-view trimming. Raster copies only
+  // take buffer_swap_mutex_; allocation and freeing stay outside that lock.
+  std::mutex pixel_buffer_write_mutex_;
+  std::atomic<bool> trim_unused_pixel_buffers_{false};
   
   // Flag to skip pixel readback when using zero-copy EGL texture mode
   // When true, OnExportDmaBuf won't call ReadPixelsFromEglImage
-  bool skip_pixel_readback_ = false;
+  std::atomic<bool> skip_pixel_readback_{false};
+  std::atomic<bool> inline_flutter_texture_consumer_{false};
+  InlineDmaBufImportState inline_flutter_import_state_;
 
   // View dimensions
   int width_ = 800;
@@ -602,6 +666,9 @@ class InAppWebView {
 
   // Disposing flag to prevent callbacks during destruction
   std::atomic<bool> is_disposing_{false};
+  // Per-instance: no sibling WebView is cancelled when this instance exits.
+  std::shared_ptr<PendingWebKitJavaScriptCalls> pending_java_script_calls_ =
+      std::make_shared<PendingWebKitJavaScriptCalls>();
 
   // Mouse state
   double cursor_x_ = 0;
@@ -627,12 +694,20 @@ class InAppWebView {
   bool is_focused_ = true;
   bool is_visible_ = true;
 
+  // GLib source and generation are owned by the platform/main thread, like
+  // setVisible() and destruction. The generation also rejects stale callbacks.
+  static constexpr guint kHiddenPixelBufferTrimDelayMs = 30000;
+  guint hidden_pixel_buffer_trim_source_ = 0;
+  uint64_t hidden_pixel_buffer_trim_generation_ = 0;
+
   // Target refresh rate (0 = default)
   uint32_t target_refresh_rate_ = 0;
 
   // Monitor change tracking for refresh rate updates
   gulong monitors_changed_handler_id_ = 0;
   gulong configure_event_handler_id_ = 0;
+  gulong host_destroy_handler_id_ = 0;
+  gulong host_view_destroy_handler_id_ = 0;
 
   // Download signal handler ID
   gulong download_started_handler_id_ = 0;
@@ -654,12 +729,23 @@ class InAppWebView {
   bool pointer_locked_ = false;
 
   // === Initialization ===
-  void InitWpeBackend();
-  void InitWebView(const InAppWebViewCreationParams& params);
+  bool InitWpeBackend();
+  bool has_console_message_listener_ = true;
+  bool InitWebView(const InAppWebViewCreationParams& params);
+  void SetCreationError(const std::string& stage, const std::string& message,
+                        std::optional<int> nativeCode = std::nullopt,
+                        std::optional<std::string> nativeDomain = std::nullopt);
   void RegisterEventHandlers();
   void PrepareAndAddUserScripts();  // Add plugin scripts based on settings
   void SetupMonitorChangeHandlers();
   void CleanupMonitorChangeHandlers();
+  // The host window is a raw pointer (no ref): when it is destroyed while the
+  // webview is still alive, fall back to the window cached at registration.
+  void ConnectHostWindowDestroyHandler();
+  void DisconnectHostWindowDestroyHandler();
+  void ConnectHostViewDestroyHandler();
+  void DisconnectHostViewDestroyHandler();
+  void OnHostWindowDestroyed();
   void UpdateMonitorRefreshRate();
 
  public:
@@ -702,6 +788,10 @@ class InAppWebView {
   GtkWidget* active_file_dialog_ = nullptr;   // Active file chooser dialog (non-blocking)
   int64_t file_dialog_show_time_ = 0;          // Time when dialog was shown (to prevent immediate close)
   void* file_chooser_context_ = nullptr;       // Opaque pointer to FileChooserContext (for cleanup)
+  std::shared_ptr<int> lifetime_token_ = std::make_shared<int>(0);
+  // Incremented when navigation starts or loading is explicitly stopped,
+  // so an old postUrl timer cannot inject into a later document.
+  uint64_t post_url_generation_ = 0;
 
   // Option menu state (for HTML <select> support)
   WebKitOptionMenu* webkit_option_menu_ = nullptr;  // WebKit's option menu object (kept alive during popup)
@@ -711,6 +801,10 @@ class InAppWebView {
 
  private:
   static void OnFrameDisplayed(void* data);
+
+  void ScheduleHiddenPixelBufferTrim();
+  void CancelHiddenPixelBufferTrim();
+  void TrimUnusedPixelBuffers();
 
   // Read pixels from EGL image to CPU buffer
   void ReadPixelsFromEglImage(void* egl_image, uint32_t width, uint32_t height);

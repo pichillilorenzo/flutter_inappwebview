@@ -1,5 +1,23 @@
+## Unreleased
+
+- Cache JavaScript handler origin regexes per WebView and refresh them on exact pattern changes, including canonically equivalent Unicode patterns with different regex meanings.
+- Preserve shared bridge scripts/handlers until the final native parent/popup owner closes; stateless message adapters avoid retaining a disposed parent, including with the experiment disabled.
+- Add default-OFF `WKScriptMessageHandlerWithReply` with raw JSON text, per-view popup ownership, bounded capability probing, and exactly-once lifecycle cancellation. Both transports now authorize the actual native sender and enforce `javaScriptHandlersForMainFrameOnly`.
+- Apply document-local console policies without changing shared popup scripts, retain bounded native-to-Dart batches, and keep callbacks current across rebuilds. Inline publishers stay disabled until a live Dart controller attaches, including delayed keep-alive creation.
+- Keep inline scroll subscriptions disabled until a live controller attaches, so cancelling pending keep-alive creation cannot leave a listener or interfere with its next owner.
+- Suppress scroll channel messages without a listener while preserving axis constraints, scroll bookkeeping and overscroll events; update callback subscriptions on the existing WebView.
+
 ## 1.2.0-beta.3
 
+- Presented in-app and Safari browsers from the calling Flutter engine's window in apps with multiple scenes.
+- Batched console notifications while preserving message order and immediate warning/error delivery.
+- Finished failed custom-scheme requests and prevented delivery after cancellation.
+- Added `WebAuthenticationSession.additionalHeaderFields` on iOS 17.4+.
+- Prevented `evaluateJavascript` crashes in popup WebViews on iOS 14 through 17.
+- Prevented named-content-world `callAsyncJavaScript` crashes in popup WebViews on iOS 14 through 17 while preserving page-world support through a compatibility path.
+- Restored scroll insets after dismissing the keyboard on iOS 17.2 and later.
+- Fixed IIFE evaluation in named content worlds when the print bridge is active.
+- Fixed `callAsyncJavaScript` with arguments on iOS versions below 14.3.
 - Updated flutter_inappwebview_platform_interface version to ^1.4.0-beta.3
 - Implemented `saveState`, `restoreState` InAppWebViewController methods
 - Implemented `PlatformProxyController` class

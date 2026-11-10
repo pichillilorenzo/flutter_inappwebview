@@ -1,3 +1,4 @@
+export 'apple_webview_activity_snapshot.dart';
 export 'action_mode_menu_item.dart'
     show ActionModeMenuItem, AndroidActionModeMenuItem;
 export 'ajax_request.dart' show AjaxRequest;
@@ -65,7 +66,8 @@ export 'javascript_handler_callback.dart'
     show
         JavaScriptHandlerCallback,
         JavaScriptHandlerFunction,
-        JavaScriptHandlerFunctionData;
+        JavaScriptHandlerFunctionData,
+        JavaScriptHandlerJsonResult;
 export 'js_alert_request.dart' show JsAlertRequest;
 export 'js_alert_response.dart' show JsAlertResponse;
 export 'js_alert_response_action.dart' show JsAlertResponseAction;
@@ -109,6 +111,7 @@ export 'permission_response.dart'
     show PermissionResponse, PermissionRequestResponse;
 export 'permission_response_action.dart'
     show PermissionResponseAction, PermissionRequestResponseAction;
+export 'preferred_color_scheme.dart' show PreferredColorScheme;
 export 'print_job_attributes.dart' show PrintJobAttributes;
 export 'print_job_color_mode.dart' show PrintJobColorMode;
 export 'print_job_dialog_kind.dart' show PrintJobDialogKind;

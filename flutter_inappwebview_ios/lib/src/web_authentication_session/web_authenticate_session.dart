@@ -55,6 +55,9 @@ class IOSWebAuthenticationSession extends PlatformWebAuthenticationSession
   late final String? callbackURLScheme;
 
   @override
+  late final Map<String, String>? additionalHeaderFields;
+
+  @override
   late final WebAuthenticationSessionSettings? initialSettings;
 
   @override
@@ -68,12 +71,14 @@ class IOSWebAuthenticationSession extends PlatformWebAuthenticationSession
   Future<IOSWebAuthenticationSession> create({
     required WebUri url,
     String? callbackURLScheme,
+    Map<String, String>? additionalHeaderFields,
     WebAuthenticationSessionCompletionHandler onComplete,
     WebAuthenticationSessionSettings? initialSettings,
   }) async {
     var session = IOSWebAuthenticationSession._create(
       url: url,
       callbackURLScheme: callbackURLScheme,
+      additionalHeaderFields: additionalHeaderFields,
       onComplete: onComplete,
       initialSettings: initialSettings,
     );
@@ -83,6 +88,10 @@ class IOSWebAuthenticationSession extends PlatformWebAuthenticationSession
     args.putIfAbsent("id", () => session.id);
     args.putIfAbsent("url", () => session.url.toString());
     args.putIfAbsent("callbackURLScheme", () => session.callbackURLScheme);
+    args.putIfAbsent(
+      "additionalHeaderFields",
+      () => session.additionalHeaderFields,
+    );
     args.putIfAbsent("initialSettings", () => initialSettings?.toMap());
     await _staticChannel.invokeMethod('create', args);
     return session;
@@ -91,6 +100,7 @@ class IOSWebAuthenticationSession extends PlatformWebAuthenticationSession
   IOSWebAuthenticationSession._create({
     required this.url,
     this.callbackURLScheme,
+    this.additionalHeaderFields,
     this.onComplete,
     WebAuthenticationSessionSettings? initialSettings,
   }) : super.implementation(IOSWebAuthenticationSessionCreationParams()) {

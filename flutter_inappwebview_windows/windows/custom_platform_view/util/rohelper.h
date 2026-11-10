@@ -90,6 +90,7 @@ class RoHelper {
   RoUninitialize_* mFpRoUninitialize;
 
   bool mWinRtAvailable;
+  bool mRoInitialized;
 
   HMODULE mComBaseModule;
   HMODULE mCoreMessagingModule;

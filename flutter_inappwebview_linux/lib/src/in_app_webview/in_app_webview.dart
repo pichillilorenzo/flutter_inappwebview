@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
@@ -216,6 +217,7 @@ class LinuxInAppWebViewWidget extends PlatformInAppWebViewWidget {
       params as LinuxInAppWebViewWidgetCreationParams;
 
   LinuxInAppWebViewController? _controller;
+  bool _disposed = false;
 
   static final LinuxInAppWebViewWidget _staticValue = LinuxInAppWebViewWidget(
     LinuxInAppWebViewWidgetCreationParams(),
@@ -223,6 +225,14 @@ class LinuxInAppWebViewWidget extends PlatformInAppWebViewWidget {
 
   factory LinuxInAppWebViewWidget.static() {
     return _staticValue;
+  }
+
+  @override
+  void updateParams(PlatformInAppWebViewWidgetCreationParams params) {
+    super.updateParams(params);
+    unawaited(
+      _controller?.updateConsoleMessageCallback(params.onConsoleMessage),
+    );
   }
 
   @override
@@ -251,6 +261,8 @@ class LinuxInAppWebViewWidget extends PlatformInAppWebViewWidget {
         'initialUrlRequest': params.initialUrlRequest?.toMap(),
         'initialFile': params.initialFile,
         'initialData': params.initialData?.toMap(),
+        // Attach the publisher only once a live Dart controller owns it.
+        'hasConsoleMessageListener': false,
         'initialSettings': settingsMap,
         'contextMenu': params.contextMenu?.toMap() ?? {},
         'windowId': params.windowId,
@@ -266,6 +278,7 @@ class LinuxInAppWebViewWidget extends PlatformInAppWebViewWidget {
   }
 
   void _onPlatformViewCreated(int id) {
+    if (_disposed) return;
     dynamic viewId = id;
     if (params.headlessWebView?.isRunning() ?? false) {
       viewId = params.headlessWebView?.id;
@@ -276,6 +289,12 @@ class LinuxInAppWebViewWidget extends PlatformInAppWebViewWidget {
       PlatformInAppWebViewControllerCreationParams(
         id: viewId,
         webviewParams: params,
+      ),
+    );
+    unawaited(
+      _controller!.updateConsoleMessageCallback(
+        widgetParams.onConsoleMessage,
+        forceNativeUpdate: true,
       ),
     );
 
@@ -348,6 +367,7 @@ class LinuxInAppWebViewWidget extends PlatformInAppWebViewWidget {
 
   @override
   void dispose() {
+    _disposed = true;
     dynamic viewId = _controller?.id;
     debugLog(
       className: runtimeType.toString(),

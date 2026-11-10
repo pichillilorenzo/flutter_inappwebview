@@ -34,6 +34,9 @@ class HeadlessInAppWebView {
 
   const std::string& id() const { return id_; }
   InAppWebView* webview() const { return webview_.get(); }
+  const std::optional<WebViewCreationError>& creationError() const {
+    return webview_->creationError();
+  }
   HeadlessInAppWebViewManager* manager() const { return manager_; }
 
   // Size management

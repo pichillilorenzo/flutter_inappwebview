@@ -1,5 +1,16 @@
+## Unreleased
+
+- Cover keyed Android WebView rebuilds, reparenting and disposal through the public widget without changing Windows creation-failure key identity.
+- Expose console level allowlists and update console subscriptions on the existing WebView across widget rebuilds. Inline publishers stay disabled until a live Dart controller attaches, including delayed keep-alive creation.
+- Verified cancelled keep-alive creation and reattachment in either completion order without an orphaned scroll subscription.
+- Preserve the native widget delegate across rebuilds so supported event callbacks update on the existing controller and the owning delegate is disposed.
+
 ## 6.2.0-beta.3
 
+- Exposed optional Android WebView startup prewarming and verified public dispatch and unsupported-platform behavior.
+- Added Android `InAppWebViewController.setBackgroundColor`.
+- Added `WebAuthenticationSession.additionalHeaderFields` on iOS 17.4+ and
+  macOS 14.4+.
 - Added Linux support
 - Updated dependencies to the latest versions for all platform implementations:
   - `flutter_inappwebview_platform_interface`: `^1.4.0-beta.2` -> `^1.4.0-beta.3`

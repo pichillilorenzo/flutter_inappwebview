@@ -165,7 +165,6 @@ namespace flutter_inappwebview_plugin
   {
     std::transform(s.begin(), s.end(), s.begin(),
       [](const T v) { return static_cast<T>(std::toupper(v)); });
-    return s2;
   }
 
   template <typename T>

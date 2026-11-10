@@ -61,6 +61,7 @@ namespace flutter_inappwebview_plugin
     auto initialFile = get_optional_fl_map_value<std::string>(params, "initialFile");
     auto initialDataMap = get_optional_fl_map_value<flutter::EncodableMap>(params, "initialData");
     auto initialUserScriptList = get_optional_fl_map_value<flutter::EncodableList>(params, "initialUserScripts");
+    auto hasConsoleMessageListener = get_optional_fl_map_value<bool>(params, "hasConsoleMessageListener").value_or(true);
     auto webViewEnvironmentId = get_optional_fl_map_value<std::string>(params, "webViewEnvironmentId");
 
     RECT bounds;
@@ -69,7 +70,8 @@ namespace flutter_inappwebview_plugin
     auto initialWidth = initialSize->width >= 0 ? initialSize->width : bounds.right - bounds.left;
     auto initialHeight = initialSize->height >= 0 ? initialSize->height : bounds.bottom - bounds.top;
 
-    auto hwnd = CreateWindowEx(0, windowClass_.lpszClassName, L"", 0, 0,
+    const DWORD windowStyle = WS_CHILD | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
+    auto hwnd = CreateWindowEx(0, windowClass_.lpszClassName, L"", windowStyle, 0,
       0, (int)initialWidth, (int)initialHeight,
       plugin->registrar->GetView()->GetNativeWindow(),
       nullptr,
@@ -79,12 +81,22 @@ namespace flutter_inappwebview_plugin
       ? plugin->webViewEnvironmentManager->webViewEnvironments.at(webViewEnvironmentId.value()).get() : nullptr;
 
     auto initialSettings = std::make_shared<InAppWebViewSettings>(settingsMap);
+    auto failureStage = std::make_shared<std::string>();
 
     InAppWebView::createInAppWebViewEnv(hwnd, false, webViewEnvironment, initialSettings,
-      [=](wil::com_ptr<ICoreWebView2Environment> webViewEnv,
+      [=, alive = alive_.weak()](HRESULT errorCode,
+        wil::com_ptr<ICoreWebView2Environment> webViewEnv,
         wil::com_ptr<ICoreWebView2Controller> webViewController,
         wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController)
       {
+        if (alive.expired()) {
+          // The engine was torn down while WebView2 was still creating the
+          // controller: this object, the registrar and result_ are all gone.
+          if (webViewController) {
+            failedLog(webViewController->Close());
+          }
+          return;
+        }
         if (plugin && webViewEnv && webViewController) {
           std::optional<std::vector<std::shared_ptr<UserScript>>> initialUserScripts = initialUserScriptList.has_value() ?
             functional_map(initialUserScriptList.value(), [](const flutter::EncodableValue& map) { return std::make_shared<UserScript>(std::get<flutter::EncodableMap>(map)); }) :
@@ -93,7 +105,8 @@ namespace flutter_inappwebview_plugin
           InAppWebViewCreationParams params = {
             id,
             std::move(initialSettings),
-            initialUserScripts
+            initialUserScripts,
+            hasConsoleMessageListener
           };
 
           auto inAppWebView = std::make_unique<InAppWebView>(plugin, params, hwnd,
@@ -132,15 +145,19 @@ namespace flutter_inappwebview_plugin
           result_->Success(true);
         }
         else {
-          result_->Error("0", "Cannot create the HeadlessInAppWebView instance!");
+          DestroyWindow(hwnd);
+          const std::string stage = failureStage->empty() ? "" : " (" + *failureStage + ")";
+          result_->Error("0", "Cannot create the HeadlessInAppWebView instance" + stage + "! HRESULT " + getHRErrorString(errorCode));
         }
-      }
+      },
+      failureStage
     );
   }
 
   HeadlessInAppWebViewManager::~HeadlessInAppWebViewManager()
   {
     debugLog("dealloc HeadlessInAppWebViewManager");
+    alive_.expire();
     webViews.clear();
     UnregisterClass(windowClass_.lpszClassName, nullptr);
     plugin = nullptr;

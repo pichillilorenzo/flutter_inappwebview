@@ -44,11 +44,11 @@ namespace flutter_inappwebview_plugin
     PermissionResponse(const flutter::EncodableMap& map);
     ~PermissionResponse() = default;
 
-    bool PermissionResponse::operator==(const PermissionResponse& other)
+    bool operator==(const PermissionResponse& other)
     {
       return resources == other.resources && action == other.action;
     }
-    bool PermissionResponse::operator!=(const PermissionResponse& other)
+    bool operator!=(const PermissionResponse& other)
     {
       return !(*this == other);
     }

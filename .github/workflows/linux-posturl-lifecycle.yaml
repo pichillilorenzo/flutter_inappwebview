@@ -1,0 +1,19 @@
+name: Linux deferred postUrl lifecycle
+on:
+  pull_request:
+    paths:
+      - 'flutter_inappwebview_linux/**'
+      - '.github/workflows/linux-posturl-lifecycle.yaml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  posturl-lifecycle:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test production POST navigation and lifetime under ASan and UBSan
+        env:
+          CXXFLAGS: -fsanitize=address,undefined -fno-omit-frame-pointer
+          ASAN_OPTIONS: detect_leaks=1
+        run: python3 flutter_inappwebview_linux/linux/test/run_deferred_post_url_test.py

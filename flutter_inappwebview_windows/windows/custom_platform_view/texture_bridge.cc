@@ -8,6 +8,7 @@
 #include <iostream>
 
 #include "util/direct3d11.interop.h"
+#include "../utils/timer.h"
 
 namespace flutter_inappwebview_plugin
 {
@@ -15,7 +16,12 @@ namespace flutter_inappwebview_plugin
 
   TextureBridge::TextureBridge(GraphicsContext* graphics_context,
     ABI::Windows::UI::Composition::IVisual* visual)
-    : graphics_context_(graphics_context)
+    : graphics_context_(graphics_context),
+      hidden_trim_(
+        [](std::function<void()> callback, uint32_t delay) {
+          return Timer::setTimeout(std::move(callback), delay);
+        },
+        [](DelayedTextureTrim::TimerId id) { Timer::clearTimeout(id); })
   {
     capture_item_ =
       graphics_context_->CreateGraphicsCaptureItemFromVisual(visual);
@@ -44,13 +50,84 @@ namespace flutter_inappwebview_plugin
     }
   }
 
+  HRESULT TextureBridge::ProbeCapture(
+    const GraphicsContext* graphics_context,
+    ABI::Windows::UI::Composition::IVisual* visual, const char** failed_stage)
+  {
+    const auto item = graphics_context->CreateGraphicsCaptureItemFromVisual(visual);
+    if (!item) {
+      *failed_stage = "CreateGraphicsCaptureItemFromVisual";
+      return E_FAIL;
+    }
+    const auto pool = graphics_context->CreateCaptureFramePool(
+      graphics_context->device(),
+      static_cast<ABI::Windows::Graphics::DirectX::DirectXPixelFormat>(
+        kPixelFormat),
+      kNumBuffers, { 1, 1 });
+    if (!pool) {
+      *failed_stage = "CreateCaptureFramePool";
+      return E_FAIL;
+    }
+    winrt::com_ptr<ABI::Windows::Graphics::Capture::IGraphicsCaptureSession>
+      session;
+    const HRESULT hr = pool->CreateCaptureSession(item.get(), session.put());
+    for (const auto closable :
+         { session.try_as<ABI::Windows::Foundation::IClosable>(),
+           pool.try_as<ABI::Windows::Foundation::IClosable>() }) {
+      if (closable) {
+        closable->Close();
+      }
+    }
+    if (FAILED(hr)) {
+      *failed_stage = "CreateCaptureSession";
+    }
+    return hr;
+  }
+
   bool TextureBridge::Start()
   {
     const std::lock_guard<std::mutex> lock(mutex_);
     if (is_running_ || !capture_item_) {
       return false;
     }
+    if (!capture_suspended_ && !StartCapture()) {
+      return false;
+    }
+    is_running_ = true;
+    if (capture_suspended_) {
+      ScheduleHiddenTrim();
+    }
+    return true;
+  }
 
+  void TextureBridge::SetCaptureSuspended(bool suspended)
+  {
+    const std::lock_guard<std::mutex> lock(mutex_);
+    if (capture_suspended_ == suspended) {
+      return;
+    }
+    capture_suspended_ = suspended;
+    if (!suspended) {
+      hidden_trim_.CancelPending();
+    }
+    if (!is_running_) {
+      return;
+    }
+    if (suspended) {
+      StopCapture();
+      last_frame_ = nullptr;
+      OnCaptureSuspended();
+      ScheduleHiddenTrim();
+    }
+    else if (!StartCapture()) {
+      // Keep the bridge running and retain the last published frame. A later
+      // visibility transition can retry StartCapture without requiring a
+      // surface resize to call Start() again.
+    }
+  }
+
+  bool TextureBridge::StartCapture()
+  {
     ABI::Windows::Graphics::SizeInt32 size;
     capture_item_->get_Size(&size);
 
@@ -59,7 +136,10 @@ namespace flutter_inappwebview_plugin
       static_cast<ABI::Windows::Graphics::DirectX::DirectXPixelFormat>(
         kPixelFormat),
       kNumBuffers, size);
-    assert(frame_pool_);
+    if (!frame_pool_) {
+      return false;
+    }
+    pool_size_ = size;
 
     frame_pool_->add_FrameArrived(
       Microsoft::WRL::Callback<ABI::Windows::Foundation::ITypedEventHandler<
@@ -78,15 +158,38 @@ namespace flutter_inappwebview_plugin
     if (FAILED(frame_pool_->CreateCaptureSession(capture_item_.get(),
       capture_session_.put()))) {
       std::cerr << "Creating capture session failed." << std::endl;
+      StopCapture();
       return false;
     }
 
-    if (SUCCEEDED(capture_session_->StartCapture())) {
-      is_running_ = true;
-      return true;
+    if (FAILED(capture_session_->StartCapture())) {
+      StopCapture();
+      return false;
     }
+    // The new pool already has the current size.
+    needs_update_ = false;
+    return true;
+  }
 
-    return false;
+  void TextureBridge::StopCapture()
+  {
+    if (frame_pool_) {
+      frame_pool_->remove_FrameArrived(on_frame_arrived_token_);
+    }
+    if (capture_session_) {
+      auto closable =
+        capture_session_.try_as<ABI::Windows::Foundation::IClosable>();
+      assert(closable);
+      closable->Close();
+      capture_session_ = nullptr;
+    }
+    if (frame_pool_) {
+      if (auto closable =
+        frame_pool_.try_as<ABI::Windows::Foundation::IClosable>()) {
+        closable->Close();
+      }
+      frame_pool_ = nullptr;
+    }
   }
 
   void TextureBridge::Stop()
@@ -97,21 +200,47 @@ namespace flutter_inappwebview_plugin
 
   void TextureBridge::StopInternal()
   {
+    hidden_trim_.CancelPending();
     if (is_running_) {
       is_running_ = false;
-      frame_pool_->remove_FrameArrived(on_frame_arrived_token_);
-      auto closable =
-        capture_session_.try_as<ABI::Windows::Foundation::IClosable>();
-      assert(closable);
-      closable->Close();
-      capture_session_ = nullptr;
+      StopCapture();
     }
+  }
+
+  void TextureBridge::OnCaptureSuspended() {}
+
+  bool TextureBridge::TrimHiddenResources(
+    std::vector<winrt::com_ptr<ID3D11Texture2D>>&)
+  {
+    return false;
+  }
+
+  void TextureBridge::ScheduleHiddenTrim()
+  {
+    // Visibility, Stop and this timer run on the owning platform thread.
+    hidden_trim_.Start([this] {
+      std::vector<winrt::com_ptr<ID3D11Texture2D>> retired;
+      // Allocate before the capture lock, also used by the CPU raster path.
+      retired.reserve(2);
+      bool retry = false;
+      {
+        const std::lock_guard<std::mutex> lock(mutex_);
+        if (!is_running_ || !capture_suspended_) {
+          return false;
+        }
+        retry = TrimHiddenResources(retired);
+      }
+      // The last published GPU texture / CPU pixel buffer was not detached.
+      // Its consumer never waits for these final driver releases.
+      return retry;
+    });
   }
 
   void TextureBridge::OnFrameArrived()
   {
     const std::lock_guard<std::mutex> lock(mutex_);
-    if (!is_running_) {
+    // A frame already in flight when capture was suspended finds no pool.
+    if (!is_running_ || !frame_pool_) {
       return;
     }
 
@@ -128,24 +257,33 @@ namespace flutter_inappwebview_plugin
       if (SUCCEEDED(frame->get_Surface(frame_surface.put()))) {
         last_frame_ =
           TryGetDXGIInterfaceFromObject<ID3D11Texture2D>(frame_surface);
-        has_frame = !ShouldDropFrame();
+        has_frame = last_frame_ && !ShouldDropFrame() && AcceptFrame(last_frame_);
       }
     }
 
     if (needs_update_) {
       ABI::Windows::Graphics::SizeInt32 size;
       capture_item_->get_Size(&size);
-      frame_pool_->Recreate(
-        graphics_context_->device(),
-        static_cast<ABI::Windows::Graphics::DirectX::DirectXPixelFormat>(
-          kPixelFormat),
-        kNumBuffers, size);
+      // A resize that ended at the pool's size needs no new buffers.
+      if (size.Width != pool_size_.Width || size.Height != pool_size_.Height) {
+        frame_pool_->Recreate(
+          graphics_context_->device(),
+          static_cast<ABI::Windows::Graphics::DirectX::DirectXPixelFormat>(
+            kPixelFormat),
+          kNumBuffers, size);
+        pool_size_ = size;
+      }
       needs_update_ = false;
     }
 
     if (has_frame && frame_available_) {
       frame_available_();
     }
+  }
+
+  bool TextureBridge::AcceptFrame(const winrt::com_ptr<ID3D11Texture2D>&)
+  {
+    return true;
   }
 
   bool TextureBridge::ShouldDropFrame()

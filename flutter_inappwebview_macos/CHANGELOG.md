@@ -1,5 +1,25 @@
+## Unreleased
+
+- Fix the legacy async JavaScript wrapper syntax and settle its pending callbacks once on disposal, document replacement, or WebContent termination.
+- Cache JavaScript handler origin regexes per WebView and refresh them on exact pattern changes, including canonically equivalent Unicode patterns with different regex meanings.
+- Preserve shared bridge scripts/handlers until the final native parent/popup owner closes; stateless message adapters avoid retaining a disposed parent, including with the experiment disabled.
+- Add default-OFF `WKScriptMessageHandlerWithReply` with raw JSON text, per-view popup ownership, bounded capability probing, and exactly-once lifecycle cancellation. Both transports now authorize the actual native sender and enforce `javaScriptHandlersForMainFrameOnly`.
+- Apply document-local console policies without changing shared popup scripts, retain bounded native-to-Dart batches, and keep callbacks current across rebuilds. Inline publishers stay disabled until a live Dart controller attaches, including delayed keep-alive creation.
+- Reconcile programmatic scrolling before a document receives its subscription and while detached, without repeating unchanged positions on attachment.
+- Keep inline scroll subscriptions disabled until a live controller attaches, so cancelling pending keep-alive creation cannot leave a listener or interfere with its next owner.
+- Attach and detach the scroll publisher with the current Dart listener, retaining final-coordinate flushing and independent popup state across rebuilds and navigation.
+
 ## 1.2.0-beta.3
 
+- Present file chooser and JavaScript dialogs as sheets attached to the hosting window.
+- Batched console notifications while preserving message order and immediate warning/error delivery.
+- Coalesced scroll notifications and removed their unused JavaScript promise round trip.
+- Finished failed custom-scheme requests and prevented delivery after cancellation.
+- Fixed native WebView frame drift with fractional platform-view sizes.
+- Added `WebAuthenticationSession.additionalHeaderFields` on macOS 14.4+.
+- Prevented `upgradeKnownHostsToHTTPS` crashes on macOS 11.x.
+- Fixed IIFE evaluation in named content worlds when the print bridge is active.
+- Fixed Xcode 26 builds when targeting macOS 10.14.
 - Updated flutter_inappwebview_platform_interface version to ^1.4.0-beta.3
 - Implemented `saveState`, `restoreState` InAppWebViewController methods
 - Implemented `PlatformProxyController` class

@@ -19,6 +19,7 @@ import com.pichillilorenzo.flutter_inappwebview_android.service_worker.ServiceWo
 import com.pichillilorenzo.flutter_inappwebview_android.tracing.TracingControllerManager;
 import com.pichillilorenzo.flutter_inappwebview_android.webview.FlutterWebViewFactory;
 import com.pichillilorenzo.flutter_inappwebview_android.webview.InAppWebViewManager;
+import com.pichillilorenzo.flutter_inappwebview_android.webview_environment.WebViewEnvironmentManager;
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.embedding.engine.plugins.activity.ActivityAware;
@@ -61,6 +62,8 @@ public class InAppWebViewFlutterPlugin implements FlutterPlugin, ActivityAware {
   public TracingControllerManager tracingControllerManager;
   @Nullable
   public ProcessGlobalConfigManager processGlobalConfigManager;
+  @Nullable
+  public WebViewEnvironmentManager webViewEnvironmentManager;
   public FlutterWebViewFactory flutterWebViewFactory;
   public Context applicationContext;
   public BinaryMessenger messenger;
@@ -116,6 +119,7 @@ public class InAppWebViewFlutterPlugin implements FlutterPlugin, ActivityAware {
     }
     tracingControllerManager = new TracingControllerManager(this);
     processGlobalConfigManager = new ProcessGlobalConfigManager(this);
+    webViewEnvironmentManager = new WebViewEnvironmentManager(this);
   }
 
   @Override
@@ -175,6 +179,10 @@ public class InAppWebViewFlutterPlugin implements FlutterPlugin, ActivityAware {
     if (tracingControllerManager != null) {
       tracingControllerManager.dispose();
       tracingControllerManager = null;
+    }
+    if (webViewEnvironmentManager != null) {
+      webViewEnvironmentManager.dispose();
+      webViewEnvironmentManager = null;
     }
     if (processGlobalConfigManager != null) {
       processGlobalConfigManager.dispose();

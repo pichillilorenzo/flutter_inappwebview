@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
 import 'chrome_safari_browser/chrome_safari_browser.dart';
@@ -634,6 +637,37 @@ class _PlatformWebViewEnvironment extends PlatformWebViewEnvironment {
       );
 
   factory _PlatformWebViewEnvironment.static() => _staticValue;
+
+  static const _channel = MethodChannel(
+    'com.pichillilorenzo/flutter_webview_environment',
+  );
+
+  /// Warms only Android startup work that can run off the UI thread.
+  /// Apply ProcessGlobalConfig before invoking this. Windows environment
+  /// settings are ignored; no Android environment instance is created.
+  @override
+  Future<WebViewEnvironmentPrewarmResult?> prewarm({
+    WebViewEnvironmentSettings? settings,
+  }) async {
+    final stopwatch = Stopwatch()..start();
+    try {
+      final result = await _channel
+          .invokeMapMethod<String, dynamic>('prewarm')
+          .timeout(const Duration(seconds: 35));
+      return WebViewEnvironmentPrewarmResult.fromMap(result);
+    } on TimeoutException {
+      return WebViewEnvironmentPrewarmResult(
+        status: 'timeout',
+        duration: stopwatch.elapsed,
+      );
+    } catch (_) {
+      // Prewarming is best effort, including unavailable plugins and malformed replies.
+      return WebViewEnvironmentPrewarmResult(
+        status: 'unavailable',
+        duration: stopwatch.elapsed,
+      );
+    }
+  }
 }
 
 class _PlatformWebNotificationController

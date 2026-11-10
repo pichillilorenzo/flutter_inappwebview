@@ -104,7 +104,7 @@ public class InAppBrowserManager: ChannelDelegate {
         navController.pushViewController(webViewController, animated: false)
         webViewController.prepareNavigationControllerBeforeViewWillAppear()
         
-        guard let visibleViewController = UIApplication.shared.visibleViewController else {
+        guard let visibleViewController = UIApplication.shared.visibleViewController(presentingFrom: plugin?.registrar.viewController) else {
             assertionFailure("Failure init the visibleViewController!")
             return
         }

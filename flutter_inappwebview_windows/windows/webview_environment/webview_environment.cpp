@@ -1,3 +1,4 @@
+#include <atomic>
 #include <WebView2EnvironmentOptions.h>
 #include <wil/wrl.h>
 
@@ -15,23 +16,8 @@ namespace flutter_inappwebview_plugin
     channelDelegate(std::make_unique<WebViewEnvironmentChannelDelegate>(this, plugin->registrar->messenger()))
   {}
 
-  void WebViewEnvironment::create(const std::unique_ptr<WebViewEnvironmentSettings> settings, const std::function<void(HRESULT)> completionHandler)
+  wil::com_ptr<ICoreWebView2EnvironmentOptions> WebViewEnvironment::createOptions(const WebViewEnvironmentSettings* settings)
   {
-    if (!plugin) {
-      if (completionHandler) {
-        completionHandler(E_FAIL);
-      }
-      return;
-    }
-
-    auto hwnd = plugin->webViewEnvironmentManager->getHWND();
-    if (!hwnd) {
-      if (completionHandler) {
-        completionHandler(E_FAIL);
-      }
-      return;
-    }
-
     auto options = Make<CoreWebView2EnvironmentOptions>();
     if (settings) {
       if (settings->additionalBrowserArguments.has_value()) {
@@ -56,9 +42,12 @@ namespace flutter_inappwebview_plugin
       }
       wil::com_ptr<ICoreWebView2EnvironmentOptions4> options4;
       if (succeededOrLog(options->QueryInterface(IID_PPV_ARGS(&options4))) && settings->customSchemeRegistrations.has_value()) {
-        std::vector<ICoreWebView2CustomSchemeRegistration*> registrations = {};
-        for (auto& customSchemeRegistration : settings->customSchemeRegistrations.value()) {
-          registrations.push_back(std::move(customSchemeRegistration->toWebView2CustomSchemeRegistration()));
+        std::vector<ComPtr<CoreWebView2CustomSchemeRegistration>> owners;
+        std::vector<ICoreWebView2CustomSchemeRegistration*> registrations;
+        for (const auto& customSchemeRegistration : settings->customSchemeRegistrations.value()) {
+          auto registration = customSchemeRegistration->toWebView2CustomSchemeRegistration();
+          registrations.push_back(registration.Get());
+          owners.push_back(std::move(registration));
         }
         options4->SetCustomSchemeRegistrations(static_cast<UINT32>(registrations.size()), registrations.data());
       }
@@ -84,14 +73,42 @@ namespace flutter_inappwebview_plugin
         options8->put_ScrollBarStyle(static_cast<COREWEBVIEW2_SCROLLBAR_STYLE>(settings->scrollbarStyle.value()));
       }
     }
+    wil::com_ptr<ICoreWebView2EnvironmentOptions> result;
+    options->QueryInterface(IID_PPV_ARGS(result.put()));
+    return result;
+  }
+
+  void WebViewEnvironment::create(const std::unique_ptr<WebViewEnvironmentSettings> settings, const std::function<void(HRESULT)> completionHandler)
+  {
+    if (!plugin) {
+      if (completionHandler) {
+        completionHandler(E_FAIL);
+      }
+      return;
+    }
+
+    auto hwnd = plugin->webViewEnvironmentManager->getHWND();
+    if (!hwnd) {
+      if (completionHandler) {
+        completionHandler(E_FAIL);
+      }
+      return;
+    }
+
+    auto options = createOptions(settings.get());
 
     auto hr = CreateCoreWebView2EnvironmentWithOptions(
       settings && settings->browserExecutableFolder.has_value() ? utf8_to_wide(settings->browserExecutableFolder.value()).c_str() : nullptr,
       settings && settings->userDataFolder.has_value() ? utf8_to_wide(settings->userDataFolder.value()).c_str() : nullptr,
-      options.Get(),
+      options.get(),
       Callback<ICoreWebView2CreateCoreWebView2EnvironmentCompletedHandler>(
-        [this, hwnd, completionHandler](HRESULT result, wil::com_ptr<ICoreWebView2Environment> environment) -> HRESULT
+        [this, hwnd, completionHandler, alive = alive_.weak()](HRESULT result, wil::com_ptr<ICoreWebView2Environment> environment) -> HRESULT
         {
+          if (alive.expired()) {
+            // Torn down mid-creation; completionHandler captures the owning
+            // manager, which is gone as well.
+            return S_OK;
+          }
           if (succeededOrLog(result)) {
             environment_ = std::move(environment);
 
@@ -250,46 +267,73 @@ namespace flutter_inappwebview_plugin
     return false;
   }
 
-  void WebViewEnvironment::getProcessInfos(const std::function<void(std::vector<std::shared_ptr<BrowserProcessInfo>>)> completionHandler) const
+  void WebViewEnvironment::getProcessInfos(const std::function<void(ProcessInfosResult)> completionHandler) const
   {
+    auto completed = std::make_shared<std::atomic<bool>>(false);
+    auto finish = [completionHandler, completed, weakAlive = alive_.weak()](ProcessInfosResult result)
+      {
+        if (!completed->exchange(true) && completionHandler) {
+          if (weakAlive.expired()) {
+            result = ProcessInfosResult::failure(E_UNEXPECTED, "environment",
+              "webview_environment_unavailable");
+          }
+          completionHandler(std::move(result));
+        }
+      };
     if (!environment_) {
-      if (completionHandler) {
-        completionHandler({});
-      }
+      finish(ProcessInfosResult::failure(E_UNEXPECTED, "environment",
+        "webview_environment_unavailable"));
       return;
     }
 
-    if (auto environment13 = environment_.try_query<ICoreWebView2Environment13>()) {
-      auto hr = environment13->GetProcessExtendedInfos(Callback<ICoreWebView2GetProcessExtendedInfosCompletedHandler>(
-        [completionHandler](HRESULT error, wil::com_ptr<ICoreWebView2ProcessExtendedInfoCollection> processCollection) -> HRESULT
+    wil::com_ptr<ICoreWebView2Environment13> environment13;
+    auto extendedError = environment_->QueryInterface(IID_PPV_ARGS(&environment13));
+    std::string extendedStage = "QueryInterface.Environment13";
+    if (SUCCEEDED(extendedError) && environment13) {
+      extendedStage = "GetProcessExtendedInfos";
+      extendedError = environment13->GetProcessExtendedInfos(Callback<ICoreWebView2GetProcessExtendedInfosCompletedHandler>(
+        [finish](HRESULT error, wil::com_ptr<ICoreWebView2ProcessExtendedInfoCollection> processCollection) -> HRESULT
         {
-          std::vector<std::shared_ptr<BrowserProcessInfo>> processInfos = {};
-          if (succeededOrLog(error) && processCollection) {
-            auto browserProcessInfosChangedDetail = BrowserProcessInfosChangedDetail::fromICoreWebView2ProcessExtendedInfoCollection(processCollection);
-            processInfos = browserProcessInfosChangedDetail->infos;
+          if (FAILED(error)) {
+            finish(ProcessInfosResult::failure(error, "GetProcessExtendedInfos.callback"));
           }
-          if (completionHandler) {
-            completionHandler(processInfos);
+          else {
+            finish(readProcessInfoCollection<ICoreWebView2ProcessExtendedInfo>(processCollection,
+              "GetProcessExtendedInfos", BrowserProcessInfo::fromICoreWebView2ProcessExtendedInfo));
           }
           return S_OK;
         }).Get());
-
-      if (succeededOrLog(hr)) {
+      if (SUCCEEDED(extendedError) || completed->load()) {
         return;
       }
     }
-    std::vector<std::shared_ptr<BrowserProcessInfo>> processInfos = {};
-    if (auto environment8 = environment_.try_query<ICoreWebView2Environment8>()) {
-      wil::com_ptr<ICoreWebView2ProcessInfoCollection> processCollection;
-      if (succeededOrLog(environment8->GetProcessInfos(&processCollection))) {
-        auto browserProcessInfosChangedDetail = BrowserProcessInfosChangedDetail::fromICoreWebView2ProcessInfoCollection(processCollection);
-        processInfos = browserProcessInfosChangedDetail->infos;
-      }
+    else if (SUCCEEDED(extendedError)) {
+      extendedError = E_POINTER;
     }
 
-    if (completionHandler) {
-      completionHandler(processInfos);
+    // Keep support for older runtimes and the existing basic-API fallback when
+    // the extended request cannot start. An asynchronous failure stays an error.
+    wil::com_ptr<ICoreWebView2Environment8> environment8;
+    auto hr = environment_->QueryInterface(IID_PPV_ARGS(&environment8));
+    if (FAILED(hr) || !environment8) {
+      if (hr == E_NOINTERFACE && extendedError != E_NOINTERFACE) {
+        finish(ProcessInfosResult::failure(extendedError, extendedStage));
+      }
+      else {
+        finish(ProcessInfosResult::failure(FAILED(hr) ? hr : E_POINTER,
+          "QueryInterface.Environment8", hr == E_NOINTERFACE
+            ? "process_info_unsupported" : "process_info_collection_failed"));
+      }
+      return;
     }
+    wil::com_ptr<ICoreWebView2ProcessInfoCollection> processCollection;
+    hr = environment8->GetProcessInfos(&processCollection);
+    if (FAILED(hr)) {
+      finish(ProcessInfosResult::failure(hr, "GetProcessInfos"));
+      return;
+    }
+    finish(readProcessInfoCollection<ICoreWebView2ProcessInfo>(processCollection,
+      "GetProcessInfos", BrowserProcessInfo::fromICoreWebView2ProcessInfo));
   }
 
   std::optional<std::string> WebViewEnvironment::getFailureReportFolderPath() const
@@ -311,6 +355,7 @@ namespace flutter_inappwebview_plugin
   WebViewEnvironment::~WebViewEnvironment()
   {
     debugLog("dealloc WebViewEnvironment");
+    alive_.expire();
     if (environment_) {
       environment_->remove_NewBrowserVersionAvailable(newBrowserVersionAvailableToken_);
       if (auto environment5 = environment_.try_query<ICoreWebView2Environment5>()) {

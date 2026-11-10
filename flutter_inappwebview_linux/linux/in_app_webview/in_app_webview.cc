@@ -6,6 +6,7 @@
 // - WPEBackend-FDO (HAVE_WPE_BACKEND_LEGACY): Legacy API for older systems
 
 #include "in_app_webview.h"
+#include "dma_buf_import_policy.h"
 
 #include <dlfcn.h>
 #include <linux/limits.h>
@@ -13,9 +14,11 @@
 
 #include <algorithm>
 #include <cmath>
+#include <cstdlib>
 #include <cstring>
 #include <filesystem>
 #include <limits>
+#include <new>
 #include <nlohmann/json.hpp>
 #include <random>
 #include <set>
@@ -67,6 +70,7 @@
 #include "../flutter_inappwebview_linux_plugin_private.h"
 #include "../plugin_instance.h"
 #include "../utils/flutter.h"
+#include "../utils/gdk_scale.h"
 #include "../utils/gl_context.h"
 #include "../utils/log.h"
 #include "../utils/uri.h"
@@ -238,6 +242,8 @@ InAppWebView::InAppWebView(FlPluginRegistrar* registrar, FlBinaryMessenger* mess
                            const InAppWebViewCreationParams& params)
     : plugin_(params.plugin), registrar_(registrar), messenger_(messenger), gtk_window_(params.gtkWindow), fl_view_(params.flView), manager_(params.manager), id_(id), settings_(params.initialSettings),
       initial_user_scripts_(params.initialUserScripts) {
+  has_console_message_listener_ = params.hasConsoleMessageListener;
+  if (settings_) javaScriptOriginPolicy_.configure(settings_->javaScriptHandlersOriginAllowList);
   js_bridge_secret_ = GenerateRandomSecret();
   
   if (params.windowId.has_value()) {
@@ -248,14 +254,17 @@ InAppWebView::InAppWebView(FlPluginRegistrar* registrar, FlBinaryMessenger* mess
     context_menu_config_ = params.contextMenu.value();
   }
 
-  InitWpeBackend();
-  InitWebView(params);
+  if (!InitWpeBackend() || !InitWebView(params)) {
+    return;
+  }
+  ConnectHostViewDestroyHandler();
   RegisterEventHandlers();
 
   // Set up monitor change handlers and initial refresh rate (like Cog browser does)
   // This helps WPE synchronize frame production with the display
   SetupMonitorChangeHandlers();
   UpdateMonitorRefreshRate();
+  ConnectHostWindowDestroyHandler();
 
   if (settings_) {
     settings_->applyToWebView(webview_);
@@ -283,8 +292,10 @@ InAppWebView::InAppWebView(FlPluginRegistrar* registrar, FlBinaryMessenger* mess
         settings_->contentBlockers,
         [this, initialUrlRequest, initialData, initialDataMimeType, initialDataEncoding,
          initialDataBaseUrl, initialFile](bool success) {
+          // Loading without the rules would run the page unrestricted.
           if (!success) {
-            debugLog("InAppWebView: Content blockers failed to apply, loading content anyway");
+            errorLog("InAppWebView: Content blockers failed to apply, not loading content");
+            return;
           }
 
           // Now load initial content
@@ -356,8 +367,16 @@ void InAppWebView::AttachChannel(FlBinaryMessenger* messenger, const std::string
 }
 
 InAppWebView::~InAppWebView() {
+  has_console_message_listener_ = false;
   debugLog("dealloc InAppWebView");
+  is_disposing_.store(true);
+  pending_java_script_calls_->cancelAll();
+  CancelHiddenPixelBufferTrim();
+  CancelHostBoundPopups();
+  lifetime_token_.reset();
 
+  DisconnectHostWindowDestroyHandler();
+  DisconnectHostViewDestroyHandler();
   CleanupMonitorChangeHandlers();
 
   context_menu_popup_.reset();
@@ -421,9 +440,6 @@ InAppWebView::~InAppWebView() {
 
 #ifdef HAVE_WPE_PLATFORM
   // === WPEPlatform proper shutdown sequence ===
-  // Mark as disposing to prevent buffer callbacks from processing
-  is_disposing_.store(true);
-  
   // 1. First disconnect signals to stop receiving callbacks
   if (wpe_view_ != nullptr && buffer_rendered_handler_ != 0) {
     g_signal_handler_disconnect(wpe_view_, buffer_rendered_handler_);
@@ -435,30 +451,21 @@ InAppWebView::~InAppWebView() {
     scale_changed_handler_ = 0;
   }
   
-  if (wpe_view_ != nullptr) {
+  if (wpe_view_ != nullptr && webview_ != nullptr) {
     wpe_view_focus_out(wpe_view_);
   }
   
-  if (wpe_view_ != nullptr) {
+  if (wpe_view_ != nullptr && webview_ != nullptr) {
     wpe_view_unmap(wpe_view_);
   }
   
-  // 4. Release any pending buffer back to WPE and clean up EGL image
+  // 4. Release any pending buffer back to WPE
   {
     std::lock_guard<std::mutex> lock(wpe_buffer_mutex_);
-    
-    // Clean up EGL image first (while display is still valid)
-    if (current_egl_image_ != nullptr && egl_display_ != nullptr) {
-      static PFNEGLDESTROYIMAGEKHRPROC eglDestroyImageKHR = nullptr;
-      if (eglDestroyImageKHR == nullptr) {
-        eglDestroyImageKHR = (PFNEGLDESTROYIMAGEKHRPROC)eglGetProcAddress("eglDestroyImageKHR");
-      }
-      if (eglDestroyImageKHR != nullptr) {
-        eglDestroyImageKHR(static_cast<EGLDisplay>(egl_display_), 
-                           static_cast<EGLImageKHR>(current_egl_image_));
-      }
-      current_egl_image_ = nullptr;
-    }
+
+    // wpe_buffer_import_to_egl_image returns an image owned by WPEBuffer.
+    // WPE destroys it when it disposes the buffer.
+    current_egl_image_ = nullptr;
     
     // Release pending buffer back to WPE
     if (current_buffer_ != nullptr && wpe_view_ != nullptr) {
@@ -469,7 +476,7 @@ InAppWebView::~InAppWebView() {
     current_buffer_height_ = 0;
   }
   
-  if (wpe_view_ != nullptr) {
+  if (wpe_view_ != nullptr && webview_ != nullptr) {
     wpe_view_closed(wpe_view_);
   }
   
@@ -504,10 +511,17 @@ InAppWebView::~InAppWebView() {
 #endif
 }
 
-void InAppWebView::InitWpeBackend() {
+void InAppWebView::SetCreationError(const std::string& stage, const std::string& message,
+                                    std::optional<int> nativeCode,
+                                    std::optional<std::string> nativeDomain) {
+  creation_error_ = WebViewCreationError{stage, message, nativeCode, nativeDomain};
+  errorLog("InAppWebView creation failed at " + stage + ": " + message);
+}
+
+bool InAppWebView::InitWpeBackend() {
   if (!IsWpeWebKitAvailable()) {
-    errorLog("InAppWebView: WPE WebKit not available");
-    return;
+    SetCreationError("wpe_loader_init", "WPE WebKit backend is not available");
+    return false;
   }
 
 #ifdef HAVE_WPE_PLATFORM
@@ -522,17 +536,20 @@ void InAppWebView::InitWpeBackend() {
   
   wpe_display_ = wpe_display_headless_new();
   if (wpe_display_ == nullptr) {
-    errorLog("InAppWebView: Failed to create WPEDisplayHeadless");
-    return;
+    SetCreationError("wpe_display_headless_new", "Failed to create WPEDisplayHeadless");
+    return false;
   }
   
   // Connect the display
   if (!wpe_display_connect(wpe_display_, &error)) {
-    errorLog("InAppWebView: Failed to connect WPEDisplay: " + 
-             std::string(error ? error->message : "unknown"));
+    const std::string message = error ? error->message : "Unknown WPE display connection error";
+    const std::optional<int> code = error ? std::optional<int>(error->code) : std::nullopt;
+    const std::optional<std::string> domain = error ?
+        std::optional<std::string>(g_quark_to_string(error->domain)) : std::nullopt;
     g_clear_error(&error);
     g_clear_object(&wpe_display_);
-    return;
+    SetCreationError("wpe_display_connect", message, code, domain);
+    return false;
   }
   
   // Get EGL display from WPEDisplay for texture operations
@@ -541,9 +558,10 @@ void InAppWebView::InitWpeBackend() {
     // Software rendering mode - no EGL display available
     g_clear_error(&error);
   }
-  
-  // Note: The WebView will be created in InitWebView() using the "display" property
-  // WPEView and WPEToplevel are obtained from the WebView after creation
+
+  // The WebView will be created in InitWebView() using the "display" property.
+  // WPEView and WPEToplevel are obtained from the WebView after creation.
+  return true;
   
 #elif defined(HAVE_WPE_BACKEND_LEGACY)
   // === WPEBackend-FDO API (Legacy) ===
@@ -589,10 +607,11 @@ void InAppWebView::InitWpeBackend() {
 
   // Initialize WPE FDO with the EGL display
   if (!wpe_fdo_initialize_for_egl_display(egl_display)) {
-    errorLog("InAppWebView: Failed to initialize WPE FDO");
     // Try again with headless mode
     if (!wpe_fdo_initialize_for_egl_display(EGL_NO_DISPLAY)) {
-      errorLog("InAppWebView: Failed to initialize WPE FDO in headless mode");
+      SetCreationError("wpe_fdo_initialize_for_egl_display",
+                       "WPE FDO initialization failed for both EGL and headless modes");
+      return false;
     }
   }
 
@@ -608,11 +627,19 @@ void InAppWebView::InitWpeBackend() {
       wpe_view_backend_exportable_fdo_egl_create(&exportable_client, this, width_, height_);
 
   if (exportable_ == nullptr) {
-    errorLog("InAppWebView: Failed to create WPE exportable backend");
-    return;
+    SetCreationError("wpe_view_backend_exportable_fdo_egl_create",
+                      "Failed to create WPE exportable backend");
+    return false;
   }
 
   wpe_backend_ = wpe_view_backend_exportable_fdo_get_view_backend(exportable_);
+  if (wpe_backend_ == nullptr) {
+    wpe_view_backend_exportable_fdo_destroy(exportable_);
+    exportable_ = nullptr;
+    SetCreationError("wpe_view_backend_exportable_fdo_get_view_backend",
+                      "Failed to get WPE view backend from exportable backend");
+    return false;
+  }
 
   // Create WebKit backend wrapper
   backend_ = webkit_web_view_backend_new(
@@ -622,6 +649,15 @@ void InAppWebView::InitWpeBackend() {
         wpe_view_backend_exportable_fdo_destroy(exportable);
       },
       exportable_);
+
+  if (backend_ == nullptr) {
+    wpe_view_backend_exportable_fdo_destroy(exportable_);
+    exportable_ = nullptr;
+    wpe_backend_ = nullptr;
+    SetCreationError("webkit_web_view_backend_new",
+                      "Failed to create WebKit web view backend");
+    return false;
+  }
 
   wpe_view_backend_dispatch_set_device_scale_factor(wpe_backend_, scale_factor_);
 
@@ -648,17 +684,19 @@ void InAppWebView::InitWpeBackend() {
       },
       this);
 #endif
+  return true;
 }
 
-void InAppWebView::InitWebView(const InAppWebViewCreationParams& params) {
+bool InAppWebView::InitWebView(const InAppWebViewCreationParams& params) {
 #ifdef HAVE_WPE_PLATFORM
   // === WPEPlatform API ===
   // With WPEPlatform, we pass the "display" property to create the WebView
   // The WPEView is automatically created by WebKit
   
   if (wpe_display_ == nullptr) {
-    errorLog("InAppWebView: Cannot create webview without WPEDisplay");
-    return;
+    SetCreationError("g_object_new(WEBKIT_TYPE_WEB_VIEW)",
+                      "Cannot create webview without WPEDisplay");
+    return false;
   }
   
   // Create WebKit settings
@@ -713,20 +751,22 @@ void InAppWebView::InitWebView(const InAppWebViewCreationParams& params) {
   g_object_unref(settings);
   
   if (webview_ == nullptr) {
-    errorLog("InAppWebView: Failed to create WebKitWebView with WPEPlatform");
+    SetCreationError("g_object_new(WEBKIT_TYPE_WEB_VIEW)",
+                      "Failed to create WebKitWebView with WPEPlatform");
     if (networkSession != nullptr) {
       g_object_unref(networkSession);
     }
-    return;
+    return false;
   }
   
   // Get WPEView from the WebView (created automatically by WebKit)
   wpe_view_ = webkit_web_view_get_wpe_view(webview_);
   if (wpe_view_ == nullptr) {
-    errorLog("InAppWebView: Failed to get WPEView from WebView");
+    SetCreationError("webkit_web_view_get_wpe_view",
+                      "Failed to get WPEView from WebKitWebView");
     g_object_unref(webview_);
     webview_ = nullptr;
-    return;
+    return false;
   }
   
   // Note: Scale factor in WPEPlatform is read from the display, not set directly
@@ -804,8 +844,8 @@ void InAppWebView::InitWebView(const InAppWebViewCreationParams& params) {
   // === WPEBackend-FDO API (Legacy) ===
   
   if (backend_ == nullptr) {
-    errorLog("InAppWebView: Cannot create webview without backend");
-    return;
+    SetCreationError("webkit_web_view_new", "Cannot create WebKitWebView without a backend");
+    return false;
   }
 
   // Check if we're creating a related webview (for multi-window support)
@@ -818,8 +858,9 @@ void InAppWebView::InitWebView(const InAppWebViewCreationParams& params) {
         nullptr));
     
     if (webview_ == nullptr) {
-      errorLog("InAppWebView: Failed to create related WebKitWebView");
-      return;
+      SetCreationError("g_object_new(WEBKIT_TYPE_WEB_VIEW)",
+                        "Failed to create related WebKitWebView");
+      return false;
     }
   } else {
     // Create WebKit settings for a standalone webview
@@ -862,14 +903,14 @@ void InAppWebView::InitWebView(const InAppWebViewCreationParams& params) {
     }
 
     if (webview_ == nullptr) {
-      errorLog("InAppWebView: Failed to create WebKitWebView");
+      SetCreationError("g_object_new(WEBKIT_TYPE_WEB_VIEW)", "Failed to create WebKitWebView");
       if (settings != nullptr) {
         g_object_unref(settings);
       }
       if (networkSession != nullptr) {
         g_object_unref(networkSession);
       }
-      return;
+      return false;
     }
 
     if (params.initialSettings != nullptr) {
@@ -899,6 +940,7 @@ void InAppWebView::InitWebView(const InAppWebViewCreationParams& params) {
   if (content_manager != nullptr) {
     content_blocker_handler_ = std::make_unique<ContentBlockerHandler>(content_manager);
   }
+  return true;
 }
 
 void InAppWebView::RegisterEventHandlers() {
@@ -1023,7 +1065,8 @@ void InAppWebView::PrepareAndAddUserScripts() {
   // === Add Console Log Interception Script ===
   // Note: Console log is always for main frame only to avoid issues
   // (see https://github.com/pichillilorenzo/flutter_inappwebview/issues/1738)
-  auto consoleLogScript = ConsoleLogJS::CONSOLE_LOG_JS_PLUGIN_SCRIPT(pluginScriptsOriginAllowList);
+  auto consoleLogScript = ConsoleLogJS::CONSOLE_LOG_JS_PLUGIN_SCRIPT(
+      pluginScriptsOriginAllowList);
   user_content_controller_->addPluginScript(std::move(consoleLogScript));
 
   // === Add Color Input Interception Script ===
@@ -1171,6 +1214,169 @@ void InAppWebView::UpdateMonitorRefreshRate() {
 #endif
 }
 
+void InAppWebView::SetHostView(GtkWindow* window, FlView* fl_view) {
+  // No window: back to the one cached at plugin registration (the main view).
+  if (window == nullptr && plugin_ != nullptr) {
+    window = plugin_->gtkWindow();
+    fl_view = plugin_->flView();
+  }
+  if (fl_view != fl_view_) {
+    DisconnectHostViewDestroyHandler();
+    fl_view_ = fl_view;
+    ConnectHostViewDestroyHandler();
+  }
+  if (window == gtk_window_) {
+    return;
+  }
+
+  // Popups are parented to the previous window; drop them so the next use
+  // recreates them against the new one.
+  CancelHostBoundPopups();
+  HideAllPopups();
+  option_menu_popup_.reset();
+  context_menu_popup_.reset();
+
+#ifdef HAVE_WPE_PLATFORM
+  if (gtk_window_ != nullptr && scale_changed_handler_ != 0) {
+    g_signal_handler_disconnect(gtk_window_, scale_changed_handler_);
+    scale_changed_handler_ = 0;
+  }
+#endif
+  if (gtk_window_ != nullptr && configure_event_handler_id_ != 0) {
+    g_signal_handler_disconnect(gtk_window_, configure_event_handler_id_);
+    configure_event_handler_id_ = 0;
+  }
+  DisconnectHostWindowDestroyHandler();
+
+  gtk_window_ = window;
+  if (gtk_window_ != nullptr) {
+    ConnectHostWindowDestroyHandler();
+  }
+
+#ifdef HAVE_WPE_PLATFORM
+  // Same scale tracking as at creation: the new window may be on a monitor
+  // with a different scale factor.
+  int gtk_scale = gtk_window_ != nullptr
+      ? gtk_widget_get_scale_factor(GTK_WIDGET(gtk_window_)) : 0;
+  if (gtk_scale > 0 && static_cast<double>(gtk_scale) != scale_factor_) {
+    scale_factor_ = static_cast<double>(gtk_scale);
+    if (wpe_toplevel_ != nullptr) {
+      wpe_toplevel_scale_changed(wpe_toplevel_, scale_factor_);
+    }
+    if (on_frame_available_) {
+      on_frame_available_();
+    }
+  }
+  if (gtk_window_ != nullptr) {
+    scale_changed_handler_ = g_signal_connect(gtk_window_, "notify::scale-factor",
+        G_CALLBACK(+[](GObject* object, GParamSpec* pspec, gpointer user_data) {
+          auto* self = static_cast<InAppWebView*>(user_data);
+          int new_scale = gtk_widget_get_scale_factor(GTK_WIDGET(object));
+          if (new_scale > 0 && static_cast<double>(new_scale) != self->scale_factor_) {
+            self->scale_factor_ = static_cast<double>(new_scale);
+            if (self->wpe_toplevel_ != nullptr) {
+              wpe_toplevel_scale_changed(self->wpe_toplevel_, self->scale_factor_);
+            }
+            if (self->on_frame_available_) {
+              self->on_frame_available_();
+            }
+          }
+        }), this);
+  }
+#endif
+
+  if (gtk_window_ != nullptr) {
+    configure_event_handler_id_ = g_signal_connect(
+        gtk_window_, "configure-event",
+        G_CALLBACK(+[](GtkWidget*, GdkEventConfigure*, gpointer user_data) -> gboolean {
+          auto* self = static_cast<InAppWebView*>(user_data);
+          self->UpdateMonitorRefreshRate();
+          return FALSE;  // Continue event propagation
+        }),
+        this);
+
+    UpdateMonitorRefreshRate();
+  }
+}
+
+void InAppWebView::ConnectHostWindowDestroyHandler() {
+  if (gtk_window_ == nullptr || host_destroy_handler_id_ != 0) {
+    return;
+  }
+  host_destroy_handler_id_ = g_signal_connect(
+      gtk_window_, "destroy",
+      G_CALLBACK(+[](GtkWidget*, gpointer user_data) {
+        static_cast<InAppWebView*>(user_data)->OnHostWindowDestroyed();
+      }),
+      this);
+}
+
+void InAppWebView::DisconnectHostWindowDestroyHandler() {
+  if (gtk_window_ != nullptr && host_destroy_handler_id_ != 0) {
+    g_signal_handler_disconnect(gtk_window_, host_destroy_handler_id_);
+  }
+  host_destroy_handler_id_ = 0;
+}
+
+void InAppWebView::ConnectHostViewDestroyHandler() {
+  if (fl_view_ == nullptr || host_view_destroy_handler_id_ != 0) {
+    return;
+  }
+  host_view_destroy_handler_id_ = g_signal_connect(
+      fl_view_, "destroy",
+      G_CALLBACK(+[](GtkWidget* widget, gpointer user_data) {
+        auto* self = static_cast<InAppWebView*>(user_data);
+        if (self->fl_view_ == FL_VIEW(widget)) {
+          if (self->host_view_destroy_handler_id_ != 0) {
+            g_signal_handler_disconnect(widget, self->host_view_destroy_handler_id_);
+          }
+          self->fl_view_ = nullptr;
+          self->host_view_destroy_handler_id_ = 0;
+        }
+      }),
+      this);
+}
+
+void InAppWebView::DisconnectHostViewDestroyHandler() {
+  if (fl_view_ != nullptr && host_view_destroy_handler_id_ != 0) {
+    g_signal_handler_disconnect(fl_view_, host_view_destroy_handler_id_);
+  }
+  host_view_destroy_handler_id_ = 0;
+}
+
+void InAppWebView::OnHostWindowDestroyed() {
+  // Runs during the "destroy" emission, so the window is still a valid object
+  // and the handlers on it can be disconnected.
+  GtkWindow* fallback = plugin_ != nullptr ? plugin_->gtkWindow() : nullptr;
+  if (plugin_ != nullptr) {
+    plugin_->InvalidateHost(gtk_window_, nullptr);
+  }
+  if (fallback != nullptr && fallback != gtk_window_) {
+    SetHostView(fallback, plugin_->flView());
+    return;
+  }
+
+  // The registration window itself is going away: drop everything bound to it.
+  CancelHostBoundPopups();
+  HideAllPopups();
+  option_menu_popup_.reset();
+  context_menu_popup_.reset();
+#ifdef HAVE_WPE_PLATFORM
+  if (scale_changed_handler_ != 0) {
+    g_signal_handler_disconnect(gtk_window_, scale_changed_handler_);
+    scale_changed_handler_ = 0;
+  }
+#endif
+  if (configure_event_handler_id_ != 0) {
+    g_signal_handler_disconnect(gtk_window_, configure_event_handler_id_);
+    configure_event_handler_id_ = 0;
+  }
+  DisconnectHostWindowDestroyHandler();
+  DisconnectHostViewDestroyHandler();
+  gtk_window_ = nullptr;
+  fl_view_ = nullptr;
+}
+
 // === WPE Backend Callbacks ===
 
 void InAppWebView::OnFrameDisplayed(void* data) {
@@ -1197,7 +1403,8 @@ void InAppWebView::OnExportDmaBuf(::wpe_fdo_egl_exported_image* image) {
   // 1. skip_pixel_readback_ is false (not using zero-copy mode)
   // 2. egl_display_ is available
   // 3. We have a valid EGL image
-  if (!skip_pixel_readback_ && egl_image != EGL_NO_IMAGE_KHR && egl_display_ != nullptr) {
+  if (!skip_pixel_readback_.load(std::memory_order_acquire) &&
+      egl_image != EGL_NO_IMAGE_KHR && egl_display_ != nullptr) {
     ReadPixelsFromEglImage(egl_image, img_width, img_height);
   }
 
@@ -1263,39 +1470,44 @@ void InAppWebView::OnWpePlatformBufferRendered(WPEBuffer* buffer) {
     // This ensures the EGL image's backing memory stays valid until we have a new frame
     previous_buffer = current_buffer_;
     
-    // Destroy previous EGL image if we created one
-    if (current_egl_image_ != nullptr && egl_display_ != nullptr) {
-      static PFNEGLDESTROYIMAGEKHRPROC eglDestroyImageKHR = nullptr;
-      if (eglDestroyImageKHR == nullptr) {
-        eglDestroyImageKHR = (PFNEGLDESTROYIMAGEKHRPROC)eglGetProcAddress("eglDestroyImageKHR");
-      }
-      if (eglDestroyImageKHR != nullptr) {
-        eglDestroyImageKHR(static_cast<EGLDisplay>(egl_display_), 
-                           static_cast<EGLImageKHR>(current_egl_image_));
-      }
-      current_egl_image_ = nullptr;
-    }
+    // The previous EGL image belongs to its WPEBuffer, not to this view.
+    // Drop our borrowed handle before releasing that buffer below.
+    current_egl_image_ = nullptr;
     
     // Check buffer type to determine best rendering path
     bool is_dma_buf = WPE_IS_BUFFER_DMA_BUF(buffer);
     bool is_shm = WPE_IS_BUFFER_SHM(buffer);
-    
-    // === Priority 1: Try EGL image import (zero-copy, best performance) ===
-    // Only attempt EGL for DMA-BUF buffers (SHM buffers cannot be imported via EGL)
-    // Skip if previous EGL attempts failed
-    if (egl_display_ != nullptr && 
-        is_dma_buf && !egl_import_failed_permanently) {
+
+    // === Priority 1: choose the DMA-BUF consumer's EGL import path ===
+    // Inline Flutter textures import into Flutter's current EGLDisplay during
+    // populate(), so a WPE-display EGLImage would be unused. Keep the buffer
+    // referenced and publish its dimensions for that import. Native InAppBrowser
+    // remains on the WPE EGLImage path through GetCurrentEglImage().
+    const bool skip_pixel_readback =
+        skip_pixel_readback_.load(std::memory_order_acquire);
+    const bool inline_flutter_consumer =
+        inline_flutter_texture_consumer_.load(std::memory_order_acquire);
+    const auto import_action = is_dma_buf
+        ? DecideDmaBufImportAction(inline_flutter_consumer, skip_pixel_readback,
+                                   egl_import_failed_permanently)
+        : DmaBufImportAction::kImportPixels;
+
+    if (import_action == DmaBufImportAction::kDeferToFlutter) {
+      current_buffer_width_ = buf_width;
+      current_buffer_height_ = buf_height;
+      buffer_handled = true;
+    } else if (import_action == DmaBufImportAction::kImportInWpe &&
+               egl_display_ != nullptr) {
       GError* error = nullptr;
       void* egl_image = wpe_buffer_import_to_egl_image(buffer, &error);
-      
+
       if (egl_image != nullptr) {
         current_egl_image_ = egl_image;
         current_buffer_width_ = buf_width;
         current_buffer_height_ = buf_height;
         buffer_handled = true;
       } else {
-        // Mark EGL as permanently failed so we don't keep trying
-        // This is common in VMs or software-only environments
+        // Mark EGL as permanently failed so we don't keep trying.
         egl_import_failed_permanently = true;
         if (error != nullptr) {
           g_clear_error(&error);
@@ -1303,103 +1515,106 @@ void InAppWebView::OnWpePlatformBufferRendered(WPEBuffer* buffer) {
       }
     }
     
-    // === Priority 2: Direct SHM buffer access (no GBM required) ===
-    // WPEBufferSHM provides direct pixel access without requiring GBM device
-    if (!buffer_handled && is_shm) {
-      WPEBufferSHM* shm_buffer = WPE_BUFFER_SHM(buffer);
-      GBytes* data = wpe_buffer_shm_get_data(shm_buffer);
-      
-      if (data != nullptr) {
-        guint stride = wpe_buffer_shm_get_stride(shm_buffer);
-        WPEPixelFormat format = wpe_buffer_shm_get_format(shm_buffer);
-        
-        gsize size;
-        const uint8_t* pixels = static_cast<const uint8_t*>(g_bytes_get_data(data, &size));
-        
-        if (pixels != nullptr && size > 0) {
-          // Store in pixel buffer for software rendering
-          size_t write_idx = write_buffer_index_.load(std::memory_order_relaxed);
-          auto& pixel_buffer = pixel_buffers_[write_idx];
-          
-          if (pixel_buffer.data.size() != size) {
-            pixel_buffer.data.resize(size);
+    try {
+      std::lock_guard<std::mutex> writer_lock(pixel_buffer_write_mutex_);
+      // === Priority 2: Direct SHM buffer access (no GBM required) ===
+      // WPEBufferSHM provides direct pixel access without requiring GBM device
+      if (!buffer_handled && is_shm) {
+        WPEBufferSHM* shm_buffer = WPE_BUFFER_SHM(buffer);
+        GBytes* data = wpe_buffer_shm_get_data(shm_buffer);
+
+        if (data != nullptr) {
+          guint stride = wpe_buffer_shm_get_stride(shm_buffer);
+          WPEPixelFormat format = wpe_buffer_shm_get_format(shm_buffer);
+
+          gsize size;
+          const uint8_t* pixels = static_cast<const uint8_t*>(g_bytes_get_data(data, &size));
+
+          if (pixels != nullptr && size > 0) {
+            // Store in pixel buffer for software rendering
+            size_t write_idx = write_buffer_index_.load(std::memory_order_relaxed);
+            auto& pixel_buffer = pixel_buffers_[write_idx];
+
+            // WPE SHM buffers use ARGB8888 format (BGRA in memory on little-endian)
+            // Flutter expects RGBA8888, so we need to convert
+            // ConvertARGB32ToRGBA handles the BGRA -> RGBA conversion
+            bool pixels_valid = true;
+            if (format == WPE_PIXEL_FORMAT_ARGB8888) {
+              pixels_valid = ConvertARGB32ToRGBAVector(
+                  pixels, size, pixel_buffer.data, buf_width, buf_height, stride);
+            } else {
+              // Keep the original bytes for formats without an ARGB conversion.
+              ResizeByteBuffer(pixel_buffer.data, size);
+              memcpy(pixel_buffer.data.data(), pixels, size);
+            }
+
+            if (pixels_valid) {
+              pixel_buffer.width = buf_width;
+              pixel_buffer.height = buf_height;
+
+              // Swap buffers
+              {
+                std::lock_guard<std::mutex> swap_lock(buffer_swap_mutex_);
+                read_buffer_index_.store(write_idx, std::memory_order_release);
+                write_buffer_index_.store((write_idx + 1) % kNumBuffers,
+                                          std::memory_order_relaxed);
+              }
+
+              current_buffer_width_ = buf_width;
+              current_buffer_height_ = buf_height;
+              buffer_handled = true;
+            }
           }
-          memcpy(pixel_buffer.data.data(), pixels, size);
-          
-          // WPE SHM buffers use ARGB8888 format (BGRA in memory on little-endian)
-          // Flutter expects RGBA8888, so we need to convert
-          // ConvertARGB32ToRGBA handles the BGRA -> RGBA conversion
-          if (format == WPE_PIXEL_FORMAT_ARGB8888) {
-            ConvertARGB32ToRGBA(pixel_buffer.data.data(),    // source (in-place)
-                                pixel_buffer.data.data(),    // destination (in-place)
-                                buf_width, buf_height,
-                                stride);
-          }
-          
-          pixel_buffer.width = buf_width;
-          pixel_buffer.height = buf_height;
-          
-          // Swap buffers
-          {
-            std::lock_guard<std::mutex> swap_lock(buffer_swap_mutex_);
-            read_buffer_index_.store(write_idx, std::memory_order_release);
-            write_buffer_index_.store((write_idx + 1) % kNumBuffers, std::memory_order_relaxed);
-          }
-          
-          current_buffer_width_ = buf_width;
-          current_buffer_height_ = buf_height;
-          buffer_handled = true;
-        }
-        // Note: Don't unref data - it's borrowed from the buffer
-      }
-    }
-    
-    // === Priority 3: Generic pixel import (works for DMA-BUF with GBM device) ===
-    // This is a fallback for DMA-BUF when EGL failed but GBM device is available
-    if (!buffer_handled) {
-      GError* error = nullptr;
-      GBytes* pixels = wpe_buffer_import_to_pixels(buffer, &error);
-      if (pixels != nullptr) {
-        gsize size;
-        const uint8_t* data = static_cast<const uint8_t*>(g_bytes_get_data(pixels, &size));
-        
-        // Store in pixel buffer for software rendering
-        size_t write_idx = write_buffer_index_.load(std::memory_order_relaxed);
-        auto& pixel_buffer = pixel_buffers_[write_idx];
-        
-        if (pixel_buffer.data.size() != size) {
-          pixel_buffer.data.resize(size);
-        }
-        memcpy(pixel_buffer.data.data(), data, size);
-        
-        // GBM pixel import also returns ARGB8888, convert to RGBA
-        uint32_t stride = buf_width * 4;
-        ConvertARGB32ToRGBA(pixel_buffer.data.data(),
-                            pixel_buffer.data.data(),
-                            buf_width, buf_height,
-                            stride);
-        
-        pixel_buffer.width = buf_width;
-        pixel_buffer.height = buf_height;
-        
-        // Swap buffers
-        {
-          std::lock_guard<std::mutex> swap_lock(buffer_swap_mutex_);
-          read_buffer_index_.store(write_idx, std::memory_order_release);
-          write_buffer_index_.store((write_idx + 1) % kNumBuffers, std::memory_order_relaxed);
-        }
-        
-        g_bytes_unref(pixels);
-        current_buffer_width_ = buf_width;
-        current_buffer_height_ = buf_height;
-        buffer_handled = true;
-      } else {
-        if (error != nullptr) {
-          g_clear_error(&error);
+          // Note: Don't unref data - it's borrowed from the buffer
         }
       }
+
+      // === Priority 3: Generic pixel import (works for DMA-BUF with GBM device) ===
+      // This is a fallback for DMA-BUF when EGL failed but GBM device is available
+      if (!buffer_handled) {
+        GError* error = nullptr;
+        GBytes* pixels = wpe_buffer_import_to_pixels(buffer, &error);
+        if (pixels != nullptr) {
+          gsize size;
+          const uint8_t* data = static_cast<const uint8_t*>(g_bytes_get_data(pixels, &size));
+
+          if (data != nullptr) {
+            // Store the imported ARGB8888 pixels directly as packed RGBA.
+            size_t write_idx = write_buffer_index_.load(std::memory_order_relaxed);
+            auto& pixel_buffer = pixel_buffers_[write_idx];
+            const size_t stride = static_cast<size_t>(buf_width) * 4;
+            if (ConvertARGB32ToRGBAVector(data, size, pixel_buffer.data, buf_width,
+                                          buf_height, stride)) {
+              pixel_buffer.width = buf_width;
+              pixel_buffer.height = buf_height;
+
+              // Swap buffers
+              {
+                std::lock_guard<std::mutex> swap_lock(buffer_swap_mutex_);
+                read_buffer_index_.store(write_idx, std::memory_order_release);
+                write_buffer_index_.store((write_idx + 1) % kNumBuffers,
+                                          std::memory_order_relaxed);
+              }
+
+              current_buffer_width_ = buf_width;
+              current_buffer_height_ = buf_height;
+              buffer_handled = true;
+            }
+          }
+
+          // The imported GBytes is owned by the WPEBuffer (transfer none).
+          // WPE releases it when the buffer is disposed.
+        } else {
+          if (error != nullptr) {
+            g_clear_error(&error);
+          }
+        }
+      }
+    } catch (const std::bad_alloc&) {
+      // Keep the published CPU frame if rebuilding a trimmed spare fails.
+      // WPE buffer ownership and release ordering below still run normally.
     }
-    
+
     if (!buffer_handled) {
       debugLog("ERROR: No rendering method succeeded!");
     }
@@ -1409,9 +1624,12 @@ void InAppWebView::OnWpePlatformBufferRendered(WPEBuffer* buffer) {
     current_buffer_ = buffer;
   }
   
+  // Late frames can arrive after unmapping. Once the grace period has elapsed,
+  // retain only their published CPU frame as well.
+  TrimUnusedPixelBuffers();
+
   // Release the PREVIOUS buffer now that we have a new one
-  // The previous EGL image has been destroyed and we have a new frame,
-  // so it's safe to let WPE reuse the old buffer's memory
+  // WPE will dispose of the previous buffer's EGL image when appropriate.
   if (previous_buffer != nullptr && wpe_view_ != nullptr && WPE_IS_BUFFER(previous_buffer)) {
     wpe_view_buffer_released(wpe_view_, previous_buffer);
   }
@@ -1472,29 +1690,34 @@ void InAppWebView::ReadPixelsFromEglImage(void* egl_image, uint32_t width, uint3
     return;
   }
 
-  size_t buffer_size = width * height * 4;  // RGBA
+  try {
+    std::lock_guard<std::mutex> writer_lock(pixel_buffer_write_mutex_);
+    size_t buffer_size = width * height * 4;  // RGBA
 
-  // Use triple buffering
-  size_t write_idx = write_buffer_index_.load(std::memory_order_relaxed);
-  auto& buffer = pixel_buffers_[write_idx];
+    // Use triple buffering
+    size_t write_idx = write_buffer_index_.load(std::memory_order_relaxed);
+    auto& buffer = pixel_buffers_[write_idx];
 
-  if (buffer.data.size() != buffer_size) {
-    buffer.data.resize(buffer_size);
-  }
+    ResizeByteBuffer(buffer.data, buffer_size);
 
-  buffer.width = width;
-  buffer.height = height;
+    buffer.width = width;
+    buffer.height = height;
 
-  glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, buffer.data.data());
+    glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, buffer.data.data());
 
-  {
-    std::lock_guard<std::mutex> lock(buffer_swap_mutex_);
-    read_buffer_index_.store(write_idx, std::memory_order_release);
-    write_buffer_index_.store((write_idx + 1) % kNumBuffers, std::memory_order_relaxed);
+    {
+      std::lock_guard<std::mutex> lock(buffer_swap_mutex_);
+      read_buffer_index_.store(write_idx, std::memory_order_release);
+      write_buffer_index_.store((write_idx + 1) % kNumBuffers, std::memory_order_relaxed);
+    }
+  } catch (const std::bad_alloc&) {
+    // Rebuilding a trimmed spare may fail. Keep the published frame and still
+    // restore GL state so the export callback can release/complete normally.
   }
 
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
   glBindTexture(GL_TEXTURE_2D, 0);
+  TrimUnusedPixelBuffers();
 }
 
 // === Navigation Methods ===
@@ -1503,6 +1726,7 @@ void InAppWebView::loadUrl(const std::string& url) {
   if (webview_ == nullptr)
     return;
 
+  ++post_url_generation_;
   webkit_web_view_load_uri(webview_, url.c_str());
 }
 
@@ -1514,6 +1738,7 @@ void InAppWebView::loadUrl(const std::shared_ptr<URLRequest>& urlRequest) {
     return;
   }
 
+  ++post_url_generation_;
   std::string method = urlRequest->method.value_or("GET");
 
   if (method == "GET" && !urlRequest->body.has_value() && !urlRequest->headers.has_value()) {
@@ -1540,6 +1765,7 @@ void InAppWebView::loadData(const std::string& data, const std::string& mime_typ
   if (webview_ == nullptr)
     return;
 
+  ++post_url_generation_;
   g_message("InAppWebView: loadData() called while loading, stopping current load first");
   webkit_web_view_stop_loading(webview_);
   // Give WebKit/WPE FDO a moment to clean up pending operations
@@ -1555,6 +1781,7 @@ void InAppWebView::loadFile(const std::string& asset_file_path) {
   if (webview_ == nullptr)
     return;
 
+  ++post_url_generation_;
   g_message("InAppWebView: loadFile() called while loading, stopping current load first");
   webkit_web_view_stop_loading(webview_);
   // Give WebKit/WPE FDO a moment to clean up pending operations
@@ -1574,23 +1801,45 @@ void InAppWebView::loadFile(const std::string& asset_file_path) {
   std::filesystem::path flutter_asset_path =
       exe_dir / "data" / "flutter_assets" / asset_file_path;
 
-  if (!std::filesystem::exists(flutter_asset_path)) {
-    debugLog("Asset file not found: " + flutter_asset_path.string());
+  std::error_code statError;
+  if (!std::filesystem::exists(flutter_asset_path, statError)) {
+    debugLog("Cannot load asset file: " + flutter_asset_path.string() +
+             (statError ? " (" + statError.message() + ")" : " (not found)"));
     return;
   }
 
-  std::string file_url = "file://" + flutter_asset_path.string();
-  webkit_web_view_load_uri(webview_, file_url.c_str());
+  // A raw file:// concatenation breaks on spaces, '#' and '?' (and paths with
+  // Hebrew characters). GLib handles native filename encoding and URI escaping.
+  GError* uriError = nullptr;
+  gchar* fileUri = g_filename_to_uri(flutter_asset_path.c_str(), nullptr, &uriError);
+  if (!fileUri) {
+    debugLog("Cannot build file URI for " + flutter_asset_path.string() +
+             (uriError ? ": " + std::string(uriError->message) : ""));
+    if (uriError) g_error_free(uriError);
+    return;
+  }
+  webkit_web_view_load_uri(webview_, fileUri);
+  g_free(fileUri);
 }
 
 void InAppWebView::postUrl(const std::string& url, const std::vector<uint8_t>& postData) {
   if (webview_ == nullptr)
     return;
 
+  // The nested main loop can dispatch a newer navigation or destroy this view.
+  // Keep this request's generation instead of adopting a newer request's value.
+  const uint64_t navigation_generation = ++post_url_generation_;
+  std::weak_ptr<int> lifetime = lifetime_token_;
   g_message("InAppWebView: postUrl() called while loading, stopping current load first");
   webkit_web_view_stop_loading(webview_);
   // Give WebKit/WPE FDO a moment to clean up pending operations
   while (g_main_context_iteration(NULL, FALSE)) { }
+
+  // Check the weak owner before touching any members after dispatching events.
+  if (lifetime.expired())
+    return;
+  if (navigation_generation != post_url_generation_ || webview_ == nullptr)
+    return;
 
   // WPE WebKit's webkit_web_view_load_request() doesn't support POST body directly.
   // We use JavaScript XMLHttpRequest to perform the POST and load the result.
@@ -1635,32 +1884,41 @@ void InAppWebView::postUrl(const std::string& url, const std::vector<uint8_t>& p
     "<!DOCTYPE html><html><head></head><body></body></html>", 
     url.c_str());
 
-  // Use evaluateJavascript to run the XHR after the blank page loads
-  // We need to wait for the load to complete, so we use a delayed approach
-  std::string* js_copy = new std::string(js);
-  g_timeout_add(100, [](gpointer user_data) -> gboolean {
-    auto* data = static_cast<std::pair<InAppWebView*, std::string*>*>(user_data);
-    if (data->first->webview() != nullptr) {
-      webkit_web_view_evaluate_javascript(
-          data->first->webview(),
-          data->second->c_str(),
-          -1,
-          nullptr,  // world
-          nullptr,  // source_uri
-          nullptr,  // cancellable
-          nullptr,  // callback
-          nullptr); // user_data
-    }
-    delete data->second;
-    delete data;
-    return G_SOURCE_REMOVE;
-  }, new std::pair<InAppWebView*, std::string*>(this, js_copy));
+  // Use one source-owned allocation instead of a raw pair of pointers.
+  // Both a closed WebView and a subsequent navigation invalidate this
+  // injection; GLib frees the allocation even when the source is removed.
+  struct DeferredPostUrlCall {
+    InAppWebView* view;
+    DeferredPostUrlScript script;
+  };
+  auto* call = new DeferredPostUrlCall{
+      this, {std::move(lifetime), navigation_generation, std::move(js)}};
+  g_timeout_add_full(
+      G_PRIORITY_DEFAULT, 100,
+      [](gpointer user_data) -> gboolean {
+        const auto* call = static_cast<DeferredPostUrlCall*>(user_data);
+        // This guard MUST precede any dereference of the view pointer: GLib
+        // may deliver the timeout after the owner has been destroyed.
+        if (!call->script.ownerAlive()) return G_SOURCE_REMOVE;
+        InAppWebView* view = call->view;
+        if (!call->script.matchesGeneration(view->post_url_generation_) ||
+            view->webview() == nullptr) return G_SOURCE_REMOVE;
+        webkit_web_view_evaluate_javascript(
+            view->webview(), call->script.javascript.c_str(), -1,
+            nullptr, nullptr, nullptr, nullptr, nullptr);
+        return G_SOURCE_REMOVE;
+      },
+      call,
+      [](gpointer user_data) {
+        delete static_cast<DeferredPostUrlCall*>(user_data);
+      });
 }
 
 void InAppWebView::reload() {
   if (webview_ == nullptr)
     return;
-  
+
+  ++post_url_generation_;
   webkit_web_view_reload(webview_);
 }
 
@@ -1668,6 +1926,7 @@ void InAppWebView::reloadFromOrigin() {
   if (webview_ == nullptr)
     return;
 
+  ++post_url_generation_;
   g_message("InAppWebView: reloadFromOrigin() called while loading, stopping current load first");
   webkit_web_view_stop_loading(webview_);
   // Give WebKit/WPE FDO a moment to clean up pending operations
@@ -1677,16 +1936,18 @@ void InAppWebView::reloadFromOrigin() {
 }
 
 void InAppWebView::goBack() {
-  if (webview_ == nullptr)
+  if (webview_ == nullptr || !webkit_web_view_can_go_back(webview_))
     return;
-  
+
+  ++post_url_generation_;
   webkit_web_view_go_back(webview_);
 }
 
 void InAppWebView::goForward() {
-  if (webview_ == nullptr)
+  if (webview_ == nullptr || !webkit_web_view_can_go_forward(webview_))
     return;
-  
+
+  ++post_url_generation_;
   webkit_web_view_go_forward(webview_);
 }
 
@@ -1705,6 +1966,7 @@ bool InAppWebView::canGoForward() const {
 void InAppWebView::stopLoading() {
   if (webview_ == nullptr)
     return;
+  ++post_url_generation_;
   webkit_web_view_stop_loading(webview_);
 }
 
@@ -1806,6 +2068,7 @@ void InAppWebView::goBackOrForward(int steps) {
 
   WebKitBackForwardListItem* item = webkit_back_forward_list_get_nth_item(bfList, steps);
   if (item != nullptr) {
+    ++post_url_generation_;
     webkit_web_view_go_to_back_forward_list_item(webview_, item);
   }
 }
@@ -1890,175 +2153,159 @@ HitTestResult InAppWebView::getHitTestResult() const {
 }
 
 // === JavaScript ===
-
+// WebKit runs these GAsync callbacks on the UI main context. The registry
+// resolves Dart on dispose, process loss or document replacement, while
+// GCancellable releases WebKit work that no longer has a consumer.
 void InAppWebView::evaluateJavascript(
     const std::string& source,
     const std::optional<std::string>& worldName,
     std::function<void(const std::optional<std::string>&)> callback) {
-  if (webview_ == nullptr) {
-    if (callback)
-      callback(std::nullopt);
+  if (!webview_) {
+    if (callback) callback(std::nullopt);
     return;
   }
 
+  using EvalCallback = std::function<void(const std::optional<std::string>&)>;
   struct CallbackData {
-    std::function<void(const std::optional<std::string>&)> callback;
+    std::shared_ptr<PendingWebKitJavaScriptCalls> requests;
+    uint64_t id;
+    EvalCallback callback;
+    std::shared_ptr<GCancellable> cancellable;
   };
 
-  auto* cb_data = new CallbackData{std::move(callback)};
-
-  const char* world = worldName.has_value() ? worldName->c_str() : nullptr;
+  const auto requests = pending_java_script_calls_;
+  auto cancellable = std::shared_ptr<GCancellable>(g_cancellable_new(),
+      [](GCancellable* value) { g_object_unref(value); });
+  const auto requestId = requests->add([cancellable, callback]() {
+    g_cancellable_cancel(cancellable.get());
+    if (callback) callback(std::nullopt);
+  });
+  auto* data = new CallbackData{requests, requestId, std::move(callback), cancellable};
+  const char* world = worldName ? worldName->c_str() : nullptr;
 
   webkit_web_view_evaluate_javascript(
-      webview_, source.c_str(), source.length(),
-      world,    // world name (for content world support)
-      nullptr,  // source URI
-      nullptr,  // cancellable
+      webview_, source.c_str(), source.length(), world, nullptr,
+      cancellable.get(),
       [](GObject* source, GAsyncResult* result, gpointer user_data) {
-        auto* data = static_cast<CallbackData*>(user_data);
+        std::unique_ptr<CallbackData> data(static_cast<CallbackData*>(user_data));
         GError* error = nullptr;
-        JSCValue* js_result =
-            webkit_web_view_evaluate_javascript_finish(WEBKIT_WEB_VIEW(source), result, &error);
+        JSCValue* jsResult = webkit_web_view_evaluate_javascript_finish(
+            WEBKIT_WEB_VIEW(source), result, &error);
 
-        if (error != nullptr) {
-          if (data->callback)
-            data->callback(std::nullopt);
-          g_error_free(error);
-        } else if (js_result != nullptr) {
-          // Use JSON.stringify on the result via JSC to get proper JSON
-          JSCContext* context = jsc_value_get_context(js_result);
-          g_autoptr(JSCValue) json_stringify = jsc_context_evaluate(
-              context,
-              "(function(v) { return JSON.stringify(v); })",
-              -1);
-          g_autoptr(JSCValue) json_value = jsc_value_function_call(
-              json_stringify, JSC_TYPE_VALUE, js_result, G_TYPE_NONE);
-          
-          if (json_value != nullptr && jsc_value_is_string(json_value)) {
-            g_autofree gchar* str = jsc_value_to_string(json_value);
-            if (data->callback) {
-              if (str) {
-                data->callback(std::string(str));
-              } else {
-                data->callback(std::nullopt);
-              }
-            }
-          } else {
-            if (data->callback)
-              data->callback(std::nullopt);
-          }
-          g_object_unref(js_result);
-        } else {
-          if (data->callback)
-            data->callback(std::nullopt);
+        // Late replies, including after rehosting, cannot resolve a second time.
+        if (!data->requests->finish(data->id)) {
+          if (error) g_error_free(error);
+          if (jsResult) g_object_unref(jsResult);
+          return;
         }
 
-        delete data;
+        std::optional<std::string> value;
+        if (!error && jsResult) {
+          JSCContext* context = jsc_value_get_context(jsResult);
+          g_autoptr(JSCValue) stringify = jsc_context_evaluate(
+              context, "(function(v) { return JSON.stringify(v); })", -1);
+          g_autoptr(JSCValue) serialized = stringify
+              ? jsc_value_function_call(stringify, JSC_TYPE_VALUE, jsResult, G_TYPE_NONE)
+              : nullptr;
+          if (serialized && jsc_value_is_string(serialized)) {
+            g_autofree gchar* utf8 = jsc_value_to_string(serialized);
+            if (utf8) value = std::string(utf8);
+          }
+        }
+        if (error) g_error_free(error);
+        if (jsResult) g_object_unref(jsResult);
+        if (data->callback) data->callback(value);
       },
-      cb_data);
+      data);
 }
 
-// Helper function to convert FlValue to GVariant
 void InAppWebView::callAsyncJavaScript(
     const std::string& functionBody,
     const std::string& argumentsJson,
     const std::vector<std::string>& argumentKeys,
     const std::optional<std::string>& worldName,
     std::function<void(const std::string&)> callback) {
-  if (webview_ == nullptr) {
-    if (callback) {
-      callback(R"({"value":null,"error":"WebView not available"})");
-    }
+  const std::string cancelled =
+      R"({"value":null,"error":"WebView JavaScript request cancelled"})";
+  if (!webview_) {
+    if (callback) callback(cancelled);
     return;
   }
 
-  // Build the wrapped function body that:
-  // 1. Parses the JSON-encoded arguments
-  // 2. Destructures them into local variables
-  // 3. Executes the user's function body
   std::string wrappedBody;
-  
   if (!argumentKeys.empty()) {
-    // Build destructuring: const {key1, key2, ...} = JSON.parse(__args__);
     wrappedBody = "const {";
-    for (size_t i = 0; i < argumentKeys.size(); i++) {
-      if (i > 0) wrappedBody += ", ";
+    for (size_t i = 0; i < argumentKeys.size(); ++i) {
+      if (i) wrappedBody += ", ";
       wrappedBody += argumentKeys[i];
     }
     wrappedBody += "} = JSON.parse(__args__);\n";
   }
   wrappedBody += functionBody;
 
-  // Pass the JSON string as a single __args__ argument
   GVariantBuilder builder;
   g_variant_builder_init(&builder, G_VARIANT_TYPE("a{sv}"));
-  g_variant_builder_add(&builder, "{sv}", "__args__", g_variant_new_string(argumentsJson.c_str()));
-  GVariant* gvariant_args = g_variant_builder_end(&builder);
+  g_variant_builder_add(&builder, "{sv}", "__args__",
+                        g_variant_new_string(argumentsJson.c_str()));
+  GVariant* args = g_variant_ref_sink(g_variant_builder_end(&builder));
 
-  const char* world = worldName.has_value() ? worldName->c_str() : nullptr;
-
+  using AsyncCallback = std::function<void(const std::string&)>;
   struct CallbackData {
-    std::function<void(const std::string&)> callback;
+    std::shared_ptr<PendingWebKitJavaScriptCalls> requests;
+    uint64_t id;
+    AsyncCallback callback;
+    std::shared_ptr<GCancellable> cancellable;
   };
-  auto* cb_data = new CallbackData{std::move(callback)};
+  const auto requests = pending_java_script_calls_;
+  auto cancellable = std::shared_ptr<GCancellable>(g_cancellable_new(),
+      [](GCancellable* value) { g_object_unref(value); });
+  const auto requestId = requests->add([cancellable, callback, cancelled]() {
+    g_cancellable_cancel(cancellable.get());
+    if (callback) callback(cancelled);
+  });
+  auto* data = new CallbackData{requests, requestId, std::move(callback), cancellable};
+  const char* world = worldName ? worldName->c_str() : nullptr;
 
   webkit_web_view_call_async_javascript_function(
-      webview_, wrappedBody.c_str(), -1,  // length: null-terminated
-      gvariant_args, world,
-      nullptr,  // source_uri
-      nullptr,  // cancellable
+      webview_, wrappedBody.c_str(), -1, args, world, nullptr,
+      cancellable.get(),
       [](GObject* source, GAsyncResult* result, gpointer user_data) {
-        auto* data = static_cast<CallbackData*>(user_data);
+        std::unique_ptr<CallbackData> data(static_cast<CallbackData*>(user_data));
         GError* error = nullptr;
-        JSCValue* js_result = webkit_web_view_call_async_javascript_function_finish(
+        JSCValue* jsResult = webkit_web_view_call_async_javascript_function_finish(
             WEBKIT_WEB_VIEW(source), result, &error);
 
-        std::string json_result;
-
-        if (error != nullptr) {
-          // Escape the error message for JSON
-          std::string error_msg = error->message ? error->message : "Unknown error";
-          // Simple JSON escaping for the error message
-          std::string escaped_error;
-          for (char c : error_msg) {
-            switch (c) {
-              case '"': escaped_error += "\\\""; break;
-              case '\\': escaped_error += "\\\\"; break;
-              case '\n': escaped_error += "\\n"; break;
-              case '\r': escaped_error += "\\r"; break;
-              case '\t': escaped_error += "\\t"; break;
-              default: escaped_error += c; break;
-            }
-          }
-          json_result = "{\"value\":null,\"error\":\"" + escaped_error + "\"}";
-          g_error_free(error);
-        } else if (js_result != nullptr) {
-          // Use JSON.stringify on the result via JSC to get proper JSON
-          JSCContext* context = jsc_value_get_context(js_result);
-          g_autoptr(JSCValue) json_stringify = jsc_context_evaluate(
-              context,
-              "(function(v) { return JSON.stringify({value: v, error: null}); })",
-              -1);
-          g_autoptr(JSCValue) json_value = jsc_value_function_call(
-              json_stringify, JSC_TYPE_VALUE, js_result, G_TYPE_NONE);
-          
-          if (json_value != nullptr && jsc_value_is_string(json_value)) {
-            g_autofree gchar* str = jsc_value_to_string(json_value);
-            json_result = str ? str : "{\"value\":null,\"error\":null}";
-          } else {
-            json_result = "{\"value\":null,\"error\":null}";
-          }
-          g_object_unref(js_result);
-        } else {
-          json_result = "{\"value\":null,\"error\":null}";
+        if (!data->requests->finish(data->id)) {
+          if (error) g_error_free(error);
+          if (jsResult) g_object_unref(jsResult);
+          return;
         }
 
-        if (data->callback) {
-          data->callback(json_result);
+        std::string json = R"({"value":null,"error":null})";
+        if (error) {
+          // JSON serialization also escapes control bytes in GLib errors.
+          const auto message = error->message ? error->message : "Unknown error";
+          json = nlohmann::json{{"value", nullptr}, {"error", message}}.dump();
+        } else if (jsResult) {
+          JSCContext* context = jsc_value_get_context(jsResult);
+          g_autoptr(JSCValue) stringify = jsc_context_evaluate(
+              context, "(function(v) { return JSON.stringify({value: v, error: null}); })", -1);
+          g_autoptr(JSCValue) serialized = stringify
+              ? jsc_value_function_call(stringify, JSC_TYPE_VALUE, jsResult, G_TYPE_NONE)
+              : nullptr;
+          if (serialized && jsc_value_is_string(serialized)) {
+            g_autofree gchar* utf8 = jsc_value_to_string(serialized);
+            if (utf8) json = utf8;
+          }
         }
-        delete data;
+        if (error) g_error_free(error);
+        if (jsResult) g_object_unref(jsResult);
+        if (data->callback) data->callback(json);
       },
-      cb_data);
+      data);
+  // WebKit parses arguments synchronously; the floating builder result is
+  // caller-owned, and must not accumulate for repeated plugin calls.
+  g_variant_unref(args);
 }
 
 void InAppWebView::injectJavascriptFileFromUrl(const std::string& urlFile) {
@@ -2466,6 +2713,68 @@ void InAppWebView::takeScreenshot(std::function<void(const std::optional<std::ve
   callback(png_data);
 }
 
+// === PDF export (Otzaria WPE runtime patch) ===
+
+namespace {
+
+typedef void (*OtzariaPrintToPdfFn)(WebKitWebView*, double, double, double, double,
+                                    double, double, GCancellable*, GAsyncReadyCallback, gpointer);
+typedef GBytes* (*OtzariaPrintToPdfFinishFn)(WebKitWebView*, GAsyncResult*, GError**);
+
+struct CreatePdfCall {
+  std::function<void(const std::optional<std::vector<uint8_t>>&)> callback;
+  OtzariaPrintToPdfFinishFn finish;
+};
+
+}  // namespace
+
+void InAppWebView::createPdf(double pageWidthPt, double pageHeightPt,
+                             double marginTopPt, double marginRightPt,
+                             double marginBottomPt, double marginLeftPt,
+                             std::function<void(const std::optional<std::vector<uint8_t>>&)> callback) {
+  if (webview_ == nullptr || callback == nullptr) {
+    if (callback) {
+      callback(std::nullopt);
+    }
+    return;
+  }
+
+  // הסימבולים קיימים רק ב-libWPEWebKit מה-runtime המטולא של אוצריא;
+  // בבנייה רגילה dlsym מחזיר null ואנחנו מדווחים "אין תמיכה" בשקט.
+  auto print_fn = reinterpret_cast<OtzariaPrintToPdfFn>(
+      dlsym(RTLD_DEFAULT, "webkit_otzaria_web_view_print_to_pdf"));
+  auto finish_fn = reinterpret_cast<OtzariaPrintToPdfFinishFn>(
+      dlsym(RTLD_DEFAULT, "webkit_otzaria_web_view_print_to_pdf_finish"));
+  if (print_fn == nullptr || finish_fn == nullptr) {
+    callback(std::nullopt);
+    return;
+  }
+
+  auto* call = new CreatePdfCall{std::move(callback), finish_fn};
+  print_fn(
+      webview_, pageWidthPt, pageHeightPt, marginTopPt, marginRightPt, marginBottomPt,
+      marginLeftPt, nullptr,
+      [](GObject* source, GAsyncResult* result, gpointer user_data) {
+        std::unique_ptr<CreatePdfCall> call(static_cast<CreatePdfCall*>(user_data));
+        GError* error = nullptr;
+        GBytes* bytes = call->finish(WEBKIT_WEB_VIEW(source), result, &error);
+        if (error != nullptr || bytes == nullptr) {
+          if (error != nullptr) {
+            g_warning("createPdf failed: %s", error->message);
+            g_error_free(error);
+          }
+          call->callback(std::nullopt);
+          return;
+        }
+        gsize size = 0;
+        const auto* data = static_cast<const uint8_t*>(g_bytes_get_data(bytes, &size));
+        std::vector<uint8_t> pdf(data, data + size);
+        g_bytes_unref(bytes);
+        call->callback(pdf);
+      },
+      call);
+}
+
 // === Session State ===
 
 std::optional<std::vector<uint8_t>> InAppWebView::saveState() const {
@@ -2698,6 +3007,27 @@ FlValue* InAppWebView::getSettings() const {
   return fl_value_new_null();
 }
 
+bool InAppWebView::acceptsConsoleMessage(int64_t level) const {
+  const auto& levels = settings_->consoleMessageLevels;
+  return has_console_message_listener_ &&
+      (!levels || std::find(levels->begin(), levels->end(), level) != levels->end());
+}
+
+void InAppWebView::setConsoleMessageListener(bool hasListener) {
+  if (has_console_message_listener_ == hasListener) return;
+  has_console_message_listener_ = hasListener;
+  updateConsoleMessagePolicy();
+}
+
+void InAppWebView::updateConsoleMessagePolicy() {
+  if (!user_content_controller_ || !settings_->javaScriptBridgeEnabled) return;
+  // Related views share their user-content manager in both backends. Keep
+  // its bootstrap neutral and change only this WebView's current document.
+  // The setter cannot install a publisher when the bootstrap is absent.
+  evaluateJavascript(ConsoleLogJS::CONSOLE_POLICY_JS_SOURCE(
+      has_console_message_listener_, settings_->consoleMessageLevels), std::nullopt, nullptr);
+}
+
 void InAppWebView::setSettings(const std::shared_ptr<InAppWebViewSettings> newSettings,
                                FlValue* newSettingsMap) {
   if (newSettings && webview_) {
@@ -2711,8 +3041,11 @@ void InAppWebView::setSettings(const std::shared_ptr<InAppWebViewSettings> newSe
       content_blocker_handler_->setContentBlockers(newContentBlockers, nullptr);
     }
 
+    bool consolePolicyChanged = settings_->consoleMessageLevels != newSettings->consoleMessageLevels;
     settings_ = newSettings;
+    javaScriptOriginPolicy_.configure(settings_->javaScriptHandlersOriginAllowList);
     settings_->applyToWebView(webview_);
+    if (consolePolicyChanged) updateConsoleMessagePolicy();
 #ifdef HAVE_WPE_PLATFORM
     // Apply WPE Platform settings (dark mode, font settings, etc.)
     if (wpe_display_ != nullptr) {
@@ -2747,6 +3080,13 @@ void InAppWebView::setSize(int width, int height) {
 }
 
 void InAppWebView::setScaleFactor(double scale_factor) {
+  // GTK3 exposes only integer widget scaling to Flutter on Wayland. Apps that
+  // deliberately render at a higher integer GDK_SCALE need WPE's offscreen
+  // backing buffer to use the same scale, otherwise the compositor upscales a
+  // low-resolution texture. Respect an explicit GDK_SCALE when it is larger
+  // than the scale reported by Flutter.
+  scale_factor = EffectiveWpeScale(scale_factor, std::getenv("GDK_SCALE"));
+
   if (scale_factor == scale_factor_)
     return;
   scale_factor_ = scale_factor;
@@ -2790,13 +3130,9 @@ void InAppWebView::setFocused(bool focused) {
 #elif defined(HAVE_WPE_BACKEND_LEGACY)
   if (wpe_backend_ != nullptr) {
     if (focused) {
-      // Add focused state - also ensure visible and in_window are set
+      // Retain focus while hidden; only setVisible may change visibility.
       wpe_view_backend_add_activity_state(wpe_backend_, wpe_view_activity_state_focused);
-      wpe_view_backend_add_activity_state(wpe_backend_, wpe_view_activity_state_visible);
-      wpe_view_backend_add_activity_state(wpe_backend_, wpe_view_activity_state_in_window);
     } else {
-      // Remove only the focused state, keep visible and in_window so the webview
-      // continues to render and process basic events
       wpe_view_backend_remove_activity_state(wpe_backend_, wpe_view_activity_state_focused);
     }
   }
@@ -2807,6 +3143,10 @@ void InAppWebView::setVisible(bool visible) {
   if (visible == is_visible_)
     return;
   is_visible_ = visible;
+
+  if (visible) {
+    CancelHiddenPixelBufferTrim();
+  }
 
 #ifdef HAVE_WPE_PLATFORM
   // WPEPlatform: Use wpe_view_set_visible and map/unmap
@@ -2829,6 +3169,86 @@ void InAppWebView::setVisible(bool visible) {
     }
   }
 #endif
+
+  if (!visible) {
+    ScheduleHiddenPixelBufferTrim();
+  }
+}
+
+void InAppWebView::ScheduleHiddenPixelBufferTrim() {
+  CancelHiddenPixelBufferTrim();
+  if (is_visible_ || is_disposing_.load()) {
+    return;
+  }
+
+  struct PendingTrim {
+    InAppWebView* webview;
+    std::weak_ptr<int> lifetime;
+    uint64_t generation;
+  };
+  auto* pending = new (std::nothrow) PendingTrim{
+      this, lifetime_token_, hidden_pixel_buffer_trim_generation_};
+  if (pending == nullptr) {
+    return;  // Trimming is optional; keep the existing rendering buffers.
+  }
+
+  // A conservative grace period avoids reallocating on quick tab switches.
+  // No GPU/WPE resource is released here: its consumer can still need it.
+  hidden_pixel_buffer_trim_source_ = g_timeout_add_full(
+      G_PRIORITY_DEFAULT, kHiddenPixelBufferTrimDelayMs,
+      [](gpointer data) -> gboolean {
+        auto* pending = static_cast<PendingTrim*>(data);
+        if (pending->lifetime.expired()) {
+          return G_SOURCE_REMOVE;
+        }
+        auto* self = pending->webview;
+        if (pending->generation != self->hidden_pixel_buffer_trim_generation_) {
+          return G_SOURCE_REMOVE;
+        }
+        self->hidden_pixel_buffer_trim_source_ = 0;
+        if (!self->is_visible_ && !self->is_disposing_.load()) {
+          self->trim_unused_pixel_buffers_.store(true, std::memory_order_release);
+          self->TrimUnusedPixelBuffers();
+        }
+        return G_SOURCE_REMOVE;
+      },
+      pending, [](gpointer data) { delete static_cast<PendingTrim*>(data); });
+}
+
+void InAppWebView::CancelHiddenPixelBufferTrim() {
+  ++hidden_pixel_buffer_trim_generation_;
+  trim_unused_pixel_buffers_.store(false, std::memory_order_release);
+  if (hidden_pixel_buffer_trim_source_ != 0) {
+    const guint source = hidden_pixel_buffer_trim_source_;
+    hidden_pixel_buffer_trim_source_ = 0;
+    g_source_remove(source);
+  }
+}
+
+void InAppWebView::TrimUnusedPixelBuffers() {
+  if (!trim_unused_pixel_buffers_.load(std::memory_order_acquire)) {
+    return;
+  }
+
+  // Keep the published CPU frame (and the texture's separate staging copy).
+  // Detach spare allocations under the locks, but free them after unlocking so
+  // neither Flutter's raster copy nor the next producer waits for deallocation.
+  std::array<std::vector<uint8_t>, kNumBuffers> retired;
+  {
+    std::lock_guard<std::mutex> writer_lock(pixel_buffer_write_mutex_);
+    if (!trim_unused_pixel_buffers_.load(std::memory_order_acquire)) {
+      return;
+    }
+    std::lock_guard<std::mutex> swap_lock(buffer_swap_mutex_);
+    const size_t read_idx = read_buffer_index_.load(std::memory_order_acquire);
+    for (size_t i = 0; i < kNumBuffers; ++i) {
+      if (i != read_idx) {
+        retired[i].swap(pixel_buffers_[i].data);
+        pixel_buffers_[i].width = 0;
+        pixel_buffers_[i].height = 0;
+      }
+    }
+  }
 }
 
 uint32_t InAppWebView::getActivityState() const {
@@ -3291,8 +3711,28 @@ void InAppWebView::SetPointerButton(int kind, int button, int clickCount) {
 }
 
 void InAppWebView::SetScrollDelta(double dx, double dy) {
-  // Hide all popups when scrolling
+  // Preserve the existing behavior even when every scroll axis is suppressed.
   HideAllPopups();
+
+  // There is no native scroll view to disable here — WPE renders offscreen and
+  // Flutter forwards the wheel/trackpad delta straight through — so an axis the
+  // embedder disabled is dropped before the event is built. Reading the current
+  // settings (rather than a cached copy) keeps a later setSettings() call live.
+  if (settings_ != nullptr &&
+      (settings_->disableHorizontalScroll || settings_->disableVerticalScroll)) {
+    if (settings_->disableHorizontalScroll) {
+      dx = 0;
+    }
+    if (settings_->disableVerticalScroll) {
+      dy = 0;
+    }
+    // Every axis the gesture carried was suppressed: swallow it entirely so the
+    // page sees no scroll event at all, the way a disabled platform scroller
+    // would behave.
+    if (dx == 0 && dy == 0) {
+      return;
+    }
+  }
 
 #ifdef HAVE_WPE_PLATFORM
   if (wpe_view_ == nullptr)
@@ -3618,6 +4058,28 @@ bool InAppWebView::HasDmaBufExport() const {
 #endif
 }
 
+bool InAppWebView::HasCurrentDmaBufBuffer() const {
+#ifdef HAVE_WPE_PLATFORM
+  std::lock_guard<std::mutex> lock(wpe_buffer_mutex_);
+  return current_buffer_ != nullptr && WPE_IS_BUFFER_DMA_BUF(current_buffer_);
+#else
+  return false;
+#endif
+}
+
+bool InAppWebView::ShouldAttemptFlutterEglImport() const {
+  return inline_flutter_texture_consumer_.load(std::memory_order_acquire) &&
+         inline_flutter_import_state_.ShouldAttemptImport();
+}
+
+void InAppWebView::ReportFlutterEglImageImportFailure(
+    bool current_frame_is_dma_buf) {
+  if (inline_flutter_texture_consumer_.load(std::memory_order_acquire) &&
+      inline_flutter_import_state_.ReportFailedImport(current_frame_is_dma_buf)) {
+    SetSkipPixelReadback(false);
+  }
+}
+
 bool InAppWebView::GetDmaBufFd(int* fd, uint32_t* stride, uint32_t* width, uint32_t* height) const {
 #ifdef HAVE_WPE_BACKEND_LEGACY
   std::lock_guard<std::mutex> lock(exported_image_mutex_);
@@ -3693,6 +4155,114 @@ void* InAppWebView::GetCurrentEglImage(uint32_t* out_width, uint32_t* out_height
     *out_width = 0;
   if (out_height)
     *out_height = 0;
+  return nullptr;
+#endif
+}
+
+void* InAppWebView::ImportCurrentBufferToEglImage(void* target_display, uint32_t* out_width,
+                                                   uint32_t* out_height,
+                                                   bool* out_is_dma_buf_frame) const {
+  if (out_width)
+    *out_width = 0;
+  if (out_height)
+    *out_height = 0;
+  if (out_is_dma_buf_frame)
+    *out_is_dma_buf_frame = false;
+
+#ifdef HAVE_WPE_PLATFORM
+  std::lock_guard<std::mutex> lock(wpe_buffer_mutex_);
+
+  // Determine frame eligibility while holding the same lock as the buffer
+  // access. A missing EGLDisplay (for example with a current GLX context) is
+  // an import failure only after we know an actual DMA-BUF frame was present.
+  if (!IsEligibleDmaBufFrame(
+          current_buffer_ != nullptr,
+          current_buffer_ != nullptr && WPE_IS_BUFFER_DMA_BUF(current_buffer_),
+          out_is_dma_buf_frame)) {
+    return nullptr;
+  }
+
+  if (target_display == nullptr) {
+    return nullptr;
+  }
+
+  WPEBufferDMABuf* dmabuf = WPE_BUFFER_DMA_BUF(current_buffer_);
+  guint32 format = wpe_buffer_dma_buf_get_format(dmabuf);
+  guint32 n_planes = wpe_buffer_dma_buf_get_n_planes(dmabuf);
+  guint64 modifier = wpe_buffer_dma_buf_get_modifier(dmabuf);
+
+  static constexpr guint32 kMaxPlanes = 4;
+  if (n_planes == 0 || n_planes > kMaxPlanes) {
+    return nullptr;
+  }
+
+  static const EGLint kFdAttrs[kMaxPlanes] = {
+      EGL_DMA_BUF_PLANE0_FD_EXT, EGL_DMA_BUF_PLANE1_FD_EXT,
+      EGL_DMA_BUF_PLANE2_FD_EXT, EGL_DMA_BUF_PLANE3_FD_EXT};
+  static const EGLint kOffsetAttrs[kMaxPlanes] = {
+      EGL_DMA_BUF_PLANE0_OFFSET_EXT, EGL_DMA_BUF_PLANE1_OFFSET_EXT,
+      EGL_DMA_BUF_PLANE2_OFFSET_EXT, EGL_DMA_BUF_PLANE3_OFFSET_EXT};
+  static const EGLint kPitchAttrs[kMaxPlanes] = {
+      EGL_DMA_BUF_PLANE0_PITCH_EXT, EGL_DMA_BUF_PLANE1_PITCH_EXT,
+      EGL_DMA_BUF_PLANE2_PITCH_EXT, EGL_DMA_BUF_PLANE3_PITCH_EXT};
+  static const EGLint kModifierLoAttrs[kMaxPlanes] = {
+      EGL_DMA_BUF_PLANE0_MODIFIER_LO_EXT, EGL_DMA_BUF_PLANE1_MODIFIER_LO_EXT,
+      EGL_DMA_BUF_PLANE2_MODIFIER_LO_EXT, EGL_DMA_BUF_PLANE3_MODIFIER_LO_EXT};
+  static const EGLint kModifierHiAttrs[kMaxPlanes] = {
+      EGL_DMA_BUF_PLANE0_MODIFIER_HI_EXT, EGL_DMA_BUF_PLANE1_MODIFIER_HI_EXT,
+      EGL_DMA_BUF_PLANE2_MODIFIER_HI_EXT, EGL_DMA_BUF_PLANE3_MODIFIER_HI_EXT};
+
+  // DRM_FORMAT_MOD_INVALID is defined by libdrm as all bits set. Keep this
+  // local so the Linux plugin does not gain a direct libdrm header dependency.
+  const bool has_modifier = (modifier != std::numeric_limits<guint64>::max());
+
+  std::vector<EGLint> attribs;
+  attribs.push_back(EGL_WIDTH);
+  attribs.push_back(static_cast<EGLint>(current_buffer_width_));
+  attribs.push_back(EGL_HEIGHT);
+  attribs.push_back(static_cast<EGLint>(current_buffer_height_));
+  attribs.push_back(EGL_LINUX_DRM_FOURCC_EXT);
+  attribs.push_back(static_cast<EGLint>(format));
+
+  for (guint32 plane = 0; plane < n_planes; ++plane) {
+    attribs.push_back(kFdAttrs[plane]);
+    attribs.push_back(wpe_buffer_dma_buf_get_fd(dmabuf, plane));
+    attribs.push_back(kOffsetAttrs[plane]);
+    attribs.push_back(static_cast<EGLint>(wpe_buffer_dma_buf_get_offset(dmabuf, plane)));
+    attribs.push_back(kPitchAttrs[plane]);
+    attribs.push_back(static_cast<EGLint>(wpe_buffer_dma_buf_get_stride(dmabuf, plane)));
+    if (has_modifier) {
+      attribs.push_back(kModifierLoAttrs[plane]);
+      attribs.push_back(static_cast<EGLint>(modifier & 0xffffffff));
+      attribs.push_back(kModifierHiAttrs[plane]);
+      attribs.push_back(static_cast<EGLint>(modifier >> 32));
+    }
+  }
+  attribs.push_back(EGL_NONE);
+
+  static PFNEGLCREATEIMAGEKHRPROC eglCreateImageKHR = nullptr;
+  if (eglCreateImageKHR == nullptr) {
+    eglCreateImageKHR = (PFNEGLCREATEIMAGEKHRPROC)eglGetProcAddress("eglCreateImageKHR");
+  }
+  if (eglCreateImageKHR == nullptr) {
+    return nullptr;
+  }
+
+  EGLImageKHR image = eglCreateImageKHR(static_cast<EGLDisplay>(target_display), EGL_NO_CONTEXT,
+                                        EGL_LINUX_DMA_BUF_EXT, static_cast<EGLClientBuffer>(nullptr),
+                                        attribs.data());
+  if (image == EGL_NO_IMAGE_KHR) {
+    return nullptr;
+  }
+
+  if (out_width)
+    *out_width = current_buffer_width_;
+  if (out_height)
+    *out_height = current_buffer_height_;
+
+  return image;
+#else
+  (void)target_display;
   return nullptr;
 #endif
 }
@@ -3787,10 +4357,17 @@ void InAppWebView::OnLoadChanged(WebKitWebView* web_view, WebKitLoadEvent load_e
       // Redirects are handled internally by WebKit
       break;
     case WEBKIT_LOAD_COMMITTED:
+      // Only committed replacement documents cancel; same-document navigation does not.
+      self->pending_java_script_calls_->cancelAll();
+      // Each navigation starts with the shared, neutral console bootstrap.
+      // Push this view's policy without rewriting a sibling's future scripts.
+      self->updateConsoleMessagePolicy();
       // Notify that page content is starting to be visible
       self->channel_delegate_->onPageCommitVisible(self->getUrl().value_or(""));
       break;
     case WEBKIT_LOAD_FINISHED:
+      // Retry if the committed event preceded bootstrap installation.
+      self->updateConsoleMessagePolicy();
       self->channel_delegate_->onLoadStop(self->getUrl().value_or(""));
       break;
     default:
@@ -3897,6 +4474,26 @@ gboolean InAppWebView::OnDecidePolicy(WebKitWebView* web_view, WebKitPolicyDecis
 
   if (decision_type != WEBKIT_POLICY_DECISION_TYPE_NAVIGATION_ACTION) {
     return FALSE;  // Let WebKit handle other decision types
+  }
+
+  // Rules were requested but none are in force: the page would run with no restrictions,
+  // so the navigation waits for them, and is refused if they failed.
+  auto* blockers = self->content_blocker_handler_.get();
+  if (blockers != nullptr && blockers->rulesMissing()) {
+    if (!blockers->isPending()) {
+      webkit_policy_decision_ignore(decision);
+      return TRUE;
+    }
+    g_object_ref(decision);
+    blockers->whenSettled([self, web_view, decision, decision_type](bool applied) {
+      if (!applied) {
+        webkit_policy_decision_ignore(decision);
+      } else if (!OnDecidePolicy(web_view, decision, decision_type, self)) {
+        webkit_policy_decision_use(decision);
+      }
+      g_object_unref(decision);
+    });
+    return TRUE;
   }
 
   auto* nav_decision = WEBKIT_NAVIGATION_POLICY_DECISION(decision);
@@ -5453,13 +6050,13 @@ void InAppWebView::HideColorPicker() {
   // This is intentionally a no-op - the dialog manages its own lifecycle.
 }
 
-void InAppWebView::HideFileChooser() {
+void InAppWebView::HideFileChooser(bool force) {
   if (active_file_dialog_ != nullptr) {
     // Don't close the dialog if it was just shown (within 200ms)
     // This prevents the click that triggered the file chooser from immediately closing it
     int64_t now = g_get_monotonic_time();
     int64_t elapsed_us = now - file_dialog_show_time_;
-    if (elapsed_us < 200000) {
+    if (!force && elapsed_us < 200000) {
       return;
     }
     
@@ -5499,6 +6096,19 @@ void InAppWebView::HideAllPopups() {
   HideDatePicker();
 }
 
+void InAppWebView::CancelHostBoundPopups() {
+  // Host changes and host destruction must synchronously release dialogs that
+  // are transient for the old window. Route response-based dialogs through
+  // their normal cancellation handlers so pending WebKit replies are resolved.
+  if (active_color_dialog_ != nullptr) {
+    gtk_dialog_response(GTK_DIALOG(active_color_dialog_), GTK_RESPONSE_CANCEL);
+  }
+  if (active_date_dialog_ != nullptr) {
+    gtk_dialog_response(GTK_DIALOG(active_date_dialog_), GTK_RESPONSE_CANCEL);
+  }
+  HideFileChooser(true);
+}
+
 void InAppWebView::ResolveInternalHandlerWithReply(WebKitScriptMessageReply* reply, const std::string& jsonResult) {
   if (reply == nullptr) {
     debugLog("ResolveInternalHandlerWithReply: reply is NULL, cannot respond");
@@ -5513,25 +6123,19 @@ void InAppWebView::ResolveInternalHandlerWithReply(WebKitScriptMessageReply* rep
     return;
   }
   
-  // Parse the JSON result and create a JSCValue
-  JSCValue* replyValue = nullptr;
-  
-  if (jsonResult == "null" || jsonResult.empty()) {
-    replyValue = jsc_value_new_null(context);
-  } else if (jsonResult[0] == '"') {
-    // It's a quoted string - evaluate it to get the actual string value
-    replyValue = jsc_context_evaluate(context, jsonResult.c_str(), -1);
-  } else {
-    // Parse as JSON
-    std::string parseScript = "(" + jsonResult + ")";
-    replyValue = jsc_context_evaluate(context, parseScript.c_str(), -1);
+  // Parse data as JSON, not as a JavaScript expression. Object literals have
+  // different __proto__ semantics and reject valid JSON with duplicate keys.
+  JSCValue* replyValue = jsc_value_new_from_json(context, jsonResult.c_str());
+  if (replyValue == nullptr || jsc_context_get_exception(context) != nullptr) {
+    webkit_script_message_reply_return_error_message(reply, "Invalid JavaScript handler JSON result");
+    if (replyValue != nullptr) {
+      g_object_unref(replyValue);
+    }
+    g_object_unref(context);
+    webkit_script_message_reply_unref(reply);
+    return;
   }
-  
-  if (replyValue == nullptr) {
-    // Fallback: return the raw string
-    replyValue = jsc_value_new_string(context, jsonResult.c_str());
-  }
-  
+
   // Send the reply back to JavaScript
   webkit_script_message_reply_return_value(reply, replyValue);
   
@@ -5949,11 +6553,11 @@ void InAppWebView::ShowDatePicker(const std::string& inputType, const std::strin
   date_dialog_show_time_ = g_get_monotonic_time();
 }
 
-void InAppWebView::HideDatePicker() {
+void InAppWebView::HideDatePicker(bool force) {
   if (active_date_dialog_ != nullptr) {
     int64_t now = g_get_monotonic_time();
     int64_t elapsed_us = now - date_dialog_show_time_;
-    if (elapsed_us < 200000) {
+    if (!force && elapsed_us < 200000) {
       return;  // Don't close if just shown
     }
     
@@ -6209,7 +6813,10 @@ void InAppWebView::setMicrophoneCaptureState(int state) {
 
 std::optional<std::string> InAppWebView::getMetaThemeColor() const {
   if (webview_ == nullptr) return std::nullopt;
-  
+#if !WEBKIT_CHECK_VERSION(2, 50, 0)
+  // webkit_web_view_get_theme_color / WebKitColor require WPE WebKit >= 2.50.
+  return std::nullopt;
+#else
   WebKitColor color;
   gboolean hasColor = webkit_web_view_get_theme_color(webview_, &color);
   
@@ -6238,6 +6845,7 @@ std::optional<std::string> InAppWebView::getMetaThemeColor() const {
   }
   
   return std::string(hexColor);
+#endif
 }
 
 // === Audio State (Playing and Mute) ===
@@ -6682,6 +7290,7 @@ void InAppWebView::OnWebProcessTerminated(WebKitWebView* web_view,
 
   g_warning("InAppWebView[%ld]: WebProcess terminated (reason=%s, didCrash=%s)",
             self->id_, reason_str, didCrash ? "true" : "false");
+  self->pending_java_script_calls_->cancelAll();
 
 #ifdef HAVE_WPE_BACKEND_LEGACY
   // IMPORTANT: When WebProcess crashes (especially from "Failed to bind wl_compositor"),
@@ -6890,7 +7499,11 @@ gboolean InAppWebView::OnRunFileChooser(WebKitWebView* web_view,
 
   // If no channel delegate, show native dialog directly
   if (!self->channel_delegate_) {
-    ShowNativeFileChooser(self, request, select_multiple, acceptTypes, self->gtk_window_);
+    if (self->gtk_window_ != nullptr) {
+      ShowNativeFileChooser(self, request, select_multiple, acceptTypes, self->gtk_window_);
+    } else {
+      webkit_file_chooser_request_cancel(request);
+    }
     return TRUE;
   }
 
@@ -6903,7 +7516,7 @@ gboolean InAppWebView::OnRunFileChooser(WebKitWebView* web_view,
   // Capture variables for the lambda
   bool selectMultipleCopy = select_multiple;
   std::vector<std::string> acceptTypesCopy = acceptTypes;
-  GtkWindow* parentWindow = self->gtk_window_;
+  std::weak_ptr<int> lifetime = self->lifetime_token_;
 
   self->channel_delegate_->onShowFileChooser(
       mode,
@@ -6911,7 +7524,12 @@ gboolean InAppWebView::OnRunFileChooser(WebKitWebView* web_view,
       false,  // isCaptureEnabled - not exposed by WPE API
       std::nullopt,  // title
       std::nullopt,  // filenameHint
-      [self, request, selectMultipleCopy, acceptTypesCopy, parentWindow](ShowFileChooserResponse response) {
+      [self, request, selectMultipleCopy, acceptTypesCopy, lifetime](ShowFileChooserResponse response) {
+        if (lifetime.expired()) {
+          webkit_file_chooser_request_cancel(request);
+          g_object_unref(request);
+          return;
+        }
         if (response.handledByClient) {
           // Client handled it - use the file paths from Dart
           if (response.filePaths.has_value() && !response.filePaths->empty()) {
@@ -6928,7 +7546,14 @@ gboolean InAppWebView::OnRunFileChooser(WebKitWebView* web_view,
           }
         } else {
           // Client didn't handle it - show native GTK file chooser
-          ShowNativeFileChooser(self, request, selectMultipleCopy, acceptTypesCopy, parentWindow);
+          // Resolve the parent at reply time: the view may have moved to a
+          // different live host while Dart was deciding whether to handle it.
+          if (self->gtk_window_ != nullptr) {
+            ShowNativeFileChooser(self, request, selectMultipleCopy, acceptTypesCopy,
+                                  self->gtk_window_);
+          } else {
+            webkit_file_chooser_request_cancel(request);
+          }
         }
         g_object_unref(request);
       });
@@ -7277,19 +7902,9 @@ bool InAppWebView::handleScriptMessageWithReply(const std::string& body, WebKitS
   }
 
   // === Security Check 3: Origin Allow List ===
-  bool isOriginAllowed = true;
-  if (settings_ && settings_->javaScriptHandlersOriginAllowList.has_value()) {
-    const auto& allowList = settings_->javaScriptHandlersOriginAllowList.value();
-    if (!allowList.empty()) {
-      isOriginAllowed = false;
-      for (const auto& allowedOrigin : allowList) {
-        if (!sourceOrigin.empty() && sourceOrigin.find(allowedOrigin) != std::string::npos) {
-          isOriginAllowed = true;
-          break;
-        }
-      }
-    }
-  }
+  // Dart specifies regular expressions: null allows, empty denies. Never
+  // use a substring check (e.g. trusted.example.evil must not match).
+  const bool isOriginAllowed = javaScriptOriginPolicy_.allows(sourceOrigin);
 
   if (!isOriginAllowed) {
     errorLog("InAppWebView: Bridge access attempt from origin not allowed: " + sourceOrigin);
@@ -7325,39 +7940,67 @@ bool InAppWebView::handleScriptMessageWithReply(const std::string& body, WebKitS
 
   // === Handle Internal Handlers ===
   
-  if (handlerName == "onConsoleMessage") {
+  if (handlerName == "onConsoleMessage" ||
+      handlerName == "onConsoleMessageBatch") {
+    // Ignore late messages from a detached publisher before parsing its payload.
+    if (!targetWebView->has_console_message_listener_ ||
+        (targetWebView->settings_->consoleMessageLevels && targetWebView->settings_->consoleMessageLevels->empty())) {
+      ResolveInternalHandlerWithReply(reply, "null");
+      return true;
+    }
     // Handle console message interception
-    std::string message = "";
-    std::string level = "log";
-
+    std::vector<json> consoleMessages;
     if (!argsJsonStr.empty()) {
       try {
         json argsJson = json::parse(argsJsonStr);
         if (argsJson.is_array() && !argsJson.empty()) {
           json firstArg = argsJson[0];
-          if (firstArg.contains("level") && firstArg["level"].is_string()) {
-            level = firstArg["level"].get<std::string>();
-          }
-          if (firstArg.contains("message") && firstArg["message"].is_string()) {
-            message = firstArg["message"].get<std::string>();
+          if (handlerName == "onConsoleMessageBatch" &&
+              firstArg.is_object() && firstArg.contains("messages") &&
+              firstArg["messages"].is_array()) {
+            for (const auto& item : firstArg["messages"]) {
+              if (item.is_object() && item.contains("message") &&
+                  item["message"].is_string()) {
+                consoleMessages.push_back(item);
+              }
+            }
+          } else if (handlerName == "onConsoleMessage" &&
+                     firstArg.is_object()) {
+            consoleMessages.push_back(firstArg);
           }
         }
       } catch (const json::parse_error& e) {}
     }
 
-    int64_t messageLevel = 1;  // LOG
-    if (level == "debug") {
-      messageLevel = 0;
-    } else if (level == "info" || level == "log") {
-      messageLevel = 1;
-    } else if (level == "warn") {
-      messageLevel = 2;
-    } else if (level == "error") {
-      messageLevel = 3;
-    }
-
     if (targetWebView->channel_delegate_) {
-      targetWebView->channel_delegate_->onConsoleMessage(message, messageLevel);
+      std::vector<std::pair<std::string, int64_t>> entries;
+      entries.reserve(64);
+      for (const auto& consoleMessage : consoleMessages) {
+        const std::string level =
+            consoleMessage.contains("level") && consoleMessage["level"].is_string()
+                ? consoleMessage["level"].get<std::string>()
+                : "log";
+        int64_t messageLevel = 1;  // LOG
+        if (level == "debug") {
+          messageLevel = 0;
+        } else if (level == "warn") {
+          messageLevel = 2;
+        } else if (level == "error") {
+          messageLevel = 3;
+        }
+        if (!targetWebView->acceptsConsoleMessage(messageLevel)) continue;
+        const std::string message =
+            consoleMessage.contains("message") &&
+                    consoleMessage["message"].is_string()
+                ? consoleMessage["message"].get<std::string>()
+                : "";
+        entries.emplace_back(message, messageLevel);
+        if (entries.size() == 64) {
+          targetWebView->channel_delegate_->onConsoleMessages(entries);
+          entries.clear();
+        }
+      }
+      targetWebView->channel_delegate_->onConsoleMessages(entries);
     }
     ResolveInternalHandlerWithReply(reply, "null");
     return true;
@@ -7800,40 +8443,45 @@ void InAppWebView::OnExportShmBuffer(struct wpe_fdo_shm_exported_buffer* buffer)
   void* data = wl_shm_buffer_get_data(shm_buffer);
 
   if (data != nullptr && width > 0 && height > 0) {
-    // Copy to our pixel buffer
-    // Note: stride is the row pitch in bytes (may include padding)
+    try {
+      std::lock_guard<std::mutex> writer_lock(pixel_buffer_write_mutex_);
+      // Copy to our pixel buffer
+      // Note: stride is the row pitch in bytes (may include padding)
 
-    size_t write_idx = write_buffer_index_.load(std::memory_order_relaxed);
-    auto& pixel_buffer = pixel_buffers_[write_idx];
+      size_t write_idx = write_buffer_index_.load(std::memory_order_relaxed);
+      auto& pixel_buffer = pixel_buffers_[write_idx];
 
-    // Use width*4 for tightly packed RGBA output (no stride padding)
-    size_t output_row_size = static_cast<size_t>(width) * 4;
-    size_t output_size = static_cast<size_t>(height) * output_row_size;
+      // Use width*4 for tightly packed RGBA output (no stride padding)
+      size_t output_row_size = static_cast<size_t>(width) * 4;
+      size_t output_size = static_cast<size_t>(height) * output_row_size;
 
-    if (pixel_buffer.data.size() != output_size) {
-      pixel_buffer.data.resize(output_size);
-    }
+      ResizeByteBuffer(pixel_buffer.data, output_size);
 
-    pixel_buffer.width = static_cast<size_t>(width);
-    pixel_buffer.height = static_cast<size_t>(height);
+      pixel_buffer.width = static_cast<size_t>(width);
+      pixel_buffer.height = static_cast<size_t>(height);
 
-    // Convert from BGRA (WL_SHM_FORMAT_ARGB8888 in memory) to RGBA
-    // Using SIMD-optimized conversion for better performance on ARM (NEON) and x86 (SSE2/SSSE3)
-    uint8_t* src = static_cast<uint8_t*>(data);
-    uint8_t* dst = pixel_buffer.data.data();
+      // Convert from BGRA (WL_SHM_FORMAT_ARGB8888 in memory) to RGBA
+      // Using SIMD-optimized conversion for better performance on ARM (NEON) and x86 (SSE2/SSSE3)
+      uint8_t* src = static_cast<uint8_t*>(data);
+      uint8_t* dst = pixel_buffer.data.data();
 
-    ConvertARGB32ToRGBA(src, dst, width, height, stride);
+      ConvertARGB32ToRGBA(src, dst, width, height, stride);
 
-    // Swap buffers
-    {
-      std::lock_guard<std::mutex> lock(buffer_swap_mutex_);
-      read_buffer_index_.store(write_idx, std::memory_order_release);
-      write_buffer_index_.store((write_idx + 1) % kNumBuffers, std::memory_order_relaxed);
+      // Swap buffers
+      {
+        std::lock_guard<std::mutex> lock(buffer_swap_mutex_);
+        read_buffer_index_.store(write_idx, std::memory_order_release);
+        write_buffer_index_.store((write_idx + 1) % kNumBuffers, std::memory_order_relaxed);
+      }
+    } catch (const std::bad_alloc&) {
+      // Preserve the last published frame, and always end SHM access and
+      // release/complete the export below, even when a spare cannot be rebuilt.
     }
   }
 
   // End access
   wl_shm_buffer_end_access(shm_buffer);
+  TrimUnusedPixelBuffers();
 
   // Release the buffer back to WPE
   if (exportable_ != nullptr) {

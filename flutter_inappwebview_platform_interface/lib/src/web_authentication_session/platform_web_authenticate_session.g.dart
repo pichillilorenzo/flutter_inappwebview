@@ -46,6 +46,18 @@ extension _PlatformWebAuthenticationSessionClassSupported
 
 ///List of [PlatformWebAuthenticationSession]'s properties that can be used to check i they are supported or not by the current platform.
 enum PlatformWebAuthenticationSessionProperty {
+  ///Can be used to check if the [PlatformWebAuthenticationSession.additionalHeaderFields] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PlatformWebAuthenticationSession.additionalHeaderFields.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- iOS WKWebView 17.4+
+  ///- macOS WKWebView 14.4+
+  ///
+  ///Use the [PlatformWebAuthenticationSession.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  additionalHeaderFields,
+
   ///Can be used to check if the [PlatformWebAuthenticationSession.callbackURLScheme] property is supported at runtime.
   ///
   ///{@template flutter_inappwebview_platform_interface.PlatformWebAuthenticationSession.callbackURLScheme.supported_platforms}
@@ -118,6 +130,12 @@ extension _PlatformWebAuthenticationSessionPropertySupported
     TargetPlatform? platform,
   }) {
     switch (property) {
+      case PlatformWebAuthenticationSessionProperty.additionalHeaderFields:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebAuthenticationSessionProperty.callbackURLScheme:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
@@ -189,6 +207,9 @@ enum PlatformWebAuthenticationSessionMethod {
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [url]: all platforms
   ///- [callbackURLScheme]: all platforms
+  ///- [additionalHeaderFields]:
+  ///    - iOS WKWebView 17.4+
+  ///    - macOS WKWebView 14.4+
   ///- [onComplete]: all platforms
   ///- [initialSettings]: all platforms
   ///

@@ -17,10 +17,17 @@ class CustomSchemeResponse {
 
   ///Data enconded to 'base64'.
   Uint8List data;
+
+  ///HTTP headers sent with the data, such as `Content-Security-Policy`.
+  ///`Content-Type` is derived from [contentType] unless it is listed here.
+  ///
+  ///**NOTE**: used on iOS, macOS and Windows; other platforms ignore it.
+  Map<String, String>? headers;
   CustomSchemeResponse({
     this.contentEncoding = 'utf-8',
     required this.contentType,
     required this.data,
+    this.headers,
   });
 
   ///Gets a possible [CustomSchemeResponse] instance from a [Map] value.
@@ -34,6 +41,7 @@ class CustomSchemeResponse {
     final instance = CustomSchemeResponse(
       contentType: map['contentType'],
       data: Uint8List.fromList(map['data'].cast<int>()),
+      headers: map['headers']?.cast<String, String>(),
     );
     if (map['contentEncoding'] != null) {
       instance.contentEncoding = map['contentEncoding'];
@@ -47,6 +55,7 @@ class CustomSchemeResponse {
       "contentEncoding": contentEncoding,
       "contentType": contentType,
       "data": data,
+      "headers": headers,
     };
   }
 
@@ -57,6 +66,6 @@ class CustomSchemeResponse {
 
   @override
   String toString() {
-    return 'CustomSchemeResponse{contentEncoding: $contentEncoding, contentType: $contentType, data: $data}';
+    return 'CustomSchemeResponse{contentEncoding: $contentEncoding, contentType: $contentType, data: $data, headers: $headers}';
   }
 }

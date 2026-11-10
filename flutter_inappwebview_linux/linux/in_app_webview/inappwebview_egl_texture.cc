@@ -6,6 +6,8 @@
 #include "../utils/gl_context.h"
 #include "../utils/log.h"
 #include "in_app_webview.h"
+#include "simd_convert.h"
+#include "zero_copy.h"
 
 // Use the shared HasCurrentGLContext from gl_context.h
 static gboolean has_current_gl_context() {
@@ -17,15 +19,16 @@ static gboolean has_current_gl_context() {
  *
  * This is the most performant texture implementation for WPE WebKit because:
  *
- * 1. WPE WebKit exports frames as EGL images (backed by DMA-BUF)
- * 2. We bind the EGL image directly to a GL texture using glEGLImageTargetTexture2DOES
+ * 1. WPE WebKit exports DMA-BUF-backed frames
+ * 2. We import the DMA-BUF into Flutter's current EGLDisplay, then bind the
+ *    resulting EGL image directly to a GL texture using glEGLImageTargetTexture2DOES
  * 3. Flutter samples this texture directly - NO pixel copy at any point!
  *
  * The previous implementation had this flow:
  *   WPE → EGL Image → glReadPixels (GPU→CPU) → glTexImage2D (CPU→GPU) → Flutter
  *
  * This implementation has:
- *   WPE → EGL Image → GL Texture binding → Flutter
+ *   WPE DMA-BUF → EGL Image on Flutter's display → GL Texture binding → Flutter
  *
  * This eliminates the glReadPixels bottleneck that was causing lag on large textures.
  */
@@ -42,12 +45,6 @@ struct _InAppWebViewEGLTexture {
   gboolean texture_initialized;
   uint32_t texture_width;   // Current texture dimensions
   uint32_t texture_height;
-
-  // Current EGL image (weak reference - owned by WPE)
-  void* current_egl_image;  // EGLImageKHR
-  uint32_t width;
-  uint32_t height;
-  gboolean has_new_frame;
 
   // Fallback: pixel buffer for when EGL is not available (SHM mode)
   uint8_t* fallback_buffer;
@@ -75,6 +72,11 @@ static gboolean check_egl_image_extension(InAppWebViewEGLTexture* self) {
   }
 
   self->extension_checked = TRUE;
+
+  // Match the producer's readback mode; keep GL uploads available without EGL sharing.
+  if (flutter_inappwebview_plugin::IsZeroCopyDisabled()) {
+    return FALSE;
+  }
 
   // Check for the extension
   const char* extensions = (const char*)glGetString(GL_EXTENSIONS);
@@ -140,11 +142,25 @@ static gboolean inappwebview_egl_texture_populate(FlTextureGL* texture, uint32_t
     return FALSE;
   }
 
-  // Use the EGL image that was set via inappwebview_egl_texture_set_egl_image()
-  // This is updated by the on_frame_available callback before Flutter is notified
-  if (self->current_egl_image != nullptr && self->width > 0 && self->height > 0) {
-    // Check if EGL image extension is available
-    if (check_egl_image_extension(self)) {
+  // Zero-copy path: re-import the current frame's DMA-BUF planes directly
+  // into the EGLDisplay that is current on THIS thread (Flutter's), rather
+  // than reusing an EGLImageKHR created against WPE's own headless
+  // EGLDisplay. An EGLImageKHR is only valid for
+  // glEGLImageTargetTexture2DOES calls made while the display that created
+  // it is current; the DMA-BUF it wraps is not display-bound, so we can
+  // freely create a fresh image per frame here.
+  const bool inline_zero_copy_requested =
+      self->webview != nullptr && self->webview->ShouldAttemptFlutterEglImport();
+  bool current_frame_is_dma_buf = false;
+  bool imported_current_frame = false;
+  if (inline_zero_copy_requested && check_egl_image_extension(self)) {
+    uint32_t img_width = 0;
+    uint32_t img_height = 0;
+    void* egl_image = self->webview->ImportCurrentBufferToEglImage(
+        reinterpret_cast<void*>(eglGetCurrentDisplay()), &img_width, &img_height,
+        &current_frame_is_dma_buf);
+
+    if (egl_image != nullptr && img_width > 0 && img_height > 0) {
       // Create texture if needed
       if (!self->texture_initialized) {
         glGenTextures(1, &self->texture_id);
@@ -154,7 +170,7 @@ static gboolean inappwebview_egl_texture_populate(FlTextureGL* texture, uint32_t
       // Bind the EGL image to our texture - ZERO-COPY!
       glBindTexture(GL_TEXTURE_2D, self->texture_id);
       self->glEGLImageTargetTexture2DOES(GL_TEXTURE_2D,
-                                         static_cast<GLeglImageOES>(self->current_egl_image));
+                                         static_cast<GLeglImageOES>(egl_image));
 
       // Set texture parameters
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -164,20 +180,39 @@ static gboolean inappwebview_egl_texture_populate(FlTextureGL* texture, uint32_t
 
       glBindTexture(GL_TEXTURE_2D, 0);
 
+      // Safe to destroy now: once bound via glEGLImageTargetTexture2DOES the
+      // texture holds its own reference to the underlying DMA-BUF.
+      static PFNEGLDESTROYIMAGEKHRPROC eglDestroyImageKHR = nullptr;
+      if (eglDestroyImageKHR == nullptr) {
+        eglDestroyImageKHR =
+            (PFNEGLDESTROYIMAGEKHRPROC)eglGetProcAddress("eglDestroyImageKHR");
+      }
+      if (eglDestroyImageKHR != nullptr) {
+        eglDestroyImageKHR(eglGetCurrentDisplay(), static_cast<EGLImageKHR>(egl_image));
+      }
+
       // Update tracked dimensions
-      self->texture_width = self->width;
-      self->texture_height = self->height;
+      self->texture_width = img_width;
+      self->texture_height = img_height;
 
       *target = GL_TEXTURE_2D;
       *name = self->texture_id;
-      *out_width = self->width;
-      *out_height = self->height;
-      
-      self->has_new_frame = FALSE;
+      *out_width = img_width;
+      *out_height = img_height;
+      imported_current_frame = true;
 
       g_mutex_unlock(&self->mutex);
       return TRUE;
     }
+  } else if (inline_zero_copy_requested) {
+    current_frame_is_dma_buf = self->webview->HasCurrentDmaBufBuffer();
+  }
+
+  // Coordinate a failed Flutter-display import with the WPE producer. The
+  // current frame remains available as a referenced DMA-BUF, and subsequent
+  // frames will use the producer's existing pixel conversion fallback.
+  if (inline_zero_copy_requested && !imported_current_frame) {
+    self->webview->ReportFlutterEglImageImportFailure(current_frame_is_dma_buf);
   }
 
   // Fallback: Try to get pixel buffer from webview (SHM mode)
@@ -196,7 +231,9 @@ static gboolean inappwebview_egl_texture_populate(FlTextureGL* texture, uint32_t
       }
 
       // Reallocate fallback buffer if needed
-      if (self->fallback_buffer_size < required_size) {
+      if (self->fallback_buffer_size < required_size ||
+          flutter_inappwebview_plugin::ShouldShrinkByteBuffer(
+              self->fallback_buffer_size, required_size)) {
         self->fallback_buffer = static_cast<uint8_t*>(g_realloc(self->fallback_buffer, required_size));
         self->fallback_buffer_size = required_size;
       }
@@ -285,7 +322,6 @@ static void inappwebview_egl_texture_dispose(GObject* object) {
   self->texture_height = 0;
   self->default_texture_id = 0;
   self->default_texture_initialized = FALSE;
-  self->current_egl_image = nullptr;
 
   g_mutex_unlock(&self->mutex);
   g_mutex_clear(&self->mutex);
@@ -304,10 +340,6 @@ static void inappwebview_egl_texture_init(InAppWebViewEGLTexture* self) {
   self->texture_initialized = FALSE;
   self->texture_width = 0;
   self->texture_height = 0;
-  self->current_egl_image = nullptr;
-  self->width = 0;
-  self->height = 0;
-  self->has_new_frame = FALSE;
   self->fallback_buffer = nullptr;
   self->fallback_buffer_size = 0;
   self->default_texture_id = 0;
@@ -325,20 +357,4 @@ InAppWebViewEGLTexture* inappwebview_egl_texture_new(
   self->webview = webview;
   flutter_inappwebview_plugin::debugLog("InAppWebViewEGLTexture: created (zero-copy mode)");
   return self;
-}
-
-void inappwebview_egl_texture_set_egl_image(InAppWebViewEGLTexture* self, void* egl_image,
-                                            uint32_t width, uint32_t height) {
-  if (self == nullptr) {
-    return;
-  }
-
-  g_mutex_lock(&self->mutex);
-
-  self->current_egl_image = egl_image;
-  self->width = width;
-  self->height = height;
-  self->has_new_frame = TRUE;
-
-  g_mutex_unlock(&self->mutex);
 }

@@ -38,7 +38,7 @@ class InAppBrowserManager {
 
   /// Create a new InAppBrowser instance
   /// @param arguments The creation arguments from Dart
-  void createInAppBrowser(FlValue* arguments);
+  std::optional<WebViewCreationError> createInAppBrowser(FlValue* arguments);
 
   /// Open a URL with the system browser
   /// @param url The URL to open
@@ -59,8 +59,6 @@ class InAppBrowserManager {
   FlPluginRegistrar* registrar_ = nullptr;
   FlBinaryMessenger* messenger_ = nullptr;
   FlMethodChannel* method_channel_ = nullptr;
-  GtkWindow* gtk_window_ = nullptr;
-  FlView* fl_view_ = nullptr;
 
   /// Map of browser ID to browser instance
   std::map<std::string, std::unique_ptr<InAppBrowser>> browsers_;

@@ -13,6 +13,7 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
     
     var useShouldOverrideUrlLoading = false
     var useOnLoadResource = false
+    var consoleMessageLevels: [Int]? = nil
     var useOnDownloadStart = false
     @available(*, deprecated, message: "Use InAppWebViewManager.clearAllCache instead.")
     var clearCache = false
@@ -85,6 +86,8 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
     var isInspectable = false
     var shouldPrintBackgrounds = false
     var javaScriptHandlersOriginAllowList: [String]? = nil
+    var javaScriptHandlersForMainFrameOnly = false
+    var useScriptMessageHandlerWithReply = false
     var javaScriptBridgeEnabled = true
     var javaScriptBridgeOriginAllowList: [String]? = nil
     var javaScriptBridgeForMainFrameOnly = false

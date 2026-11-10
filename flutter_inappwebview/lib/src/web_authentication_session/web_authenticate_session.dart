@@ -44,6 +44,12 @@ class WebAuthenticationSession {
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebAuthenticationSession.callbackURLScheme.supported_platforms}
   String? get callbackURLScheme => platform.callbackURLScheme;
 
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebAuthenticationSession.additionalHeaderFields}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebAuthenticationSession.additionalHeaderFields.supported_platforms}
+  Map<String, String>? get additionalHeaderFields =>
+      platform.additionalHeaderFields;
+
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebAuthenticationSession.initialSettings}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebAuthenticationSession.initialSettings.supported_platforms}
@@ -62,6 +68,7 @@ class WebAuthenticationSession {
   static Future<WebAuthenticationSession> create({
     required WebUri url,
     String? callbackURLScheme,
+    Map<String, String>? additionalHeaderFields,
     WebAuthenticationSessionCompletionHandler onComplete,
     WebAuthenticationSessionSettings? initialSettings,
   }) async {
@@ -69,6 +76,7 @@ class WebAuthenticationSession {
       platform: await PlatformWebAuthenticationSession.static().create(
         url: url,
         callbackURLScheme: callbackURLScheme,
+        additionalHeaderFields: additionalHeaderFields,
         onComplete: onComplete,
         initialSettings: initialSettings,
       ),

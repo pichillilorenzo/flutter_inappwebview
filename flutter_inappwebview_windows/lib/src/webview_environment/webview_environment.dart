@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
@@ -103,16 +105,47 @@ class WindowsWebViewEnvironment extends PlatformWebViewEnvironment
 
   @override
   Future<List<BrowserProcessInfo>> getProcessInfos() async {
+    // The shared channel getter asserts when disposed in debug builds.
+    final environmentChannel = disposed ? null : channel;
+    if (environmentChannel == null) {
+      throw PlatformException(
+        code: 'webview_environment_unavailable',
+        message:
+            'The WebView environment has not been created or was disposed.',
+        details: {'stage': 'channel'},
+      );
+    }
     Map<String, dynamic> args = <String, dynamic>{};
-    final result = await channel?.invokeMethod<List<dynamic>>(
+    final result = await environmentChannel.invokeMethod<Object?>(
       'getProcessInfos',
       args,
     );
-    return result
-            ?.map((e) => BrowserProcessInfo.fromMap(e.cast<String, dynamic>()))
-            .whereType<BrowserProcessInfo>()
-            .toList() ??
-        [];
+    if (result is! List) {
+      throw PlatformException(
+        code: 'process_info_collection_failed',
+        message: 'The native process collection returned no snapshot.',
+        details: {'stage': 'methodChannel.result'},
+      );
+    }
+    try {
+      return result.map((e) {
+        if (e is! Map) {
+          throw const FormatException('Process information must be a map.');
+        }
+        return BrowserProcessInfo.fromMap(e.cast<String, dynamic>())!;
+      }).toList();
+    } catch (error) {
+      if (error is! TypeError &&
+          error is! NoSuchMethodError &&
+          error is! FormatException) {
+        rethrow;
+      }
+      throw PlatformException(
+        code: 'process_info_collection_failed',
+        message: 'The native process snapshot contains invalid information.',
+        details: {'stage': 'methodChannel.decode'},
+      );
+    }
   }
 
   @override
@@ -143,6 +176,34 @@ class WindowsWebViewEnvironment extends PlatformWebViewEnvironment
     env.handler = env.handleMethod;
     env.initMethodCallHandler();
     return env;
+  }
+
+  @override
+  Future<WebViewEnvironmentPrewarmResult?> prewarm({
+    WebViewEnvironmentSettings? settings,
+  }) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('settings', () => settings?.toMap());
+    final stopwatch = Stopwatch()..start();
+    try {
+      final result = await _staticChannel
+          .invokeMethod<Map<dynamic, dynamic>>('prewarm', args)
+          .timeout(const Duration(seconds: 31));
+      return WebViewEnvironmentPrewarmResult.fromMap(
+        result?.cast<String, dynamic>(),
+      );
+    } on TimeoutException {
+      return WebViewEnvironmentPrewarmResult(
+        status: 'timeout',
+        duration: stopwatch.elapsed,
+      );
+    } catch (_) {
+      // Prewarming is optional, including with an older/missing native plugin.
+      return WebViewEnvironmentPrewarmResult(
+        status: 'unavailable',
+        duration: stopwatch.elapsed,
+      );
+    }
   }
 
   @override

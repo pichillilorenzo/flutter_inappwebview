@@ -7,11 +7,53 @@
 #include "../utils/strconv.h"
 #include "../utils/string.h"
 #include "../utils/uuid.h"
+#include "../utils/timer.h"
 #include "in_app_webview.h"
 #include "webview_channel_delegate.h"
 
 namespace flutter_inappwebview_plugin
 {
+  namespace
+  {
+    void completeLifecycleMethod(
+      const std::shared_ptr<flutter::MethodResult<flutter::EncodableValue>>& result,
+      const WebViewLifecycleResult completion)
+    {
+      if (completion.status == WebViewLifecycleStatus::succeeded) {
+        result->Success(true);
+        return;
+      }
+      const char* code = "WEBVIEW_LIFECYCLE_FAILED";
+      const char* message = "The native WebView lifecycle operation failed.";
+      switch (completion.status) {
+      case WebViewLifecycleStatus::suspendRejected:
+        code = "WEBVIEW_SUSPEND_REJECTED";
+        message = "WebView2 declined the suspension request.";
+        break;
+      case WebViewLifecycleStatus::cancelled:
+        code = "WEBVIEW_LIFECYCLE_CANCELLED";
+        message = "A newer pause or resume request superseded this operation.";
+        break;
+      case WebViewLifecycleStatus::disposed:
+        code = "WEBVIEW_DISPOSED";
+        message = "The WebView was disposed before the operation completed.";
+        break;
+      case WebViewLifecycleStatus::timedOut:
+        code = "WEBVIEW_LIFECYCLE_TIMEOUT";
+        message = "WebView2 did not complete the lifecycle operation in time.";
+        break;
+      case WebViewLifecycleStatus::unavailable:
+        code = "WEBVIEW_LIFECYCLE_UNAVAILABLE";
+        message = "The WebView or its lifecycle interface is unavailable.";
+        break;
+      default:
+        break;
+      }
+      result->Error(code, message,
+        flutter::EncodableValue(static_cast<int64_t>(completion.errorCode)));
+    }
+  }
+
   WebViewChannelDelegate::WebViewChannelDelegate(InAppWebView* webView, flutter::BinaryMessenger* messenger)
     : webView(webView), ChannelDelegate(messenger, InAppWebView::METHOD_CHANNEL_NAME_PREFIX + variant_to_string(webView->id))
   {}
@@ -152,7 +194,13 @@ namespace flutter_inappwebview_plugin
     std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result)
   {
     if (!webView) {
-      result->Success();
+      if (string_equals(method_call.method_name(), "pause") ||
+        string_equals(method_call.method_name(), "resume")) {
+        result->Error("WEBVIEW_DISPOSED", "The WebView is no longer available.");
+      }
+      else {
+        result->Success();
+      }
       return;
     }
 
@@ -331,6 +379,10 @@ namespace flutter_inappwebview_plugin
           result_->Success(make_fl_value(data));
         });
     }
+    else if (string_equals(methodName, "setConsoleMessageListener")) {
+      if (webView) webView->setHasConsoleMessageListener(get_fl_map_value<bool>(arguments, "hasListener", false));
+      result->Success(true);
+    }
     else if (string_equals(methodName, "setSettings")) {
       if (webView->inAppBrowser) {
         auto settingsMap = get_fl_map_value<flutter::EncodableMap>(arguments, "settings");
@@ -381,12 +433,16 @@ namespace flutter_inappwebview_plugin
       result->Success(true);
     }
     else if (string_equals(methodName, "pause")) {
-      webView->pause();
-      result->Success(true);
+      auto result_ = std::shared_ptr<flutter::MethodResult<flutter::EncodableValue>>(std::move(result));
+      webView->pause([result_ = std::move(result_)](WebViewLifecycleResult completion) {
+        completeLifecycleMethod(result_, completion);
+      });
     }
     else if (string_equals(methodName, "resume")) {
-      webView->resume();
-      result->Success(true);
+      auto result_ = std::shared_ptr<flutter::MethodResult<flutter::EncodableValue>>(std::move(result));
+      webView->resume([result_ = std::move(result_)](WebViewLifecycleResult completion) {
+        completeLifecycleMethod(result_, completion);
+      });
     }
     else if (string_equals(methodName, "getCertificate")) {
       auto result_ = std::shared_ptr<flutter::MethodResult<flutter::EncodableValue>>(std::move(result));
@@ -556,6 +612,7 @@ namespace flutter_inappwebview_plugin
 
   void WebViewChannelDelegate::onLoadStart(const std::optional<std::string>& url) const
   {
+    flushConsoleMessages();
     if (!channel) {
       return;
     }
@@ -684,15 +741,46 @@ namespace flutter_inappwebview_plugin
 
   void WebViewChannelDelegate::onConsoleMessage(const std::string& message, const int64_t& messageLevel) const
   {
-    if (!channel) {
-      return;
+    if (!channel || !webView || !webView->acceptsConsoleMessage(messageLevel)) return;
+    const auto size = message.size() + 48;
+    if (!pendingConsoleMessages_.empty() && pendingConsoleBytes_ + size > 65536) flushConsoleMessages();
+    pendingConsoleMessages_.emplace_back(message, messageLevel);
+    pendingConsoleBytes_ += size;
+    if (messageLevel == 2 || messageLevel == 3 || pendingConsoleMessages_.size() >= 64 || pendingConsoleBytes_ >= 65536) {
+      flushConsoleMessages();
     }
+    else if (consoleFlushTimer_ == 0) {
+      consoleFlushTimer_ = Timer::setTimeout([this]() {
+        // Timer clears its own executing callback after it returns.
+        consoleFlushTimer_ = 0;
+        flushConsoleMessages();
+      }, 25);
+      if (consoleFlushTimer_ == 0) flushConsoleMessages();
+    }
+  }
 
-    auto arguments = std::make_unique<flutter::EncodableValue>(flutter::EncodableMap{
-      {"message", message},
-      {"messageLevel", messageLevel}
-      });
-    channel->InvokeMethod("onConsoleMessage", std::move(arguments));
+  void WebViewChannelDelegate::clearConsoleMessages() const
+  {
+    if (consoleFlushTimer_ != 0) Timer::clearTimeout(consoleFlushTimer_);
+    consoleFlushTimer_ = 0;
+    pendingConsoleMessages_.clear();
+    pendingConsoleBytes_ = 0;
+  }
+
+  void WebViewChannelDelegate::flushConsoleMessages() const
+  {
+    flutter::EncodableList batch;
+    if (webView && channel) {
+      for (const auto& entry : pendingConsoleMessages_) {
+        if (webView->acceptsConsoleMessage(entry.second)) {
+          batch.emplace_back(flutter::EncodableMap{{"message", entry.first}, {"messageLevel", entry.second}});
+        }
+      }
+    }
+    clearConsoleMessages();
+    if (batch.empty() || !channel) return;
+    channel->InvokeMethod("onConsoleMessageBatch", std::make_unique<flutter::EncodableValue>(
+      flutter::EncodableMap{{"messages", batch}}));
   }
 
   void WebViewChannelDelegate::onDevToolsProtocolEventReceived(const std::string& eventName, const std::string& data) const
@@ -974,6 +1062,7 @@ namespace flutter_inappwebview_plugin
 
   WebViewChannelDelegate::~WebViewChannelDelegate()
   {
+    clearConsoleMessages();
     debugLog("dealloc WebViewChannelDelegate");
     webView = nullptr;
   }

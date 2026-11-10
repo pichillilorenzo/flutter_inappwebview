@@ -3,6 +3,7 @@
 
 #include <flutter/standard_method_codec.h>
 #include <optional>
+#include <string>
 #include <WebView2.h>
 #include <wil/com.h>
 
@@ -22,8 +23,12 @@ namespace flutter_inappwebview_plugin
       const std::optional<std::vector<std::shared_ptr<FrameInfo>>>& frameInfos);
     ~BrowserProcessInfo() = default;
 
-    static std::unique_ptr<BrowserProcessInfo> fromICoreWebView2ProcessInfo(const wil::com_ptr<ICoreWebView2ProcessInfo> processInfo);
-    static std::unique_ptr<BrowserProcessInfo> fromICoreWebView2ProcessExtendedInfo(const wil::com_ptr<ICoreWebView2ProcessExtendedInfo> processExtendedInfo);
+    // Explicit snapshots request errors for fields required by the Dart model.
+    // The ProcessInfosChanged event keeps its existing best-effort conversion.
+    static std::unique_ptr<BrowserProcessInfo> fromICoreWebView2ProcessInfo(const wil::com_ptr<ICoreWebView2ProcessInfo> processInfo,
+      HRESULT* requiredFieldError = nullptr, std::string* requiredFieldStage = nullptr);
+    static std::unique_ptr<BrowserProcessInfo> fromICoreWebView2ProcessExtendedInfo(const wil::com_ptr<ICoreWebView2ProcessExtendedInfo> processExtendedInfo,
+      HRESULT* requiredFieldError = nullptr, std::string* requiredFieldStage = nullptr);
 
     flutter::EncodableMap toEncodableMap() const;
   };

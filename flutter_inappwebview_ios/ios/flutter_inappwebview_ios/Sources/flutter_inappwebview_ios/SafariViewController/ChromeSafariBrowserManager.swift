@@ -90,7 +90,7 @@ public class ChromeSafariBrowserManager: ChannelDelegate {
         
         if #available(iOS 9.0, *), let plugin = plugin {
             
-            if let flutterViewController = UIApplication.shared.visibleViewController {
+            if let flutterViewController = UIApplication.shared.visibleViewController(presentingFrom: plugin.registrar.viewController) {
                 // flutterViewController could be casted to FlutterViewController if needed
                 
                 let safariSettings = SafariBrowserSettings()

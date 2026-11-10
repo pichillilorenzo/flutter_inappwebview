@@ -1,5 +1,53 @@
+## Unreleased
+
+- Preserve isolated JavaScript worlds when creation fails, complete the request with an error instead of evaluating in the page, and ignore cancelled world-creation replies before installing plugin scripts.
+- Filter console levels before payload formatting and Flutter IPC, batch native delivery, and update console listener gates across rebuilds and keep-alive reuse. Inline publishers stay disabled until a live Dart controller attaches, including delayed keep-alive creation.
+- Keep creation parameters immutable while the retained widget delegate reads the latest widget key during rebuilds.
+
 ## 0.7.0-beta.3
 
+- Added per-controller Windows widget creation diagnostics: verified native render mode, platform view id, and available selection stage/unsigned HRESULT. Legacy or unknown modes remain unverified; keepAlive reattachment does not invent a missing reason. Disposed owners cannot acquire another attachment's observation.
+- Detached partial Dart controller bindings when a controller wrapper factory throws, preserving its original error and leaving replacement/keepAlive owners subscribed.
+- Added best-effort WebView2 runtime prewarming with shared in-flight work, a total deadline, and completion that survives worker or message-delivery failures.
+- Kept custom scheme origins alive during conversion and released temporary registration references.
+- Serialized native host changes and skipped closed intermediate windows while WebView creation is pending.
+- Fixed a crash of the whole app when a page called `callHandler` with a name that has no Dart handler.
+- Fixed `onProcessFailed`, `onAcceleratorKeyPressed` and `onShowFileChooser` never reaching Dart; `onShowFileChooser` has no WebView2 event and stays unsupported.
+- Fixed `ProcessFailedDetail.frameInfos` skipping the first and every second frame.
+- Preserved Windows process enumeration failures as structured errors instead of empty or partial process snapshots; successful empty snapshots remain empty lists.
+- Fixed `<select>` popups and other WebView2 popups opening at the old position after the window moved without a drag.
+- Fixed a WebView created before its first layout (a kept-alive hidden page) keeping its initial size until clicked.
+- Sent `callHandler` results to visible pages as web messages and posted the arguments without a second JSON encoding, about 40% faster for large payloads; error messages are now escaped correctly. A result still goes through a script when the page is hidden or suspended, when the top document navigated since the call, or while an `evaluateJavascript`/`callAsyncJavaScript` call is pending, so it cannot reach another document or overtake an earlier script.
+- Enabled the DevTools `Network` domain only before the first `Network.*` command or listener, `Runtime` only with an `onConsoleMessage` listener, a `Runtime.*` listener or an isolated content world, and `Fetch` only with `useShouldOverrideUrlLoading`. Cookie commands do not need `Network.enable`. A `Fetch.*` listener added through `addDevToolsProtocolEventListener` is not enabled automatically, because `Fetch.enable` needs the app's request patterns; a `Fetch.enable` sent by the app is never replaced or disabled by a settings change.
+- Without `useShouldOverrideUrlLoading`, `onLoadStart` and `onProgressChanged(0)` are no longer sent twice for each main-frame navigation.
+- Restored the captured-frame comparison, which never completed since buffer leasing, with a wait of at most 1 ms and a pause while every frame differs; Flutter's raster thread no longer waits on the capture lock.
+- Collapsed mouse moves to one per 8 ms; a pending move is sent before any click, wheel or touch.
+- Fixed compilation with MSVC 14.51 (Visual Studio 18) and with `/permissive-`.
+- Reported the exact WebView2 creation stage in errors without copying initialization payloads for each callback.
+- Delivered `setMemoryUsageTargetLevel` through the browser responsiveness gate, avoiding waits on an unresponsive browser process when responsiveness data is available.
+- Stopped capturing frames of paused WebViews and of WebViews whose host window is minimized; the last frame stays on screen until capture resumes.
+- Released unused composition shared textures and CPU readback staging after 30 seconds hidden. Short tab switches keep their buffers; the last published frame and outstanding Flutter leases survive trim, resize and disposal. Resources are rebuilt at the current size on the next frame. HWND rendering is unchanged.
+- Kept the previous CPU frame when readback texture allocation fails, and corrected array ownership of the CPU pixel buffer during resize/disposal.
+- Coalesced surface size reports to at most one per frame, skipped unchanged sizes natively, and rebuilt the capture frame pool only when the captured size actually changed.
+- Shipped the captured-frame comparison shader precompiled instead of compiling it with `d3dcompiler_47.dll` on the platform thread when the first WebView starts capturing; on slow disks loading and compiling it blocked the app for seconds.
+- Saved one full-frame GPU copy per changed WebView frame by swapping the comparison textures instead of copying between them.
+- Published the first captured frame after creation, resizing, or resuming capture.
+- Reused texture resource views across frame comparisons.
+- Fixed leaked WebView2 response references when serving custom and intercepted resources.
+- Fixed leaked COM stream references in custom responses, intercepted responses, and request bodies.
+- Fixed reversed horizontal scrolling: two-finger trackpad pans and mouse
+  tilt-wheel scrolls moved the content in the opposite direction, because
+  `WM_MOUSEHWHEEL`'s sign convention is inverted relative to `WM_MOUSEWHEEL`.
+- Fixed WebView2 input windows intercepting desktop clicks while the Flutter
+  host window is minimized, including WebViews created or resumed during
+  minimization.
+- Updated Microsoft.Windows.ImplementationLibrary to `1.0.260126.7` and
+  Microsoft.Web.WebView2 to `1.0.4078.44` for current MSVC toolchains.
+- Fixed internal WebView host windows stealing focus from the Flutter window.
+- Fixed owned popups (`<select>` dropdowns, print preview pickers, context
+  menus) opening away from the WebView after the host windows became
+  `WS_CHILD`: positioning now uses parent-client coordinates.
+- Added profile-scoped WebView2 preferred color-scheme control.
 - Updated flutter_inappwebview_platform_interface version to ^1.4.0-beta.3
 - Updated Microsoft.Web.WebView2 SDK version from `1.0.2849.39` to `1.0.3650.58`
 - Implemented `getFrameId`, `getFavicon`, `showSaveAsUI`, `getMemoryUsageTargetLevel`, `setMemoryUsageTargetLevel` InAppWebViewController method

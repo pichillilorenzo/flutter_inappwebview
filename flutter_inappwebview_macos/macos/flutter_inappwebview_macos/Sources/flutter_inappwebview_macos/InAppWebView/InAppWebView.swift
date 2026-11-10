@@ -19,10 +19,14 @@ public class InAppWebView: WKWebView, WKUIDelegate,
     var plugin: InAppWebViewFlutterPlugin?
     var windowId: Int64?
     var windowCreated = false
+    // Older clients and InAppBrowser retain event delivery by default.
+    var hasScrollChangedListener = true
     var windowBeforeCreatedCallbacks: [() -> ()] = []
     var inAppBrowserDelegate: InAppBrowserDelegate?
     var channelDelegate: WebViewChannelDelegate?
     var settings: InAppWebViewSettings?
+    let javaScriptHandlerOriginRules = JavaScriptHandlerOriginRules()
+    var hasConsoleMessageListener = true
     var findInteractionController: FindInteractionController?
     var webMessageChannels: [String:WebMessageChannel] = [:]
     var webMessageListeners: [WebMessageListener] = []
@@ -45,14 +49,23 @@ public class InAppWebView: WKWebView, WKUIDelegate,
     
     var customIMPs: [IMP] = []
     
-    var callAsyncJavaScriptBelowMacOS11Results: [String:((Any?) -> Void)] = [:]
+    private let pendingLegacyJavaScriptCallbacks = PendingLegacyJavaScriptCallbacks()
     
     var currentOpenPanel: NSOpenPanel?
+    private var currentOpenPanelCompletion: JavaScriptDialogCompletion<[URL]?>?
+    private var activeJavaScriptDialogPresentations: [UUID: PendingJavaScriptDialog] = [:]
+    private var hostDialogWindowCloseObserver: NSObjectProtocol?
     
     fileprivate var interceptOnlyAsyncAjaxRequestsPluginScript: PluginScript?
     
     private var exceptedBridgeSecret = NSUUID().uuidString
     private var javaScriptBridgeEnabled = true
+    private var scriptMessageReplyPolicy: Bool?
+    private var javaScriptBridgeDisposed = false
+    private var javaScriptBridgeOwnerReleased = false
+    private let javaScriptBridgeReplies = JavaScriptBridgeReplyRegistry()
+
+    var usesScriptMessageHandlerWithReply: Bool { scriptMessageReplyPolicy == true }
     
     public override var acceptsFirstResponder: Bool { return true }
     
@@ -60,6 +73,7 @@ public class InAppWebView: WKWebView, WKUIDelegate,
          userScripts: [UserScript] = []) {
         super.init(frame: frame, configuration: configuration)
         self.id = id
+        self.configuration.userContentController.registerJavaScriptBridgeOwner(self)
         self.plugin = plugin
         if let id = id, let registrar = plugin?.registrar {
             let channel = FlutterMethodChannel(name: InAppWebView.METHOD_CHANNEL_NAME_PREFIX + String(describing: id),
@@ -166,7 +180,15 @@ public class InAppWebView: WKWebView, WKUIDelegate,
             }
         }
         
+        // Creation-owned policy: setSettings/keepAlive cannot opt another view in.
+        if scriptMessageReplyPolicy == nil {
+            scriptMessageReplyPolicy = settings?.useScriptMessageHandlerWithReply ?? false
+        }
         prepareAndAddUserScripts()
+        if #available(macOS 11.0, *), javaScriptBridgeEnabled,
+           usesScriptMessageHandlerWithReply, configuration.userContentController.javaScriptBridgeSecret != nil {
+            configuration.userContentController.registerJavaScriptBridgeReplyOwner(self)
+        }
         
         if windowId != nil {
             // The new created window webview has the same WKWebViewConfiguration variable reference.
@@ -186,7 +208,7 @@ public class InAppWebView: WKWebView, WKUIDelegate,
                 configuration.defaultWebpagePreferences.preferredContentMode = WKWebpagePreferences.ContentMode(rawValue: settings.preferredContentMode)!
             }
             
-            configuration.preferences.javaScriptEnabled = settings.javaScriptEnabled
+            configuration.preferences.legacyJavaScriptEnabled = settings.javaScriptEnabled
             if #available(macOS 11.0, *) {
                 configuration.defaultWebpagePreferences.allowsContentJavaScript = settings.javaScriptEnabled
             }
@@ -203,6 +225,45 @@ public class InAppWebView: WKWebView, WKUIDelegate,
         }
     }
     
+    public func setScrollChangedListener(hasListener: Bool) {
+        hasScrollChangedListener = hasListener
+        updateScrollChangedListener()
+    }
+
+    private func updateScrollChangedListener() {
+        guard javaScriptBridgeEnabled, windowId == nil || windowCreated else { return }
+        // Update only this document. Popups share their parent's user content
+        // controller, so changing its scripts would change the parent's policy.
+        let source = OnScrollChangedJS.ON_SCROLL_CHANGED_EVENT_JS_PLUGIN_SCRIPT(
+            allowedOriginRules: settings?.pluginScriptsOriginAllowList,
+            enabled: hasScrollChangedListener).source
+        evaluateJavaScript(source, completionHandler: nil)
+    }
+
+    public func acceptsConsoleMessage(_ level: Int) -> Bool {
+        return hasConsoleMessageListener && (settings?.consoleMessageLevels?.contains(level) ?? true)
+    }
+
+    public func setConsoleMessageListener(_ hasListener: Bool) {
+        hasConsoleMessageListener = hasListener
+        updateConsoleMessagePolicy()
+    }
+
+    public func updateConsoleMessagePolicy() {
+        guard javaScriptBridgeEnabled, windowId == nil || windowCreated else { return }
+        let source = ConsoleLogJS.CONSOLE_POLICY_JS_SOURCE(enabled: hasConsoleMessageListener,
+                                                         levels: settings?.consoleMessageLevels)
+        // WKUserContentController may be shared with a popup. Evaluate only in
+        // this WebView; never remove or replace the parent's shared scripts.
+        if #available(macOS 11.0, *) {
+            for world in configuration.userContentController.getContentWorlds(with: windowId) {
+                super.evaluateJavaScript(source, in: nil, in: world, completionHandler: nil)
+            }
+        } else {
+            super.evaluateJavaScript(source, completionHandler: nil)
+        }
+    }
+
     public func prepareAndAddUserScripts() -> Void {
         if windowId != nil {
             // The new created window webview has the same WKWebViewConfiguration variable reference.
@@ -211,8 +272,10 @@ public class InAppWebView: WKWebView, WKUIDelegate,
             return
         }
         configuration.userContentController.initialize()
+        configuration.userContentController.javaScriptBridgeSecret = nil
         
         if javaScriptBridgeEnabled {
+            configuration.userContentController.javaScriptBridgeSecret = exceptedBridgeSecret
             let pluginScriptsOriginAllowList = settings?.pluginScriptsOriginAllowList
             let pluginScriptsForMainFrameOnly = settings?.pluginScriptsForMainFrameOnly ?? true
             
@@ -262,7 +325,9 @@ public class InAppWebView: WKWebView, WKUIDelegate,
         let configuration = WKWebViewConfiguration()
         // initialzie WKUserContentController here to fix possible "undefined is not an object (evaluating 'window.webkit.messageHandlers')" javascript error
         configuration.userContentController = WKUserContentController()
-        configuration.processPool = WKProcessPoolManager.sharedProcessPool
+        if #unavailable(macOS 12.0) {
+            configuration.processPool = WKProcessPoolManager.sharedProcessPool
+        }
         
         if let settings = settings {
             configuration.suppressesIncrementalRendering = settings.suppressesIncrementalRendering
@@ -314,7 +379,9 @@ public class InAppWebView: WKWebView, WKUIDelegate,
             }
             
             if #available(macOS 11.3, *) {
-                configuration.upgradeKnownHostsToHTTPS = settings.upgradeKnownHostsToHTTPS
+                if configuration.responds(to: NSSelectorFromString("setUpgradeKnownHostsToHTTPS:")) {
+                    configuration.upgradeKnownHostsToHTTPS = settings.upgradeKnownHostsToHTTPS
+                }
             }
         }
         
@@ -556,6 +623,125 @@ public class InAppWebView: WKWebView, WKUIDelegate,
         loadUrl(urlRequest: urlRequest, allowingReadAccessTo: nil)
     }
     
+    /// The content rule list compiled from `settings.contentBlockers` that this WebView enforces.
+    private var appliedContentRuleList: WKContentRuleList?
+
+    /// Identifier of the latest request: "" for no rules, nil when it could not be encoded.
+    private var requestedContentRuleListIdentifier: String? = ""
+
+    /// Whether the latest request is still being looked up or compiled.
+    private var contentRuleListPending = false
+
+    /// Callers waiting for the latest request to take effect.
+    private var contentRuleListWaiters: [(Bool) -> Void] = []
+
+    private static let contentRuleListPrefix = "ContentBlockingRules-"
+
+    /// Each rule set is stored under its own identifier, so lists of earlier runs pile up in
+    /// the store; they are removed once per process.
+    private static var staleContentRuleListsRemoved = false
+
+    /// Identifiers this process requested, which the removal keeps.
+    private static var requestedContentRuleListIdentifiers = Set<String>()
+
+    /// Enforces `contentBlockers` on this WebView; `completion` reports whether the latest
+    /// request took effect, so a caller whose request was superseded still gets an answer.
+    ///
+    /// The new list is added before the previous one is removed, so replacing the rules never
+    /// leaves the WebView unprotected; when compilation fails the previous list stays in force.
+    @available(macOS 10.13, *)
+    public func applyContentBlockers(_ contentBlockers: [[String: [String: Any]]],
+                                     completion: ((Bool) -> Void)? = nil) {
+        if let completion = completion {
+            contentRuleListWaiters.append(completion)
+        }
+        if contentBlockers.isEmpty {
+            requestedContentRuleListIdentifier = ""
+            enforceContentRuleList(nil)
+            return
+        }
+        guard let jsonData = try? JSONSerialization.data(withJSONObject: contentBlockers, options: [.sortedKeys]),
+              let encodedRules = String(data: jsonData, encoding: .utf8) else {
+            print("InAppWebView: contentBlockers could not be encoded")
+            requestedContentRuleListIdentifier = nil
+            finishContentRuleListRequest(false)
+            return
+        }
+        // The store is shared by every WebView: one identifier for different rules lets a
+        // concurrent compile hand this WebView another WebView's rules.
+        let identifier = InAppWebView.contentRuleListPrefix + Util.sha256Hex(encodedRules)
+        requestedContentRuleListIdentifier = identifier
+        InAppWebView.requestedContentRuleListIdentifiers.insert(identifier)
+        if appliedContentRuleList?.identifier == identifier {
+            finishContentRuleListRequest(true)
+            return
+        }
+        contentRuleListPending = true
+        let store: WKContentRuleListStore = WKContentRuleListStore.default()
+        if !InAppWebView.staleContentRuleListsRemoved {
+            InAppWebView.staleContentRuleListsRemoved = true
+            store.getAvailableContentRuleListIdentifiers { identifiers in
+                for stale in identifiers ?? []
+                where stale.hasPrefix(InAppWebView.contentRuleListPrefix)
+                    && !InAppWebView.requestedContentRuleListIdentifiers.contains(stale) {
+                    store.removeContentRuleList(forIdentifier: stale) { _ in }
+                }
+            }
+        }
+        store.lookUpContentRuleList(forIdentifier: identifier) { [weak self] (storedList, _) in
+            if let storedList = storedList {
+                self?.contentRuleListReady(storedList, identifier: identifier)
+                return
+            }
+            store.compileContentRuleList(
+                forIdentifier: identifier,
+                encodedContentRuleList: encodedRules) { [weak self] (compiledList, error) in
+                    guard let self = self else {
+                        return
+                    }
+                    if let compiledList = compiledList, error == nil {
+                        self.contentRuleListReady(compiledList, identifier: identifier)
+                        return
+                    }
+                    print("InAppWebView: contentBlockers failed to compile: " + (error?.localizedDescription ?? "unknown error"))
+                    if self.requestedContentRuleListIdentifier == identifier {
+                        self.finishContentRuleListRequest(false)
+                    }
+            }
+        }
+    }
+
+    /// A list that is ready after a newer request was made is dropped: enforcing it would undo
+    /// that request.
+    @available(macOS 10.13, *)
+    private func contentRuleListReady(_ contentRuleList: WKContentRuleList, identifier: String) {
+        guard requestedContentRuleListIdentifier == identifier else {
+            return
+        }
+        enforceContentRuleList(contentRuleList)
+    }
+
+    @available(macOS 10.13, *)
+    private func enforceContentRuleList(_ contentRuleList: WKContentRuleList?) {
+        let userContentController = configuration.userContentController
+        let previous = appliedContentRuleList
+        if let contentRuleList = contentRuleList {
+            userContentController.add(contentRuleList)
+        }
+        if let previous = previous, previous.identifier != contentRuleList?.identifier {
+            userContentController.remove(previous)
+        }
+        appliedContentRuleList = contentRuleList
+        finishContentRuleListRequest(true)
+    }
+
+    private func finishContentRuleListRequest(_ applied: Bool) {
+        contentRuleListPending = false
+        let waiters = contentRuleListWaiters
+        contentRuleListWaiters.removeAll()
+        waiters.forEach { $0(applied) }
+    }
+
     func setSettings(newSettings: InAppWebViewSettings, newSettingsMap: [String: Any]) {
         
         if newSettingsMap["alpha"] != nil, settings?.alpha != newSettings.alpha, let viewAlpha = newSettings.alpha {
@@ -715,7 +901,7 @@ public class InAppWebView: WKWebView, WKUIDelegate,
         }
         
         if newSettingsMap["javaScriptEnabled"] != nil && settings?.javaScriptEnabled != newSettings.javaScriptEnabled {
-            configuration.preferences.javaScriptEnabled = newSettings.javaScriptEnabled
+            configuration.preferences.legacyJavaScriptEnabled = newSettings.javaScriptEnabled
         }
         
         if #available(macOS 11.0, *) {
@@ -737,29 +923,13 @@ public class InAppWebView: WKWebView, WKUIDelegate,
         }
         
         if #available(macOS 10.13, *), newSettingsMap["contentBlockers"] != nil {
-            configuration.userContentController.removeAllContentRuleLists()
-            let contentBlockers = newSettings.contentBlockers
-            if contentBlockers.count > 0 {
-                do {
-                    let jsonData = try JSONSerialization.data(withJSONObject: contentBlockers, options: [])
-                    let blockRules = String(data: jsonData, encoding: .utf8)
-                    WKContentRuleListStore.default().compileContentRuleList(
-                        forIdentifier: "ContentBlockingRules",
-                        encodedContentRuleList: blockRules) { (contentRuleList, error) in
-                            if let error = error {
-                                print(error.localizedDescription)
-                                return
-                            }
-                            self.configuration.userContentController.add(contentRuleList!)
-                    }
-                } catch {
-                    print(error.localizedDescription)
-                }
-            }
+            applyContentBlockers(newSettings.contentBlockers)
         }
         
         if #available(macOS 11.3, *) {
-            if newSettingsMap["upgradeKnownHostsToHTTPS"] != nil && settings?.upgradeKnownHostsToHTTPS != newSettings.upgradeKnownHostsToHTTPS {
+            if newSettingsMap["upgradeKnownHostsToHTTPS"] != nil &&
+                settings?.upgradeKnownHostsToHTTPS != newSettings.upgradeKnownHostsToHTTPS &&
+                configuration.responds(to: NSSelectorFromString("setUpgradeKnownHostsToHTTPS:")) {
                 configuration.upgradeKnownHostsToHTTPS = newSettings.upgradeKnownHostsToHTTPS
             }
             if newSettingsMap["isTextInteractionEnabled"] != nil && settings?.isTextInteractionEnabled != newSettings.isTextInteractionEnabled {
@@ -787,7 +957,9 @@ public class InAppWebView: WKWebView, WKUIDelegate,
             }
         }
 
+        newSettings.useScriptMessageHandlerWithReply = usesScriptMessageHandlerWithReply
         self.settings = newSettings
+        updateConsoleMessagePolicy()
     }
     
     func getSettings() -> [String: Any?]? {
@@ -827,7 +999,6 @@ public class InAppWebView: WKWebView, WKUIDelegate,
         }
     }
     
-    @available(*, deprecated, message: "Use InAppWebViewManager.clearAllCache instead.")
     public func clearCache() {
         let date = NSDate(timeIntervalSince1970: 0)
         WKWebsiteDataStore.default().removeData(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes(), modifiedSince: date as Date, completionHandler:{ })
@@ -963,7 +1134,7 @@ public class InAppWebView: WKWebView, WKUIDelegate,
         
         let resultUuid = NSUUID().uuidString
         if let completionHandler = completionHandler {
-            callAsyncJavaScriptBelowMacOS11Results[resultUuid] = completionHandler
+            pendingLegacyJavaScriptCallbacks.register(completionHandler, for: resultUuid)
         }
         
         var functionArgumentNamesList: [String] = []
@@ -984,16 +1155,17 @@ public class InAppWebView: WKWebView, WKUIDelegate,
             .replacingOccurrences(of: PluginScriptsUtil.VAR_FUNCTION_BODY, with: jsToInject)
             .replacingOccurrences(of: PluginScriptsUtil.VAR_RESULT_UUID, with: resultUuid)
         
-        evaluateJavaScript(jsToInject) { (value, error) in
-            if let error = error {
-                let userInfo = (error as NSError).userInfo
-                let errorMessage = userInfo["WKJavaScriptExceptionMessage"] ??
-                                   userInfo["NSLocalizedDescription"] as? String ??
-                                   error.localizedDescription
-                self.channelDelegate?.onConsoleMessage(message: String(describing: errorMessage), messageLevel: 3)
-                completionHandler?(nil)
-                self.callAsyncJavaScriptBelowMacOS11Results.removeValue(forKey: resultUuid)
-            }
+        evaluateJavaScript(jsToInject) { [weak self] (_, error) in
+            guard let self = self, let error = error else { return }
+            let userInfo = (error as NSError).userInfo
+            let errorMessage = userInfo["WKJavaScriptExceptionMessage"] ??
+                               userInfo["NSLocalizedDescription"] as? String ??
+                               error.localizedDescription
+            self.channelDelegate?.onConsoleMessage(message: String(describing: errorMessage), messageLevel: 3)
+            self.pendingLegacyJavaScriptCallbacks.complete(resultUuid, with: [
+                "value": NSNull(),
+                "error": String(describing: errorMessage)
+            ])
         }
     }
     
@@ -1205,6 +1377,22 @@ public class InAppWebView: WKWebView, WKUIDelegate,
     public func webView(_ webView: WKWebView,
                  decidePolicyFor navigationAction: WKNavigationAction,
                  decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+        // Rules were requested but none are in force: the page would run with no restrictions,
+        // so the navigation waits for them, and is refused if they failed.
+        if requestedContentRuleListIdentifier != "", appliedContentRuleList == nil {
+            guard contentRuleListPending else {
+                decisionHandler(.cancel)
+                return
+            }
+            contentRuleListWaiters.append { [weak self] applied in
+                guard let self = self, applied else {
+                    decisionHandler(.cancel)
+                    return
+                }
+                self.webView(webView, decidePolicyFor: navigationAction, decisionHandler: decisionHandler)
+            }
+            return
+        }
         var decisionHandlerCalled = false
         let callback = WebViewChannelDelegate.ShouldOverrideUrlLoadingCallback()
         callback.nonNullSuccess = { (response: WKNavigationActionPolicy) in
@@ -1306,6 +1494,7 @@ public class InAppWebView: WKWebView, WKUIDelegate,
     }
     
     public func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+        javaScriptBridgeReplies.cancel(error: "JavaScript bridge document navigated")
         currentOriginalUrl = url
         
         disposeWebMessageChannels()
@@ -1322,6 +1511,7 @@ public class InAppWebView: WKWebView, WKUIDelegate,
     
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         initializeWindowIdJS()
+        updateScrollChangedListener()
         
         InAppWebView.credentialsProposed = []
         evaluateJavaScript(JavaScriptBridgeJS.PLATFORM_READY_JS_SOURCE, completionHandler: nil)
@@ -1643,20 +1833,88 @@ public class InAppWebView: WKWebView, WKUIDelegate,
         completionHandler: @escaping ([URL]?) -> Void
     ) {
         let openPanel = NSOpenPanel()
+        currentOpenPanel?.cancel(self)
+        currentOpenPanel?.close()
+        currentOpenPanelCompletion?.call([])
         currentOpenPanel = openPanel
         openPanel.canChooseFiles = true
         if #available(macOS 10.13.4, *) {
             openPanel.canChooseDirectories = parameters.allowsDirectories
         }
         openPanel.allowsMultipleSelection = parameters.allowsMultipleSelection
-        openPanel.begin { (result) in
-            if result == .OK {
-                completionHandler(openPanel.urls)
-            } else {
-                completionHandler([])
+        let completion = JavaScriptDialogCompletion<[URL]?> { [weak self, weak openPanel] urls in
+            if self?.currentOpenPanel === openPanel {
+                self?.currentOpenPanel = nil
+                self?.currentOpenPanelCompletion = nil
             }
-            self.currentOpenPanel = nil
+            completionHandler(urls)
         }
+        currentOpenPanelCompletion = completion
+        let panelCompletion: (NSApplication.ModalResponse) -> Void = { [weak openPanel] result in
+            completion.call(result == .OK ? openPanel?.urls : [])
+        }
+        if let window = window {
+            observeHostDialogWindowClose(window)
+            openPanel.beginSheetModal(for: window, completionHandler: panelCompletion)
+        } else {
+            openPanel.begin { result in panelCompletion(result) }
+        }
+    }
+
+    private func runJavaScriptDialog(_ alert: NSAlert, completionHandler: @escaping (NSApplication.ModalResponse) -> Void) {
+        guard let window = window else {
+            JavaScriptDialogPresenter.present(alert, in: nil, completionHandler: completionHandler)
+            return
+        }
+
+        observeHostDialogWindowClose(window)
+        let id = UUID()
+        let presentation = PendingJavaScriptDialog(window: window, alert: alert) { response in
+            completionHandler(response)
+        }
+        activeJavaScriptDialogPresentations[id] = presentation
+        JavaScriptDialogPresenter.present(alert, in: window) { [weak self, weak presentation] response in
+            // Keep the presentation alive while removing its owning entry.
+            guard let presentation = presentation else { return }
+            self?.activeJavaScriptDialogPresentations.removeValue(forKey: id)
+            presentation.completion.call(response)
+        }
+    }
+
+    private func observeHostDialogWindowClose(_ window: NSWindow) {
+        if let observer = hostDialogWindowCloseObserver {
+            NotificationCenter.default.removeObserver(observer)
+        }
+        hostDialogWindowCloseObserver = NotificationCenter.default.addObserver(
+            forName: NSWindow.willCloseNotification, object: window, queue: nil
+        ) { [weak self] _ in
+            self?.cancelHostDialogs()
+        }
+    }
+
+    private func cancelHostDialogs() {
+        if let observer = hostDialogWindowCloseObserver {
+            NotificationCenter.default.removeObserver(observer)
+            hostDialogWindowCloseObserver = nil
+        }
+        let presentations = Array(activeJavaScriptDialogPresentations.values)
+        activeJavaScriptDialogPresentations.removeAll()
+        presentations.forEach { $0.cancel() }
+
+        let openPanel = currentOpenPanel
+        let openPanelCompletion = currentOpenPanelCompletion
+        currentOpenPanel = nil
+        currentOpenPanelCompletion = nil
+        openPanel?.cancel(self)
+        openPanel?.close()
+        openPanelCompletion?.call([])
+    }
+
+    public override func viewWillMove(toWindow newWindow: NSWindow?) {
+        if let window = window, window !== newWindow {
+            cancelHostDialogs()
+        }
+        super.viewWillMove(toWindow: newWindow)
     }
     
     func createAlertDialog(message: String?, responseMessage: String?, confirmButtonTitle: String?, completionHandler: @escaping () -> Void) {
@@ -1667,8 +1925,7 @@ public class InAppWebView: WKWebView, WKUIDelegate,
         alert.messageText = title ?? ""
         alert.alertStyle = .informational
         alert.addButton(withTitle: okButton ?? "")
-        alert.runModal()
-        completionHandler()
+        runJavaScriptDialog(alert) { _ in completionHandler() }
     }
     
     public func webView(_ webView: WKWebView, runJavaScriptAlertPanelWithMessage message: String,
@@ -1702,7 +1959,11 @@ public class InAppWebView: WKWebView, WKUIDelegate,
                 completionHandlerCalled = true
                 let responseMessage = response?.message
                 let confirmButtonTitle = response?.confirmButtonTitle
-                self?.createAlertDialog(message: message, responseMessage: responseMessage,
+                guard let self = self else {
+                    completionHandler()
+                    return
+                }
+                self.createAlertDialog(message: message, responseMessage: responseMessage,
                                        confirmButtonTitle: confirmButtonTitle, completionHandler: completionHandler)
             }
         }
@@ -1731,8 +1992,9 @@ public class InAppWebView: WKWebView, WKUIDelegate,
         alert.alertStyle = .informational
         alert.addButton(withTitle: okButton ?? "")
         alert.addButton(withTitle: cancelButton ?? "")
-        let res = alert.runModal()
-        completionHandler(res == .alertFirstButtonReturn)
+        runJavaScriptDialog(alert) { response in
+            completionHandler(JavaScriptDialogPresenter.confirmResult(response))
+        }
     }
     
     public func webView(_ webView: WKWebView, runJavaScriptConfirmPanelWithMessage message: String, initiatedByFrame frame: WKFrameInfo,
@@ -1764,7 +2026,11 @@ public class InAppWebView: WKWebView, WKUIDelegate,
                 let responseMessage = response?.message
                 let confirmButtonTitle = response?.confirmButtonTitle
                 let cancelButtonTitle = response?.cancelButtonTitle
-                self?.createConfirmDialog(message: message, responseMessage: responseMessage, confirmButtonTitle: confirmButtonTitle, cancelButtonTitle: cancelButtonTitle, completionHandler: completionHandler)
+                guard let self = self else {
+                    completionHandler(false)
+                    return
+                }
+                self.createConfirmDialog(message: message, responseMessage: responseMessage, confirmButtonTitle: confirmButtonTitle, cancelButtonTitle: cancelButtonTitle, completionHandler: completionHandler)
             }
         }
         callback.error = { (code: String, message: String?, details: Any?) in
@@ -1795,9 +2061,9 @@ public class InAppWebView: WKWebView, WKUIDelegate,
         let txt = NSTextField(frame: NSRect(x: 0, y: 0, width: 200, height: 24))
         txt.stringValue = defaultValue ?? ""
         alert.accessoryView = txt
-        let res = alert.runModal()
-        
-        completionHandler(value != nil ? value : (res == .alertFirstButtonReturn ? txt.stringValue : nil))
+        runJavaScriptDialog(alert) { response in
+            completionHandler(JavaScriptDialogPresenter.promptResult(response, clientValue: value, enteredValue: txt.stringValue))
+        }
     }
     
     public func webView(_ webView: WKWebView, runJavaScriptTextInputPanelWithPrompt message: String, defaultText defaultValue: String?, initiatedByFrame frame: WKFrameInfo,
@@ -1831,7 +2097,11 @@ public class InAppWebView: WKWebView, WKUIDelegate,
                 let confirmButtonTitle = response?.confirmButtonTitle
                 let cancelButtonTitle = response?.cancelButtonTitle
                 let value = response?.value
-                self?.createPromptDialog(message: message, defaultValue: defaultValue, responseMessage: responseMessage, confirmButtonTitle: confirmButtonTitle,
+                guard let self = self else {
+                    completionHandler(nil)
+                    return
+                }
+                self.createPromptDialog(message: message, defaultValue: defaultValue, responseMessage: responseMessage, confirmButtonTitle: confirmButtonTitle,
                                         cancelButtonTitle: cancelButtonTitle, value: value, completionHandler: completionHandler)
             }
         }
@@ -1877,7 +2147,8 @@ public class InAppWebView: WKWebView, WKUIDelegate,
         callback.nonNullSuccess = { (handledByClient: Bool) in
             return !handledByClient
         }
-        callback.defaultBehaviour = { [weak self] (handledByClient: Bool?) in
+        callback.defaultBehaviour = { [weak self, weak windowWebView] (handledByClient: Bool?) in
+            windowWebView?.releaseJavaScriptBridgeOwner()
             if inAppWebViewManager?.windowWebViews[windowId] != nil {
                 inAppWebViewManager?.windowWebViews.removeValue(forKey: windowId)
             }
@@ -1938,11 +2209,17 @@ public class InAppWebView: WKWebView, WKUIDelegate,
     }
     
     public func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
+        javaScriptBridgeReplies.cancel(error: "JavaScript bridge web content process terminated")
+        pendingLegacyJavaScriptCallbacks.cancelAll(reason: "Web content process terminated")
         channelDelegate?.onWebContentProcessDidTerminate()
     }
     
     public func webView(_ webView: WKWebView,
                         didCommit navigation: WKNavigation!) {
+        javaScriptBridgeReplies.cancel(error: "JavaScript bridge document replaced")
+        pendingLegacyJavaScriptCallbacks.cancelAll(reason: "JavaScript document replaced")
+        initializeWindowIdJS()
+        updateScrollChangedListener()
         channelDelegate?.onPageCommitVisible(url: url?.absoluteString)
     }
     
@@ -2156,19 +2433,62 @@ public class InAppWebView: WKWebView, WKUIDelegate,
 //    }
     
     public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-        guard javaScriptBridgeEnabled else {
+        handleScriptMessage(userContentController, didReceive: message, reply: nil)
+    }
+
+    // Both transports use this route and authorization. The body window ID is
+    // only a consistency check; it must never select a different native owner.
+    func handleScriptMessage(_ userContentController: WKUserContentController,
+                             didReceive message: WKScriptMessage,
+                             reply: JavaScriptBridgeReply?) {
+        var replyDispatched = false
+        defer {
+            if !replyDispatched { reply?.fail("JavaScript bridge handler did not produce a reply") }
+        }
+        guard let webView = message.webView as? InAppWebView,
+              webView.configuration.userContentController === userContentController,
+              !webView.javaScriptBridgeDisposed, webView.javaScriptBridgeEnabled else {
+            reply?.fail("JavaScript bridge WebView is unavailable or disabled")
             return
         }
-        
         guard let body = message.body as? [String: Any?] else {
+            reply?.fail("Invalid JavaScript bridge message")
             return
         }
-        
-        guard let bridgeSecret = body["_bridgeSecret"] as? String, bridgeSecret == exceptedBridgeSecret else {
-            print("Bridge access attempt with wrong secret token, possibly from malicious code from origin \(message.frameInfo.securityOrigin)")
+        guard let bridgeSecret = body["_bridgeSecret"] as? String,
+              bridgeSecret == userContentController.javaScriptBridgeSecret else {
+            reply?.fail("JavaScript bridge secret rejected")
             return
         }
-        
+        if let suppliedWindowId = body["_windowId"] as? Int64,
+           suppliedWindowId != webView.windowId {
+            reply?.fail("JavaScript bridge window does not match its sender")
+            return
+        }
+        if #available(macOS 11.0, *), message.world != .page,
+           message.world.windowId != webView.windowId {
+            reply?.fail("JavaScript bridge content world does not belong to its sender")
+            return
+        }
+        func replyDocumentScope(_ documentId: String) -> String {
+            var scope = message.frameInfo.isMainFrame ? "main:" : "frame:"
+            if #available(macOS 11.0, *) { scope += (message.world.name ?? "page") + ":" }
+            return scope + documentId
+        }
+        // An authenticated document may release its previously accepted work
+        // even if the app has since tightened origin/main-frame permissions.
+        // This lifecycle message invokes no handler or new application work.
+        if message.name == "callHandler", reply == nil,
+           let documentId = body["_bridgeReplyCancelDocument"] as? String {
+            webView.javaScriptBridgeReplies.cancel(documentId: replyDocumentScope(documentId),
+                                                   error: "JavaScript bridge frame navigated")
+            return
+        }
+        if webView.settings?.javaScriptHandlersForMainFrameOnly == true && !message.frameInfo.isMainFrame {
+            reply?.fail("JavaScript bridge handler requires the main frame")
+            return
+        }
+
         var sourceOrigin: URL? = nil
         let securityOrigin = message.frameInfo.securityOrigin
         let scheme = securityOrigin.protocol
@@ -2178,37 +2498,46 @@ public class InAppWebView: WKWebView, WKUIDelegate,
             sourceOrigin = URL(string: "\(scheme)://\(host)\(port != 0 ? ":" + String(port) : "")")
         }
         let requestUrl = message.frameInfo.request.url
-        
-        var isOriginAllowed = false
-        if let javaScriptHandlersOriginAllowList = settings?.javaScriptHandlersOriginAllowList {
-            if let origin = sourceOrigin?.absoluteString {
-                for allowedOrigin in javaScriptHandlersOriginAllowList {
-                    if origin.range(of: allowedOrigin, options: .regularExpression, range: nil, locale: nil) != nil {
-                        isOriginAllowed = true
-                        break
-                    }
+
+        // Regexes are compiled once per settings value, not on every bridge message.
+        let isOriginAllowed = webView.javaScriptHandlerOriginRules.allows(
+            origin: sourceOrigin?.absoluteString,
+            patterns: webView.settings?.javaScriptHandlersOriginAllowList
+        )
+        guard isOriginAllowed else {
+            reply?.fail("JavaScript bridge origin is not allowed")
+            return
+        }
+
+        if message.name == "callHandler" || message.name == "callHandlerWithReply" {
+            if let reply = reply {
+                if body["_bridgeReplyProbe"] as? Bool == true {
+                    // A popup may bootstrap before Flutter supplies its own settings.
+                    let pending = webView.scriptMessageReplyPolicy == nil ||
+                        (webView.windowId != nil && !webView.windowCreated)
+                    let policy = pending ? "pending" : (webView.usesScriptMessageHandlerWithReply ? "enabled:" + UUID().uuidString : "false")
+                    reply.succeed(policy)
+                    return
                 }
+                guard webView.usesScriptMessageHandlerWithReply,
+                      webView.windowId == nil || webView.windowCreated else {
+                    reply.fail("JavaScript bridge reply transport is not enabled for this WebView")
+                    return
+                }
+                guard body["_callHandlerOneWay"] as? Bool != true else {
+                    reply.fail("One-way messages require the one-way JavaScript bridge")
+                    return
+                }
+                guard let documentId = body["_bridgeReplyDocumentId"] as? String,
+                      !documentId.isEmpty, documentId.utf8.count <= 128 else {
+                    reply.fail("JavaScript bridge reply document is missing or invalid")
+                    return
+                }
+                webView.javaScriptBridgeReplies.track(reply, documentId: replyDocumentScope(documentId))
             }
-        } else {
-            // origin is by default allowed if the allow list is null
-            isOriginAllowed = true
-        }
-        
-        if !isOriginAllowed {
-          print("Bridge access attempt from an origin not allowed: \(message.frameInfo.securityOrigin)")
-          return
-        }
-        
-        if message.name == "callHandler" {
             guard let handlerName = body["handlerName"] as? String else {
-                print("handlerName is null or undefined")
+                reply?.fail("JavaScript bridge handlerName is missing")
                 return
-            }
-            
-            let _windowId = body["_windowId"] as? Int64
-            var webView = self
-            if let wId = _windowId, let webViewTransport = plugin?.inAppWebViewManager?.windowWebViews[wId] {
-                webView = webViewTransport.webView
             }
             var isInternalHandler = true
             switch (handlerName) {
@@ -2232,10 +2561,23 @@ public class InAppWebView: WKWebView, WKUIDelegate,
                         webView.channelDelegate?.onPrintRequest(url: webView.url, printJobId: printJobId, callback: callback)
                     }
                     break
-                case "onConsoleMessage":
+                case "onConsoleMessagePolicy":
+                    (message.webView as? InAppWebView ?? webView).updateConsoleMessagePolicy()
+                    break
+                case "onConsoleMessage", "onConsoleMessageBatch":
+                    let consoleWebView = message.webView as? InAppWebView ?? webView
+                    if !consoleWebView.hasConsoleMessageListener || consoleWebView.settings?.consoleMessageLevels?.isEmpty == true { break }
                     if let args = body["args"] as? String, let data = args.data(using: .utf8) {
                         let jsonArgs = try? JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? [[String: Any]]
-                        if let jsonData = jsonArgs?.first {
+                        var consoleMessages: [[String: Any]] = []
+                        if handlerName == "onConsoleMessageBatch" {
+                            consoleMessages = jsonArgs?.first?["messages"] as? [[String: Any]] ?? []
+                        } else if let jsonData = jsonArgs?.first {
+                            consoleMessages = [jsonData]
+                        }
+                        var entries: [(String, Int)] = []
+                        entries.reserveCapacity(64)
+                        for jsonData in consoleMessages {
                             var messageLevel = 1
                             switch (jsonData["level"] as? String) {
                             case "log":
@@ -2259,10 +2601,23 @@ public class InAppWebView: WKWebView, WKUIDelegate,
                                 messageLevel = 1
                                 break
                             }
-                            let consoleMessage = jsonData["message"] as? String ?? ""
-                            
-                            webView.channelDelegate?.onConsoleMessage(message: consoleMessage, messageLevel: messageLevel)
+                            if !consoleWebView.acceptsConsoleMessage(messageLevel) { continue }
+                            let consoleMessage: String
+                            if let message = jsonData["message"] as? String {
+                                consoleMessage = message
+                            } else if handlerName == "onConsoleMessageBatch" {
+                                continue
+                            } else {
+                                consoleMessage = ""
+                            }
+
+                            entries.append((consoleMessage, messageLevel))
+                            if entries.count == 64 {
+                                consoleWebView.channelDelegate?.onConsoleMessages(entries)
+                                entries.removeAll(keepingCapacity: true)
+                            }
                         }
+                        consoleWebView.channelDelegate?.onConsoleMessages(entries)
                     }
                     break
                 case "onFindResultReceived":
@@ -2282,13 +2637,11 @@ public class InAppWebView: WKWebView, WKUIDelegate,
                     if let args = body["args"] as? String, let data = args.data(using: .utf8) {
                         let jsonArgs = try? JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? [[String: Any]]
                         if let jsonData = jsonArgs?.first,
-                           let resultUuid = jsonData["resultUuid"] as? String,
-                           let result = webView.callAsyncJavaScriptBelowMacOS11Results[resultUuid] {
-                            result([
+                           let resultUuid = jsonData["resultUuid"] as? String {
+                            webView.pendingLegacyJavaScriptCallbacks.complete(resultUuid, with: [
                                 "value": jsonData["value"],
                                 "error": jsonData["error"]
                             ])
-                            webView.callAsyncJavaScriptBelowMacOS11Results.removeValue(forKey: resultUuid)
                         }
                     }
                     break
@@ -2340,7 +2693,8 @@ public class InAppWebView: WKWebView, WKUIDelegate,
                     }
                     break
                 case "onScrollChanged":
-                    if let args = body["args"] as? String, let data = args.data(using: .utf8) {
+                    if webView.hasScrollChangedListener,
+                       let args = body["args"] as? String, let data = args.data(using: .utf8) {
                         let jsonArgs = try? JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? [[String: Any]]
                         if let jsonData = jsonArgs?.first,
                            let x = jsonData["x"] as? Int,
@@ -2357,7 +2711,14 @@ public class InAppWebView: WKWebView, WKUIDelegate,
             let _callHandlerID = body["_callHandlerID"] as? Int64 ?? 0
             
             if isInternalHandler {
-                evaluateJavaScript("""
+                if let reply = reply {
+                    reply.succeed(nil)
+                    return
+                }
+                if body["_callHandlerOneWay"] as? Bool == true {
+                    return
+                }
+                webView.evaluateJavaScript("""
 if(window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)] != null) {
     window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)].resolve();
     delete window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)];
@@ -2369,26 +2730,65 @@ if(window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)] 
             let args = body["args"] as? String ?? ""
             
             let callback = WebViewChannelDelegate.CallJsHandlerCallback()
-            callback.defaultBehaviour = { (response: Any?) in
+            callback.defaultBehaviour = { [weak webView] (response: Any?) in
+                if let reply = reply {
+                    reply.succeed(response as? String ?? "null")
+                    return
+                }
+                guard let webView = webView else { return }
                 var json = "null"
                 if let r = response as? String {
                     json = r
                 }
-                
+
+                // Pass the JSON string as data so large replies need no native
+                // quoting or object conversion on the main thread.
+                if #available(macOS 11.0, *) {
+                    webView.callAsyncJavaScript("""
+if(window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)] != null) {
+    try {
+        window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)].resolve(JSON.parse(jsonText));
+    } catch (error) {
+        window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)].reject(error);
+    }
+    delete window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)];
+}
+""", arguments: ["jsonText": json], frame: nil, contentWorld: .page, completionHandler: nil)
+                    return
+                }
+
+                // Quote JSON text without decoding it into native objects. JSON is
+                // not an equivalent JavaScript expression (notably __proto__).
+                let jsonText = Util.JSONStringify(value: [json])
+                    .replacingOccurrences(of: "\u{2028}", with: "\\u2028", options: .literal)
+                    .replacingOccurrences(of: "\u{2029}", with: "\\u2029", options: .literal)
+
                 webView.evaluateJavaScript("""
 if(window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)] != null) {
-    window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)].resolve(\(json));
+    try {
+        window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)].resolve(JSON.parse(\(jsonText)[0]));
+    } catch (error) {
+        window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)].reject(error);
+    }
     delete window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)];
 }
 """, completionHandler: nil)
             }
-            callback.error = { (code: String, message: String?, details: Any?) in
+            callback.error = { [weak webView] (code: String, message: String?, details: Any?) in
                 let errorMessage = code + (message != nil ? ", " + (message ?? "") : "")
+                if let reply = reply {
+                    reply.fail(errorMessage)
+                    return
+                }
+                guard let webView = webView else { return }
                 print(errorMessage)
+                let errorMessageJSON = Util.JSONStringify(value: [errorMessage])
+                    .replacingOccurrences(of: "\u{2028}", with: "\\u2028")
+                    .replacingOccurrences(of: "\u{2029}", with: "\\u2029")
                 
                 webView.evaluateJavaScript("""
 if(window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)] != null) {
-    window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)].reject(new Error('\(errorMessage.replacingOccurrences(of: "\'", with: "\\'"))'));
+    window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)].reject(new Error(\(errorMessageJSON)[0]));
     delete window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)];
 }
 """, completionHandler: nil)
@@ -2400,7 +2800,10 @@ if(window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)] 
                     origin: sourceOrigin?.absoluteString ?? "",
                     requestUrl: requestUrl?.absoluteString ?? ""
                 )
+                replyDispatched = true
                 channelDelegate.onCallJsHandler(handlerName: handlerName, data: data, callback: callback)
+            } else {
+                reply?.fail("JavaScript bridge Dart handler is unavailable")
             }
         }
     }
@@ -2613,7 +3016,7 @@ if(window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)] 
     }
     
     public func getSelectedText(completionHandler: @escaping (Any?, Error?) -> Void) {
-        if configuration.preferences.javaScriptEnabled {
+        if configuration.preferences.legacyJavaScriptEnabled {
             evaluateJavaScript(PluginScriptsUtil.GET_SELECTED_TEXT_JS_SOURCE, completionHandler: completionHandler)
         } else {
             completionHandler(nil, nil)
@@ -2796,13 +3199,38 @@ if(window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)] 
         windowBeforeCreatedCallbacks.removeAll()
     }
     
+    // The controller is shared with related WebViews. The final native owner,
+    // which may be a popup, releases shared scripts and handlers.
+    func releaseJavaScriptBridgeOwner() {
+        guard !javaScriptBridgeOwnerReleased else { return }
+        javaScriptBridgeOwnerReleased = true
+        javaScriptBridgeDisposed = true
+        javaScriptBridgeReplies.cancel(error: "JavaScript bridge WebView disposed")
+        let controller = configuration.userContentController
+        if #available(macOS 11.0, *) {
+            controller.unregisterJavaScriptBridgeReplyOwner(self)
+        }
+        if controller.unregisterJavaScriptBridgeOwner(self) {
+            controller.removeAllPluginScriptMessageHandlers()
+            controller.removeAllUserScripts()
+            if #available(macOS 10.13, *) {
+                controller.removeAllContentRuleLists()
+            }
+            controller.dispose(windowId: nil)
+        } else if let windowId = windowId {
+            controller.dispose(windowId: windowId)
+        }
+    }
+
     public func dispose() {
+        javaScriptBridgeDisposed = true
+        javaScriptBridgeReplies.cancel(error: "JavaScript bridge WebView disposed")
+        pendingLegacyJavaScriptCallbacks.cancelAll(reason: "WebView disposed")
+        setConsoleMessageListener(false)
         channelDelegate?.dispose()
         channelDelegate = nil
         runWindowBeforeCreatedCallbacks()
-        currentOpenPanel?.cancel(self)
-        currentOpenPanel?.close()
-        currentOpenPanel = nil
+        cancelHostDialogs()
         printJobCompletionHandler = nil
         removeObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress))
         removeObserver(self, forKeyPath: #keyPath(WKWebView.url))
@@ -2822,16 +3250,10 @@ if(window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)] 
         }
         webMessageListeners.removeAll()
         interceptOnlyAsyncAjaxRequestsPluginScript = nil
-        if windowId == nil {
-            configuration.userContentController.removeAllPluginScriptMessageHandlers()
-            configuration.userContentController.removeAllUserScripts()
-            if #available(macOS 10.13, *) {
-                configuration.userContentController.removeAllContentRuleLists()
-            }
-        } else if let wId = windowId, plugin?.inAppWebViewManager?.windowWebViews[wId] != nil {
+        if let wId = windowId, plugin?.inAppWebViewManager?.windowWebViews[wId] != nil {
             plugin?.inAppWebViewManager?.windowWebViews.removeValue(forKey: wId)
         }
-        configuration.userContentController.dispose(windowId: windowId)
+        releaseJavaScriptBridgeOwner()
         NotificationCenter.default.removeObserver(self)
         for imp in customIMPs {
             imp_removeBlock(imp)
@@ -2841,11 +3263,11 @@ if(window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)] 
         uiDelegate = nil
         navigationDelegate = nil
         isPausedTimersCompletionHandler = nil
-        callAsyncJavaScriptBelowMacOS11Results.removeAll()
         plugin = nil
     }
     
     deinit {
+        cancelHostDialogs()
         debugPrint("InAppWebView - dealloc")
     }
 }

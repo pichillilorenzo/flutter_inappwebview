@@ -194,6 +194,15 @@ class LinuxInAppBrowser extends PlatformInAppBrowser with ChannelController {
     return args;
   }
 
+  Future<void> _invokeOpen(Map<String, dynamic> arguments) async {
+    try {
+      await _staticChannel.invokeMethod('open', arguments);
+    } catch (error, stackTrace) {
+      _isOpened = false;
+      Error.throwWithStackTrace(error, stackTrace);
+    }
+  }
+
   @override
   Future<void> openUrlRequest({
     required URLRequest urlRequest,
@@ -208,7 +217,7 @@ class LinuxInAppBrowser extends PlatformInAppBrowser with ChannelController {
       settings: settings,
     );
     args.putIfAbsent('urlRequest', () => urlRequest.toMap());
-    await _staticChannel.invokeMethod('open', args);
+    await _invokeOpen(args);
   }
 
   @override
@@ -225,7 +234,7 @@ class LinuxInAppBrowser extends PlatformInAppBrowser with ChannelController {
       settings: settings,
     );
     args.putIfAbsent('assetFilePath', () => assetFilePath);
-    await _staticChannel.invokeMethod('open', args);
+    await _invokeOpen(args);
   }
 
   @override
@@ -252,7 +261,7 @@ class LinuxInAppBrowser extends PlatformInAppBrowser with ChannelController {
       'historyUrl',
       () => (historyUrl ?? androidHistoryUrl)?.toString() ?? "about:blank",
     );
-    await _staticChannel.invokeMethod('open', args);
+    await _invokeOpen(args);
   }
 
   @override

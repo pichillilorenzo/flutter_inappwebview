@@ -280,6 +280,22 @@ class PermissionResourceType {
     },
   );
 
+  ///Indicates permission to persist storage created by Storage APIs and service workers.
+  ///When granted, the browser will not evict the origin's data because of low disk space.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows WebView2 ([Official API - COREWEBVIEW2_PERMISSION_KIND_PERSISTENT_STORAGE](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.4078.44#corewebview2_permission_kind))
+  static final PERSISTENT_STORAGE =
+      PermissionResourceType._internalMultiPlatform('PERSISTENT_STORAGE', () {
+        switch (defaultTargetPlatform) {
+          case TargetPlatform.windows:
+            return 13;
+          default:
+            break;
+        }
+        return null;
+      });
+
   ///Resource belongs to protected media identifier. After the user grants this resource, the origin can use EME APIs to generate the license requests.
   ///
   ///**Officially Supported Platforms/Implementations**:
@@ -347,6 +363,7 @@ class PermissionResourceType {
     PermissionResourceType.MULTIPLE_AUTOMATIC_DOWNLOADS,
     PermissionResourceType.NOTIFICATIONS,
     PermissionResourceType.OTHER_SENSORS,
+    PermissionResourceType.PERSISTENT_STORAGE,
     PermissionResourceType.PROTECTED_MEDIA_ID,
     PermissionResourceType.UNKNOWN,
     PermissionResourceType.WINDOW_MANAGEMENT,
@@ -446,6 +463,8 @@ class PermissionResourceType {
         return 'NOTIFICATIONS';
       case 'OTHER_SENSORS':
         return 'OTHER_SENSORS';
+      case 'PERSISTENT_STORAGE':
+        return 'PERSISTENT_STORAGE';
       case 'PROTECTED_MEDIA_ID':
         return 'PROTECTED_MEDIA_ID';
       case 'UNKNOWN':

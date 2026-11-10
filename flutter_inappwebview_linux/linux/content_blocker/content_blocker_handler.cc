@@ -5,6 +5,9 @@
 #include <algorithm>
 #include <cstring>
 #include <filesystem>
+#include <functional>
+#include <set>
+#include <sstream>
 
 #include "../utils/log.h"
 #include "../utils/util.h"
@@ -12,6 +15,39 @@
 using json = nlohmann::json;
 
 namespace flutter_inappwebview_plugin {
+
+namespace {
+
+// Each rule set is stored under its own identifier, so filters of earlier runs pile up in the
+// store; they are removed once per process.
+bool stale_filters_removed = false;
+
+// Identifiers this process requested, which the removal keeps.
+std::set<std::string>& requestedIdentifiers() {
+  static std::set<std::string> identifiers;
+  return identifiers;
+}
+
+void onStaleFilterRemoved(GObject* source, GAsyncResult* result, gpointer user_data) {
+  webkit_user_content_filter_store_remove_finish(WEBKIT_USER_CONTENT_FILTER_STORE(source), result,
+                                                 nullptr);
+}
+
+void onIdentifiersFetched(GObject* source, GAsyncResult* result, gpointer user_data) {
+  auto* prefix = static_cast<std::string*>(user_data);
+  auto* store = WEBKIT_USER_CONTENT_FILTER_STORE(source);
+  gchar** identifiers = webkit_user_content_filter_store_fetch_identifiers_finish(store, result);
+  for (gchar** id = identifiers; id != nullptr && *id != nullptr; ++id) {
+    std::string identifier(*id);
+    if (identifier.rfind(*prefix, 0) == 0 && requestedIdentifiers().count(identifier) == 0) {
+      webkit_user_content_filter_store_remove(store, *id, nullptr, onStaleFilterRemoved, nullptr);
+    }
+  }
+  g_strfreev(identifiers);
+  delete prefix;
+}
+
+}  // namespace
 
 ContentBlockerHandler::ContentBlockerHandler(WebKitUserContentManager* content_manager)
     : content_manager_(content_manager),
@@ -49,6 +85,7 @@ ContentBlockerHandler::ContentBlockerHandler(WebKitUserContentManager* content_m
 }
 
 ContentBlockerHandler::~ContentBlockerHandler() {
+  finishRequest(false);
   removeAllFilters();
 
   if (filter_store_ != nullptr) {
@@ -59,35 +96,58 @@ ContentBlockerHandler::~ContentBlockerHandler() {
 
 void ContentBlockerHandler::setContentBlockers(FlValue* contentBlockers,
                                                 std::function<void(bool success)> callback) {
+  // The callback answers for the latest request, so a superseded caller still gets an answer.
+  if (callback) waiters_.push_back(std::move(callback));
+
   if (filter_store_ == nullptr || content_manager_ == nullptr) {
     errorLog("ContentBlockerHandler: filter_store or content_manager is null");
-    if (callback) callback(false);
+    requested_identifier_.reset();
+    finishRequest(false);
     return;
   }
-
-  // First remove existing filters
-  removeAllFilters();
 
   // Check if there are any content blockers to apply
   if (contentBlockers == nullptr ||
       fl_value_get_type(contentBlockers) != FL_VALUE_TYPE_LIST ||
       fl_value_get_length(contentBlockers) == 0) {
     // No blockers - this is success (empty set)
-    if (callback) callback(true);
+    requested_identifier_ = std::string();
+    removeAllFilters();
+    finishRequest(true);
     return;
   }
+
+  // The existing filter stays in force until the new one is compiled and added, so replacing
+  // the rules never leaves the WebView unprotected, and a failed compile keeps the old rules.
 
   // Convert to JSON string
   std::string jsonSource = convertToJsonString(contentBlockers);
 
   if (jsonSource.empty()) {
     errorLog("ContentBlockerHandler: Failed to convert content blockers to JSON");
-    if (callback) callback(false);
+    requested_identifier_.reset();
+    finishRequest(false);
     return;
   }
 
-  // Compile the content blockers
-  compileContentBlockers(jsonSource, callback);
+  // The store is shared by every WebView: one identifier for different rules lets a concurrent
+  // compile hand this WebView another WebView's rules.
+  std::ostringstream identifier;
+  identifier << filter_identifier_ << "-" << std::hex << std::hash<std::string>{}(jsonSource);
+  requested_identifier_ = identifier.str();
+  requestedIdentifiers().insert(*requested_identifier_);
+
+  if (applied_identifier_ == *requested_identifier_) {
+    finishRequest(true);
+    return;
+  }
+  pending_ = true;
+  if (!stale_filters_removed) {
+    stale_filters_removed = true;
+    webkit_user_content_filter_store_fetch_identifiers(
+        filter_store_, nullptr, onIdentifiersFetched, new std::string(filter_identifier_ + "-"));
+  }
+  loadOrCompile(*requested_identifier_, jsonSource);
 }
 
 void ContentBlockerHandler::removeAllFilters() {
@@ -96,6 +156,7 @@ void ContentBlockerHandler::removeAllFilters() {
   if (content_manager_ != nullptr && WEBKIT_IS_USER_CONTENT_MANAGER(content_manager_)) {
     webkit_user_content_manager_remove_all_filters(content_manager_);
   }
+  applied_identifier_.clear();
 }
 
 std::string ContentBlockerHandler::convertToJsonString(FlValue* contentBlockers) {
@@ -284,69 +345,114 @@ std::string ContentBlockerHandler::convertToJsonString(FlValue* contentBlockers)
   return jsonArray.dump();
 }
 
-void ContentBlockerHandler::compileContentBlockers(const std::string& jsonSource,
-                                                    std::function<void(bool success)> callback) {
-  if (filter_store_ == nullptr) {
-    if (callback) callback(false);
+void ContentBlockerHandler::loadOrCompile(const std::string& identifier,
+                                          const std::string& jsonSource) {
+  auto* context = new CompileContext{this, alive_, identifier, jsonSource};
+  webkit_user_content_filter_store_load(filter_store_, context->identifier.c_str(),
+                                         nullptr,  // cancellable
+                                         onFilterLoaded, context);
+}
+
+void ContentBlockerHandler::onFilterLoaded(GObject* source, GAsyncResult* result,
+                                            gpointer user_data) {
+  auto* context = static_cast<CompileContext*>(user_data);
+  // The task keeps the store alive even after the handler released it.
+  auto* store = WEBKIT_USER_CONTENT_FILTER_STORE(source);
+  GError* error = nullptr;
+  WebKitUserContentFilter* filter =
+      webkit_user_content_filter_store_load_finish(store, result, &error);
+  if (error != nullptr) {
+    g_error_free(error);
+  }
+
+  if (context->alive.expired()) {
+    if (filter != nullptr) {
+      webkit_user_content_filter_unref(filter);
+    }
+    delete context;
     return;
   }
 
-  // Create GBytes from JSON source
-  GBytes* sourceBytes = g_bytes_new(jsonSource.c_str(), jsonSource.length());
+  auto* handler = context->handler;
+  if (filter != nullptr) {
+    handler->filterReady(filter, context->identifier);
+    webkit_user_content_filter_unref(filter);
+    delete context;
+    return;
+  }
 
-  // Create context for async callback
-  auto* context = new CompileContext{this, std::move(callback)};
-
-  // Start async compilation
-  webkit_user_content_filter_store_save(filter_store_, filter_identifier_.c_str(), sourceBytes,
+  // Not in the store yet: compile it.
+  GBytes* sourceBytes = g_bytes_new(context->jsonSource.c_str(), context->jsonSource.length());
+  webkit_user_content_filter_store_save(store, context->identifier.c_str(),
+                                         sourceBytes,
                                          nullptr,  // cancellable
                                          onFilterCompiled, context);
-
   g_bytes_unref(sourceBytes);
 }
 
 void ContentBlockerHandler::onFilterCompiled(GObject* source, GAsyncResult* result,
                                               gpointer user_data) {
   auto* context = static_cast<CompileContext*>(user_data);
-  if (context == nullptr) {
-    return;
-  }
-
-  auto* handler = context->handler;
-  auto callback = std::move(context->callback);
+  auto* handler = context->alive.expired() ? nullptr : context->handler;
+  auto identifier = std::move(context->identifier);
   delete context;
 
-  if (handler == nullptr || handler->filter_store_ == nullptr) {
-    if (callback) callback(false);
-    return;
-  }
-
   GError* error = nullptr;
-  WebKitUserContentFilter* filter =
-      webkit_user_content_filter_store_save_finish(handler->filter_store_, result, &error);
+  WebKitUserContentFilter* filter = webkit_user_content_filter_store_save_finish(
+      WEBKIT_USER_CONTENT_FILTER_STORE(source), result, &error);
 
-  if (error != nullptr) {
-    errorLog("ContentBlockerHandler: Failed to compile content blockers: " +
-             std::string(error->message));
-    g_error_free(error);
-    if (callback) callback(false);
+  if (handler == nullptr) {
+    if (filter != nullptr) {
+      webkit_user_content_filter_unref(filter);
+    }
+    if (error != nullptr) {
+      g_error_free(error);
+    }
     return;
   }
 
   if (filter == nullptr) {
-    errorLog("ContentBlockerHandler: Compiled filter is null");
-    if (callback) callback(false);
+    errorLog("ContentBlockerHandler: Failed to compile content blockers: " +
+             std::string(error != nullptr ? error->message : "compiled filter is null"));
+    if (error != nullptr) {
+      g_error_free(error);
+    }
+    if (handler->requested_identifier_ == identifier) {
+      handler->finishRequest(false);
+    }
     return;
   }
 
-  // Add the compiled filter to the content manager
-  if (handler->content_manager_ != nullptr) {
-    webkit_user_content_manager_add_filter(handler->content_manager_, filter);
+  handler->filterReady(filter, identifier);
+  webkit_user_content_filter_unref(filter);
+}
+
+void ContentBlockerHandler::filterReady(WebKitUserContentFilter* filter,
+                                        const std::string& identifier) {
+  if (requested_identifier_ != identifier) {
+    return;
   }
 
-  webkit_user_content_filter_unref(filter);
+  // Add the new filter, then retire the previous one.
+  if (content_manager_ != nullptr) {
+    webkit_user_content_manager_add_filter(content_manager_, filter);
+    if (!applied_identifier_.empty() && applied_identifier_ != identifier) {
+      webkit_user_content_manager_remove_filter_by_id(content_manager_,
+                                                     applied_identifier_.c_str());
+    }
+    applied_identifier_ = identifier;
+  }
 
-  if (callback) callback(true);
+  finishRequest(true);
+}
+
+void ContentBlockerHandler::finishRequest(bool applied) {
+  pending_ = false;
+  auto waiters = std::move(waiters_);
+  waiters_.clear();
+  for (auto& waiter : waiters) {
+    waiter(applied);
+  }
 }
 
 }  // namespace flutter_inappwebview_plugin

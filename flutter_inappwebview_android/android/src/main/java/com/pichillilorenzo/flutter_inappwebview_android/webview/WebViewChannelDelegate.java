@@ -1,5 +1,6 @@
 package com.pichillilorenzo.flutter_inappwebview_android.webview;
 
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.webkit.ValueCallback;
@@ -71,6 +72,11 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
 
   @Nullable
   private InAppWebView webView;
+  private final List<Map<String, Object>> pendingConsoleMessages = new ArrayList<>();
+  private long pendingConsoleCharacters = 0;
+  private final Runnable consoleFlush = new Runnable() {
+    @Override public void run() { flushConsoleMessages(); }
+  };
 
   public WebViewChannelDelegate(@NonNull InAppWebView webView, @NonNull MethodChannel channel) {
     super(channel);
@@ -95,6 +101,15 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
         break;
       case getProgress:
         result.success((webView != null) ? webView.getProgress() : null);
+        break;
+      case setBackgroundColor:
+        if (webView != null) {
+          String color = (String) call.argument("color");
+          if (color != null) {
+            webView.setCustomBackgroundColor(Color.parseColor(color));
+          }
+        }
+        result.success(true);
         break;
       case loadUrl:
         if (webView != null) {
@@ -216,6 +231,16 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
           webView.takeScreenshot(screenshotConfiguration, result);
         } else
           result.success(null);
+        break;
+      case setScrollChangedListener:
+        if (webView != null) {
+          webView.hasScrollChangedListener = Boolean.TRUE.equals(call.argument("hasListener"));
+        }
+        result.success(true);
+        break;
+      case setConsoleMessageListener:
+        if (webView != null) webView.setConsoleMessageListener(Boolean.TRUE.equals(call.argument("hasListener")));
+        result.success(true);
         break;
       case setSettings:
         if (webView != null && webView.getInAppBrowserDelegate() instanceof InAppBrowserActivity) {
@@ -949,12 +974,41 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
   }
 
   public void onConsoleMessage(String message, int messageLevel) {
+    if (webView == null || getChannel() == null || !webView.acceptsConsoleMessage(messageLevel)) return;
+    long size = (long) message.length() + 48;
+    if (!pendingConsoleMessages.isEmpty() && pendingConsoleCharacters + size > 65536) flushConsoleMessages();
+    Map<String, Object> entry = new HashMap<>();
+    entry.put("message", message);
+    entry.put("messageLevel", messageLevel);
+    pendingConsoleMessages.add(entry);
+    pendingConsoleCharacters += size;
+    if (messageLevel == 2 || messageLevel == 3 || pendingConsoleMessages.size() >= 64 || pendingConsoleCharacters >= 65536) {
+      flushConsoleMessages();
+    } else if (pendingConsoleMessages.size() == 1 && !webView.mainLooperHandler.postDelayed(consoleFlush, 25)) {
+      flushConsoleMessages();
+    }
+  }
+
+  public void clearConsoleMessages() {
+    if (webView != null) webView.mainLooperHandler.removeCallbacks(consoleFlush);
+    pendingConsoleMessages.clear();
+    pendingConsoleCharacters = 0;
+  }
+
+  public void flushConsoleMessages() {
+    List<Map<String, Object>> batch = new ArrayList<>();
+    if (webView != null) {
+      for (Map<String, Object> entry : pendingConsoleMessages) {
+        // A policy change applies also to messages waiting for the timer.
+        if (webView.acceptsConsoleMessage((Integer) entry.get("messageLevel"))) batch.add(entry);
+      }
+    }
+    clearConsoleMessages();
     MethodChannel channel = getChannel();
-    if (channel == null) return;
-    Map<String, Object> obj = new HashMap<>();
-    obj.put("message", message);
-    obj.put("messageLevel", messageLevel);
-    channel.invokeMethod("onConsoleMessage", obj);
+    if (channel == null || batch.isEmpty()) return;
+    Map<String, Object> arguments = new HashMap<>();
+    arguments.put("messages", batch);
+    channel.invokeMethod("onConsoleMessageBatch", arguments);
   }
 
   public void onProgressChanged(int progress) {
@@ -1039,6 +1093,7 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
   }
 
   public void onLoadStart(String url) {
+    flushConsoleMessages();
     MethodChannel channel = getChannel();
     if (channel == null) return;
     Map<String, Object> obj = new HashMap<>();
@@ -1381,6 +1436,7 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
 
   @Override
   public void dispose() {
+    clearConsoleMessages();
     super.dispose();
     webView = null;
   }

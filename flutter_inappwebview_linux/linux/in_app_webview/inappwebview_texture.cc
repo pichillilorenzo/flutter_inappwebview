@@ -4,6 +4,7 @@
 
 #include "../utils/log.h"
 #include "in_app_webview.h"
+#include "simd_convert.h"
 
 // Private structure
 struct _InAppWebViewTexture {
@@ -44,7 +45,9 @@ static gboolean inappwebview_texture_copy_pixels(FlPixelBufferTexture* texture,
     return TRUE;
   }
 
-  if (self->staging_buffer_size < required_size) {
+  if (self->staging_buffer_size < required_size ||
+      flutter_inappwebview_plugin::ShouldShrinkByteBuffer(self->staging_buffer_size,
+                                                          required_size)) {
     self->staging_buffer = static_cast<uint8_t*>(g_realloc(self->staging_buffer, required_size));
     self->staging_buffer_size = required_size;
   }

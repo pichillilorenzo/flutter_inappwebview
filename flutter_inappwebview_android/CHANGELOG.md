@@ -1,5 +1,34 @@
+## Unreleased
+
+- Resolve content-blocker top-URL conditions from the current document once per request, cap background lookup waits at 200 ms, and avoid waiting on the WebView's own looper.
+- Avoid registering an outer widget's GlobalKey again on its Android platform view, while preserving separately supplied inner keys, LocalKeys, composition settings and controller ownership.
+- Filter console levels before Flutter IPC and send bounded native batches, preserving per-message callbacks, order, immediate warning/error flushes, and subscription/disposal cleanup. Inline publishers stay disabled until a live Dart controller attaches, including delayed keep-alive creation.
+- Keep inline scroll subscriptions disabled until a live controller attaches, so cancelling pending keep-alive creation cannot leave a listener or interfere with its next owner.
+- Suppress scroll channel messages without a listener, update callbacks on widget rebuilds, and resynchronize headless/keep-alive subscriptions without recreating the WebView.
+
 ## 1.2.0-beta.3
 
+- Added opt-in `WebViewEnvironment.prewarm` using AndroidX 1.14's experimental
+  async startup API with UI startup tasks disabled. Apply `ProcessGlobalConfig`
+  first and await prewarming before other WebView APIs for the greatest benefit.
+  This warms only background-capable work, creates no WebView, and ignores
+  Windows environment settings. Calls share the result within each engine;
+  failures, detach and a 30-second timeout complete without throwing.
+
+- Added creation-stage context to WebView constructor failures while preserving the original exception cause and Flutter error delivery.
+- Cancelled pending JavaScript callbacks and stale queued evaluations when their document is replaced or disposed.
+- Added `InAppWebViewController.setBackgroundColor`, retaining the selected
+  native color across `transparentBackground` toggles.
+- Added audio capture to Android file choosers, with file-selection fallback
+  when no recorder is installed.
+- Avoided the deprecated status-bar color call when Android 15 edge-to-edge is
+  enforced, while preserving legacy target-SDK behavior.
+- Reduced Java deprecation warnings while preserving synchronous session-cookie
+  clearing [#2641](https://github.com/pichillilorenzo/flutter_inappwebview/issues/2641).
+- Fixed nullable Android context-menu action titles.
+- Restricted captured-media FileProvider access to the app-scoped `Captures`
+  directory.
+- Rejected unsafe `file://` URIs returned by Android file pickers.
 - Updated flutter_inappwebview_platform_interface version to ^1.4.0-beta.3
 - Updated native dependencies:
   - implementation from `'androidx.webkit:webkit:1.12.0'` to `'androidx.webkit:webkit:1.14.0'`

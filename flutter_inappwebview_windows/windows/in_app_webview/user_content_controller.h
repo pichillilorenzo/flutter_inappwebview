@@ -3,12 +3,14 @@
 
 #include <functional>
 #include <map>
+#include <optional>
 #include <vector>
 
 #include "../plugin_scripts_js/javascript_bridge_js.h"
 #include "../plugin_scripts_js/javascript_bridge_js.h"
 #include "../plugin_scripts_js/plugin_scripts_util.h"
 #include "../types/content_world.h"
+#include "content_world_execution_contexts.h"
 #include "../types/plugin_script.h"
 #include "../types/user_script.h"
 
@@ -44,13 +46,16 @@ namespace flutter_inappwebview_plugin
     std::vector<std::shared_ptr<PluginScript>> getPluginScriptsRequiredInAllContentWorlds() const;
 
     void registerEventHandlers();
-    void createContentWorld(const std::shared_ptr<ContentWorld> contentWorld, const std::function<void(int)> completionHandler);
+    // An empty result means creation failed; -1 is reserved for the page world.
+    void createContentWorld(const std::shared_ptr<ContentWorld> contentWorld,
+      const std::function<bool()> isRequestPending,
+      const std::function<void(std::optional<int>)> completionHandler);
 
   private:
     InAppWebView* webView_;
 
     // used to track Content World names -> Execution Context ID
-    std::map<std::string, int> contentWorlds_;
+    ContentWorldExecutionContexts contentWorlds_;
     // used only to track plugin script to inject inside new Content Worlds
     std::map<std::string, std::vector<std::shared_ptr<PluginScript>>> pluginScriptsInContentWorlds_;
 

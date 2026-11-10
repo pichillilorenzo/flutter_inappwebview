@@ -140,6 +140,19 @@ abstract class PlatformWebViewEnvironment extends PlatformInterface
 
   ///{@template flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.getProcessInfos}
   ///Returns a list of all process using same user data folder except for crashpad process.
+  ///
+  ///On Windows, an empty list means collection succeeded with no processes.
+  ///Failures are reported as a `PlatformException`: `process_info_unsupported`
+  ///when the runtime has no process enumeration API,
+  ///`webview_environment_unavailable` before creation or after disposal, or
+  ///`process_info_collection_failed` when the snapshot cannot be collected.
+  ///Native failures include the failing `stage` and signed `hresult` in the
+  ///exception details. A failed collection is never returned as a partial list.
+  ///Process IDs and frame details remain nullable when WebView2 cannot read them.
+  ///Failure to read a process kind, which is required by the model, fails the
+  ///snapshot. If the environment is disposed while awaiting a native callback,
+  ///that callback reports `webview_environment_unavailable`.
+  ///Older runtimes use the basic process API without associated frame details.
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.getProcessInfos.supported_platforms}
@@ -159,7 +172,7 @@ abstract class PlatformWebViewEnvironment extends PlatformInterface
     );
   }
 
-  ///{@template flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.getProcessInfos}
+  ///{@template flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.getFailureReportFolderPath}
   ///Returns the path of the folder where minidump files are written.
   ///
   ///Whenever a WebView2 process crashes, a crash dump file will be created in the crash dump folder.
@@ -282,6 +295,51 @@ abstract class PlatformWebViewEnvironment extends PlatformInterface
       'compareBrowserVersions is not implemented on the current platform',
     );
   }
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.prewarm}
+  ///Preloads supported WebView startup work before creating the first view.
+  ///
+  ///On Windows, a temporary WebView2 environment is created on a background STA
+  ///and released without creating a view. Pass the same [settings] as the later
+  ///[create] to select the same runtime. Concurrent calls with identical settings
+  ///share in-flight work; completed results are not cached. Await prewarming
+  ///before [create] to avoid competing with the runtime loader on the UI thread.
+  ///
+  ///On Android, AndroidX 1.14's experimental startup API warms only work that
+  ///can run in the background, with UI startup tasks disabled. No WebView is
+  ///created, and the first view still performs remaining UI startup work.
+  ///Apply ProcessGlobalConfig first, then await prewarming before other WebView
+  ///APIs. Windows [settings] are ignored. All calls in the same Flutter engine
+  ///reuse its first outcome, including failures and timeouts.
+  ///
+  ///Native work has a 30-second deadline. Dart also bounds missing native replies
+  ///at 31 seconds on Windows and 35 seconds on Android. The runtime loader cannot
+  ///be interrupted, so a worker may still be running after a timeout.
+  ///Failures are reported in the result, never thrown. Returns `null` on platforms
+  ///that do not support it.
+  ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.prewarm.supported_platforms}
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(
+        apiName: 'WebViewCompat.startUpWebView',
+        apiUrl:
+            'https://developer.android.com/reference/androidx/webkit/WebViewCompat',
+        note:
+            'Uses the AndroidX 1.14 experimental API with UI startup tasks disabled.',
+      ),
+      WindowsPlatform(
+        apiName: 'CreateCoreWebView2EnvironmentWithOptions',
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#createcorewebview2environmentwithoptions',
+      ),
+    ],
+  )
+  Future<WebViewEnvironmentPrewarmResult?> prewarm({
+    @SupportedPlatforms(platforms: [WindowsPlatform()])
+    WebViewEnvironmentSettings? settings,
+  }) async => null;
 
   ///{@template flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.onNewBrowserVersionAvailable}
   ///[onNewBrowserVersionAvailable] runs when a newer version of the WebView2 Runtime
@@ -501,4 +559,44 @@ abstract class PlatformWebViewEnvironment extends PlatformInterface
     method,
     platform: platform,
   );
+}
+
+///Outcome of [PlatformWebViewEnvironment.prewarm].
+class WebViewEnvironmentPrewarmResult {
+  const WebViewEnvironmentPrewarmResult({
+    required this.status,
+    required this.duration,
+    this.errorCode,
+  });
+
+  ///`ok`, or where it stopped: `no_runtime`, `com_init_failed`,
+  ///`create_failed`, `timeout`, `thread_failed` or `unavailable`.
+  final String status;
+
+  ///Windows HRESULT of the failed step or successful creation; null on Android.
+  final int? errorCode;
+
+  ///Elapsed time until completion or timeout. Android reuses the first outcome's
+  ///duration when returning a cached result.
+  final Duration duration;
+
+  bool get succeeded => status == 'ok';
+
+  static WebViewEnvironmentPrewarmResult? fromMap(Map<String, dynamic>? map) {
+    if (map == null) return null;
+    return WebViewEnvironmentPrewarmResult(
+      status: map['status'] as String? ?? 'unknown',
+      errorCode: map['errorCode'] as int?,
+      duration: Duration(milliseconds: map['durationMs'] as int? ?? 0),
+    );
+  }
+
+  @override
+  String toString() {
+    final code = errorCode;
+    final hr = code == null || code == 0
+        ? ''
+        : ' hr=0x${(code & 0xFFFFFFFF).toRadixString(16).padLeft(8, '0')}';
+    return '$status$hr ${duration.inMilliseconds}ms';
+  }
 }

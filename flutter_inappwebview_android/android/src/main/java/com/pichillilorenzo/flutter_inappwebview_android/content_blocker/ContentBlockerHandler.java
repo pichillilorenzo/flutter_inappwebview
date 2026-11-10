@@ -2,6 +2,7 @@ package com.pichillilorenzo.flutter_inappwebview_android.content_blocker;
 
 import android.os.Build;
 import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
 import android.webkit.WebResourceResponse;
@@ -26,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 
 import javax.net.ssl.SSLHandshakeException;
@@ -33,12 +35,14 @@ import javax.net.ssl.SSLHandshakeException;
 public class ContentBlockerHandler {
     protected static final String LOG_TAG = "ContentBlockerHandler";
 
-    protected List<ContentBlocker> ruleList = new ArrayList<>();
+    // Read requests use a stable COW iterator without an O(number-of-rules) copy.
+    // Updating the entire list publishes one fully compiled snapshot.
+    protected volatile List<ContentBlocker> ruleList = new CopyOnWriteArrayList<>();
 
     public ContentBlockerHandler() {}
 
     public ContentBlockerHandler(List<ContentBlocker> ruleList) {
-        this.ruleList = ruleList;
+        this.ruleList = new CopyOnWriteArrayList<>(ruleList);
     }
 
     public List<ContentBlocker> getRuleList() {
@@ -46,7 +50,7 @@ public class ContentBlockerHandler {
     }
 
     public void setRuleList(List<ContentBlocker> newRuleList) {
-        this.ruleList = newRuleList;
+        this.ruleList = new CopyOnWriteArrayList<>(newRuleList);
     }
 
     @Nullable
@@ -55,6 +59,9 @@ public class ContentBlockerHandler {
             throws URISyntaxException, InterruptedException, MalformedURLException {
         if (webView.customSettings.contentBlockers == null)
             return null;
+
+        final List<ContentBlocker> rules = ruleList;
+        if (rules.isEmpty()) return null;
 
         String url = request.getUrl();
 
@@ -70,81 +77,81 @@ public class ContentBlockerHandler {
         String host = u.getHost();
         int port = u.getPort();
         String scheme = u.getScheme();
-        // thread safe copy list
-        List<ContentBlocker> ruleListCopy = new CopyOnWriteArrayList<ContentBlocker>(ruleList);
-
-        for (ContentBlocker contentBlocker : ruleListCopy) {
+        // Resolve lazily once per request, including an unavailable result. A URL
+        // retained across requests can describe a pending or previous document.
+        boolean topLevelUrlResolved = false;
+        String topLevelUrl = null;
+        // A snapshot is captured by the COW iterator; no per-request array copying.
+        rulesLoop: for (ContentBlocker contentBlocker : rules) {
             ContentBlockerTrigger trigger =  contentBlocker.getTrigger();
             List<ContentBlockerTriggerResourceType> resourceTypes = trigger.getResourceType();
-            if (resourceTypes.contains(ContentBlockerTriggerResourceType.IMAGE) && !resourceTypes.contains(ContentBlockerTriggerResourceType.SVG_DOCUMENT)) {
-                resourceTypes.add(ContentBlockerTriggerResourceType.SVG_DOCUMENT);
-            }
+            // Honor IMAGE rules for SVG without mutating a shared trigger on request threads.
+            final boolean matchesResourceType = resourceTypes.isEmpty()
+                    || resourceTypes.contains(responseResourceType)
+                    || (responseResourceType == ContentBlockerTriggerResourceType.SVG_DOCUMENT
+                        && resourceTypes.contains(ContentBlockerTriggerResourceType.IMAGE));
 
             ContentBlockerAction action = contentBlocker.getAction();
 
             Matcher m = trigger.getUrlFilterPatternCompiled().matcher(url);
             if (m.matches()) {
 
-                if (!resourceTypes.isEmpty() && !resourceTypes.contains(responseResourceType)) {
-                    return null;
+                if (!matchesResourceType) {
+                    continue rulesLoop;
                 }
                 if (!trigger.getIfDomain().isEmpty()) {
                     boolean matchFound = false;
                     for (String domain : trigger.getIfDomain()) {
-                        if ((domain.startsWith("*") && host.endsWith(domain.replace("*", ""))) || domain.equals(host)) {
+                        if (host != null && ((domain.startsWith("*") && host.endsWith(domain.replace("*", ""))) || domain.equals(host))) {
                             matchFound = true;
                             break;
                         }
                     }
                     if (!matchFound)
-                        return null;
+                        continue rulesLoop;
                 }
                 if (!trigger.getUnlessDomain().isEmpty()) {
                     for (String domain : trigger.getUnlessDomain())
-                        if ((domain.startsWith("*") && host.endsWith(domain.replace("*", ""))) || domain.equals(host))
-                            return null;
+                        if (host != null && ((domain.startsWith("*") && host.endsWith(domain.replace("*", ""))) || domain.equals(host)))
+                            continue rulesLoop;
                 }
 
-                final String[] webViewUrl = new String[1];
-                if (!trigger.getLoadType().isEmpty() || !trigger.getIfTopUrl().isEmpty() || !trigger.getUnlessTopUrl().isEmpty()) {
-                    final CountDownLatch latch = new CountDownLatch(1);
-                    Handler handler = new Handler(webView.getWebViewLooper());
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            webViewUrl[0] = webView.getUrl();
-                            latch.countDown();
-                        }
-                    });
-                    latch.await();
+                final boolean needsTopUrl = !trigger.getLoadType().isEmpty()
+                        || !trigger.getIfTopUrl().isEmpty()
+                        || !trigger.getUnlessTopUrl().isEmpty();
+                if (needsTopUrl && !topLevelUrlResolved) {
+                    topLevelUrlResolved = true;
+                    topLevelUrl = getTopLevelUrl(webView);
                 }
+                // A constrained rule cannot be evaluated without its top-level URL.
+                if (needsTopUrl && topLevelUrl == null) continue rulesLoop;
 
-                if (webViewUrl[0] != null) {
+                if (topLevelUrl != null) {
                     if (!trigger.getLoadType().isEmpty()) {
-                        URI cUrl = new URI(webViewUrl[0]);
+                        URI cUrl = new URI(topLevelUrl);
                         String cHost = cUrl.getHost();
                         int cPort = cUrl.getPort();
                         String cScheme = cUrl.getScheme();
 
                         if ( (trigger.getLoadType().contains("first-party") && cHost != null && !(cScheme.equals(scheme) && cHost.equals(host) && cPort == port)) ||
                                 (trigger.getLoadType().contains("third-party") && cHost != null && cHost.equals(host)) )
-                            return null;
+                            continue rulesLoop;
                     }
                     if (!trigger.getIfTopUrl().isEmpty()) {
                         boolean matchFound = false;
                         for (String topUrl : trigger.getIfTopUrl()) {
-                            if (webViewUrl[0].startsWith(topUrl)) {
+                            if (topLevelUrl.startsWith(topUrl)) {
                                 matchFound = true;
                                 break;
                             }
                         }
                         if (!matchFound)
-                            return null;
+                            continue rulesLoop;
                     }
                     if (!trigger.getUnlessTopUrl().isEmpty()) {
                         for (String topUrl : trigger.getUnlessTopUrl())
-                            if (webViewUrl[0].startsWith(topUrl))
-                                return null;
+                            if (topLevelUrl.startsWith(topUrl))
+                                continue rulesLoop;
                     }
                 }
 
@@ -272,6 +279,34 @@ public class ContentBlockerHandler {
             }
         }
         return null;
+    }
+
+    @Nullable
+    private String getTopLevelUrl(final InAppWebView webView) throws InterruptedException {
+        final Looper webViewLooper = webView.getWebViewLooper();
+        if (Looper.myLooper() == webViewLooper) {
+            // Posting and waiting on this same looper would deadlock.
+            return webView.getContentBlockerTopUrl();
+        }
+
+        final String[] fetched = new String[1];
+        final CountDownLatch latch = new CountDownLatch(1);
+        final Handler handler = new Handler(webViewLooper);
+        final Runnable lookup = () -> {
+            try {
+                fetched[0] = webView.getContentBlockerTopUrl();
+            } finally {
+                latch.countDown();
+            }
+        };
+        if (!handler.post(lookup)) return null;
+        try {
+            // Read the result only after the latch publishes it. A late lookup
+            // cannot change this request's decision after timeout or interruption.
+            return latch.await(200, TimeUnit.MILLISECONDS) ? fetched[0] : null;
+        } finally {
+            handler.removeCallbacks(lookup);
+        }
     }
     
     @Nullable

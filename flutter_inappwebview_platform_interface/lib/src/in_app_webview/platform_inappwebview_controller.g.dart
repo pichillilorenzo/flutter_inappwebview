@@ -473,6 +473,8 @@ enum PlatformInAppWebViewControllerMethod {
   ///- iOS WKWebView 14.0+ ([Official API - WKWebView.createPdf](https://developer.apple.com/documentation/webkit/wkwebview/3650490-createpdf))
   ///- macOS WKWebView 11.0+ ([Official API - WKWebView.createPdf](https://developer.apple.com/documentation/webkit/wkwebview/3650490-createpdf))
   ///- Windows WebView2 ([Official API - ICoreWebView2_16.PrintToPdfStream](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_16#printtopdfstream))
+  ///- Linux WPE WebKit:
+  ///    - Requires the Otzaria-patched WPE runtime. With stock libWPEWebKit, this method returns null.
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [pdfConfiguration]: all platforms
@@ -629,6 +631,18 @@ enum PlatformInAppWebViewControllerMethod {
   ///{@endtemplate}
   @Deprecated('Use FindInteractionController.findNext instead')
   findNext,
+
+  ///Can be used to check if the [PlatformInAppWebViewController.getAppleWebViewActivitySnapshot] method is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getAppleWebViewActivitySnapshot.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- iOS WKWebView
+  ///- macOS WKWebView
+  ///
+  ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
+  ///{@endtemplate}
+  getAppleWebViewActivitySnapshot,
 
   ///Can be used to check if the [PlatformInAppWebViewController.getCameraCaptureState] method is supported at runtime.
   ///
@@ -2193,6 +2207,20 @@ enum PlatformInAppWebViewControllerMethod {
   ///{@endtemplate}
   setAllMediaPlaybackSuspended,
 
+  ///Can be used to check if the [PlatformInAppWebViewController.setBackgroundColor] method is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.setBackgroundColor.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android WebView ([Official API - View.setBackgroundColor](https://developer.android.com/reference/android/view/View#setBackgroundColor(int)))
+  ///
+  ///**Parameters - Officially Supported Platforms/Implementations**:
+  ///- [color]: all platforms
+  ///
+  ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
+  ///{@endtemplate}
+  setBackgroundColor,
+
   ///Can be used to check if the [PlatformInAppWebViewController.setCameraCaptureState] method is supported at runtime.
   ///
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.setCameraCaptureState.supported_platforms}
@@ -2727,6 +2755,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
               TargetPlatform.iOS,
               TargetPlatform.macOS,
               TargetPlatform.windows,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.createWebArchiveData:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -2794,6 +2823,12 @@ extension _PlatformInAppWebViewControllerMethodSupported
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
+      case PlatformInAppWebViewControllerMethod.getAppleWebViewActivitySnapshot:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [
               TargetPlatform.iOS,
               TargetPlatform.macOS,
             ].contains(platform ?? defaultTargetPlatform);
@@ -3579,6 +3614,11 @@ extension _PlatformInAppWebViewControllerMethodSupported
               TargetPlatform.iOS,
               TargetPlatform.macOS,
               TargetPlatform.linux,
+            ].contains(platform ?? defaultTargetPlatform);
+      case PlatformInAppWebViewControllerMethod.setBackgroundColor:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [
+              TargetPlatform.android,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.setCameraCaptureState:
         return ((kIsWeb && platform != null) || !kIsWeb) &&

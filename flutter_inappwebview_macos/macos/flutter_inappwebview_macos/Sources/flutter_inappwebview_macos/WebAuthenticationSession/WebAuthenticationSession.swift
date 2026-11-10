@@ -10,21 +10,23 @@ import AuthenticationServices
 import SafariServices
 import FlutterMacOS
 
-public class WebAuthenticationSession: NSObject, ASWebAuthenticationPresentationContextProviding, Disposable {
+public class WebAuthenticationSession: NSObject, Disposable {
     static let METHOD_CHANNEL_NAME_PREFIX = "com.pichillilorenzo/flutter_webauthenticationsession_"
     var id: String
     var plugin: InAppWebViewFlutterPlugin?
     var url: URL
     var callbackURLScheme: String?
+    var additionalHeaderFields: [String: String]?
     var settings: WebAuthenticationSessionSettings
     var session: Any?
     var channelDelegate: WebAuthenticationSessionChannelDelegate?
     private var _canStart = true
     
-    public init(plugin: InAppWebViewFlutterPlugin, id: String, url: URL, callbackURLScheme: String?, settings: WebAuthenticationSessionSettings) {
+    public init(plugin: InAppWebViewFlutterPlugin, id: String, url: URL, callbackURLScheme: String?, additionalHeaderFields: [String: String]?, settings: WebAuthenticationSessionSettings) {
         self.id = id
         self.plugin = plugin
         self.url = url
+        self.additionalHeaderFields = additionalHeaderFields
         self.settings = settings
         super.init()
         self.callbackURLScheme = callbackURLScheme
@@ -41,6 +43,10 @@ public class WebAuthenticationSession: NSObject, ASWebAuthenticationPresentation
     public func prepare() {
         if #available(macOS 10.15, *), let session = session as? ASWebAuthenticationSession {
             session.prefersEphemeralWebBrowserSession = settings.prefersEphemeralWebBrowserSession
+            if #available(macOS 14.4, *),
+               session.responds(to: Selector(("setAdditionalHeaderFields:"))) {
+                session.setValue(additionalHeaderFields, forKey: "additionalHeaderFields")
+            }
         }
     }
     
@@ -81,11 +87,6 @@ public class WebAuthenticationSession: NSObject, ASWebAuthenticationPresentation
         }
     }
     
-    @available(macOS 10.15, *)
-    public func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
-        return NSApplication.shared.windows.first { $0.isKeyWindow } ?? ASPresentationAnchor()
-    }
-    
     public func dispose() {
         cancel()
         channelDelegate?.dispose()
@@ -98,5 +99,16 @@ public class WebAuthenticationSession: NSObject, ASWebAuthenticationPresentation
     deinit {
         debugPrint("WebAuthenticationSession - dealloc")
         dispose()
+    }
+}
+
+// The conformance is restricted to macOS 10.15+ (the availability of
+// ASWebAuthenticationSession itself). Xcode 26 rejects a witness annotated
+// @available(macOS 10.15, *) on a type whose ASWebAuthenticationPresentationContextProviding
+// conformance is unconditionally available from the 10.14 deployment target.
+@available(macOS 10.15, *)
+extension WebAuthenticationSession: ASWebAuthenticationPresentationContextProviding {
+    public func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
+        return NSApplication.shared.windows.first { $0.isKeyWindow } ?? ASPresentationAnchor()
     }
 }

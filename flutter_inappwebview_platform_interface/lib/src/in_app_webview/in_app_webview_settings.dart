@@ -5,6 +5,7 @@ import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_pla
 
 import '../types/action_mode_menu_item.dart';
 import '../types/cache_mode.dart';
+import '../types/console_message_level.dart';
 import '../types/data_detector_types.dart';
 import '../types/font_hinting_style.dart';
 import '../types/font_subpixel_layout.dart';
@@ -14,6 +15,7 @@ import '../types/layout_algorithm.dart';
 import '../types/mixed_content_mode.dart';
 import '../types/over_scroll_mode.dart';
 import '../types/pdf_toolbar_items.dart';
+import '../types/preferred_color_scheme.dart';
 import '../types/referrer_policy.dart';
 import '../types/renderer_priority_policy.dart';
 import '../types/sandbox.dart';
@@ -74,6 +76,28 @@ class InAppWebViewSettings_ {
     ],
   )
   bool? useShouldOverrideUrlLoading;
+
+  ///Console levels forwarded to [PlatformWebViewCreationParams.onConsoleMessage].
+  ///A null value forwards all levels; an empty list disables console forwarding.
+  ///This does not suppress messages in the browser's own developer tools.
+  ///Levels are matched individually, not by numeric severity. On WebKit and
+  ///Windows, JavaScript `console.debug` uses [ConsoleMessageLevel.TIP] and
+  ///`console.info` uses [ConsoleMessageLevel.LOG], matching Android's console API.
+  ///Use [PlatformInAppWebViewController.setSettings] to change the policy.
+  ///
+  ///Accepted messages may travel in bounded batches, but the console callback
+  ///still runs once per message in order. An exception in one callback is
+  ///reported through [FlutterError.reportError] without dropping later messages.
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(),
+      IOSPlatform(),
+      MacOSPlatform(),
+      WindowsPlatform(),
+      LinuxPlatform(),
+    ],
+  )
+  List<ConsoleMessageLevel_>? consoleMessageLevels;
 
   ///Set to `true` to be able to listen at the [PlatformWebViewCreationParams.onLoadResource] event.
   ///
@@ -2185,6 +2209,46 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
   )
   bool? javaScriptBridgeEnabled;
 
+  ///Experimental opt-in to WebKit's Promise-based reply transport for
+  ///JavaScript `callHandler` requests. The default value is `false`.
+  ///
+  ///Set this in [PlatformWebViewCreationParams.initialSettings]. Changes through
+  ///`setSettings` are ignored; a popup uses its own initial setting and a
+  ///keep-alive WebView retains its original setting.
+  ///
+  ///The JavaScript Promise, Dart handler arguments, and JSON results are
+  ///unchanged. One-way messages continue to use the one-way bridge. Older
+  ///operating systems and missing native support use the existing transport.
+  ///When the native API exists, the first calls wait for a per-document
+  ///capability probe before choosing a transport. The probe has a one-second
+  ///deadline and may select the existing transport before sending any request.
+  ///A popup whose Flutter owner is not ready yet rejects that call; a later
+  ///call can check again. Once a request is dispatched, failures are never
+  ///retried on the other transport.
+  ///
+  ///A shared Apple user-content controller exposes the reply API only while
+  ///at least one of its WebViews has opted in. Each frame and content world
+  ///then checks the policy of its own native WebView. Navigation or disposal
+  ///rejects outstanding experimental replies; late Dart results are ignored.
+  ///This experiment does not imply a measured application performance gain.
+  @SupportedPlatforms(
+    platforms: [
+      IOSPlatform(
+        available: "14.0",
+        apiName: "WKScriptMessageHandlerWithReply",
+        apiUrl:
+            "https://developer.apple.com/documentation/webkit/wkscriptmessagehandlerwithreply",
+      ),
+      MacOSPlatform(
+        available: "11.0",
+        apiName: "WKScriptMessageHandlerWithReply",
+        apiUrl:
+            "https://developer.apple.com/documentation/webkit/wkscriptmessagehandlerwithreply",
+      ),
+    ],
+  )
+  bool? useScriptMessageHandlerWithReply;
+
   ///A [Set] of patterns that will be used to match the allowed origins where
   ///the JavaScript Bridge could be used.
   ///If [pluginScriptsOriginAllowList] is present, then this value will override
@@ -2494,6 +2558,26 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
   ///The default value is `false`.
   @SupportedPlatforms(platforms: [WindowsPlatform()])
   bool? handleAcceleratorKeyPressed;
+
+  ///Sets the preferred color scheme for the WebView2 profile.
+  ///
+  ///This value is profile-scoped and persisted. All WebViews that share the
+  ///same profile observe the same value, and the last update wins. It affects
+  ///WebView2 UI and CSS `prefers-color-scheme` evaluation.
+  ///
+  ///When omitted, the profile's persisted value is preserved. New profiles
+  ///default to [PreferredColorScheme.AUTO].
+  @SupportedPlatforms(
+    platforms: [
+      WindowsPlatform(
+        available: '1.0.1210.39',
+        apiName: "ICoreWebView2Profile.PreferredColorScheme",
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2profile#get_preferredcolorscheme',
+      ),
+    ],
+  )
+  PreferredColorScheme_? preferredColorScheme;
 
   ///The view’s alpha value. The value of this property is a floating-point number
   ///in the range 0.0 to 1.0, where 0.0 represents totally transparent and 1.0 represents totally opaque.
@@ -3278,6 +3362,7 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
 
   @ExchangeableObjectConstructor()
   InAppWebViewSettings_({
+    this.consoleMessageLevels,
     this.useShouldOverrideUrlLoading,
     this.useOnLoadResource,
     this.useOnDownloadStart,
@@ -3420,6 +3505,7 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
     this.javaScriptHandlersOriginAllowList,
     this.javaScriptHandlersForMainFrameOnly,
     this.javaScriptBridgeEnabled = true,
+    this.useScriptMessageHandlerWithReply = false,
     this.javaScriptBridgeOriginAllowList,
     this.javaScriptBridgeForMainFrameOnly,
     this.pluginScriptsOriginAllowList,
@@ -3435,6 +3521,7 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
     this.nonClientRegionSupportEnabled = false,
     this.isUserInteractionEnabled = true,
     this.handleAcceleratorKeyPressed = false,
+    this.preferredColorScheme,
     this.alpha,
     this.useOnShowFileChooser,
     this.iframeAllow,

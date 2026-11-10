@@ -46,12 +46,12 @@ namespace flutter_inappwebview_plugin
     ClientCertResponse(const flutter::EncodableMap& map);
     ~ClientCertResponse() = default;
 
-    bool ClientCertResponse::operator==(const ClientCertResponse& other)
+    bool operator==(const ClientCertResponse& other)
     {
       return selectedCertificate == other.selectedCertificate &&
         action == other.action;
     }
-    bool ClientCertResponse::operator!=(const ClientCertResponse& other)
+    bool operator!=(const ClientCertResponse& other)
     {
       return !(*this == other);
     }

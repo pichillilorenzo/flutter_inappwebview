@@ -55,6 +55,7 @@ import io.flutter.plugin.common.MethodChannel;
 
 public class InAppBrowserActivity extends AppCompatActivity implements InAppBrowserDelegate, Disposable {
   protected static final String LOG_TAG = "InAppBrowserActivity";
+  private static final int ANDROID_15_API_LEVEL = 35;
   public static final String METHOD_CHANNEL_NAME_PREFIX = "com.pichillilorenzo/flutter_inappbrowser_";
 
   @Nullable
@@ -84,6 +85,16 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
   @Nullable
   public InAppBrowserChannelDelegate channelDelegate;
   public List<InAppBrowserMenuItem> menuItems = new ArrayList<>();
+
+  @SuppressWarnings("deprecation")
+  private void configureTransparentStatusBar() {
+    boolean isEdgeToEdgeEnforced =
+        Build.VERSION.SDK_INT >= ANDROID_15_API_LEVEL
+            && getApplicationInfo().targetSdkVersion >= ANDROID_15_API_LEVEL;
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && !isEdgeToEdgeEnforced) {
+      getWindow().setStatusBarColor(Color.TRANSPARENT);
+    }
+  }
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -118,9 +129,7 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
     WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
     toolbar = findViewById(R.id.toolbar);
     setSupportActionBar(toolbar);
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-      getWindow().setStatusBarColor(Color.TRANSPARENT);
-    }
+    configureTransparentStatusBar();
 
     ViewCompat.setOnApplyWindowInsetsListener(toolbar, (v, insets) -> {
       Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.statusBars());

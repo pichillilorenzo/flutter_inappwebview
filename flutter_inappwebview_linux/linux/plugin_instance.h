@@ -25,7 +25,7 @@ class WebViewEnvironment;
 class PluginInstance {
 public:
   explicit PluginInstance(FlPluginRegistrar* registrar);
-  ~PluginInstance() = default;
+  ~PluginInstance();
 
   // Prevent copying
   PluginInstance(const PluginInstance&) = delete;
@@ -45,6 +45,7 @@ public:
 
   /// Get the Flutter view (may be nullptr for headless scenarios)
   FlView* flView() const { return fl_view_; }
+  void InvalidateHost(GtkWindow* window, FlView* view);
 
   // Manager accessors - set by the main plugin after creation
   InAppWebViewManager* inAppWebViewManager = nullptr;
@@ -60,6 +61,8 @@ private:
   FlPluginRegistrar* registrar_ = nullptr;
   GtkWindow* gtk_window_ = nullptr;  // Cached during plugin registration
   FlView* fl_view_ = nullptr;        // Cached during plugin registration
+  gulong host_window_destroy_handler_ = 0;
+  gulong host_view_destroy_handler_ = 0;
 };
 
 }  // namespace flutter_inappwebview_plugin

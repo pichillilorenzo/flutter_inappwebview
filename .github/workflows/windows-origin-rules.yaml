@@ -12,7 +12,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Run policy and cache invalidation tests (ASan and UBSan)
         run: |
-          g++ -std=c++17 -O1 -Wall -Wextra -Werror -fsanitize=address,undefined -fno-omit-frame-pointer \
+          g++ -std=c++17 -O0 -Wall -Wextra -Werror -fsanitize=address,undefined -fno-omit-frame-pointer \
             flutter_inappwebview_windows/windows/test/javascript_origin_rules_test.cpp -o /tmp/javascript_origin_rules_test
           ASAN_OPTIONS=detect_leaks=1 /tmp/javascript_origin_rules_test
       - name: Verify integration updates compiled policy on settings change

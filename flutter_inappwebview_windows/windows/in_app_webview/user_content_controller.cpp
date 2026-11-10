@@ -25,10 +25,11 @@ namespace flutter_inappwebview_plugin
     if (succeededOrLog(webView_->webView->GetDevToolsProtocolEventReceiver(L"Runtime.executionContextCreated", &executionContextCreated))) {
       auto hr = executionContextCreated->add_DevToolsProtocolEventReceived(
         Callback<ICoreWebView2DevToolsProtocolEventReceivedEventHandler>(
-          [this](
+          [this, alive = webView_->aliveToken()](
             ICoreWebView2* sender,
             ICoreWebView2DevToolsProtocolEventReceivedEventArgs* args) -> HRESULT
           {
+            if (alive.expired()) return S_OK;
             wil::unique_cotaskmem_string json;
             if (succeededOrLog(args->get_ParameterObjectAsJson(&json))) {
               nlohmann::json context = nlohmann::json::parse(wide_to_utf8(json.get()))["context"];
@@ -39,10 +40,10 @@ namespace flutter_inappwebview_plugin
               auto frameId = auxData["frameId"].get<std::string>();
               if (string_equals(webView_->pageFrameId(), frameId)) {
                 if (isDefault) {
-                  contentWorlds_.insert_or_assign(ContentWorld::page()->name, id);
+                  contentWorlds_.put(ContentWorld::page()->name, id);
                 }
                 else {
-                  contentWorlds_.insert_or_assign(name, id);
+                  contentWorlds_.put(name, id);
                   addPluginScriptsIfRequired(std::make_shared<ContentWorld>(name));
                 }
               }
@@ -55,26 +56,39 @@ namespace flutter_inappwebview_plugin
       failedLog(hr);
     }
 
-    /*
+    // Clearing stale CDP context IDs avoids failed Runtime.evaluate requests
+    // when a document is replaced, reloaded or a renderer is recreated.
     wil::com_ptr<ICoreWebView2DevToolsProtocolEventReceiver> executionContextDestroyed;
-    if (succeededOrLog(webView_->webView->GetDevToolsProtocolEventReceiver(L"Runtime.executionContextDestroyed ", &executionContextDestroyed))) {
+    if (succeededOrLog(webView_->webView->GetDevToolsProtocolEventReceiver(
+        L"Runtime.executionContextDestroyed", &executionContextDestroyed))) {
       failedLog(executionContextDestroyed->add_DevToolsProtocolEventReceived(
         Callback<ICoreWebView2DevToolsProtocolEventReceivedEventHandler>(
-          [this](
-            ICoreWebView2* sender,
-            ICoreWebView2DevToolsProtocolEventReceivedEventArgs* args) -> HRESULT
-          {
+          [this, alive = webView_->aliveToken()](
+              ICoreWebView2*, ICoreWebView2DevToolsProtocolEventReceivedEventArgs* args) -> HRESULT {
+            if (alive.expired()) return S_OK;
             wil::unique_cotaskmem_string json;
-            if (succeededOrLog(args->get_ParameterObjectAsJson(&json))) {
-              debugLog("executionContextDestroyed: " + wide_to_utf8(json.get()));
+            if (succeededOrLog(args->get_ParameterObjectAsJson(&json)) && json) {
+              const auto payload = nlohmann::json::parse(wide_to_utf8(json.get()), nullptr, false);
+              if (payload.is_object() && payload.contains("executionContextId") &&
+                  payload["executionContextId"].is_number_integer()) {
+                contentWorlds_.eraseId(payload["executionContextId"].get<int>());
+              }
             }
-
             return S_OK;
-          })
-        .Get(), nullptr));
+          }).Get(), nullptr));
     }
-    */
-  }
+
+    wil::com_ptr<ICoreWebView2DevToolsProtocolEventReceiver> executionContextsCleared;
+    if (succeededOrLog(webView_->webView->GetDevToolsProtocolEventReceiver(
+        L"Runtime.executionContextsCleared", &executionContextsCleared))) {
+      failedLog(executionContextsCleared->add_DevToolsProtocolEventReceived(
+        Callback<ICoreWebView2DevToolsProtocolEventReceivedEventHandler>(
+          [this, alive = webView_->aliveToken()](
+              ICoreWebView2*, ICoreWebView2DevToolsProtocolEventReceivedEventArgs*) -> HRESULT {
+            if (!alive.expired()) contentWorlds_.clear();
+            return S_OK;
+          }).Get(), nullptr));
+    }  }
 
   std::vector<std::shared_ptr<UserScript>> UserContentController::getUserOnlyScriptsAt(const UserScriptInjectionTime& injectionTime) const
   {
@@ -310,7 +324,8 @@ namespace flutter_inappwebview_plugin
     // Isolated worlds are tracked through Runtime.executionContextCreated.
     webView_->ensureRuntimeDomain();
     auto& worldName = contentWorld->name;
-    if (!map_contains(contentWorlds_, worldName)) {
+    const auto cachedContextId = contentWorlds_.get(worldName);
+    if (!cachedContextId.has_value()) {
       nlohmann::json parameters = {
         {"frameId", webView_->pageFrameId()},
         {"worldName", worldName}
@@ -331,7 +346,7 @@ namespace flutter_inappwebview_plugin
       }
     }
     else if (completionHandler) {
-      completionHandler(contentWorlds_.at(worldName));
+      completionHandler(*cachedContextId);
     }
   }
 

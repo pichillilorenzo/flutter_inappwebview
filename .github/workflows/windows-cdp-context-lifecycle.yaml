@@ -1,0 +1,17 @@
+name: Windows CDP execution context lifetime
+on:
+  pull_request:
+    paths:
+      - 'flutter_inappwebview_windows/**'
+      - '.github/workflows/windows-cdp-context-lifecycle.yaml'
+  workflow_dispatch:
+jobs:
+  cache-regression:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate CDP context invalidation under sanitizers
+        run: |
+          g++ -std=c++17 -Wall -Wextra -Werror -fsanitize=address,undefined -fno-omit-frame-pointer \
+            flutter_inappwebview_windows/windows/test/content_world_execution_contexts_test.cpp -o /tmp/cdp_context_lifecycle_test
+          ASAN_OPTIONS=detect_leaks=1 /tmp/cdp_context_lifecycle_test

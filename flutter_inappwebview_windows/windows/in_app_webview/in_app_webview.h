@@ -25,6 +25,7 @@
 #include "user_content_controller.h"
 #include "webview_lifecycle_state.h"
 #include "webview_visibility_state.h"
+#include "pending_script_requests.h"
 #include "webview_channel_delegate.h"
 #include "../web_message/web_message_channel.h"
 #include "../web_message/web_message_listener.h"
@@ -334,7 +335,7 @@ namespace flutter_inappwebview_plugin
     mutable bool appEnabledFetch_ = false;
     uint64_t mainDocumentGeneration_ = 0;
     // Runtime.evaluate calls not completed yet; a reply waits behind them.
-    std::shared_ptr<int> pendingScripts_ = std::make_shared<int>(0);
+    std::shared_ptr<PendingScriptRequests> pendingScripts_ = std::make_shared<PendingScriptRequests>();
     JavaScriptOriginRules javaScriptOriginRules_;
     mutable bool runtimeDomainEnabled_ = false;
     mutable bool networkDomainEnabled_ = false;
@@ -382,7 +383,6 @@ namespace flutter_inappwebview_plugin
     void callDevToolsDomainMethod(const wchar_t* method, const wchar_t* parametersAsJson) const;
     void setFetchDomainEnabled(bool enabled) const;
     void settleJavaScriptHandler(int64_t callHandlerID, uint64_t documentGeneration, const std::string& resultJson, const std::optional<std::string>& error) const;
-    std::shared_ptr<void> trackPendingScript() const;
     void registerConsoleMessageReceiver();
   };
 }

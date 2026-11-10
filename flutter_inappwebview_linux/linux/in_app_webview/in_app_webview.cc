@@ -1726,6 +1726,7 @@ void InAppWebView::loadUrl(const std::string& url) {
   if (webview_ == nullptr)
     return;
 
+  ++post_url_generation_;
   webkit_web_view_load_uri(webview_, url.c_str());
 }
 
@@ -1737,6 +1738,7 @@ void InAppWebView::loadUrl(const std::shared_ptr<URLRequest>& urlRequest) {
     return;
   }
 
+  ++post_url_generation_;
   std::string method = urlRequest->method.value_or("GET");
 
   if (method == "GET" && !urlRequest->body.has_value() && !urlRequest->headers.has_value()) {
@@ -1763,6 +1765,7 @@ void InAppWebView::loadData(const std::string& data, const std::string& mime_typ
   if (webview_ == nullptr)
     return;
 
+  ++post_url_generation_;
   g_message("InAppWebView: loadData() called while loading, stopping current load first");
   webkit_web_view_stop_loading(webview_);
   // Give WebKit/WPE FDO a moment to clean up pending operations
@@ -1778,6 +1781,7 @@ void InAppWebView::loadFile(const std::string& asset_file_path) {
   if (webview_ == nullptr)
     return;
 
+  ++post_url_generation_;
   g_message("InAppWebView: loadFile() called while loading, stopping current load first");
   webkit_web_view_stop_loading(webview_);
   // Give WebKit/WPE FDO a moment to clean up pending operations
@@ -1810,10 +1814,20 @@ void InAppWebView::postUrl(const std::string& url, const std::vector<uint8_t>& p
   if (webview_ == nullptr)
     return;
 
+  // The nested main loop can dispatch a newer navigation or destroy this view.
+  // Keep this request's generation instead of adopting a newer request's value.
+  const uint64_t navigation_generation = ++post_url_generation_;
+  std::weak_ptr<int> lifetime = lifetime_token_;
   g_message("InAppWebView: postUrl() called while loading, stopping current load first");
   webkit_web_view_stop_loading(webview_);
   // Give WebKit/WPE FDO a moment to clean up pending operations
   while (g_main_context_iteration(NULL, FALSE)) { }
+
+  // Check the weak owner before touching any members after dispatching events.
+  if (lifetime.expired())
+    return;
+  if (navigation_generation != post_url_generation_ || webview_ == nullptr)
+    return;
 
   // WPE WebKit's webkit_web_view_load_request() doesn't support POST body directly.
   // We use JavaScript XMLHttpRequest to perform the POST and load the result.
@@ -1858,32 +1872,41 @@ void InAppWebView::postUrl(const std::string& url, const std::vector<uint8_t>& p
     "<!DOCTYPE html><html><head></head><body></body></html>", 
     url.c_str());
 
-  // Use evaluateJavascript to run the XHR after the blank page loads
-  // We need to wait for the load to complete, so we use a delayed approach
-  std::string* js_copy = new std::string(js);
-  g_timeout_add(100, [](gpointer user_data) -> gboolean {
-    auto* data = static_cast<std::pair<InAppWebView*, std::string*>*>(user_data);
-    if (data->first->webview() != nullptr) {
-      webkit_web_view_evaluate_javascript(
-          data->first->webview(),
-          data->second->c_str(),
-          -1,
-          nullptr,  // world
-          nullptr,  // source_uri
-          nullptr,  // cancellable
-          nullptr,  // callback
-          nullptr); // user_data
-    }
-    delete data->second;
-    delete data;
-    return G_SOURCE_REMOVE;
-  }, new std::pair<InAppWebView*, std::string*>(this, js_copy));
+  // Use one source-owned allocation instead of a raw pair of pointers.
+  // Both a closed WebView and a subsequent navigation invalidate this
+  // injection; GLib frees the allocation even when the source is removed.
+  struct DeferredPostUrlCall {
+    InAppWebView* view;
+    DeferredPostUrlScript script;
+  };
+  auto* call = new DeferredPostUrlCall{
+      this, {std::move(lifetime), navigation_generation, std::move(js)}};
+  g_timeout_add_full(
+      G_PRIORITY_DEFAULT, 100,
+      [](gpointer user_data) -> gboolean {
+        const auto* call = static_cast<DeferredPostUrlCall*>(user_data);
+        // This guard MUST precede any dereference of the view pointer: GLib
+        // may deliver the timeout after the owner has been destroyed.
+        if (!call->script.ownerAlive()) return G_SOURCE_REMOVE;
+        InAppWebView* view = call->view;
+        if (!call->script.matchesGeneration(view->post_url_generation_) ||
+            view->webview() == nullptr) return G_SOURCE_REMOVE;
+        webkit_web_view_evaluate_javascript(
+            view->webview(), call->script.javascript.c_str(), -1,
+            nullptr, nullptr, nullptr, nullptr, nullptr);
+        return G_SOURCE_REMOVE;
+      },
+      call,
+      [](gpointer user_data) {
+        delete static_cast<DeferredPostUrlCall*>(user_data);
+      });
 }
 
 void InAppWebView::reload() {
   if (webview_ == nullptr)
     return;
-  
+
+  ++post_url_generation_;
   webkit_web_view_reload(webview_);
 }
 
@@ -1891,6 +1914,7 @@ void InAppWebView::reloadFromOrigin() {
   if (webview_ == nullptr)
     return;
 
+  ++post_url_generation_;
   g_message("InAppWebView: reloadFromOrigin() called while loading, stopping current load first");
   webkit_web_view_stop_loading(webview_);
   // Give WebKit/WPE FDO a moment to clean up pending operations
@@ -1900,16 +1924,18 @@ void InAppWebView::reloadFromOrigin() {
 }
 
 void InAppWebView::goBack() {
-  if (webview_ == nullptr)
+  if (webview_ == nullptr || !webkit_web_view_can_go_back(webview_))
     return;
-  
+
+  ++post_url_generation_;
   webkit_web_view_go_back(webview_);
 }
 
 void InAppWebView::goForward() {
-  if (webview_ == nullptr)
+  if (webview_ == nullptr || !webkit_web_view_can_go_forward(webview_))
     return;
-  
+
+  ++post_url_generation_;
   webkit_web_view_go_forward(webview_);
 }
 
@@ -1928,6 +1954,7 @@ bool InAppWebView::canGoForward() const {
 void InAppWebView::stopLoading() {
   if (webview_ == nullptr)
     return;
+  ++post_url_generation_;
   webkit_web_view_stop_loading(webview_);
 }
 
@@ -2029,6 +2056,7 @@ void InAppWebView::goBackOrForward(int steps) {
 
   WebKitBackForwardListItem* item = webkit_back_forward_list_get_nth_item(bfList, steps);
   if (item != nullptr) {
+    ++post_url_generation_;
     webkit_web_view_go_to_back_forward_list_item(webview_, item);
   }
 }

@@ -69,6 +69,7 @@
 #include "../types/user_script.h"
 #include "../find_interaction/find_interaction_controller.h"
 #include "in_app_webview_settings.h"
+#include "deferred_post_url_script.h"
 #include "javascript_origin_policy.h"
 #include "pending_webkit_javascript_calls.h"
 #include "webview_creation_error.h"
@@ -788,6 +789,9 @@ class InAppWebView : public TextureWebViewApi {
   int64_t file_dialog_show_time_ = 0;          // Time when dialog was shown (to prevent immediate close)
   void* file_chooser_context_ = nullptr;       // Opaque pointer to FileChooserContext (for cleanup)
   std::shared_ptr<int> lifetime_token_ = std::make_shared<int>(0);
+  // Incremented when navigation starts or loading is explicitly stopped,
+  // so an old postUrl timer cannot inject into a later document.
+  uint64_t post_url_generation_ = 0;
 
   // Option menu state (for HTML <select> support)
   WebKitOptionMenu* webkit_option_menu_ = nullptr;  // WebKit's option menu object (kept alive during popup)

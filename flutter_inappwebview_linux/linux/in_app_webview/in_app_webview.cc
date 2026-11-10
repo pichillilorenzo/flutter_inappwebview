@@ -1801,13 +1801,25 @@ void InAppWebView::loadFile(const std::string& asset_file_path) {
   std::filesystem::path flutter_asset_path =
       exe_dir / "data" / "flutter_assets" / asset_file_path;
 
-  if (!std::filesystem::exists(flutter_asset_path)) {
-    debugLog("Asset file not found: " + flutter_asset_path.string());
+  std::error_code statError;
+  if (!std::filesystem::exists(flutter_asset_path, statError)) {
+    debugLog("Cannot load asset file: " + flutter_asset_path.string() +
+             (statError ? " (" + statError.message() + ")" : " (not found)"));
     return;
   }
 
-  std::string file_url = "file://" + flutter_asset_path.string();
-  webkit_web_view_load_uri(webview_, file_url.c_str());
+  // A raw file:// concatenation breaks on spaces, '#' and '?' (and paths with
+  // Hebrew characters). GLib handles native filename encoding and URI escaping.
+  GError* uriError = nullptr;
+  gchar* fileUri = g_filename_to_uri(flutter_asset_path.c_str(), nullptr, &uriError);
+  if (!fileUri) {
+    debugLog("Cannot build file URI for " + flutter_asset_path.string() +
+             (uriError ? ": " + std::string(uriError->message) : ""));
+    if (uriError) g_error_free(uriError);
+    return;
+  }
+  webkit_web_view_load_uri(webview_, fileUri);
+  g_free(fileUri);
 }
 
 void InAppWebView::postUrl(const std::string& url, const std::vector<uint8_t>& postData) {

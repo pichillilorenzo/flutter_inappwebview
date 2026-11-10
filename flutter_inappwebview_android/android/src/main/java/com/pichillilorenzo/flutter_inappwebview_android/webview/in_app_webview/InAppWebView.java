@@ -204,6 +204,13 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
   private boolean disposed;
   private boolean destroyed;
 
+  // Called only on the WebView looper. Navigation callbacks may describe a
+  // pending or previous page, so getUrl() remains the source of truth.
+  @Nullable
+  public String getContentBlockerTopUrl() {
+    return disposed || rendererGone || destroyed ? null : getUrl();
+  }
+
   public InAppWebView(Context context) {
     super(context);
   }

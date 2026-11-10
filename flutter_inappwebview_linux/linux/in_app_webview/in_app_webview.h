@@ -789,8 +789,8 @@ class InAppWebView : public TextureWebViewApi {
   int64_t file_dialog_show_time_ = 0;          // Time when dialog was shown (to prevent immediate close)
   void* file_chooser_context_ = nullptr;       // Opaque pointer to FileChooserContext (for cleanup)
   std::shared_ptr<int> lifetime_token_ = std::make_shared<int>(0);
-  // Incremented by each explicit navigation/stop so an old postUrl timer
-  // cannot inject into a later document on the same still-live WebView.
+  // Incremented when navigation starts or loading is explicitly stopped,
+  // so an old postUrl timer cannot inject into a later document.
   uint64_t post_url_generation_ = 0;
 
   // Option menu state (for HTML <select> support)

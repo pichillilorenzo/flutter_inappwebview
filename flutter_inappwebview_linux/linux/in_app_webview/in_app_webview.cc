@@ -1723,15 +1723,14 @@ void InAppWebView::ReadPixelsFromEglImage(void* egl_image, uint32_t width, uint3
 // === Navigation Methods ===
 
 void InAppWebView::loadUrl(const std::string& url) {
-  ++post_url_generation_;
   if (webview_ == nullptr)
     return;
 
+  ++post_url_generation_;
   webkit_web_view_load_uri(webview_, url.c_str());
 }
 
 void InAppWebView::loadUrl(const std::shared_ptr<URLRequest>& urlRequest) {
-  ++post_url_generation_;
   if (webview_ == nullptr || !urlRequest)
     return;
 
@@ -1739,6 +1738,7 @@ void InAppWebView::loadUrl(const std::shared_ptr<URLRequest>& urlRequest) {
     return;
   }
 
+  ++post_url_generation_;
   std::string method = urlRequest->method.value_or("GET");
 
   if (method == "GET" && !urlRequest->body.has_value() && !urlRequest->headers.has_value()) {
@@ -1762,10 +1762,10 @@ void InAppWebView::loadUrl(const std::shared_ptr<URLRequest>& urlRequest) {
 
 void InAppWebView::loadData(const std::string& data, const std::string& mime_type,
                             const std::string& encoding, const std::string& base_url) {
-  ++post_url_generation_;
   if (webview_ == nullptr)
     return;
 
+  ++post_url_generation_;
   g_message("InAppWebView: loadData() called while loading, stopping current load first");
   webkit_web_view_stop_loading(webview_);
   // Give WebKit/WPE FDO a moment to clean up pending operations
@@ -1778,10 +1778,10 @@ void InAppWebView::loadData(const std::string& data, const std::string& mime_typ
 }
 
 void InAppWebView::loadFile(const std::string& asset_file_path) {
-  ++post_url_generation_;
   if (webview_ == nullptr)
     return;
 
+  ++post_url_generation_;
   g_message("InAppWebView: loadFile() called while loading, stopping current load first");
   webkit_web_view_stop_loading(webview_);
   // Give WebKit/WPE FDO a moment to clean up pending operations
@@ -1811,14 +1811,23 @@ void InAppWebView::loadFile(const std::string& asset_file_path) {
 }
 
 void InAppWebView::postUrl(const std::string& url, const std::vector<uint8_t>& postData) {
-  ++post_url_generation_;
   if (webview_ == nullptr)
     return;
 
+  // The nested main loop can dispatch a newer navigation or destroy this view.
+  // Keep this request's generation instead of adopting a newer request's value.
+  const uint64_t navigation_generation = ++post_url_generation_;
+  std::weak_ptr<int> lifetime = lifetime_token_;
   g_message("InAppWebView: postUrl() called while loading, stopping current load first");
   webkit_web_view_stop_loading(webview_);
   // Give WebKit/WPE FDO a moment to clean up pending operations
   while (g_main_context_iteration(NULL, FALSE)) { }
+
+  // Check the weak owner before touching any members after dispatching events.
+  if (lifetime.expired())
+    return;
+  if (navigation_generation != post_url_generation_ || webview_ == nullptr)
+    return;
 
   // WPE WebKit's webkit_web_view_load_request() doesn't support POST body directly.
   // We use JavaScript XMLHttpRequest to perform the POST and load the result.
@@ -1871,7 +1880,7 @@ void InAppWebView::postUrl(const std::string& url, const std::vector<uint8_t>& p
     DeferredPostUrlScript script;
   };
   auto* call = new DeferredPostUrlCall{
-      this, {std::weak_ptr<int>(lifetime_token_), post_url_generation_, std::move(js)}};
+      this, {std::move(lifetime), navigation_generation, std::move(js)}};
   g_timeout_add_full(
       G_PRIORITY_DEFAULT, 100,
       [](gpointer user_data) -> gboolean {
@@ -1894,18 +1903,18 @@ void InAppWebView::postUrl(const std::string& url, const std::vector<uint8_t>& p
 }
 
 void InAppWebView::reload() {
-  ++post_url_generation_;
   if (webview_ == nullptr)
     return;
-  
+
+  ++post_url_generation_;
   webkit_web_view_reload(webview_);
 }
 
 void InAppWebView::reloadFromOrigin() {
-  ++post_url_generation_;
   if (webview_ == nullptr)
     return;
 
+  ++post_url_generation_;
   g_message("InAppWebView: reloadFromOrigin() called while loading, stopping current load first");
   webkit_web_view_stop_loading(webview_);
   // Give WebKit/WPE FDO a moment to clean up pending operations
@@ -1915,18 +1924,18 @@ void InAppWebView::reloadFromOrigin() {
 }
 
 void InAppWebView::goBack() {
-  ++post_url_generation_;
-  if (webview_ == nullptr)
+  if (webview_ == nullptr || !webkit_web_view_can_go_back(webview_))
     return;
-  
+
+  ++post_url_generation_;
   webkit_web_view_go_back(webview_);
 }
 
 void InAppWebView::goForward() {
-  ++post_url_generation_;
-  if (webview_ == nullptr)
+  if (webview_ == nullptr || !webkit_web_view_can_go_forward(webview_))
     return;
-  
+
+  ++post_url_generation_;
   webkit_web_view_go_forward(webview_);
 }
 
@@ -1943,9 +1952,9 @@ bool InAppWebView::canGoForward() const {
 }
 
 void InAppWebView::stopLoading() {
-  ++post_url_generation_;
   if (webview_ == nullptr)
     return;
+  ++post_url_generation_;
   webkit_web_view_stop_loading(webview_);
 }
 
@@ -2038,7 +2047,6 @@ FlValue* InAppWebView::getCopyBackForwardList() const {
 }
 
 void InAppWebView::goBackOrForward(int steps) {
-  ++post_url_generation_;
   if (webview_ == nullptr)
     return;
 
@@ -2048,6 +2056,7 @@ void InAppWebView::goBackOrForward(int steps) {
 
   WebKitBackForwardListItem* item = webkit_back_forward_list_get_nth_item(bfList, steps);
   if (item != nullptr) {
+    ++post_url_generation_;
     webkit_web_view_go_to_back_forward_list_item(webview_, item);
   }
 }

@@ -37,9 +37,14 @@ struct JavaScriptHandlerOriginRulesTests {
         assert(!broad.utf8.elementsEqual(narrow.utf8))
         assert(unicodeOrigin.range(of: broad, options: .regularExpression) != nil)
         assert(unicodeOrigin.range(of: narrow, options: .regularExpression) == nil)
-        for updatedPattern in [broad, narrow, broad, narrow] {
+        for (index, updatedPattern) in [broad, narrow, broad, narrow].enumerated() {
             let expected = unicodeOrigin.range(of: updatedPattern, options: .regularExpression) != nil
-            assert(a.allows(origin: unicodeOrigin, patterns: [updatedPattern]) == expected)
+            let actual = a.allows(origin: unicodeOrigin, patterns: [updatedPattern])
+            let freshRegex = try! NSRegularExpression(pattern: updatedPattern)
+            let freshResult = freshRegex.firstMatch(in: unicodeOrigin, options: [],
+                range: NSRange(unicodeOrigin.startIndex..<unicodeOrigin.endIndex, in: unicodeOrigin)) != nil
+            let legacyAfter = unicodeOrigin.range(of: updatedPattern, options: .regularExpression) != nil
+            assert(actual == expected, "Unicode policy \(index): utf8=\(Array(updatedPattern.utf8)), cached=\(actual), legacyBefore=\(expected), fresh=\(freshResult), legacyAfter=\(legacyAfter), freshPatternUTF8=\(Array(freshRegex.pattern.utf8))")
         }
         var mutablePatterns = [broad]
         assert(a.allows(origin: unicodeOrigin, patterns: mutablePatterns))

@@ -38,12 +38,12 @@ void main() {
         start,
         webView.indexOf('void InAppWebView::', start + 1),
       );
-      expect(
-        body,
-        contains('const auto pendingScript = trackPendingScript();'),
-      );
-      expect(body, contains('[this, completionHandler, pendingScript]'));
+      expect(body, contains('const auto requests = pendingScripts_;'));
+      expect(body, contains('const auto requestId = requests->add('));
+      expect(body, contains('requests->complete(requestId,'));
+      expect(body, contains('if (!requests->contains(requestId)) return S_OK;'));
     }
+    expect(webView, contains('pendingScripts_->cancelAll();'));
     expect(settle, contains('PostWebMessageAsJson'));
     expect(settle, contains('JavaScriptBridgeMessage::settleScript('));
   });

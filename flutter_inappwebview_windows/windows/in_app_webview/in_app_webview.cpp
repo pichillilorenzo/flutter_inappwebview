@@ -69,6 +69,7 @@ namespace flutter_inappwebview_plugin
     settings(params.initialSettings), userContentController(std::make_unique<UserContentController>(this)),
     visibilityState_(hostWindowMinimized)
   {
+    if (settings) javaScriptOriginRules_.configure(settings->javaScriptHandlersOriginAllowList);
     if (failedAndLog(this->webViewController->get_CoreWebView2(webView.put()))) {
       std::cerr << "Cannot create CoreWebView2." << std::endl;
     }
@@ -3141,6 +3142,7 @@ namespace flutter_inappwebview_plugin
     }
 
     settings = newSettings;
+    if (settings) javaScriptOriginRules_.configure(settings->javaScriptHandlersOriginAllowList);
   }
 
   void InAppWebView::registerConsoleMessageReceiver()
@@ -4807,19 +4809,8 @@ namespace flutter_inappwebview_plugin
             return S_OK;
           }
 
-          bool isOriginAllowed = false;
-          if (settings->javaScriptHandlersOriginAllowList.has_value()) {
-            for (auto& allowedOrigin : settings->javaScriptHandlersOriginAllowList.value()) {
-              if (std::regex_match(origin, std::regex(allowedOrigin))) {
-                isOriginAllowed = true;
-                break;
-              }
-            }
-          }
-          else {
-            // origin is by default allowed if the allow list is null
-            isOriginAllowed = true;
-          }
+           // Evaluate the origin against precompiled policy without allocating regexes.
+           const bool isOriginAllowed = javaScriptOriginRules_.allows(origin);
           if (!isOriginAllowed) {
             debugLog("Bridge access attempt from an origin not allowed: " + origin);
             return S_OK;

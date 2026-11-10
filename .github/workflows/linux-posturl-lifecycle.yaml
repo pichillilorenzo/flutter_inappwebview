@@ -1,0 +1,35 @@
+name: Linux deferred postUrl lifecycle
+on:
+  pull_request:
+    paths:
+      - 'flutter_inappwebview_linux/**'
+      - '.github/workflows/linux-posturl-lifecycle.yaml'
+  workflow_dispatch:
+jobs:
+  posturl-lifecycle:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test postUrl owner/generation under ASan and UBSan
+        run: |
+          g++ -std=c++17 -O0 -Wall -Wextra -Werror -fsanitize=address,undefined -fno-omit-frame-pointer \
+            flutter_inappwebview_linux/linux/test/deferred_post_url_test.cpp -o /tmp/posturl_lifecycle_test
+          ASAN_OPTIONS=detect_leaks=1 /tmp/posturl_lifecycle_test
+      - name: Guard production callback source against stale owner and navigation
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          text=Path("flutter_inappwebview_linux/linux/in_app_webview/in_app_webview.cc").read_text()
+          start=text.index("void InAppWebView::postUrl(")
+          end=text.index("void InAppWebView::reload()",start)
+          body=text[start:end]
+          assert "g_timeout_add_full(" in body
+          assert "if (!call->script.ownerAlive()) return G_SOURCE_REMOVE;" in body
+          assert body.index("if (!call->script.ownerAlive())") < body.index("view->post_url_generation_")
+          assert "matchesGeneration(view->post_url_generation_)" in body
+          assert "delete static_cast<DeferredPostUrlCall*>" in body
+          assert "g_timeout_add(100" not in body
+          for method in ["loadUrl(", "loadData(", "loadFile(", "reload(", "goBack(", "goForward(", "goBackOrForward(", "stopLoading("]:
+              pos=text.index("void InAppWebView::"+method)
+              assert "++post_url_generation_" in text[pos:text.index("{",pos)+90], method
+          PY

@@ -69,6 +69,7 @@
 #include "../types/user_script.h"
 #include "../find_interaction/find_interaction_controller.h"
 #include "in_app_webview_settings.h"
+#include "javascript_origin_policy.h"
 #include "webview_creation_error.h"
 
 // Forward declaration of WPE types in global scope to avoid namespace conflicts
@@ -514,6 +515,7 @@ class InAppWebView : public TextureWebViewApi {
 
   // Settings
   std::shared_ptr<InAppWebViewSettings> settings_;
+  JavaScriptOriginPolicy javaScriptOriginPolicy_;
 
   // Context menu configuration
   std::shared_ptr<ContextMenu> context_menu_config_;

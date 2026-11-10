@@ -5,6 +5,7 @@
 #include <regex>
 #include <set>
 #include <Shlwapi.h>
+#include <UIAutomation.h>
 #include <flutter/encodable_value.h>
 #include <wil/wrl.h>
 #include <winrt/Windows.Foundation.h>
@@ -55,6 +56,9 @@ namespace flutter_inappwebview_plugin
 {
   using namespace Microsoft::WRL;
 
+  // Window property linking the hidden parent window to its InAppWebView (see hostWindowProc)
+  constexpr auto kHostWindowViewProp = L"flutter_inappwebview.InAppWebView";
+
   InAppWebView::InAppWebView(const FlutterInappwebviewWindowsPlugin* plugin, const InAppWebViewCreationParams& params, const HWND parentWindow, wil::com_ptr<ICoreWebView2Environment> webViewEnv,
     wil::com_ptr<ICoreWebView2Controller> webViewController,
     wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController)
@@ -71,6 +75,15 @@ namespace flutter_inappwebview_plugin
         std::cerr << "Cannot create InAppWebView surface." << std::endl;
       }
       registerSurfaceEventHandlers();
+      // With visual hosting, the WebView2 accessibility tree is not attached to any window:
+      // the host has to expose it (see ICoreWebView2CompositionController2::get_AutomationProvider).
+      // The parent window answers WM_GETOBJECT with it in hostWindowProc.
+      wil::com_ptr<ICoreWebView2CompositionController2> compositionController2;
+      if (SUCCEEDED(this->webViewCompositionController->QueryInterface(IID_PPV_ARGS(&compositionController2)))) {
+        failedLog(compositionController2->get_AutomationProvider(automationProvider_.put()));
+      }
+      hostWindow_ = parentWindow;
+      SetPropW(parentWindow, kHostWindowViewProp, this);
     }
     else {
       this->webViewController->put_IsVisible(true);
@@ -1926,11 +1939,52 @@ namespace flutter_inappwebview_plugin
     }
   }
 
+  LRESULT CALLBACK InAppWebView::hostWindowProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
+  {
+    if (message == WM_GETOBJECT && static_cast<DWORD>(lparam) == static_cast<DWORD>(UiaRootObjectId)) {
+      auto view = static_cast<InAppWebView*>(GetPropW(hwnd, kHostWindowViewProp));
+      if (view && view->automationProvider_) {
+        wil::com_ptr<IRawElementProviderSimple> provider;
+        if (SUCCEEDED(view->automationProvider_->QueryInterface(IID_PPV_ARGS(&provider)))) {
+          return UiaReturnRawElementProvider(hwnd, wparam, lparam, provider.get());
+        }
+      }
+    }
+    return DefWindowProc(hwnd, message, wparam, lparam);
+  }
+
+  void InAppWebView::moveFocus(bool next)
+  {
+    if (webViewController) {
+      failedLog(webViewController->MoveFocus(next ? COREWEBVIEW2_MOVE_FOCUS_REASON_NEXT : COREWEBVIEW2_MOVE_FOCUS_REASON_PREVIOUS));
+    }
+  }
+
   void InAppWebView::registerSurfaceEventHandlers()
   {
     if (!webViewCompositionController) {
       return;
     }
+
+    // Tab past the last element of the page (Shift+Tab before the first one):
+    // give Win32 focus back to the Flutter view, the Dart side moves Flutter focus on.
+    failedLog(webViewController->add_MoveFocusRequested(
+      Callback<ICoreWebView2MoveFocusRequestedEventHandler>(
+        [this](ICoreWebView2Controller* sender, ICoreWebView2MoveFocusRequestedEventArgs* args) -> HRESULT
+        {
+          COREWEBVIEW2_MOVE_FOCUS_REASON reason;
+          if (FAILED(args->get_Reason(&reason)) || reason == COREWEBVIEW2_MOVE_FOCUS_REASON_PROGRAMMATIC) {
+            return S_OK;
+          }
+          args->put_Handled(TRUE);
+          if (plugin && plugin->registrar) {
+            SetFocus(plugin->registrar->GetView()->GetNativeWindow());
+          }
+          if (moveFocusRequestedCallback_) {
+            moveFocusRequestedCallback_(reason == COREWEBVIEW2_MOVE_FOCUS_REASON_NEXT);
+          }
+          return S_OK;
+        }).Get(), nullptr));
 
     failedLog(webViewCompositionController->add_CursorChanged(
       Callback<ICoreWebView2CursorChangedEventHandler>(
@@ -4123,6 +4177,9 @@ namespace flutter_inappwebview_plugin
   InAppWebView::~InAppWebView()
   {
     debugLog("dealloc InAppWebView");
+    if (hostWindow_) {
+      RemovePropW(hostWindow_, kHostWindowViewProp);
+    }
     userContentController = nullptr;
     if (webView) {
       failedLog(webView->Stop());

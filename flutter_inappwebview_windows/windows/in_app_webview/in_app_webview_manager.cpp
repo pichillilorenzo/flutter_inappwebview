@@ -53,7 +53,8 @@ namespace flutter_inappwebview_plugin
     }
 
     windowClass_.lpszClassName = CustomPlatformView::CLASS_NAME;
-    windowClass_.lpfnWndProc = &DefWindowProc;
+    // exposes the WebView2 accessibility tree to screen readers
+    windowClass_.lpfnWndProc = &InAppWebView::hostWindowProc;
     windowClass_.style |= CS_NOCLOSE;
 
     RegisterClass(&windowClass_);

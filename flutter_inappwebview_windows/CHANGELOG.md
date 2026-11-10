@@ -1,3 +1,8 @@
+## Unreleased
+
+- Screen readers (Narrator, NVDA, JAWS) can read the page: the WebView2 accessibility tree of the visually hosted web view is exposed through its parent window (`ICoreWebView2CompositionController2::AutomationProvider`)
+- Tab and Shift+Tab move keyboard focus into the page (at its first or last focusable element) and back out to the next or previous Flutter widget (`MoveFocus`, `MoveFocusRequested`)
+
 ## 0.7.0-beta.3
 
 - Updated flutter_inappwebview_platform_interface version to ^1.4.0-beta.3

@@ -21,6 +21,7 @@ namespace flutter_inappwebview_plugin
   constexpr auto kMethodSetPointerButton = "setPointerButton";
   constexpr auto kMethodSetScrollDelta = "setScrollDelta";
   constexpr auto kMethodSetFpsLimit = "setFpsLimit";
+  constexpr auto kMethodMoveFocus = "moveFocus";
 
   constexpr auto kEventType = "type";
   constexpr auto kEventValue = "value";
@@ -225,6 +226,17 @@ namespace flutter_inappwebview_plugin
           { flutter::EncodableValue(kEventValue), name }});
         EmitEvent(event);
       });
+
+    view->onMoveFocusRequested([this](bool next)
+      {
+        const auto event = flutter::EncodableValue(
+          flutter::EncodableMap { {
+              flutter::EncodableValue(kEventType),
+                flutter::EncodableValue("moveFocusRequested")
+            },
+          { flutter::EncodableValue(kEventValue), flutter::EncodableValue(next) }});
+        EmitEvent(event);
+      });
   }
 
   void CustomPlatformView::HandleMethodCall(
@@ -232,6 +244,17 @@ namespace flutter_inappwebview_plugin
     std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result)
   {
     const auto& method_name = method_call.method_name();
+
+    // moveFocus: bool next
+    // Moves keyboard focus into the page, at its first (next) or last element.
+    if (method_name.compare(kMethodMoveFocus) == 0) {
+      const auto next = std::get_if<bool>(method_call.arguments());
+      if (next && view) {
+        view->moveFocus(*next);
+        return result->Success();
+      }
+      return result->Error(kErrorInvalidArgs);
+    }
 
     // setCursorPos: [double x, double y]
     if (method_name.compare(kMethodSetCursorPos) == 0) {

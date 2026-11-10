@@ -116,6 +116,13 @@ class CustomPlatformViewController
   /// A stream reflecting the current cursor style.
   Stream<SystemMouseCursor> get _cursor => _cursorStreamController.stream;
 
+  final StreamController<bool> _moveFocusRequestedController =
+      StreamController<bool>.broadcast();
+
+  /// Keyboard focus left the page past its last element (`true`, Tab) or
+  /// before its first one (`false`, Shift+Tab).
+  Stream<bool> get _moveFocusRequested => _moveFocusRequestedController.stream;
+
   CustomPlatformViewController()
     : super(CustomFlutterViewControllerValue.uninitialized());
 
@@ -146,6 +153,9 @@ class CustomPlatformViewController
         case 'cursorChanged':
           _cursorStreamController.add(_getCursorByName(map['value']));
           break;
+        case 'moveFocusRequested':
+          _moveFocusRequestedController.add(map['value'] == true);
+          break;
       }
     });
 
@@ -166,6 +176,7 @@ class CustomPlatformViewController
     if (!_isDisposed) {
       _isDisposed = true;
       await _eventStreamSubscription?.cancel();
+      await _moveFocusRequestedController.close();
       await _pluginChannel.invokeMethod('dispose', {"id": _textureId});
     }
     super.dispose();
@@ -200,6 +211,19 @@ class CustomPlatformViewController
       size,
       pressure,
     ]);
+  }
+
+  /// Moves keyboard focus into the page, at its first element when [next],
+  /// at its last one otherwise.
+  ///
+  /// With visual hosting the page is only a texture to Flutter, so keyboard
+  /// and screen reader focus get inside only when the host does this.
+  Future<void> _moveFocus(bool next) async {
+    if (_isDisposed) {
+      return;
+    }
+    assert(value.isInitialized);
+    return _methodChannel.invokeMethod('moveFocus', next);
   }
 
   /// Moves the virtual cursor to [position].
@@ -306,6 +330,7 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
   final _focusNode = FocusNode();
 
   StreamSubscription? _cursorSubscription;
+  StreamSubscription? _moveFocusRequestedSubscription;
 
   late final AppLifecycleListener _listener;
 
@@ -315,6 +340,7 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
   void initState() {
     super.initState();
 
+    _TabKeyTracker.install();
     _platformUtil.addListener(this);
 
     _controller.initialize(
@@ -348,6 +374,18 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
         _cursor = cursor;
       });
     });
+
+    // Tab out of the page continues in Flutter's focus order.
+    _moveFocusRequestedSubscription = _controller._moveFocusRequested.listen((
+      next,
+    ) {
+      if (!mounted) return;
+      if (next) {
+        _focusNode.nextFocus();
+      } else {
+        _focusNode.previousFocus();
+      }
+    });
   }
 
   @override
@@ -363,7 +401,15 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
       focusNode: _focusNode,
       canRequestFocus: true,
       debugLabel: "flutter_inappwebview_windows_custom_platform_view",
-      onFocusChange: (focused) {},
+      // Tab (Shift+Tab) landing on the web view goes on into the page.
+      // Focus coming from a click or from autofocus is left alone: a click
+      // focuses the page by itself, and autofocus must not take the keyboard.
+      onFocusChange: (focused) {
+        if (!focused || !_controller.value.isInitialized) return;
+        final next = _TabKeyTracker.recentTraversal();
+        if (next == null) return;
+        _controller._moveFocus(next);
+      },
       child: SizedBox.expand(key: _key, child: _buildInner()),
     );
   }
@@ -532,8 +578,39 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
     super.dispose();
     _platformUtil.removeListener(this);
     _cursorSubscription?.cancel();
+    _moveFocusRequestedSubscription?.cancel();
     _controller.dispose();
     _focusNode.dispose();
     _listener.dispose();
   }
+}
+
+/// Remembers the last Tab key press.
+///
+/// Focus changes are reported after the key event has been handled, when
+/// [HardwareKeyboard] no longer lists Tab as pressed, so a focus change that
+/// arrives right after a Tab press is taken as Tab traversal.
+class _TabKeyTracker {
+  static DateTime _pressedAt = DateTime(0);
+  static bool _shift = false;
+  static bool _installed = false;
+
+  static void install() {
+    if (_installed) return;
+    _installed = true;
+    HardwareKeyboard.instance.addHandler((event) {
+      if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.tab) {
+        _pressedAt = DateTime.now();
+        _shift = HardwareKeyboard.instance.isShiftPressed;
+      }
+      return false;
+    });
+  }
+
+  /// `true` for Tab, `false` for Shift+Tab, `null` if the current focus change
+  /// did not come from Tab traversal.
+  static bool? recentTraversal() =>
+      DateTime.now().difference(_pressedAt) < const Duration(milliseconds: 300)
+      ? !_shift
+      : null;
 }

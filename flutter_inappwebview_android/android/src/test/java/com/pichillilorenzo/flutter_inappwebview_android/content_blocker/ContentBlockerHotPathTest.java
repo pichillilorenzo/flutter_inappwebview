@@ -26,6 +26,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk = 28)
@@ -98,6 +102,46 @@ public class ContentBlockerHotPathTest {
         ContentBlockerTriggerResourceType.SVG_DOCUMENT));
     assertEquals(Collections.singletonList(ContentBlockerTriggerResourceType.IMAGE),
         rule.getTrigger().getResourceType());
+  }
+
+  @Test
+  public void constrainedBlockerUsesCachedTopUrlWithoutWaitingForMainThread() throws Exception {
+    ContentBlockerTrigger trigger = new ContentBlockerTrigger(
+        "https://cdn\\.example/.*", true,
+        Collections.singletonList(ContentBlockerTriggerResourceType.IMAGE),
+        null, null, null, Collections.singletonList("https://otzaria.org"), null);
+    handler.setRuleList(Collections.singletonList(new ContentBlocker(
+        trigger, ContentBlockerAction.fromMap(Collections.singletonMap("type", "block")))));
+
+    webView.setContentBlockerTopUrl("https://otzaria.org/plugins");
+    assertNotNull(handler.checkUrl(webView, request, ContentBlockerTriggerResourceType.IMAGE));
+    webView.setContentBlockerTopUrl("https://unrelated.example/");
+    assertNull(handler.checkUrl(webView, request, ContentBlockerTriggerResourceType.IMAGE));
+  }
+
+  @Test
+  public void backgroundRequestNeverWaitsIndefinitelyWhenUiLooperIsNotPumping() throws Exception {
+    ContentBlockerTrigger trigger = new ContentBlockerTrigger(
+        "https://cdn\\.example/.*", true,
+        Collections.singletonList(ContentBlockerTriggerResourceType.IMAGE),
+        null, null, null, Collections.singletonList("https://otzaria.org"), null);
+    handler.setRuleList(Collections.singletonList(new ContentBlocker(
+        trigger, ContentBlockerAction.fromMap(Collections.singletonMap("type", "block")))));
+    webView.setContentBlockerTopUrl(null);
+    ExecutorService worker = Executors.newSingleThreadExecutor();
+    try {
+      Future<?> result = worker.submit(() -> {
+        try {
+          // The Robolectric main looper stays paused while this runs.
+          return handler.checkUrl(webView, request, ContentBlockerTriggerResourceType.IMAGE);
+        } catch (Exception e) {
+          throw new RuntimeException(e);
+        }
+      });
+      assertNull(result.get(2, TimeUnit.SECONDS));
+    } finally {
+      worker.shutdownNow();
+    }
   }
 
   @Test

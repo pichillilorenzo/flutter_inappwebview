@@ -1723,6 +1723,7 @@ void InAppWebView::ReadPixelsFromEglImage(void* egl_image, uint32_t width, uint3
 // === Navigation Methods ===
 
 void InAppWebView::loadUrl(const std::string& url) {
+  ++post_url_generation_;
   if (webview_ == nullptr)
     return;
 
@@ -1730,6 +1731,7 @@ void InAppWebView::loadUrl(const std::string& url) {
 }
 
 void InAppWebView::loadUrl(const std::shared_ptr<URLRequest>& urlRequest) {
+  ++post_url_generation_;
   if (webview_ == nullptr || !urlRequest)
     return;
 
@@ -1760,6 +1762,7 @@ void InAppWebView::loadUrl(const std::shared_ptr<URLRequest>& urlRequest) {
 
 void InAppWebView::loadData(const std::string& data, const std::string& mime_type,
                             const std::string& encoding, const std::string& base_url) {
+  ++post_url_generation_;
   if (webview_ == nullptr)
     return;
 
@@ -1775,6 +1778,7 @@ void InAppWebView::loadData(const std::string& data, const std::string& mime_typ
 }
 
 void InAppWebView::loadFile(const std::string& asset_file_path) {
+  ++post_url_generation_;
   if (webview_ == nullptr)
     return;
 
@@ -1807,6 +1811,7 @@ void InAppWebView::loadFile(const std::string& asset_file_path) {
 }
 
 void InAppWebView::postUrl(const std::string& url, const std::vector<uint8_t>& postData) {
+  ++post_url_generation_;
   if (webview_ == nullptr)
     return;
 
@@ -1858,29 +1863,38 @@ void InAppWebView::postUrl(const std::string& url, const std::vector<uint8_t>& p
     "<!DOCTYPE html><html><head></head><body></body></html>", 
     url.c_str());
 
-  // Use evaluateJavascript to run the XHR after the blank page loads
-  // We need to wait for the load to complete, so we use a delayed approach
-  std::string* js_copy = new std::string(js);
-  g_timeout_add(100, [](gpointer user_data) -> gboolean {
-    auto* data = static_cast<std::pair<InAppWebView*, std::string*>*>(user_data);
-    if (data->first->webview() != nullptr) {
-      webkit_web_view_evaluate_javascript(
-          data->first->webview(),
-          data->second->c_str(),
-          -1,
-          nullptr,  // world
-          nullptr,  // source_uri
-          nullptr,  // cancellable
-          nullptr,  // callback
-          nullptr); // user_data
-    }
-    delete data->second;
-    delete data;
-    return G_SOURCE_REMOVE;
-  }, new std::pair<InAppWebView*, std::string*>(this, js_copy));
+  // Use one source-owned allocation instead of a raw pair of pointers.
+  // Both a closed WebView and a subsequent navigation invalidate this
+  // injection; GLib frees the allocation even when the source is removed.
+  struct DeferredPostUrlCall {
+    InAppWebView* view;
+    DeferredPostUrlScript script;
+  };
+  auto* call = new DeferredPostUrlCall{
+      this, {std::weak_ptr<int>(lifetime_token_), post_url_generation_, std::move(js)}};
+  g_timeout_add_full(
+      G_PRIORITY_DEFAULT, 100,
+      [](gpointer user_data) -> gboolean {
+        const auto* call = static_cast<DeferredPostUrlCall*>(user_data);
+        // This guard MUST precede any dereference of the view pointer: GLib
+        // may deliver the timeout after the owner has been destroyed.
+        if (!call->script.ownerAlive()) return G_SOURCE_REMOVE;
+        InAppWebView* view = call->view;
+        if (!call->script.matchesGeneration(view->post_url_generation_) ||
+            view->webview() == nullptr) return G_SOURCE_REMOVE;
+        webkit_web_view_evaluate_javascript(
+            view->webview(), call->script.javascript.c_str(), -1,
+            nullptr, nullptr, nullptr, nullptr, nullptr);
+        return G_SOURCE_REMOVE;
+      },
+      call,
+      [](gpointer user_data) {
+        delete static_cast<DeferredPostUrlCall*>(user_data);
+      });
 }
 
 void InAppWebView::reload() {
+  ++post_url_generation_;
   if (webview_ == nullptr)
     return;
   
@@ -1888,6 +1902,7 @@ void InAppWebView::reload() {
 }
 
 void InAppWebView::reloadFromOrigin() {
+  ++post_url_generation_;
   if (webview_ == nullptr)
     return;
 
@@ -1900,6 +1915,7 @@ void InAppWebView::reloadFromOrigin() {
 }
 
 void InAppWebView::goBack() {
+  ++post_url_generation_;
   if (webview_ == nullptr)
     return;
   
@@ -1907,6 +1923,7 @@ void InAppWebView::goBack() {
 }
 
 void InAppWebView::goForward() {
+  ++post_url_generation_;
   if (webview_ == nullptr)
     return;
   
@@ -1926,6 +1943,7 @@ bool InAppWebView::canGoForward() const {
 }
 
 void InAppWebView::stopLoading() {
+  ++post_url_generation_;
   if (webview_ == nullptr)
     return;
   webkit_web_view_stop_loading(webview_);
@@ -2020,6 +2038,7 @@ FlValue* InAppWebView::getCopyBackForwardList() const {
 }
 
 void InAppWebView::goBackOrForward(int steps) {
+  ++post_url_generation_;
   if (webview_ == nullptr)
     return;
 

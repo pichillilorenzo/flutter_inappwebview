@@ -13,14 +13,14 @@ jobs:
       - uses: actions/checkout@v4
       - name: Test iOS matcher and parse actual WebKit implementation
         run: |
-          swiftc -O \
+          swiftc \
             flutter_inappwebview_ios/ios/flutter_inappwebview_ios/Sources/flutter_inappwebview_ios/Types/JavaScriptHandlerOriginRules.swift \
             flutter_inappwebview_ios/test/javascript_handler_origin_rules_test.swift -o /tmp/ios_origin_rules
           /tmp/ios_origin_rules
           swiftc -frontend -parse flutter_inappwebview_ios/ios/flutter_inappwebview_ios/Sources/flutter_inappwebview_ios/InAppWebView/InAppWebView.swift
       - name: Test macOS matcher and parse actual WebKit implementation
         run: |
-          swiftc -O \
+          swiftc \
             flutter_inappwebview_macos/macos/flutter_inappwebview_macos/Sources/flutter_inappwebview_macos/Types/JavaScriptHandlerOriginRules.swift \
             flutter_inappwebview_macos/test/javascript_handler_origin_rules_test.swift -o /tmp/macos_origin_rules
           /tmp/macos_origin_rules

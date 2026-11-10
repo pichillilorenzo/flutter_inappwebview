@@ -2,6 +2,7 @@ package com.pichillilorenzo.flutter_inappwebview_android.content_blocker;
 
 import android.os.Build;
 import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
 import android.webkit.WebResourceResponse;
@@ -26,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 
 import javax.net.ssl.SSLHandshakeException;
@@ -110,23 +112,42 @@ public class ContentBlockerHandler {
                             continue rulesLoop;
                 }
 
-                final String[] webViewUrl = new String[1];
-                if (!trigger.getLoadType().isEmpty() || !trigger.getIfTopUrl().isEmpty() || !trigger.getUnlessTopUrl().isEmpty()) {
-                    final CountDownLatch latch = new CountDownLatch(1);
-                    Handler handler = new Handler(webView.getWebViewLooper());
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            webViewUrl[0] = webView.getUrl();
-                            latch.countDown();
+                // Most network requests arrive off-thread. Reading the volatile
+                // top-level URL avoids a UI roundtrip per resource and avoids
+                // unbounded waits when a tab is closing or Flutter is busy.
+                final boolean needsTopUrl = !trigger.getLoadType().isEmpty()
+                        || !trigger.getIfTopUrl().isEmpty()
+                        || !trigger.getUnlessTopUrl().isEmpty();
+                String topLevelUrl = webView.getContentBlockerTopUrl();
+                if (needsTopUrl && topLevelUrl == null) {
+                    if (Looper.myLooper() == webView.getWebViewLooper()) {
+                        // No self-deadlock when intercepting on the WebView looper.
+                        topLevelUrl = webView.getUrl();
+                    } else {
+                        final String[] fetched = new String[1];
+                        final CountDownLatch latch = new CountDownLatch(1);
+                        final Handler handler = new Handler(webView.getWebViewLooper());
+                        final Runnable lookup = () -> {
+                            try {
+                                fetched[0] = webView.getUrl();
+                            } finally {
+                                latch.countDown();
+                            }
+                        };
+                        if (handler.post(lookup)) {
+                            if (!latch.await(200, TimeUnit.MILLISECONDS)) {
+                                handler.removeCallbacks(lookup);
+                            }
                         }
-                    });
-                    latch.await();
+                        topLevelUrl = fetched[0];
+                    }
                 }
+                // A constrained rule cannot be evaluated without its top-level URL.
+                if (needsTopUrl && topLevelUrl == null) continue rulesLoop;
 
-                if (webViewUrl[0] != null) {
+                if (topLevelUrl != null) {
                     if (!trigger.getLoadType().isEmpty()) {
-                        URI cUrl = new URI(webViewUrl[0]);
+                        URI cUrl = new URI(topLevelUrl);
                         String cHost = cUrl.getHost();
                         int cPort = cUrl.getPort();
                         String cScheme = cUrl.getScheme();
@@ -138,7 +159,7 @@ public class ContentBlockerHandler {
                     if (!trigger.getIfTopUrl().isEmpty()) {
                         boolean matchFound = false;
                         for (String topUrl : trigger.getIfTopUrl()) {
-                            if (webViewUrl[0].startsWith(topUrl)) {
+                            if (topLevelUrl.startsWith(topUrl)) {
                                 matchFound = true;
                                 break;
                             }
@@ -148,7 +169,7 @@ public class ContentBlockerHandler {
                     }
                     if (!trigger.getUnlessTopUrl().isEmpty()) {
                         for (String topUrl : trigger.getUnlessTopUrl())
-                            if (webViewUrl[0].startsWith(topUrl))
+                            if (topLevelUrl.startsWith(topUrl))
                                 continue rulesLoop;
                     }
                 }

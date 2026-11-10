@@ -36,8 +36,11 @@ def main():
     controller = read(f"{NATIVE}/in_app_webview/user_content_controller.cpp")
     controller_header = read(f"{NATIVE}/in_app_webview/user_content_controller.h")
     declaration = re.search(r"    void createContentWorld\([^;]+;", controller_header)
+    cache_declaration = re.search(r"    [^\n;]+ contentWorlds_;", controller_header)
     if declaration is None:
         raise RuntimeError("Could not extract the production content-world declaration")
+    if cache_declaration is None:
+        raise RuntimeError("Could not extract the production content-world cache type")
 
     production = "\n".join([
         method(view_header, "  const std::string CALL_ASYNC_JAVASCRIPT_WRAPPER_JS", "  struct InAppWebViewCreationParams"),
@@ -47,6 +50,7 @@ def main():
     ])
     fixture = (Path(__file__).with_name("javascript_content_world_test.cpp")).read_text()
     fixture = fixture.replace("// PRODUCTION_CONTENT_WORLD_DECLARATION", declaration.group())
+    fixture = fixture.replace("// PRODUCTION_CONTENT_WORLD_CACHE", cache_declaration.group())
     fixture = fixture.replace("// PRODUCTION_METHODS", production)
 
     with tempfile.TemporaryDirectory(prefix="javascript-content-world-") as temp:

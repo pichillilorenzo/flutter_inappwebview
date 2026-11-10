@@ -12,6 +12,7 @@
 #include <vector>
 
 #include <nlohmann/json.hpp>
+#include "in_app_webview/content_world_execution_contexts.h"
 #include "in_app_webview/pending_script_requests.h"
 #include "plugin_scripts_js/plugin_scripts_util.h"
 
@@ -107,7 +108,7 @@ struct ContentWorld {
 struct InAppWebView;
 struct UserContentController {
   InAppWebView* webView_;
-  std::map<std::string, int> contentWorlds_;
+  // PRODUCTION_CONTENT_WORLD_CACHE
   int pluginScriptsAdded = 0;
   explicit UserContentController(InAppWebView* webView) : webView_(webView) {}
   // PRODUCTION_CONTENT_WORLD_DECLARATION
@@ -139,6 +140,14 @@ struct InAppWebView {
 
 using namespace flutter_inappwebview_plugin;
 using Results = std::vector<std::string>;
+
+// Populate the exact production cache type, including when checking older refs.
+void putContext(ContentWorldExecutionContexts& contexts, const std::string& name, int id) {
+  contexts.put(name, id);
+}
+void putContext(std::map<std::string, int>& contexts, const std::string& name, int id) {
+  contexts.insert_or_assign(name, id);
+}
 
 void runRequest(InAppWebView& view, bool async, const std::shared_ptr<ContentWorld>& world,
                 Results& results) {
@@ -190,7 +199,7 @@ void isolatedSuccess() {
     requireSuccess(results, async);
 
     results.clear();
-    view.userContentController->contentWorlds_[world->name] = 9;
+    putContext(view.userContentController->contentWorlds_, world->name, 9);
     runRequest(view, async, world, results);
     require(view.webView->calls.size() == 3 && view.webView->calls.at(2).parameters.at("contextId") == 9,
             "an existing isolated context is reused directly");
@@ -274,6 +283,46 @@ void disposal() {
   }
 }
 
+void contextRecreation() {
+  for (bool async : {false, true}) {
+    Results oldResults, newResults, cachedResults;
+    InAppWebView view;
+    auto world = std::make_shared<ContentWorld>("isolated");
+    auto& contexts = view.userContentController->contentWorlds_;
+    putContext(contexts, world->name, 7);
+    runRequest(view, async, world, oldResults);
+    require(view.webView->calls.at(0).parameters.at("contextId") == 7,
+            "the current cached context is used before replacement");
+
+    // Runtime.executionContextsCleared invalidates IDs; document/process loss
+    // independently cancels the outstanding Dart requests.
+    contexts.clear();
+    view.pendingScripts_->cancelAll();
+    requireFailure(oldResults, async);
+    runRequest(view, async, world, newResults);
+    require(view.webView->calls.at(1).method == "Page.createIsolatedWorld",
+            "clearing contexts must create a new world instead of reusing a stale ID");
+    view.webView->reply(0, S_OK, LR"({"result":{"value":42}})");
+    requireFailure(oldResults, async);
+    require(newResults.empty(), "a stale eval reply must not finish the new document's request");
+
+    // Runtime.executionContextCreated announces the new cache entry before the
+    // createIsolatedWorld completion, as the production event handler permits.
+    putContext(contexts, world->name, 9);
+    view.webView->reply(1, S_OK, LR"({"executionContextId":9})");
+    require(view.webView->calls.at(2).parameters.at("contextId") == 9,
+            "the recovered request runs only in the replacement isolated context");
+    view.webView->reply(2, S_OK, LR"({"result":{"value":42}})");
+    requireSuccess(newResults, async);
+    runRequest(view, async, world, cachedResults);
+    require(view.webView->calls.at(3).method == "Runtime.evaluate" &&
+            view.webView->calls.at(3).parameters.at("contextId") == 9,
+            "subsequent requests reuse the recovered context");
+    view.webView->reply(3, S_OK, LR"({"result":{"value":42}})");
+    requireSuccess(cachedResults, async);
+  }
+}
+
 void peerIsolation() {
   for (bool async : {false, true}) {
     Results closedResults, peerResults;
@@ -294,7 +343,8 @@ int main(int argc, char** argv) {
   const std::map<std::string, std::function<void()>> cases = {
     {"page-success", pageSuccess}, {"isolated-success", isolatedSuccess},
     {"creation-failure", creationFailure}, {"cancellation", cancellation},
-    {"disposal", disposal}, {"peer-isolation", peerIsolation}
+    {"disposal", disposal}, {"peer-isolation", peerIsolation},
+    {"context-recreation", contextRecreation}
   };
   try {
     for (const auto& test : cases) {

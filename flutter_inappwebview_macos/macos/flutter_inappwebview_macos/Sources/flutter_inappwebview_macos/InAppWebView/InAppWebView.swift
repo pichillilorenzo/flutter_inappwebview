@@ -25,6 +25,7 @@ public class InAppWebView: WKWebView, WKUIDelegate,
     var inAppBrowserDelegate: InAppBrowserDelegate?
     var channelDelegate: WebViewChannelDelegate?
     var settings: InAppWebViewSettings?
+    let javaScriptHandlerOriginRules = JavaScriptHandlerOriginRules()
     var hasConsoleMessageListener = true
     var findInteractionController: FindInteractionController?
     var webMessageChannels: [String:WebMessageChannel] = [:]
@@ -2498,19 +2499,11 @@ public class InAppWebView: WKWebView, WKUIDelegate,
         }
         let requestUrl = message.frameInfo.request.url
 
-        var isOriginAllowed = false
-        if let javaScriptHandlersOriginAllowList = webView.settings?.javaScriptHandlersOriginAllowList {
-            if let origin = sourceOrigin?.absoluteString {
-                for allowedOrigin in javaScriptHandlersOriginAllowList {
-                    if origin.range(of: allowedOrigin, options: .regularExpression, range: nil, locale: nil) != nil {
-                        isOriginAllowed = true
-                        break
-                    }
-                }
-            }
-        } else {
-            isOriginAllowed = true
-        }
+        // Regexes are compiled once per settings value, not on every bridge message.
+        let isOriginAllowed = webView.javaScriptHandlerOriginRules.allows(
+            origin: sourceOrigin?.absoluteString,
+            patterns: webView.settings?.javaScriptHandlersOriginAllowList
+        )
         guard isOriginAllowed else {
             reply?.fail("JavaScript bridge origin is not allowed")
             return

@@ -1,4 +1,5 @@
 import Foundation
+import Dispatch
 
 @main
 struct JavaScriptHandlerOriginRulesTests {

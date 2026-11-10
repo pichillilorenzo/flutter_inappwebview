@@ -315,6 +315,8 @@ target_compile_definitions(${PLUGIN_NAME} PRIVATE FLUTTER_PLUGIN_IMPL)
 target_include_directories(${PLUGIN_NAME} INTERFACE
   "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_link_libraries(${PLUGIN_NAME} PRIVATE flutter flutter_wrapper_plugin)
+# UiaReturnRawElementProvider, to expose the WebView2 accessibility tree
+target_link_libraries(${PLUGIN_NAME} PRIVATE uiautomationcore)
 
 # List of absolute paths to libraries that should be bundled with the plugin.
 # This list could contain prebuilt libraries, or libraries created by an
@@ -357,6 +359,7 @@ target_compile_options(${TEST_RUNNER} PRIVATE /WX-)
 target_include_directories(${TEST_RUNNER} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 target_link_libraries(${TEST_RUNNER} PRIVATE flutter_wrapper_plugin)
 target_link_libraries(${TEST_RUNNER} PRIVATE gtest_main gmock)
+target_link_libraries(${TEST_RUNNER} PRIVATE uiautomationcore)
 add_dependencies(${TEST_RUNNER} ${PROJECT_NAME}_DEPS)
 target_link_libraries(${TEST_RUNNER} PRIVATE ${CMAKE_BINARY_DIR}/packages/Microsoft.Web.WebView2/build/native/Microsoft.Web.WebView2.targets)
 target_link_libraries(${TEST_RUNNER} PRIVATE ${CMAKE_BINARY_DIR}/packages/Microsoft.Windows.ImplementationLibrary/build/native/Microsoft.Windows.ImplementationLibrary.targets)

@@ -2337,8 +2337,9 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     if (windowId != null && plugin != null && plugin.inAppWebViewManager != null) {
       plugin.inAppWebViewManager.windowWebViewMessages.remove(windowId);
     }
+    // Only this view owns mainLooperHandler. mHandler is static and shared
+    // by every WebView: clearing it would discard surviving views' messages.
     mainLooperHandler.removeCallbacksAndMessages(null);
-    mHandler.removeCallbacksAndMessages(null);
     disposeWebMessageChannels();
     disposeWebMessageListeners();
     floatingContextMenu = null;

@@ -33,12 +33,14 @@ import javax.net.ssl.SSLHandshakeException;
 public class ContentBlockerHandler {
     protected static final String LOG_TAG = "ContentBlockerHandler";
 
-    protected List<ContentBlocker> ruleList = new ArrayList<>();
+    // Read requests use a stable COW iterator without an O(number-of-rules) copy.
+    // Updating the entire list publishes one fully compiled snapshot.
+    protected volatile List<ContentBlocker> ruleList = new CopyOnWriteArrayList<>();
 
     public ContentBlockerHandler() {}
 
     public ContentBlockerHandler(List<ContentBlocker> ruleList) {
-        this.ruleList = ruleList;
+        this.ruleList = new CopyOnWriteArrayList<>(ruleList);
     }
 
     public List<ContentBlocker> getRuleList() {
@@ -46,7 +48,7 @@ public class ContentBlockerHandler {
     }
 
     public void setRuleList(List<ContentBlocker> newRuleList) {
-        this.ruleList = newRuleList;
+        this.ruleList = new CopyOnWriteArrayList<>(newRuleList);
     }
 
     @Nullable
@@ -55,6 +57,9 @@ public class ContentBlockerHandler {
             throws URISyntaxException, InterruptedException, MalformedURLException {
         if (webView.customSettings.contentBlockers == null)
             return null;
+
+        final List<ContentBlocker> rules = ruleList;
+        if (rules.isEmpty()) return null;
 
         String url = request.getUrl();
 
@@ -70,39 +75,39 @@ public class ContentBlockerHandler {
         String host = u.getHost();
         int port = u.getPort();
         String scheme = u.getScheme();
-        // thread safe copy list
-        List<ContentBlocker> ruleListCopy = new CopyOnWriteArrayList<ContentBlocker>(ruleList);
-
-        for (ContentBlocker contentBlocker : ruleListCopy) {
+        // A snapshot is captured by the COW iterator; no per-request array copying.
+        rulesLoop: for (ContentBlocker contentBlocker : rules) {
             ContentBlockerTrigger trigger =  contentBlocker.getTrigger();
             List<ContentBlockerTriggerResourceType> resourceTypes = trigger.getResourceType();
-            if (resourceTypes.contains(ContentBlockerTriggerResourceType.IMAGE) && !resourceTypes.contains(ContentBlockerTriggerResourceType.SVG_DOCUMENT)) {
-                resourceTypes.add(ContentBlockerTriggerResourceType.SVG_DOCUMENT);
-            }
+            // Honor IMAGE rules for SVG without mutating a shared trigger on request threads.
+            final boolean matchesResourceType = resourceTypes.isEmpty()
+                    || resourceTypes.contains(responseResourceType)
+                    || (responseResourceType == ContentBlockerTriggerResourceType.SVG_DOCUMENT
+                        && resourceTypes.contains(ContentBlockerTriggerResourceType.IMAGE));
 
             ContentBlockerAction action = contentBlocker.getAction();
 
             Matcher m = trigger.getUrlFilterPatternCompiled().matcher(url);
             if (m.matches()) {
 
-                if (!resourceTypes.isEmpty() && !resourceTypes.contains(responseResourceType)) {
-                    return null;
+                if (!matchesResourceType) {
+                    continue rulesLoop;
                 }
                 if (!trigger.getIfDomain().isEmpty()) {
                     boolean matchFound = false;
                     for (String domain : trigger.getIfDomain()) {
-                        if ((domain.startsWith("*") && host.endsWith(domain.replace("*", ""))) || domain.equals(host)) {
+                        if (host != null && ((domain.startsWith("*") && host.endsWith(domain.replace("*", ""))) || domain.equals(host))) {
                             matchFound = true;
                             break;
                         }
                     }
                     if (!matchFound)
-                        return null;
+                        continue rulesLoop;
                 }
                 if (!trigger.getUnlessDomain().isEmpty()) {
                     for (String domain : trigger.getUnlessDomain())
-                        if ((domain.startsWith("*") && host.endsWith(domain.replace("*", ""))) || domain.equals(host))
-                            return null;
+                        if (host != null && ((domain.startsWith("*") && host.endsWith(domain.replace("*", ""))) || domain.equals(host)))
+                            continue rulesLoop;
                 }
 
                 final String[] webViewUrl = new String[1];
@@ -128,7 +133,7 @@ public class ContentBlockerHandler {
 
                         if ( (trigger.getLoadType().contains("first-party") && cHost != null && !(cScheme.equals(scheme) && cHost.equals(host) && cPort == port)) ||
                                 (trigger.getLoadType().contains("third-party") && cHost != null && cHost.equals(host)) )
-                            return null;
+                            continue rulesLoop;
                     }
                     if (!trigger.getIfTopUrl().isEmpty()) {
                         boolean matchFound = false;
@@ -139,12 +144,12 @@ public class ContentBlockerHandler {
                             }
                         }
                         if (!matchFound)
-                            return null;
+                            continue rulesLoop;
                     }
                     if (!trigger.getUnlessTopUrl().isEmpty()) {
                         for (String topUrl : trigger.getUnlessTopUrl())
                             if (webViewUrl[0].startsWith(topUrl))
-                                return null;
+                                continue rulesLoop;
                     }
                 }
 

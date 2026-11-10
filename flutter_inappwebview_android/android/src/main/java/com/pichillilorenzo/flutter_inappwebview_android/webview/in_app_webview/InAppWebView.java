@@ -498,13 +498,14 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
       WebSettingsCompat.setRequestedWithHeaderOriginAllowList(settings, customSettings.requestedWithHeaderOriginAllowList);
     }
 
-    contentBlockerHandler.getRuleList().clear();
+    // Build a complete list before publishing; readers see a single immutable snapshot.
+    List<ContentBlocker> updatedRules = new ArrayList<>(customSettings.contentBlockers.size());
     for (Map<String, Map<String, Object>> contentBlocker : customSettings.contentBlockers) {
-      // compile ContentBlockerTrigger urlFilter
       ContentBlockerTrigger trigger = ContentBlockerTrigger.fromMap(contentBlocker.get("trigger"));
       ContentBlockerAction action = ContentBlockerAction.fromMap(contentBlocker.get("action"));
-      contentBlockerHandler.getRuleList().add(new ContentBlocker(trigger, action));
+      updatedRules.add(new ContentBlocker(trigger, action));
     }
+    contentBlockerHandler.setRuleList(updatedRules);
 
     setFindListener(new FindListener() {
       @Override
@@ -1148,13 +1149,14 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     }
 
     if (newCustomSettings.contentBlockers != null) {
-      contentBlockerHandler.getRuleList().clear();
+      // Build a complete list before publishing; readers see a single immutable snapshot.
+      List<ContentBlocker> updatedRules = new ArrayList<>(newCustomSettings.contentBlockers.size());
       for (Map<String, Map<String, Object>> contentBlocker : newCustomSettings.contentBlockers) {
-        // compile ContentBlockerTrigger urlFilter
         ContentBlockerTrigger trigger = ContentBlockerTrigger.fromMap(contentBlocker.get("trigger"));
         ContentBlockerAction action = ContentBlockerAction.fromMap(contentBlocker.get("action"));
-        contentBlockerHandler.getRuleList().add(new ContentBlocker(trigger, action));
+        updatedRules.add(new ContentBlocker(trigger, action));
       }
+      contentBlockerHandler.setRuleList(updatedRules);
     }
 
     if (newSettingsMap.get("scrollBarStyle") != null && !customSettings.scrollBarStyle.equals(newCustomSettings.scrollBarStyle))

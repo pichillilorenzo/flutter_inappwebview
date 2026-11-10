@@ -35,16 +35,17 @@ struct JavaScriptHandlerOriginRulesTests {
         let unicodeOrigin = "https://evil.example"
         assert(broad == narrow)
         assert(!broad.utf8.elementsEqual(narrow.utf8))
-        assert(unicodeOrigin.range(of: broad, options: .regularExpression) != nil)
-        assert(unicodeOrigin.range(of: narrow, options: .regularExpression) == nil)
-        for (index, updatedPattern) in [broad, narrow, broad, narrow].enumerated() {
-            let expected = unicodeOrigin.range(of: updatedPattern, options: .regularExpression) != nil
+        // Fresh NSRegularExpression is the oracle: Foundation's String.range
+        // regex cache can itself conflate canonically equivalent pattern keys.
+        let policies = [(broad, true), (narrow, false), (broad, true), (narrow, false)]
+        for (index, policy) in policies.enumerated() {
+            let (updatedPattern, expected) = policy
             let actual = a.allows(origin: unicodeOrigin, patterns: [updatedPattern])
             let freshRegex = try! NSRegularExpression(pattern: updatedPattern)
             let freshResult = freshRegex.firstMatch(in: unicodeOrigin, options: [],
                 range: NSRange(unicodeOrigin.startIndex..<unicodeOrigin.endIndex, in: unicodeOrigin)) != nil
-            let legacyAfter = unicodeOrigin.range(of: updatedPattern, options: .regularExpression) != nil
-            assert(actual == expected, "Unicode policy \(index): utf8=\(Array(updatedPattern.utf8)), cached=\(actual), legacyBefore=\(expected), fresh=\(freshResult), legacyAfter=\(legacyAfter), freshPatternUTF8=\(Array(freshRegex.pattern.utf8))")
+            assert(freshResult == expected, "Unexpected native regex result for Unicode policy \(index)")
+            assert(actual == expected, "Unicode policy \(index): utf8=\(Array(updatedPattern.utf8)), cached=\(actual), expected=\(expected)")
         }
         var mutablePatterns = [broad]
         assert(a.allows(origin: unicodeOrigin, patterns: mutablePatterns))

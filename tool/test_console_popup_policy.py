@@ -140,7 +140,13 @@ struct Channel {
   void onPageCommitVisible(const std::string&) { ++commits; }
   void onLoadStop(const std::string&) { ++finishes; }
 };
+struct PendingJavaScriptRequestsDouble {
+  int cancellations = 0;
+  void cancelAll() { ++cancellations; }
+};
 struct InAppWebView {
+  std::shared_ptr<PendingJavaScriptRequestsDouble> pending_java_script_calls_ =
+      std::make_shared<PendingJavaScriptRequestsDouble>();
   UserContentController* user_content_controller_;
   std::shared_ptr<Settings> settings_ = std::make_shared<Settings>();
   bool has_console_message_listener_ = true;

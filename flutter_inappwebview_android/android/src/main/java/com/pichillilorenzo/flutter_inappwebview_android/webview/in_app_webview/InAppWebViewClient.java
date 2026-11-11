@@ -55,6 +55,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CancellationException;
 import java.util.regex.Matcher;
 
 public class InAppWebViewClient extends WebViewClient {
@@ -657,6 +658,8 @@ public class InAppWebViewClient extends WebViewClient {
       if (webView.channelDelegate != null) {
         try {
           response = webView.channelDelegate.shouldInterceptRequest(request);
+        } catch (CancellationException e) {
+          return new WebResourceResponse("", "", null);
         } catch (InterruptedException e) {
           Log.e(LOG_TAG, "", e);
           return null;
@@ -694,6 +697,8 @@ public class InAppWebViewClient extends WebViewClient {
       if (webView.channelDelegate != null) {
         try {
           customSchemeResponse = webView.channelDelegate.onLoadResourceWithCustomScheme(request);
+        } catch (CancellationException e) {
+          return new WebResourceResponse("", "", null);
         } catch (InterruptedException e) {
           Log.e(LOG_TAG, "", e);
           return null;

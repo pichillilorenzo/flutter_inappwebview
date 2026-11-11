@@ -10,7 +10,6 @@ import androidx.annotation.Nullable;
 import androidx.webkit.WebViewAssetLoader;
 
 import com.pichillilorenzo.flutter_inappwebview_android.InAppWebViewFlutterPlugin;
-import com.pichillilorenzo.flutter_inappwebview_android.Util;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -18,6 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CancellationException;
 
 import io.flutter.plugin.common.MethodChannel;
 
@@ -122,6 +122,8 @@ public class WebViewAssetLoaderExt implements Disposable {
 
         try {
           response = channelDelegate.handle(path);
+        } catch (CancellationException e) {
+          return new WebResourceResponse("", "", null);
         } catch (InterruptedException e) {
           Log.e(LOG_TAG, "", e);
           return null;
@@ -192,12 +194,10 @@ public class WebViewAssetLoaderExt implements Disposable {
 
     @Nullable
     public WebResourceResponseExt handle(String path) throws InterruptedException {
-      MethodChannel channel = getChannel();
-      if (channel == null) return null;
       final SyncHandleCallback callback = new SyncHandleCallback();
       Map<String, Object> obj = new HashMap<>();
       obj.put("path", path);
-      return Util.invokeMethodAndWaitResult(channel, "handle", obj, callback);
+      return invokeMethodAndWaitResult("handle", obj, callback);
     }
 
     @Override

@@ -1,5 +1,6 @@
 ## 1.2.0-beta.3
 
+- Cancel pending resource callbacks when their channel is disposed, and block cancelled requests instead of falling through to the network.
 - Updated flutter_inappwebview_platform_interface version to ^1.4.0-beta.3
 - Updated native dependencies:
   - implementation from `'androidx.webkit:webkit:1.12.0'` to `'androidx.webkit:webkit:1.14.0'`

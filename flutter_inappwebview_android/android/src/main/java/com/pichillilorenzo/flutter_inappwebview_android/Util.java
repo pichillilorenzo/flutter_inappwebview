@@ -52,6 +52,7 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.CancellationException;
 import java.util.regex.Pattern;
 
 import javax.net.ssl.SSLHandshakeException;
@@ -103,10 +104,15 @@ public class Util {
     handler.post(new Runnable() {
       @Override
       public void run() {
-        channel.invokeMethod(method, arguments, callback);
+        if (!callback.isCancelled()) {
+          channel.invokeMethod(method, arguments, callback);
+        }
       }
     });
     callback.latch.await();
+    if (callback.isCancelled()) {
+      throw new CancellationException("Channel has been disposed");
+    }
     return callback.result;
   }
 

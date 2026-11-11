@@ -19,6 +19,7 @@ import com.pichillilorenzo.flutter_inappwebview_android.types.WebResourceRespons
 
 import java.io.ByteArrayInputStream;
 import java.util.Map;
+import java.util.concurrent.CancellationException;
 
 import io.flutter.plugin.common.MethodChannel;
 
@@ -61,6 +62,8 @@ public class ServiceWorkerManager implements Disposable {
           if (channelDelegate != null) {
             try {
               response = channelDelegate.shouldInterceptRequest(requestExt);
+            } catch (CancellationException e) {
+              return new WebResourceResponse("", "", null);
             } catch (InterruptedException e) {
               Log.e(LOG_TAG, "", e);
               return null;

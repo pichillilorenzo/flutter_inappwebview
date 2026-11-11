@@ -9,7 +9,6 @@ import androidx.webkit.ServiceWorkerControllerCompat;
 import androidx.webkit.ServiceWorkerWebSettingsCompat;
 import androidx.webkit.WebViewFeature;
 
-import com.pichillilorenzo.flutter_inappwebview_android.Util;
 import com.pichillilorenzo.flutter_inappwebview_android.types.BaseCallbackResultImpl;
 import com.pichillilorenzo.flutter_inappwebview_android.types.ChannelDelegateImpl;
 import com.pichillilorenzo.flutter_inappwebview_android.types.SyncBaseCallbackResultImpl;
@@ -133,10 +132,8 @@ public class ServiceWorkerChannelDelegate extends ChannelDelegateImpl {
 
   @Nullable
   public WebResourceResponseExt shouldInterceptRequest(WebResourceRequestExt request) throws InterruptedException {
-    MethodChannel channel = getChannel();
-    if (channel == null) return null;
     final SyncShouldInterceptRequestCallback callback = new SyncShouldInterceptRequestCallback();
-    return Util.invokeMethodAndWaitResult(channel, "shouldInterceptRequest", request.toMap(), callback);
+    return invokeMethodAndWaitResult("shouldInterceptRequest", request.toMap(), callback);
   }
 
   @Override

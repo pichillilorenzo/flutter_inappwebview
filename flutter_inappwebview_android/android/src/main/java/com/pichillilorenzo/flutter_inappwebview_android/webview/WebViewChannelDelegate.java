@@ -12,7 +12,6 @@ import androidx.webkit.WebMessagePortCompat;
 import androidx.webkit.WebViewCompat;
 import androidx.webkit.WebViewFeature;
 
-import com.pichillilorenzo.flutter_inappwebview_android.Util;
 import com.pichillilorenzo.flutter_inappwebview_android.find_interaction.FindInteractionChannelDelegate;
 import com.pichillilorenzo.flutter_inappwebview_android.in_app_browser.InAppBrowserActivity;
 import com.pichillilorenzo.flutter_inappwebview_android.in_app_browser.InAppBrowserSettings;
@@ -1236,12 +1235,10 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
 
   @Nullable
   public CustomSchemeResponse onLoadResourceWithCustomScheme(WebResourceRequestExt request) throws InterruptedException {
-    MethodChannel channel = getChannel();
-    if (channel == null) return null;
     final Map<String, Object> obj = new HashMap<>();
     obj.put("request", request.toMap());
     final SyncLoadResourceWithCustomSchemeCallback callback = new SyncLoadResourceWithCustomSchemeCallback();
-    return Util.invokeMethodAndWaitResult(channel, "onLoadResourceWithCustomScheme", obj, callback);
+    return invokeMethodAndWaitResult("onLoadResourceWithCustomScheme", obj, callback);
   }
 
   public static class ShouldInterceptRequestCallback extends BaseCallbackResultImpl<WebResourceResponseExt> {
@@ -1271,10 +1268,8 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
 
   @Nullable
   public WebResourceResponseExt shouldInterceptRequest(WebResourceRequestExt request) throws InterruptedException {
-    MethodChannel channel = getChannel();
-    if (channel == null) return null;
     final SyncShouldInterceptRequestCallback callback = new SyncShouldInterceptRequestCallback();
-    return Util.invokeMethodAndWaitResult(channel, "shouldInterceptRequest", request.toMap(), callback);
+    return invokeMethodAndWaitResult("shouldInterceptRequest", request.toMap(), callback);
   }
 
   public static class RenderProcessUnresponsiveCallback extends BaseCallbackResultImpl<Integer> {

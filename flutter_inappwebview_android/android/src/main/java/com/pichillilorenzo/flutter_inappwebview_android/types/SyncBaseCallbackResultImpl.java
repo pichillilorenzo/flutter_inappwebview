@@ -9,15 +9,34 @@ public class SyncBaseCallbackResultImpl<T> extends BaseCallbackResultImpl<T> {
   final public CountDownLatch latch = new CountDownLatch(1);
   @Nullable
   public T result = null;
+  private boolean cancelled;
+
+  public synchronized void cancel() {
+    if (latch.getCount() == 0) {
+      return;
+    }
+    cancelled = true;
+    latch.countDown();
+  }
+
+  public synchronized boolean isCancelled() {
+    return cancelled;
+  }
 
   @CallSuper
   @Override
-  public void defaultBehaviour(@Nullable T result) {
+  public synchronized void defaultBehaviour(@Nullable T result) {
+    if (latch.getCount() == 0) {
+      return;
+    }
     latch.countDown();
   }
 
   @Override
-  public void success(@Nullable Object obj) {
+  public synchronized void success(@Nullable Object obj) {
+    if (latch.getCount() == 0) {
+      return;
+    }
     T result = decodeResult(obj);
     this.result = result;
     boolean shouldRunDefaultBehaviour;
@@ -25,6 +44,9 @@ public class SyncBaseCallbackResultImpl<T> extends BaseCallbackResultImpl<T> {
       shouldRunDefaultBehaviour = nullSuccess();
     } else {
       shouldRunDefaultBehaviour = nonNullSuccess(result);
+    }
+    if (latch.getCount() == 0) {
+      return;
     }
     if (shouldRunDefaultBehaviour) {
       defaultBehaviour(result);
@@ -35,13 +57,19 @@ public class SyncBaseCallbackResultImpl<T> extends BaseCallbackResultImpl<T> {
   
   @CallSuper
   @Override
-  public void error(String errorCode, @Nullable String errorMessage, @Nullable Object errorDetails) {
+  public synchronized void error(String errorCode, @Nullable String errorMessage, @Nullable Object errorDetails) {
+    if (latch.getCount() == 0) {
+      return;
+    }
     latch.countDown();
   }
 
   @CallSuper
   @Override
-  public void notImplemented() {
+  public synchronized void notImplemented() {
+    if (latch.getCount() == 0) {
+      return;
+    }
     defaultBehaviour(null);
   }
 }

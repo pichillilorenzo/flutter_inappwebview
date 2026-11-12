@@ -666,7 +666,7 @@ extension InternalChannelController on ChannelController {
     Future<dynamic> Function(MethodCall call)? detachedHandler,
   }) {
     if (removeMethodCallHandler) {
-      channel?.setMethodCallHandler(null);
+      _channel?.setMethodCallHandler(null);
     }
     _detachedHandler = removeMethodCallHandler ? null : detachedHandler;
     channel = null;

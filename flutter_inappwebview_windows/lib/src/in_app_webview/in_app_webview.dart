@@ -371,6 +371,7 @@ class WindowsInAppWebViewWidget extends PlatformInAppWebViewWidget {
         webviewParams: params,
       ),
     );
+    notifyNativeViewCreated();
     _windowsParams.findInteractionController?.init(viewId);
     debugLog(
       className: runtimeType.toString(),

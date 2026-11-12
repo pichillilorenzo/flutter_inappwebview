@@ -352,6 +352,7 @@ class IOSInAppWebViewWidget extends PlatformInAppWebViewWidget {
         webviewParams: params,
       ),
     );
+    notifyNativeViewCreated();
     _iosParams.pullToRefreshController?.init(viewId);
     _iosParams.findInteractionController?.init(viewId);
     debugLog(

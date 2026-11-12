@@ -329,6 +329,7 @@ class WebPlatformInAppWebViewWidget extends PlatformInAppWebViewWidget {
         webviewParams: params,
       ),
     );
+    notifyNativeViewCreated();
     debugLog(
       className: runtimeType.toString(),
       id: viewId?.toString(),

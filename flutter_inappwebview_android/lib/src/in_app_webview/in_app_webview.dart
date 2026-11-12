@@ -413,6 +413,7 @@ class AndroidInAppWebViewWidget extends PlatformInAppWebViewWidget {
         webviewParams: params,
       ),
     );
+    notifyNativeViewCreated();
     _androidParams.pullToRefreshController?.init(viewId);
     _androidParams.findInteractionController?.init(viewId);
     debugLog(

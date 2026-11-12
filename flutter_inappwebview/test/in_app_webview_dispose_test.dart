@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
@@ -24,25 +25,54 @@ class _FakePlatform extends InAppWebViewPlatform {
   PlatformInAppWebViewWidget createPlatformInAppWebViewWidget(
     PlatformInAppWebViewWidgetCreationParams params,
   ) => _FakeWidget(params, platform: this);
+
+  @override
+  PlatformPullToRefreshController createPlatformPullToRefreshController(
+    PlatformPullToRefreshControllerCreationParams params,
+  ) => _FakePullToRefreshController(params);
 }
 
+/// Readies its params' controllers when the native view is created for it, and
+/// disposes them along with itself, like the platform implementations do.
 class _FakeWidget extends PlatformInAppWebViewWidget {
   _FakeWidget(super.params, {required this.platform}) : super.implementation();
 
   final _FakePlatform platform;
 
   @override
-  Widget build(BuildContext context) => _ViewLink(
-    onCreate: () => platform.viewCreator = this,
-    platform: platform,
-  );
+  Widget build(BuildContext context) =>
+      _ViewLink(onCreate: _onViewCreated, platform: platform);
+
+  void _onViewCreated() {
+    platform.viewCreator = this;
+    notifyNativeViewCreated();
+    (params.pullToRefreshController as _FakePullToRefreshController?)?.init();
+  }
 
   @override
-  void dispose() => platform.disposed.add(this);
+  void dispose() {
+    platform.disposed.add(this);
+    params.pullToRefreshController?.dispose();
+  }
 
   @override
   T controllerFromPlatform<T>(PlatformInAppWebViewController controller) =>
       controller as T;
+}
+
+class _FakePullToRefreshController extends PlatformPullToRefreshController
+    with ChannelController {
+  _FakePullToRefreshController(super.params) : super.implementation();
+
+  void init() {
+    channel = const MethodChannel('pull_to_refresh_test');
+    handler = (call) async {};
+    initMethodCallHandler();
+  }
+
+  @override
+  void dispose({bool isKeepAlive = false}) =>
+      disposeChannel(removeMethodCallHandler: !isKeepAlive);
 }
 
 /// Creates the view once and keeps it across every rebuild after that, like
@@ -76,22 +106,25 @@ class _ViewLinkState extends State<_ViewLink> {
 
 void main() {
   testWidgets(
-    'a webview rebuilt after its view exists releases that view when it goes',
+    'a webview rebuilt after its view exists releases that view and its latest build only when it goes',
     (tester) async {
       final platform = _FakePlatform();
       InAppWebViewPlatform.instance = platform;
 
       await tester.pumpWidget(InAppWebView());
+      final creator = platform.viewCreator;
       await tester.pumpWidget(InAppWebView());
+      await tester.pumpWidget(InAppWebView());
+      final latest = tester.widget<InAppWebView>(find.byType(InAppWebView));
       await tester.pumpWidget(const SizedBox.shrink());
 
-      expect(platform.viewCreator, isNotNull);
-      expect(platform.disposed, contains(platform.viewCreator));
+      expect(creator, isNotNull);
+      expect(platform.disposed, [creator, latest.platform]);
     },
   );
 
   testWidgets(
-    'a webview rebuilt while its view is being created releases that view when it goes',
+    'a webview rebuilt while its view is being created releases that view and its latest build only when it goes',
     (tester) async {
       final platform = _FakePlatform(createsViewLater: true);
       InAppWebViewPlatform.instance = platform;
@@ -99,11 +132,14 @@ void main() {
       await tester.pumpWidget(InAppWebView());
       await tester.pumpWidget(InAppWebView());
       platform.completeViewCreation();
+      final creator = platform.viewCreator;
       await tester.pumpWidget(InAppWebView());
+      await tester.pumpWidget(InAppWebView());
+      final latest = tester.widget<InAppWebView>(find.byType(InAppWebView));
       await tester.pumpWidget(const SizedBox.shrink());
 
-      expect(platform.viewCreator, isNotNull);
-      expect(platform.disposed, contains(platform.viewCreator));
+      expect(creator, isNotNull);
+      expect(platform.disposed, [creator, latest.platform]);
     },
   );
 
@@ -117,6 +153,27 @@ void main() {
       await tester.pumpWidget(const SizedBox.shrink());
 
       expect(platform.disposed, [platform.viewCreator]);
+    },
+  );
+
+  testWidgets(
+    'a webview rebuilt with the same pull-to-refresh controller releases it when it goes',
+    (tester) async {
+      InAppWebViewPlatform.instance = _FakePlatform();
+      final pullToRefresh = PullToRefreshController();
+
+      await tester.pumpWidget(
+        InAppWebView(pullToRefreshController: pullToRefresh),
+      );
+      await tester.pumpWidget(
+        InAppWebView(pullToRefreshController: pullToRefresh),
+      );
+      await tester.pumpWidget(const SizedBox.shrink());
+
+      expect(
+        (pullToRefresh.platform as _FakePullToRefreshController).disposed,
+        isTrue,
+      );
     },
   );
 }

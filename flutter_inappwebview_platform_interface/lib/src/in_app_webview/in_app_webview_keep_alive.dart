@@ -1,5 +1,6 @@
 /// @docImport 'in_app_webview_settings.dart';
 /// @docImport 'platform_headless_in_app_webview.dart';
+/// @docImport 'platform_webview.dart';
 library;
 
 import '../types/main.dart';
@@ -18,7 +19,9 @@ class InAppWebViewKeepAlive {
 
   ///Event fired when the kept-alive WebView's render process is gone, for the
   ///whole native lifetime of the WebView: whether a widget is currently
-  ///attached to it or not.
+  ///attached to it or not. While one is, its own
+  ///[PlatformWebViewCreationParams.onRenderProcessGone] fires for the same
+  ///death as well: handle it in one of the two.
   ///
   ///Passing it also enables [InAppWebViewSettings.useOnRenderProcessGone]
   ///when the WebView is created, as the widget's own callback does. A keep
@@ -38,7 +41,9 @@ class InAppWebViewKeepAlive {
 
   ///Event fired when the kept-alive WebView's content process is terminated,
   ///for the whole native lifetime of the WebView: whether a widget is
-  ///currently attached to it or not.
+  ///currently attached to it or not. While one is, its own
+  ///[PlatformWebViewCreationParams.onWebContentProcessDidTerminate] fires for
+  ///the same termination as well: handle it in one of the two.
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- iOS ([Official API - WKNavigationDelegate.webViewWebContentProcessDidTerminate](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455639-webviewwebcontentprocessdidtermi))

@@ -660,13 +660,13 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
         }
         break;
       case "onRenderProcessGone":
-        RenderProcessGoneDetail detail = _renderProcessGoneDetailOf(call);
-
         if ((webviewParams != null &&
                 (webviewParams!.onRenderProcessGone != null ||
                     // ignore: deprecated_member_use_from_same_package
                     webviewParams!.androidOnRenderProcessGone != null)) ||
             _inAppBrowserEventHandler != null) {
+          RenderProcessGoneDetail detail = _renderProcessGoneDetailOf(call);
+
           if (webviewParams != null) {
             if (webviewParams!.onRenderProcessGone != null)
               webviewParams!.onRenderProcessGone!(
@@ -686,7 +686,7 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
             _inAppBrowserEventHandler!.androidOnRenderProcessGone(detail);
           }
         }
-        _reportRenderProcessGoneToKeepAlive(detail);
+        _reportRenderProcessGoneToKeepAlive(call);
         break;
       case "onFormResubmission":
         if ((webviewParams != null &&
@@ -3219,7 +3219,7 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
   ///[InAppWebViewKeepAlive] that still holds it.
   Future<dynamic> _handleDetachedKeepAliveMethod(MethodCall call) async {
     if (call.method == "onRenderProcessGone") {
-      _reportRenderProcessGoneToKeepAlive(_renderProcessGoneDetailOf(call));
+      _reportRenderProcessGoneToKeepAlive(call);
     }
     return null;
   }
@@ -3227,8 +3227,12 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
   RenderProcessGoneDetail _renderProcessGoneDetailOf(MethodCall call) =>
       RenderProcessGoneDetail.fromMap(call.arguments.cast<String, dynamic>())!;
 
-  void _reportRenderProcessGoneToKeepAlive(RenderProcessGoneDetail detail) =>
-      _keepAlive?.onRenderProcessGone?.call(detail);
+  void _reportRenderProcessGoneToKeepAlive(MethodCall call) {
+    final onRenderProcessGone = _keepAlive?.onRenderProcessGone;
+    if (onRenderProcessGone != null) {
+      onRenderProcessGone(_renderProcessGoneDetailOf(call));
+    }
+  }
 
   @override
   void dispose({bool isKeepAlive = false}) {

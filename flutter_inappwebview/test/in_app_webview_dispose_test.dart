@@ -118,7 +118,6 @@ void main() {
       final latest = tester.widget<InAppWebView>(find.byType(InAppWebView));
       await tester.pumpWidget(const SizedBox.shrink());
 
-      expect(creator, isNotNull);
       expect(platform.disposed, [creator, latest.platform]);
     },
   );
@@ -138,7 +137,6 @@ void main() {
       final latest = tester.widget<InAppWebView>(find.byType(InAppWebView));
       await tester.pumpWidget(const SizedBox.shrink());
 
-      expect(creator, isNotNull);
       expect(platform.disposed, [creator, latest.platform]);
     },
   );

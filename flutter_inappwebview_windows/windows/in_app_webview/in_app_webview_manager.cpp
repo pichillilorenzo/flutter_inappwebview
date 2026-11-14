@@ -17,10 +17,12 @@
 
 namespace flutter_inappwebview_plugin
 {
+  static unsigned manager_count = 0;
   InAppWebViewManager::InAppWebViewManager(const FlutterInappwebviewWindowsPlugin* plugin)
     : plugin(plugin),
     ChannelDelegate(plugin->registrar->messenger(), InAppWebViewManager::METHOD_CHANNEL_NAME)
   {
+    ++manager_count;
     if (!rohelper_) {
       rohelper_ = std::make_unique<rx::RoHelper>(RO_INIT_SINGLETHREADED);
 
@@ -43,11 +45,6 @@ namespace flutter_inappwebview_plugin
 
         graphics_context_ = std::make_unique<GraphicsContext>(rohelper_.get());
         compositor_ = graphics_context_->CreateCompositor();
-        if (compositor_) {
-          // fix for KernelBase.dll RaiseFailFastException
-          // when app is closing 
-          compositor_->AddRef();
-        }
         valid_ = graphics_context_->IsValid();
       }
     }
@@ -258,5 +255,12 @@ namespace flutter_inappwebview_plugin
     windowWebViews.clear();
     UnregisterClass(windowClass_.lpszClassName, nullptr);
     plugin = nullptr;
+    if (--manager_count == 0) {
+      valid_ = false;
+      compositor_ = nullptr;
+      graphics_context_.reset();
+      dispatcher_queue_controller_ = nullptr;
+      rohelper_.reset();
+    }
   }
 }

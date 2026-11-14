@@ -88,7 +88,7 @@ body:
   - type: input
     attributes:
       label: Plugin version
-      description: In which version of flutter_inappwebview did you encounter this bug?
+      description: In which version of drago_inappwebview did you encounter this bug?
       placeholder: v6.1.0, v6.0.0, etc.
     validations:
       required: true

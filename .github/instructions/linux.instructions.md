@@ -1,5 +1,5 @@
 ---
-applyTo: "flutter_inappwebview_linux/**"
+applyTo: "drago_inappwebview/**"
 ---
 
 # Linux Platform Implementation Instructions
@@ -29,8 +29,8 @@ applyTo: "flutter_inappwebview_linux/**"
 \`\`\`
 linux/
 ├── CMakeLists.txt                           # CMake build config (links WPE WebKit)
-├── flutter_inappwebview_linux_plugin.cc     # Plugin entry point
-├── flutter_inappwebview_linux_plugin_private.h
+├── drago_inappwebview_plugin.cc     # Plugin entry point
+├── drago_inappwebview_plugin_private.h
 │
 ├── plugin_instance.cc/h                     # Plugin instance management
 ├── cookie_manager.cc/h                      # WebKit cookie manager wrapper
@@ -318,9 +318,9 @@ ForExtend \`Platform*CreationParams\` for Linux-specific parameters
 ## Native Code Development
 
 When modifying C++ code:
-- Main plugin class: \`FlutterInappwebviewLinuxPlugin\`
+- Main plugin class: \`DragoInappwebviewPlugin\`
 - Core WebView class: \`InAppWebView\` (handles WPE WebKit integration)
 - WPE WebKit handles headless rendering to texture via EGL or SHM
 - Use provided utilities in \`utils/\` for FlValue serialization, string operations, etc. APIs for maintainability
-- Plugin class: \`FlutterInappwebviewLinuxPlugin\`
+- Plugin class: \`DragoInappwebviewPlugin\`
 - WPE WebKit handles headless rendering to texture

@@ -22,6 +22,14 @@ export interface InAppWebView {
   settings: InAppWebViewSettings,
   javaScriptBridgeEnabled: boolean,
   disableContextMenuHandler: (event: Event) => boolean,
+  fullscreenChangeHandler?: ((event: Event) => void) | null,
+  iframeLoadHandler?: ((event: Event) => void) | null,
+  dispose?: () => void,
+  webMessageListeners?: { [jsObjectName: string]: string[] },
+  webMessageHandler?: ((event: MessageEvent) => void) | null,
+  postWebMessage?: (data: any, targetOrigin?: string | null) => void,
+  replyWebMessage?: (data: any, sourceOrigin: string) => void,
+  addWebMessageListener?: (jsObjectName: string, allowedOriginRules: string[]) => void,
   prepare: (settings: { [key: string]: any }) => void,
   setSettings: (newSettings: InAppWebViewSettings) => void,
   reload: () => void,
@@ -50,7 +58,7 @@ export interface InAppWebView {
 }
 
 export interface InAppWebViewPlugin {
-  createFlutterInAppWebView: (viewId: number | string, iframe: HTMLIFrameElement, iframeContainer: HTMLDivElement, bridgeSecret: string) => InAppWebView,
+  createDragoInAppWebView: (viewId: number | string, iframe: HTMLIFrameElement, iframeContainer: HTMLDivElement, bridgeSecret: string) => InAppWebView,
   getCookieExpirationDate: (timestamp: number) => string,
   nativeAsyncCommunication: (method: string, viewId: number | string, args?: any[]) => Promise<string>,
   nativeSyncCommunication: (method: string, viewId: number | string, args?: any[]) => string,

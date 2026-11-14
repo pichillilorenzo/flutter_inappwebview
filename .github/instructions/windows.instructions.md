@@ -1,5 +1,5 @@
 ---
-applyTo: "flutter_inappwebview_windows/**"
+applyTo: "drago_inappwebview/**"
 ---
 
 # Windows Platform Implementation Instructions
@@ -27,9 +27,9 @@ applyTo: "flutter_inappwebview_windows/**"
 ```
 windows/
 ├── CMakeLists.txt                              # CMake build config (fetches WebView2 NuGet)
-├── flutter_inappwebview_windows_plugin.cpp     # Plugin entry point
-├── flutter_inappwebview_windows_plugin.h
-├── flutter_inappwebview_windows_plugin_c_api.cpp  # C API wrapper
+├── drago_inappwebview_windows_plugin.cpp     # Plugin entry point
+├── drago_inappwebview_windows_plugin.h
+├── drago_inappwebview_plugin_c_api.cpp  # C API wrapper
 │
 ├── cookie_manager.cpp/h                        # ICoreWebView2CookieManager wrapper
 ├── platform_util.cpp/h                         # Platform utilities
@@ -325,7 +325,7 @@ JavaScript files injected into WebViews for native-web communication:
 
 | Script | File | Description |
 |--------|------|-------------|
-| **JavaScriptBridgeJS** | `javascript_bridge_js.h` | Core bridge enabling `window.flutter_inappwebview.callHandler()` for Dart-JS communication. Uses `chrome.webview.postMessage` for WebView2 communication. |
+| **JavaScriptBridgeJS** | `javascript_bridge_js.h` | Core bridge enabling `window.drago_inappwebview.callHandler()` for Dart-JS communication. Uses `chrome.webview.postMessage` for WebView2 communication. |
 
 **Helper class:** `plugin_scripts_util.h` contains utility functions for script management.
 
@@ -342,7 +342,7 @@ Additional scripts may be needed for features not natively supported by WebView2
 ## Dart-Side Development
 
 For Dart-only changes:
-1. Implement platform interface from `flutter_inappwebview_platform_interface`
+1. Implement platform interface from `drago_inappwebview_platform_interface`
 2. Windows-specific features: `WebViewEnvironment` for session isolation
 3. `WebViewInterface` enum maps to ICoreWebView2 interface versions
 
@@ -351,19 +351,19 @@ For Dart-only changes:
 When modifying C++ code:
 - Located in `windows/`
 - **Prefer standard C++17** over Windows-specific APIs for maintainability
-- Plugin class: `FlutterInappwebviewWindowsPluginCApi`
+- Plugin class: `DragoInappwebviewPluginCApi`
 - Uses Flutter texture for rendering WebView2 content
 
 ## Build Commands
 
 ```bash
-cd flutter_inappwebview_windows && flutter pub get
+cd drago_inappwebview && flutter pub get
 cd example && flutter build windows --debug
 ```
 
 ## Key C++ Files
 
-- `flutter_inappwebview_windows_plugin.cpp` - Plugin entry point
+- `drago_inappwebview_windows_plugin.cpp` - Plugin entry point
 - `in_app_webview/in_app_webview.cpp` - WebView2 wrapper
 - `webview_environment/webview_environment.cpp` - Environment management
 

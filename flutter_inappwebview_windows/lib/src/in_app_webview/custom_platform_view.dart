@@ -467,7 +467,7 @@ class CustomPlatformViewController
     return _methodChannel.invokeMethod('setHostWindowClip', rects);
   }
 
-  /// A PNG of the page, or null when WebView2 did not capture it.
+  /// A JPEG of the page, or null when WebView2 did not capture it.
   Future<Uint8List?> _captureHostWindowPreview() async {
     if (_isDisposed) {
       return null;
@@ -585,9 +585,10 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
   bool _tickerEnabled = true;
   int? _viewId;
   bool? _hostWindowHidden;
-  Int32List _hostWindowClip = Int32List(0);
+  static final _noClip = Int32List(0);
+  Int32List _hostWindowClip = _noClip;
   bool _desiredHostHidden = true;
-  Int32List _desiredHostClip = Int32List(0);
+  Int32List _desiredHostClip = _noClip;
   (Offset, Size, double)? _hostWindowPlacement;
 
   // Flutter cannot paint over the window, so it is cut out or hidden under
@@ -595,6 +596,7 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
   Uint8List? _coverSnapshot;
   bool _coverSnapshotRequested = false;
   bool _awaitingCoverSnapshot = false;
+  int _coverSnapshotGeneration = 0;
 
   final _controller = CustomPlatformViewController();
   final _focusNode = FocusNode();
@@ -1107,7 +1109,7 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
     final box = _key.currentContext?.findRenderObject() as RenderBox?;
     var hidden = !_tickerEnabled;
     var covered = false;
-    var clip = Int32List(0);
+    var clip = _noClip;
     if (box == null || !box.attached || !box.hasSize) {
       hidden = true;
     } else {
@@ -1155,14 +1157,14 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
     _desiredHostClip = clip;
     if (!covered) {
       _coverSnapshotRequested = false;
-    } else if (!_coverSnapshotRequested &&
-        _hostWindowHidden == false &&
-        _hostWindowClip.isEmpty) {
+      _awaitingCoverSnapshot = false;
+    } else if (!_coverSnapshotRequested && _hostWindowHidden == false) {
       // Captured before cutting or hiding: a hidden page may not render.
       _coverSnapshotRequested = true;
       _awaitingCoverSnapshot = true;
-      unawaited(_captureCoverSnapshot());
+      unawaited(_captureCoverSnapshot(++_coverSnapshotGeneration));
     }
+    // Only going under a cover waits for the capture; other hides do not.
     if (_awaitingCoverSnapshot) return;
     _sendHostWindowState();
     if (!covered && _coverSnapshot != null) {
@@ -1170,30 +1172,39 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
     }
   }
 
-  Future<void> _captureCoverSnapshot() async {
-    Uint8List? png;
+  Future<void> _captureCoverSnapshot(int generation) async {
+    bool stillCovered() =>
+        mounted &&
+        _coverSnapshotRequested &&
+        generation == _coverSnapshotGeneration;
+    void release() {
+      if (!stillCovered() || !_awaitingCoverSnapshot) return;
+      _awaitingCoverSnapshot = false;
+      _sendHostWindowState();
+    }
+
+    // Past the limit the window is cut or hidden anyway; a late capture is
+    // still shown under it.
+    final limit = Timer(_coverSnapshotTimeout, release);
+    Uint8List? image;
     try {
-      png = await _controller._captureHostWindowPreview().timeout(
-        _coverSnapshotTimeout,
-      );
-      if (png != null && mounted) {
-        await precacheImage(MemoryImage(png), context);
+      image = await _controller._captureHostWindowPreview();
+      if (image != null && mounted) {
+        await precacheImage(MemoryImage(image), context);
       }
     } catch (_) {
-      png = null;
+      image = null;
     }
-    if (!mounted) return;
-    if (png == null || !_coverSnapshotRequested) {
-      _awaitingCoverSnapshot = false;
-      _sendHostWindowState();
+    if (image == null || !stillCovered()) {
+      limit.cancel();
+      release();
       return;
     }
-    setState(() => _coverSnapshot = png);
+    setState(() => _coverSnapshot = image);
     // Cut the window only once the frame with the snapshot is painted.
     SchedulerBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      _awaitingCoverSnapshot = false;
-      _sendHostWindowState();
+      limit.cancel();
+      release();
     });
   }
 

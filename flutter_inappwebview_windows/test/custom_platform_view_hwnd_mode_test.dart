@@ -543,6 +543,168 @@ void main() {
       );
     });
 
+    OverlayEntry cornerEntry() => OverlayEntry(
+      builder: (_) => const Positioned(
+        left: 40,
+        top: 30,
+        width: 40,
+        height: 40,
+        child: ColoredBox(color: Colors.black),
+      ),
+    );
+
+    Finder snapshotImage() => find.descendant(
+      of: find.byType(CustomPlatformView),
+      matching: find.byType(Image),
+    );
+
+    testWidgets('a partial cover is cut only after the capture is shown', (
+      tester,
+    ) async {
+      final capture = Completer<Object?>();
+      previewResult = () => capture.future;
+      await pumpView(tester);
+      final overlay = Overlay.of(
+        tester.element(find.byType(CustomPlatformView)),
+      );
+      final entry = cornerEntry();
+      overlay.insert(entry);
+      await tester.pump();
+      await tester.pump();
+      expect(clipCalls(), isEmpty);
+
+      capture.complete(_kPreviewPng);
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 100)),
+      );
+      await tester.pump();
+      await tester.pump();
+      expect(clipCalls(), hasLength(1));
+      expect(hiddenCalls(), [false]);
+      expect(snapshotImage(), findsOneWidget);
+
+      entry.remove();
+      entry.dispose();
+      await tester.pump();
+      await tester.pump();
+      expect(clipCalls().last, isEmpty);
+      expect(snapshotImage(), findsNothing);
+    });
+
+    testWidgets('a pending capture does not delay hiding for a tab switch', (
+      tester,
+    ) async {
+      previewResult = () => Completer<Object?>().future;
+      final tickers = ValueNotifier(true);
+      addTearDown(tickers.dispose);
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: ValueListenableBuilder<bool>(
+              valueListenable: tickers,
+              builder: (_, enabled, child) =>
+                  TickerMode(enabled: enabled, child: child!),
+              child: const CustomPlatformView(),
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+      await tester.pump();
+      final overlay = Overlay.of(
+        tester.element(find.byType(CustomPlatformView)),
+      );
+      final entry = cornerEntry();
+      overlay.insert(entry);
+      await tester.pump();
+      await tester.pump();
+      expect(hiddenCalls(), [false]);
+
+      tickers.value = false;
+      await tester.pump();
+      await tester.pump();
+      expect(hiddenCalls(), [false, true]);
+
+      entry.remove();
+      entry.dispose();
+      await tester.pump(const Duration(milliseconds: 400));
+    });
+
+    testWidgets('a stale capture does not act for a newer cover', (
+      tester,
+    ) async {
+      final captures = <Completer<Object?>>[];
+      previewResult = () {
+        final capture = Completer<Object?>();
+        captures.add(capture);
+        return capture.future;
+      };
+      await pumpView(tester);
+      final overlay = Overlay.of(
+        tester.element(find.byType(CustomPlatformView)),
+      );
+      var entry = cornerEntry();
+      overlay.insert(entry);
+      await tester.pump();
+      await tester.pump();
+      entry.remove();
+      entry.dispose();
+      await tester.pump();
+      await tester.pump();
+      entry = cornerEntry();
+      overlay.insert(entry);
+      await tester.pump();
+      await tester.pump();
+      expect(captures, hasLength(2));
+
+      captures.first.complete(null);
+      await tester.pump();
+      await tester.pump();
+      expect(clipCalls(), isEmpty);
+
+      captures.last.complete(null);
+      await tester.pump();
+      await tester.pump();
+      expect(clipCalls(), hasLength(1));
+
+      entry.remove();
+      entry.dispose();
+      await tester.pump();
+    });
+
+    testWidgets('a capture arriving after the limit is still shown', (
+      tester,
+    ) async {
+      final capture = Completer<Object?>();
+      previewResult = () => capture.future;
+      await pumpView(tester);
+      final context = tester.element(find.byType(CustomPlatformView));
+
+      showDialog<void>(
+        context: context,
+        builder: (_) => const AlertDialog(content: Text('over')),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+      await tester.pump();
+      expect(hiddenCalls(), [false, true]);
+      expect(snapshotImage(), findsNothing);
+
+      capture.complete(_kPreviewPng);
+      await tester.pump();
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 100)),
+      );
+      await tester.pump();
+      await tester.pump();
+      expect(snapshotImage(), findsOneWidget);
+
+      Navigator.of(context).pop();
+      await tester.pumpAndSettle();
+      expect(hiddenCalls(), [false, true, false]);
+      expect(snapshotImage(), findsNothing);
+    });
+
     testWidgets('detaching a kept-alive HWND hides it before disposal', (
       tester,
     ) async {

@@ -387,12 +387,14 @@ namespace flutter_inappwebview_plugin
       }
       return result->Error(kErrorInvalidArgs);
     }
-    // captureHostWindowPreview -> base64 PNG or null, drawn by Flutter under
+    // captureHostWindowPreview -> base64 JPEG or null, drawn by Flutter under
     // the host window while Flutter content covers it.
     else if (method_name.compare(kMethodCaptureHostWindowPreview) == 0) {
       if (view) {
         auto shared_result = std::shared_ptr<flutter::MethodResult<flutter::EncodableValue>>(std::move(result));
-        view->takeScreenshot(std::nullopt, [shared_result](const std::optional<std::string> data)
+        // JPEG keeps a full-screen capture small enough to decode in time.
+        auto config = std::make_shared<ScreenshotConfiguration>(CompressFormat::jpeg, 70, std::nullopt);
+        view->takeScreenshot(std::move(config), [shared_result](const std::optional<std::string> data)
           {
             shared_result->Success(data ? flutter::EncodableValue(*data) : flutter::EncodableValue());
           });

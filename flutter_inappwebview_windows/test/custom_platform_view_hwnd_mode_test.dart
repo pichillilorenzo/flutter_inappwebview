@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -17,6 +18,9 @@ const MethodChannel _viewChannel = MethodChannel(
 const EventChannel _viewEventChannel = EventChannel(
   'com.pichillilorenzo/custom_platform_view_${_kViewId}_events',
 );
+// A 1x1 PNG.
+const String _kPreviewPng =
+    'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -75,14 +79,31 @@ void main() {
   group('CustomPlatformView', () {
     late List<MethodCall> viewCalls;
     late Object? creationResult;
+    late Future<Object?> Function() previewResult;
 
     List<Object?> hiddenCalls() => viewCalls
         .where((call) => call.method == 'setHostWindowHidden')
         .map((call) => call.arguments)
         .toList();
 
+    List<List<int>> clipCalls() => viewCalls
+        .where((call) => call.method == 'setHostWindowClip')
+        .map((call) => List<int>.of(call.arguments as Int32List))
+        .toList();
+
+    List<int> physical(WidgetTester tester, Rect rect) {
+      final ratio = tester.view.devicePixelRatio;
+      return [
+        (rect.left * ratio).floor(),
+        (rect.top * ratio).floor(),
+        (rect.right * ratio).ceil(),
+        (rect.bottom * ratio).ceil(),
+      ];
+    }
+
     setUp(() {
       viewCalls = <MethodCall>[];
+      previewResult = () async => null;
       creationResult = {
         'id': _kViewId,
         'renderMode': 'hwnd',
@@ -99,6 +120,7 @@ void main() {
       });
       messenger.setMockMethodCallHandler(_viewChannel, (call) async {
         viewCalls.add(call);
+        if (call.method == 'captureHostWindowPreview') return previewResult();
         return null;
       });
       messenger.setMockStreamHandler(
@@ -196,7 +218,7 @@ void main() {
       expect(hiddenCalls(), [false, true, false]);
     });
 
-    testWidgets('an overlay entry covering part of the view hides it', (
+    testWidgets('an overlay entry covering part of the view cuts it out', (
       tester,
     ) async {
       await pumpView(tester);
@@ -216,13 +238,18 @@ void main() {
       overlay.insert(entry);
       await tester.pump();
       await tester.pump();
-      expect(hiddenCalls(), [false, true]);
+      expect(hiddenCalls(), [false]);
+      // The view starts at (30, 20).
+      expect(clipCalls(), [
+        physical(tester, const Rect.fromLTWH(10, 10, 40, 40)),
+      ]);
 
       entry.remove();
       entry.dispose();
       await tester.pump();
       await tester.pump();
-      expect(hiddenCalls(), [false, true, false]);
+      expect(hiddenCalls(), [false]);
+      expect(clipCalls().last, isEmpty);
     });
 
     for (final scenario in <(String, Widget, bool)>[
@@ -313,7 +340,7 @@ void main() {
         false,
       ),
     ]) {
-      testWidgets('${scenario.$1} respects HWND visibility', (tester) async {
+      testWidgets('${scenario.$1} respects the HWND cut', (tester) async {
         await pumpView(tester);
         final overlay = Overlay.of(
           tester.element(find.byType(CustomPlatformView)),
@@ -322,13 +349,15 @@ void main() {
         overlay.insert(entry);
         await tester.pump();
         await tester.pump();
-        expect(hiddenCalls(), scenario.$3 ? [false, true] : [false]);
+        expect(hiddenCalls(), [false]);
+        expect(clipCalls(), hasLength(scenario.$3 ? 1 : 0));
 
         entry.remove();
         entry.dispose();
         await tester.pump();
         await tester.pump();
-        expect(hiddenCalls(), scenario.$3 ? [false, true, false] : [false]);
+        expect(hiddenCalls(), [false]);
+        expect(clipCalls(), scenario.$3 ? [isNotEmpty, isEmpty] : isEmpty);
       });
     }
 
@@ -439,11 +468,79 @@ void main() {
       tester.binding.scheduleFrame();
       await tester.pump();
       expect(visited, 0);
-      expect(hiddenCalls(), [false, true]);
+      expect(clipCalls(), hasLength(1));
       entry.remove();
       entry.dispose();
       await tester.pump();
+      expect(hiddenCalls(), [false]);
+      expect(clipCalls().last, isEmpty);
+    });
+
+    testWidgets('a dialog shows a capture of the page while the window hides', (
+      tester,
+    ) async {
+      previewResult = () async => _kPreviewPng;
+      await pumpView(tester);
+      final context = tester.element(find.byType(CustomPlatformView));
+
+      showDialog<void>(
+        context: context,
+        builder: (_) => const AlertDialog(content: Text('over')),
+      );
+      await tester.pump();
+      // Decoding the capture needs real async time.
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 100)),
+      );
+      await tester.pumpAndSettle();
+
+      final methods = viewCalls.map((call) => call.method).toList();
+      expect(
+        methods.indexOf('captureHostWindowPreview'),
+        lessThan(methods.lastIndexOf('setHostWindowHidden')),
+      );
+      expect(hiddenCalls(), [false, true]);
+      expect(
+        find.descendant(
+          of: find.byType(CustomPlatformView),
+          matching: find.byType(Image),
+        ),
+        findsOneWidget,
+      );
+
+      Navigator.of(context).pop();
+      await tester.pumpAndSettle();
       expect(hiddenCalls(), [false, true, false]);
+      expect(
+        find.descendant(
+          of: find.byType(CustomPlatformView),
+          matching: find.byType(Image),
+        ),
+        findsNothing,
+      );
+    });
+
+    testWidgets('a capture that never answers delays hiding only briefly', (
+      tester,
+    ) async {
+      previewResult = () => Completer<Object?>().future;
+      await pumpView(tester);
+      final context = tester.element(find.byType(CustomPlatformView));
+
+      showDialog<void>(
+        context: context,
+        builder: (_) => const AlertDialog(content: Text('over')),
+      );
+      await tester.pump();
+      expect(hiddenCalls(), [false]);
+      await tester.pump(const Duration(milliseconds: 300));
+      await tester.pump();
+      expect(hiddenCalls(), [false, true]);
+      await tester.pumpAndSettle();
+      expect(
+        viewCalls.where((call) => call.method == 'captureHostWindowPreview'),
+        hasLength(1),
+      );
     });
 
     testWidgets('detaching a kept-alive HWND hides it before disposal', (

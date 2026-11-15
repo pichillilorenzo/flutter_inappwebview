@@ -3710,6 +3710,7 @@ namespace flutter_inappwebview_plugin
     if (auto controller4 = webViewController.try_query<ICoreWebView2Controller4>()) {
       failedLog(controller4->put_AllowExternalDrop(FALSE));
     }
+    applyHostWindowClip();
     syncHostWindowVisibility();
   }
 
@@ -3717,6 +3718,38 @@ namespace flutter_inappwebview_plugin
   {
     hostWindowHidden_ = hidden;
     syncHostWindowVisibility();
+  }
+
+  void InAppWebView::setHostWindowClip(std::vector<RECT> rects)
+  {
+    hostWindowClip_ = std::move(rects);
+    applyHostWindowClip();
+  }
+
+  void InAppWebView::applyHostWindowClip()
+  {
+    if (!hostWindow_) {
+      return;
+    }
+    if (hostWindowClip_.empty()) {
+      SetWindowRgn(hostWindow_, nullptr, TRUE);
+      return;
+    }
+    // Larger than any window: the region then survives resizes unchanged.
+    const HRGN region = CreateRectRgn(0, 0, 0x7FFF, 0x7FFF);
+    if (!region) {
+      return;
+    }
+    for (const auto& rect : hostWindowClip_) {
+      if (const HRGN hole = CreateRectRgnIndirect(&rect)) {
+        CombineRgn(region, region, hole, RGN_DIFF);
+        DeleteObject(hole);
+      }
+    }
+    // On success the system owns the region.
+    if (!SetWindowRgn(hostWindow_, region, TRUE)) {
+      DeleteObject(region);
+    }
   }
 
   void InAppWebView::syncHostWindowVisibility()

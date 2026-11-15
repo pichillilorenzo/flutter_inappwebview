@@ -1,8 +1,11 @@
 import 'package:flutter/services.dart';
 
 import 'dart:async';
+import 'dart:convert';
+import 'dart:typed_data';
 import 'dart:ui';
 
+import 'package:flutter/foundation.dart' show listEquals;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -454,6 +457,27 @@ class CustomPlatformViewController
     return _methodChannel.invokeMethod('setHostWindowHidden', hidden);
   }
 
+  /// Cuts the HWND-mode window out at [rects]: physical pixels of the window,
+  /// four values (left, top, right, bottom) per rect.
+  Future<void> _setHostWindowClip(Int32List rects) async {
+    if (_isDisposed) {
+      return;
+    }
+    assert(value.isInitialized);
+    return _methodChannel.invokeMethod('setHostWindowClip', rects);
+  }
+
+  /// A PNG of the page, or null when WebView2 did not capture it.
+  Future<Uint8List?> _captureHostWindowPreview() async {
+    if (_isDisposed) {
+      return null;
+    }
+    final data = await _methodChannel.invokeMethod<String>(
+      'captureHostWindowPreview',
+    );
+    return data == null ? null : base64Decode(data);
+  }
+
   /// Sets the surface size to the provided [size].
   Future<void> _setPosition(Offset position, double scaleFactor) async {
     if (_isDisposed) {
@@ -561,7 +585,16 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
   bool _tickerEnabled = true;
   int? _viewId;
   bool? _hostWindowHidden;
+  Int32List _hostWindowClip = Int32List(0);
+  bool _desiredHostHidden = true;
+  Int32List _desiredHostClip = Int32List(0);
   (Offset, Size, double)? _hostWindowPlacement;
+
+  // Flutter cannot paint over the window, so it is cut out or hidden under
+  // Flutter content; this capture of the page is drawn in its place.
+  Uint8List? _coverSnapshot;
+  bool _coverSnapshotRequested = false;
+  bool _awaitingCoverSnapshot = false;
 
   final _controller = CustomPlatformViewController();
   final _focusNode = FocusNode();
@@ -731,7 +764,16 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
             : _isHwndMode
             // The native window takes the input itself. The opaque listener
             // only makes this view a hit-test target for the coverage check.
-            ? const Listener(behavior: HitTestBehavior.opaque)
+            ? Listener(
+                behavior: HitTestBehavior.opaque,
+                child: _coverSnapshot == null
+                    ? null
+                    : Image.memory(
+                        _coverSnapshot!,
+                        fit: BoxFit.fill,
+                        gaplessPlayback: true,
+                      ),
+              )
             : Listener(
                 onPointerHover: (ev) {
                   // ev.kind is for whatever reason not set to touch
@@ -1064,6 +1106,8 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
     if (!mounted || !_isHwndMode) return;
     final box = _key.currentContext?.findRenderObject() as RenderBox?;
     var hidden = !_tickerEnabled;
+    var covered = false;
+    var clip = Int32List(0);
     if (box == null || !box.attached || !box.hasSize) {
       hidden = true;
     } else {
@@ -1082,23 +1126,114 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
           unawaited(_controller._setSize(placement.$2, placement.$3));
           unawaited(_controller._setPosition(placement.$1, placement.$3));
         }
-        hidden = hidden || _isCoveredByFlutterContent(box, transform);
+        final rects = _coveringRects(box, transform);
+        if (rects == null) {
+          covered = true;
+          hidden = true;
+        } else if (rects.isNotEmpty) {
+          covered = true;
+          clip = _hostClip(rects, placement.$1, placement.$3);
+        }
       }
+    }
+    _updateHostWindow(
+      hidden: hidden,
+      clip: clip,
+      covered: covered && _tickerEnabled,
+    );
+    SchedulerBinding.instance.addPostFrameCallback(_trackHostWindow);
+  }
+
+  static const _coverSnapshotTimeout = Duration(milliseconds: 300);
+
+  void _updateHostWindow({
+    required bool hidden,
+    required Int32List clip,
+    required bool covered,
+  }) {
+    _desiredHostHidden = hidden;
+    _desiredHostClip = clip;
+    if (!covered) {
+      _coverSnapshotRequested = false;
+    } else if (!_coverSnapshotRequested &&
+        _hostWindowHidden == false &&
+        _hostWindowClip.isEmpty) {
+      // Captured before cutting or hiding: a hidden page may not render.
+      _coverSnapshotRequested = true;
+      _awaitingCoverSnapshot = true;
+      unawaited(_captureCoverSnapshot());
+    }
+    if (_awaitingCoverSnapshot) return;
+    _sendHostWindowState();
+    if (!covered && _coverSnapshot != null) {
+      setState(() => _coverSnapshot = null);
+    }
+  }
+
+  Future<void> _captureCoverSnapshot() async {
+    Uint8List? png;
+    try {
+      png = await _controller._captureHostWindowPreview().timeout(
+        _coverSnapshotTimeout,
+      );
+      if (png != null && mounted) {
+        await precacheImage(MemoryImage(png), context);
+      }
+    } catch (_) {
+      png = null;
+    }
+    if (!mounted) return;
+    if (png == null || !_coverSnapshotRequested) {
+      _awaitingCoverSnapshot = false;
+      _sendHostWindowState();
+      return;
+    }
+    setState(() => _coverSnapshot = png);
+    // Cut the window only once the frame with the snapshot is painted.
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _awaitingCoverSnapshot = false;
+      _sendHostWindowState();
+    });
+  }
+
+  void _sendHostWindowState() {
+    final hidden = _desiredHostHidden;
+    // The cut is set before showing, so the window never flashes uncut.
+    if (!hidden && !listEquals(_desiredHostClip, _hostWindowClip)) {
+      _hostWindowClip = _desiredHostClip;
+      unawaited(_controller._setHostWindowClip(_hostWindowClip));
     }
     if (hidden != _hostWindowHidden) {
       _hostWindowHidden = hidden;
       unawaited(_controller._setHostWindowHidden(hidden));
     }
-    SchedulerBinding.instance.addPostFrameCallback(_trackHostWindow);
   }
 
-  /// Probe overlapping render bounds instead of a grid that misses small menus.
-  /// Custom hit shapes or paint ordering may require explicit pause/resume.
-  bool _isCoveredByFlutterContent(RenderBox box, Matrix4 transform) {
+  /// Logical rects relative to [origin], rounded outward to physical pixels.
+  static Int32List _hostClip(List<Rect> rects, Offset origin, double scale) {
+    final values = Int32List(rects.length * 4);
+    for (var i = 0; i < rects.length; i++) {
+      final rect = rects[i].shift(-origin);
+      values[i * 4] = (rect.left * scale).floor();
+      values[i * 4 + 1] = (rect.top * scale).floor();
+      values[i * 4 + 2] = (rect.right * scale).ceil();
+      values[i * 4 + 3] = (rect.bottom * scale).ceil();
+    }
+    return values;
+  }
+
+  static const _maxClipRects = 16;
+
+  /// Global rects of Flutter content painted over the view, or null when the
+  /// window has to hide entirely. Probes overlapping render bounds instead of
+  /// a grid that misses small menus; custom hit shapes may need explicit pause.
+  List<Rect>? _coveringRects(RenderBox box, Matrix4 transform) {
     final viewId = _viewId;
-    if (viewId == null) return false;
+    if (viewId == null) return const [];
     final bounds = MatrixUtils.transformRect(transform, Offset.zero & box.size);
-    final testedBounds = <Rect>{bounds};
+    final testedBounds = <Rect>{};
+    final rects = <Rect>[];
     bool isCoveredAt(Offset position) {
       final result = HitTestResult();
       WidgetsBinding.instance.hitTestInView(result, position, viewId);
@@ -1115,55 +1250,61 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
       return true;
     }
 
-    if (isCoveredAt(bounds.center)) return true;
+    final centerCovered = isCoveredAt(bounds.center);
 
-    bool overlaps(RenderObject object, Rect clip) {
-      if (object is RenderIgnorePointer && object.ignoring) return false;
+    void collect(RenderObject object, Rect clip) {
+      if (rects.length > _maxClipRects) return;
+      if (object is RenderIgnorePointer && object.ignoring) return;
       final transform = object.getTransformTo(null);
-      if (transform.determinant() == 0) return false;
+      if (transform.determinant() == 0) return;
       final overlap = MatrixUtils.transformRect(
         transform,
         object.paintBounds,
       ).intersect(clip);
+      // The whole view was already probed at its center.
       if (!overlap.isEmpty &&
           testedBounds.add(overlap) &&
-          isCoveredAt(overlap.center)) {
-        return true;
+          (overlap == bounds ? centerCovered : isCoveredAt(overlap.center))) {
+        rects.add(overlap);
+        return;
       }
-      var covered = false;
       object.visitChildren((child) {
-        if (covered || !object.paintsChild(child)) return;
+        if (!object.paintsChild(child)) return;
         final childClip = object.describeApproximatePaintClip(child);
         final clipped = childClip == null
             ? clip
             : clip.intersect(MatrixUtils.transformRect(transform, childClip));
-        if (!clipped.isEmpty) covered = overlaps(child, clipped);
+        if (!clipped.isEmpty) collect(child, clipped);
       });
-      return covered;
     }
 
     RenderObject child = box;
     for (var parent = child.parent; parent != null; parent = child.parent) {
-      var covered = false;
       var afterChild = false;
       parent.visitChildren((sibling) {
         if (identical(sibling, child)) {
           afterChild = true;
           return;
         }
-        if (covered || !afterChild || !parent!.paintsChild(sibling)) return;
+        if (!afterChild || !parent!.paintsChild(sibling)) return;
         final clip = parent.describeApproximatePaintClip(sibling);
         final clipped = clip == null
             ? bounds
             : bounds.intersect(
                 MatrixUtils.transformRect(parent.getTransformTo(null), clip),
               );
-        if (!clipped.isEmpty) covered = overlaps(sibling, clipped);
+        if (!clipped.isEmpty) collect(sibling, clipped);
       });
-      if (covered) return true;
+      if (rects.length > _maxClipRects) return null;
       child = parent;
     }
-    return false;
+    // Hide when the walk missed what covers the center, or one rect covers
+    // the whole view (a modal barrier).
+    if (centerCovered && !rects.any((rect) => rect.contains(bounds.center))) {
+      return null;
+    }
+    if (rects.any((rect) => rect.intersect(bounds) == bounds)) return null;
+    return rects;
   }
 
   @override

@@ -1,5 +1,6 @@
 ## Unreleased
 
+- Match HWND overlay cuts to the hit-tested Flutter subtree, refresh page previews when a persistent partial cover expands to a dialog, and release decoded previews without retaining them in the shared image cache.
 - Preserve isolated JavaScript worlds when creation fails, complete the request with an error instead of evaluating in the page, and ignore cancelled world-creation replies before installing plugin scripts.
 - Filter console levels before payload formatting and Flutter IPC, batch native delivery, and update console listener gates across rebuilds and keep-alive reuse. Inline publishers stay disabled until a live Dart controller attaches, including delayed keep-alive creation.
 - Keep creation parameters immutable while the retained widget delegate reads the latest widget key during rebuilds.

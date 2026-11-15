@@ -4,6 +4,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 import 'dart:ui';
+import 'dart:ui' as ui show Image, instantiateImageCodec;
 
 import 'package:flutter/foundation.dart' show listEquals;
 import 'package:flutter/gestures.dart';
@@ -593,7 +594,9 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
 
   // Flutter cannot paint over the window, so it is cut out or hidden under
   // Flutter content; this capture of the page is drawn in its place.
-  Uint8List? _coverSnapshot;
+  // Own decoded pixels directly: these one-use captures must not fill the
+  // application's shared ImageCache.
+  ui.Image? _coverSnapshot;
   bool _coverSnapshotRequested = false;
   bool _awaitingCoverSnapshot = false;
   int _coverSnapshotGeneration = 0;
@@ -770,11 +773,7 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
                 behavior: HitTestBehavior.opaque,
                 child: _coverSnapshot == null
                     ? null
-                    : Image.memory(
-                        _coverSnapshot!,
-                        fit: BoxFit.fill,
-                        gaplessPlayback: true,
-                      ),
+                    : RawImage(image: _coverSnapshot, fit: BoxFit.fill),
               )
             : Listener(
                 onPointerHover: (ev) {
@@ -1153,13 +1152,17 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
     required Int32List clip,
     required bool covered,
   }) {
+    final newlyHiddenByCover = covered && hidden && !_desiredHostHidden;
     _desiredHostHidden = hidden;
     _desiredHostClip = clip;
     if (!covered) {
       _coverSnapshotRequested = false;
       _awaitingCoverSnapshot = false;
-    } else if (!_coverSnapshotRequested && _hostWindowHidden == false) {
+    } else if ((!_coverSnapshotRequested || newlyHiddenByCover) &&
+        _hostWindowHidden == false) {
       // Captured before cutting or hiding: a hidden page may not render.
+      // A persistent corner cover must not reuse its old capture when a
+      // dialog later hides the whole page.
       _coverSnapshotRequested = true;
       _awaitingCoverSnapshot = true;
       unawaited(_captureCoverSnapshot(++_coverSnapshotGeneration));
@@ -1168,7 +1171,9 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
     if (_awaitingCoverSnapshot) return;
     _sendHostWindowState();
     if (!covered && _coverSnapshot != null) {
+      final previous = _coverSnapshot;
       setState(() => _coverSnapshot = null);
+      previous?.dispose();
     }
   }
 
@@ -1186,21 +1191,29 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
     // Past the limit the window is cut or hidden anyway; a late capture is
     // still shown under it.
     final limit = Timer(_coverSnapshotTimeout, release);
-    Uint8List? image;
+    ui.Image? image;
     try {
-      image = await _controller._captureHostWindowPreview();
-      if (image != null && mounted) {
-        await precacheImage(MemoryImage(image), context);
+      final bytes = await _controller._captureHostWindowPreview();
+      if (bytes != null && stillCovered()) {
+        final codec = await ui.instantiateImageCodec(bytes);
+        try {
+          if (stillCovered()) image = (await codec.getNextFrame()).image;
+        } finally {
+          codec.dispose();
+        }
       }
     } catch (_) {
       image = null;
     }
     if (image == null || !stillCovered()) {
+      image?.dispose();
       limit.cancel();
       release();
       return;
     }
+    final previous = _coverSnapshot;
     setState(() => _coverSnapshot = image);
+    previous?.dispose();
     // Cut the window only once the frame with the snapshot is painted.
     SchedulerBinding.instance.addPostFrameCallback((_) {
       limit.cancel();
@@ -1243,25 +1256,31 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
     final viewId = _viewId;
     if (viewId == null) return const [];
     final bounds = MatrixUtils.transformRect(transform, Offset.zero & box.size);
-    final testedBounds = <Rect>{};
+    // Cache the hit's ancestry, not whether a rect was covered: unrelated
+    // objects can have the same bounds or centers.
+    final hitAncestors = <Offset, Set<RenderObject>?>{};
     final rects = <Rect>[];
-    bool isCoveredAt(Offset position) {
-      final result = HitTestResult();
-      WidgetsBinding.instance.hitTestInView(result, position, viewId);
-      for (final entry in result.path) {
-        if (identical(entry.target, box)) return false;
-        RenderObject? ancestor = entry.target is RenderObject
-            ? entry.target as RenderObject
-            : null;
-        while (ancestor != null && !identical(ancestor, box)) {
-          ancestor = ancestor.parent;
-        }
-        if (ancestor == null) return true;
-      }
-      return true;
-    }
+    Set<RenderObject>? coveringAncestorsAt(Offset position) =>
+        hitAncestors.putIfAbsent(position, () {
+          final result = HitTestResult();
+          WidgetsBinding.instance.hitTestInView(result, position, viewId);
+          for (final entry in result.path) {
+            if (identical(entry.target, box)) return null;
+            final ancestors = <RenderObject>{};
+            RenderObject? ancestor = entry.target is RenderObject
+                ? entry.target as RenderObject
+                : null;
+            while (ancestor != null && !identical(ancestor, box)) {
+              ancestors.add(ancestor);
+              ancestor = ancestor.parent;
+            }
+            if (ancestor == null) return ancestors;
+          }
+          // Preserve the conservative fallback when the view is not hit at all.
+          return <RenderObject>{};
+        });
 
-    final centerCovered = isCoveredAt(bounds.center);
+    final centerCovered = coveringAncestorsAt(bounds.center) != null;
 
     void collect(RenderObject object, Rect clip) {
       if (rects.length > _maxClipRects) return;
@@ -1272,10 +1291,12 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
         transform,
         object.paintBounds,
       ).intersect(clip);
-      // The whole view was already probed at its center.
+      // AbsorbPointer consumes hits without adding itself to the hit path.
+      final absorbsPointers = object is RenderAbsorbPointer && object.absorbing;
       if (!overlap.isEmpty &&
-          testedBounds.add(overlap) &&
-          (overlap == bounds ? centerCovered : isCoveredAt(overlap.center))) {
+          (absorbsPointers ||
+              (coveringAncestorsAt(overlap.center)?.contains(object) ??
+                  false))) {
         rects.add(overlap);
         return;
       }
@@ -1320,6 +1341,8 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
 
   @override
   void dispose() {
+    _coverSnapshotRequested = false;
+    _coverSnapshot?.dispose();
     _tapFocusTimer?.cancel();
     _flingTicker?.dispose();
     _platformUtil.removeListener(this);

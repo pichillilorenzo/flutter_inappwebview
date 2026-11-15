@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:typed_data';
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -328,6 +329,17 @@ void main() {
         true,
       ),
       (
+        'a non-absorbing empty overlay',
+        const Positioned(
+          left: 40,
+          top: 30,
+          width: 40,
+          height: 40,
+          child: AbsorbPointer(absorbing: false, child: SizedBox.expand()),
+        ),
+        false,
+      ),
+      (
         'an empty fullscreen overlay',
         const Positioned.fill(child: SizedBox.expand()),
         false,
@@ -503,7 +515,7 @@ void main() {
       expect(
         find.descendant(
           of: find.byType(CustomPlatformView),
-          matching: find.byType(Image),
+          matching: find.byType(RawImage),
         ),
         findsOneWidget,
       );
@@ -514,7 +526,7 @@ void main() {
       expect(
         find.descendant(
           of: find.byType(CustomPlatformView),
-          matching: find.byType(Image),
+          matching: find.byType(RawImage),
         ),
         findsNothing,
       );
@@ -555,8 +567,229 @@ void main() {
 
     Finder snapshotImage() => find.descendant(
       of: find.byType(CustomPlatformView),
-      matching: find.byType(Image),
+      matching: find.byType(RawImage),
     );
+
+    Future<void> finishPreview(WidgetTester tester) async {
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 100)),
+      );
+      await tester.pumpAndSettle();
+    }
+
+    for (final size in [40.0, 200.0]) {
+      testWidgets(
+        'an unrelated transparent sibling of size $size does not enlarge the cut',
+        (tester) async {
+          await pumpView(tester);
+          final overlay = Overlay.of(
+            tester.element(find.byType(CustomPlatformView)),
+          );
+          // Both centers are over the button. At size 40 their bounds also
+          // match, so caching a yes/no coverage result for the rect is wrong.
+          final empty = OverlayEntry(
+            builder: (_) => Positioned(
+              left: 140 - size / 2,
+              top: 130 - size / 2,
+              width: size,
+              height: size,
+              child: const SizedBox.expand(),
+            ),
+          );
+          final button = OverlayEntry(
+            builder: (_) => const Positioned(
+              left: 120,
+              top: 110,
+              width: 40,
+              height: 40,
+              child: ColoredBox(color: Colors.black),
+            ),
+          );
+          overlay.insert(empty);
+          overlay.insert(button);
+          await tester.pump();
+          await tester.pump();
+
+          expect(hiddenCalls(), [false]);
+          expect(clipCalls(), [
+            physical(tester, const Rect.fromLTWH(90, 90, 40, 40)),
+          ]);
+          button.remove();
+          button.dispose();
+          empty.remove();
+          empty.dispose();
+          await tester.pump();
+          expect(clipCalls().last, isEmpty);
+        },
+      );
+    }
+
+    testWidgets(
+      'a persistent corner cover refreshes the preview for each dialog',
+      (tester) async {
+        previewResult = () async => _kPreviewPng;
+        await pumpView(tester);
+        final context = tester.element(find.byType(CustomPlatformView));
+        final corner = cornerEntry();
+        Overlay.of(context).insert(corner);
+        await tester.pump();
+        await finishPreview(tester);
+        var previous = tester.widget<RawImage>(snapshotImage()).image!;
+        expect(previous.debugDisposed, isFalse);
+
+        for (var dialog = 0; dialog < 2; dialog++) {
+          showDialog<void>(
+            context: context,
+            builder: (_) => const AlertDialog(content: Text('over')),
+          );
+          await tester.pump();
+          await finishPreview(tester);
+          expect(
+            viewCalls.where(
+              (call) => call.method == 'captureHostWindowPreview',
+            ),
+            hasLength(dialog + 2),
+          );
+          expect(previous.debugDisposed, isTrue);
+          final current = tester.widget<RawImage>(snapshotImage()).image!;
+          expect(current, isNot(same(previous)));
+          expect(current.debugDisposed, isFalse);
+          previous = current;
+          tester.binding.scheduleFrame();
+          await tester.pump();
+          expect(
+            viewCalls.where(
+              (call) => call.method == 'captureHostWindowPreview',
+            ),
+            hasLength(dialog + 2),
+          );
+          Navigator.of(context).pop();
+          await tester.pumpAndSettle();
+        }
+        expect(hiddenCalls(), [false, true, false, true, false]);
+        corner.remove();
+        corner.dispose();
+        await tester.pumpAndSettle();
+        expect(previous.debugDisposed, isTrue);
+      },
+    );
+
+    testWidgets(
+      'a modal refresh ignores a late capture from the corner cover',
+      (tester) async {
+        final captures = <Completer<Object?>>[];
+        previewResult = () {
+          final capture = Completer<Object?>();
+          captures.add(capture);
+          return capture.future;
+        };
+        await pumpView(tester);
+        final context = tester.element(find.byType(CustomPlatformView));
+        final corner = cornerEntry();
+        Overlay.of(context).insert(corner);
+        await tester.pump();
+        showDialog<void>(
+          context: context,
+          builder: (_) => const AlertDialog(content: Text('over')),
+        );
+        await tester.pump();
+        expect(captures, hasLength(2));
+        captures.last.complete(_kPreviewPng);
+        await finishPreview(tester);
+        final current = tester.widget<RawImage>(snapshotImage()).image!;
+        captures.first.complete(_kPreviewPng);
+        await finishPreview(tester);
+        expect(tester.widget<RawImage>(snapshotImage()).image, same(current));
+        expect(current.debugDisposed, isFalse);
+        expect(hiddenCalls(), [false, true]);
+        Navigator.of(context).pop();
+        corner.remove();
+        corner.dispose();
+        await tester.pumpAndSettle();
+      },
+    );
+
+    testWidgets(
+      'one-use previews bypass the shared cache and release all handles',
+      (tester) async {
+        previewResult = () async => _kPreviewPng;
+        await pumpView(tester);
+        final overlay = Overlay.of(
+          tester.element(find.byType(CustomPlatformView)),
+        );
+        final cache = PaintingBinding.instance.imageCache;
+        final cachedBytes = cache.currentSizeBytes;
+        final cachedImages = cache.currentSize;
+
+        // Repeated captures must not accumulate decoded entries or image handles.
+        for (var cover = 0; cover < 3; cover++) {
+          final entry = cornerEntry();
+          overlay.insert(entry);
+          await tester.pump();
+          await finishPreview(tester);
+          final image = tester.widget<RawImage>(snapshotImage()).image!;
+          final rendered = tester
+              .renderObject<RenderImage>(snapshotImage())
+              .image!;
+          expect(image.debugDisposed, isFalse);
+          expect(rendered.debugDisposed, isFalse);
+          expect(cache.currentSizeBytes, cachedBytes);
+          expect(cache.currentSize, cachedImages);
+          entry.remove();
+          entry.dispose();
+          await tester.pumpAndSettle();
+          expect(snapshotImage(), findsNothing);
+          expect(image.debugDisposed, isTrue);
+          expect(rendered.debugDisposed, isTrue);
+          expect(cache.currentSizeBytes, cachedBytes);
+          expect(cache.currentSize, cachedImages);
+        }
+      },
+    );
+
+    testWidgets('disposing a covered view releases the preview image handles', (
+      tester,
+    ) async {
+      previewResult = () async => _kPreviewPng;
+      await pumpView(tester);
+      final entry = cornerEntry();
+      Overlay.of(tester.element(find.byType(CustomPlatformView))).insert(entry);
+      await tester.pump();
+      await finishPreview(tester);
+      final image = tester.widget<RawImage>(snapshotImage()).image!;
+      final rendered = tester.renderObject<RenderImage>(snapshotImage()).image!;
+      entry.remove();
+      entry.dispose();
+      await tester.pumpWidget(const SizedBox());
+      expect(image.debugDisposed, isTrue);
+      expect(rendered.debugDisposed, isTrue);
+    });
+
+    testWidgets('a capture arriving after its cover ends is not decoded', (
+      tester,
+    ) async {
+      final capture = Completer<Object?>();
+      previewResult = () => capture.future;
+      await pumpView(tester);
+      final entry = cornerEntry();
+      Overlay.of(tester.element(find.byType(CustomPlatformView))).insert(entry);
+      await tester.pump();
+      entry.remove();
+      entry.dispose();
+      await tester.pump();
+      final created = <ui.Image>[];
+      final previousOnCreate = ui.Image.onCreate;
+      ui.Image.onCreate = (image) {
+        previousOnCreate?.call(image);
+        created.add(image);
+      };
+      addTearDown(() => ui.Image.onCreate = previousOnCreate);
+      capture.complete(_kPreviewPng);
+      await finishPreview(tester);
+      expect(created, isEmpty);
+      expect(snapshotImage(), findsNothing);
+      expect(clipCalls(), isEmpty);
+    });
 
     testWidgets('a partial cover is cut only after the capture is shown', (
       tester,

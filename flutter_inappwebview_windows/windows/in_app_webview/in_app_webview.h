@@ -198,6 +198,8 @@ namespace flutter_inappwebview_plugin
     bool isHostedInWindow() const { return hostWindow_ != nullptr; }
     // Hides the HWND-mode host window while Flutter content covers it.
     void setHostWindowHidden(bool hidden);
+    // Cuts the HWND-mode host window out where Flutter content covers it.
+    void setHostWindowClip(std::vector<RECT> rects);
     // Widget origin and size inside the Flutter view, physical pixels —
     // used by WebViewDropTarget to route OLE drag events to this webview.
     POINT widgetOffset() const { return widgetOffset_; }
@@ -343,6 +345,7 @@ namespace flutter_inappwebview_plugin
     // Shown only once Dart has placed it, so it never flashes at the origin.
     bool hostWindowHidden_ = true;
     bool hostWindowPlaced_ = false;
+    std::vector<RECT> hostWindowClip_;
 
     const std::string expectedBridgeSecret = get_uuid();
     bool javaScriptBridgeEnabled = true;
@@ -377,6 +380,7 @@ namespace flutter_inappwebview_plugin
     void invalidateBrowserProcessCache();
     void notifyVisibilityChanged(bool wasVisible);
     void syncHostWindowVisibility();
+    void applyHostWindowClip();
     void startLifecycleDeadline();
     void clearLifecycleDeadline();
     HRESULT onCallJsHandler(const bool& isMainFrame, ICoreWebView2WebMessageReceivedEventArgs* args);

@@ -24,6 +24,8 @@ namespace flutter_inappwebview_plugin
   constexpr auto kMethodRequestFocus = "requestFocus";
   constexpr auto kMethodRequestFocusIfNeeded = "requestFocusIfNeeded";
   constexpr auto kMethodSetHostWindowHidden = "setHostWindowHidden";
+  constexpr auto kMethodSetHostWindowClip = "setHostWindowClip";
+  constexpr auto kMethodCaptureHostWindowPreview = "captureHostWindowPreview";
   constexpr auto kMethodClearFocus = "clearFocus";
   constexpr auto kMethodSetFlutterViewId = "setFlutterViewId";
 
@@ -368,6 +370,35 @@ namespace flutter_inappwebview_plugin
       if (hidden && view) {
         view->setHostWindowHidden(*hidden);
         return result->Success();
+      }
+      return result->Error(kErrorInvalidArgs);
+    }
+    // setHostWindowClip: Int32List [left, top, right, bottom, ...] in physical
+    // pixels of the host window; the window stays visible outside them.
+    else if (method_name.compare(kMethodSetHostWindowClip) == 0) {
+      const auto values = std::get_if<std::vector<int32_t>>(method_call.arguments());
+      if (values && view && values->size() % 4 == 0) {
+        std::vector<RECT> rects;
+        for (size_t i = 0; i < values->size(); i += 4) {
+          rects.push_back({ (*values)[i], (*values)[i + 1], (*values)[i + 2], (*values)[i + 3] });
+        }
+        view->setHostWindowClip(std::move(rects));
+        return result->Success();
+      }
+      return result->Error(kErrorInvalidArgs);
+    }
+    // captureHostWindowPreview -> base64 JPEG or null, drawn by Flutter under
+    // the host window while Flutter content covers it.
+    else if (method_name.compare(kMethodCaptureHostWindowPreview) == 0) {
+      if (view) {
+        auto shared_result = std::shared_ptr<flutter::MethodResult<flutter::EncodableValue>>(std::move(result));
+        // JPEG keeps a full-screen capture small enough to decode in time.
+        auto config = std::make_shared<ScreenshotConfiguration>(CompressFormat::jpeg, 70, std::nullopt);
+        view->takeScreenshot(std::move(config), [shared_result](const std::optional<std::string> data)
+          {
+            shared_result->Success(data ? flutter::EncodableValue(*data) : flutter::EncodableValue());
+          });
+        return;
       }
       return result->Error(kErrorInvalidArgs);
     }

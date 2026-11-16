@@ -13,7 +13,7 @@ namespace flutter_inappwebview_plugin
     m_hInstance(GetModuleHandle(nullptr)),
     id(params.id),
     settings(params.initialSettings),
-    channelDelegate(std::make_unique<InAppBrowserChannelDelegate>(id, plugin->registrar->messenger()))
+    channelDelegate(std::make_unique<InAppBrowserChannelDelegate>(id, plugin->messenger()))
   {
 
     WNDCLASS wndClass = {};

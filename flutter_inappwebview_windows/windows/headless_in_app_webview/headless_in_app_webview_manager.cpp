@@ -20,7 +20,7 @@ namespace flutter_inappwebview_plugin
 {
   HeadlessInAppWebViewManager::HeadlessInAppWebViewManager(const FlutterInappwebviewWindowsPlugin* plugin)
     : plugin(plugin),
-    ChannelDelegate(plugin->registrar->messenger(), HeadlessInAppWebViewManager::METHOD_CHANNEL_NAME)
+    ChannelDelegate(plugin->messenger(), HeadlessInAppWebViewManager::METHOD_CHANNEL_NAME)
   {
     windowClass_.lpszClassName = HeadlessInAppWebView::CLASS_NAME;
     windowClass_.lpfnWndProc = &DefWindowProc;

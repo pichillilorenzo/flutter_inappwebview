@@ -5,6 +5,7 @@
 
 namespace flutter_inappwebview_plugin
 {
+  class PluginMessenger;
   class WebViewEnvironmentManager;
   class InAppWebViewManager;
   class InAppBrowserManager;
@@ -13,7 +14,10 @@ namespace flutter_inappwebview_plugin
   class PlatformUtil;
 
   class FlutterInappwebviewWindowsPlugin : public flutter::Plugin {
+    std::unique_ptr<PluginMessenger> messenger_;
+
   public:
+    flutter::BinaryMessenger* messenger() const;
     flutter::PluginRegistrarWindows* registrar;
     std::unique_ptr<WebViewEnvironmentManager> webViewEnvironmentManager;
     std::unique_ptr<InAppWebViewManager> inAppWebViewManager;

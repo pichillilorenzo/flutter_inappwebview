@@ -212,10 +212,10 @@ namespace flutter_inappwebview_plugin
     if (viewId.has_value()) {
       id = viewId.value();
     }
-    channelDelegate = channelName.has_value() ? std::make_unique<WebViewChannelDelegate>(this, plugin->registrar->messenger(), channelName.value()) :
-      std::make_unique<WebViewChannelDelegate>(this, plugin->registrar->messenger());
-    findInteractionController = std::make_unique<FindInteractionController>(this, plugin->registrar->messenger());
-    printJobManager = std::make_unique<PrintJobManager>(this, plugin->registrar->messenger());
+    channelDelegate = channelName.has_value() ? std::make_unique<WebViewChannelDelegate>(this, plugin->messenger(), channelName.value()) :
+      std::make_unique<WebViewChannelDelegate>(this, plugin->messenger());
+    findInteractionController = std::make_unique<FindInteractionController>(this, plugin->messenger());
+    printJobManager = std::make_unique<PrintJobManager>(this, plugin->messenger());
   }
 
   void InAppWebView::prepare(const InAppWebViewCreationParams& params)
@@ -1672,7 +1672,7 @@ namespace flutter_inappwebview_plugin
             // Create WebNotificationController with unique ID, passing this InAppWebView pointer
             std::string notificationControllerId = get_uuid();
             auto notificationController = std::make_shared<WebNotificationController>(
-              notificationControllerId, notification, notificationPtr, plugin->registrar->messenger(), this);
+              notificationControllerId, notification, notificationPtr, plugin->messenger(), this);
 
             // Store the controller in the map to prevent deallocation
             webNotificationControllers_[notificationControllerId] = notificationController;
@@ -2447,7 +2447,7 @@ namespace flutter_inappwebview_plugin
 
     std::set<std::string> originRulesSet(allowedOriginRules.begin(), allowedOriginRules.end());
     auto listener = std::make_unique<WebMessageListener>(
-      plugin->registrar->messenger(), listenerId, jsObjectName, originRulesSet, this);
+      plugin->messenger(), listenerId, jsObjectName, originRulesSet, this);
     webMessageListeners_[jsObjectName] = std::move(listener);
 
     std::string allowedOriginRulesJs = "[";
@@ -2543,7 +2543,7 @@ namespace flutter_inappwebview_plugin
       {
         if (!result.empty() && result != "null") {
           auto channel = std::make_unique<WebMessageChannel>(
-            plugin->registrar->messenger(), channelId, this);
+            plugin->messenger(), channelId, this);
           webMessageChannels_[channelId] = std::move(channel);
           if (callback) callback(channelId);
         }

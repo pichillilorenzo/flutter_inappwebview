@@ -19,7 +19,7 @@ namespace flutter_inappwebview_plugin
 {
   InAppWebViewManager::InAppWebViewManager(const FlutterInappwebviewWindowsPlugin* plugin)
     : plugin(plugin),
-    ChannelDelegate(plugin->registrar->messenger(), InAppWebViewManager::METHOD_CHANNEL_NAME)
+    ChannelDelegate(plugin->messenger(), InAppWebViewManager::METHOD_CHANNEL_NAME)
   {
     if (!rohelper_) {
       rohelper_ = std::make_unique<rx::RoHelper>(RO_INIT_SINGLETHREADED);
@@ -132,7 +132,7 @@ namespace flutter_inappwebview_plugin
     if (keepAliveId.has_value() && map_contains(keepAliveWebViews, keepAliveId.value())) {
       auto webView = std::move(keepAliveWebViews.at(keepAliveId.value())->view);
       keepAliveWebViews.erase(keepAliveId.value());
-      auto customPlatformView = std::make_unique<CustomPlatformView>(plugin->registrar->messenger(),
+      auto customPlatformView = std::make_unique<CustomPlatformView>(plugin->messenger(),
         plugin->registrar->texture_registrar(),
         graphics_context(),
         hwnd,
@@ -185,7 +185,7 @@ namespace flutter_inappwebview_plugin
             windowWebViews.erase(windowId.value());
           }
 
-          auto customPlatformView = std::make_unique<CustomPlatformView>(plugin->registrar->messenger(),
+          auto customPlatformView = std::make_unique<CustomPlatformView>(plugin->messenger(),
             plugin->registrar->texture_registrar(),
             graphics_context(),
             hwnd,

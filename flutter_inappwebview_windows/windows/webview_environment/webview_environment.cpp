@@ -12,7 +12,7 @@ namespace flutter_inappwebview_plugin
 
   WebViewEnvironment::WebViewEnvironment(const FlutterInappwebviewWindowsPlugin* plugin, const std::string& id)
     : plugin(plugin), id(id),
-    channelDelegate(std::make_unique<WebViewEnvironmentChannelDelegate>(this, plugin->registrar->messenger()))
+    channelDelegate(std::make_unique<WebViewEnvironmentChannelDelegate>(this, plugin->messenger()))
   {}
 
   void WebViewEnvironment::create(const std::unique_ptr<WebViewEnvironmentSettings> settings, const std::function<void(HRESULT)> completionHandler)

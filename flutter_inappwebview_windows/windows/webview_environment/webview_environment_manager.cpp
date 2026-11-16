@@ -13,7 +13,7 @@ namespace flutter_inappwebview_plugin
 {
   WebViewEnvironmentManager::WebViewEnvironmentManager(const FlutterInappwebviewWindowsPlugin* plugin)
     : plugin(plugin),
-    ChannelDelegate(plugin->registrar->messenger(), WebViewEnvironmentManager::METHOD_CHANNEL_NAME)
+    ChannelDelegate(plugin->messenger(), WebViewEnvironmentManager::METHOD_CHANNEL_NAME)
   {
     windowClass_.lpszClassName = WebViewEnvironmentManager::CLASS_NAME;
     windowClass_.lpfnWndProc = &DefWindowProc;

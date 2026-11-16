@@ -18,6 +18,37 @@
 
 namespace flutter_inappwebview_plugin
 {
+  // Channels can outlive the engine dispatcher during registrar destruction.
+  class PluginMessenger final : public flutter::BinaryMessenger {
+  public:
+    explicit PluginMessenger(flutter::BinaryMessenger* messenger) : messenger_(messenger) {}
+
+    void Detach() { messenger_ = nullptr; }
+
+    void Send(const std::string& channel, const uint8_t* data, size_t size,
+      flutter::BinaryReply reply) const override
+    {
+      if (messenger_) {
+        messenger_->Send(channel, data, size, std::move(reply));
+      }
+    }
+
+    void SetMessageHandler(const std::string& channel, flutter::BinaryMessageHandler handler) override
+    {
+      if (messenger_) {
+        messenger_->SetMessageHandler(channel, std::move(handler));
+      }
+    }
+
+  private:
+    flutter::BinaryMessenger* messenger_;
+  };
+
+  flutter::BinaryMessenger* FlutterInappwebviewWindowsPlugin::messenger() const
+  {
+    return messenger_.get();
+  }
+
   // static
   void FlutterInappwebviewWindowsPlugin::RegisterWithRegistrar(
     flutter::PluginRegistrarWindows* registrar)
@@ -27,7 +58,7 @@ namespace flutter_inappwebview_plugin
   }
 
   FlutterInappwebviewWindowsPlugin::FlutterInappwebviewWindowsPlugin(flutter::PluginRegistrarWindows* registrar)
-    : registrar(registrar)
+    : messenger_(std::make_unique<PluginMessenger>(registrar->messenger())), registrar(registrar)
   {
     webViewEnvironmentManager = std::make_unique<WebViewEnvironmentManager>(this);
     inAppWebViewManager = std::make_unique<InAppWebViewManager>(this);
@@ -45,6 +76,7 @@ namespace flutter_inappwebview_plugin
 
   FlutterInappwebviewWindowsPlugin::~FlutterInappwebviewWindowsPlugin()
   {
+    messenger_->Detach();
     if (registrar) {
       registrar->UnregisterTopLevelWindowProcDelegate(window_proc_id);
     }

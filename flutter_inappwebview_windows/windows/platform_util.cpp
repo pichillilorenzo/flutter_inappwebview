@@ -15,7 +15,7 @@ namespace flutter_inappwebview_plugin
   using namespace Microsoft::WRL;
 
   PlatformUtil::PlatformUtil(const FlutterInappwebviewWindowsPlugin* plugin)
-    : plugin(plugin), ChannelDelegate(plugin->registrar->messenger(), PlatformUtil::METHOD_CHANNEL_NAME_PREFIX)
+    : plugin(plugin), ChannelDelegate(plugin->messenger(), PlatformUtil::METHOD_CHANNEL_NAME_PREFIX)
   {}
 
   void PlatformUtil::HandleMethodCall(const flutter::MethodCall<flutter::EncodableValue>& method_call,

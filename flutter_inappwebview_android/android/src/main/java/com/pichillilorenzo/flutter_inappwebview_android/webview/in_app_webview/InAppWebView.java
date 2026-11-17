@@ -46,6 +46,7 @@ import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.CookieManager;
 import android.webkit.DownloadListener;
+import android.webkit.RenderProcessGoneDetail;
 import android.webkit.URLUtil;
 import android.webkit.ValueCallback;
 import android.webkit.WebBackForwardList;
@@ -2190,6 +2191,16 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     setWebViewClient(new WebViewClient() {
       public void onPageFinished(WebView view, String url) {
         destroy();
+      }
+
+      // Until that load finishes, this view shares the app's render process with every other WebView, and
+      // WebView takes the whole app down with a render process whose death any of its views leaves
+      // unclaimed. Nothing is left to report to here, so the death is claimed and the view destroyed now.
+      @RequiresApi(api = Build.VERSION_CODES.O)
+      @Override
+      public boolean onRenderProcessGone(WebView view, RenderProcessGoneDetail detail) {
+        destroy();
+        return true;
       }
     });
     interceptOnlyAsyncAjaxRequestsPluginScript = null;

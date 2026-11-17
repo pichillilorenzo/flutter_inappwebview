@@ -44,6 +44,10 @@ class WindowsInAppWebViewControllerCreationParams
   }
 }
 
+///The method channel a WebView's events arrive on, named after its view id.
+MethodChannel _webViewChannel(dynamic id) =>
+    MethodChannel('com.pichillilorenzo/flutter_inappwebview_$id');
+
 ///Controls a WebView, such as an [InAppWebView] widget instance, a [WindowsHeadlessInAppWebView] instance or [WindowsInAppBrowser] WebView instance.
 ///
 ///If you are using the [InAppWebView] widget, an [InAppWebViewController] instance can be obtained by setting the [InAppWebView.onWebViewCreated]
@@ -74,6 +78,13 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
   PlatformInAppBrowserEvents? get _inAppBrowserEventHandler =>
       _inAppBrowser?.eventHandler;
 
+  InAppWebViewKeepAlive? get _keepAlive {
+    final webviewParams = this.webviewParams;
+    return webviewParams is PlatformInAppWebViewWidgetCreationParams
+        ? webviewParams.keepAlive
+        : null;
+  }
+
   dynamic _controllerFromPlatform;
 
   @override
@@ -88,7 +99,7 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
                 params,
               ),
       ) {
-    channel = MethodChannel('com.pichillilorenzo/flutter_inappwebview_$id');
+    channel = _webViewChannel(id);
     handler = handleMethod;
     initMethodCallHandler();
 
@@ -700,11 +711,7 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
                     // ignore: deprecated_member_use_from_same_package
                     webviewParams!.androidOnRenderProcessGone != null)) ||
             _inAppBrowserEventHandler != null) {
-          Map<String, dynamic> arguments = call.arguments
-              .cast<String, dynamic>();
-          RenderProcessGoneDetail detail = RenderProcessGoneDetail.fromMap(
-            arguments,
-          )!;
+          RenderProcessGoneDetail detail = _renderProcessGoneDetailOf(call);
 
           if (webviewParams != null) {
             if (webviewParams!.onRenderProcessGone != null)
@@ -725,6 +732,7 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
             _inAppBrowserEventHandler!.androidOnRenderProcessGone(detail);
           }
         }
+        _reportRenderProcessGoneToKeepAlive(call);
         break;
       case "onFormResubmission":
         if ((webviewParams != null &&
@@ -1307,6 +1315,7 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
           // ignore: deprecated_member_use_from_same_package
           _inAppBrowserEventHandler!.iosOnWebContentProcessDidTerminate();
         }
+        _keepAlive?.onWebContentProcessDidTerminate?.call();
         break;
       case "onPageCommitVisible":
         if ((webviewParams != null &&
@@ -3430,8 +3439,11 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
   Future<void> disposeKeepAlive(InAppWebViewKeepAlive keepAlive) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('keepAliveId', () => keepAlive.id);
+    // Before the await: a widget attaching this keep-alive meanwhile installs
+    // its own handler on this channel.
+    _webViewChannel(keepAlive.id).setMethodCallHandler(null);
     await _staticChannel.invokeMethod('disposeKeepAlive', args);
-    _keepAliveMap[keepAlive] = null;
+    _keepAliveMap.remove(keepAlive);
   }
 
   @override
@@ -3477,9 +3489,39 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
     return id;
   }
 
+  ///Handles the method calls the native WebView keeps sending after its
+  ///widget is gone: only its processes going away matter to the
+  ///[InAppWebViewKeepAlive] that still holds it. WebView2 reports a browser
+  ///process exit as `onRenderProcessGone` and a render process exit as
+  ///`onWebContentProcessDidTerminate`.
+  Future<dynamic> _handleDetachedKeepAliveMethod(MethodCall call) async {
+    switch (call.method) {
+      case "onRenderProcessGone":
+        _reportRenderProcessGoneToKeepAlive(call);
+        break;
+      case "onWebContentProcessDidTerminate":
+        _keepAlive?.onWebContentProcessDidTerminate?.call();
+        break;
+    }
+    return null;
+  }
+
+  RenderProcessGoneDetail _renderProcessGoneDetailOf(MethodCall call) =>
+      RenderProcessGoneDetail.fromMap(call.arguments.cast<String, dynamic>())!;
+
+  void _reportRenderProcessGoneToKeepAlive(MethodCall call) {
+    final onRenderProcessGone = _keepAlive?.onRenderProcessGone;
+    if (onRenderProcessGone != null) {
+      onRenderProcessGone(_renderProcessGoneDetailOf(call));
+    }
+  }
+
   @override
   void dispose({bool isKeepAlive = false}) {
-    disposeChannel(removeMethodCallHandler: !isKeepAlive);
+    disposeChannel(
+      removeMethodCallHandler: !isKeepAlive,
+      detachedHandler: isKeepAlive ? _handleDetachedKeepAliveMethod : null,
+    );
     _inAppBrowser = null;
     webStorage.dispose();
     if (!isKeepAlive) {

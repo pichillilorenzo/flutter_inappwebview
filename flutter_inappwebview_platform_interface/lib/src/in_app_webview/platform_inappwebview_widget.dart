@@ -347,3 +347,20 @@ abstract class PlatformInAppWebViewWidget extends PlatformInterface
   @override
   void dispose();
 }
+
+final _nativeViewCreatedListeners = Expando<VoidCallback>();
+
+///Reports which [PlatformInAppWebViewWidget] the native view was created for,
+///so the one holding its controller can be told apart from the others built
+///for the same view: Android creates the view for the first one, while iOS,
+///macOS, Windows and Linux create it for whichever is current when their
+///asynchronous creation completes.
+extension PlatformInAppWebViewWidgetViewCreation on PlatformInAppWebViewWidget {
+  ///Called once the native view has been created for this platform widget.
+  set onNativeViewCreated(VoidCallback? listener) =>
+      _nativeViewCreatedListeners[this] = listener;
+
+  ///Implementations call it as soon as this platform widget holds the native
+  ///view's controller.
+  void notifyNativeViewCreated() => _nativeViewCreatedListeners[this]?.call();
+}

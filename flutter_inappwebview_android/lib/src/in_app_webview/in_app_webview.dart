@@ -413,6 +413,7 @@ class AndroidInAppWebViewWidget extends PlatformInAppWebViewWidget {
         webviewParams: params,
       ),
     );
+    notifyNativeViewCreated();
     _androidParams.pullToRefreshController?.init(viewId);
     _androidParams.findInteractionController?.init(viewId);
     debugLog(
@@ -464,7 +465,8 @@ class AndroidInAppWebViewWidget extends PlatformInAppWebViewWidget {
         settings.useShouldInterceptRequest == null) {
       settings.useShouldInterceptRequest = true;
     }
-    if (params.onRenderProcessGone != null &&
+    if ((params.onRenderProcessGone != null ||
+            params.keepAlive?.onRenderProcessGone != null) &&
         settings.useOnRenderProcessGone == null) {
       settings.useOnRenderProcessGone = true;
     }

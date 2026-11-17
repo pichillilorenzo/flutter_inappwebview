@@ -601,6 +601,7 @@ class Color_ extends Color {
 
 abstract mixin class ChannelController implements Disposable {
   MethodChannel? _channel;
+  Future<dynamic> Function(MethodCall call)? _detachedHandler;
   Future<dynamic> Function(MethodCall call)? _handler;
 
   static bool debugAssertNotDisposed(ChannelController controller) {
@@ -644,9 +645,10 @@ extension InternalChannelController on ChannelController {
     );
 
     channel?.setMethodCallHandler((call) async {
-      if (disposed) return null;
+      final target = disposed ? _detachedHandler : handler;
+      if (target == null) return null;
       try {
-        return await handler!(call);
+        return await target(call);
       } on Error catch (e) {
         print(e);
         print(e.stackTrace);
@@ -654,10 +656,19 @@ extension InternalChannelController on ChannelController {
     });
   }
 
-  disposeChannel({bool removeMethodCallHandler = true}) {
+  ///[detachedHandler], when [removeMethodCallHandler] is `false`, is what the
+  ///method call handler left on the channel forwards to from now on, so the
+  ///native side can still be heard by whoever outlives this controller (a keep
+  ///alive). Nothing is registered on the channel here: another controller may
+  ///already own it under the same name, and its handler must stay in place.
+  disposeChannel({
+    bool removeMethodCallHandler = true,
+    Future<dynamic> Function(MethodCall call)? detachedHandler,
+  }) {
     if (removeMethodCallHandler) {
-      channel?.setMethodCallHandler(null);
+      _channel?.setMethodCallHandler(null);
     }
+    _detachedHandler = removeMethodCallHandler ? null : detachedHandler;
     channel = null;
     handler = null;
   }

@@ -35,7 +35,7 @@ namespace flutter_inappwebview_plugin
     bool isGraphicsCaptureSessionSupported();
     GraphicsContext* graphics_context() const
     {
-      return graphics_context_.get();
+      return graphics_context_;
     };
     rx::RoHelper* rohelper() const { return rohelper_.get(); }
     winrt::com_ptr<ABI::Windows::UI::Composition::ICompositor> compositor() const
@@ -58,7 +58,7 @@ namespace flutter_inappwebview_plugin
     inline static std::shared_ptr<rx::RoHelper> rohelper_ = nullptr;
     inline static winrt::com_ptr<ABI::Windows::System::IDispatcherQueueController>
       dispatcher_queue_controller_;
-    inline static std::unique_ptr<GraphicsContext> graphics_context_ = nullptr;
+    inline static GraphicsContext* graphics_context_ = nullptr;
     inline static winrt::com_ptr<ABI::Windows::UI::Composition::ICompositor> compositor_;
     WNDCLASS windowClass_ = {};
     inline static bool valid_ = false;

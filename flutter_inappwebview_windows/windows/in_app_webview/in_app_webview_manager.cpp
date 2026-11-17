@@ -42,7 +42,10 @@ namespace flutter_inappwebview_plugin
           return;
         }
 
-        graphics_context_ = std::make_unique<GraphicsContext>(rohelper_.get());
+        // fix for a hang in ExitProcess: releasing the D3D device from a static
+        // destructor deadlocks some GPU drivers once the other threads are gone,
+        // so the context lives until the OS reclaims the process
+        graphics_context_ = new GraphicsContext(rohelper_.get());
         compositor_ = graphics_context_->CreateCompositor();
         if (compositor_) {
           // fix for KernelBase.dll RaiseFailFastException

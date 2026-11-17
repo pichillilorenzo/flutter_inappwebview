@@ -362,6 +362,13 @@ class WindowsHeadlessInAppWebView extends PlatformHeadlessInAppWebView
         _windowsParams.pullToRefreshController?.params.options.toMap() ??
         PullToRefreshSettings(enabled: false).toMap();
 
+    // Multi-window aware: headless webviews aren't anchored to a specific
+    // Flutter view, so just pass any implicit view's id (and the engine id)
+    // for the C++ side to resolve a valid HWND. The HWND is only used as
+    // an attachment point — headless webviews don't render to screen.
+    final implicitView = PlatformDispatcher.instance.implicitView;
+    final engineId = PlatformDispatcher.instance.engineId;
+
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('id', () => id);
     args.putIfAbsent(
@@ -378,6 +385,8 @@ class WindowsHeadlessInAppWebView extends PlatformHeadlessInAppWebView
         'pullToRefreshSettings': pullToRefreshSettings,
         'initialSize': params.initialSize.toMap(),
         'webViewEnvironmentId': params.webViewEnvironment?.id,
+        'flutterViewId': implicitView?.viewId,
+        'flutterEngineId': engineId,
       },
     );
     try {

@@ -500,16 +500,29 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
     );
   }
 
+  /// Multi-window aware device pixel ratio.
+  ///
+  /// The deprecated `window` singleton always points at the implicit view
+  /// (the main window) — or may not be backed by a real monitor at all when
+  /// the app runs through `runWidget` + `RegularWindow`. The WebView2
+  /// surface must be sized with the DPR of the view actually hosting this
+  /// widget, otherwise the texture is rasterized at the wrong physical size
+  /// and gets stretched onto the window.
+  double get _scaleFactor {
+    if (widget.scaleFactor case final scaleFactor?) {
+      return scaleFactor;
+    }
+    final view = mounted ? View.maybeOf(context) : null;
+    return view?.devicePixelRatio ??
+        PlatformDispatcher.instance.implicitView?.devicePixelRatio ??
+        1.0;
+  }
+
   void _reportSurfaceSize() async {
     final box = _key.currentContext?.findRenderObject() as RenderBox?;
     if (box != null) {
       await _controller.ready;
-      unawaited(
-        _controller._setSize(
-          box.size,
-          widget.scaleFactor ?? window.devicePixelRatio,
-        ),
-      );
+      unawaited(_controller._setSize(box.size, _scaleFactor));
     }
   }
 
@@ -518,12 +531,7 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
     if (box != null) {
       await _controller.ready;
       final position = box.localToGlobal(Offset.zero);
-      unawaited(
-        _controller._setPosition(
-          position,
-          widget.scaleFactor ?? window.devicePixelRatio,
-        ),
-      );
+      unawaited(_controller._setPosition(position, _scaleFactor));
     }
   }
 

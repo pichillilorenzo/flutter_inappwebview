@@ -1,3 +1,9 @@
+## Unreleased
+
+- **BREAKING**: Dropped CocoaPods support. The plugin is now distributed only as a Swift package:
+  the podspec has been removed and apps must enable Swift Package Manager
+  (`flutter config --enable-swift-package-manager`).
+
 ## 1.2.0-beta.3
 
 - Updated flutter_inappwebview_platform_interface version to ^1.4.0-beta.3

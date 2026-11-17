@@ -278,6 +278,7 @@ class LinuxInAppWebViewWidget extends PlatformInAppWebViewWidget {
         webviewParams: params,
       ),
     );
+    notifyNativeViewCreated();
 
     // Initialize the find interaction controller with the same view ID
     if (_linuxParams.findInteractionController != null) {

@@ -347,6 +347,7 @@ class MacOSInAppWebViewWidget extends PlatformInAppWebViewWidget {
         webviewParams: params,
       ),
     );
+    notifyNativeViewCreated();
     _macosParams.findInteractionController?.init(viewId);
     debugLog(
       className: runtimeType.toString(),

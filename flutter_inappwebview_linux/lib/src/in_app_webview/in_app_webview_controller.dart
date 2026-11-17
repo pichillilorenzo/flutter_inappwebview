@@ -1491,7 +1491,7 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('keepAliveId', () => keepAlive.id);
     await _staticChannel.invokeMethod('disposeKeepAlive', args);
-    _keepAliveMap[keepAlive] = null;
+    _keepAliveMap.remove(keepAlive);
   }
 
   @override

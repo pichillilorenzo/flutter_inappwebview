@@ -245,6 +245,10 @@ namespace flutter_inappwebview_plugin
 
     static bool isSslError(const COREWEBVIEW2_WEB_ERROR_STATUS& webErrorStatus);
   private:
+    // The HWND of the Flutter window that hosts this webview. Captured at
+    // construction time so position computations don't have to re-resolve
+    // it from the registrar (which may have no view in multi-window mode).
+    HWND parentWindow_ = nullptr;
     // custom_platform_view
     winrt::com_ptr<ABI::Windows::UI::Composition::IVisual> surface_;
     SurfaceSizeChangedCallback surfaceSizeChangedCallback_;
@@ -255,6 +259,17 @@ namespace flutter_inappwebview_plugin
 
     const std::string expectedBridgeSecret = get_uuid();
     bool javaScriptBridgeEnabled = true;
+    // Alive token for asynchronous callbacks. Many event handlers capture
+    // raw `this` into lambdas that only run after a round-trip through the
+    // Dart side (CDP Fetch.requestPaused continuations, WebView2 deferral
+    // completions, Runtime.evaluate completions). If the webview is
+    // destroyed while such a round-trip is in flight — e.g. a JS bridge or
+    // url handler closes the hosting window while an iframe-heavy page
+    // (payment PSPs) still has intercepted navigations pending — the
+    // callback would dereference a dangling `this` and crash with an
+    // access violation. Async lambdas must capture this token and bail out
+    // when it is set.
+    std::shared_ptr<bool> destroyed_ = std::make_shared<bool>(false);
     std::map<UINT64, std::shared_ptr<NavigationAction>> navigationActions_ = {};
     std::shared_ptr<NavigationAction> lastNavigationAction_;
     bool isLoading_ = false;

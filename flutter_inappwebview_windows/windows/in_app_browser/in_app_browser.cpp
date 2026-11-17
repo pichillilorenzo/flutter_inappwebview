@@ -1,5 +1,6 @@
 #include <Windows.h>
 
+#include "../utils/host_window.h"
 #include "../utils/log.h"
 #include "../utils/strconv.h"
 #include "../webview_environment/webview_environment_manager.h"
@@ -26,9 +27,18 @@ namespace flutter_inappwebview_plugin
 
     RegisterClass(&wndClass);
 
-    auto parentWindow = plugin->registrar->GetView()->GetNativeWindow();
-    RECT bounds;
-    GetWindowRect(parentWindow, &bounds);
+    // Multi-window aware: use Dart-supplied flutter view/engine ids when
+    // present, else fall back to the registrar's view. May still be null
+    // in pure multi-window startup; we use defaults for the bounds in
+    // that case (the browser window is positioned via settings->windowFrame
+    // when set, and InAppBrowser is shown as a top-level window anyway).
+    auto parentWindow = PickHostHwnd(plugin->registrar, params.flutterEngineId, params.flutterViewId);
+    RECT bounds = {};
+    if (parentWindow) {
+      GetWindowRect(parentWindow, &bounds);
+    } else {
+      bounds = {0, 0, 1280, 720};
+    }
 
     auto x = CW_USEDEFAULT;
     auto y = CW_USEDEFAULT;

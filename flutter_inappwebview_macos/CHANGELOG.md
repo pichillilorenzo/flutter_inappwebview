@@ -1,3 +1,13 @@
+## Unreleased
+
+- **BREAKING**: Dropped CocoaPods support. The plugin is now distributed only as a Swift package:
+  the podspec has been removed and apps must enable Swift Package Manager
+  (`flutter config --enable-swift-package-manager`).
+- Fixed the macOS build at the package's declared `macOS 10.14` minimum: the
+  `ASWebAuthenticationPresentationContextProviding` conformance of `WebAuthenticationSession` is now
+  declared on an `@available(macOS 10.15, *)` extension instead of on the class itself. CocoaPods
+  used to hide this by forcing the plugin up to the app's deployment target.
+
 ## 1.2.0-beta.3
 
 - Updated flutter_inappwebview_platform_interface version to ^1.4.0-beta.3

@@ -911,6 +911,33 @@ class InAppWebView extends StatefulWidget {
 }
 
 class _InAppWebViewState extends State<InAppWebView> {
+  /// The platform widget the native view was created for, which holds its
+  /// controller. Until the view exists it is the first one, which Android
+  /// creates the view for; iOS, macOS, Windows and Linux create it for
+  /// whichever is current when their asynchronous creation completes, so the
+  /// current one is disposed as well. Any other one never gets a controller
+  /// and is not kept.
+  late PlatformInAppWebViewWidget _viewOwner;
+
+  @override
+  void initState() {
+    super.initState();
+    _viewOwner = widget.platform;
+    _followViewCreation(widget.platform);
+  }
+
+  @override
+  void didUpdateWidget(InAppWebView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!identical(widget.platform, oldWidget.platform)) {
+      _followViewCreation(widget.platform);
+    }
+  }
+
+  void _followViewCreation(PlatformInAppWebViewWidget platform) {
+    platform.onNativeViewCreated = () => _viewOwner = platform;
+  }
+
   @override
   Widget build(BuildContext context) {
     return widget.platform.build(context);
@@ -918,7 +945,10 @@ class _InAppWebViewState extends State<InAppWebView> {
 
   @override
   void dispose() {
-    widget.platform.dispose();
+    _viewOwner.dispose();
+    if (!identical(widget.platform, _viewOwner)) {
+      widget.platform.dispose();
+    }
     super.dispose();
   }
 }

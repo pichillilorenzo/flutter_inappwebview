@@ -1910,6 +1910,23 @@ public class InAppWebView: WKWebView, WKUIDelegate,
         openPanelCompletion?.call([])
     }
 
+    private lazy var unhandledScrollGestureForwarder = UnhandledScrollGestureForwarder { [weak self] event in
+        // Only a Flutter platform view has a host that can use the gesture.
+        guard let host = self?.superview as? FlutterWebViewController else { return }
+        host.nextResponder?.scrollWheel(with: event)
+    }
+
+    public override func scrollWheel(with event: NSEvent) {
+        unhandledScrollGestureForwarder.observe(event)
+        super.scrollWheel(with: event)
+    }
+
+    @objc(_webView:didNotHandleWheelEvent:)
+    public func webViewDidNotHandleWheelEvent(_ webView: WKWebView, event: NSEvent) {
+        guard webView === self else { return }
+        unhandledScrollGestureForwarder.didNotHandle(event)
+    }
+
     public override func viewWillMove(toWindow newWindow: NSWindow?) {
         if let window = window, window !== newWindow {
             cancelHostDialogs()
@@ -3258,6 +3275,7 @@ if(window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)] 
         for imp in customIMPs {
             imp_removeBlock(imp)
         }
+        unhandledScrollGestureForwarder.reset()
         findInteractionController?.dispose()
         findInteractionController = nil
         uiDelegate = nil

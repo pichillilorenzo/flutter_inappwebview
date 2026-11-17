@@ -62,6 +62,7 @@ public class FlutterWebViewController: NSView, Disposable {
         self.autoresizesSubviews = false
         self.autoresizingMask = []
         self.addSubview(webView!)
+        UnhandledScrollGestureForwarder.stopHorizontalRubberBanding(webView!)
         syncWebViewFrameToBounds()
 
         webView!.hasScrollChangedListener = params["hasScrollChangedListener"] as? Bool ?? true

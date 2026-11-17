@@ -1,0 +1,36 @@
+name: macOS unhandled scroll gesture
+
+on:
+  pull_request:
+    paths:
+      - 'flutter_inappwebview_macos/**'
+      - 'tool/swift_source.py'
+      - 'tool/test_unhandled_scroll_gesture_native.py'
+      - 'tool/unhandled_scroll_gesture_probe/**'
+      - '.github/workflows/unhandled-scroll-gesture.yaml'
+  push:
+    paths:
+      - 'flutter_inappwebview_macos/**'
+      - 'tool/swift_source.py'
+      - 'tool/test_unhandled_scroll_gesture_native.py'
+      - 'tool/unhandled_scroll_gesture_probe/**'
+      - '.github/workflows/unhandled-scroll-gesture.yaml'
+
+permissions:
+  contents: read
+
+jobs:
+  source:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 tool/test_unhandled_scroll_gesture_native.py --source-checks-only
+
+  macos:
+    runs-on: macos-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Drive a real WKWebView with native trackpad scroll events
+        run: python3 tool/test_unhandled_scroll_gesture_native.py

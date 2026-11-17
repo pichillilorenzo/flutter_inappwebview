@@ -1,5 +1,6 @@
 ## Unreleased
 
+- Hand horizontal trackpad swipes that the page did not use (no scrolling, rubber-banding or `preventDefault()`) to the Flutter host, so Flutter gestures such as swiping between tabs work over a web view. Hosted web views no longer rubber-band sideways.
 - Fix the legacy async JavaScript wrapper syntax and settle its pending callbacks once on disposal, document replacement, or WebContent termination.
 - Cache JavaScript handler origin regexes per WebView and refresh them on exact pattern changes, including canonically equivalent Unicode patterns with different regex meanings.
 - Preserve shared bridge scripts/handlers until the final native parent/popup owner closes; stateless message adapters avoid retaining a disposed parent, including with the experiment disabled.

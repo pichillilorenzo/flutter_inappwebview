@@ -8,6 +8,7 @@
 import Foundation
 
 public enum WebViewChannelDelegateMethods: String {
+    case getAppleWebViewActivitySnapshot = "getAppleWebViewActivitySnapshot"
     case getUrl = "getUrl"
     case getTitle = "getTitle"
     case getProgress = "getProgress"
@@ -29,7 +30,9 @@ public enum WebViewChannelDelegateMethods: String {
     case stopLoading = "stopLoading"
     case isLoading = "isLoading"
     case takeScreenshot = "takeScreenshot"
+    case setScrollChangedListener
     case setSettings = "setSettings"
+    case setConsoleMessageListener = "setConsoleMessageListener"
     case getSettings = "getSettings"
     case close = "close"
     case show = "show"

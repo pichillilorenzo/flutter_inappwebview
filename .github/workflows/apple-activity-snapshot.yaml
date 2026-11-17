@@ -1,0 +1,76 @@
+name: Apple activity snapshot
+
+on:
+  pull_request:
+    paths:
+      - 'flutter_inappwebview/**'
+      - 'flutter_inappwebview_platform_interface/**'
+      - 'flutter_inappwebview_ios/**'
+      - 'flutter_inappwebview_macos/**'
+      - 'tool/*apple_activity_snapshot*'
+      - 'tool/apple_activity_snapshot_probe/**'
+      - '.github/workflows/apple-activity-snapshot.yaml'
+  push:
+    branches: [master]
+    paths:
+      - 'flutter_inappwebview/**'
+      - 'flutter_inappwebview_platform_interface/**'
+      - 'flutter_inappwebview_ios/**'
+      - 'flutter_inappwebview_macos/**'
+      - 'tool/*apple_activity_snapshot*'
+      - 'tool/apple_activity_snapshot_probe/**'
+      - '.github/workflows/apple-activity-snapshot.yaml'
+
+permissions:
+  contents: read
+
+jobs:
+  contracts:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 tool/test_apple_activity_snapshot.py --mode source
+      - run: python3 tool/test_apple_activity_snapshot_contracts.py
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: '3.47.7'
+      - name: Test immutable snapshots and platform support
+        working-directory: flutter_inappwebview_platform_interface
+        run: flutter pub get --no-example && flutter test --no-pub test/apple_webview_activity_snapshot_test.dart
+      - name: Test both Apple controllers through the public wrapper
+        working-directory: flutter_inappwebview
+        run: flutter pub get --no-example && flutter test --no-pub test/apple_activity_snapshot_test.dart
+
+  macos:
+    runs-on: macos-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Typecheck exact production capture and route against both Apple SDKs
+        run: python3 tool/test_apple_activity_snapshot.py --mode sdk --output "$RUNNER_TEMP/apple-activity-sdk"
+      - name: Observe real WKWebViews and NSWindow transitions
+        run: python3 tool/test_apple_activity_snapshot.py --mode macos --output "$RUNNER_TEMP/apple-activity-macos"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: apple-activity-macos-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/apple-activity-sdk
+            ${{ runner.temp }}/apple-activity-macos
+          if-no-files-found: error
+
+  ios-simulator:
+    runs-on: macos-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Observe real WKWebViews in an isolated iOS Simulator
+        run: python3 tool/test_apple_activity_snapshot.py --mode ios-simulator --output "$RUNNER_TEMP/apple-activity-ios"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: apple-activity-ios-simulator-${{ github.sha }}
+          path: ${{ runner.temp }}/apple-activity-ios
+          if-no-files-found: error

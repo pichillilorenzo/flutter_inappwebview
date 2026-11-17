@@ -15,6 +15,7 @@ namespace flutter_inappwebview_plugin
 
   TextureBridgeFallback::~TextureBridgeFallback()
   {
+    Stop();
     const std::lock_guard<std::mutex> lock(buffer_mutex_);
   }
 
@@ -28,7 +29,9 @@ namespace flutter_inappwebview_plugin
     const auto height = desc.Height;
 
     bool is_exact_size;
-    EnsureStagingTexture(width, height, is_exact_size);
+    if (!EnsureStagingTexture(width, height, is_exact_size)) {
+      return;
+    }
 
     auto device_context = graphics_context_->d3d_device_context();
     auto staging_texture = staging_texture_.get();
@@ -86,7 +89,7 @@ namespace flutter_inappwebview_plugin
     device_context->Unmap(staging_texture, 0);
   }
 
-  void TextureBridgeFallback::EnsureStagingTexture(uint32_t width,
+  bool TextureBridgeFallback::EnsureStagingTexture(uint32_t width,
     uint32_t height,
     bool& is_exact_size)
   {
@@ -107,10 +110,11 @@ namespace flutter_inappwebview_plugin
       dstDesc.Usage = D3D11_USAGE_STAGING;
 
       staging_texture_ = nullptr;
+      staging_texture_size_ = { 0, 0 };
       if (!SUCCEEDED(graphics_context_->d3d_device()->CreateTexture2D(
         &dstDesc, nullptr, staging_texture_.put()))) {
         std::cerr << "Creating dst texture failed" << std::endl;
-        return;
+        return false;
       }
 
       staging_texture_size_ = { width, height };
@@ -118,6 +122,19 @@ namespace flutter_inappwebview_plugin
 
     is_exact_size = staging_texture_size_.width == width &&
       staging_texture_size_.height == height;
+    return true;
+  }
+
+  bool TextureBridgeFallback::TrimHiddenResources(
+    std::vector<winrt::com_ptr<ID3D11Texture2D>>& retired)
+  {
+    // Flutter holds |backing_pixel_buffer_|, never this readback texture.
+    // Keep the last pixels and their release callback available while hidden.
+    if (staging_texture_) {
+      retired.push_back(std::move(staging_texture_));
+      staging_texture_size_ = { 0, 0 };
+    }
+    return false;
   }
 
   const FlutterDesktopPixelBuffer* TextureBridgeFallback::CopyPixelBuffer(

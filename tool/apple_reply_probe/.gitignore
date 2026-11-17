@@ -1,0 +1,5 @@
+.dart_tool/
+.packages
+pubspec.lock
+build/
+assets/javascript_handler_json_cases.json

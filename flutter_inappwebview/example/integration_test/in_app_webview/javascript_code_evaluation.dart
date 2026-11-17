@@ -96,6 +96,65 @@ void javascriptCodeEvaluation() {
       expect(result, 49);
     }, skip: shouldSkipTest2);
 
+    final shouldSkipPrintBoundaryTest =
+        kIsWeb ||
+        (!Platform.isIOS && !Platform.isMacOS) ||
+        !InAppWebViewController.isMethodSupported(
+          PlatformInAppWebViewControllerMethod.evaluateJavascript,
+        );
+
+    skippableTestWidgets(
+      'content world IIFE does not invoke print',
+      (WidgetTester tester) async {
+        final controllerCompleter = Completer<InAppWebViewController>();
+        final firstLoad = Completer<void>();
+        final secondLoad = Completer<void>();
+        var printRequests = 0;
+
+        await tester.pumpWidget(
+          Directionality(
+            textDirection: TextDirection.ltr,
+            child: InAppWebView(
+              key: GlobalKey(),
+              initialUrlRequest: URLRequest(url: TEST_URL_ABOUT_BLANK),
+              onWebViewCreated: controllerCompleter.complete,
+              onLoadStop: (controller, url) {
+                if (!firstLoad.isCompleted) {
+                  firstLoad.complete();
+                } else if (!secondLoad.isCompleted) {
+                  secondLoad.complete();
+                }
+              },
+              onPrintRequest: (controller, url, printJob) async {
+                printRequests++;
+                return false;
+              },
+            ),
+          ),
+        );
+
+        final controller = await controllerCompleter.future;
+        await firstLoad.future;
+        final contentWorld = ContentWorld.world(name: 'print-boundary-world');
+
+        Future<void> expectIifeEvaluation() async {
+          final result = await controller.evaluateJavascript(
+            source: "(function () { return 'content-world-ok'; })();",
+            contentWorld: contentWorld,
+          );
+          expect(result, 'content-world-ok');
+          await tester.pump();
+          expect(printRequests, 0);
+        }
+
+        await expectIifeEvaluation();
+        await controller.reload();
+        await secondLoad.future;
+        await expectIifeEvaluation();
+      },
+      skip: shouldSkipPrintBoundaryTest,
+    );
+
     final shouldSkipTest3 = !InAppWebViewController.isMethodSupported(
       PlatformInAppWebViewControllerMethod.callAsyncJavaScript,
     );

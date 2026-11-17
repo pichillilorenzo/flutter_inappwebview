@@ -26,6 +26,17 @@ public class WebViewChannelDelegate: ChannelDelegate {
         }
         
         switch method {
+        case .getAppleWebViewActivitySnapshot:
+            // Queue one native read; do not retain a view while it waits. A
+            // disposed delegate has no view, including an already queued call.
+            DispatchQueue.main.async { [weak self] in
+                guard let webView = self?.webView else {
+                    result(["availability": "noNativeView"])
+                    return
+                }
+                result(webView.getAppleWebViewActivitySnapshot())
+            }
+            break
         case .getUrl:
             result(webView?.url?.absoluteString)
             break
@@ -158,6 +169,14 @@ public class WebViewChannelDelegate: ChannelDelegate {
             else {
                 result(nil)
             }
+            break
+        case .setScrollChangedListener:
+            webView?.setScrollChangedListener(hasListener: arguments?["hasListener"] as? Bool ?? false)
+            result(true)
+            break
+        case .setConsoleMessageListener:
+            webView?.setConsoleMessageListener(arguments?["hasListener"] as? Bool ?? false)
+            result(true)
             break
         case .setSettings:
             if let iabController = webView?.inAppBrowserDelegate as? InAppBrowserWebViewController {
@@ -486,7 +505,7 @@ public class WebViewChannelDelegate: ChannelDelegate {
             break
         case .postWebMessage:
             if let webView = webView {
-                var message = WebMessage.fromMap(map: arguments!["message"] as! [String: Any?])
+                let message = WebMessage.fromMap(map: arguments!["message"] as! [String: Any?])
                 let targetOrigin = arguments!["targetOrigin"] as! String
                 
                 var ports: [WebMessagePort] = []
@@ -684,7 +703,6 @@ public class WebViewChannelDelegate: ChannelDelegate {
         }
     }
     
-    @available(*, deprecated, message: "Use FindInteractionChannelDelegate.onFindResultReceived instead.")
     public func onFindResultReceived(activeMatchOrdinal: Int, numberOfMatches: Int, isDoneCounting: Bool) {
         let arguments: [String : Any?] = [
             "activeMatchOrdinal": activeMatchOrdinal,
@@ -831,13 +849,31 @@ public class WebViewChannelDelegate: ChannelDelegate {
     }
     
     public func onConsoleMessage(message: String, messageLevel: Int) {
-        let arguments: [String: Any?] = [
-            "message": message,
-            "messageLevel": messageLevel
-        ]
-        channel?.invokeMethod("onConsoleMessage", arguments: arguments)
+        onConsoleMessages([(message, messageLevel)])
     }
-    
+
+    public func onConsoleMessages(_ messages: [(String, Int)]) {
+        guard let webView = webView, let channel = channel else { return }
+        var batch: [[String: Any]] = []
+        var characters = 0
+        func flush() {
+            if batch.isEmpty { return }
+            channel.invokeMethod("onConsoleMessageBatch", arguments: ["messages": batch])
+            batch.removeAll(keepingCapacity: true)
+            characters = 0
+        }
+        for (message, level) in messages {
+            guard webView.acceptsConsoleMessage(level) else { continue }
+            let size = message.utf16.count + 48
+            if !batch.isEmpty && (batch.count >= 64 || characters + size > 65536) { flush() }
+            batch.append(["message": message, "messageLevel": level])
+            characters += size
+            // Preserve oversized messages intact as singleton batches.
+            if batch.count >= 64 || characters >= 65536 { flush() }
+        }
+        flush()
+    }
+
     public func onProgressChanged(progress: Int) {
         let arguments: [String: Any?] = [
             "progress": progress

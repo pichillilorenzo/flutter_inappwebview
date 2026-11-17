@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -283,6 +284,7 @@ class AndroidInAppWebViewWidget extends PlatformInAppWebViewWidget {
       params as AndroidInAppWebViewWidgetCreationParams;
 
   AndroidInAppWebViewController? _controller;
+  bool _disposed = false;
 
   AndroidHeadlessInAppWebView? get _androidHeadlessInAppWebView =>
       params.headlessWebView as AndroidHeadlessInAppWebView?;
@@ -292,6 +294,15 @@ class AndroidInAppWebViewWidget extends PlatformInAppWebViewWidget {
 
   factory AndroidInAppWebViewWidget.static() {
     return _staticValue;
+  }
+
+  @override
+  void updateParams(PlatformInAppWebViewWidgetCreationParams params) {
+    super.updateParams(params);
+    unawaited(_controller?.updateScrollChangedCallback(params.onScrollChanged));
+    unawaited(
+      _controller?.updateConsoleMessageCallback(params.onConsoleMessage),
+    );
   }
 
   @override
@@ -326,15 +337,20 @@ class AndroidInAppWebViewWidget extends PlatformInAppWebViewWidget {
             : params.initialOptions?.android.useHybridComposition) ??
         true;
 
+    final platformViewKey = widgetParams.key;
     return PlatformViewLink(
-      key: params.key,
+      // A GlobalKey already attached to the building widget belongs to that
+      // owner, not its child. Preserve separately supplied platform-view keys.
+      key: platformViewKey is GlobalKey && platformViewKey == context.widget.key
+          ? null
+          : platformViewKey,
       viewType: 'com.pichillilorenzo/flutter_inappwebview',
       surfaceFactory:
           (BuildContext context, PlatformViewController controller) {
             return AndroidViewSurface(
               controller: controller as AndroidViewController,
               gestureRecognizers:
-                  params.gestureRecognizers ??
+                  widgetParams.gestureRecognizers ??
                   const <Factory<OneSequenceGestureRecognizer>>{},
               hitTestBehavior: PlatformViewHitTestBehavior.opaque,
             );
@@ -345,14 +361,19 @@ class AndroidInAppWebViewWidget extends PlatformInAppWebViewWidget {
             id: params.id,
             viewType: 'com.pichillilorenzo/flutter_inappwebview',
             layoutDirection:
-                this.params.layoutDirection ??
+                this.widgetParams.layoutDirection ??
                 Directionality.maybeOf(context) ??
                 TextDirection.rtl,
             creationParams: <String, dynamic>{
               'initialUrlRequest': this.params.initialUrlRequest?.toMap(),
               'initialFile': this.params.initialFile,
               'initialData': this.params.initialData?.toMap(),
+              // Attach the publisher only once a live Dart controller owns it.
+              'hasConsoleMessageListener': false,
               'initialSettings': settingsMap,
+              // Subscribe only once a live Dart controller has attached.
+              // A cancelled keepAlive creation may never report completion.
+              'hasScrollChangedListener': false,
               'contextMenu': this.params.contextMenu?.toMap() ?? {},
               'windowId': this.params.windowId,
               'headlessWebViewId':
@@ -401,6 +422,7 @@ class AndroidInAppWebViewWidget extends PlatformInAppWebViewWidget {
   }
 
   void _onPlatformViewCreated(int id) {
+    if (_disposed) return;
     dynamic viewId = id;
     if (params.headlessWebView?.isRunning() ?? false) {
       viewId = params.headlessWebView?.id;
@@ -413,7 +435,21 @@ class AndroidInAppWebViewWidget extends PlatformInAppWebViewWidget {
         webviewParams: params,
       ),
     );
+    unawaited(
+      _controller!.updateConsoleMessageCallback(
+        widgetParams.onConsoleMessage,
+        forceNativeUpdate: true,
+      ),
+    );
     _androidParams.pullToRefreshController?.init(viewId);
+    // Creation may finish after a rebuild, or attach a headless/kept-alive view.
+    // Refresh both the Dart callback and the native gate before exposing it.
+    unawaited(
+      _controller!.updateScrollChangedCallback(
+        widgetParams.onScrollChanged,
+        forceNativeUpdate: true,
+      ),
+    );
     _androidParams.findInteractionController?.init(viewId);
     debugLog(
       className: runtimeType.toString(),
@@ -480,6 +516,7 @@ class AndroidInAppWebViewWidget extends PlatformInAppWebViewWidget {
 
   @override
   void dispose() {
+    _disposed = true;
     dynamic viewId = _controller?.getViewId();
     debugLog(
       className: runtimeType.toString(),

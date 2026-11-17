@@ -390,6 +390,9 @@ class WebPlatformInAppWebViewWidget extends PlatformInAppWebViewWidget {
       args: [],
     );
     final isKeepAlive = _webPlatformParams.keepAlive != null;
+    if (!isKeepAlive && viewId != null) {
+      InAppWebViewManager.webViews[viewId]?.dispose();
+    }
     _controller?.dispose(isKeepAlive: isKeepAlive);
     _controller = null;
     _webPlatformParams.pullToRefreshController?.dispose(

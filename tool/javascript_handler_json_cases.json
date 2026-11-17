@@ -1,0 +1,28 @@
+{
+  "valid": [
+    "{\"__proto__\":1,\"__proto__\":2}",
+    "{\"__proto__\":{\"inherited\":true},\"ok\":1}",
+    "{\"nested\":[{\"__proto__\":null,\"__proto__\":{\"x\":1}}]}",
+    "{\"__pro\\u0074o__\":1,\"__proto__\":2}",
+    "{\"a\":1,\"a\":2}",
+    "\"quotes \\\" and slash \\\\ and newline \\n\"",
+    "\"עברית 😃  \"",
+    "\"'); window.injected = true; //\"",
+    "\"\\ud800\"",
+    " \n{\"a\":[1,true,null]}\t ",
+    "null",
+    "true",
+    "false",
+    "-0",
+    "3.25",
+    "1e21",
+    "[]",
+    "{}"
+  ],
+  "invalid": [
+    "",
+    "{\"a\":",
+    "undefined",
+    "null); window.injected = true; //"
+  ]
+}

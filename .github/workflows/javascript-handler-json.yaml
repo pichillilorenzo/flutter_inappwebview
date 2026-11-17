@@ -1,0 +1,66 @@
+name: JavaScript handler JSON replies
+
+on:
+  pull_request:
+    paths:
+      - 'flutter_inappwebview_*/**'
+      - 'tool/*javascript_handler_json*'
+      - 'tool/*console*'
+      - 'tool/swift_source.py'
+      - 'tool/test_apple_bridge_source_invariants.js'
+      - '.github/workflows/javascript-handler-json.yaml'
+  push:
+    branches: [master]
+    paths:
+      - 'flutter_inappwebview_*/**'
+      - 'tool/*javascript_handler_json*'
+      - 'tool/*console*'
+      - 'tool/swift_source.py'
+      - 'tool/test_apple_bridge_source_invariants.js'
+      - '.github/workflows/javascript-handler-json.yaml'
+
+permissions:
+  contents: read
+
+jobs:
+  apple:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: node tool/test_javascript_handler_json_replies.js apple
+      - run: python3 tool/test_console_native.py apple
+      - run: node flutter_inappwebview_linux/linux/test/console_log_batch_test.js
+      - run: python3 flutter_inappwebview_linux/linux/test/run_javascript_handler_json_reply_test.py
+
+  linux-android-windows:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install native test dependencies
+        run: sudo apt-get update && sudo apt-get install -y nlohmann-json3-dev libandroid-json-java libjavascriptcoregtk-4.1-dev
+      - run: node tool/test_javascript_handler_json_replies.js android
+        env:
+          ANDROID_JSON_JAR: /usr/share/java/com.android.json.jar
+      - run: node tool/test_javascript_handler_json_replies.js windows
+      - run: python3 tool/test_console_native.py
+      - run: python3 tool/test_console_popup_policy.py
+      - run: python3 flutter_inappwebview_linux/linux/test/run_javascript_handler_json_reply_test.py
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: '3.47.2'
+      - run: flutter pub get --no-example
+        working-directory: flutter_inappwebview_platform_interface
+      - run: flutter test --no-pub
+        working-directory: flutter_inappwebview_platform_interface
+      - name: Test native platform Dart handlers
+        run: |
+          for platform in android ios macos windows linux; do
+            (cd flutter_inappwebview_$platform && flutter pub get --no-example && flutter test --no-pub test/javascript_handler_json_result_test.dart test/console_message_batch_test.dart)
+          done
+      - name: Test console subscriptions through the public widget
+        run: flutter pub get --no-example && flutter test --no-pub test/console_subscriptions_test.dart test/console_desktop_subscriptions_test.dart test/console_keep_alive_creation_test.dart test/scroll_subscriptions_test.dart
+        working-directory: flutter_inappwebview
+      - name: Test browser Dart handler
+        run: flutter pub get --no-example && flutter test --no-pub --platform chrome test/javascript_handler_json_result_test.dart test/webview_disposal_test.dart
+        working-directory: flutter_inappwebview_web

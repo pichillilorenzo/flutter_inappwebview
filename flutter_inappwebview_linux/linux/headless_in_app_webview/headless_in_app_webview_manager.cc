@@ -16,10 +16,6 @@ HeadlessInAppWebViewManager::HeadlessInAppWebViewManager(PluginInstance* plugin)
     : plugin_(plugin), registrar_(plugin->registrar()) {
   messenger_ = plugin->messenger();
   
-  // Cache the GTK window from the plugin instance
-  // This may return nullptr for headless scenarios, which is fine
-  gtk_window_ = plugin->gtkWindow();
-
   // Create the method channel
   g_autoptr(FlStandardMethodCodec) codec = fl_standard_method_codec_new();
   method_channel_ = fl_method_channel_new(messenger_, METHOD_CHANNEL_NAME, FL_METHOD_CODEC(codec));
@@ -121,9 +117,10 @@ void HeadlessInAppWebViewManager::Run(FlMethodCall* method_call) {
 
   // Create InAppWebView params
   InAppWebViewCreationParams webviewParams;
+  webviewParams.hasConsoleMessageListener = get_fl_map_value(params, "hasConsoleMessageListener", true);
   webviewParams.id = 0;  // Not used for headless
   webviewParams.plugin = plugin_;  // Pass plugin instance for accessing managers
-  webviewParams.gtkWindow = gtk_window_;  // Use cached GTK window (may be nullptr for headless)
+  webviewParams.gtkWindow = plugin_->gtkWindow();  // May be nullptr for headless/destroyed host.
   webviewParams.manager = nullptr;  // Not needed for headless
 
   // Parse initial settings
@@ -175,6 +172,17 @@ void HeadlessInAppWebViewManager::Run(FlMethodCall* method_call) {
   // Create the headless webview
   auto headlessWebView =
       std::make_unique<HeadlessInAppWebView>(this, headlessParams, webviewParams);
+  if (headlessWebView->creationError().has_value()) {
+    const auto& error = headlessWebView->creationError().value();
+    g_autoptr(FlValue) details = to_fl_map({
+        {"stage", make_fl_value(error.stage)},
+        {"nativeCode", make_fl_value(error.nativeCode)},
+        {"nativeDomain", make_fl_value(error.nativeDomain)},
+    });
+    fl_method_call_respond_error(method_call, "WEBVIEW_CREATION_FAILED",
+                                 error.message.c_str(), details, nullptr);
+    return;
+  }
 
   // Store it
   webviews_[id] = std::move(headlessWebView);

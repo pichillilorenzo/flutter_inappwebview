@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
+
 import '../webview_environment/webview_environment.dart';
 import 'headless_in_app_webview.dart';
 
@@ -8,6 +11,7 @@ import '../find_interaction/find_interaction_controller.dart';
 import 'in_app_webview_controller.dart';
 
 import 'custom_platform_view.dart';
+import 'webview_render_mode.dart';
 
 /// Object specifying creation parameters for creating a [PlatformInAppWebViewWidget].
 ///
@@ -133,6 +137,9 @@ class WindowsInAppWebViewWidgetCreationParams
     super.onSaveAsUIShowing,
     super.onSaveFileSecurityCheckStarting,
     super.onScreenCaptureStarting,
+    super.onAcceleratorKeyPressed,
+    super.onProcessFailed,
+    super.onShowFileChooser,
     super.initialUrlRequest,
     super.initialFile,
     super.initialData,
@@ -259,6 +266,9 @@ class WindowsInAppWebViewWidgetCreationParams
         onSaveAsUIShowing: params.onSaveAsUIShowing,
         onSaveFileSecurityCheckStarting: params.onSaveFileSecurityCheckStarting,
         onScreenCaptureStarting: params.onScreenCaptureStarting,
+        onAcceleratorKeyPressed: params.onAcceleratorKeyPressed,
+        onProcessFailed: params.onProcessFailed,
+        onShowFileChooser: params.onShowFileChooser,
         initialUrlRequest: params.initialUrlRequest,
         initialFile: params.initialFile,
         initialData: params.initialData,
@@ -297,6 +307,8 @@ class WindowsInAppWebViewWidget extends PlatformInAppWebViewWidget {
       params as WindowsInAppWebViewWidgetCreationParams;
 
   WindowsInAppWebViewController? _controller;
+  WindowsWebViewCreationDetails? _creationDetails;
+  bool _disposed = false;
 
   WindowsHeadlessInAppWebView? get _windowsHeadlessInAppWebView =>
       params.headlessWebView as WindowsHeadlessInAppWebView?;
@@ -306,6 +318,14 @@ class WindowsInAppWebViewWidget extends PlatformInAppWebViewWidget {
 
   factory WindowsInAppWebViewWidget.static() {
     return _staticValue;
+  }
+
+  @override
+  void updateParams(PlatformInAppWebViewWidgetCreationParams params) {
+    super.updateParams(params);
+    unawaited(
+      _controller?.updateConsoleMessageCallback(params.onConsoleMessage),
+    );
   }
 
   @override
@@ -329,7 +349,11 @@ class WindowsInAppWebViewWidget extends PlatformInAppWebViewWidget {
     }
 
     return CustomPlatformView(
+      onPlatformViewCreationDetails: (details) {
+        if (!_disposed) _creationDetails = details;
+      },
       onPlatformViewCreated: _onPlatformViewCreated,
+      creationKey: widgetParams.key,
       creationParams: <String, dynamic>{
         'initialUrlRequest': params.initialUrlRequest?.toMap(),
         'initialFile': params.initialFile,
@@ -340,6 +364,8 @@ class WindowsInAppWebViewWidget extends PlatformInAppWebViewWidget {
         'headlessWebViewId': params.headlessWebView?.isRunning() ?? false
             ? params.headlessWebView?.id
             : null,
+        // Attach the publisher only once a live Dart controller owns it.
+        'hasConsoleMessageListener': false,
         'initialUserScripts':
             params.initialUserScripts?.map((e) => e.toMap()).toList() ?? [],
         'keepAliveId': params.keepAlive?.id,
@@ -349,16 +375,30 @@ class WindowsInAppWebViewWidget extends PlatformInAppWebViewWidget {
   }
 
   void _onPlatformViewCreated(int id) {
+    if (_disposed) return;
     dynamic viewId = id;
     if (params.headlessWebView?.isRunning() ?? false) {
       viewId = params.headlessWebView?.id;
     }
     viewId = params.keepAlive?.id ?? viewId ?? id;
     _windowsHeadlessInAppWebView?.internalDispose();
-    _controller = WindowsInAppWebViewController(
-      PlatformInAppWebViewControllerCreationParams(
+    final controller = WindowsInAppWebViewController(
+      WindowsInAppWebViewControllerCreationParams(
         id: viewId,
         webviewParams: params,
+        creationDetails: _creationDetails,
+      ),
+    );
+    // controllerFromPlatform runs during construction and may detach its owner.
+    if (_disposed) {
+      controller.dispose(isKeepAlive: params.keepAlive != null);
+      return;
+    }
+    _controller = controller;
+    unawaited(
+      _controller!.updateConsoleMessageCallback(
+        widgetParams.onConsoleMessage,
+        forceNativeUpdate: true,
       ),
     );
     _windowsParams.findInteractionController?.init(viewId);
@@ -370,9 +410,9 @@ class WindowsInAppWebViewWidget extends PlatformInAppWebViewWidget {
       args: [],
     );
     if (params.onWebViewCreated != null) {
-      params.onWebViewCreated!(
-        params.controllerFromPlatform?.call(_controller!) ?? _controller!,
-      );
+      final wrappedController =
+          params.controllerFromPlatform?.call(controller) ?? controller;
+      if (!_disposed) params.onWebViewCreated!(wrappedController);
     }
   }
 
@@ -423,6 +463,8 @@ class WindowsInAppWebViewWidget extends PlatformInAppWebViewWidget {
 
   @override
   void dispose() {
+    _disposed = true;
+    _creationDetails = null;
     dynamic viewId = _controller?.getViewId();
     debugLog(
       className: runtimeType.toString(),

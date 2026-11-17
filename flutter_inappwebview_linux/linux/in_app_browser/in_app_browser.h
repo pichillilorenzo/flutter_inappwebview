@@ -74,6 +74,9 @@ class InAppBrowser {
 
   /// Get the embedded WebView
   InAppWebView* webView() const { return webView_.get(); }
+  std::optional<WebViewCreationError> creationError() const {
+    return webView_ ? webView_->creationError() : std::nullopt;
+  }
 
   /// Get the channel delegate
   InAppBrowserChannelDelegate* channelDelegate() const { return channelDelegate_.get(); }

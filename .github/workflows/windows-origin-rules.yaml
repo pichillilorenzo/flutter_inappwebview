@@ -1,0 +1,26 @@
+name: Windows JavaScript origin cache regression
+on:
+  pull_request:
+    paths:
+      - 'flutter_inappwebview_windows/**'
+      - '.github/workflows/windows-origin-rules.yaml'
+  workflow_dispatch:
+jobs:
+  native-origin-policy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run policy and cache invalidation tests (ASan and UBSan)
+        run: |
+          g++ -std=c++17 -O0 -Wall -Wextra -Werror -fsanitize=address,undefined -fno-omit-frame-pointer \
+            flutter_inappwebview_windows/windows/test/javascript_origin_rules_test.cpp -o /tmp/javascript_origin_rules_test
+          ASAN_OPTIONS=detect_leaks=1 /tmp/javascript_origin_rules_test
+      - name: Verify integration updates compiled policy on settings change
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          s=Path("flutter_inappwebview_windows/windows/in_app_webview/in_app_webview.cpp").read_text()
+          assert "javaScriptOriginRules_.allows(origin)" in s
+          assert s.count("javaScriptOriginRules_.configure(") == 2
+          assert "std::regex(allowedOrigin)" not in s
+          PY

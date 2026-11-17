@@ -19,6 +19,9 @@ HeadlessInAppWebView::HeadlessInAppWebView(HeadlessInAppWebViewManager* manager,
   // Use 0 as the numeric ID since we use string ID for headless webviews
   webview_ = std::make_shared<InAppWebView>(manager_->registrar(), manager_->messenger(), 0,
                                             webviewParams);
+  if (webview_->creationError().has_value()) {
+    return;
+  }
 
   // CRITICAL: Attach the method channel to the InAppWebView using the string ID.
   // This creates the channel at "com.pichillilorenzo/flutter_inappwebview_<id>"

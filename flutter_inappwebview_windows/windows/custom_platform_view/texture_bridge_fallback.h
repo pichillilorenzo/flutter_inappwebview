@@ -16,15 +16,19 @@ namespace flutter_inappwebview_plugin
 
     const FlutterDesktopPixelBuffer* CopyPixelBuffer(size_t width, size_t height);
 
+  protected:
+    bool TrimHiddenResources(
+      std::vector<winrt::com_ptr<ID3D11Texture2D>>& retired) override;
+
   private:
     Size staging_texture_size_ = { 0, 0 };
     winrt::com_ptr<ID3D11Texture2D> staging_texture_{ nullptr };
     std::mutex buffer_mutex_;
-    std::unique_ptr<uint8_t> backing_pixel_buffer_;
+    std::unique_ptr<uint8_t[]> backing_pixel_buffer_;
     std::unique_ptr<FlutterDesktopPixelBuffer> pixel_buffer_;
 
     void ProcessFrame(winrt::com_ptr<ID3D11Texture2D> src_texture);
-    void EnsureStagingTexture(uint32_t width, uint32_t height,
+    bool EnsureStagingTexture(uint32_t width, uint32_t height,
       bool& is_exact_size);
   };
 }

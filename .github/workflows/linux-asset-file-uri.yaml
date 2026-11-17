@@ -1,0 +1,31 @@
+name: Linux asset file URI encoding
+on:
+  pull_request:
+    paths:
+      - 'flutter_inappwebview_linux/**'
+      - '.github/workflows/linux-asset-file-uri.yaml'
+  workflow_dispatch:
+jobs:
+  local-asset-uri:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install GLib development headers
+        run: sudo apt-get update && sudo apt-get install -y libglib2.0-dev pkg-config
+      - name: Check native GLib file URI roundtrips (English/Hebrew/metacharacters)
+        run: |
+          g++ -std=c++17 -O0 -Wall -Wextra -Werror -fsanitize=address,undefined -fno-omit-frame-pointer \
+            $(pkg-config --cflags glib-2.0) \
+            flutter_inappwebview_linux/linux/test/file_asset_uri_test.cc -o /tmp/file_asset_uri_test \
+            $(pkg-config --libs glib-2.0)
+          ASAN_OPTIONS=detect_leaks=1 /tmp/file_asset_uri_test
+      - name: Verify loadFile uses encoded native URI rather than raw concatenation
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          s=Path("flutter_inappwebview_linux/linux/in_app_webview/in_app_webview.cc").read_text()
+          b=s[s.index("void InAppWebView::loadFile("):s.index("void InAppWebView::postUrl(")]
+          assert "g_filename_to_uri(flutter_asset_path.c_str()" in b
+          assert '"file://" + flutter_asset_path.string()' not in b
+          assert "std::filesystem::exists(flutter_asset_path, statError)" in b
+          PY

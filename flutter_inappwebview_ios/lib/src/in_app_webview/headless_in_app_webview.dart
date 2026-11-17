@@ -350,7 +350,9 @@ class IOSHeadlessInAppWebView extends PlatformHeadlessInAppWebView
         'initialUrlRequest': params.initialUrlRequest?.toMap(),
         'initialFile': params.initialFile,
         'initialData': params.initialData?.toMap(),
+        'hasConsoleMessageListener': params.onConsoleMessage != null,
         'initialSettings': settingsMap,
+        'hasScrollChangedListener': params.onScrollChanged != null,
         'contextMenu': params.contextMenu?.toMap() ?? {},
         'windowId': params.windowId,
         'initialUserScripts':

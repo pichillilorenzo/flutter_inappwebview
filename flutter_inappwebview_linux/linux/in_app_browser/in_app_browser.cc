@@ -80,6 +80,27 @@ InAppBrowser::InAppBrowser(InAppBrowserManager* manager, FlBinaryMessenger* mess
   setupToolbar();
   setupDrawingArea();
   setupWebView(params);
+  if (webView_ && webView_->creationError().has_value()) {
+    if (window_ != nullptr) {
+      // This browser is not registered with the manager yet. Prevent the
+      // destroy signal from notifying Dart or removing another browser with
+      // the same ID while releasing the hidden, partially built window.
+      g_signal_handlers_disconnect_by_data(window_, this);
+      if (glArea_ != nullptr) {
+        g_signal_handlers_disconnect_by_data(glArea_, this);
+      }
+      if (drawingArea_ != nullptr) {
+        g_signal_handlers_disconnect_by_data(drawingArea_, this);
+      }
+      gtk_widget_destroy(GTK_WIDGET(window_));
+      // The destructor's normal cleanup may run after GTK has freed these
+      // widgets, so clear every pointer that it could otherwise inspect.
+      window_ = nullptr;
+      glArea_ = nullptr;
+      drawingArea_ = nullptr;
+    }
+    return;
+  }
   applySettings();
 
   // Show window unless hidden
@@ -446,6 +467,9 @@ void InAppBrowser::setupWebView(const InAppBrowserCreationParams& params) {
 
   // Create the InAppWebView - pass nullptr for registrar since we have messenger directly
   webView_ = std::make_shared<InAppWebView>(nullptr, messenger_, 0, webViewParams);
+  if (webView_->creationError().has_value()) {
+    return;
+  }
 
   // Attach channel with browser-specific ID
   webView_->AttachChannel(messenger_, METHOD_CHANNEL_NAME_PREFIX + id_, true);

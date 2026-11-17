@@ -22,7 +22,9 @@ public enum WebViewChannelDelegateMethods {
   stopLoading,
   isLoading,
   takeScreenshot,
+  setScrollChangedListener,
   setSettings,
+  setConsoleMessageListener,
   getSettings,
   close,
   show,
@@ -88,4 +90,5 @@ public enum WebViewChannelDelegateMethods {
   showInputMethod,
   saveState,
   restoreState,
+  setBackgroundColor,
 }

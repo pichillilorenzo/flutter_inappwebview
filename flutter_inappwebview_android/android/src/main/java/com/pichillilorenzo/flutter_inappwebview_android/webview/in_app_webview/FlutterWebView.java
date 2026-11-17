@@ -63,8 +63,13 @@ public class FlutterWebView implements PlatformWebView {
       }
     }
 
-    webView = new InAppWebView(context, plugin, id, windowId, customSettings, contextMenu, 
-            customSettings.useHybridComposition ? null : plugin.flutterView, userScripts);
+    try {
+      webView = new InAppWebView(context, plugin, id, windowId, customSettings, contextMenu,
+              customSettings.useHybridComposition ? null : plugin.flutterView, userScripts);
+    } catch (RuntimeException exception) {
+      throw new WebViewCreationException(
+              WebViewCreationException.STAGE_IN_APP_WEB_VIEW_CONSTRUCTOR, exception);
+    }
     displayListenerProxy.onPostWebViewInitialization(displayManager);
 
     // set MATCH_PARENT layout params to the WebView, otherwise it won't take all the available space!
@@ -79,6 +84,8 @@ public class FlutterWebView implements PlatformWebView {
     webView.findInteractionController = findInteractionController;
     findInteractionController.prepare();
 
+    webView.hasScrollChangedListener = !Boolean.FALSE.equals(params.get("hasScrollChangedListener"));
+    webView.setConsoleMessageListener(!Boolean.FALSE.equals(params.get("hasConsoleMessageListener")));
     webView.prepare();
   }
 

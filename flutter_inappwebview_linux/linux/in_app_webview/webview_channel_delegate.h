@@ -9,6 +9,7 @@
 #include <optional>
 #include <string>
 #include <vector>
+#include <utility>
 
 #include "../types/base_callback_result.h"
 #include "../types/channel_delegate.h"
@@ -214,6 +215,7 @@ class WebViewChannelDelegate : public ChannelDelegate {
                            std::shared_ptr<WebResourceResponse> errorResponse) const;
 
   void onConsoleMessage(const std::string& message, int64_t messageLevel) const;
+  void onConsoleMessages(const std::vector<std::pair<std::string, int64_t>>& messages) const;
 
   void onLoadResource(const std::string& url,
                       const std::string& initiatorType,

@@ -6,7 +6,9 @@
 
 #include <functional>
 #include <memory>
+#include <optional>
 #include <string>
+#include <vector>
 
 namespace flutter_inappwebview_plugin {
 
@@ -60,6 +62,25 @@ class ContentBlockerHandler {
    */
   std::string getFilterIdentifier() const { return filter_identifier_; }
 
+  /**
+   * Whether rules were requested but none are in force.
+   */
+  bool rulesMissing() const {
+    return requested_identifier_ != std::string() && applied_identifier_.empty();
+  }
+
+  /**
+   * Whether the latest request is still being loaded or compiled.
+   */
+  bool isPending() const { return pending_; }
+
+  /**
+   * Call [waiter] with the outcome of the latest request.
+   */
+  void whenSettled(std::function<void(bool applied)> waiter) {
+    waiters_.push_back(std::move(waiter));
+  }
+
  private:
   /**
    * Convert FlValue content blockers to Safari-format JSON string.
@@ -70,22 +91,36 @@ class ContentBlockerHandler {
   std::string convertToJsonString(FlValue* contentBlockers);
 
   /**
-   * Compile JSON to WebKit filter (async).
-   *
-   * @param jsonSource JSON string in Safari format
-   * @param callback Called when compilation is complete
+   * Load the filter from the store, compiling it only when it is not there (async).
    */
-  void compileContentBlockers(const std::string& jsonSource,
-                              std::function<void(bool success)> callback);
+  void loadOrCompile(const std::string& identifier, const std::string& jsonSource);
+
+  static void onFilterLoaded(GObject* source, GAsyncResult* result, gpointer user_data);
+  static void onFilterCompiled(GObject* source, GAsyncResult* result, gpointer user_data);
 
   /**
-   * Callback when filter store save completes.
+   * Enforce a ready filter, unless a newer request was made since: enforcing it would undo
+   * that request.
    */
-  static void onFilterCompiled(GObject* source, GAsyncResult* result, gpointer user_data);
+  void filterReady(WebKitUserContentFilter* filter, const std::string& identifier);
+
+  /**
+   * Report the outcome of the latest request to everyone waiting for it.
+   */
+  void finishRequest(bool applied);
 
   WebKitUserContentManager* content_manager_;  // Not owned (from webview)
   WebKitUserContentFilterStore* filter_store_;  // Owned
   std::string filter_identifier_;
+  // Identifier of the filter currently enforced; empty when none is.
+  std::string applied_identifier_;
+  // Latest request: "" for no rules, nullopt when it could not be applied.
+  std::optional<std::string> requested_identifier_ = std::string();
+  bool pending_ = false;
+  // Callers waiting for the latest request to take effect.
+  std::vector<std::function<void(bool)>> waiters_;
+  // Expires with the handler; a load or compile can complete after the WebView is closed.
+  std::shared_ptr<bool> alive_ = std::make_shared<bool>(true);
   std::string store_path_;
 
   /**
@@ -93,7 +128,9 @@ class ContentBlockerHandler {
    */
   struct CompileContext {
     ContentBlockerHandler* handler;
-    std::function<void(bool)> callback;
+    std::weak_ptr<bool> alive;
+    std::string identifier;
+    std::string jsonSource;
   };
 };
 

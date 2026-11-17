@@ -43,19 +43,27 @@ pkg_check_modules(GTK REQUIRED IMPORTED_TARGET gtk+-3.0)
 
 message(STATUS "flutter_inappwebview_linux: Using WPE WebKit backend")
 
-# Try wpe-webkit-2.0 first (newer API), fall back to wpe-webkit-1.1, then wpe-webkit-1.0
+# Try wpe-webkit-2.0 first (newer API), fall back to wpe-webkit-1.1, then wpe-webkit-1.0.
+# WPE_WEBKIT_PC_MODULE / WPE_API_VERSION are reused below to locate the helper
+# processes and injected bundle (their install dirs are named wpe-webkit-<API>).
 pkg_check_modules(WPE_WEBKIT QUIET IMPORTED_TARGET wpe-webkit-2.0)
 if(NOT WPE_WEBKIT_FOUND)
   pkg_check_modules(WPE_WEBKIT QUIET IMPORTED_TARGET wpe-webkit-1.1)
   if(WPE_WEBKIT_FOUND)
+    set(WPE_WEBKIT_PC_MODULE "wpe-webkit-1.1")
+    set(WPE_API_VERSION "1.1")
     message(STATUS "flutter_inappwebview_linux: Found wpe-webkit-1.1 (${WPE_WEBKIT_VERSION})")
   else()
     pkg_check_modules(WPE_WEBKIT QUIET IMPORTED_TARGET wpe-webkit-1.0)
     if(WPE_WEBKIT_FOUND)
+      set(WPE_WEBKIT_PC_MODULE "wpe-webkit-1.0")
+      set(WPE_API_VERSION "1.0")
       message(STATUS "flutter_inappwebview_linux: Found wpe-webkit-1.0 (${WPE_WEBKIT_VERSION})")
     endif()
   endif()
 else()
+  set(WPE_WEBKIT_PC_MODULE "wpe-webkit-2.0")
+  set(WPE_API_VERSION "2.0")
   message(STATUS "flutter_inappwebview_linux: Found wpe-webkit-2.0 (${WPE_WEBKIT_VERSION})")
 endif()
 
@@ -75,8 +83,40 @@ if(WPE_PLATFORM_FOUND AND WPE_PLATFORM_HEADLESS_FOUND)
   # The pkg-config file may exist but WebKit headers may not have the required functions
   # This happens when WPE WebKit is rebuilt without WPEPlatform support
   include(CheckCXXSourceCompiles)
+  include(CMakePushCheckState)
+  # The CMAKE_REQUIRED_* variables are process-wide. Keep this probe's include
+  # paths, libraries, and linker search paths from affecting later checks.
+  cmake_push_check_state(RESET)
   set(CMAKE_REQUIRED_INCLUDES ${WPE_WEBKIT_INCLUDE_DIRS} ${WPE_PLATFORM_INCLUDE_DIRS})
-  set(CMAKE_REQUIRED_LIBRARIES ${WPE_WEBKIT_LIBRARIES} ${WPE_PLATFORM_LIBRARIES})
+  # The probe must find direct libraries and their DT_NEEDED dependencies in a
+  # non-system SDK prefix (e.g. /opt/wpe-sdk). -rpath-link is link-time only:
+  # unlike --allow-shlib-undefined, it does not hide a dependency that will be
+  # missing from the application bundle at runtime.
+  set(_wpe_probe_ldirs
+    ${WPE_WEBKIT_LIBRARY_DIRS}
+    ${WPE_PLATFORM_LIBRARY_DIRS}
+    ${WPE_PLATFORM_HEADLESS_LIBRARY_DIRS})
+  list(REMOVE_DUPLICATES _wpe_probe_ldirs)
+  set(_wpe_probe_link_options "")
+  foreach(_wpe_probe_ldir ${_wpe_probe_ldirs})
+    list(APPEND _wpe_probe_link_options
+      "-L${_wpe_probe_ldir}"
+      "-Wl,-rpath-link,${_wpe_probe_ldir}")
+  endforeach()
+  # CMAKE_REQUIRED_LINK_OPTIONS was added in CMake 3.14, while this plugin
+  # supports CMake 3.10. Older CMake versions accept the same driver options
+  # through CMAKE_REQUIRED_FLAGS.
+  if(CMAKE_VERSION VERSION_LESS "3.14")
+    string(REPLACE ";" " " _wpe_probe_required_flags "${_wpe_probe_link_options}")
+    set(CMAKE_REQUIRED_FLAGS "${CMAKE_REQUIRED_FLAGS} ${_wpe_probe_required_flags}")
+  else()
+    set(CMAKE_REQUIRED_LINK_OPTIONS ${_wpe_probe_link_options})
+  endif()
+  set(CMAKE_REQUIRED_LIBRARIES
+    ${WPE_WEBKIT_LINK_LIBRARIES}
+    ${WPE_PLATFORM_LINK_LIBRARIES}
+    ${WPE_PLATFORM_HEADLESS_LINK_LIBRARIES})
+  message(STATUS "flutter_inappwebview_linux: probe ldirs=[${_wpe_probe_ldirs}] libs=[${WPE_WEBKIT_LINK_LIBRARIES}]")
   check_cxx_source_compiles("
     #include <wpe/webkit.h>
     int main() {
@@ -85,6 +125,7 @@ if(WPE_PLATFORM_FOUND AND WPE_PLATFORM_HEADLESS_FOUND)
       return 0;
     }
   " WEBKIT_HAS_WPE_PLATFORM_API)
+  cmake_pop_check_state()
   
   if(WEBKIT_HAS_WPE_PLATFORM_API)
     message(STATUS "flutter_inappwebview_linux: Found wpe-platform-2.0 (WPEPlatform API - DEFAULT)")
@@ -163,8 +204,15 @@ FetchContent_Declare(
 # Don't build tests/examples
 set(JSON_BuildTests OFF CACHE INTERNAL "")
 FetchContent_MakeAvailable(nlohmann_json)
-# Suppress deprecated literal operator warnings from nlohmann_json
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-literal-operator")
+# Suppress this nlohmann/json warning only when the active compiler knows the
+# option. Older Clang releases reject unknown warning options as errors when
+# the host project enables -Werror.
+check_cxx_compiler_flag("-Wno-deprecated-literal-operator"
+  COMPILER_SUPPORTS_NO_DEPRECATED_LITERAL_OPERATOR)
+if(COMPILER_SUPPORTS_NO_DEPRECATED_LITERAL_OPERATOR)
+  target_compile_options(nlohmann_json INTERFACE
+    -Wno-deprecated-literal-operator)
+endif()
 message(STATUS "flutter_inappwebview_linux: nlohmann/json ${NLOHMANN_JSON_VERSION} configured")
 
 # Plugin source files
@@ -175,6 +223,7 @@ list(APPEND PLUGIN_SOURCES
   "credential_database.cc"
   "proxy_manager.cc"
   "utils/software_rendering.cc"
+  "utils/wpe_bundle_paths.cc"
   "web_storage_manager.cc"
   "webview_environment.cc"
   "content_blocker/content_blocker_handler.cc"
@@ -280,6 +329,8 @@ target_link_libraries(${PLUGIN_NAME} PRIVATE PkgConfig::WPE_WEBKIT)
 target_link_libraries(${PLUGIN_NAME} PRIVATE PkgConfig::LIBWPE)
 target_link_libraries(${PLUGIN_NAME} PRIVATE PkgConfig::WAYLAND_SERVER)
 target_link_libraries(${PLUGIN_NAME} PRIVATE PkgConfig::LIBSECRET)
+# ${CMAKE_DL_LIBS} provides dladdr (used to locate the bundled helper processes).
+target_link_libraries(${PLUGIN_NAME} PRIVATE ${CMAKE_DL_LIBS})
 
 # Link WPEPlatform if available (new API - default)
 if(HAVE_WPE_PLATFORM)
@@ -334,6 +385,12 @@ endif()
 if(HAVE_WPE_FDO AND WPE_FDO_LIBRARY_DIRS)
   list(APPEND WPE_LIB_DIRS ${WPE_FDO_LIBRARY_DIRS})
 endif()
+if(HAVE_WPE_PLATFORM AND WPE_PLATFORM_LIBRARY_DIRS)
+  list(APPEND WPE_LIB_DIRS ${WPE_PLATFORM_LIBRARY_DIRS})
+endif()
+if(HAVE_WPE_PLATFORM AND WPE_PLATFORM_HEADLESS_LIBRARY_DIRS)
+  list(APPEND WPE_LIB_DIRS ${WPE_PLATFORM_HEADLESS_LIBRARY_DIRS})
+endif()
 # Add common paths as fallback
 list(APPEND WPE_LIB_DIRS 
   "/usr/local/lib"
@@ -349,8 +406,11 @@ find_and_add_library("libWPEWebKit-2.0" "${WPE_LIB_DIRS}" WPE_BUNDLED_LIBS)
 # Find libwpe library  
 find_and_add_library("libwpe-1.0" "${WPE_LIB_DIRS}" WPE_BUNDLED_LIBS)
 
-# WPEPlatform is built into libWPEWebKit-2.0 on modern builds, so there are
-# no separate libWPEPlatform*.so files to bundle.
+# WPEPlatform is a separate DT_NEEDED library in current WPE releases (including
+# the 2.48.x SDK used by Otzaria), so it must be bundled explicitly.
+if(HAVE_WPE_PLATFORM)
+  find_and_add_library("libWPEPlatform-2.0" "${WPE_LIB_DIRS}" WPE_BUNDLED_LIBS)
+endif()
 
 # Find WPE Backend FDO library (legacy fallback)
 if(HAVE_WPE_FDO)
@@ -359,6 +419,86 @@ endif()
 
 # Also need to create symlinks for the sonames that the libraries expect
 # This will be handled at install time in the example CMakeLists.txt
+
+# === Self-contained helper processes and injected bundle ===
+# WPE WebKit is multi-process: libWPEWebKit spawns WPEWebProcess/WPENetworkProcess
+# and loads libWPEInjectedBundle.so. Their locations are baked into the library as
+# absolute PKGLIBEXECDIR/PKGLIBDIR paths, so bundling only the .so files is not
+# enough to run on a machine without WPE installed. Stage these extra files into
+# the app bundle; utils/wpe_bundle_paths.cc redirects WebKit to them at runtime.
+
+# Derive install prefix/libdir from the WPE WebKit .pc file to build candidate dirs.
+pkg_get_variable(WPE_WEBKIT_PREFIX "${WPE_WEBKIT_PC_MODULE}" prefix)
+pkg_get_variable(WPE_WEBKIT_LIBDIR "${WPE_WEBKIT_PC_MODULE}" libdir)
+
+# Probes ONE install prefix (its base dirs are passed as ARGN) for the complete
+# WPE runtime set: WPEWebProcess + WPENetworkProcess + libWPEInjectedBundle.so
+# (WPEGPUProcess optional). All-or-nothing per prefix, so components of
+# different WPE installs/versions are never mixed in the app bundle.
+function(wpe_probe_runtime_set OUT_FILES OUT_COMPLETE)
+  set(exec_dirs "")
+  set(bundle_dirs "")
+  foreach(BASE ${ARGN})
+    if(BASE)
+      list(APPEND exec_dirs "${BASE}/wpe-webkit-${WPE_API_VERSION}" "${BASE}")
+      list(APPEND bundle_dirs "${BASE}/wpe-webkit-${WPE_API_VERSION}/injected-bundle")
+    endif()
+  endforeach()
+  list(REMOVE_DUPLICATES exec_dirs)
+  list(REMOVE_DUPLICATES bundle_dirs)
+
+  set(files "")
+  set(complete TRUE)
+  foreach(PROC "WPEWebProcess" "WPENetworkProcess" "WPEGPUProcess")
+    set(found "")
+    foreach(DIR ${exec_dirs})
+      if(EXISTS "${DIR}/${PROC}")
+        set(found "${DIR}/${PROC}")
+        break()
+      endif()
+    endforeach()
+    if(found)
+      list(APPEND files "${found}")
+    elseif(NOT PROC STREQUAL "WPEGPUProcess")
+      set(complete FALSE)
+    endif()
+  endforeach()
+
+  set(found "")
+  foreach(DIR ${bundle_dirs})
+    if(EXISTS "${DIR}/libWPEInjectedBundle.so")
+      set(found "${DIR}/libWPEInjectedBundle.so")
+      break()
+    endif()
+  endforeach()
+  if(found)
+    list(APPEND files "${found}")
+  else()
+    set(complete FALSE)
+  endif()
+
+  set(${OUT_FILES} "${files}" PARENT_SCOPE)
+  set(${OUT_COMPLETE} "${complete}" PARENT_SCOPE)
+endfunction()
+
+# Probe only the installation selected by pkg-config. Falling back independently
+# to /usr could combine libWPEWebKit from a custom SDK with helper processes and
+# an injected bundle from a different system version.
+wpe_probe_runtime_set(WPE_RUNTIME_SET WPE_RUNTIME_SET_COMPLETE
+  "${WPE_WEBKIT_LIBDIR}" "${WPE_WEBKIT_PREFIX}/libexec" "${WPE_WEBKIT_PREFIX}/lib")
+
+# Append to WPE_BUNDLED_LIBS — the core .so libraries were already collected
+# above and must always ship, with or without the helper-process set.
+if(WPE_RUNTIME_SET_COMPLETE)
+  list(APPEND WPE_BUNDLED_LIBS ${WPE_RUNTIME_SET})
+  foreach(BUNDLED_FILE ${WPE_RUNTIME_SET})
+    message(STATUS "flutter_inappwebview_linux: Will bundle ${BUNDLED_FILE}")
+  endforeach()
+else()
+  # Partial sets are discarded: wpe_bundle_paths.cc activates the bundled path
+  # only when the full set is present, so shipping a partial one is dead weight.
+  message(STATUS "flutter_inappwebview_linux: complete WPE runtime set not found; app will fall back to system WPE")
+endif()
 
 set(flutter_inappwebview_linux_bundled_libraries
   ${WPE_BUNDLED_LIBS}
@@ -413,6 +553,7 @@ target_link_libraries(${TEST_RUNNER} PRIVATE PkgConfig::WPE_WEBKIT)
 target_link_libraries(${TEST_RUNNER} PRIVATE PkgConfig::LIBWPE)
 target_link_libraries(${TEST_RUNNER} PRIVATE PkgConfig::WAYLAND_SERVER)
 target_link_libraries(${TEST_RUNNER} PRIVATE PkgConfig::LIBSECRET)
+target_link_libraries(${TEST_RUNNER} PRIVATE ${CMAKE_DL_LIBS})
 if(HAVE_WPE_PLATFORM)
   target_link_libraries(${TEST_RUNNER} PRIVATE PkgConfig::WPE_PLATFORM)
   target_link_libraries(${TEST_RUNNER} PRIVATE PkgConfig::WPE_PLATFORM_HEADLESS)

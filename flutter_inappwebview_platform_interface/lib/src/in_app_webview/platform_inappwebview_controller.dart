@@ -30,6 +30,8 @@ part 'platform_inappwebview_controller.g.dart';
 final kJavaScriptHandlerForbiddenNames = UnmodifiableListView<String>([
   "onLoadResource",
   "onConsoleMessage",
+  "onConsoleMessageBatch",
+  "onConsoleMessagePolicy",
   "shouldInterceptAjaxRequest",
   "onAjaxReadyStateChange",
   "onAjaxProgress",
@@ -723,6 +725,30 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
     );
   }
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.setBackgroundColor}
+  ///Sets the native WebView background color.
+  ///
+  ///On Android, the color is retained when [InAppWebViewSettings.transparentBackground]
+  ///is toggled off again. This runtime method is called after the controller is
+  ///created, so it cannot change a platform view's very first native frame.
+  ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.setBackgroundColor.supported_platforms}
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(
+        apiName: 'View.setBackgroundColor',
+        apiUrl:
+            'https://developer.android.com/reference/android/view/View#setBackgroundColor(int)',
+      ),
+    ],
+  )
+  Future<void> setBackgroundColor(Color color) {
+    throw UnimplementedError(
+      '${PlatformInAppWebViewControllerMethod.setBackgroundColor.name} is not implemented on the current platform',
+    );
+  }
+
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.goBack}
   ///Goes back in the history of the WebView.
   ///{@endtemplate}
@@ -1049,6 +1075,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///Instead, on Android, it will run the [source] code into an iframe, using `eval(source);` to get and return the result.
   ///This parameter doesn’t apply to changes you make to the underlying web content, such as the document’s DOM structure.
   ///Those changes remain visible to all scripts, regardless of which content world you specify.
+  ///On iOS 14 through 17, named content worlds are unavailable in popup WebViews; the page world remains supported.
   ///For more information about content worlds, see [ContentWorld].
   ///
   ///**NOTE**: This method shouldn't be called in the [PlatformWebViewCreationParams.onWebViewCreated] or [PlatformWebViewCreationParams.onLoadStart] events,
@@ -2476,6 +2503,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///Instead, on Android, it will run the [source] code into an iframe.
   ///This parameter doesn’t apply to changes you make to the underlying web content, such as the document’s DOM structure.
   ///Those changes remain visible to all scripts, regardless of which content world you specify.
+  ///On iOS 14 through 17, named content worlds are unavailable in popup WebViews; the page world remains supported.
   ///For more information about content worlds, see [ContentWorld].
   ///
   ///**NOTE**: This method shouldn't be called in the [PlatformWebViewCreationParams.onWebViewCreated] or [PlatformWebViewCreationParams.onLoadStart] events,
@@ -2978,8 +3006,21 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.pause}
-  ///Does a best-effort attempt to pause any processing that can be paused safely, such as animations and geolocation. Note that this call does not pause JavaScript.
-  ///To pause JavaScript globally, use [PlatformInAppWebViewController.pauseTimers]. To resume WebView, call [resume].
+  ///Attempts to pause processing in this WebView. To resume it, call [resume].
+  ///
+  ///On Android, this calls `WebView.onPause`: it pauses processing such as
+  ///animations and geolocation on a best-effort basis, but does not pause
+  ///JavaScript. [pauseTimers] affects **all** WebViews in the process and must
+  ///not be used to suspend an individual tab.
+  ///
+  ///On Windows, this hides the WebView and awaits the asynchronous WebView2
+  ///`TrySuspend` result. It completes successfully only when the callback
+  ///reports both a successful HRESULT and `isSuccessful == true`. Suspension
+  ///is still best effort: currently running script may finish before it takes
+  ///effect. Refusal, native errors, superseding requests, disposal, or a
+  ///five-second completion timeout throw a `PlatformException`; a hidden
+  ///WebView alone does not confirm suspension. A failed request remains
+  ///hidden until [resume] is called.
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.pause.supported_platforms}
@@ -3005,6 +3046,10 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
 
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.resume}
   ///Resumes a WebView after a previous call to [pause].
+  ///On Windows, completion waits for the native Resume and visibility update
+  ///to be delivered, and supersedes an outstanding pause. Native errors,
+  ///disposal, supersession, or a completion timeout throw a
+  ///`PlatformException`. A minimized host remains hidden after resuming.
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.resume.supported_platforms}
@@ -3214,6 +3259,10 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
         apiName: 'ICoreWebView2_16.PrintToPdfStream',
         apiUrl:
             'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_16#printtopdfstream',
+      ),
+      LinuxPlatform(
+        note:
+            'Requires the Otzaria-patched WPE runtime. With stock libWPEWebKit, this method returns null.',
       ),
     ],
   )
@@ -3544,6 +3593,30 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   Future<void> setScreenScale({required double scale}) {
     throw UnimplementedError(
       '${PlatformInAppWebViewControllerMethod.setScreenScale.name} is not implemented on the current platform',
+    );
+  }
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getAppleWebViewActivitySnapshot}
+  ///Reads public native Apple view/window/application metadata once on the main
+  ///thread, without evaluating JavaScript or changing scheduling preferences.
+  ///
+  ///This observation does not establish actual JavaScript suspension, process
+  ///liveness, work progress, or complete rendered visibility. Read it outside
+  ///timed quiet intervals; even a native method call adds host-side work.
+  ///
+  ///Unsupported platforms return an explicit `unsupportedPlatform` result.
+  ///Apple controllers return `disposed` after disposal/keepAlive detachment,
+  ///`noNativeView` for a static controller or absent native view, and
+  ///`methodUnavailable` when the native channel/method is not registered (for
+  ///example an older native plugin). Failed native calls and malformed results
+  ///throw; they never produce an observed `false` or a stale cached snapshot.
+  ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getAppleWebViewActivitySnapshot.supported_platforms}
+  @SupportedPlatforms(platforms: [IOSPlatform(), MacOSPlatform()])
+  Future<AppleWebViewActivitySnapshot> getAppleWebViewActivitySnapshot() async {
+    return AppleWebViewActivitySnapshot.unavailable(
+      AppleWebViewActivityAvailability.unsupportedPlatform,
     );
   }
 
@@ -4737,6 +4810,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
       WindowsPlatform(),
     ],
   )
+  @override
   void dispose({bool isKeepAlive = false}) {
     throw UnimplementedError(
       '${PlatformInAppWebViewControllerMethod.dispose.name} is not implemented on the current platform',

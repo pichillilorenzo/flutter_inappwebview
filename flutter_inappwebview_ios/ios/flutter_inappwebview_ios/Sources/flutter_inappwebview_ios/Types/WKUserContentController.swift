@@ -69,6 +69,7 @@ extension WKUserContentController {
 
     public func dispose (windowId: Int64?) {
         if windowId == nil {
+            javaScriptBridgeSecret = nil
             let tmpAddress = String(format: "%p", unsafeBitCast(self, to: Int.self))
             if #available(iOS 14.0, *) {
                 contentWorlds.removeAll()
@@ -83,19 +84,22 @@ extension WKUserContentController {
             let contentWorldsToRemove = contentWorlds.filter({ $0.windowId == windowId })
             for contentWorld in contentWorldsToRemove {
                 contentWorlds.remove(contentWorld)
+                removeJavaScriptBridgeReplyWorld(contentWorld)
                 removeAllScriptMessageHandlers(from: contentWorld)
             }
         }
     }
 
     public func sync(scriptMessageHandler: WKScriptMessageHandler) {
+        let registeredHandler: WKScriptMessageHandler = scriptMessageHandler is InAppWebView ?
+            JavaScriptBridgeMessageHandler() : scriptMessageHandler
         let pluginScriptsList = pluginScripts.compactMap({ $0.value }).joined()
         for pluginScript in pluginScriptsList {
             if !containsPluginScript(pluginScript: pluginScript) {
                 addUserScript(pluginScript)
                 for messageHandlerName in pluginScript.messageHandlerNames {
                     removeScriptMessageHandler(forName: messageHandlerName)
-                    add(scriptMessageHandler, name: messageHandlerName)
+                    add(registeredHandler, name: messageHandlerName)
                 }
             }
             if #available(iOS 14.0, *), pluginScript.requiredInAllContentWorlds {
@@ -105,11 +109,15 @@ extension WKUserContentController {
                         addUserScript(pluginScriptWithContentWorld)
                         for messageHandlerName in pluginScriptWithContentWorld.messageHandlerNames {
                             removeScriptMessageHandler(forName: messageHandlerName, contentWorld: contentWorld)
-                            add(scriptMessageHandler, contentWorld: contentWorld, name: messageHandlerName)
+                            add(registeredHandler, contentWorld: contentWorld, name: messageHandlerName)
                         }
                     }
                 }
             }
+        }
+
+        if #available(iOS 14.0, *) {
+            syncJavaScriptBridgeReplyHandler()
         }
 
         let userOnlyScriptsList = userOnlyScripts.compactMap({ $0.value }).joined()
@@ -156,13 +164,16 @@ extension WKUserContentController {
     public func generateCodeForScriptEvaluation(scriptMessageHandler: WKScriptMessageHandler, source: String, contentWorld: WKContentWorld) -> String {
         let (inserted, _) = contentWorlds.insert(contentWorld)
         if inserted {
+            let registeredHandler: WKScriptMessageHandler = scriptMessageHandler is InAppWebView ?
+                JavaScriptBridgeMessageHandler() : scriptMessageHandler
+            syncJavaScriptBridgeReplyHandler()
             var generatedCode = ""
             let pluginScriptsRequired = getPluginScriptsRequiredInAllContentWorlds()
             for pluginScript in pluginScriptsRequired {
                 generatedCode += pluginScript.source + "\n"
                 for messageHandlerName in pluginScript.messageHandlerNames {
                     removeScriptMessageHandler(forName: messageHandlerName, contentWorld: contentWorld)
-                    add(scriptMessageHandler, contentWorld: contentWorld, name: messageHandlerName)
+                    add(registeredHandler, contentWorld: contentWorld, name: messageHandlerName)
                 }
             }
             if let windowId = contentWorld.windowId {

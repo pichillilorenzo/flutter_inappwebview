@@ -28,7 +28,7 @@ namespace flutter_inappwebview_plugin
     ~WebResourceResponse() = default;
 
     flutter::EncodableMap toEncodableMap() const;
-    ICoreWebView2WebResourceResponse* WebResourceResponse::toWebView2Response(const wil::com_ptr<ICoreWebView2Environment> webViewEnvironment) const;
+    wil::com_ptr<ICoreWebView2WebResourceResponse> toWebView2Response(const wil::com_ptr<ICoreWebView2Environment> webViewEnvironment) const;
   };
 }
 

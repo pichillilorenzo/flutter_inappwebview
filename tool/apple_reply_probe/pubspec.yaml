@@ -1,0 +1,13 @@
+name: apple_reply_probe
+publish_to: none
+environment:
+  sdk: ^3.8.0
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_inappwebview:
+    path: ../../flutter_inappwebview
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/javascript_handler_json_cases.json

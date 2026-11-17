@@ -31,6 +31,8 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
 
   public Boolean useShouldOverrideUrlLoading = false;
   public Boolean useOnLoadResource = false;
+  @Nullable
+  public List<Integer> consoleMessageLevels;
   public Boolean useOnDownloadStart = false;
   /**
    * @deprecated
@@ -176,6 +178,9 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
       switch (key) {
         case "useShouldOverrideUrlLoading":
           useShouldOverrideUrlLoading = (Boolean) value;
+          break;
+        case "consoleMessageLevels":
+          consoleMessageLevels = (List<Integer>) value;
           break;
         case "useOnLoadResource":
           useOnLoadResource = (Boolean) value;
@@ -495,6 +500,7 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
     Map<String, Object> settings = new HashMap<>();
     settings.put("useShouldOverrideUrlLoading", useShouldOverrideUrlLoading);
     settings.put("useOnLoadResource", useOnLoadResource);
+    settings.put("consoleMessageLevels", consoleMessageLevels);
     settings.put("useOnDownloadStart", useOnDownloadStart);
     settings.put("clearCache", clearCache);
     settings.put("userAgent", userAgent);

@@ -57,6 +57,7 @@ RoHelper::RoHelper(RO_INIT_TYPE init_type)
       mFpRoInitialize(nullptr),
       mFpRoUninitialize(nullptr),
       mWinRtAvailable(false),
+      mRoInitialized(false),
       mComBaseModule(nullptr),
       mCoreMessagingModule(nullptr) {
 #ifdef WINUWP
@@ -117,6 +118,7 @@ RoHelper::RoHelper(RO_INIT_TYPE init_type)
   }
 
   auto result = RoInitialize(init_type);
+  mRoInitialized = SUCCEEDED(result);
 
   if (SUCCEEDED(result) || result == S_FALSE || result == RPC_E_CHANGED_MODE) {
     mWinRtAvailable = true;
@@ -126,7 +128,7 @@ RoHelper::RoHelper(RO_INIT_TYPE init_type)
 
 RoHelper::~RoHelper() {
 #ifndef WINUWP
-  if (mWinRtAvailable) {
+  if (mRoInitialized) {
     RoUninitialize();
   }
 

@@ -87,7 +87,7 @@ void webViewWindows() {
 
       var windowId = await onCreateWindowCompleter.future;
 
-      final Completer windowControllerCompleter =
+      final Completer<InAppWebViewController> windowControllerCompleter =
           Completer<InAppWebViewController>();
       final Completer<String> windowPageLoaded = Completer<String>();
       final Completer<void> onCloseWindowCompleter = Completer<void>();
@@ -105,7 +105,6 @@ void webViewWindows() {
             onLoadStop: (controller, url) async {
               if (url!.scheme != "about" && !windowPageLoaded.isCompleted) {
                 windowPageLoaded.complete(url.toString());
-                await controller.evaluateJavascript(source: "window.close();");
               }
             },
             onCloseWindow: (controller) {
@@ -118,8 +117,144 @@ void webViewWindows() {
       await tester.pump();
 
       final String windowUrlLoaded = await windowPageLoaded.future;
+      final windowController = await windowControllerCompleter.future;
 
       expect(windowUrlLoaded, TEST_URL_EXAMPLE.toString());
+
+      if (Platform.isIOS) {
+        final popupWorld = ContentWorld.world(name: 'popup-evaluation');
+        expect(
+          await windowController.evaluateJavascript(
+            source: 'window.popupPageValue = 7; window.popupPageValue;',
+          ),
+          7,
+        );
+
+        final namedWorldValue = await windowController.evaluateJavascript(
+          source: 'window.popupPageValue = 49; window.popupPageValue;',
+          contentWorld: popupWorld,
+        );
+        // iOS 18+ preserves the named world; iOS 14-17 fails closed because
+        // WebKit can crash when that overload is used by a popup WebView.
+        expect(namedWorldValue, anyOf(isNull, 49));
+
+        // A named-world request must never fall back to the page world.
+        expect(
+          await windowController.evaluateJavascript(
+            source: 'window.popupPageValue;',
+          ),
+          7,
+        );
+
+        final persistedNamedWorldValue = await windowController
+            .evaluateJavascript(
+              source: 'window.popupPageValue;',
+              contentWorld: popupWorld,
+            );
+        if (namedWorldValue == null) {
+          expect(persistedNamedWorldValue, isNull);
+        } else {
+          expect(persistedNamedWorldValue, 49);
+          expect(
+            await windowController.evaluateJavascript(
+              source: 'typeof window.popupOnlyValue;',
+            ),
+            'undefined',
+          );
+          expect(
+            await windowController.evaluateJavascript(
+              source: 'window.popupOnlyValue = 11;',
+              contentWorld: popupWorld,
+            ),
+            11,
+          );
+          expect(
+            await windowController.evaluateJavascript(
+              source: 'typeof window.popupOnlyValue;',
+            ),
+            'undefined',
+          );
+        }
+
+        final asyncPageWorldResult = await windowController.callAsyncJavaScript(
+          functionBody:
+              'await Promise.resolve(); '
+              'window.popupPageAsyncValue = n + 2; '
+              'return window.popupPageAsyncValue;',
+          arguments: {'n': 40},
+        );
+        expect(asyncPageWorldResult, isNotNull);
+        expect(asyncPageWorldResult!.value, 42);
+        expect(asyncPageWorldResult.error, isNull);
+        expect(
+          await windowController.evaluateJavascript(
+            source: 'window.popupPageAsyncValue;',
+          ),
+          42,
+        );
+        final explicitPageWorldResult = await windowController
+            .callAsyncJavaScript(
+              functionBody: 'return n + 3;',
+              arguments: {'n': 39},
+              contentWorld: ContentWorld.PAGE,
+            );
+        expect(explicitPageWorldResult, isNotNull);
+        expect(explicitPageWorldResult!.value, 42);
+        expect(explicitPageWorldResult.error, isNull);
+
+        final asyncPageWorldError = await windowController.callAsyncJavaScript(
+          functionBody: "throw new Error('popup-page-async-error');",
+        );
+        expect(asyncPageWorldError, isNotNull);
+        expect(asyncPageWorldError!.value, isNull);
+        expect(asyncPageWorldError.error, contains('popup-page-async-error'));
+
+        final asyncNamedWorldResult = await windowController
+            .callAsyncJavaScript(
+              functionBody:
+                  'window.popupAsyncOnlyValue = 23; '
+                  'return window.popupAsyncOnlyValue;',
+              contentWorld: popupWorld,
+            );
+        expect(asyncNamedWorldResult, isNotNull);
+        if (namedWorldValue == null) {
+          expect(asyncNamedWorldResult!.value, isNull);
+          expect(asyncNamedWorldResult.error, isNotNull);
+        } else {
+          expect(asyncNamedWorldResult!.value, 23);
+          expect(asyncNamedWorldResult.error, isNull);
+        }
+        expect(
+          await windowController.evaluateJavascript(
+            source: 'typeof window.popupAsyncOnlyValue;',
+          ),
+          'undefined',
+        );
+
+        expect(
+          await windowController.evaluateJavascript(
+            source: 'null;',
+            contentWorld: popupWorld,
+          ),
+          isNull,
+        );
+        expect(
+          await windowController.evaluateJavascript(
+            source: 'undefined;',
+            contentWorld: popupWorld,
+          ),
+          isNull,
+        );
+        expect(
+          await windowController.evaluateJavascript(
+            source: "throw new Error('popup-eval-error');",
+            contentWorld: popupWorld,
+          ),
+          isNull,
+        );
+      }
+
+      await windowController.evaluateJavascript(source: 'window.close();');
       await expectLater(onCloseWindowCompleter.future, completes);
     }, skip: shouldSkipTest2);
 

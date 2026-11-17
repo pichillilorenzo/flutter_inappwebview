@@ -7,6 +7,7 @@
 #include "../types/plugin_script.h"
 #include "../utils/log.h"
 #include "../utils/string.h"
+#include "javascript_bridge_message.h"
 
 namespace flutter_inappwebview_plugin
 {
@@ -59,19 +60,30 @@ namespace flutter_inappwebview_plugin
             _Promise = window.Promise;\
             _postMessage = window.chrome.webview.postMessage;\
           } catch (_) { return; }\
+          if (isMainFrame) {\
+            window.chrome.webview.addEventListener('message', function(e) {\
+              var d = e.data;\
+              var r = d !== null && typeof d === 'object' ? d['" + get_JAVASCRIPT_BRIDGE_NAME() + "'] : null;\
+              if (r == null || typeof r !== 'object' || typeof r.id !== 'number') { return; }\
+              e.stopImmediatePropagation();\
+              var p = window." + get_JAVASCRIPT_BRIDGE_NAME() + "[r.id];\
+              if (p == null) { return; }\
+              delete window." + get_JAVASCRIPT_BRIDGE_NAME() + "[r.id];\
+              if (r.e !== undefined) { p.reject(new Error(r.e)); } else { p.resolve(r.v); }\
+            }, true);\
+          }\
           window." + get_JAVASCRIPT_BRIDGE_NAME() + ".callHandler = function() { \
             try {\
               requestUrl = window.location.href;\
             } catch (_) {}\
             var _callHandlerID = _setTimeout(function() {}); \
-            _postMessage({ 'name': 'callHandler', 'body': {\
+            _postMessage('" + JavaScriptBridgeMessage::CALL_PREFIX + "' + _JSON_stringify({ 'name': 'callHandler', 'body': {\
               'handlerName': arguments[0],\
               '_callHandlerID' : _callHandlerID,\
               '_bridgeSecret': bridgeSecret,\
               'origin': origin,\
-              'requestUrl': requestUrl,\
-              'args' : _JSON_stringify(_Array_slice.call(arguments, 1))}\
-            });\
+              'requestUrl': requestUrl}\
+            }) + '\\n' + _JSON_stringify(_Array_slice.call(arguments, 1)));\
             return new _Promise(function(resolve, reject) { \
               try {\
                 (isMainFrame ? window : window.top)." + get_JAVASCRIPT_BRIDGE_NAME() + "[_callHandlerID] = { resolve: resolve, reject : reject };\

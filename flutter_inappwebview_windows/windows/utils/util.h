@@ -16,6 +16,10 @@
 
 namespace flutter_inappwebview_plugin
 {
+  // Fails a static_assert in a branch the compiler must still parse.
+  template<typename>
+  inline constexpr bool always_false_v = false;
+
   template<typename T>
   static inline std::optional<T> make_pointer_optional(const T* value)
   {

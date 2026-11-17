@@ -5,11 +5,21 @@
 //  Created by Lorenzo Pichilli on 12/02/21.
 //
 
+import CommonCrypto
 import Foundation
 import WebKit
 import FlutterMacOS
 
 public class Util {
+    public static func sha256Hex(_ text: String) -> String {
+        let data = Data(text.utf8)
+        var digest = [UInt8](repeating: 0, count: Int(CC_SHA256_DIGEST_LENGTH))
+        data.withUnsafeBytes { buffer in
+            _ = CC_SHA256(buffer.baseAddress, CC_LONG(data.count), &digest)
+        }
+        return digest.map { String(format: "%02x", $0) }.joined()
+    }
+
     public static func getUrlAsset(assetFilePath: String) throws -> URL {
 //        let key = SwiftFlutterPlugin.instance?.registrar?.lookupKey(forAsset: assetFilePath)
         let assetFilePath = "../Frameworks/App.framework/Resources/flutter_assets/\(assetFilePath)"

@@ -35,12 +35,23 @@ declare global {
         functionMap: {},
         settings: {},
         javaScriptBridgeEnabled: true,
+        listenerAbortController: new AbortController(),
+        dispose: function () {
+          // The document listener otherwise retains the WebView and its iframe.
+          webView.listenerAbortController.abort();
+          webView.iframe = null;
+          webView.iframeContainer = null;
+          webView.functionMap = {};
+        },
         disableContextMenuHandler: function (event: Event) {
           event.preventDefault();
           event.stopPropagation();
           return false;
         },
         prepare: function (settings: InAppWebViewSettings) {
+          // Re-preparing a view replaces its listeners instead of adding copies.
+          webView.listenerAbortController.abort();
+          webView.listenerAbortController = new AbortController();
           webView.settings = settings;
 
           webView.javaScriptBridgeEnabled = webView.settings.javaScriptBridgeEnabled ?? true;
@@ -65,7 +76,7 @@ declare global {
             } else {
               webView.isFullscreen = false;
             }
-          });
+          }, { signal: webView.listenerAbortController.signal });
 
           if (iframe != null) {
             webView.iframe = iframe;
@@ -346,7 +357,7 @@ declare global {
                 console.log(e);
               }
 
-            });
+            }, { signal: webView.listenerAbortController.signal });
           }
         },
         setSettings: function (newSettings: InAppWebViewSettings) {

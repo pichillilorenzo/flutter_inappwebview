@@ -15,6 +15,12 @@ namespace flutter_inappwebview_plugin
   {
     useShouldOverrideUrlLoading = get_fl_map_value(encodableMap, "useShouldOverrideUrlLoading", useShouldOverrideUrlLoading);
     useOnLoadResource = get_fl_map_value(encodableMap, "useOnLoadResource", useOnLoadResource);
+    if (fl_map_contains_not_null(encodableMap, "consoleMessageLevels")) {
+      consoleMessageLevels = std::vector<int64_t>{};
+      for (const auto& level : std::get<flutter::EncodableList>(encodableMap.at(flutter::EncodableValue("consoleMessageLevels")))) {
+        consoleMessageLevels->push_back(level.LongValue());
+      }
+    }
     useOnDownloadStart = get_fl_map_value(encodableMap, "useOnDownloadStart", useOnDownloadStart);
     useShouldInterceptRequest = get_fl_map_value(encodableMap, "useShouldInterceptRequest", useShouldInterceptRequest);
     userAgent = get_fl_map_value(encodableMap, "userAgent", userAgent);
@@ -51,6 +57,9 @@ namespace flutter_inappwebview_plugin
     reputationCheckingRequired = get_fl_map_value(encodableMap, "reputationCheckingRequired", reputationCheckingRequired);
     nonClientRegionSupportEnabled = get_fl_map_value(encodableMap, "nonClientRegionSupportEnabled", nonClientRegionSupportEnabled);
     handleAcceleratorKeyPressed = get_fl_map_value(encodableMap, "handleAcceleratorKeyPressed", handleAcceleratorKeyPressed);
+    if (fl_map_contains_not_null(encodableMap, "preferredColorScheme")) {
+      preferredColorScheme = get_fl_map_value<int64_t>(encodableMap, "preferredColorScheme");
+    }
   }
 
   flutter::EncodableMap InAppWebViewSettings::toEncodableMap() const
@@ -58,6 +67,7 @@ namespace flutter_inappwebview_plugin
     return flutter::EncodableMap{
       {"useShouldOverrideUrlLoading", useShouldOverrideUrlLoading},
       {"useOnLoadResource", useOnLoadResource},
+      {"consoleMessageLevels", make_fl_value(consoleMessageLevels)},
       {"useOnDownloadStart", useOnDownloadStart},
       {"useShouldInterceptRequest", useShouldInterceptRequest},
       {"userAgent", userAgent},
@@ -85,7 +95,8 @@ namespace flutter_inappwebview_plugin
       {"hiddenPdfToolbarItems", hiddenPdfToolbarItems},
       {"reputationCheckingRequired", reputationCheckingRequired},
       {"nonClientRegionSupportEnabled", nonClientRegionSupportEnabled},
-      {"handleAcceleratorKeyPressed", handleAcceleratorKeyPressed}
+      {"handleAcceleratorKeyPressed", handleAcceleratorKeyPressed},
+      {"preferredColorScheme", make_fl_value(preferredColorScheme)}
     };
   }
 
@@ -178,6 +189,17 @@ namespace flutter_inappwebview_plugin
           BOOL isNonClientRegionSupportEnabled;
           if (SUCCEEDED(settings9->get_IsNonClientRegionSupportEnabled(&isNonClientRegionSupportEnabled))) {
             settingsMap["nonClientRegionSupportEnabled"] = (bool)isNonClientRegionSupportEnabled;
+          }
+        }
+      }
+
+      // Read the persisted, profile-scoped color scheme when supported.
+      if (auto webView13 = webView.try_query<ICoreWebView2_13>()) {
+        wil::com_ptr<ICoreWebView2Profile> profile;
+        if (succeededOrLog(webView13->get_Profile(&profile)) && profile) {
+          COREWEBVIEW2_PREFERRED_COLOR_SCHEME realPreferredColorScheme;
+          if (succeededOrLog(profile->get_PreferredColorScheme(&realPreferredColorScheme))) {
+            settingsMap["preferredColorScheme"] = static_cast<int64_t>(realPreferredColorScheme);
           }
         }
       }

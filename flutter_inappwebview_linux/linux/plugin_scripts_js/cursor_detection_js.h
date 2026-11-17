@@ -43,6 +43,11 @@ class CursorDetectionJS {
   window._flutterCursorDetectorInstalled = true;
   
   var lastCursor = '';
+  var pendingCursorFrame = null;
+  var cursorFrameGeneration = 0;
+  var isMouseInsideDocument = false;
+  var latestMouseX = 0;
+  var latestMouseY = 0;
   
   // Helper to check if element is editable
   function isEditable(el) {
@@ -208,9 +213,9 @@ class CursorDetectionJS {
     }
   }
   
-  // Handle mouse movement
-  function handleMouseMove(e) {
-    var el = document.elementFromPoint(e.clientX, e.clientY);
+  // Determine the cursor at the latest pointer position.
+  function updateCursor(mouseX, mouseY) {
+    var el = document.elementFromPoint(mouseX, mouseY);
     if (!el) {
       reportCursor('default');
       return;
@@ -223,20 +228,44 @@ class CursorDetectionJS {
     } catch(_) {}
     
     // Determine effective cursor (pass mouse coordinates for precise text detection)
-    var effectiveCursor = getEffectiveCursor(el, computedCursor, e.clientX, e.clientY);
+    var effectiveCursor = getEffectiveCursor(el, computedCursor, mouseX, mouseY);
     reportCursor(effectiveCursor);
+  }
+
+  // Coalesce pointer events so layout and text hit-testing run at most once per frame.
+  function scheduleCursorUpdate(e) {
+    latestMouseX = e.clientX;
+    latestMouseY = e.clientY;
+    isMouseInsideDocument = true;
+    if (pendingCursorFrame !== null) return;
+
+    var generation = cursorFrameGeneration;
+    pendingCursorFrame = window.requestAnimationFrame(function() {
+      if (generation !== cursorFrameGeneration) return;
+      pendingCursorFrame = null;
+      if (isMouseInsideDocument) updateCursor(latestMouseX, latestMouseY);
+    });
+  }
+
+  // A leave invalidates any queued work, including callbacks already dispatched by the browser.
+  function handleMouseOut(e) {
+    if (e.relatedTarget === null) {
+      isMouseInsideDocument = false;
+      cursorFrameGeneration++;
+      if (pendingCursorFrame !== null) {
+        window.cancelAnimationFrame(pendingCursorFrame);
+        pendingCursorFrame = null;
+      }
+      reportCursor('default');
+    }
   }
   
   // Use both mousemove and mouseover for comprehensive coverage
-  document.addEventListener('mousemove', handleMouseMove, { passive: true });
+  document.addEventListener('mousemove', scheduleCursorUpdate, { passive: true });
+  document.addEventListener('mouseover', scheduleCursorUpdate, { passive: true });
   
   // Also handle mouseout to reset cursor when leaving elements
-  document.addEventListener('mouseout', function(e) {
-    if (e.relatedTarget === null) {
-      // Mouse left the document
-      reportCursor('default');
-    }
-  }, { passive: true });
+  document.addEventListener('mouseout', handleMouseOut, { passive: true });
   
 })();
 )JS";

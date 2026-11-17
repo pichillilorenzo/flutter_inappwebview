@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
 import 'dart:core';
@@ -73,6 +74,8 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
       _inAppBrowser?.eventHandler;
 
   dynamic _controllerFromPlatform;
+  void Function(dynamic controller, int x, int y)? _onScrollChanged;
+  void Function(dynamic controller, ConsoleMessage message)? _onConsoleMessage;
 
   @override
   late IOSWebStorage webStorage;
@@ -150,6 +153,8 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
   }
 
   void _init(PlatformInAppWebViewControllerCreationParams params) {
+    _onScrollChanged = params.webviewParams?.onScrollChanged;
+    _onConsoleMessage = params.webviewParams?.onConsoleMessage;
     _controllerFromPlatform =
         params.webviewParams?.controllerFromPlatform?.call(this) ?? this;
 
@@ -357,28 +362,47 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
         }
         break;
       case "onConsoleMessage":
-        if ((webviewParams != null &&
-                webviewParams!.onConsoleMessage != null) ||
-            _inAppBrowserEventHandler != null) {
-          Map<String, dynamic> arguments = call.arguments
-              .cast<String, dynamic>();
-          ConsoleMessage consoleMessage = ConsoleMessage.fromMap(arguments)!;
-          if (webviewParams != null && webviewParams!.onConsoleMessage != null)
-            webviewParams!.onConsoleMessage!(
-              _controllerFromPlatform,
-              consoleMessage,
+      case "onConsoleMessageBatch":
+        if (disposed) break;
+        final List<dynamic> messages = call.method == "onConsoleMessageBatch"
+            ? (call.arguments["messages"] as List<dynamic>)
+            : [call.arguments];
+        for (final entry in messages) {
+          // Consult the live callback for each entry: it may be removed or the
+          // controller disposed by an earlier callback in this same batch.
+          if (disposed) break;
+          final callback = _onConsoleMessage;
+          final browser = _inAppBrowserEventHandler;
+          if (callback == null && browser == null) break;
+          try {
+            final message = ConsoleMessage.fromMap(
+              Map<String, dynamic>.from(entry as Map),
+            )!;
+            if (callback != null) {
+              callback(_controllerFromPlatform, message);
+            } else {
+              browser!.onConsoleMessage(message);
+            }
+          } catch (error, stack) {
+            // A failed callback must not discard the other messages that would
+            // previously have arrived as independent method calls.
+            FlutterError.reportError(
+              FlutterErrorDetails(
+                exception: error,
+                stack: stack,
+                library: 'flutter_inappwebview',
+                context: ErrorDescription('while dispatching onConsoleMessage'),
+              ),
             );
-          else
-            _inAppBrowserEventHandler!.onConsoleMessage(consoleMessage);
+          }
         }
         break;
       case "onScrollChanged":
-        if ((webviewParams != null && webviewParams!.onScrollChanged != null) ||
-            _inAppBrowserEventHandler != null) {
+        if (_onScrollChanged != null || _inAppBrowserEventHandler != null) {
           int x = call.arguments["x"];
           int y = call.arguments["y"];
-          if (webviewParams != null && webviewParams!.onScrollChanged != null)
-            webviewParams!.onScrollChanged!(_controllerFromPlatform, x, y);
+          if (_onScrollChanged != null)
+            _onScrollChanged!(_controllerFromPlatform, x, y);
           else
             _inAppBrowserEventHandler!.onScrollChanged(x, y);
         }
@@ -1767,7 +1791,7 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
             } else {
               jsHandlerResult = await _javaScriptHandlersMap[handlerName]!();
             }
-            return jsonEncode(jsHandlerResult);
+            return JavaScriptHandlerJsonResult.encode(jsHandlerResult);
           } catch (error, stacktrace) {
             developer.log(
               error.toString() + '\n' + stacktrace.toString(),
@@ -1781,6 +1805,48 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
         throw UnimplementedError("Unimplemented ${call.method} method");
     }
     return null;
+  }
+
+  @override
+  Future<AppleWebViewActivitySnapshot> getAppleWebViewActivitySnapshot() async {
+    if (disposed) {
+      return AppleWebViewActivitySnapshot.unavailable(
+        AppleWebViewActivityAvailability.disposed,
+      );
+    }
+    if (id == null) {
+      return AppleWebViewActivitySnapshot.unavailable(
+        AppleWebViewActivityAvailability.noNativeView,
+      );
+    }
+    try {
+      final result = await channel!.invokeMethod<Object?>(
+        'getAppleWebViewActivitySnapshot',
+      );
+      // A keepAlive detachment also invalidates this controller's observation.
+      if (disposed) {
+        return AppleWebViewActivitySnapshot.unavailable(
+          AppleWebViewActivityAvailability.disposed,
+        );
+      }
+      if (result is! Map) {
+        throw const FormatException('Invalid Apple activity snapshot response');
+      }
+      return AppleWebViewActivitySnapshot.fromMap(result);
+    } on MissingPluginException {
+      return AppleWebViewActivitySnapshot.unavailable(
+        disposed
+            ? AppleWebViewActivityAvailability.disposed
+            : AppleWebViewActivityAvailability.methodUnavailable,
+      );
+    } catch (_) {
+      if (disposed) {
+        return AppleWebViewActivitySnapshot.unavailable(
+          AppleWebViewActivityAvailability.disposed,
+        );
+      }
+      rethrow;
+    }
   }
 
   @override
@@ -3156,6 +3222,12 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
 
   @override
   void dispose({bool isKeepAlive = false}) {
+    if (isKeepAlive) {
+      unawaited(updateScrollChangedCallback(null));
+      unawaited(updateConsoleMessageCallback(null));
+    }
+    _onScrollChanged = null;
+    _onConsoleMessage = null;
     disposeChannel(removeMethodCallHandler: !isKeepAlive);
     _inAppBrowser = null;
     webStorage.dispose();
@@ -3178,5 +3250,36 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
 }
 
 extension InternalInAppWebViewController on IOSInAppWebViewController {
+  /// Updates this subscription without replacing the controller's creation params.
+  Future<void> updateScrollChangedCallback(
+    void Function(dynamic controller, int x, int y)? callback, {
+    bool forceNativeUpdate = false,
+  }) async {
+    if (disposed) return;
+    final hadListener = _onScrollChanged != null;
+    _onScrollChanged = callback;
+    final hasListener = callback != null;
+    if (forceNativeUpdate || hadListener != hasListener) {
+      await channel?.invokeMethod<void>('setScrollChangedListener', {
+        'hasListener': hasListener,
+      });
+    }
+  }
+
+  /// Updates this subscription without replacing the controller's creation params.
+  Future<void> updateConsoleMessageCallback(
+    void Function(dynamic controller, ConsoleMessage message)? callback, {
+    bool forceNativeUpdate = false,
+  }) async {
+    if (disposed) return;
+    final hadListener = _onConsoleMessage != null;
+    _onConsoleMessage = callback;
+    if (forceNativeUpdate || hadListener != (callback != null)) {
+      await channel?.invokeMethod<void>('setConsoleMessageListener', {
+        'hasListener': callback != null,
+      });
+    }
+  }
+
   get handleMethod => _handleMethod;
 }

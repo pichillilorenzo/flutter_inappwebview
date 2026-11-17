@@ -1,0 +1,17 @@
+name: Linux JavaScript callback lifecycle
+on:
+  pull_request:
+    paths:
+      - 'flutter_inappwebview_linux/**'
+      - '.github/workflows/linux-javascript-lifecycle.yaml'
+  workflow_dispatch:
+jobs:
+  callback-regression:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile and run JavaScript cancellation isolation under ASan and UBSan
+        run: |
+          g++ -std=c++17 -Wall -Wextra -Werror -fsanitize=address,undefined -fno-omit-frame-pointer \
+            flutter_inappwebview_linux/linux/test/pending_webkit_javascript_calls_test.cpp -o /tmp/pending_webkit_js_test
+          ASAN_OPTIONS=detect_leaks=1 /tmp/pending_webkit_js_test

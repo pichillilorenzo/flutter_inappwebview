@@ -1,0 +1,20 @@
+name: macos pending legacy JavaScript lifecycle
+on:
+  pull_request:
+    paths:
+      - 'flutter_inappwebview_macos/**'
+      - 'tool/swift_source.py'
+      - '.github/workflows/macos-pending-legacy-javascript.yaml'
+  workflow_dispatch:
+jobs:
+  swift-callback-regression:
+    runs-on: macos-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile callback state tests and parse platform source
+        run: sh flutter_inappwebview_macos/test/run_pending_legacy_javascript_callbacks_test.sh
+      - name: Execute production legacy JavaScript wrapper
+        run: node --test flutter_inappwebview_macos/test/legacy_javascript_wrapper_test.cjs
+      - name: Exercise the production legacy route in live WKWebViews
+        run: python3 flutter_inappwebview_macos/test/run_legacy_javascript_webkit_test.py

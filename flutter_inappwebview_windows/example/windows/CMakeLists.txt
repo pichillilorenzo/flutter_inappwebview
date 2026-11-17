@@ -52,8 +52,13 @@ add_subdirectory(${FLUTTER_MANAGED_DIR})
 # Application build; see runner/CMakeLists.txt.
 add_subdirectory("runner")
 
-# Disable the test target for the example app.
-set(include_flutter_inappwebview_windows_tests FALSE)
+# Keep plugin tests opt-in for normal example builds. CI enables the target
+# explicitly after Flutter generates the Windows build directory.
+option(include_flutter_inappwebview_windows_tests
+  "Build flutter_inappwebview_windows native tests" OFF)
+if(include_flutter_inappwebview_windows_tests)
+  enable_testing()
+endif()
 
 # Generated plugin build rules, which manage building the plugins and adding
 # them to the application.

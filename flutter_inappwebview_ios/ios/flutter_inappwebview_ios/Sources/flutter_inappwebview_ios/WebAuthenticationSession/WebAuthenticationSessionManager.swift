@@ -30,8 +30,9 @@ public class WebAuthenticationSessionManager: ChannelDelegate {
                 let id = arguments!["id"] as! String
                 let url = arguments!["url"] as! String
                 let callbackURLScheme = arguments!["callbackURLScheme"] as? String
+                let additionalHeaderFields = arguments!["additionalHeaderFields"] as? [String: String]
                 let initialSettings = arguments!["initialSettings"] as! [String: Any?]
-                create(id: id, url: url, callbackURLScheme: callbackURLScheme, settings: initialSettings, result: result)
+                create(id: id, url: url, callbackURLScheme: callbackURLScheme, additionalHeaderFields: additionalHeaderFields, settings: initialSettings, result: result)
                 break
             case "isAvailable":
                 if #available(iOS 11.0, *) {
@@ -46,12 +47,12 @@ public class WebAuthenticationSessionManager: ChannelDelegate {
         }
     }
     
-    public func create(id: String, url: String, callbackURLScheme: String?, settings: [String: Any?], result: @escaping FlutterResult) {
+    public func create(id: String, url: String, callbackURLScheme: String?, additionalHeaderFields: [String: String]?, settings: [String: Any?], result: @escaping FlutterResult) {
         if #available(iOS 11.0, *), let plugin = plugin {
             let sessionUrl = URL(string: url) ?? URL(string: "about:blank")!
             let initialSettings = WebAuthenticationSessionSettings()
             let _ = initialSettings.parse(settings: settings)
-            let session = WebAuthenticationSession(plugin: plugin, id: id, url: sessionUrl, callbackURLScheme: callbackURLScheme, settings: initialSettings)
+            let session = WebAuthenticationSession(plugin: plugin, id: id, url: sessionUrl, callbackURLScheme: callbackURLScheme, additionalHeaderFields: additionalHeaderFields, settings: initialSettings)
             session.prepare()
             sessions[id] = session
             result(true)

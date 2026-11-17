@@ -24,6 +24,7 @@ class InAppWebViewSettings {
   // === Event flags ===
   bool useShouldOverrideUrlLoading = false;
   bool useOnLoadResource = false;
+  std::optional<std::vector<int64_t>> consoleMessageLevels;
   bool useOnDownloadStart = false;
   bool useOnNavigationResponse = false;
   bool useShouldInterceptRequest = false;
@@ -42,6 +43,13 @@ class InAppWebViewSettings {
   bool supportZoom = true;
   bool isInspectable = true;
   bool disableContextMenu = false;
+
+  // === Scroll settings ===
+  // WPE draws into an offscreen surface with no native scroll view, so these
+  // are enforced where Flutter's scroll delta is dispatched into the web view
+  // rather than on a platform scroller.
+  bool disableVerticalScroll = false;
+  bool disableHorizontalScroll = false;
 
   // === JavaScript bridge settings ===
   std::optional<std::vector<std::string>> javaScriptHandlersOriginAllowList =

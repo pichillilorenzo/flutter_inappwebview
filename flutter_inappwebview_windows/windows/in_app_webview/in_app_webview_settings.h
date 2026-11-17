@@ -3,6 +3,7 @@
 
 #include <optional>
 #include <string>
+#include <vector>
 #include <WebView2.h>
 
 namespace flutter_inappwebview_plugin
@@ -14,6 +15,7 @@ namespace flutter_inappwebview_plugin
   public:
     bool useShouldOverrideUrlLoading = false;
     bool useOnLoadResource = false;
+    std::optional<std::vector<int64_t>> consoleMessageLevels;
     bool useOnDownloadStart = false;
     bool useShouldInterceptRequest = false;
     std::string userAgent;
@@ -42,6 +44,7 @@ namespace flutter_inappwebview_plugin
     bool reputationCheckingRequired = true;
     bool nonClientRegionSupportEnabled = false;
     bool handleAcceleratorKeyPressed = false;
+    std::optional<int64_t> preferredColorScheme = std::optional<int64_t>{};
 
     InAppWebViewSettings();
     InAppWebViewSettings(const flutter::EncodableMap& encodableMap);

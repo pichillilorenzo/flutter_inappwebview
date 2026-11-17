@@ -36,7 +36,6 @@ class HeadlessInAppWebViewManager {
   FlPluginRegistrar* registrar_ = nullptr;
   FlBinaryMessenger* messenger_ = nullptr;
   FlMethodChannel* method_channel_ = nullptr;
-  GtkWindow* gtk_window_ = nullptr;  // Cached GTK window (can be null for headless)
 
   // Map of id to HeadlessInAppWebView instance
   std::map<std::string, std::unique_ptr<HeadlessInAppWebView>> webviews_;

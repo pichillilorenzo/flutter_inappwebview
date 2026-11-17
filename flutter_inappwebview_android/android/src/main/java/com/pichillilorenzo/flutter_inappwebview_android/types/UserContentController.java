@@ -528,11 +528,21 @@ public class UserContentController implements Disposable {
 
   @Override
   public void dispose() {
-    if (WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT) && contentWorldsCreatorScript != null) {
-      contentWorldsCreatorScript.remove();
+    dispose(true);
+  }
+
+  public void dispose(boolean removeNativeScripts) {
+    if (removeNativeScripts && WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
+      if (contentWorldsCreatorScript != null) contentWorldsCreatorScript.remove();
+      for (ScriptHandler scriptHandler : scriptHandlerMap.values()) {
+        scriptHandler.remove();
+      }
     }
-    removeAllUserOnlyScripts();
-    removeAllPluginScripts();
+    contentWorldsCreatorScript = null;
+    scriptHandlerMap.clear();
+    for (LinkedHashSet<UserScript> scripts : userOnlyScripts.values()) scripts.clear();
+    for (LinkedHashSet<PluginScript> scripts : pluginScripts.values()) scripts.clear();
+    contentWorlds.clear();
     webView = null;
   }
 }

@@ -1,0 +1,26 @@
+name: Linux JavaScript origin policy
+on:
+  pull_request:
+    paths:
+      - 'flutter_inappwebview_linux/**'
+      - '.github/workflows/linux-origin-policy.yaml'
+  workflow_dispatch:
+jobs:
+  origin-policy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile and execute native regex policy regressions
+        run: |
+          g++ -std=c++17 -Wall -Wextra -Werror -fsanitize=address,undefined -fno-omit-frame-pointer \
+            flutter_inappwebview_linux/linux/test/javascript_origin_policy_test.cpp -o /tmp/linux_origin_test
+          ASAN_OPTIONS=detect_leaks=1 /tmp/linux_origin_test
+      - name: Verify native bridge invokes precompiled exact-origin policy
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          s = Path("flutter_inappwebview_linux/linux/in_app_webview/in_app_webview.cc").read_text()
+          assert "javaScriptOriginPolicy_.allows(sourceOrigin)" in s
+          assert "sourceOrigin.find(allowedOrigin)" not in s
+          assert s.count("javaScriptOriginPolicy_.configure(") == 2
+          PY

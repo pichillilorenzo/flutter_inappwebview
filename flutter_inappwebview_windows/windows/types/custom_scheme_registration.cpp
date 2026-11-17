@@ -26,14 +26,20 @@ namespace flutter_inappwebview_plugin
     };
   }
 
-  CoreWebView2CustomSchemeRegistration* CustomSchemeRegistration::toWebView2CustomSchemeRegistration() const
+  Microsoft::WRL::ComPtr<CoreWebView2CustomSchemeRegistration> CustomSchemeRegistration::toWebView2CustomSchemeRegistration() const
   {
     auto customSchemeRegistration = Microsoft::WRL::Make<CoreWebView2CustomSchemeRegistration>(utf8_to_wide(scheme).c_str());
 
     if (allowedOrigins.has_value()) {
-      std::vector<const WCHAR*> wideAllowedOrigins;
+      std::vector<std::wstring> origins;
+      origins.reserve(allowedOrigins->size());
       for (const auto& origin : allowedOrigins.value()) {
-        wideAllowedOrigins.push_back(utf8_to_wide(origin).c_str());
+        origins.push_back(utf8_to_wide(origin));
+      }
+      std::vector<const WCHAR*> wideAllowedOrigins;
+      wideAllowedOrigins.reserve(origins.size());
+      for (const auto& origin : origins) {
+        wideAllowedOrigins.push_back(origin.c_str());
       }
       customSchemeRegistration->SetAllowedOrigins(
         static_cast<UINT32>(wideAllowedOrigins.size()),
@@ -48,8 +54,7 @@ namespace flutter_inappwebview_plugin
       customSchemeRegistration->put_HasAuthorityComponent(hasAuthorityComponent.value());
     }
 
-    customSchemeRegistration->AddRef();
-    return customSchemeRegistration.Get();
+    return customSchemeRegistration;
   }
 
 }

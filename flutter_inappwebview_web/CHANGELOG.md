@@ -1,5 +1,6 @@
 ## 1.2.0-beta.3
 
+- Fixed WebView listener cleanup after widget disposal and preserved it when rebuilding the JavaScript bundle from TypeScript.
 - Updated flutter_inappwebview_platform_interface version to ^1.4.0-beta.3
 - Updated `onCreateWindow` WebView event
 - Implemented `onCloseWindow`, `onCallJsHandler` WebView events

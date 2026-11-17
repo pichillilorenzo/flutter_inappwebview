@@ -95,4 +95,49 @@ class ProcessFailedReason_ {
   static const OUT_OF_MEMORY = const ProcessFailedReason_._internal(
     'OUT_OF_MEMORY',
   );
+
+  ///The process exited normally (exit code 0), typically a clean shutdown.
+  @EnumSupportedPlatforms(
+    platforms: [
+      EnumWindowsPlatform(
+        apiName: 'COREWEBVIEW2_PROCESS_FAILED_REASON_NORMAL_EXIT',
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_process_failed_reason',
+        value: 7,
+      ),
+    ],
+  )
+  static const NORMAL_EXIT = const ProcessFailedReason_._internal(
+    'NORMAL_EXIT',
+  );
+
+  ///The process exited with a non-zero exit code that is neither a crash nor a kill.
+  @EnumSupportedPlatforms(
+    platforms: [
+      EnumWindowsPlatform(
+        apiName: 'COREWEBVIEW2_PROCESS_FAILED_REASON_ABNORMAL_EXIT',
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_process_failed_reason',
+        value: 8,
+      ),
+    ],
+  )
+  static const ABNORMAL_EXIT = const ProcessFailedReason_._internal(
+    'ABNORMAL_EXIT',
+  );
+
+  ///The OS terminated the process because a DLL failed Windows Code Integrity verification.
+  @EnumSupportedPlatforms(
+    platforms: [
+      EnumWindowsPlatform(
+        apiName: 'COREWEBVIEW2_PROCESS_FAILED_REASON_INTEGRITY_FAILURE',
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_process_failed_reason',
+        value: 9,
+      ),
+    ],
+  )
+  static const INTEGRITY_FAILURE = const ProcessFailedReason_._internal(
+    'INTEGRITY_FAILURE',
+  );
 }

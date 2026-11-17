@@ -1,0 +1,107 @@
+name: Windows WebView checks
+
+on:
+  pull_request:
+    paths:
+      - "flutter_inappwebview_windows/**"
+      - "flutter_inappwebview_platform_interface/**"
+      - "flutter_inappwebview/test/windows_creation_details_test.dart"
+      - ".github/workflows/windows-webview-visibility.yaml"
+
+permissions:
+  contents: read
+
+jobs:
+  creation-diagnostics:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: '3.47.7'
+      - name: Resolve public widget dependencies
+        working-directory: flutter_inappwebview
+        run: flutter pub get --no-example
+      - name: Test Windows creation observations and owner lifetimes
+        working-directory: flutter_inappwebview
+        run: >-
+          flutter test --no-pub
+          test/windows_creation_details_test.dart
+          test/console_keep_alive_creation_test.dart
+          test/console_desktop_subscriptions_test.dart
+
+  lifecycle-state:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test process snapshot failures against native production code
+        run: python3 flutter_inappwebview_windows/windows/test/run_process_infos_tests.py --sanitize
+      - name: Test native lifecycle without a WebView runtime
+        run: sh flutter_inappwebview_windows/windows/test/run_webview_lifecycle_tests.sh
+      - name: Test browser process ownership and last-view cleanup
+        run: sh flutter_inappwebview_windows/windows/test/run_browser_process_gate_tests.sh
+      - name: Test delayed trim cancellation without a real-time wait
+        run: sh flutter_inappwebview_windows/windows/test/run_delayed_texture_trim_tests.sh
+      - name: Test production GPU and CPU trim methods with platform doubles
+        run: python3 flutter_inappwebview_windows/tool/test_hidden_texture_trim.py --sanitize
+
+  test:
+    name: Windows checks (texture fallback ${{ matrix.texture_fallback }})
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        texture_fallback: ["OFF", "ON"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.44.9
+          cache: true
+
+      - name: Resolve package dependencies
+        working-directory: flutter_inappwebview_windows
+        run: flutter pub get
+
+      - name: Analyze Dart code
+        working-directory: flutter_inappwebview_windows
+        run: flutter analyze --no-fatal-infos
+
+      - name: Run Dart regression tests
+        working-directory: flutter_inappwebview_windows
+        run: flutter test
+
+      - name: Verify precompiled frame comparison shader
+        working-directory: flutter_inappwebview_windows
+        shell: pwsh
+        run: ./tool/update_frame_compare_shader.ps1 -Check
+
+      - name: Generate Windows build
+        working-directory: flutter_inappwebview_windows/example
+        run: flutter build windows --debug --config-only
+
+      - name: Configure native tests
+        working-directory: flutter_inappwebview_windows/example
+        run: >-
+          cmake -S windows -B build/windows/x64
+          -Dinclude_flutter_inappwebview_windows_tests=TRUE
+          -DFLUTTER_WEBVIEW_WINDOWS_USE_TEXTURE_FALLBACK=${{ matrix.texture_fallback }}
+
+      - name: Build example and native tests
+        working-directory: flutter_inappwebview_windows/example
+        run: cmake --build build/windows/x64 --config Debug --parallel
+
+      - name: Run native tests
+        working-directory: flutter_inappwebview_windows/example
+        run: >-
+          ctest --test-dir build/windows/x64 -C Debug
+          --output-on-failure --no-tests=error
+      - name: Preserve native test observations
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-native-texture-fallback-${{ matrix.texture_fallback }}
+          path: flutter_inappwebview_windows/example/build/windows/x64/Testing/Temporary/*.log
+          if-no-files-found: warn

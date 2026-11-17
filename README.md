@@ -63,6 +63,52 @@ Send a submission request to the [Submit App](https://inappwebview.dev/submit-ap
 
 ## Installation
 
+### Otzaria fork
+
+This fork is distributed from Git. Its platform packages use sibling path
+dependencies so the API and native implementations come from the same commit.
+They are marked `publish_to: none`; publishing separate packages requires
+replacing those paths with compatible published versions first.
+
+```yaml
+dependencies:
+  flutter_inappwebview:
+    git:
+      url: https://github.com/Otzaria/flutter_inappwebview.git
+      ref: master # Prefer a tested commit SHA in production.
+      path: flutter_inappwebview
+```
+
+Do not combine these packages with overrides pointing to published platform
+implementations or a different Git revision.
+
+### Apple view activity metadata
+
+`controller.getAppleWebViewActivitySnapshot()` reads public view, window,
+application and scheduling-preference metadata on iOS/macOS without evaluating
+JavaScript or changing WebKit policy. Missing/unsupported/disposed observations
+stay explicit. These flags do not establish actual JavaScript suspension or
+WebContent process liveness. See the [API semantics and native CI probes](tool/apple_activity_snapshot.md).
+
+### Preparing WebView startup
+
+Call `await WebViewEnvironment.prewarm()` before creating the first WebView to
+prepare supported startup work asynchronously. Prewarming is optional: failures
+are returned as results, and unsupported platforms return `null`.
+
+| Platform | Behavior |
+| --- | --- |
+| Windows | Loads WebView2 through a temporary environment on a background STA. Pass the same environment settings to `prewarm` and the later `create`. Concurrent identical calls share work; completed results are not cached. |
+| Android | Uses AndroidX 1.14's experimental startup API with UI tasks disabled. Apply `ProcessGlobalConfig` first. Only background startup work is warmed; the first WebView still performs UI initialization. Windows settings are ignored. The first outcome is reused within the engine. |
+| Linux | `prewarm` returns `null`. An explicit `WebViewEnvironment.create()` can prepare and retain the WebKit context for later views. |
+| iOS, macOS, Web | `prewarm` returns `null`. |
+
+Native startup has a 30-second deadline, with a Dart reply timeout of 31 seconds
+on Windows and 35 seconds on Android. Provider initialization cannot be
+interrupted, so its worker may continue after a timeout. Prewarming does not
+guarantee that subsequent view creation will avoid all startup costs.
+
+
 Add `flutter_inappwebview` as a [dependency in your pubspec.yaml file](https://flutter.io/using-packages/).
 
 ### Platform Installation Setup:

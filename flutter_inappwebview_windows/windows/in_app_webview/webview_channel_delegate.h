@@ -4,6 +4,7 @@
 #include <flutter/standard_message_codec.h>
 #include <optional>
 #include <vector>
+#include <utility>
 
 #include "../types/accelerator_key_pressed_detail.h"
 #include "../types/base_callback_result.h"
@@ -159,6 +160,8 @@ namespace flutter_inappwebview_plugin
     void onUpdateVisitedHistory(const std::optional<std::string>& url, const std::optional<bool>& isReload) const;
     void onCallJsHandler(const std::string& handlerName, const std::unique_ptr<JavaScriptHandlerFunctionData> data, std::unique_ptr<CallJsHandlerCallback> callback) const;
     void onConsoleMessage(const std::string& message, const int64_t& messageLevel) const;
+    void flushConsoleMessages() const;
+    void clearConsoleMessages() const;
     void onDevToolsProtocolEventReceived(const std::string& eventName, const std::string& data) const;
     void onCreateWindow(std::shared_ptr<CreateWindowAction> createWindowAction, std::unique_ptr<CreateWindowCallback> callback) const;
     void onCloseWindow() const;
@@ -183,6 +186,10 @@ namespace flutter_inappwebview_plugin
     void onSaveAsUIShowing(std::shared_ptr<SaveAsUIShowingRequest> request, std::unique_ptr<SaveAsUIShowingCallback> callback) const;
     void onSaveFileSecurityCheckStarting(std::shared_ptr<SaveFileSecurityCheckStartingRequest> request, std::unique_ptr<SaveFileSecurityCheckStartingCallback> callback) const;
     void onScreenCaptureStarting(std::shared_ptr<ScreenCaptureStartingRequest> request, std::unique_ptr<ScreenCaptureStartingCallback> callback) const;
+  private:
+    mutable std::vector<std::pair<std::string, int64_t>> pendingConsoleMessages_;
+    mutable size_t pendingConsoleBytes_ = 0;
+    mutable UINT_PTR consoleFlushTimer_ = 0;
   };
 }
 

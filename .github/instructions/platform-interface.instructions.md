@@ -1,12 +1,12 @@
 ---
-applyTo: "flutter_inappwebview_platform_interface/**"
+applyTo: "drago_inappwebview_platform_interface/**"
 ---
 
 # Platform Interface Package Instructions
 
 This is the **source of truth** for the entire plugin. All types, enums, and platform contracts are defined here.
 Used by all platform implementations and the main plugin-facing-API package.
-When adding new features here, you must propagate them also to the main `flutter_inappwebview` package.
+When adding new features here, you must propagate them also to the main `drago_inappwebview` package.
 
 ## Main Platform Contracts
 
@@ -84,13 +84,13 @@ lib/src/
    ```bash
    npm run build
    # Or directly:
-   cd flutter_inappwebview_platform_interface
+   cd drago_inappwebview_platform_interface
    flutter pub run build_runner build --delete-conflicting-outputs
    ```
 
 2. **Never Edit Generated Files**: Files ending in `.g.dart` are auto-generated. Modify the source file (same name without `.g`) instead.
 
-3. **Propagation**: Changes here require updates to ALL platform packages AND the main `flutter_inappwebview` package.
+3. **Propagation**: Changes here require updates to ALL platform packages AND the main `drago_inappwebview` package.
 
 ## InAppWebViewSettings
 
@@ -124,7 +124,7 @@ When implementing a new platform interface class:
 class PlatformWebViewEnvironmentCreationParams {
   const PlatformWebViewEnvironmentCreationParams({this.settings});
 
-  ///{@template flutter_inappwebview_platform_interface.PlatformWebViewEnvironmentCreationParams.settings}
+  ///{@template drago_inappwebview_platform_interface.PlatformWebViewEnvironmentCreationParams.settings}
   /// WebView Environment settings.
   ///{@endtemplate}
   @SupportedPlatforms(platforms: [WindowsPlatform()])
@@ -143,7 +143,7 @@ class PlatformWebViewEnvironmentCreationParams {
 ```dart
 @SupportedPlatforms(platforms: [WindowsPlatform()])
 abstract class PlatformWebViewEnvironment extends PlatformInterface implements Disposable {
-  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironmentCreationParams.settings}
+  ///{@macro drago_inappwebview_platform_interface.PlatformWebViewEnvironmentCreationParams.settings}
   WebViewEnvironmentSettings? get settings => params.settings;
 
   bool isClassSupported({TargetPlatform? platform}) =>

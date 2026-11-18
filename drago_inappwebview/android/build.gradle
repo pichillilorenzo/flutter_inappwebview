@@ -1,0 +1,38 @@
+group 'com.pichillilorenzo.drago_inappwebview'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'com.android.library'
+
+android {
+    namespace 'com.pichillilorenzo.drago_inappwebview'
+    compileSdk = flutter.compileSdkVersion
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_21
+        targetCompatibility JavaVersion.VERSION_21
+    }
+
+    defaultConfig {
+        minSdkVersion 21
+        consumerProguardFiles 'proguard-rules.pro'
+    }
+    lint {
+        disable 'InvalidPackage'
+    }
+    buildTypes {
+        debug {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    dependencies {
+        implementation 'androidx.webkit:webkit:1.14.0'
+        implementation 'androidx.browser:browser:1.9.0'
+        implementation 'androidx.appcompat:appcompat:1.7.1'
+        implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.2.0'
+    }
+}

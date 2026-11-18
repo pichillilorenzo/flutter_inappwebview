@@ -1,5 +1,5 @@
 ---
-applyTo: "flutter_inappwebview_android/**"
+applyTo: "drago_inappwebview/**"
 ---
 
 # Android Platform Implementation Instructions
@@ -32,7 +32,7 @@ applyTo: "flutter_inappwebview_android/**"
 ## Native Code Structure
 
 ```
-android/src/main/java/com/.../flutter_inappwebview_android/
+android/src/main/java/com/.../drago_inappwebview/
 ├── InAppWebViewFlutterPlugin.java       # Plugin entry/registration
 ├── InAppWebViewFileProvider.java        # FileProvider for downloads
 │
@@ -336,7 +336,7 @@ JavaScript files injected into WebViews for native-web communication:
 
 | Script | File | Description |
 |--------|------|-------------|
-| **JavaScriptBridgeJS** | `JavaScriptBridgeJS.java` | Core bridge enabling `window.flutter_inappwebview.callHandler()` for Dart-JS communication. Uses `@JavascriptInterface` annotation. |
+| **JavaScriptBridgeJS** | `JavaScriptBridgeJS.java` | Core bridge enabling `window.drago_inappwebview.callHandler()` for Dart-JS communication. Uses `@JavascriptInterface` annotation. |
 | **InterceptAjaxRequestJS** | `InterceptAjaxRequestJS.java` | Wraps `XMLHttpRequest` to intercept AJAX requests. Enables `shouldInterceptAjaxRequest`, `onAjaxReadyStateChange`, `onAjaxProgress` callbacks. |
 | **InterceptFetchRequestJS** | `InterceptFetchRequestJS.java` | Wraps `window.fetch()` to intercept Fetch API requests. Enables `shouldInterceptFetchRequest` callback. |
 | **OnLoadResourceJS** | `OnLoadResourceJS.java` | Uses `PerformanceObserver` to track resource loading (images, scripts, etc.). Enables `onLoadResource` callback. |
@@ -358,7 +358,7 @@ JavaScript files injected into WebViews for native-web communication:
 ## Dart-Side Development
 
 For Dart-only changes:
-1. Implement platform interface from `flutter_inappwebview_platform_interface`
+1. Implement platform interface from `drago_inappwebview_platform_interface`
 2. Extend `Platform*CreationParams` for Android-specific parameters
 3. Register in `AndroidInAppWebViewPlatform.registerWith()`
 4. Android-specific features: Chrome Custom Tabs, Service Workers, Tracing
@@ -374,7 +374,7 @@ When modifying Java code:
 ## Build Commands
 
 ```bash
-cd flutter_inappwebview_android && flutter pub get
+cd drago_inappwebview && flutter pub get
 cd example && flutter build apk --debug
 ```
 

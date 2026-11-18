@@ -1,5 +1,5 @@
 ---
-applyTo: "flutter_inappwebview/lib/**,flutter_inappwebview/example/**"
+applyTo: "drago_inappwebview/lib/**,drago_inappwebview/example/**"
 ---
 
 # App-Facing Package Instructions
@@ -10,13 +10,13 @@ This is the **public API** package that developers depend on. It wraps all platf
 
 1. **No Platform Logic Here**: This package only wraps platform implementations. Never add platform-specific code.
 
-2. **Delegate to Platform Interface**: All functionality must delegate to `flutter_inappwebview_platform_interface` types.
+2. **Delegate to Platform Interface**: All functionality must delegate to `drago_inappwebview_platform_interface` types.
 
 3. **Avoid Breaking Changes**: Public API changes affect all users. Maintain backward compatibility.
 
 ## Directory Structure
 
-- `lib/flutter_inappwebview.dart` - Main export file
+- `lib/drago_inappwebview.dart` - Main export file
 - `lib/src/` - Public API wrappers
 - `example/` - Example app and integration tests
 - `example/integration_test/` - Integration test suite
@@ -77,7 +77,7 @@ class MyFeature {
 Located in `example/integration_test/`:
 ```bash
 # Run with device/emulator
-cd flutter_inappwebview/example
+cd drago_inappwebview/example
 NODE_SERVER_IP=<ip> flutter driver --driver=test_driver/integration_test.dart \
   --target=integration_test/webview_flutter_test.dart
 ```

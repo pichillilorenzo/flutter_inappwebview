@@ -14,12 +14,13 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.webkit.WebView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.SearchView;
 
-import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
@@ -28,6 +29,7 @@ import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.pichillilorenzo.drago_inappwebview.R;
@@ -113,10 +115,19 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
 
     windowId = b.getInt("windowId");
 
-    // EdgeToEdge replaces setDecorFitsSystemWindows + setStatusBarColor, which
-    // Android 15 deprecates; the toolbar pads itself for the status bar below.
-    EdgeToEdge.enable(this);
+    // Edge-to-edge without androidx.activity.EdgeToEdge: its own code calls
+    // Window.setStatusBarColor / setNavigationBarColor, which Play flags as
+    // deprecated in Android 15. Below 15 the bars keep the theme colours.
+    // The toolbar pads for the status bar, the page for the nav bar.
+    drawEdgeToEdge(getWindow());
     setContentView(R.layout.activity_web_view);
+
+    ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.container), (v, insets) -> {
+      Insets bars = insets.getInsets(WindowInsetsCompat.Type.navigationBars()
+          | WindowInsetsCompat.Type.displayCutout());
+      v.setPadding(bars.left, 0, bars.right, bars.bottom);
+      return insets;
+    });
 
     toolbar = findViewById(R.id.toolbar);
     setSupportActionBar(toolbar);
@@ -675,5 +686,21 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
   public void onDestroy() {
     dispose();
     super.onDestroy();
+  }
+
+  private static void drawEdgeToEdge(Window window) {
+    WindowCompat.setDecorFitsSystemWindows(window, false);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+      WindowManager.LayoutParams attributes = window.getAttributes();
+      attributes.layoutInDisplayCutoutMode =
+          Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
+              ? WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS
+              : WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
+      window.setAttributes(attributes);
+    }
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+      window.setStatusBarContrastEnforced(false);
+      window.setNavigationBarContrastEnforced(false);
+    }
   }
 }

@@ -14,15 +14,10 @@ extension URLProtectionSpace {
             return nil
         }
         
-        var secResult = SecTrustResultType.invalid
-        let secTrustEvaluateStatus = SecTrustEvaluate(serverTrust, &secResult);
-        
-        if secTrustEvaluateStatus == errSecSuccess, let serverCertificate = SecTrustGetCertificateAtIndex(serverTrust, 0) {
-            return serverCertificate.data
-        }
-        return nil
+        let chain = SecTrustCopyCertificateChain(serverTrust) as? [SecCertificate]
+        return chain?.first?.data
     }
-    
+
     var sslCertificate: SslCertificate? {
         var sslCertificate: SslCertificate? = nil
         if let x509Certificate = x509Certificate {
@@ -37,7 +32,8 @@ extension URLProtectionSpace {
         }
         
         var secResult = SecTrustResultType.invalid
-        SecTrustEvaluate(serverTrust, &secResult);
+        _ = SecTrustEvaluateWithError(serverTrust, nil)
+        SecTrustGetTrustResult(serverTrust, &secResult)
         
         guard let sslErrorType = secResult != SecTrustResultType.proceed ? secResult : nil else {
             return nil

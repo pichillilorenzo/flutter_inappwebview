@@ -22,7 +22,7 @@ import Foundation
 import AVFoundation
 import SafariServices
 
-public class InAppWebViewFlutterPlugin: NSObject, FlutterPlugin {
+public class InAppWebViewFlutterPlugin: NSObject, FlutterPlugin, FlutterSceneLifeCycleDelegate {
     
     var registrar: FlutterPluginRegistrar
     var platformUtil: PlatformUtil?
@@ -44,7 +44,7 @@ public class InAppWebViewFlutterPlugin: NSObject, FlutterPlugin {
         self.registrar = registrar
         
         super.init()
-        
+
         registrar.register(FlutterWebViewFactory(plugin: self) as FlutterPlatformViewFactory, withId: FlutterWebViewFactory.VIEW_TYPE_ID)
         
         platformUtil = PlatformUtil(plugin: self)
@@ -67,9 +67,28 @@ public class InAppWebViewFlutterPlugin: NSObject, FlutterPlugin {
     }
     
     public static func register(with registrar: FlutterPluginRegistrar) {
-        let _ = InAppWebViewFlutterPlugin(with: registrar)
+        let instance = InAppWebViewFlutterPlugin(with: registrar)
+        // Publishing lets the engine call detachFromEngine during teardown.
+        registrar.publish(instance)
+        registrar.addApplicationDelegate(instance)
+        registrar.addSceneDelegate(instance)
     }
     
+    public func sceneDidBecomeActive(_ scene: UIScene) {
+        guard window?.windowScene === scene else { return }
+        attachHeadlessWebViews()
+    }
+
+    public func applicationDidBecomeActive(_ application: UIApplication) {
+        attachHeadlessWebViews()
+    }
+
+    private func attachHeadlessWebViews() {
+        for webView in headlessInAppWebViewManager?.webViews.values.compactMap({ $0 }) ?? [] {
+            webView.attachToWindowIfNeeded()
+        }
+    }
+
     public func detachFromEngine(for registrar: FlutterPluginRegistrar) {
         platformUtil?.dispose()
         platformUtil = nil

@@ -14,6 +14,12 @@ public class HeadlessInAppWebView: Disposable {
     var channelDelegate: HeadlessWebViewChannelDelegate?
     var flutterWebView: FlutterWebViewController?
     var plugin: InAppWebViewFlutterPlugin?
+    private var wrapperView: NSView?
+
+    private var hostView: NSView? {
+        // mainWindow can be nil while the app is inactive, or belong to another engine.
+        return plugin?.registrar.view?.window?.contentView ?? plugin?.registrar.view
+    }
     
     public init(plugin: InAppWebViewFlutterPlugin, id: String, flutterWebView: FlutterWebViewController) {
         self.id = id
@@ -35,8 +41,8 @@ public class HeadlessInAppWebView: Disposable {
             if let size = Size2D.fromMap(map: initialSize) {
                 setSize(size: size)
             } else {
-                view.frame = CGRect(x: 0.0, y: 0.0, width: NSApplication.shared.mainWindow?.contentView?.bounds.width ?? 0.0,
-                                    height: NSApplication.shared.mainWindow?.contentView?.bounds.height ?? 0.0)
+                view.frame = CGRect(x: 0.0, y: 0.0, width: hostView?.bounds.width ?? 0.0,
+                                    height: hostView?.bounds.height ?? 0.0)
             }
             /// Note: The WKWebView behaves very unreliable when rendering offscreen
             /// on a device. This is especially true with JavaScript, which simply
@@ -44,15 +50,16 @@ public class HeadlessInAppWebView: Disposable {
             /// So, add the headless WKWebView to the view hierarchy.
             /// This way is also possible to take screenshots.
             let wrapperView = NSView() // wrapper view with frame zero
+            self.wrapperView = wrapperView
             wrapperView.addSubview(view, positioned: .below, relativeTo: nil)
-            NSApplication.shared.mainWindow?.contentView?.addSubview(wrapperView, positioned: .below, relativeTo: nil)
+            hostView?.addSubview(wrapperView, positioned: .below, relativeTo: nil)
         }
     }
     
     public func setSize(size: Size2D) {
         if let view = flutterWebView?.view() {
-            let width = size.width == -1.0 ? NSApplication.shared.mainWindow?.contentView?.bounds.width ?? 0.0 : CGFloat(size.width)
-            let height = size.height == -1.0 ? NSApplication.shared.mainWindow?.contentView?.bounds.height ?? 0.0 : CGFloat(size.height)
+            let width = size.width == -1.0 ? hostView?.bounds.width ?? 0.0 : CGFloat(size.width)
+            let height = size.height == -1.0 ? hostView?.bounds.height ?? 0.0 : CGFloat(size.height)
             view.frame = CGRect(x: 0.0, y: 0.0, width: width, height: height)
         }
     }
@@ -85,6 +92,8 @@ public class HeadlessInAppWebView: Disposable {
         if disposeWebView {
             flutterWebView?.dispose(removeFromSuperview: true)
         }
+        wrapperView?.removeFromSuperview()
+        wrapperView = nil
         flutterWebView = nil
         plugin = nil
     }

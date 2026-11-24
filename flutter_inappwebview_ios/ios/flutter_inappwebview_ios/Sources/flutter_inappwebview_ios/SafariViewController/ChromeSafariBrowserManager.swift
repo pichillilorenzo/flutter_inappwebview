@@ -90,7 +90,7 @@ public class ChromeSafariBrowserManager: ChannelDelegate {
         
         if #available(iOS 9.0, *), let plugin = plugin {
             
-            if let flutterViewController = UIApplication.shared.visibleViewController {
+            if let flutterViewController = plugin.visibleViewController {
                 // flutterViewController could be casted to FlutterViewController if needed
                 
                 let safariSettings = SafariBrowserSettings()
@@ -115,6 +115,9 @@ public class ChromeSafariBrowserManager: ChannelDelegate {
                 }
                 
                 browsers[id] = safari
+            } else {
+                result(FlutterError(code: "ChromeSafariBrowserManager",
+                                    message: "No view controller attached to the Flutter engine", details: nil))
             }
             return
         }

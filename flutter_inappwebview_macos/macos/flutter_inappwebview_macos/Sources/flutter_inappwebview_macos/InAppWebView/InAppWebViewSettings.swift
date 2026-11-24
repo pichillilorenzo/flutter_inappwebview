@@ -14,7 +14,7 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
     var useShouldOverrideUrlLoading = false
     var useOnLoadResource = false
     var useOnDownloadStart = false
-    @available(*, deprecated, message: "Use InAppWebViewManager.clearAllCache instead.")
+    // Kept for the legacy Dart clearCache setting.
     var clearCache = false
     var userAgent = ""
     var applicationNameForUserAgent = ""
@@ -101,7 +101,6 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
             }
             realSettings["allowUniversalAccessFromFileURLs"] = configuration.value(forKey: "allowUniversalAccessFromFileURLs") as? Bool
             realSettings["allowFileAccessFromFileURLs"] = configuration.preferences.value(forKey: "allowFileAccessFromFileURLs") as? Bool
-            realSettings["javaScriptEnabled"] = configuration.preferences.javaScriptEnabled
             if #available(macOS 11.0, *) {
                 realSettings["mediaType"] = webView.mediaType
                 realSettings["pageZoom"] = Float(webView.pageZoom)

@@ -1,3 +1,8 @@
+## Unreleased
+
+- Support UIScene, iOS 15+, and SwiftPM.
+- Add the FlutterFramework dependency for SwiftPM.
+
 ## 1.2.0-beta.3
 
 - Updated flutter_inappwebview_platform_interface version to ^1.4.0-beta.3

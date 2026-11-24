@@ -1,3 +1,8 @@
+## Unreleased
+
+- Fix recent Xcode builds and headless WebViews; require macOS 12+.
+- Add the FlutterFramework dependency for SwiftPM.
+
 ## 1.2.0-beta.3
 
 - Updated flutter_inappwebview_platform_interface version to ^1.4.0-beta.3

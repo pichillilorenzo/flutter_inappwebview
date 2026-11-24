@@ -1,23 +1,9 @@
 import UIKit
 import Flutter
-//import flutter_downloader
 
-@UIApplicationMain
-
-@objc class AppDelegate: FlutterAppDelegate {
-
-  override func application(
-    _ application: UIApplication,
-    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
-  ) -> Bool {
-    GeneratedPluginRegistrant.register(with: self)
-    //FlutterDownloaderPlugin.setPluginRegistrantCallback(registerPlugins)
-    return super.application(application, didFinishLaunchingWithOptions: launchOptions)
+@main
+@objc class AppDelegate: FlutterAppDelegate, FlutterImplicitEngineDelegate {
+  func didInitializeImplicitFlutterEngine(_ engineBridge: FlutterImplicitEngineBridge) {
+    GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
   }
 }
-
-//private func registerPlugins(registry: FlutterPluginRegistry) {
-//    if (!registry.hasPlugin("FlutterDownloaderPlugin")) {
-//       FlutterDownloaderPlugin.register(with: registry.registrar(forPlugin: "FlutterDownloaderPlugin")!)
-//    }
-//}

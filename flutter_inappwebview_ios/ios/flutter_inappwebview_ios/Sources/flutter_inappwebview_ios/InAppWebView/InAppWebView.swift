@@ -547,7 +547,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
             }
             
             if settings.clearCache {
-                clearCache()
+                clearWebsiteData()
             }
         }
         
@@ -575,10 +575,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                 configuration.defaultWebpagePreferences.preferredContentMode = WKWebpagePreferences.ContentMode(rawValue: settings.preferredContentMode)!
             }
             
-            configuration.preferences.javaScriptEnabled = settings.javaScriptEnabled
-            if #available(iOS 14.0, *) {
-                configuration.defaultWebpagePreferences.allowsContentJavaScript = settings.javaScriptEnabled
-            }
+            configuration.defaultWebpagePreferences.allowsContentJavaScript = settings.javaScriptEnabled
             
             if #available(iOS 15.0, *) {
                 configuration.preferences.isTextInteractionEnabled = settings.isTextInteractionEnabled
@@ -656,12 +653,10 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         let configuration = WKWebViewConfiguration()
         // initialzie WKUserContentController here to fix possible "undefined is not an object (evaluating 'window.webkit.messageHandlers')" javascript error
         configuration.userContentController = WKUserContentController()
-        configuration.processPool = WKProcessPoolManager.sharedProcessPool
         
         if let settings = settings {
             configuration.allowsInlineMediaPlayback = settings.allowsInlineMediaPlayback
             configuration.suppressesIncrementalRendering = settings.suppressesIncrementalRendering
-            configuration.selectionGranularity = WKSelectionGranularity.init(rawValue: settings.selectionGranularity)!
             
             if settings.allowUniversalAccessFromFileURLs {
                 configuration.setValue(settings.allowUniversalAccessFromFileURLs, forKey: "allowUniversalAccessFromFileURLs")
@@ -742,7 +737,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         let hitTestResult = HitTestResult(type: .unknownType, extra: nil)
         
         if let lastLongPressTouhLocation = lastLongPressTouchPoint {
-            if configuration.preferences.javaScriptEnabled {
+            if configuration.defaultWebpagePreferences.allowsContentJavaScript {
                 self.evaluateJavaScript("window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())._findElementsAtPoint(\(lastLongPressTouhLocation.x),\(lastLongPressTouhLocation.y))", completionHandler: {(value, error) in
                     if error != nil {
                         print("Long press gesture recognizer error: \(error?.localizedDescription ?? "")")
@@ -1233,10 +1228,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
             configuration.preferences.minimumFontSize = CGFloat(newSettings.minimumFontSize)
         }
         
-        if newSettingsMap["selectionGranularity"] != nil && settings?.selectionGranularity != newSettings.selectionGranularity {
-            configuration.selectionGranularity = WKSelectionGranularity.init(rawValue: newSettings.selectionGranularity)!
-        }
-        
         if #available(iOS 10.0, *) {
             if newSettingsMap["ignoresViewportScaleLimits"] != nil && settings?.ignoresViewportScaleLimits != newSettings.ignoresViewportScaleLimits {
                 configuration.ignoresViewportScaleLimits = newSettings.ignoresViewportScaleLimits
@@ -1331,11 +1322,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         }
         
         if newSettingsMap["clearCache"] != nil && newSettings.clearCache {
-            clearCache()
-        }
-        
-        if newSettingsMap["javaScriptEnabled"] != nil && settings?.javaScriptEnabled != newSettings.javaScriptEnabled {
-            configuration.preferences.javaScriptEnabled = newSettings.javaScriptEnabled
+            clearWebsiteData()
         }
         
         if #available(iOS 14.0, *) {
@@ -1460,22 +1447,15 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
     
     @available(*, deprecated, message: "Use InAppWebViewManager.clearAllCache instead.")
     public func clearCache() {
-        if #available(iOS 9.0, *) {
-            let date = NSDate(timeIntervalSince1970: 0)
-            WKWebsiteDataStore.default().removeData(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes(), modifiedSince: date as Date, completionHandler:{ })
-        } else {
-            var libraryPath = NSSearchPathForDirectoriesInDomains(FileManager.SearchPathDirectory.libraryDirectory, FileManager.SearchPathDomainMask.userDomainMask, false).first!
-            libraryPath += "/Cookies"
-            
-            do {
-                try FileManager.default.removeItem(atPath: libraryPath)
-            } catch {
-                print("can't clear cache")
-            }
-            URLCache.shared.removeAllCachedResponses()
-        }
+        clearWebsiteData()
     }
-    
+
+    func clearWebsiteData() {
+        WKWebsiteDataStore.default().removeData(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes(),
+                                                modifiedSince: Date(timeIntervalSince1970: 0),
+                                                completionHandler: {})
+    }
+
     public func injectDeferredObject(source: String, withWrapper jsWrapper: String?, completionHandler: ((Any?) -> Void)? = nil) {
         var jsToInject = source
         if let wrapper = jsWrapper {
@@ -3063,7 +3043,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                            let numberOfMatches = findResult["numberOfMatches"] as? Int,
                            let isDoneCounting = findResult["isDoneCounting"] as? Bool {
                             webView.findInteractionController?.channelDelegate?.onFindResultReceived(activeMatchOrdinal: activeMatchOrdinal, numberOfMatches: numberOfMatches, isDoneCounting: isDoneCounting)
-                            webView.channelDelegate?.onFindResultReceived(activeMatchOrdinal: activeMatchOrdinal, numberOfMatches: numberOfMatches, isDoneCounting: isDoneCounting)
+                            webView.channelDelegate?.sendLegacyFindResult(activeMatchOrdinal: activeMatchOrdinal, numberOfMatches: numberOfMatches, isDoneCounting: isDoneCounting)
                         }
                     }
                     break
@@ -3319,7 +3299,7 @@ if(window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)] 
     }
     
     public func getSelectedText(completionHandler: @escaping (Any?, Error?) -> Void) {
-        if configuration.preferences.javaScriptEnabled {
+        if configuration.defaultWebpagePreferences.allowsContentJavaScript {
             evaluateJavaScript(PluginScriptsUtil.GET_SELECTED_TEXT_JS_SOURCE, completionHandler: completionHandler)
         } else {
             completionHandler(nil, nil)
@@ -3327,7 +3307,7 @@ if(window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)] 
     }
     
     public func getHitTestResult(completionHandler: @escaping (HitTestResult) -> Void) {
-        if configuration.preferences.javaScriptEnabled, let lastTouchLocation = lastTouchPoint {
+        if configuration.defaultWebpagePreferences.allowsContentJavaScript, let lastTouchLocation = lastTouchPoint {
             self.evaluateJavaScript("window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())._findElementsAtPoint(\(lastTouchLocation.x),\(lastTouchLocation.y))", completionHandler: {(value, error) in
                 if error != nil {
                     print("getHitTestResult error: \(error?.localizedDescription ?? "")")
@@ -3345,7 +3325,7 @@ if(window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)] 
     }
     
     public func requestFocusNodeHref(completionHandler: @escaping ([String: Any?]?, Error?) -> Void) {
-        if configuration.preferences.javaScriptEnabled {
+        if configuration.defaultWebpagePreferences.allowsContentJavaScript {
             // add some delay to make it sure _lastAnchorOrImageTouched is updated
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
                 self.evaluateJavaScript("window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())._lastAnchorOrImageTouched", completionHandler: {(value, error) in
@@ -3359,7 +3339,7 @@ if(window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)] 
     }
     
     public func requestImageRef(completionHandler: @escaping ([String: Any?]?, Error?) -> Void) {
-        if configuration.preferences.javaScriptEnabled {
+        if configuration.defaultWebpagePreferences.allowsContentJavaScript {
             // add some delay to make it sure _lastImageTouched is updated
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
                 self.evaluateJavaScript("window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())._lastImageTouched", completionHandler: {(value, error) in

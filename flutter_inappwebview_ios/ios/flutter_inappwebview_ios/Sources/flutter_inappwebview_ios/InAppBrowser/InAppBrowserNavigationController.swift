@@ -9,8 +9,10 @@ import Foundation
 import UIKit
 
 public class InAppBrowserNavigationController: UINavigationController {
+    weak var hostWindow: UIWindow?
+
     deinit {
         debugPrint("InAppBrowserNavigationController - dealloc")
-        UIApplication.shared.delegate?.window??.makeKeyAndVisible()
+        hostWindow?.makeKeyAndVisible()
     }
 }

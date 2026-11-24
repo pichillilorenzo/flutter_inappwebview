@@ -100,11 +100,12 @@ public class InAppBrowserManager: ChannelDelegate {
             let storyboard = UIStoryboard(name: InAppBrowserManager.WEBVIEW_STORYBOARD, bundle: Bundle(for: InAppWebViewFlutterPlugin.self))
         #endif
         let navController = storyboard.instantiateViewController(withIdentifier: InAppBrowserManager.NAV_STORYBOARD_CONTROLLER_ID) as! InAppBrowserNavigationController
+        navController.hostWindow = plugin?.window
         webViewController.edgesForExtendedLayout = []
         navController.pushViewController(webViewController, animated: false)
         webViewController.prepareNavigationControllerBeforeViewWillAppear()
         
-        guard let visibleViewController = UIApplication.shared.visibleViewController else {
+        guard let visibleViewController = plugin?.visibleViewController else {
             assertionFailure("Failure init the visibleViewController!")
             return
         }

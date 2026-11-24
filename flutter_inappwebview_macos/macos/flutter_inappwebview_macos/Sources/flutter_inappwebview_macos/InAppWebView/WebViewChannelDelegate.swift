@@ -256,7 +256,7 @@ public class WebViewChannelDelegate: ChannelDelegate {
             }
             break
         case .clearCache:
-            webView?.clearCache()
+            webView?.clearWebsiteData()
             result(true)
             break
         case .scrollTo:
@@ -486,7 +486,7 @@ public class WebViewChannelDelegate: ChannelDelegate {
             break
         case .postWebMessage:
             if let webView = webView {
-                var message = WebMessage.fromMap(map: arguments!["message"] as! [String: Any?])
+                let message = WebMessage.fromMap(map: arguments!["message"] as! [String: Any?])
                 let targetOrigin = arguments!["targetOrigin"] as! String
                 
                 var ports: [WebMessagePort] = []
@@ -572,13 +572,8 @@ public class WebViewChannelDelegate: ChannelDelegate {
             }
             break
         case .closeAllMediaPresentations:
-            if let webView = self.webView, #available(macOS 11.3, *) {
-                if #available(macOS 12.0, *) {
-                    webView.closeAllMediaPresentations {
-                        result(true)
-                    }
-                } else {
-                    webView.closeAllMediaPresentations()
+            if let webView = self.webView {
+                webView.closeAllMediaPresentations {
                     result(true)
                 }
             } else {
@@ -686,6 +681,10 @@ public class WebViewChannelDelegate: ChannelDelegate {
     
     @available(*, deprecated, message: "Use FindInteractionChannelDelegate.onFindResultReceived instead.")
     public func onFindResultReceived(activeMatchOrdinal: Int, numberOfMatches: Int, isDoneCounting: Bool) {
+        sendLegacyFindResult(activeMatchOrdinal: activeMatchOrdinal, numberOfMatches: numberOfMatches, isDoneCounting: isDoneCounting)
+    }
+
+    func sendLegacyFindResult(activeMatchOrdinal: Int, numberOfMatches: Int, isDoneCounting: Bool) {
         let arguments: [String : Any?] = [
             "activeMatchOrdinal": activeMatchOrdinal,
             "numberOfMatches": numberOfMatches,
@@ -951,7 +950,7 @@ public class WebViewChannelDelegate: ChannelDelegate {
         }
         // workaround for ProtectionSpace.toMap() SSL Certificate
         // https://github.com/pichillilorenzo/flutter_inappwebview/issues/1678
-        DispatchQueue.global().async {
+        DispatchQueue.global().async { [weak self] in
             let arguments = challenge.toMap()
             DispatchQueue.main.async { [weak self] in
                 if self?.channel == nil {
@@ -983,7 +982,7 @@ public class WebViewChannelDelegate: ChannelDelegate {
         }
         // workaround for ProtectionSpace.toMap() SSL Certificate
         // https://github.com/pichillilorenzo/flutter_inappwebview/issues/1678
-        DispatchQueue.global().async {
+        DispatchQueue.global().async { [weak self] in
             let arguments = challenge.toMap()
             DispatchQueue.main.async { [weak self] in
                 if self?.channel == nil {
@@ -1015,7 +1014,7 @@ public class WebViewChannelDelegate: ChannelDelegate {
         }
         // workaround for ProtectionSpace.toMap() SSL Certificate
         // https://github.com/pichillilorenzo/flutter_inappwebview/issues/1678
-        DispatchQueue.global().async {
+        DispatchQueue.global().async { [weak self] in
             let arguments = challenge.toMap()
             DispatchQueue.main.async { [weak self] in
                 if self?.channel == nil {
@@ -1128,7 +1127,7 @@ public class WebViewChannelDelegate: ChannelDelegate {
         }
         // workaround for ProtectionSpace.toMap() SSL Certificate
         // https://github.com/pichillilorenzo/flutter_inappwebview/issues/1678
-        DispatchQueue.global().async {
+        DispatchQueue.global().async { [weak self] in
             let arguments = challenge.toMap()
             DispatchQueue.main.async { [weak self] in
                 if self?.channel == nil {

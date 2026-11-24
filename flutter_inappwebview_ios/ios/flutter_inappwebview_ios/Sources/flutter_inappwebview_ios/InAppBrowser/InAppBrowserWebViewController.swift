@@ -412,7 +412,7 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
     }
     
     public func show(completion: (() -> Void)? = nil) {
-        if let visibleViewController = UIApplication.shared.visibleViewController,
+        if let visibleViewController = plugin?.visibleViewController,
            let navigationController = navigationController {
             isHidden = false
             visibleViewController.present(navigationController, animated: true) {
@@ -428,11 +428,11 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
             isHidden = true
             navigationController.dismiss(animated: true) {
                 completion?()
-                UIApplication.shared.delegate?.window??.makeKeyAndVisible()
+                self.plugin?.window?.makeKeyAndVisible()
             }
         } else {
             completion?()
-            UIApplication.shared.delegate?.window??.makeKeyAndVisible()
+            self.plugin?.window?.makeKeyAndVisible()
         }
     }
     

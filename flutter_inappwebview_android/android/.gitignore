@@ -11,3 +11,4 @@ gradle-wrapper.jar
 /captures
 local.properties
 keystore.properties
+.cxx

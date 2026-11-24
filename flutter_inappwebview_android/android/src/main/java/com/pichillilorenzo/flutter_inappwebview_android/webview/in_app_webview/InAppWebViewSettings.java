@@ -697,7 +697,8 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
         realSettings.put("enterpriseAuthenticationAppLinkPolicyEnabled", WebSettingsCompat.getEnterpriseAuthenticationAppLinkPolicyEnabled(settings));
       }
       if (WebViewFeature.isFeatureSupported(WebViewFeature.REQUESTED_WITH_HEADER_ALLOW_LIST)) {
-        realSettings.put("requestedWithHeaderOriginAllowList", new ArrayList<>(WebSettingsCompat.getRequestedWithHeaderOriginAllowList(settings)));
+        // AndroidX returns an empty allow-list since the X-Requested-With origin trial ended.
+        realSettings.put("requestedWithHeaderOriginAllowList", new ArrayList<String>());
       }
     }
     return realSettings;

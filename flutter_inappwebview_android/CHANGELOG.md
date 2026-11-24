@@ -1,3 +1,9 @@
+## Unreleased
+
+- Migrate Android build files to the current Flutter template with Kotlin DSL and AGP 9.1.1 and compileSdk 37.
+- Require Android API 24+.
+- Update AndroidX WebKit to 1.18.0, Browser to 1.10.0 and AppCompat to 1.8.0.
+
 ## 1.2.0-beta.3
 
 - Updated flutter_inappwebview_platform_interface version to ^1.4.0-beta.3

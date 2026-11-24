@@ -13,7 +13,7 @@ let package = Package(
     ],
     dependencies: [
         .package(name: "FlutterFramework", path: "../FlutterFramework"),
-        .package(url: "https://github.com/apple/swift-collections.git", from: "1.2.1")
+        .package(url: "https://github.com/apple/swift-collections.git", from: "1.3.0")
     ],
     targets: [
         .target(

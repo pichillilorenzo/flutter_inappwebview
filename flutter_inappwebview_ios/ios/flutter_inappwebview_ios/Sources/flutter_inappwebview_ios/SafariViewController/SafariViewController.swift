@@ -37,7 +37,9 @@ public class SafariViewController: SFSafariViewController, SFSafariViewControlle
         self.plugin = plugin
         self.menuItemList = menuItemList
         self.safariSettings = safariSettings
-        super.init(url: url, entersReaderIfAvailable: entersReaderIfAvailable)
+        let configuration = SFSafariViewController.Configuration()
+        configuration.entersReaderIfAvailable = entersReaderIfAvailable
+        super.init(url: url, configuration: configuration)
         let channel = FlutterMethodChannel(name: SafariViewController.METHOD_CHANNEL_NAME_PREFIX + id,
                                            binaryMessenger: plugin.registrar.messenger())
         self.channelDelegate = SafariViewControllerChannelDelegate(safariViewController: self, channel: channel)

@@ -162,7 +162,7 @@ public class InAppWebView: WKWebView, WKUIDelegate,
             }
             
             if settings.clearCache {
-                clearCache()
+                clearWebsiteData()
             }
         }
         
@@ -186,10 +186,7 @@ public class InAppWebView: WKWebView, WKUIDelegate,
                 configuration.defaultWebpagePreferences.preferredContentMode = WKWebpagePreferences.ContentMode(rawValue: settings.preferredContentMode)!
             }
             
-            configuration.preferences.javaScriptEnabled = settings.javaScriptEnabled
-            if #available(macOS 11.0, *) {
-                configuration.defaultWebpagePreferences.allowsContentJavaScript = settings.javaScriptEnabled
-            }
+            configuration.defaultWebpagePreferences.allowsContentJavaScript = settings.javaScriptEnabled
             if #available(macOS 11.3, *) {
                 configuration.preferences.isTextInteractionEnabled = settings.isTextInteractionEnabled
             }
@@ -262,7 +259,6 @@ public class InAppWebView: WKWebView, WKUIDelegate,
         let configuration = WKWebViewConfiguration()
         // initialzie WKUserContentController here to fix possible "undefined is not an object (evaluating 'window.webkit.messageHandlers')" javascript error
         configuration.userContentController = WKUserContentController()
-        configuration.processPool = WKProcessPoolManager.sharedProcessPool
         
         if let settings = settings {
             configuration.suppressesIncrementalRendering = settings.suppressesIncrementalRendering
@@ -711,11 +707,7 @@ public class InAppWebView: WKWebView, WKUIDelegate,
         }
         
         if newSettingsMap["clearCache"] != nil && newSettings.clearCache {
-            clearCache()
-        }
-        
-        if newSettingsMap["javaScriptEnabled"] != nil && settings?.javaScriptEnabled != newSettings.javaScriptEnabled {
-            configuration.preferences.javaScriptEnabled = newSettings.javaScriptEnabled
+            clearWebsiteData()
         }
         
         if #available(macOS 11.0, *) {
@@ -829,10 +821,15 @@ public class InAppWebView: WKWebView, WKUIDelegate,
     
     @available(*, deprecated, message: "Use InAppWebViewManager.clearAllCache instead.")
     public func clearCache() {
-        let date = NSDate(timeIntervalSince1970: 0)
-        WKWebsiteDataStore.default().removeData(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes(), modifiedSince: date as Date, completionHandler:{ })
+        clearWebsiteData()
     }
-    
+
+    func clearWebsiteData() {
+        WKWebsiteDataStore.default().removeData(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes(),
+                                                modifiedSince: Date(timeIntervalSince1970: 0),
+                                                completionHandler: {})
+    }
+
     public func injectDeferredObject(source: String, withWrapper jsWrapper: String?, completionHandler: ((Any?) -> Void)? = nil) {
         var jsToInject = source
         if let wrapper = jsWrapper {
@@ -2274,7 +2271,7 @@ public class InAppWebView: WKWebView, WKUIDelegate,
                            let numberOfMatches = findResult["numberOfMatches"] as? Int,
                            let isDoneCounting = findResult["isDoneCounting"] as? Bool {
                             webView.findInteractionController?.channelDelegate?.onFindResultReceived(activeMatchOrdinal: activeMatchOrdinal, numberOfMatches: numberOfMatches, isDoneCounting: isDoneCounting)
-                            webView.channelDelegate?.onFindResultReceived(activeMatchOrdinal: activeMatchOrdinal, numberOfMatches: numberOfMatches, isDoneCounting: isDoneCounting)
+                            webView.channelDelegate?.sendLegacyFindResult(activeMatchOrdinal: activeMatchOrdinal, numberOfMatches: numberOfMatches, isDoneCounting: isDoneCounting)
                         }
                     }
                     break
@@ -2613,7 +2610,7 @@ if(window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)] 
     }
     
     public func getSelectedText(completionHandler: @escaping (Any?, Error?) -> Void) {
-        if configuration.preferences.javaScriptEnabled {
+        if configuration.defaultWebpagePreferences.allowsContentJavaScript {
             evaluateJavaScript(PluginScriptsUtil.GET_SELECTED_TEXT_JS_SOURCE, completionHandler: completionHandler)
         } else {
             completionHandler(nil, nil)

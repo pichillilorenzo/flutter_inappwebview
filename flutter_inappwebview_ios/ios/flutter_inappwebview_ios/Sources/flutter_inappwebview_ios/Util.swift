@@ -80,10 +80,8 @@ public class Util {
                 return .trackingNumber
             case "FLIGHT_NUMBER":
                 return .flightNumber
-            case "LOOKUP_SUGGESTION":
+            case "LOOKUP_SUGGESTION", "SPOTLIGHT_SUGGESTION":
                 return .lookupSuggestion
-            case "SPOTLIGHT_SUGGESTION":
-                return .spotlightSuggestion
             case "ALL":
                 return .all
             default:
@@ -117,8 +115,7 @@ public class Util {
             }
             if type.contains(.lookupSuggestion) {
                 dataDetectorTypeString.append("LOOKUP_SUGGESTION")
-            }
-            if type.contains(.spotlightSuggestion) {
+
                 dataDetectorTypeString.append("SPOTLIGHT_SUGGESTION")
             }
         }

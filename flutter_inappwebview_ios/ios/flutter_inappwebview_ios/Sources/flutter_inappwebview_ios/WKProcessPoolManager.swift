@@ -8,6 +8,7 @@
 import Foundation
 import WebKit
 
+@available(iOS, deprecated: 15.0, message: "WebKit manages process pools automatically.")
 public class WKProcessPoolManager {
     static let sharedProcessPool = WKProcessPool()
 }

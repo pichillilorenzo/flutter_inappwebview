@@ -1,3 +1,8 @@
+## Unreleased
+
+- Fixed Visual Studio 2026 builds and MSVC warnings; updated Windows platform files.
+- Updated WebView2 to `1.0.4258.31`, WIL to `1.0.260126.7`, and C++/WinRT to `3.0.260818.1`, with reliable native package restoration.
+
 ## 0.7.0-beta.3
 
 - Updated flutter_inappwebview_platform_interface version to ^1.4.0-beta.3

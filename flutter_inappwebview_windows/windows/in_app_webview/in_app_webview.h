@@ -222,20 +222,20 @@ namespace flutter_inappwebview_plugin
     void closeWebMessagePort(const std::string& channelId, int portIndex);
     void disposeWebMessageChannel(const std::string& channelId);
 
-    void addWebNotificationController(const std::string& id, std::shared_ptr<WebNotificationController> controller);
-    WebNotificationController* getWebNotificationController(const std::string& id) const;
-    void eraseWebNotificationController(const std::string& id);
+    void addWebNotificationController(const std::string& controllerId, std::shared_ptr<WebNotificationController> controller);
+    WebNotificationController* getWebNotificationController(const std::string& controllerId) const;
+    void eraseWebNotificationController(const std::string& controllerId);
     void disposeAllWebNotificationControllers();
 
-    void addPrintJobController(const std::string& id, std::shared_ptr<PrintJobController> controller);
-    PrintJobController* getPrintJobController(const std::string& id) const;
-    void erasePrintJobController(const std::string& id);
+    void addPrintJobController(const std::string& controllerId, std::shared_ptr<PrintJobController> controller);
+    PrintJobController* getPrintJobController(const std::string& controllerId) const;
+    void erasePrintJobController(const std::string& controllerId);
     void disposeAllPrintJobControllers();
 
-    void printCurrentPage(std::shared_ptr<PrintJobSettings> settings,
+    void printCurrentPage(std::shared_ptr<PrintJobSettings> printJobSettings,
       const std::function<void(const std::optional<std::string>&)> completionHandler);
 
-    void createPdf(std::shared_ptr<PrintJobSettings> settings,
+    void createPdf(std::shared_ptr<PrintJobSettings> printJobSettings,
       const std::function<void(const std::optional<std::vector<uint8_t>>&)> completionHandler);
 
     std::string pageFrameId() const

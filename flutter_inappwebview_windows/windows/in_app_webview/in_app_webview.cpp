@@ -2653,21 +2653,21 @@ namespace flutter_inappwebview_plugin
     webMessageChannels_.erase(channelId);
   }
 
-  void InAppWebView::addWebNotificationController(const std::string& id, std::shared_ptr<WebNotificationController> controller)
+  void InAppWebView::addWebNotificationController(const std::string& controllerId, std::shared_ptr<WebNotificationController> controller)
   {
-    if (id.empty() || !controller) return;
-    webNotificationControllers_[id] = std::move(controller);
+    if (controllerId.empty() || !controller) return;
+    webNotificationControllers_[controllerId] = std::move(controller);
   }
 
-  WebNotificationController* InAppWebView::getWebNotificationController(const std::string& id) const
+  WebNotificationController* InAppWebView::getWebNotificationController(const std::string& controllerId) const
   {
-    auto it = webNotificationControllers_.find(id);
+    auto it = webNotificationControllers_.find(controllerId);
     return it != webNotificationControllers_.end() ? it->second.get() : nullptr;
   }
 
-  void InAppWebView::eraseWebNotificationController(const std::string& id)
+  void InAppWebView::eraseWebNotificationController(const std::string& controllerId)
   {
-    webNotificationControllers_.erase(id);
+    webNotificationControllers_.erase(controllerId);
   }
 
   void InAppWebView::disposeAllWebNotificationControllers()
@@ -2688,21 +2688,21 @@ namespace flutter_inappwebview_plugin
     webNotificationControllers_.clear();
   }
 
-  void InAppWebView::addPrintJobController(const std::string& id, std::shared_ptr<PrintJobController> controller)
+  void InAppWebView::addPrintJobController(const std::string& controllerId, std::shared_ptr<PrintJobController> controller)
   {
-    if (id.empty() || !controller) return;
-    printJobControllers_[id] = std::move(controller);
+    if (controllerId.empty() || !controller) return;
+    printJobControllers_[controllerId] = std::move(controller);
   }
 
-  PrintJobController* InAppWebView::getPrintJobController(const std::string& id) const
+  PrintJobController* InAppWebView::getPrintJobController(const std::string& controllerId) const
   {
-    auto it = printJobControllers_.find(id);
+    auto it = printJobControllers_.find(controllerId);
     return it != printJobControllers_.end() ? it->second.get() : nullptr;
   }
 
-  void InAppWebView::erasePrintJobController(const std::string& id)
+  void InAppWebView::erasePrintJobController(const std::string& controllerId)
   {
-    printJobControllers_.erase(id);
+    printJobControllers_.erase(controllerId);
   }
 
   void InAppWebView::disposeAllPrintJobControllers()
@@ -2723,7 +2723,7 @@ namespace flutter_inappwebview_plugin
     printJobControllers_.clear();
   }
 
-  void InAppWebView::printCurrentPage(std::shared_ptr<PrintJobSettings> settings,
+  void InAppWebView::printCurrentPage(std::shared_ptr<PrintJobSettings> printJobSettings,
     const std::function<void(const std::optional<std::string>&)> completionHandler)
   {
     if (!webView || !webViewEnv) {
@@ -2742,13 +2742,13 @@ namespace flutter_inappwebview_plugin
     }
 
     // Check if showUI is true - use ShowPrintUI instead of Print
-    bool showUI = settings && settings->showUI.value_or(true);
+    bool showUI = printJobSettings && printJobSettings->showUI.value_or(true);
     
     if (showUI) {
       // Use ShowPrintUI to display the print dialog
       COREWEBVIEW2_PRINT_DIALOG_KIND dialogKind = COREWEBVIEW2_PRINT_DIALOG_KIND_BROWSER;
-      if (settings && settings->printDialogKind.has_value()) {
-        dialogKind = static_cast<COREWEBVIEW2_PRINT_DIALOG_KIND>(settings->printDialogKind.value());
+      if (printJobSettings && printJobSettings->printDialogKind.has_value()) {
+        dialogKind = static_cast<COREWEBVIEW2_PRINT_DIALOG_KIND>(printJobSettings->printDialogKind.value());
       }
       
       if (failedAndLog(webView16->ShowPrintUI(dialogKind))) {
@@ -2767,7 +2767,7 @@ namespace flutter_inappwebview_plugin
 
     // Generate print job ID if handledByClient is true
     std::optional<std::string> printJobId = std::nullopt;
-    if (settings && settings->handledByClient.value_or(false)) {
+    if (printJobSettings && printJobSettings->handledByClient.value_or(false)) {
       printJobId = get_uuid();
     }
 
@@ -2781,8 +2781,8 @@ namespace flutter_inappwebview_plugin
     }
 
     wil::com_ptr<ICoreWebView2PrintSettings> printSettings;
-    if (settings) {
-      printSettings = settings->createPrintSettings(environment6.get());
+    if (printJobSettings) {
+      printSettings = printJobSettings->createPrintSettings(environment6.get());
     }
     else {
       // Create default print settings if no settings provided
@@ -2801,7 +2801,7 @@ namespace flutter_inappwebview_plugin
     // Create PrintJobController if handledByClient
     std::shared_ptr<PrintJobController> printJobController = nullptr;
     if (printJobId.has_value() && printJobManager) {
-      printJobController = printJobManager->createPrintJobController(printJobId.value(), settings);
+      printJobController = printJobManager->createPrintJobController(printJobId.value(), printJobSettings);
       if (printJobController) {
         addPrintJobController(printJobId.value(), printJobController);
       }
@@ -2852,7 +2852,7 @@ namespace flutter_inappwebview_plugin
     }
   }
 
-  void InAppWebView::createPdf(std::shared_ptr<PrintJobSettings> settings,
+  void InAppWebView::createPdf(std::shared_ptr<PrintJobSettings> printJobSettings,
     const std::function<void(const std::optional<std::vector<uint8_t>>&)> completionHandler)
   {
     if (!webView || !webViewEnv) {
@@ -2880,8 +2880,8 @@ namespace flutter_inappwebview_plugin
     }
 
     wil::com_ptr<ICoreWebView2PrintSettings> printSettings;
-    if (settings) {
-      printSettings = settings->createPrintSettings(environment6.get());
+    if (printJobSettings) {
+      printSettings = printJobSettings->createPrintSettings(environment6.get());
     }
     else {
       // Create default print settings if no settings provided
@@ -4136,7 +4136,7 @@ namespace flutter_inappwebview_plugin
     if (webViewController) {
       failedLog(webViewController->Close());
     }
-    for (auto& [id, channel] : webMessageChannels_) {
+    for (auto& [channelId, channel] : webMessageChannels_) {
       if (channel) {
         channel->dispose();
       }

@@ -3,6 +3,7 @@
 #include "web_resource_response.h"
 
 #include <Shlwapi.h>
+#include <intsafe.h>
 
 namespace flutter_inappwebview_plugin
 {
@@ -42,6 +43,13 @@ namespace flutter_inappwebview_plugin
     wil::com_ptr<ICoreWebView2WebResourceResponse> webResourceResponse;
 
     if (webViewEnvironment) {
+      // Dart integers are 64-bit, but WebView2 takes a native int. Reject
+      // values that cannot be represented instead of silently truncating them.
+      int nativeStatusCode;
+      if (FAILED(Int64ToInt(statusCode.value_or(200), &nativeStatusCode))) {
+        return nullptr;
+      }
+
       wil::com_ptr<IStream> postDataStream = nullptr;
       if (data.has_value()) {
         auto postData = std::string(data.value().begin(), data.value().end());
@@ -49,12 +57,15 @@ namespace flutter_inappwebview_plugin
           reinterpret_cast<const BYTE*>(postData.data()), static_cast<UINT>(postData.length()));
       }
 
-      webViewEnvironment->CreateWebResourceResponse(
+      auto hr = webViewEnvironment->CreateWebResourceResponse(
         postDataStream.get(),
-        statusCode.value_or(200), // Default to 200 if statusCode is not set
+        nativeStatusCode,
         reasonPhrase.has_value() ? utf8_to_wide(reasonPhrase.value()).c_str() : L"OK", // Default to "OK" if reasonPhrase is not set
         nullptr,
         &webResourceResponse);
+      if (FAILED(hr) || !webResourceResponse) {
+        return nullptr;
+      }
 
       wil::com_ptr<ICoreWebView2HttpResponseHeaders> responseHeaders;
       if (SUCCEEDED(webResourceResponse->get_Headers(&responseHeaders))) {

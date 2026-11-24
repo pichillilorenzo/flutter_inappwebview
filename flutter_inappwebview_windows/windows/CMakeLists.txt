@@ -4,10 +4,10 @@
 # customers of the plugin.
 cmake_minimum_required(VERSION 3.14)
 
-set(WIL_VERSION "1.0.250325.1")
-set(WEBVIEW_VERSION "1.0.3650.58")
+set(WIL_VERSION "1.0.260126.7")
+set(WEBVIEW_VERSION "1.0.4258.31")
 set(NLOHMANN_JSON_VERSION "3.12.0")
-set(CPP_WINRT_VERSION "2.0.250303.1")
+set(CPP_WINRT_VERSION "3.0.260818.1")
 
 message(VERBOSE "CMake system version is ${CMAKE_SYSTEM_VERSION} (using SDK ${CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION})")
 
@@ -25,18 +25,44 @@ set(PLUGIN_NAME "flutter_inappwebview_windows_plugin")
 
 find_program(NUGET nuget)
 if(NOT NUGET)
-  message(NOTICE "Nuget is not installed! The flutter_inappwebview_windows plugin requires it. Check https://inappwebview.dev/docs/intro#setup-windows")
+  message(FATAL_ERROR "NuGet is required to build flutter_inappwebview_windows. Install nuget.exe and add it to PATH. See https://inappwebview.dev/docs/intro#setup-windows")
 endif()
 
-add_custom_target(${PROJECT_NAME}_DEPS ALL)
-add_custom_command(
-  TARGET ${PROJECT_NAME}_DEPS PRE_BUILD
-  COMMAND ${NUGET} install Microsoft.Windows.ImplementationLibrary -Version ${WIL_VERSION} -ExcludeVersion -OutputDirectory ${CMAKE_BINARY_DIR}/packages
-  COMMAND ${NUGET} install Microsoft.Windows.CppWinRT -Version ${CPP_WINRT_VERSION} -ExcludeVersion -OutputDirectory ${CMAKE_BINARY_DIR}/packages
-  COMMAND ${NUGET} install Microsoft.Web.WebView2 -Version ${WEBVIEW_VERSION} -ExcludeVersion -OutputDirectory ${CMAKE_BINARY_DIR}/packages
-  COMMAND ${NUGET} install nlohmann.json -Version ${NLOHMANN_JSON_VERSION} -ExcludeVersion -OutputDirectory ${CMAKE_BINARY_DIR}/packages
-  DEPENDS ${NUGET}
-)
+# MSBuild evaluates .props/.targets before running PRE_BUILD commands. Restore
+# during configuration so a clean build imports the dependencies on its first run.
+# Keep versions in the paths so another plugin cannot replace our SDK headers.
+set(NUGET_PACKAGES_DIR "${CMAKE_CURRENT_BINARY_DIR}/packages")
+function(flutter_inappwebview_windows_restore_package PACKAGE VERSION)
+  execute_process(
+    COMMAND "${NUGET}" install "${PACKAGE}" -Version "${VERSION}"
+      -OutputDirectory "${NUGET_PACKAGES_DIR}" -NonInteractive
+      -Source https://api.nuget.org/v3/index.json
+    RESULT_VARIABLE RESTORE_RESULT
+    OUTPUT_VARIABLE RESTORE_OUTPUT
+    ERROR_VARIABLE RESTORE_ERROR
+  )
+  if(NOT RESTORE_RESULT EQUAL 0)
+    message(FATAL_ERROR "Could not restore ${PACKAGE} ${VERSION}:\n${RESTORE_OUTPUT}\n${RESTORE_ERROR}")
+  endif()
+endfunction()
+flutter_inappwebview_windows_restore_package(Microsoft.Windows.ImplementationLibrary ${WIL_VERSION})
+flutter_inappwebview_windows_restore_package(Microsoft.Windows.CppWinRT ${CPP_WINRT_VERSION})
+flutter_inappwebview_windows_restore_package(Microsoft.Web.WebView2 ${WEBVIEW_VERSION})
+flutter_inappwebview_windows_restore_package(nlohmann.json ${NLOHMANN_JSON_VERSION})
+
+function(flutter_inappwebview_windows_link_packages TARGET)
+  # Keep /W4 for our code while treating the vendor SDK headers as external.
+  target_include_directories(${TARGET} SYSTEM PRIVATE
+    "${NUGET_PACKAGES_DIR}/Microsoft.Web.WebView2.${WEBVIEW_VERSION}/build/native/include")
+  set_target_properties(${TARGET} PROPERTIES VS_USER_PROPS
+    "${NUGET_PACKAGES_DIR}/Microsoft.Windows.CppWinRT.${CPP_WINRT_VERSION}/build/native/Microsoft.Windows.CppWinRT.props")
+  target_link_libraries(${TARGET} PRIVATE
+    "${NUGET_PACKAGES_DIR}/Microsoft.Windows.CppWinRT.${CPP_WINRT_VERSION}/build/native/Microsoft.Windows.CppWinRT.targets"
+    "${NUGET_PACKAGES_DIR}/Microsoft.Web.WebView2.${WEBVIEW_VERSION}/build/native/Microsoft.Web.WebView2.targets"
+    "${NUGET_PACKAGES_DIR}/Microsoft.Windows.ImplementationLibrary.${WIL_VERSION}/build/native/Microsoft.Windows.ImplementationLibrary.targets"
+    "${NUGET_PACKAGES_DIR}/nlohmann.json.${NLOHMANN_JSON_VERSION}/build/native/nlohmann.json.targets"
+  )
+endfunction()
 
 # Any new source files that you add to the plugin should be added here.
 list(APPEND PLUGIN_SOURCES
@@ -299,9 +325,7 @@ function(FLUTTER_INAPPWEBVIEW_WINDOWS_APPLY_STANDARD_SETTINGS TARGET)
 endfunction()
 flutter_inappwebview_windows_apply_standard_settings(${PLUGIN_NAME})
 
-target_link_libraries(${PLUGIN_NAME} PRIVATE ${CMAKE_BINARY_DIR}/packages/Microsoft.Web.WebView2/build/native/Microsoft.Web.WebView2.targets)
-target_link_libraries(${PLUGIN_NAME} PRIVATE ${CMAKE_BINARY_DIR}/packages/Microsoft.Windows.ImplementationLibrary/build/native/Microsoft.Windows.ImplementationLibrary.targets)
-target_link_libraries(${PLUGIN_NAME} PRIVATE ${CMAKE_BINARY_DIR}/packages/nlohmann.json/build/native/nlohmann.json.targets)
+flutter_inappwebview_windows_link_packages(${PLUGIN_NAME})
 
 # Symbols are hidden by default to reduce the chance of accidental conflicts
 # between plugins. This should not be removed; any symbols that should be
@@ -357,10 +381,7 @@ target_compile_options(${TEST_RUNNER} PRIVATE /WX-)
 target_include_directories(${TEST_RUNNER} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 target_link_libraries(${TEST_RUNNER} PRIVATE flutter_wrapper_plugin)
 target_link_libraries(${TEST_RUNNER} PRIVATE gtest_main gmock)
-add_dependencies(${TEST_RUNNER} ${PROJECT_NAME}_DEPS)
-target_link_libraries(${TEST_RUNNER} PRIVATE ${CMAKE_BINARY_DIR}/packages/Microsoft.Web.WebView2/build/native/Microsoft.Web.WebView2.targets)
-target_link_libraries(${TEST_RUNNER} PRIVATE ${CMAKE_BINARY_DIR}/packages/Microsoft.Windows.ImplementationLibrary/build/native/Microsoft.Windows.ImplementationLibrary.targets)
-target_link_libraries(${TEST_RUNNER} PRIVATE ${CMAKE_BINARY_DIR}/packages/nlohmann.json/build/native/nlohmann.json.targets)
+flutter_inappwebview_windows_link_packages(${TEST_RUNNER})
 # flutter_wrapper_plugin has link dependencies on the Flutter DLL.
 add_custom_command(TARGET ${TEST_RUNNER} POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E copy_if_different

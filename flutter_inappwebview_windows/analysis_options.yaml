@@ -8,6 +8,9 @@ linter:
 # Additional information about this file can be found at
 # https://dart.dev/guides/language/analysis-options
 analyzer:
+  exclude:
+    - build/**
+    - windows/**
   errors:
     constant_identifier_names: ignore
     deprecated_member_use: ignore

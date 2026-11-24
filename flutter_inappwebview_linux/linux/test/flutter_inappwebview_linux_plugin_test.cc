@@ -1,16 +1,19 @@
 #include <gtest/gtest.h>
 
-// Placeholder test for the flutter_inappwebview_linux plugin.
-// More comprehensive tests can be added as features are implemented.
+#include "flutter_inappwebview_linux_plugin_private.h"
 
-namespace flutter_inappwebview_plugin {
+namespace flutter_inappwebview_linux {
 namespace test {
 
-TEST(FlutterInappwebviewLinuxPlugin, Placeholder) {
-  // This is a placeholder test to satisfy the CMake build.
-  // Real tests should be added for the WebView functionality.
-  EXPECT_TRUE(true);
+// A missing registrar/window must be handled without a display or WebView.
+TEST(FlutterInappwebviewLinuxPlugin, HandlesMissingRegistrarAndWindow) {
+  EXPECT_EQ(flutter_inappwebview_linux_plugin_get_view(nullptr), nullptr);
+  EXPECT_EQ(flutter_inappwebview_linux_plugin_get_window(nullptr), nullptr);
+  EXPECT_EQ(flutter_inappwebview_linux_plugin_get_monitor_refresh_rate(nullptr), 0);
+  EXPECT_EQ(
+      flutter_inappwebview_linux_plugin_get_monitor_refresh_rate_for_window(nullptr),
+      0);
 }
 
 }  // namespace test
-}  // namespace flutter_inappwebview_plugin
+}  // namespace flutter_inappwebview_linux

@@ -3,342 +3,242 @@
 #include <epoxy/egl.h>
 #include <epoxy/gl.h>
 
+#include <vector>
+
 #include "../utils/gl_context.h"
-#include "../utils/log.h"
 #include "in_app_webview.h"
 
-// Use the shared HasCurrentGLContext from gl_context.h
-static gboolean has_current_gl_context() {
-  return flutter_inappwebview_plugin::HasCurrentGLContext() ? TRUE : FALSE;
-}
-
-/**
- * Zero-copy EGL Image texture implementation.
- *
- * This is the most performant texture implementation for WPE WebKit because:
- *
- * 1. WPE WebKit exports frames as EGL images (backed by DMA-BUF)
- * 2. We bind the EGL image directly to a GL texture using glEGLImageTargetTexture2DOES
- * 3. Flutter samples this texture directly - NO pixel copy at any point!
- *
- * The previous implementation had this flow:
- *   WPE → EGL Image → glReadPixels (GPU→CPU) → glTexImage2D (CPU→GPU) → Flutter
- *
- * This implementation has:
- *   WPE → EGL Image → GL Texture binding → Flutter
- *
- * This eliminates the glReadPixels bottleneck that was causing lag on large textures.
- */
-
-// Private structure for the EGL texture
 struct _InAppWebViewEGLTexture {
   FlTextureGL parent_instance;
-
-  // Reference to the webview (not owned)
   flutter_inappwebview_plugin::WebViewType* webview;
-
-  // The GL texture bound to the current EGL image
-  GLuint texture_id;
-  gboolean texture_initialized;
-  uint32_t texture_width;   // Current texture dimensions
-  uint32_t texture_height;
-
-  // Current EGL image (weak reference - owned by WPE)
-  void* current_egl_image;  // EGLImageKHR
+  GLuint texture;
   uint32_t width;
   uint32_t height;
-  gboolean has_new_frame;
-
-  // Fallback: pixel buffer for when EGL is not available (SHM mode)
-  uint8_t* fallback_buffer;
-  size_t fallback_buffer_size;
-
-  // Default texture for when no content is available
-  GLuint default_texture_id;
-  gboolean default_texture_initialized;
-
-  // Cached function pointer for EGL image binding
-  PFNGLEGLIMAGETARGETTEXTURE2DOESPROC glEGLImageTargetTexture2DOES;
-  gboolean extension_checked;
-  gboolean extension_available;
-
-  // Mutex to protect frame data access
+  gboolean pixels_only;
+  gboolean gpu_path_logged;
+  gboolean pixel_path_logged;
+  gboolean upload_error_logged;
+  std::vector<uint8_t>* pixels;
   GMutex mutex;
 };
 
 G_DEFINE_TYPE(InAppWebViewEGLTexture, inappwebview_egl_texture, fl_texture_gl_get_type())
 
-// Check and cache the EGL image extension availability
-static gboolean check_egl_image_extension(InAppWebViewEGLTexture* self) {
-  if (self->extension_checked) {
-    return self->extension_available;
-  }
+namespace {
 
-  self->extension_checked = TRUE;
-
-  // Check for the extension
-  const char* extensions = (const char*)glGetString(GL_EXTENSIONS);
-  
-  if (extensions != nullptr &&
-      (strstr(extensions, "GL_OES_EGL_image") != nullptr ||
-       strstr(extensions, "GL_OES_EGL_image_external") != nullptr)) {
-    self->glEGLImageTargetTexture2DOES =
-        (PFNGLEGLIMAGETARGETTEXTURE2DOESPROC)eglGetProcAddress("glEGLImageTargetTexture2DOES");
-    self->extension_available = (self->glEGLImageTargetTexture2DOES != nullptr);
-  } else {
-    // Try to get the function pointer anyway - epoxy might handle it
-    self->glEGLImageTargetTexture2DOES =
-        (PFNGLEGLIMAGETARGETTEXTURE2DOESPROC)eglGetProcAddress("glEGLImageTargetTexture2DOES");
-    self->extension_available = (self->glEGLImageTargetTexture2DOES != nullptr);
-  }
-
-  if (self->extension_available) {
-    flutter_inappwebview_plugin::debugLog(
-        "InAppWebViewEGLTexture: GL_OES_EGL_image extension available - zero-copy enabled");
-  } else {
-    flutter_inappwebview_plugin::debugLog(
-        "InAppWebViewEGLTexture: GL_OES_EGL_image extension NOT available - falling back to "
-        "pixel buffer");
-  }
-
-  return self->extension_available;
+void ClearGlErrors() {
+  // Bound this even if the context has been lost.
+  for (int i = 0; i < 16 && glGetError() != GL_NO_ERROR; ++i) {}
 }
 
-// Populate callback - called by Flutter to get the OpenGL texture
+// Flutter owns the current context. Do not leak bindings or pixel-store state.
+class GlState {
+ public:
+  GlState() {
+    glGetIntegerv(GL_TEXTURE_BINDING_2D, &texture_);
+    glGetIntegerv(GL_FRAMEBUFFER_BINDING, &framebuffer_);
+    separate_framebuffers_ = epoxy_gl_version() >= 30;
+    if (separate_framebuffers_) {
+      glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &read_framebuffer_);
+    }
+    glGetIntegerv(GL_UNPACK_ALIGNMENT, &alignment_);
+    extended_unpack_ = epoxy_is_desktop_gl() || epoxy_gl_version() >= 30;
+    if (extended_unpack_) {
+      glGetIntegerv(GL_UNPACK_ROW_LENGTH, &row_length_);
+      glGetIntegerv(GL_UNPACK_SKIP_ROWS, &skip_rows_);
+      glGetIntegerv(GL_UNPACK_SKIP_PIXELS, &skip_pixels_);
+      glGetIntegerv(GL_PIXEL_UNPACK_BUFFER_BINDING, &unpack_buffer_);
+      glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+      glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+      glPixelStorei(GL_UNPACK_SKIP_ROWS, 0);
+      glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0);
+    }
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+  }
+  ~GlState() {
+    glBindTexture(GL_TEXTURE_2D, texture_);
+    if (separate_framebuffers_) {
+      glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer_);
+      glBindFramebuffer(GL_READ_FRAMEBUFFER, read_framebuffer_);
+    } else {
+      glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_);
+    }
+    glPixelStorei(GL_UNPACK_ALIGNMENT, alignment_);
+    if (extended_unpack_) {
+      glBindBuffer(GL_PIXEL_UNPACK_BUFFER, unpack_buffer_);
+      glPixelStorei(GL_UNPACK_ROW_LENGTH, row_length_);
+      glPixelStorei(GL_UNPACK_SKIP_ROWS, skip_rows_);
+      glPixelStorei(GL_UNPACK_SKIP_PIXELS, skip_pixels_);
+    }
+  }
+
+ private:
+  GLint texture_ = 0, framebuffer_ = 0, read_framebuffer_ = 0;
+  GLint alignment_ = 4, row_length_ = 0, skip_rows_ = 0, skip_pixels_ = 0;
+  GLint unpack_buffer_ = 0;
+  bool extended_unpack_ = false, separate_framebuffers_ = false;
+};
+
+void BindOutput(InAppWebViewEGLTexture* self) {
+  if (!self->texture) {
+    glGenTextures(1, &self->texture);
+  }
+  glBindTexture(GL_TEXTURE_2D, self->texture);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+}
+
+bool CopyGpuFrame(InAppWebViewEGLTexture* self, void* image, uint32_t width, uint32_t height) {
+  if (!epoxy_has_gl_extension("GL_OES_EGL_image")) {
+    g_message("InAppWebView: GL_OES_EGL_image unavailable; using pixel transfer");
+    self->pixels_only = TRUE;
+    return false;
+  }
+  auto bind_image = reinterpret_cast<PFNGLEGLIMAGETARGETTEXTURE2DOESPROC>(
+      eglGetProcAddress("glEGLImageTargetTexture2DOES"));
+  if (!bind_image) {
+    self->pixels_only = TRUE;
+    return false;
+  }
+
+  ClearGlErrors();
+  GLuint source_texture = 0, framebuffer = 0;
+  glGenTextures(1, &source_texture);
+  glGenFramebuffers(1, &framebuffer);
+  glBindTexture(GL_TEXTURE_2D, source_texture);
+  bind_image(GL_TEXTURE_2D, static_cast<GLeglImageOES>(image));
+  GLenum gl_error = glGetError();
+  if (gl_error == GL_NO_ERROR) {
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, source_texture, 0);
+    const GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    if (status == GL_FRAMEBUFFER_COMPLETE) {
+      BindOutput(self);
+      if (self->width != width || self->height != height) {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE,
+                     nullptr);
+      }
+      glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, width, height);
+      gl_error = glGetError();
+    } else {
+      g_warning("InAppWebView: WPE framebuffer incomplete: 0x%x", status);
+      gl_error = GL_INVALID_FRAMEBUFFER_OPERATION;
+    }
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0);
+  }
+  // The producer may recycle the buffer as soon as the WebView lock is released.
+  // Flutter samples our own texture, not the borrowed WPE image.
+  glFinish();
+  glDeleteFramebuffers(1, &framebuffer);
+  glDeleteTextures(1, &source_texture);
+  if (gl_error != GL_NO_ERROR) {
+    g_warning("InAppWebView: EGL frame copy failed: 0x%x; using pixel transfer", gl_error);
+    self->pixels_only = TRUE;
+    ClearGlErrors();
+    return false;
+  }
+  self->width = width;
+  self->height = height;
+  if (!self->gpu_path_logged) {
+    g_message("InAppWebView: GPU frame transfer active (%ux%u)", width, height);
+    self->gpu_path_logged = TRUE;
+  }
+  return true;
+}
+
+}  // namespace
+
 static gboolean inappwebview_egl_texture_populate(FlTextureGL* texture, uint32_t* target,
-                                                  uint32_t* name, uint32_t* out_width,
-                                                  uint32_t* out_height, GError** error) {
-  InAppWebViewEGLTexture* self = INAPPWEBVIEW_EGL_TEXTURE(texture);
-
+                                                  uint32_t* name, uint32_t* width, uint32_t* height,
+                                                  GError** error) {
+  auto* self = INAPPWEBVIEW_EGL_TEXTURE(texture);
   g_mutex_lock(&self->mutex);
-
-  // CRITICAL: Verify we have a current GL context before any GL operations.
-  if (!has_current_gl_context()) {
-    // Return cached texture if available
-    if (self->texture_initialized && self->texture_id != 0) {
-      *target = GL_TEXTURE_2D;
-      *name = self->texture_id;
-      *out_width = self->texture_width > 0 ? self->texture_width : 1;
-      *out_height = self->texture_height > 0 ? self->texture_height : 1;
-      g_mutex_unlock(&self->mutex);
-      return TRUE;
-    }
-
-    // Return default texture if available
-    if (self->default_texture_initialized && self->default_texture_id != 0) {
-      *target = GL_TEXTURE_2D;
-      *name = self->default_texture_id;
-      *out_width = 1;
-      *out_height = 1;
-      g_mutex_unlock(&self->mutex);
-      return TRUE;
-    }
-
+  if (!flutter_inappwebview_plugin::HasCurrentGLContext()) {
+    g_set_error_literal(error, g_quark_from_static_string("InAppWebViewEGLTexture"), 1,
+                        "No current GL context");
     g_mutex_unlock(&self->mutex);
-    g_set_error(error, g_quark_from_static_string("InAppWebViewEGLTexture"), 1,
-                "No EGL/GL context current - will retry");
     return FALSE;
   }
 
-  // Use the EGL image that was set via inappwebview_egl_texture_set_egl_image()
-  // This is updated by the on_frame_available callback before Flutter is notified
-  if (self->current_egl_image != nullptr && self->width > 0 && self->height > 0) {
-    // Check if EGL image extension is available
-    if (check_egl_image_extension(self)) {
-      // Create texture if needed
-      if (!self->texture_initialized) {
-        glGenTextures(1, &self->texture_id);
-        self->texture_initialized = TRUE;
-      }
-
-      // Bind the EGL image to our texture - ZERO-COPY!
-      glBindTexture(GL_TEXTURE_2D, self->texture_id);
-      self->glEGLImageTargetTexture2DOES(GL_TEXTURE_2D,
-                                         static_cast<GLeglImageOES>(self->current_egl_image));
-
-      // Set texture parameters
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-      glBindTexture(GL_TEXTURE_2D, 0);
-
-      // Update tracked dimensions
-      self->texture_width = self->width;
-      self->texture_height = self->height;
-
-      *target = GL_TEXTURE_2D;
-      *name = self->texture_id;
-      *out_width = self->width;
-      *out_height = self->height;
-      
-      self->has_new_frame = FALSE;
-
-      g_mutex_unlock(&self->mutex);
-      return TRUE;
+  {
+    GlState state;
+    bool rendered = false;
+    if (self->webview && !self->pixels_only) {
+      rendered = self->webview->PaintCurrentEglImage(
+          [self](void* image, uint32_t w, uint32_t h) { return CopyGpuFrame(self, image, w, h); });
     }
-  }
-
-  // Fallback: Try to get pixel buffer from webview (SHM mode)
-  if (self->webview != nullptr) {
-    uint32_t buf_width = 0;
-    uint32_t buf_height = 0;
-    size_t required_size = self->webview->GetPixelBufferSize(&buf_width, &buf_height);
-
-    if (required_size > 0 && buf_width > 0 && buf_height > 0) {
-      static bool first_fallback = true;
-      if (first_fallback) {
-        flutter_inappwebview_plugin::debugLog(
-            "InAppWebViewEGLTexture: using pixel buffer fallback (SHM mode), size=" +
-            std::to_string(buf_width) + "x" + std::to_string(buf_height));
-        first_fallback = false;
-      }
-
-      // Reallocate fallback buffer if needed
-      if (self->fallback_buffer_size < required_size) {
-        self->fallback_buffer = static_cast<uint8_t*>(g_realloc(self->fallback_buffer, required_size));
-        self->fallback_buffer_size = required_size;
-      }
-
-      if (self->fallback_buffer != nullptr) {
-        // Copy pixel data from webview
-        if (self->webview->CopyPixelBufferTo(self->fallback_buffer, self->fallback_buffer_size,
-                                             &buf_width, &buf_height)) {
-          // Create texture if needed
-          if (!self->texture_initialized) {
-            glGenTextures(1, &self->texture_id);
-            self->texture_initialized = TRUE;
-          }
-
-          // Upload pixel data to texture
-          glBindTexture(GL_TEXTURE_2D, self->texture_id);
-          
-          // Use glTexSubImage2D if size hasn't changed, otherwise glTexImage2D
-          if (self->texture_width == buf_width && self->texture_height == buf_height) {
-            glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, buf_width, buf_height,
-                            GL_RGBA, GL_UNSIGNED_BYTE, self->fallback_buffer);
-          } else {
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, buf_width, buf_height, 0,
-                         GL_RGBA, GL_UNSIGNED_BYTE, self->fallback_buffer);
-            self->texture_width = buf_width;
-            self->texture_height = buf_height;
-          }
-
-          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-          glBindTexture(GL_TEXTURE_2D, 0);
-
-          *target = GL_TEXTURE_2D;
-          *name = self->texture_id;
-          *out_width = buf_width;
-          *out_height = buf_height;
-
-          g_mutex_unlock(&self->mutex);
-          return TRUE;
+    uint32_t w = 0, h = 0;
+    if (!rendered && self->webview &&
+        self->webview->CopyCurrentFramePixels(*self->pixels, &w, &h)) {
+      ClearGlErrors();
+      BindOutput(self);
+      // Reallocate also after a failed GPU import; its storage may be incomplete.
+      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE,
+                   self->pixels->data());
+      const GLenum gl_error = glGetError();
+      if (gl_error == GL_NO_ERROR) {
+        self->width = w;
+        self->height = h;
+        if (!self->pixel_path_logged) {
+          g_message("InAppWebView: pixel transfer active (%ux%u); GPU rendering unchanged", w, h);
+          self->pixel_path_logged = TRUE;
         }
+      } else if (!self->upload_error_logged) {
+        g_warning("InAppWebView: pixel upload failed: 0x%x", gl_error);
+        self->upload_error_logged = TRUE;
       }
     }
+    if (!self->width || !self->height) {
+      BindOutput(self);
+      const uint8_t transparent[4] = {};
+      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, transparent);
+      // Keep dimensions at zero so the next real frame allocates its storage.
+    }
   }
-
-  // No frame available yet, use default 1x1 transparent texture
-  if (!self->default_texture_initialized) {
-    glGenTextures(1, &self->default_texture_id);
-    glBindTexture(GL_TEXTURE_2D, self->default_texture_id);
-    uint8_t pixel[4] = {0, 0, 0, 0};  // Transparent
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixel);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    self->default_texture_initialized = TRUE;
-  }
-
   *target = GL_TEXTURE_2D;
-  *name = self->default_texture_id;
-  *out_width = 1;
-  *out_height = 1;
-
+  *name = self->texture;
+  *width = self->width ? self->width : 1;
+  *height = self->height ? self->height : 1;
   g_mutex_unlock(&self->mutex);
   return TRUE;
 }
 
-static void inappwebview_egl_texture_dispose(GObject* object) {
-  InAppWebViewEGLTexture* self = INAPPWEBVIEW_EGL_TEXTURE(object);
-
+void inappwebview_egl_texture_detach(InAppWebViewEGLTexture* self) {
   g_mutex_lock(&self->mutex);
-
-  // Free fallback buffer
-  if (self->fallback_buffer != nullptr) {
-    g_free(self->fallback_buffer);
-    self->fallback_buffer = nullptr;
-    self->fallback_buffer_size = 0;
-  }
-
-  // Note: We don't call glDeleteTextures here because:
-  // 1. The GL context may not be current
-  // 2. Flutter's texture registrar will handle texture cleanup
-  self->texture_id = 0;
-  self->texture_initialized = FALSE;
-  self->texture_width = 0;
-  self->texture_height = 0;
-  self->default_texture_id = 0;
-  self->default_texture_initialized = FALSE;
-  self->current_egl_image = nullptr;
-
+  self->webview = nullptr;
   g_mutex_unlock(&self->mutex);
-  g_mutex_clear(&self->mutex);
+}
 
+static void inappwebview_egl_texture_dispose(GObject* object) {
+  auto* self = INAPPWEBVIEW_EGL_TEXTURE(object);
+  inappwebview_egl_texture_detach(self);
   G_OBJECT_CLASS(inappwebview_egl_texture_parent_class)->dispose(object);
+}
+
+static void inappwebview_egl_texture_finalize(GObject* object) {
+  auto* self = INAPPWEBVIEW_EGL_TEXTURE(object);
+  delete self->pixels;
+  // Destruction is not guaranteed to have Flutter's GL context current.
+  g_mutex_clear(&self->mutex);
+  G_OBJECT_CLASS(inappwebview_egl_texture_parent_class)->finalize(object);
 }
 
 static void inappwebview_egl_texture_class_init(InAppWebViewEGLTextureClass* klass) {
   FL_TEXTURE_GL_CLASS(klass)->populate = inappwebview_egl_texture_populate;
   G_OBJECT_CLASS(klass)->dispose = inappwebview_egl_texture_dispose;
+  G_OBJECT_CLASS(klass)->finalize = inappwebview_egl_texture_finalize;
 }
 
 static void inappwebview_egl_texture_init(InAppWebViewEGLTexture* self) {
-  self->webview = nullptr;
-  self->texture_id = 0;
-  self->texture_initialized = FALSE;
-  self->texture_width = 0;
-  self->texture_height = 0;
-  self->current_egl_image = nullptr;
-  self->width = 0;
-  self->height = 0;
-  self->has_new_frame = FALSE;
-  self->fallback_buffer = nullptr;
-  self->fallback_buffer_size = 0;
-  self->default_texture_id = 0;
-  self->default_texture_initialized = FALSE;
-  self->glEGLImageTargetTexture2DOES = nullptr;
-  self->extension_checked = FALSE;
-  self->extension_available = FALSE;
+  self->pixels = new std::vector<uint8_t>();
   g_mutex_init(&self->mutex);
 }
 
 InAppWebViewEGLTexture* inappwebview_egl_texture_new(
     flutter_inappwebview_plugin::WebViewType* webview) {
-  InAppWebViewEGLTexture* self =
-      INAPPWEBVIEW_EGL_TEXTURE(g_object_new(INAPPWEBVIEW_TYPE_EGL_TEXTURE, nullptr));
+  auto* self = INAPPWEBVIEW_EGL_TEXTURE(g_object_new(INAPPWEBVIEW_TYPE_EGL_TEXTURE, nullptr));
   self->webview = webview;
-  flutter_inappwebview_plugin::debugLog("InAppWebViewEGLTexture: created (zero-copy mode)");
   return self;
-}
-
-void inappwebview_egl_texture_set_egl_image(InAppWebViewEGLTexture* self, void* egl_image,
-                                            uint32_t width, uint32_t height) {
-  if (self == nullptr) {
-    return;
-  }
-
-  g_mutex_lock(&self->mutex);
-
-  self->current_egl_image = egl_image;
-  self->width = width;
-  self->height = height;
-  self->has_new_frame = TRUE;
-
-  g_mutex_unlock(&self->mutex);
 }

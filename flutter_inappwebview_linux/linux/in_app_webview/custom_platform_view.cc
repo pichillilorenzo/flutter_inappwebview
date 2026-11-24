@@ -94,8 +94,8 @@ CustomPlatformView::CustomPlatformView(FlBinaryMessenger* messenger,
   }
 
   // Create texture - two modes:
-  // 1. EGL/GL texture (hardware accelerated) - uses zero-copy EGL when available,
-  //    falls back to pixel buffer upload when EGL is not available (e.g., in VMs)
+  // 1. GL texture with DMA-BUF import and GPU copy, falling back to pixel
+  //    transfer only when the GPU path is unavailable.
   // 2. Pixel buffer texture (software) - pure software fallback when GL is disabled
   //
   // The EGL texture handles both EGL and SHM modes internally, providing the best
@@ -103,8 +103,7 @@ CustomPlatformView::CustomPlatformView(FlBinaryMessenger* messenger,
   if (UseGLTexture()) {
     texture_ = FL_TEXTURE(inappwebview_egl_texture_new(webview_.get()));
     egl_texture_ = INAPPWEBVIEW_EGL_TEXTURE(texture_);
-    // In zero-copy EGL mode, we don't need pixel readback - the EGL image is passed
-    // directly to Flutter. This improves performance and avoids GL context issues.
+    // The GL texture reads a locked frame on demand, including its pixel fallback.
     webview_->SetSkipPixelReadback(true);
     debugLog("CustomPlatformView: using GL texture (hardware accelerated)");
   } else {
@@ -123,6 +122,7 @@ CustomPlatformView::CustomPlatformView(FlBinaryMessenger* messenger,
     errorLog("CustomPlatformView: failed to register texture");
     g_object_unref(texture_);
     texture_ = nullptr;
+    egl_texture_ = nullptr;
     return;
   }
 
@@ -136,20 +136,8 @@ CustomPlatformView::CustomPlatformView(FlBinaryMessenger* messenger,
     webview_->AttachChannel(messenger, texture_id_);
   }
 
-  // Set up the webview's callback to mark frame available
-  // For EGL texture, we also update the EGL image reference
-  webview_->SetOnFrameAvailable([this]() {
-    // If using EGL texture, update the EGL image reference before marking available
-    if (egl_texture_ != nullptr && webview_ != nullptr) {
-      uint32_t width = 0;
-      uint32_t height = 0;
-      void* egl_image = webview_->GetCurrentEglImage(&width, &height);
-      if (egl_image != nullptr) {
-        inappwebview_egl_texture_set_egl_image(egl_texture_, egl_image, width, height);
-      }
-    }
-    MarkTextureFrameAvailable();
-  });
+  // Read the frame inside populate(), while the WebView holds its buffer lock.
+  webview_->SetOnFrameAvailable([this]() { MarkTextureFrameAvailable(); });
 
   // Set up cursor change callback
   webview_->SetOnCursorChanged(
@@ -178,6 +166,13 @@ CustomPlatformView::CustomPlatformView(FlBinaryMessenger* messenger,
 
 CustomPlatformView::~CustomPlatformView() {
   debugLog("dealloc CustomPlatformView");
+  if (webview_) {
+    webview_->SetOnFrameAvailable({});
+    webview_->SetOnCursorChanged({});
+  }
+  if (egl_texture_) {
+    inappwebview_egl_texture_detach(egl_texture_);
+  }
 
   if (method_channel_ != nullptr) {
     fl_method_channel_set_method_call_handler(method_channel_, nullptr, nullptr, nullptr);

@@ -2,10 +2,11 @@
 //
 // This file provides offscreen web rendering using WPE WebKit.
 // Supports two backend APIs:
-// - WPEPlatform (HAVE_WPE_PLATFORM): New modern API for WPE WebKit 2.40+
+// - WPEPlatform (HAVE_WPE_PLATFORM): WPEPlatform API for WPE WebKit 2.52+
 // - WPEBackend-FDO (HAVE_WPE_BACKEND_LEGACY): Legacy API for older systems
 
 #include "in_app_webview.h"
+#include "../utils/frame_pixels.h"
 
 #include <dlfcn.h>
 #include <linux/limits.h>
@@ -429,6 +430,11 @@ InAppWebView::~InAppWebView() {
     g_signal_handler_disconnect(wpe_view_, buffer_rendered_handler_);
     buffer_rendered_handler_ = 0;
   }
+  if (buffer_release_hook_ != 0) {
+    g_signal_remove_emission_hook(g_signal_lookup("buffer-released", WPE_TYPE_VIEW),
+                                 buffer_release_hook_);
+    buffer_release_hook_ = 0;
+  }
   // Note: scale_changed_handler_ is connected to gtk_window_, not wpe_view_
   if (gtk_window_ != nullptr && scale_changed_handler_ != 0) {
     g_signal_handler_disconnect(gtk_window_, scale_changed_handler_);
@@ -447,24 +453,8 @@ InAppWebView::~InAppWebView() {
   {
     std::lock_guard<std::mutex> lock(wpe_buffer_mutex_);
     
-    // Clean up EGL image first (while display is still valid)
-    if (current_egl_image_ != nullptr && egl_display_ != nullptr) {
-      static PFNEGLDESTROYIMAGEKHRPROC eglDestroyImageKHR = nullptr;
-      if (eglDestroyImageKHR == nullptr) {
-        eglDestroyImageKHR = (PFNEGLDESTROYIMAGEKHRPROC)eglGetProcAddress("eglDestroyImageKHR");
-      }
-      if (eglDestroyImageKHR != nullptr) {
-        eglDestroyImageKHR(static_cast<EGLDisplay>(egl_display_), 
-                           static_cast<EGLImageKHR>(current_egl_image_));
-      }
-      current_egl_image_ = nullptr;
-    }
-    
-    // Release pending buffer back to WPE
-    if (current_buffer_ != nullptr && wpe_view_ != nullptr) {
-      wpe_view_buffer_released(wpe_view_, current_buffer_);
-    }
-    current_buffer_ = nullptr;
+    // Headless owns release notifications; only drop our reference.
+    g_clear_object(&current_buffer_);
     current_buffer_width_ = 0;
     current_buffer_height_ = 0;
   }
@@ -732,6 +722,25 @@ void InAppWebView::InitWebView(const InAppWebViewCreationParams& params) {
   // Note: Scale factor in WPEPlatform is read from the display, not set directly
   // The WPEDisplay handles scale factor automatically based on the output
   
+  // Headless releases the previous frame itself. Wait for any GPU copy before
+  // WebKit's already-connected handler tells the producer to reuse that buffer.
+  // An ordinary signal handler would run too late; emission hooks run first.
+  buffer_release_hook_ = g_signal_add_emission_hook(
+      g_signal_lookup("buffer-released", WPE_TYPE_VIEW), 0,
+      +[](GSignalInvocationHint*, guint count, const GValue* values, gpointer data) -> gboolean {
+        auto* self = static_cast<InAppWebView*>(data);
+        if (count < 2 || g_value_get_object(&values[0]) != self->wpe_view_) {
+          return TRUE;
+        }
+        std::lock_guard<std::mutex> lock(self->wpe_buffer_mutex_);
+        if (g_value_get_object(&values[1]) == self->current_buffer_) {
+          g_clear_object(&self->current_buffer_);
+          self->current_buffer_width_ = 0;
+          self->current_buffer_height_ = 0;
+        }
+        return TRUE;
+      }, this, nullptr);
+
   // IMPORTANT: Connect to buffer-rendered signal BEFORE mapping the view
   // This ensures we don't miss the first frame that WPE renders after mapping
   buffer_rendered_handler_ = g_signal_connect(wpe_view_, "buffer-rendered",
@@ -1194,7 +1203,7 @@ void InAppWebView::OnExportDmaBuf(::wpe_fdo_egl_exported_image* image) {
   EGLImageKHR egl_image = wpe_fdo_egl_exported_image_get_egl_image(image);
 
   // Only do pixel readback if:
-  // 1. skip_pixel_readback_ is false (not using zero-copy mode)
+  // 1. skip_pixel_readback_ is false (producer-side readback is enabled)
   // 2. egl_display_ is available
   // 3. We have a valid EGL image
   if (!skip_pixel_readback_ && egl_image != EGL_NO_IMAGE_KHR && egl_display_ != nullptr) {
@@ -1202,7 +1211,7 @@ void InAppWebView::OnExportDmaBuf(::wpe_fdo_egl_exported_image* image) {
   }
 
   // Protect exported_image_ access - this method is called from WPE's thread
-  // while GetCurrentEglImage may be called from Flutter's rendering thread
+  // while PaintCurrentEglImage may run on Flutter's rendering thread
   {
     std::lock_guard<std::mutex> lock(exported_image_mutex_);
     
@@ -1215,14 +1224,12 @@ void InAppWebView::OnExportDmaBuf(::wpe_fdo_egl_exported_image* image) {
     exported_image_ = image;
   }
 
-  // Call on_frame_available BEFORE dispatch_frame_complete
-  // This ensures the EGL image is captured before we signal WPE we're ready for more
+  // Notify the consumer before allowing the producer to schedule another frame.
   if (on_frame_available_) {
     on_frame_available_();
   }
 
   // Dispatch frame complete to allow WebKit to render next frame
-  // Note: This is moved AFTER on_frame_available to ensure the EGL image is used first
   if (exportable_ != nullptr) {
     wpe_view_backend_exportable_fdo_dispatch_frame_complete(exportable_);
   }
@@ -1231,195 +1238,95 @@ void InAppWebView::OnExportDmaBuf(::wpe_fdo_egl_exported_image* image) {
 
 #ifdef HAVE_WPE_PLATFORM
 void InAppWebView::OnWpePlatformBufferRendered(WPEBuffer* buffer) {
-  if (buffer == nullptr) {
+  if (buffer == nullptr || is_disposing_.load()) {
     return;
   }
-  
-  // Don't process buffers during destruction
-  if (is_disposing_.load()) {
-    // Still need to release the buffer back to WPE
-    if (wpe_view_ != nullptr) {
-      wpe_view_buffer_released(wpe_view_, buffer);
-    }
-    return;
-  }
-  
-  // Get buffer dimensions
-  uint32_t buf_width = static_cast<uint32_t>(wpe_buffer_get_width(buffer));
-  uint32_t buf_height = static_cast<uint32_t>(wpe_buffer_get_height(buffer));
-  
-  
-  WPEBuffer* previous_buffer = nullptr;
-  bool buffer_handled = false;
-  
-  // Track EGL import failures to avoid repeated attempts
-  // Static because if EGL fails once, it will likely keep failing (e.g., no GPU)
-  static bool egl_import_failed_permanently = false;
-  
+
+  WPEBuffer* previous = nullptr;
   {
     std::lock_guard<std::mutex> lock(wpe_buffer_mutex_);
-    
-    // Store reference to previous buffer - we'll release it AFTER importing the new one
-    // This ensures the EGL image's backing memory stays valid until we have a new frame
-    previous_buffer = current_buffer_;
-    
-    // Destroy previous EGL image if we created one
-    if (current_egl_image_ != nullptr && egl_display_ != nullptr) {
-      static PFNEGLDESTROYIMAGEKHRPROC eglDestroyImageKHR = nullptr;
-      if (eglDestroyImageKHR == nullptr) {
-        eglDestroyImageKHR = (PFNEGLDESTROYIMAGEKHRPROC)eglGetProcAddress("eglDestroyImageKHR");
-      }
-      if (eglDestroyImageKHR != nullptr) {
-        eglDestroyImageKHR(static_cast<EGLDisplay>(egl_display_), 
-                           static_cast<EGLImageKHR>(current_egl_image_));
-      }
-      current_egl_image_ = nullptr;
-    }
-    
-    // Check buffer type to determine best rendering path
-    bool is_dma_buf = WPE_IS_BUFFER_DMA_BUF(buffer);
-    bool is_shm = WPE_IS_BUFFER_SHM(buffer);
-    
-    // === Priority 1: Try EGL image import (zero-copy, best performance) ===
-    // Only attempt EGL for DMA-BUF buffers (SHM buffers cannot be imported via EGL)
-    // Skip if previous EGL attempts failed
-    if (egl_display_ != nullptr && 
-        is_dma_buf && !egl_import_failed_permanently) {
-      GError* error = nullptr;
-      void* egl_image = wpe_buffer_import_to_egl_image(buffer, &error);
-      
-      if (egl_image != nullptr) {
-        current_egl_image_ = egl_image;
-        current_buffer_width_ = buf_width;
-        current_buffer_height_ = buf_height;
-        buffer_handled = true;
-      } else {
-        // Mark EGL as permanently failed so we don't keep trying
-        // This is common in VMs or software-only environments
-        egl_import_failed_permanently = true;
-        if (error != nullptr) {
-          g_clear_error(&error);
-        }
+    previous = current_buffer_;
+    current_buffer_ = WPE_BUFFER(g_object_ref(buffer));
+    current_buffer_width_ = wpe_buffer_get_width(buffer);
+    current_buffer_height_ = wpe_buffer_get_height(buffer);
+
+    if (!skip_pixel_readback_) {
+      std::vector<uint8_t> pixels;
+      uint32_t width = 0, height = 0;
+      if (CopyWpePixelsLocked(pixels, &width, &height)) {
+        std::lock_guard<std::mutex> swap_lock(buffer_swap_mutex_);
+        const size_t index = write_buffer_index_.load(std::memory_order_relaxed);
+        auto& frame = pixel_buffers_[index];
+        frame.data = std::move(pixels);
+        frame.width = width;
+        frame.height = height;
+        read_buffer_index_.store(index, std::memory_order_release);
+        write_buffer_index_.store((index + 1) % kNumBuffers, std::memory_order_relaxed);
       }
     }
-    
-    // === Priority 2: Direct SHM buffer access (no GBM required) ===
-    // WPEBufferSHM provides direct pixel access without requiring GBM device
-    if (!buffer_handled && is_shm) {
-      WPEBufferSHM* shm_buffer = WPE_BUFFER_SHM(buffer);
-      GBytes* data = wpe_buffer_shm_get_data(shm_buffer);
-      
-      if (data != nullptr) {
-        guint stride = wpe_buffer_shm_get_stride(shm_buffer);
-        WPEPixelFormat format = wpe_buffer_shm_get_format(shm_buffer);
-        
-        gsize size;
-        const uint8_t* pixels = static_cast<const uint8_t*>(g_bytes_get_data(data, &size));
-        
-        if (pixels != nullptr && size > 0) {
-          // Store in pixel buffer for software rendering
-          size_t write_idx = write_buffer_index_.load(std::memory_order_relaxed);
-          auto& pixel_buffer = pixel_buffers_[write_idx];
-          
-          if (pixel_buffer.data.size() != size) {
-            pixel_buffer.data.resize(size);
-          }
-          memcpy(pixel_buffer.data.data(), pixels, size);
-          
-          // WPE SHM buffers use ARGB8888 format (BGRA in memory on little-endian)
-          // Flutter expects RGBA8888, so we need to convert
-          // ConvertARGB32ToRGBA handles the BGRA -> RGBA conversion
-          if (format == WPE_PIXEL_FORMAT_ARGB8888) {
-            ConvertARGB32ToRGBA(pixel_buffer.data.data(),    // source (in-place)
-                                pixel_buffer.data.data(),    // destination (in-place)
-                                buf_width, buf_height,
-                                stride);
-          }
-          
-          pixel_buffer.width = buf_width;
-          pixel_buffer.height = buf_height;
-          
-          // Swap buffers
-          {
-            std::lock_guard<std::mutex> swap_lock(buffer_swap_mutex_);
-            read_buffer_index_.store(write_idx, std::memory_order_release);
-            write_buffer_index_.store((write_idx + 1) % kNumBuffers, std::memory_order_relaxed);
-          }
-          
-          current_buffer_width_ = buf_width;
-          current_buffer_height_ = buf_height;
-          buffer_handled = true;
-        }
-        // Note: Don't unref data - it's borrowed from the buffer
-      }
-    }
-    
-    // === Priority 3: Generic pixel import (works for DMA-BUF with GBM device) ===
-    // This is a fallback for DMA-BUF when EGL failed but GBM device is available
-    if (!buffer_handled) {
-      GError* error = nullptr;
-      GBytes* pixels = wpe_buffer_import_to_pixels(buffer, &error);
-      if (pixels != nullptr) {
-        gsize size;
-        const uint8_t* data = static_cast<const uint8_t*>(g_bytes_get_data(pixels, &size));
-        
-        // Store in pixel buffer for software rendering
-        size_t write_idx = write_buffer_index_.load(std::memory_order_relaxed);
-        auto& pixel_buffer = pixel_buffers_[write_idx];
-        
-        if (pixel_buffer.data.size() != size) {
-          pixel_buffer.data.resize(size);
-        }
-        memcpy(pixel_buffer.data.data(), data, size);
-        
-        // GBM pixel import also returns ARGB8888, convert to RGBA
-        uint32_t stride = buf_width * 4;
-        ConvertARGB32ToRGBA(pixel_buffer.data.data(),
-                            pixel_buffer.data.data(),
-                            buf_width, buf_height,
-                            stride);
-        
-        pixel_buffer.width = buf_width;
-        pixel_buffer.height = buf_height;
-        
-        // Swap buffers
-        {
-          std::lock_guard<std::mutex> swap_lock(buffer_swap_mutex_);
-          read_buffer_index_.store(write_idx, std::memory_order_release);
-          write_buffer_index_.store((write_idx + 1) % kNumBuffers, std::memory_order_relaxed);
-        }
-        
-        g_bytes_unref(pixels);
-        current_buffer_width_ = buf_width;
-        current_buffer_height_ = buf_height;
-        buffer_handled = true;
-      } else {
-        if (error != nullptr) {
-          g_clear_error(&error);
-        }
-      }
-    }
-    
-    if (!buffer_handled) {
-      debugLog("ERROR: No rendering method succeeded!");
-    }
-    
-    // Store reference to current buffer - we keep it until the NEXT frame arrives
-    // This ensures the EGL image's backing DMA-BUF memory stays valid
-    current_buffer_ = buffer;
   }
-  
-  // Release the PREVIOUS buffer now that we have a new one
-  // The previous EGL image has been destroyed and we have a new frame,
-  // so it's safe to let WPE reuse the old buffer's memory
-  if (previous_buffer != nullptr && wpe_view_ != nullptr && WPE_IS_BUFFER(previous_buffer)) {
-    wpe_view_buffer_released(wpe_view_, previous_buffer);
+  if (previous != nullptr) {
+    // Headless releases buffers; imported image/pixels are transfer-none.
+    g_object_unref(previous);
   }
-  
-  if (buffer_handled && on_frame_available_) {
+  if (on_frame_available_) {
     on_frame_available_();
   }
 }
+
+bool InAppWebView::CopyWpePixelsLocked(std::vector<uint8_t>& pixels,
+                                       uint32_t* width, uint32_t* height) {
+  if (current_buffer_ == nullptr || !current_buffer_width_ || !current_buffer_height_) {
+    return false;
+  }
+  GError* error = nullptr;
+  GBytes* bytes = nullptr;
+  size_t stride = 0;
+  bool opaque = false;
+  if (WPE_IS_BUFFER_SHM(current_buffer_)) {
+    auto* shm = WPE_BUFFER_SHM(current_buffer_);
+    if (wpe_buffer_shm_get_format(shm) != WPE_PIXEL_FORMAT_ARGB8888) {
+      return false;
+    }
+    bytes = wpe_buffer_shm_get_data(shm);
+    stride = wpe_buffer_shm_get_stride(shm);
+  } else if (WPE_IS_BUFFER_DMA_BUF(current_buffer_)) {
+    // WPE's GBM importer supports ARGB8888 and XRGB8888. A successful map
+    // returns height * mapStride bytes; mapStride need not equal width * 4.
+    constexpr uint32_t argb8888 = 0x34325241;
+    constexpr uint32_t xrgb8888 = 0x34325258;
+    const auto format = wpe_buffer_dma_buf_get_format(WPE_BUFFER_DMA_BUF(current_buffer_));
+    if (format != argb8888 && format != xrgb8888) {
+      return false;
+    }
+    opaque = format == xrgb8888;
+    bytes = wpe_buffer_import_to_pixels(current_buffer_, &error);
+    if (bytes) {
+      const size_t size = g_bytes_get_size(bytes);
+      if (size % current_buffer_height_ == 0) {
+        stride = size / current_buffer_height_;
+      }
+    }
+  }
+  gsize size = 0;
+  const auto* data = bytes ? static_cast<const uint8_t*>(g_bytes_get_data(bytes, &size)) : nullptr;
+  const bool copied = stride && PackFramePixels(data, size, stride, current_buffer_width_,
+                                                current_buffer_height_, opaque, pixels);
+  if (!copied && !pixel_import_error_logged_) {
+    g_warning("InAppWebView: pixel import failed: %s",
+              error ? error->message : "unsupported format or invalid pixel buffer");
+    pixel_import_error_logged_ = true;
+  }
+  g_clear_error(&error);
+  // bytes is borrowed from WPEBuffer; do not unref it.
+  if (copied) {
+    *width = current_buffer_width_;
+    *height = current_buffer_height_;
+    pixel_import_error_logged_ = false;
+  }
+  return copied;
+}
+
 #endif
 
 void InAppWebView::ReadPixelsFromEglImage(void* egl_image, uint32_t width, uint32_t height) {
@@ -3609,7 +3516,7 @@ bool InAppWebView::CopyPixelBufferTo(uint8_t* dst, size_t dst_size, uint32_t* ou
 bool InAppWebView::HasDmaBufExport() const {
 #ifdef HAVE_WPE_PLATFORM
   std::lock_guard<std::mutex> lock(wpe_buffer_mutex_);
-  return current_egl_image_ != nullptr;
+  return current_buffer_ && WPE_IS_BUFFER_DMA_BUF(current_buffer_);
 #elif defined(HAVE_WPE_BACKEND_LEGACY)
   std::lock_guard<std::mutex> lock(exported_image_mutex_);
   return exported_image_ != nullptr;
@@ -3644,69 +3551,141 @@ bool InAppWebView::GetDmaBufFd(int* fd, uint32_t* stride, uint32_t* width, uint3
 #endif
 }
 
-void* InAppWebView::GetCurrentEglImage(uint32_t* out_width, uint32_t* out_height) const {
+bool InAppWebView::PaintCurrentEglImage(
+    const std::function<bool(void*, uint32_t, uint32_t)>& paint) {
 #ifdef HAVE_WPE_PLATFORM
-  // WPEPlatform: Return the EGL image from our buffer-rendered callback
   std::lock_guard<std::mutex> lock(wpe_buffer_mutex_);
-  
-  if (current_egl_image_ == nullptr) {
-    if (out_width)
-      *out_width = 0;
-    if (out_height)
-      *out_height = 0;
-    return nullptr;
+  if (current_buffer_ == nullptr || !WPE_IS_BUFFER_DMA_BUF(current_buffer_)) {
+    return false;
   }
-  
-  if (out_width)
-    *out_width = current_buffer_width_;
-  if (out_height)
-    *out_height = current_buffer_height_;
-  
-  return current_egl_image_;
-  
+  // An EGLImage belongs to its EGLDisplay. Import the same DMA-BUF into the
+  // consumer's display instead of reading pixels when WPE uses another display.
+  EGLDisplay consumer_display = eglGetCurrentDisplay();
+  if (consumer_display != EGL_NO_DISPLAY && consumer_display != egl_display_) {
+    auto fail_import = [this](const char* reason) {
+      if (!egl_import_error_logged_) {
+        g_warning("InAppWebView: DMA-BUF import failed: %s", reason);
+        egl_import_error_logged_ = true;
+      }
+      return false;
+    };
+    if (!epoxy_has_egl_extension(consumer_display, "EGL_EXT_image_dma_buf_import") ||
+        !epoxy_has_egl_extension(consumer_display, "EGL_KHR_image_base")) {
+      return fail_import("consumer EGL display lacks DMA-BUF import");
+    }
+    const auto create_image =
+        reinterpret_cast<PFNEGLCREATEIMAGEKHRPROC>(eglGetProcAddress("eglCreateImageKHR"));
+    const auto destroy_image =
+        reinterpret_cast<PFNEGLDESTROYIMAGEKHRPROC>(eglGetProcAddress("eglDestroyImageKHR"));
+    if (!create_image || !destroy_image) {
+      return fail_import("EGL image entry points unavailable");
+    }
+    auto* buffer = WPE_BUFFER_DMA_BUF(current_buffer_);
+    const guint32 planes = wpe_buffer_dma_buf_get_n_planes(buffer);
+    const guint64 modifier = wpe_buffer_dma_buf_get_modifier(buffer);
+    constexpr uint64_t invalid_modifier = (UINT64_C(1) << 56) - 1;
+    const bool has_modifiers =
+        epoxy_has_egl_extension(consumer_display, "EGL_EXT_image_dma_buf_import_modifiers");
+    if (!planes || planes > 4 || (planes == 4 && !has_modifiers)) {
+      return fail_import("unsupported plane count");
+    }
+    // Never silently interpret a tiled/compressed frame as an implicit layout.
+    if (modifier != invalid_modifier && !has_modifiers) {
+      return fail_import("consumer EGL display cannot import explicit modifiers");
+    }
+    constexpr EGLint plane_keys[4][5] = {
+        {EGL_DMA_BUF_PLANE0_FD_EXT, EGL_DMA_BUF_PLANE0_OFFSET_EXT, EGL_DMA_BUF_PLANE0_PITCH_EXT,
+         EGL_DMA_BUF_PLANE0_MODIFIER_LO_EXT, EGL_DMA_BUF_PLANE0_MODIFIER_HI_EXT},
+        {EGL_DMA_BUF_PLANE1_FD_EXT, EGL_DMA_BUF_PLANE1_OFFSET_EXT, EGL_DMA_BUF_PLANE1_PITCH_EXT,
+         EGL_DMA_BUF_PLANE1_MODIFIER_LO_EXT, EGL_DMA_BUF_PLANE1_MODIFIER_HI_EXT},
+        {EGL_DMA_BUF_PLANE2_FD_EXT, EGL_DMA_BUF_PLANE2_OFFSET_EXT, EGL_DMA_BUF_PLANE2_PITCH_EXT,
+         EGL_DMA_BUF_PLANE2_MODIFIER_LO_EXT, EGL_DMA_BUF_PLANE2_MODIFIER_HI_EXT},
+        {EGL_DMA_BUF_PLANE3_FD_EXT, EGL_DMA_BUF_PLANE3_OFFSET_EXT, EGL_DMA_BUF_PLANE3_PITCH_EXT,
+         EGL_DMA_BUF_PLANE3_MODIFIER_LO_EXT, EGL_DMA_BUF_PLANE3_MODIFIER_HI_EXT}};
+    std::vector<EGLint> attributes = {EGL_WIDTH,
+                                      static_cast<EGLint>(current_buffer_width_),
+                                      EGL_HEIGHT,
+                                      static_cast<EGLint>(current_buffer_height_),
+                                      EGL_LINUX_DRM_FOURCC_EXT,
+                                      static_cast<EGLint>(wpe_buffer_dma_buf_get_format(buffer))};
+    attributes.reserve(7 + planes * 10);
+    for (guint32 plane = 0; plane < planes; ++plane) {
+      const auto* keys = plane_keys[plane];
+      attributes.insert(attributes.end(),
+                        {keys[0], wpe_buffer_dma_buf_get_fd(buffer, plane), keys[1],
+                         static_cast<EGLint>(wpe_buffer_dma_buf_get_offset(buffer, plane)), keys[2],
+                         static_cast<EGLint>(wpe_buffer_dma_buf_get_stride(buffer, plane))});
+      if (modifier != invalid_modifier) {
+        attributes.insert(attributes.end(),
+                          {keys[3], static_cast<EGLint>(modifier & UINT64_C(0xffffffff)), keys[4],
+                           static_cast<EGLint>(modifier >> 32)});
+      }
+    }
+    attributes.push_back(EGL_NONE);
+    EGLImageKHR image = create_image(consumer_display, EGL_NO_CONTEXT, EGL_LINUX_DMA_BUF_EXT,
+                                     nullptr, attributes.data());
+    if (image == EGL_NO_IMAGE_KHR) {
+      if (!egl_import_error_logged_) {
+        g_warning("InAppWebView: DMA-BUF import failed: EGL error 0x%x", eglGetError());
+        egl_import_error_logged_ = true;
+      }
+      return false;
+    }
+    // The callback completes GPU use before returning. Only this imported image
+    // is ours; the descriptors and the original WPE image remain owned by WPE.
+    const bool painted = paint(image, current_buffer_width_, current_buffer_height_);
+    destroy_image(consumer_display, image);
+    return painted;
+  }
+  // With GLX there is no current EGLDisplay. Try WPE's image through the GL
+  // extension; the consumer checks whether the driver actually accepts it.
+  GError* error = nullptr;
+  void* image = wpe_buffer_import_to_egl_image(current_buffer_, &error);
+  if (!image && !egl_import_error_logged_) {
+    g_warning("InAppWebView: EGL import failed: %s", error ? error->message : "no image returned");
+    egl_import_error_logged_ = true;
+  }
+  g_clear_error(&error);
+  return image && paint(image, current_buffer_width_, current_buffer_height_);
 #elif defined(HAVE_WPE_BACKEND_LEGACY)
-  // Protect exported_image_ access - OnExportDmaBuf may be called from WPE's thread
   std::lock_guard<std::mutex> lock(exported_image_mutex_);
-  
-  if (exported_image_ == nullptr) {
-    if (out_width)
-      *out_width = 0;
-    if (out_height)
-      *out_height = 0;
-    return nullptr;
+  if (!exported_image_) {
+    return false;
   }
-
-  // Get dimensions from the exported image
-  uint32_t img_width = wpe_fdo_egl_exported_image_get_width(exported_image_);
-  uint32_t img_height = wpe_fdo_egl_exported_image_get_height(exported_image_);
-
-  if (out_width)
-    *out_width = img_width;
-  if (out_height)
-    *out_height = img_height;
-
-  // Return the EGL image handle (EGLImageKHR)
-  return wpe_fdo_egl_exported_image_get_egl_image(exported_image_);
+  return paint(wpe_fdo_egl_exported_image_get_egl_image(exported_image_),
+               wpe_fdo_egl_exported_image_get_width(exported_image_),
+               wpe_fdo_egl_exported_image_get_height(exported_image_));
 #else
-  // No backend available
-  if (out_width)
-    *out_width = 0;
-  if (out_height)
-    *out_height = 0;
-  return nullptr;
+  return false;
+#endif
+}
+
+bool InAppWebView::CopyCurrentFramePixels(std::vector<uint8_t>& pixels, uint32_t* width,
+                                          uint32_t* height) {
+#ifdef HAVE_WPE_PLATFORM
+  std::lock_guard<std::mutex> lock(wpe_buffer_mutex_);
+  return CopyWpePixelsLocked(pixels, width, height);
+#else
+  std::lock_guard<std::mutex> lock(buffer_swap_mutex_);
+  const auto& frame = pixel_buffers_[read_buffer_index_.load(std::memory_order_acquire)];
+  if (frame.data.empty()) {
+    return false;
+  }
+  pixels = frame.data;
+  *width = frame.width;
+  *height = frame.height;
+  return true;
 #endif
 }
 
 void InAppWebView::SetOnFrameAvailable(std::function<void()> callback) {
   on_frame_available_ = std::move(callback);
-  
+
 #ifdef HAVE_WPE_PLATFORM
   // Force WPE to render a new frame by triggering a resize.
   // This is needed because:
   // 1. The first frame may have been rendered before this callback was set
-  // 2. We release buffers immediately in OnWpePlatformBufferRendered, so
-  //    old EGL images may be invalid
-  // 3. A resize notification causes WPE to re-render with the current content
+  // 2. A resize notification causes WPE to re-render with the current content
   //
   // We use g_idle_add to defer this slightly, ensuring the texture registration
   // is complete before we trigger the new frame.
@@ -6208,6 +6187,7 @@ void InAppWebView::setMicrophoneCaptureState(int state) {
 // === Theme Color ===
 
 std::optional<std::string> InAppWebView::getMetaThemeColor() const {
+#if WEBKIT_CHECK_VERSION(2, 50, 0)
   if (webview_ == nullptr) return std::nullopt;
   
   WebKitColor color;
@@ -6238,6 +6218,9 @@ std::optional<std::string> InAppWebView::getMetaThemeColor() const {
   }
   
   return std::string(hexColor);
+#else
+  return std::nullopt;
+#endif
 }
 
 // === Audio State (Playing and Mute) ===

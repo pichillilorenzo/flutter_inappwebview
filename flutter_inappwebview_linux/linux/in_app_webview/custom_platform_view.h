@@ -37,7 +37,7 @@ class CustomPlatformView {
   std::shared_ptr<WebViewType> webview_;
   FlTextureRegistrar* texture_registrar_;
   FlTexture* texture_ = nullptr;
-  InAppWebViewEGLTexture* egl_texture_ = nullptr;  // Pointer to EGL texture if using zero-copy mode
+  InAppWebViewEGLTexture* egl_texture_ = nullptr;  // Pointer to EGL texture if using GL rendering
   int64_t texture_id_ = -1;
   std::string keepAliveId_;  // Keep-alive ID for preserving WebView across widget disposal
 

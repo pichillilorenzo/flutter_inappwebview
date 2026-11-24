@@ -303,7 +303,7 @@ void InAppWebViewSettings::applyToWebView(WebKitWebView* webview) const {
   // Note: Back-forward gestures not available in WPE (requires touch/gesture backend)
   webkit_settings_set_enable_caret_browsing(settings, enableCaretBrowsing);
   webkit_settings_set_enable_spatial_navigation(settings, enableSpatialNavigation);
-  // Note: DNS prefetching and hyperlink auditing are deprecated in WPE 2.50+
+  // Note: DNS prefetching and hyperlink auditing are deprecated (including WPE 2.50+)
 
   // Content settings
   webkit_settings_set_enable_fullscreen(settings, isElementFullscreenEnabled);
@@ -315,7 +315,7 @@ void InAppWebViewSettings::applyToWebView(WebKitWebView* webview) const {
   webkit_settings_set_enable_page_cache(settings, enablePageCache);
 
   // HTML5 features
-  // Note: offline web application cache is deprecated in WPE 2.50+
+  // Note: offline web application cache is deprecated (including WPE 2.50+)
   webkit_settings_set_enable_html5_local_storage(settings, enableHtml5LocalStorage);
   webkit_settings_set_enable_html5_database(settings, enableHtml5Database);
 
@@ -400,9 +400,14 @@ void InAppWebViewSettings::applyWpePlatformSettings(void* display_ptr) const {
     g_clear_error(&error);
   }
 
-  // Apply disable animations setting
+  // Preserve the Dart setting while using the available WPE preference.
+  // In 2.54 this controls prefers-reduced-motion; it does not stop all animations.
   if (disableAnimations.has_value()) {
+#ifdef WPE_SETTING_REDUCED_MOTION
+    wpe_settings_set_boolean(wpe_settings, WPE_SETTING_REDUCED_MOTION,
+#else
     wpe_settings_set_boolean(wpe_settings, WPE_SETTING_DISABLE_ANIMATIONS,
+#endif
                              disableAnimations.value(), WPE_SETTINGS_SOURCE_APPLICATION, &error);
     g_clear_error(&error);
   }

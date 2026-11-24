@@ -327,9 +327,14 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
           WebResourceRequest request = WebResourceRequest.fromMap(
             arguments["request"]?.cast<String, dynamic>(),
           )!;
-          WebResourceError error = WebResourceError.fromMap(
-            arguments["error"]?.cast<String, dynamic>(),
-          )!;
+          final errorMap = arguments["error"].cast<String, dynamic>();
+          // GLib/libsoup can return codes not represented by the shared enum.
+          // Its fromMap force-unwraps the enum, losing the actual load error.
+          final error = WebResourceError(
+            description: errorMap["description"],
+            type: WebResourceErrorType.fromNativeValue(errorMap["type"]) ??
+                WebResourceErrorType.UNKNOWN,
+          );
           var isForMainFrame = request.isForMainFrame ?? false;
 
           if (webviewParams != null) {

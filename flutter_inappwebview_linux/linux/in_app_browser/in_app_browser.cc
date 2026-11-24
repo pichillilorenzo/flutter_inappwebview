@@ -446,6 +446,10 @@ void InAppBrowser::setupWebView(const InAppBrowserCreationParams& params) {
 
   // Create the InAppWebView - pass nullptr for registrar since we have messenger directly
   webView_ = std::make_shared<InAppWebView>(nullptr, messenger_, 0, webViewParams);
+#ifdef HAVE_WPE_PLATFORM
+  // Read pixels only if the GL consumer actually needs the fallback.
+  webView_->SetSkipPixelReadback(useGlRendering_);
+#endif
 
   // Attach channel with browser-specific ID
   webView_->AttachChannel(messenger_, METHOD_CHANNEL_NAME_PREFIX + id_, true);
@@ -1213,65 +1217,73 @@ gboolean InAppBrowser::OnGlAreaRender(GtkGLArea* area, GdkGLContext* context,
   
   glViewport(0, 0, fbWidth, fbHeight);
 
-  // Try to get EGL image for zero-copy rendering
-  uint32_t imgWidth = 0, imgHeight = 0;
-  void* eglImage = browser->webView_->GetCurrentEglImage(&imgWidth, &imgHeight);
+  // Keep the borrowed image alive until the draw has finished.
+  const bool rendered = browser->webView_->PaintCurrentEglImage(
+      [browser](void* eglImage, uint32_t imgWidth, uint32_t imgHeight) {
+        if (!imgWidth || !imgHeight || !epoxy_has_gl_extension("GL_OES_EGL_image")) {
+          return false;
+        }
+        // Get the glEGLImageTargetTexture2DOES function
+        static PFNGLEGLIMAGETARGETTEXTURE2DOESPROC glEGLImageTargetTexture2DOES =
+            (PFNGLEGLIMAGETARGETTEXTURE2DOESPROC)eglGetProcAddress("glEGLImageTargetTexture2DOES");
 
-  if (eglImage != nullptr && imgWidth > 0 && imgHeight > 0) {
-    // Get the glEGLImageTargetTexture2DOES function
-    static PFNGLEGLIMAGETARGETTEXTURE2DOESPROC glEGLImageTargetTexture2DOES =
-        (PFNGLEGLIMAGETARGETTEXTURE2DOESPROC)eglGetProcAddress("glEGLImageTargetTexture2DOES");
+        if (glEGLImageTargetTexture2DOES != nullptr && browser->glProgram_ != 0) {
+          // Zero-copy path: bind EGL image directly as GL texture
+          glActiveTexture(GL_TEXTURE0);
+          glBindTexture(GL_TEXTURE_2D, browser->glTexture_);
+          for (int i = 0; i < 16 && glGetError() != GL_NO_ERROR; ++i) {}
+          glEGLImageTargetTexture2DOES(GL_TEXTURE_2D, static_cast<GLeglImageOES>(eglImage));
+          if (glGetError() != GL_NO_ERROR) {
+            glBindTexture(GL_TEXTURE_2D, 0);
+            return false;
+          }
 
-    if (glEGLImageTargetTexture2DOES != nullptr && browser->glProgram_ != 0) {
-      // Zero-copy path: bind EGL image directly as GL texture
-      glActiveTexture(GL_TEXTURE0);
-      glBindTexture(GL_TEXTURE_2D, browser->glTexture_);
-      glEGLImageTargetTexture2DOES(GL_TEXTURE_2D, static_cast<GLeglImageOES>(eglImage));
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+          // Use shader program for rendering
+          glUseProgram(browser->glProgram_);
+          glUniform1i(browser->glUniformTexture_, 0);
 
-      // Use shader program for rendering
-      glUseProgram(browser->glProgram_);
-      glUniform1i(browser->glUniformTexture_, 0);
+          // Bind VBO and set up vertex attributes (non-interleaved layout)
+          glBindBuffer(GL_ARRAY_BUFFER, browser->glVBO_);
 
-      // Bind VBO and set up vertex attributes (non-interleaved layout)
-      glBindBuffer(GL_ARRAY_BUFFER, browser->glVBO_);
+          // Position attribute: 2 floats, stride 0 (tightly packed), offset 0
+          glVertexAttribPointer(browser->glAttribPosition_, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+          glEnableVertexAttribArray(browser->glAttribPosition_);
 
-      // Position attribute: 2 floats, stride 0 (tightly packed), offset 0
-      glVertexAttribPointer(browser->glAttribPosition_, 2, GL_FLOAT, GL_FALSE,
-                            0, (void*)0);
-      glEnableVertexAttribArray(browser->glAttribPosition_);
+          // Texture attribute: 2 floats, stride 0, offset = 4 positions * 2 floats = 8 floats
+          glVertexAttribPointer(browser->glAttribTexture_, 2, GL_FLOAT, GL_FALSE, 0,
+                                (void*)(8 * sizeof(GLfloat)));
+          glEnableVertexAttribArray(browser->glAttribTexture_);
 
-      // Texture attribute: 2 floats, stride 0, offset = 4 positions * 2 floats = 8 floats
-      glVertexAttribPointer(browser->glAttribTexture_, 2, GL_FLOAT, GL_FALSE,
-                            0, (void*)(8 * sizeof(GLfloat)));
-      glEnableVertexAttribArray(browser->glAttribTexture_);
+          // Draw fullscreen quad as triangle strip
+          glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+          glFinish();
+          const bool painted = glGetError() == GL_NO_ERROR;
 
-      // Draw fullscreen quad as triangle strip
-      glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+          // Cleanup state
+          glDisableVertexAttribArray(browser->glAttribPosition_);
+          glDisableVertexAttribArray(browser->glAttribTexture_);
+          glBindBuffer(GL_ARRAY_BUFFER, 0);
+          glBindTexture(GL_TEXTURE_2D, 0);
+          glUseProgram(0);
 
-
-
-      // Cleanup state
-      glDisableVertexAttribArray(browser->glAttribPosition_);
-      glDisableVertexAttribArray(browser->glAttribTexture_);
-      glBindBuffer(GL_ARRAY_BUFFER, 0);
-      glBindTexture(GL_TEXTURE_2D, 0);
-      glUseProgram(0);
-
-      return TRUE;
-    }
+          return painted;
+        }
+        return false;
+      });
+  if (rendered) {
+    return TRUE;
   }
 
   // Fallback: use pixel buffer rendering
   return browser->RenderFromPixelBuffer(area);
 }
 
-void InAppBrowser::OnGlAreaResize(GtkGLArea* area, gint width, gint height,
-                                   gpointer user_data) {
+void InAppBrowser::OnGlAreaResize(GtkGLArea* area, gint width, gint height, gpointer user_data) {
   auto* browser = static_cast<InAppBrowser*>(user_data);
   if (browser && browser->webView_ && width > 0 && height > 0) {
     // GtkGLArea resize signal provides physical pixel dimensions
@@ -1312,15 +1324,9 @@ gboolean InAppBrowser::RenderFromPixelBuffer(GtkGLArea* area) {
   }
 
   uint32_t width = 0, height = 0;
-  size_t bufferSize = webView_->GetPixelBufferSize(&width, &height);
-
-  if (bufferSize == 0 || width == 0 || height == 0) {
+  std::vector<uint8_t> buffer;
+  if (!webView_->CopyCurrentFramePixels(buffer, &width, &height)) {
     return TRUE;  // Nothing to render
-  }
-
-  std::vector<uint8_t> buffer(bufferSize);
-  if (!webView_->CopyPixelBufferTo(buffer.data(), bufferSize, &width, &height)) {
-    return FALSE;
   }
 
   // Get viewport dimensions - account for device scale factor

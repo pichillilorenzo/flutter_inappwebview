@@ -5,33 +5,37 @@ cmake_minimum_required(VERSION 3.10)
 
 # Project-level configuration.
 set(PROJECT_NAME "flutter_inappwebview_linux")
-project(${PROJECT_NAME} LANGUAGES CXX C)
+project(${PROJECT_NAME} LANGUAGES CXX)
 
 # This value is used when generating builds using this plugin, so it must
 # not be changed.
 set(PLUGIN_NAME "flutter_inappwebview_linux_plugin")
 
+# The WebView implementation uses C++17 (for example, std::optional).
+# Keep this requirement even when the application's standard settings use C++14.
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # nlohmann/json version for JSON parsing
-set(NLOHMANN_JSON_VERSION "3.11.3")
+set(NLOHMANN_JSON_VERSION "3.12.0")
 
 # === WPE WebKit Backend ===
 # This plugin uses WPE WebKit for offscreen web rendering.
 # WPE WebKit is designed for embedded systems and provides excellent offscreen
 # rendering performance through DMA-BUF buffer sharing.
 #
-# Dual API Support:
-#   - WPEPlatform API (wpe-platform-2.0): NEW default API for WPE WebKit 2.40+
-#   - WPEBackend-FDO (wpebackend-fdo-1.0): Legacy fallback for older systems
-#
-# Required packages:
-#   - wpe-webkit-2.0 (or wpe-webkit-1.1 on older systems)
-#   - wpe-platform-2.0 (preferred) OR wpebackend-fdo-1.0 (fallback)
-#   - libwpe-1.0
-#
-# See WPE_BACKEND.md for installation instructions.
+# Prefer WPEPlatform 2.54, retain the 2.52 API and legacy FDO backend.
+# Backend selection is made at build time, not by switching libraries at runtime.
+# See WPE_BACKEND.md for dependencies and SDK configuration.
+set(FLUTTER_INAPPWEBVIEW_WPE_BACKEND "AUTO" CACHE STRING
+    "WPE backend: AUTO, PLATFORM or LEGACY")
+set_property(CACHE FLUTTER_INAPPWEBVIEW_WPE_BACKEND PROPERTY STRINGS AUTO PLATFORM LEGACY)
+if(NOT FLUTTER_INAPPWEBVIEW_WPE_BACKEND MATCHES "^(AUTO|PLATFORM|LEGACY)$")
+  message(FATAL_ERROR "FLUTTER_INAPPWEBVIEW_WPE_BACKEND must be AUTO, PLATFORM or LEGACY")
+endif()
+option(FLUTTER_INAPPWEBVIEW_BUNDLE_WPE "Bundle WPE libraries with the Flutter application" ON)
+set(FLUTTER_INAPPWEBVIEW_WPE_INSTALL_RPATH "$ORIGIN" CACHE STRING
+    "Runtime search paths relative to the installed plugin")
 
 find_package(PkgConfig REQUIRED)
 
@@ -43,94 +47,106 @@ pkg_check_modules(GTK REQUIRED IMPORTED_TARGET gtk+-3.0)
 
 message(STATUS "flutter_inappwebview_linux: Using WPE WebKit backend")
 
-# Try wpe-webkit-2.0 first (newer API), fall back to wpe-webkit-1.1, then wpe-webkit-1.0
-pkg_check_modules(WPE_WEBKIT QUIET IMPORTED_TARGET wpe-webkit-2.0)
+# The implementation uses the 2.0 API (network sessions and JS replies).
+# FDO is a rendering backend, not a compatibility layer for WebKit's 1.x API.
+pkg_check_modules(WPE_WEBKIT QUIET IMPORTED_TARGET wpe-webkit-2.0>=2.48)
 if(NOT WPE_WEBKIT_FOUND)
-  pkg_check_modules(WPE_WEBKIT QUIET IMPORTED_TARGET wpe-webkit-1.1)
-  if(WPE_WEBKIT_FOUND)
-    message(STATUS "flutter_inappwebview_linux: Found wpe-webkit-1.1 (${WPE_WEBKIT_VERSION})")
-  else()
-    pkg_check_modules(WPE_WEBKIT QUIET IMPORTED_TARGET wpe-webkit-1.0)
-    if(WPE_WEBKIT_FOUND)
-      message(STATUS "flutter_inappwebview_linux: Found wpe-webkit-1.0 (${WPE_WEBKIT_VERSION})")
+  message(FATAL_ERROR
+    "This plugin requires wpe-webkit-2.0 >= 2.48. "
+    "WebKit <2.48 lacks some APIs required by this plugin, including network sessions, "
+    "JavaScript message replies and all-cookie retrieval. FDO does not provide these APIs. "
+    "Install a newer WPE SDK and select it with PKG_CONFIG_PATH. See WPE_BACKEND.md.")
+endif()
+message(STATUS "flutter_inappwebview_linux: WPE WebKit ${WPE_WEBKIT_VERSION}")
+
+# Use imported targets in link probes: bare -l names lose a custom SDK's -L
+# paths and can either fail or accidentally test a system WebKit instead.
+include(CheckCXXSourceCompiles)
+include(CMakePushCheckState)
+cmake_push_check_state(RESET)
+set(CMAKE_REQUIRED_LIBRARIES PkgConfig::WPE_WEBKIT)
+unset(WEBKIT_HAS_NETWORK_SESSION_API CACHE)
+check_cxx_source_compiles("
+  #include <wpe/webkit.h>
+  int main() {
+    auto* session = webkit_network_session_new(nullptr, nullptr);
+    g_object_unref(session);
+    return 0;
+  }
+" WEBKIT_HAS_NETWORK_SESSION_API)
+if(NOT WEBKIT_HAS_NETWORK_SESSION_API)
+  message(FATAL_ERROR "The plugin requires the WebKit network-session API (wpe-webkit-2.0). "
+                      "The legacy FDO backend does not imply support for the old 1.x WebKit API.")
+endif()
+
+set(HAVE_WPE_PLATFORM OFF)
+set(HAVE_WPE_FDO OFF)
+if(NOT FLUTTER_INAPPWEBVIEW_WPE_BACKEND STREQUAL "LEGACY")
+  pkg_check_modules(WPE_PLATFORM QUIET IMPORTED_TARGET wpe-platform-2.0>=2.52)
+  pkg_check_modules(WPE_PLATFORM_HEADLESS QUIET IMPORTED_TARGET wpe-platform-headless-2.0>=2.52)
+  if(WPE_PLATFORM_FOUND AND WPE_PLATFORM_HEADLESS_FOUND)
+    # All three modules belong to the same WebKit build. Do not mix SDK and
+    # distribution headers/libraries just because their module names match.
+    if(NOT WPE_PLATFORM_VERSION VERSION_EQUAL WPE_WEBKIT_VERSION OR
+       NOT WPE_PLATFORM_HEADLESS_VERSION VERSION_EQUAL WPE_WEBKIT_VERSION OR
+       NOT WPE_PLATFORM_PREFIX STREQUAL WPE_WEBKIT_PREFIX OR
+       NOT WPE_PLATFORM_HEADLESS_PREFIX STREQUAL WPE_WEBKIT_PREFIX)
+      message(FATAL_ERROR "WPE WebKit, WPEPlatform and headless must come from the same SDK")
+    endif()
+    set(CMAKE_REQUIRED_LIBRARIES PkgConfig::WPE_WEBKIT
+        PkgConfig::WPE_PLATFORM PkgConfig::WPE_PLATFORM_HEADLESS)
+    unset(WEBKIT_HAS_WPE_PLATFORM_API CACHE)
+    check_cxx_source_compiles("
+      #include <wpe/webkit.h>
+      #include <wpe/wpe-platform.h>
+      #include <wpe/headless/wpe-headless.h>
+      int main() {
+        auto* display = wpe_display_headless_new();
+        auto* view = webkit_web_view_get_wpe_view(nullptr);
+        auto* toplevel = wpe_view_get_toplevel(view);
+        wpe_toplevel_resize(toplevel, 1, 1);
+        g_object_unref(display);
+        return 0;
+      }
+    " WEBKIT_HAS_WPE_PLATFORM_API)
+    if(WEBKIT_HAS_WPE_PLATFORM_API)
+      set(HAVE_WPE_PLATFORM ON)
+      add_compile_definitions(HAVE_WPE_PLATFORM=1)
+      message(STATUS "flutter_inappwebview_linux: WPEPlatform ${WPE_PLATFORM_VERSION} + headless")
     endif()
   endif()
-else()
-  message(STATUS "flutter_inappwebview_linux: Found wpe-webkit-2.0 (${WPE_WEBKIT_VERSION})")
 endif()
 
-if(NOT WPE_WEBKIT_FOUND)
-  message(FATAL_ERROR "WPE WebKit not found. Please install libwpewebkit-1.0-dev (Ubuntu/Debian) or wpe-webkit package.\n"
-                      "See WPE_BACKEND.md or https://wpewebkit.org/about/get-wpe.html")
-endif()
-
-# === WPE Platform API Detection (NEW - default) ===
-# Check for WPEPlatform API first (wpe-platform-2.0) - this is the modern API
-# introduced in WPE WebKit 2.40+ and is the preferred approach.
-pkg_check_modules(WPE_PLATFORM QUIET IMPORTED_TARGET wpe-platform-2.0)
-pkg_check_modules(WPE_PLATFORM_HEADLESS QUIET IMPORTED_TARGET wpe-platform-headless-2.0)
-
-if(WPE_PLATFORM_FOUND AND WPE_PLATFORM_HEADLESS_FOUND)
-  # Additional check: verify that WebKit was actually built WITH WPEPlatform support
-  # The pkg-config file may exist but WebKit headers may not have the required functions
-  # This happens when WPE WebKit is rebuilt without WPEPlatform support
-  include(CheckCXXSourceCompiles)
-  set(CMAKE_REQUIRED_INCLUDES ${WPE_WEBKIT_INCLUDE_DIRS} ${WPE_PLATFORM_INCLUDE_DIRS})
-  set(CMAKE_REQUIRED_LIBRARIES ${WPE_WEBKIT_LIBRARIES} ${WPE_PLATFORM_LIBRARIES})
+if(NOT HAVE_WPE_PLATFORM)
+  if(FLUTTER_INAPPWEBVIEW_WPE_BACKEND STREQUAL "PLATFORM")
+    message(FATAL_ERROR "WPEPlatform >= 2.52 with headless is required by the selected backend")
+  endif()
+  pkg_check_modules(WPE_FDO REQUIRED IMPORTED_TARGET wpebackend-fdo-1.0)
+  pkg_check_modules(LIBWPE REQUIRED IMPORTED_TARGET wpe-1.0)
+  pkg_check_modules(WAYLAND_SERVER REQUIRED IMPORTED_TARGET wayland-server)
+  set(CMAKE_REQUIRED_LIBRARIES PkgConfig::WPE_WEBKIT PkgConfig::WPE_FDO PkgConfig::LIBWPE)
+  unset(WEBKIT_HAS_WPE_LEGACY_API CACHE)
   check_cxx_source_compiles("
     #include <wpe/webkit.h>
     int main() {
-      WebKitWebView* view = nullptr;
-      webkit_web_view_get_wpe_view(view);
+      auto* backend = webkit_web_view_backend_new(nullptr, nullptr, nullptr);
+      webkit_web_view_backend_unref(backend);
       return 0;
     }
-  " WEBKIT_HAS_WPE_PLATFORM_API)
-  
-  if(WEBKIT_HAS_WPE_PLATFORM_API)
-    message(STATUS "flutter_inappwebview_linux: Found wpe-platform-2.0 (WPEPlatform API - DEFAULT)")
-    message(STATUS "flutter_inappwebview_linux: Found wpe-platform-headless-2.0")
-    message(STATUS "flutter_inappwebview_linux: WebKit has WPEPlatform API support (webkit_web_view_get_wpe_view)")
-    set(HAVE_WPE_PLATFORM ON)
-    add_compile_definitions(HAVE_WPE_PLATFORM=1)
-  else()
-    message(STATUS "flutter_inappwebview_linux: wpe-platform-2.0 pkg-config found, but WebKit lacks WPEPlatform API")
-    message(STATUS "flutter_inappwebview_linux: WebKit was likely built without WPEPlatform support, falling back to legacy FDO")
+  " WEBKIT_HAS_WPE_LEGACY_API)
+  if(NOT WEBKIT_HAS_WPE_LEGACY_API)
+    message(FATAL_ERROR "Selected WebKit has no legacy API. Use WPEPlatform + headless, "
+                        "or a WebKit build with ENABLE_WPE_LEGACY_API=ON for FDO.")
   endif()
-endif()
-
-# === WPE Backend FDO Detection (Legacy - fallback) ===
-# Check for WPEBackend-FDO as fallback ONLY if WPEPlatform is NOT available
-# WPEPlatform and WPEBackend-FDO are mutually exclusive at compile time
-pkg_check_modules(WPE_FDO QUIET IMPORTED_TARGET wpebackend-fdo-1.0)
-if(WPE_FDO_FOUND AND NOT HAVE_WPE_PLATFORM)
-  message(STATUS "flutter_inappwebview_linux: Found wpebackend-fdo-1.0 (Legacy FDO API)")
   set(HAVE_WPE_FDO ON)
   add_compile_definitions(HAVE_WPE_BACKEND_LEGACY=1)
-elseif(WPE_FDO_FOUND AND HAVE_WPE_PLATFORM)
-  message(STATUS "flutter_inappwebview_linux: wpebackend-fdo-1.0 available but not used (WPEPlatform preferred)")
+  message(STATUS "flutter_inappwebview_linux: Legacy WPEBackend-FDO")
 endif()
-
-# Require at least one backend
-if(NOT HAVE_WPE_PLATFORM AND NOT HAVE_WPE_FDO)
-  message(FATAL_ERROR "Neither WPEPlatform (wpe-platform-2.0) nor WPEBackend-FDO (wpebackend-fdo-1.0) found.\n"
-                      "Please install one of:\n"
-                      "  - WPE WebKit 2.40+ with WPEPlatform support (recommended)\n"
-                      "  - wpebackend-fdo-1.0-dev (legacy fallback)\n"
-                      "See WPE_BACKEND.md for installation instructions.")
-endif()
-
-# Check for libwpe
-pkg_check_modules(LIBWPE QUIET IMPORTED_TARGET wpe-1.0)
-if(NOT LIBWPE_FOUND)
-  message(FATAL_ERROR "libwpe (wpe-1.0) not found. Please install libwpe-1.0-dev.")
-endif()
+cmake_pop_check_state()
 
 # Check for libsecret for secure credential storage
 pkg_check_modules(LIBSECRET REQUIRED IMPORTED_TARGET libsecret-1)
 message(STATUS "flutter_inappwebview_linux: Found libsecret-1 (${LIBSECRET_VERSION})")
-
-# Find wayland-server for SHM buffer handling
-pkg_check_modules(WAYLAND_SERVER REQUIRED IMPORTED_TARGET wayland-server)
 
 # Enable SIMD optimizations for color conversion
 # These flags enable NEON on ARM64 and SSE/SSSE3 on x86_64
@@ -164,10 +180,13 @@ FetchContent_Declare(
 set(JSON_BuildTests OFF CACHE INTERNAL "")
 FetchContent_MakeAvailable(nlohmann_json)
 # Suppress deprecated literal operator warnings from nlohmann_json
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-literal-operator")
+check_cxx_compiler_flag("-Wdeprecated-literal-operator" COMPILER_SUPPORTS_DEPRECATED_LITERAL_OPERATOR)
+if(COMPILER_SUPPORTS_DEPRECATED_LITERAL_OPERATOR)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-literal-operator")
+endif()
 message(STATUS "flutter_inappwebview_linux: nlohmann/json ${NLOHMANN_JSON_VERSION} configured")
 
-# Plugin source files
+# Any new source files that you add to the plugin should be added here.
 list(APPEND PLUGIN_SOURCES
   "flutter_inappwebview_linux_plugin.cc"
   "plugin_instance.cc"
@@ -256,15 +275,15 @@ set_target_properties(${PLUGIN_NAME} PROPERTIES
   CXX_VISIBILITY_PRESET hidden)
 target_compile_definitions(${PLUGIN_NAME} PRIVATE FLUTTER_PLUGIN_IMPL)
 
-# Set RPATH so the plugin loads bundled WPE libraries from the same directory.
-# $ORIGIN refers to the directory containing the plugin shared library.
-# This eliminates the need for LD_LIBRARY_PATH or launcher scripts.
+# Flutter copies the plugin via install(FILES), which does not rewrite RPATH.
+# Link with the runtime paths already set, including for flutter run bundles.
+# WebKit subprocesses and resources still need a complete runtime installation.
 set_target_properties(${PLUGIN_NAME} PROPERTIES
-  INSTALL_RPATH "$ORIGIN"
-  BUILD_RPATH "$ORIGIN"
+  INSTALL_RPATH "${FLUTTER_INAPPWEBVIEW_WPE_INSTALL_RPATH}"
   BUILD_WITH_INSTALL_RPATH TRUE)
 
-# Source include directories and library dependencies
+# Source include directories and library dependencies. Add any plugin-specific
+# dependencies here.
 target_include_directories(${PLUGIN_NAME} INTERFACE
   "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_include_directories(${PLUGIN_NAME} PRIVATE
@@ -277,8 +296,6 @@ target_link_libraries(${PLUGIN_NAME} PRIVATE PkgConfig::GTK)
 target_link_libraries(${PLUGIN_NAME} PRIVATE PkgConfig::EPOXY)
 target_link_libraries(${PLUGIN_NAME} PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(${PLUGIN_NAME} PRIVATE PkgConfig::WPE_WEBKIT)
-target_link_libraries(${PLUGIN_NAME} PRIVATE PkgConfig::LIBWPE)
-target_link_libraries(${PLUGIN_NAME} PRIVATE PkgConfig::WAYLAND_SERVER)
 target_link_libraries(${PLUGIN_NAME} PRIVATE PkgConfig::LIBSECRET)
 
 # Link WPEPlatform if available (new API - default)
@@ -289,7 +306,8 @@ endif()
 
 # Link WPEBackend-FDO if available (legacy fallback)
 if(HAVE_WPE_FDO)
-  target_link_libraries(${PLUGIN_NAME} PRIVATE PkgConfig::WPE_FDO)
+  target_link_libraries(${PLUGIN_NAME} PRIVATE
+    PkgConfig::WPE_FDO PkgConfig::LIBWPE PkgConfig::WAYLAND_SERVER)
 endif()
 
 # === Library Bundling ===
@@ -298,67 +316,38 @@ endif()
 
 set(WPE_BUNDLED_LIBS "")
 
-# Helper function to find and add real shared library files (resolving symlinks)
+# Keep the linker/SONAME symlinks as well as their real file. Flutter installs
+# the returned list as files and does not create missing SONAME links for us.
+# Search only directories belonging to the selected pkg-config module.
 function(find_and_add_library LIB_NAME SEARCH_PATHS OUT_LIST)
-  foreach(SEARCH_PATH ${SEARCH_PATHS})
-    # Look for the versioned .so file (e.g., libwpe-1.0.so.1.10.0)
-    file(GLOB LIB_FILES "${SEARCH_PATH}/${LIB_NAME}.so.*.*.*")
-    if(NOT LIB_FILES)
-      # Try less specific pattern (e.g., libwpe-1.0.so.1)
-      file(GLOB LIB_FILES "${SEARCH_PATH}/${LIB_NAME}.so.*")
-    endif()
-    if(LIB_FILES)
-      # Get the first matching file
-      list(GET LIB_FILES 0 LIB_FILE)
-      # Resolve symlinks to get the real file
-      get_filename_component(REAL_LIB "${LIB_FILE}" REALPATH)
-      if(EXISTS "${REAL_LIB}")
-        list(APPEND ${OUT_LIST} "${REAL_LIB}")
-        set(${OUT_LIST} ${${OUT_LIST}} PARENT_SCOPE)
-        message(STATUS "flutter_inappwebview_linux: Will bundle ${REAL_LIB}")
-        return()
-      endif()
+  unset(WPE_BUNDLE_LIBRARY CACHE)
+  find_library(WPE_BUNDLE_LIBRARY NAMES "${LIB_NAME}.so"
+    PATHS ${SEARCH_PATHS} NO_DEFAULT_PATH)
+  if(NOT WPE_BUNDLE_LIBRARY)
+    message(FATAL_ERROR "Could not find ${LIB_NAME} in the selected WPE SDK")
+  endif()
+  get_filename_component(REAL_LIB "${WPE_BUNDLE_LIBRARY}" REALPATH)
+  get_filename_component(LIB_DIR "${WPE_BUNDLE_LIBRARY}" DIRECTORY)
+  file(GLOB LIB_FILES "${LIB_DIR}/${LIB_NAME}.so*")
+  foreach(LIB_FILE IN LISTS LIB_FILES)
+    get_filename_component(RESOLVED_LIB "${LIB_FILE}" REALPATH)
+    if(RESOLVED_LIB STREQUAL REAL_LIB)
+      list(APPEND ${OUT_LIST} "${LIB_FILE}")
     endif()
   endforeach()
-  message(WARNING "flutter_inappwebview_linux: Could not find ${LIB_NAME} to bundle")
+  list(REMOVE_DUPLICATES ${OUT_LIST})
+  set(${OUT_LIST} ${${OUT_LIST}} PARENT_SCOPE)
+  unset(WPE_BUNDLE_LIBRARY CACHE)
 endfunction()
 
-# Get library directories from pkg-config
-set(WPE_LIB_DIRS "")
-if(WPE_WEBKIT_LIBRARY_DIRS)
-  list(APPEND WPE_LIB_DIRS ${WPE_WEBKIT_LIBRARY_DIRS})
+if(FLUTTER_INAPPWEBVIEW_BUNDLE_WPE)
+  find_and_add_library("libWPEWebKit-2.0" "${WPE_WEBKIT_LIBRARY_DIRS}" WPE_BUNDLED_LIBS)
+  # WPEPlatform/headless are part of libWPEWebKit, not separate libraries.
+  if(HAVE_WPE_FDO)
+    find_and_add_library("libwpe-1.0" "${LIBWPE_LIBRARY_DIRS}" WPE_BUNDLED_LIBS)
+    find_and_add_library("libWPEBackend-fdo-1.0" "${WPE_FDO_LIBRARY_DIRS}" WPE_BUNDLED_LIBS)
+  endif()
 endif()
-if(LIBWPE_LIBRARY_DIRS)
-  list(APPEND WPE_LIB_DIRS ${LIBWPE_LIBRARY_DIRS})
-endif()
-if(HAVE_WPE_FDO AND WPE_FDO_LIBRARY_DIRS)
-  list(APPEND WPE_LIB_DIRS ${WPE_FDO_LIBRARY_DIRS})
-endif()
-# Add common paths as fallback
-list(APPEND WPE_LIB_DIRS 
-  "/usr/local/lib"
-  "/usr/local/lib/${CMAKE_LIBRARY_ARCHITECTURE}"
-  "/usr/lib"
-  "/usr/lib/${CMAKE_LIBRARY_ARCHITECTURE}"
-)
-list(REMOVE_DUPLICATES WPE_LIB_DIRS)
-
-# Find WPE WebKit library
-find_and_add_library("libWPEWebKit-2.0" "${WPE_LIB_DIRS}" WPE_BUNDLED_LIBS)
-
-# Find libwpe library  
-find_and_add_library("libwpe-1.0" "${WPE_LIB_DIRS}" WPE_BUNDLED_LIBS)
-
-# WPEPlatform is built into libWPEWebKit-2.0 on modern builds, so there are
-# no separate libWPEPlatform*.so files to bundle.
-
-# Find WPE Backend FDO library (legacy fallback)
-if(HAVE_WPE_FDO)
-  find_and_add_library("libWPEBackend-fdo-1.0" "${WPE_LIB_DIRS}" WPE_BUNDLED_LIBS)
-endif()
-
-# Also need to create symlinks for the sonames that the libraries expect
-# This will be handled at install time in the example CMakeLists.txt
 
 set(flutter_inappwebview_linux_bundled_libraries
   ${WPE_BUNDLED_LIBS}
@@ -369,62 +358,60 @@ set(flutter_inappwebview_linux_bundled_libraries
 set(FLUTTER_INAPPWEBVIEW_WPE_LIBS ${WPE_BUNDLED_LIBS} CACHE INTERNAL "WPE libraries to bundle")
 
 # === Tests ===
-# These unit tests can be run from a terminal after building the example.
+# Opt in from the host application's CMakeLists.txt before loading plugins:
+# set(include_flutter_inappwebview_linux_tests TRUE)
+if(include_${PROJECT_NAME}_tests)
+  enable_testing()
+  add_executable(${PROJECT_NAME}_frame_pixels_test test/frame_pixels_test.cc)
+  target_compile_features(${PROJECT_NAME}_frame_pixels_test PRIVATE cxx_std_17)
+  add_test(NAME ${PROJECT_NAME}_frame_pixels_test COMMAND ${PROJECT_NAME}_frame_pixels_test)
+  if(CMAKE_VERSION VERSION_LESS "3.11.0")
+    message("Unit tests require CMake 3.11.0 or later")
+  else()
+    set(TEST_RUNNER "${PROJECT_NAME}_test")
+    enable_testing()
 
-# Only enable test builds when building the example (which sets this variable)
-# so that plugin clients aren't building the tests.
-if (${include_${PROJECT_NAME}_tests})
-if(${CMAKE_VERSION} VERSION_LESS "3.11.0")
-message("Unit tests require CMake 3.11.0 or later")
-else()
-set(TEST_RUNNER "${PROJECT_NAME}_test")
-enable_testing()
+    # Match the Flutter Linux plugin template's Google Test setup.
+    include(FetchContent)
+    FetchContent_Declare(
+      googletest
+      URL https://github.com/google/googletest/archive/release-1.11.0.zip
+    )
+    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+    set(INSTALL_GTEST OFF CACHE BOOL "Disable installation of googletest" FORCE)
+    FetchContent_MakeAvailable(googletest)
 
-# Add the Google Test dependency.
-include(FetchContent)
-FetchContent_Declare(
-  googletest
-  URL https://github.com/google/googletest/archive/release-1.11.0.zip
-  DOWNLOAD_EXTRACT_TIMESTAMP TRUE
-)
-# Prevent overriding the parent project's compiler/linker settings
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-# Disable install commands for gtest so it doesn't end up in the bundle.
-set(INSTALL_GTEST OFF CACHE BOOL "Disable installation of googletest" FORCE)
+    # Compile the implementation directly to test private, non-exported helpers.
+    add_executable(${TEST_RUNNER}
+      test/flutter_inappwebview_linux_plugin_test.cc
+      test/wpe_settings_test.cc
+      ${PLUGIN_SOURCES}
+    )
+    apply_standard_settings(${TEST_RUNNER})
+    target_include_directories(${TEST_RUNNER} PRIVATE
+      "${CMAKE_CURRENT_SOURCE_DIR}"
+      ${EPOXY_INCLUDE_DIRS}
+      ${WPE_WEBKIT_INCLUDE_DIRS})
+    target_link_libraries(${TEST_RUNNER} PRIVATE
+      flutter
+      PkgConfig::GTK
+      PkgConfig::EPOXY
+      nlohmann_json::nlohmann_json
+      PkgConfig::WPE_WEBKIT
+      PkgConfig::LIBSECRET
+      gtest_main
+      gmock)
+    if(HAVE_WPE_PLATFORM)
+      target_link_libraries(${TEST_RUNNER} PRIVATE
+        PkgConfig::WPE_PLATFORM
+        PkgConfig::WPE_PLATFORM_HEADLESS)
+    endif()
+    if(HAVE_WPE_FDO)
+      target_link_libraries(${TEST_RUNNER} PRIVATE
+        PkgConfig::WPE_FDO PkgConfig::LIBWPE PkgConfig::WAYLAND_SERVER)
+    endif()
 
-FetchContent_MakeAvailable(googletest)
-
-# The plugin's exported API is not very useful for unit testing, so build the
-# sources directly into the test binary rather than using the shared library.
-add_executable(${TEST_RUNNER}
-  test/flutter_inappwebview_linux_plugin_test.cc
-  ${PLUGIN_SOURCES}
-)
-apply_standard_settings(${TEST_RUNNER})
-target_include_directories(${TEST_RUNNER} PRIVATE 
-  "${CMAKE_CURRENT_SOURCE_DIR}" 
-  ${EPOXY_INCLUDE_DIRS}
-  ${WPE_WEBKIT_INCLUDE_DIRS})
-target_link_libraries(${TEST_RUNNER} PRIVATE flutter)
-target_link_libraries(${TEST_RUNNER} PRIVATE PkgConfig::GTK)
-target_link_libraries(${TEST_RUNNER} PRIVATE PkgConfig::EPOXY)
-target_link_libraries(${TEST_RUNNER} PRIVATE nlohmann_json::nlohmann_json)
-target_link_libraries(${TEST_RUNNER} PRIVATE PkgConfig::WPE_WEBKIT)
-target_link_libraries(${TEST_RUNNER} PRIVATE PkgConfig::LIBWPE)
-target_link_libraries(${TEST_RUNNER} PRIVATE PkgConfig::WAYLAND_SERVER)
-target_link_libraries(${TEST_RUNNER} PRIVATE PkgConfig::LIBSECRET)
-if(HAVE_WPE_PLATFORM)
-  target_link_libraries(${TEST_RUNNER} PRIVATE PkgConfig::WPE_PLATFORM)
-  target_link_libraries(${TEST_RUNNER} PRIVATE PkgConfig::WPE_PLATFORM_HEADLESS)
+    include(GoogleTest)
+    gtest_discover_tests(${TEST_RUNNER})
+  endif()
 endif()
-if(HAVE_WPE_FDO)
-  target_link_libraries(${TEST_RUNNER} PRIVATE PkgConfig::WPE_FDO)
-endif()
-target_link_libraries(${TEST_RUNNER} PRIVATE gtest_main gmock)
-
-# Enable automatic test discovery.
-include(GoogleTest)
-gtest_discover_tests(${TEST_RUNNER})
-
-endif()  # CMake version check
-endif()  # include_${PROJECT_NAME}_tests

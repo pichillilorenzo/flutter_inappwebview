@@ -11,3 +11,6 @@ so you do not need to add it to your `pubspec.yaml`.
 
 However, if you `import` this package to use any of its APIs directly, you
 should add it to your `pubspec.yaml` as usual.
+
+See [Linux compatibility](LINUX_COMPATIBILITY.md) for required WPE versions,
+backend selection and runtime packaging.

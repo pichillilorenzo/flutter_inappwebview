@@ -5,7 +5,7 @@
 //
 // Uses WPE WebKit for offscreen web rendering.
 // Supports two APIs:
-// - WPEPlatform (HAVE_WPE_PLATFORM): New modern API for WPE WebKit 2.40+
+// - WPEPlatform (HAVE_WPE_PLATFORM): WPEPlatform API for WPE WebKit 2.52+
 // - WPEBackend-FDO (HAVE_WPE_BACKEND_LEGACY): Legacy API for older systems
 //
 // WPE WebKit is designed for embedded systems and offers excellent offscreen rendering
@@ -18,7 +18,7 @@
 // - Direct OpenGL texture export (zero-copy when supported)
 //
 // Required packages (Ubuntu/Debian):
-//   - libwpe-1.0-dev (or build from source)
+//   - libwpe-1.0-dev (legacy FDO backend only)
 //   - wpewebkit (build from source or use Flatpak)
 //   - wpe-platform-headless-2.0 (recommended) OR wpebackend-fdo-1.0-dev (legacy)
 //
@@ -300,13 +300,15 @@ class InAppWebView {
   bool HasDmaBufExport() const;
   bool GetDmaBufFd(int* fd, uint32_t* stride, uint32_t* width, uint32_t* height) const;
 
-  // EGL image access (for zero-copy texture sharing with Flutter)
-  // Returns the current EGL image handle (EGLImageKHR) and dimensions.
-  // The EGL image is owned by WPE and remains valid until the next frame.
-  void* GetCurrentEglImage(uint32_t* out_width, uint32_t* out_height) const;
+  // Import DMA-BUFs into the consumer's EGLDisplay when needed. The callback
+  // must finish using the image before returning, while WPE buffers stay locked.
+  bool PaintCurrentEglImage(
+      const std::function<bool(void*, uint32_t, uint32_t)>& paint);
+  bool CopyCurrentFramePixels(std::vector<uint8_t>& pixels, uint32_t* width,
+                              uint32_t* height);
 
-  // Skip pixel readback - when using zero-copy EGL texture mode, we don't need
-  // to read pixels back to CPU. This improves performance and avoids GL context issues.
+  // Defer pixel transfer to the GL texture consumer instead of reading every
+  // frame on the producer thread.
   void SetSkipPixelReadback(bool skip) { skip_pixel_readback_ = skip; }
 
   // Frame available callback (called when new frame is ready)
@@ -474,12 +476,15 @@ class InAppWebView {
   WPEToplevel* wpe_toplevel_ = nullptr;   // From wpe_view_get_toplevel, not owned
   
   // Buffer rendering for WPEPlatform
-  WPEBuffer* current_buffer_ = nullptr;   // Current frame buffer (borrowed, not owned)
-  void* current_egl_image_ = nullptr;     // EGL image created from current buffer
+  WPEBuffer* current_buffer_ = nullptr;   // Referenced until headless releases it
   uint32_t current_buffer_width_ = 0;     // Width of current buffer
   uint32_t current_buffer_height_ = 0;    // Height of current buffer
   gulong buffer_rendered_handler_ = 0;    // Signal handler ID for buffer-rendered
+  gulong buffer_release_hook_ = 0;        // Runs before WebKit's buffer-released handler
   gulong scale_changed_handler_ = 0;      // Signal handler ID for notify::scale-factor
+  bool pixel_import_error_logged_ = false;
+  bool egl_import_error_logged_ = false;
+  bool CopyWpePixelsLocked(std::vector<uint8_t>& pixels, uint32_t* width, uint32_t* height);
   mutable std::mutex wpe_buffer_mutex_;   // Mutex for thread-safe buffer access
 #endif
 
@@ -520,7 +525,7 @@ class InAppWebView {
   std::atomic<size_t> read_buffer_index_{1};
   mutable std::mutex buffer_swap_mutex_;
   
-  // Flag to skip pixel readback when using zero-copy EGL texture mode
+  // Flag to defer pixel readback to the GL texture consumer
   // When true, OnExportDmaBuf won't call ReadPixelsFromEglImage
   bool skip_pixel_readback_ = false;
 

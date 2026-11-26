@@ -123,7 +123,13 @@ namespace flutter_inappwebview_plugin
     RECT bounds;
     GetClientRect(plugin->registrar->GetView()->GetNativeWindow(), &bounds);
 
-    auto hwnd = CreateWindowEx(0, windowClass_.lpszClassName, L"", 0, 0,
+    // Create the host as a child of the Flutter view. A window created with
+    // style 0 is an owned top-level window: clicking the WebView activates it
+    // and the Flutter runner loses foreground state, so the native title bar
+    // changes color and focus-related input is affected. A child window stays
+    // inside the Flutter view and does not compete for activation.
+    auto hwnd = CreateWindowEx(0, windowClass_.lpszClassName, L"",
+      WS_CHILD | WS_CLIPSIBLINGS, 0,
       0, bounds.right - bounds.left, bounds.bottom - bounds.top,
       plugin->registrar->GetView()->GetNativeWindow(),
       nullptr,

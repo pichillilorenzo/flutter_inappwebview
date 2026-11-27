@@ -1,5 +1,5 @@
 ---
-applyTo: "flutter_inappwebview_web/**"
+applyTo: "drago_inappwebview/**"
 ---
 
 # Web Platform Implementation Instructions
@@ -19,7 +19,7 @@ applyTo: "flutter_inappwebview_web/**"
 
 ## Source Code Structure
 
-### Dart Side (`flutter_inappwebview_web/lib/src/`)
+### Dart Side (`drago_inappwebview/lib/src/`)
 
 ```
 lib/src/
@@ -44,7 +44,7 @@ lib/src/
 
 ```
 web_support/src/
-├── index.ts                         # Main JavaScript bridge (flutter_inappwebview_plugin)
+├── index.ts                         # Main JavaScript bridge (drago_inappwebview_plugin)
 └── types.ts                         # TypeScript type definitions
 ```
 
@@ -81,11 +81,11 @@ Due to browser security (CORS), the Web platform cannot:
 
 ### `web_support/src/index.ts`
 
-The TypeScript module provides the `flutter_inappwebview_plugin` global object:
+The TypeScript module provides the `drago_inappwebview_plugin` global object:
 
 ```typescript
-window.flutter_inappwebview_plugin = {
-  createFlutterInAppWebView(viewId, iframe, iframeContainer, bridgeSecret),
+window.drago_inappwebview_plugin = {
+  createDragoInAppWebView(viewId, iframe, iframeContainer, bridgeSecret),
   getCookieExpirationDate(timestamp),
   nativeAsyncCommunication(method, viewId, args),
   nativeSyncCommunication(method, viewId, args),
@@ -177,7 +177,7 @@ The compiled output is used by the Dart web plugin.
 ### Dart-Side Development
 
 For Dart-only changes:
-1. Implement platform interface from `flutter_inappwebview_platform_interface`
+1. Implement platform interface from `drago_inappwebview_platform_interface`
 2. Register in `WebPlatformInAppWebViewPlatform.registerWith()`
 3. Use `dart:js_interop` for JavaScript interop
 4. Use `dart:html` for DOM manipulation
@@ -186,7 +186,7 @@ For Dart-only changes:
 
 1. Update TypeScript in `web_support/src/` if JS bridge changes needed
 2. Run `npm run build` in `web_support/`
-3. Update Dart wrappers in `flutter_inappwebview_web/lib/src/`
+3. Update Dart wrappers in `drago_inappwebview/lib/src/`
 4. Implement platform interface methods
 
 ---
@@ -204,8 +204,8 @@ _nativeCommunication('methodName', viewId, [arg1, arg2]);
 
 ```dart
 // Using js_interop
-@JS('flutter_inappwebview_plugin')
-external FlutterInAppWebViewPlugin get flutterInAppWebViewPlugin;
+@JS('drago_inappwebview_plugin')
+external DragoInAppWebViewPlugin get dragoInAppWebViewPlugin;
 ```
 
 ### Handling Same-Origin Restrictions
@@ -226,13 +226,13 @@ try {
 
 ```bash
 # Dart package
-cd flutter_inappwebview_web && flutter pub get
+cd drago_inappwebview && flutter pub get
 
 # TypeScript (if modified)
 cd web_support && npm install && npm run build
 
 # Example app
-cd flutter_inappwebview_web/example && flutter run -d chrome
+cd drago_inappwebview/example && flutter run -d chrome
 ```
 
 ## Testing Considerations

@@ -2,13 +2,13 @@
 applyTo: "**"
 ---
 
-# Copilot Coding Agent Instructions — flutter_inappwebview
+# Copilot Coding Agent Instructions — drago_inappwebview
 
 You are an expert Flutter and Dart plugin developer working on this federated WebView plugin.
 
 ## Repository Summary
 
-**flutter_inappwebview** is a multi-platform Flutter plugin providing inline WebView, headless WebView, and in-app browser capabilities across Android, iOS, macOS, Windows, Linux, and Web.
+**drago_inappwebview** is a multi-platform Flutter plugin providing inline WebView, headless WebView, and in-app browser capabilities across Android, iOS, macOS, Windows, Linux, and Web.
 
 | Aspect | Details |
 |--------|---------|
@@ -22,8 +22,8 @@ You are an expert Flutter and Dart plugin developer working on this federated We
 
 ### Dependencies (Always Run First)
 ```bash
-cd flutter_inappwebview_platform_interface && flutter pub get
-cd ../flutter_inappwebview && flutter pub get
+cd drago_inappwebview_platform_interface && flutter pub get
+cd ../drago_inappwebview && flutter pub get
 # Repeat for any platform package you modify
 ```
 
@@ -32,13 +32,13 @@ cd ../flutter_inappwebview && flutter pub get
 # From repo root - REQUIRED after editing @ExchangeableObject/@ExchangeableEnum files
 npm run build # or npm run build:windows for Windows only
 # Or directly:
-cd flutter_inappwebview_platform_interface && flutter pub run build_runner build --delete-conflicting-outputs
+cd drago_inappwebview_platform_interface && flutter pub run build_runner build --delete-conflicting-outputs
 ```
 
 ### Static Analysis (Validation)
 ```bash
-cd flutter_inappwebview_platform_interface && dart analyze
-cd flutter_inappwebview && dart analyze
+cd drago_inappwebview_platform_interface && dart analyze
+cd drago_inappwebview && dart analyze
 ```
 **Expected**: Only `info`-level `constant_identifier_names` warnings (intentional for API naming).
 
@@ -49,12 +49,12 @@ npm run format # or npm run format:windows for Windows only
 
 ### Unit Tests
 ```bash
-cd flutter_inappwebview && flutter test
+cd drago_inappwebview && flutter test
 ```
 
 ### Integration Tests (Requires Device + Node Server)
 ```bash
-cd flutter_inappwebview/example
+cd drago_inappwebview/example
 NODE_SERVER_IP=<ip> flutter driver --driver=test_driver/integration_test.dart --target=integration_test/webview_flutter_test.dart
 ```
 
@@ -64,15 +64,15 @@ NODE_SERVER_IP=<ip> flutter driver --driver=test_driver/integration_test.dart --
 
 This repository follows the **Federated Plugin** architecture:
 
-- **`flutter_inappwebview/`**: The **plugin-facing-API package**. This is the public API that developers depend on.
+- **`drago_inappwebview/`**: The **plugin-facing-API package**. This is the public API that developers depend on.
   - Files here usually wrap platform implementations via `Platform*` classes (e.g., `PlatformInAppWebViewWidget`).
   - It delegates logic to the platform interface or specific platform implementations.
-- **`flutter_inappwebview_platform_interface/`**: The **platform interface package**.
+- **`drago_inappwebview_platform_interface/`**: The **platform interface package**.
   - Contains pure Dart contracts, typedefs, enums, and shared utilities.
   - Defines the `PlatformInterface` that all platform packages must implement.
-  - **Crucial**: Anything added to the public API (`flutter_inappwebview`) MUST rely on or extend these definitions. DO NOT duplicate platform logic in the public package.
-- **`flutter_inappwebview_<platform>/`**: The **platform implementation packages** (Android, iOS, macOS, Windows, Linux, Web).
-  - These packages implement the abstract classes defined in `flutter_inappwebview_platform_interface`.
+  - **Crucial**: Anything added to the public API (`drago_inappwebview`) MUST rely on or extend these definitions. DO NOT duplicate platform logic in the public package.
+- **`drago_inappwebview_<platform>/`**: The **platform implementation packages** (Android, iOS, macOS, Windows, Linux, Web).
+  - These packages implement the abstract classes defined in `drago_inappwebview_platform_interface`.
   - They contain platform-specific code (Dart and native: Java, Obj-C/Swift, C++, JavaScript).
   - Keep their APIs strictly aligned with the `platform_interface` layer.
 - **`dev_packages/` and `scripts/`**: Internal tooling, generators, and maintenance scripts.
@@ -107,7 +107,7 @@ When implementing platform-specific features, consult the official API documenta
 - **Generated Files**: Never hand-edit `*.g.dart` files. Update the annotated source instead.
 
 ### Platform Interface & Public API
-- **Propagation Order**: Add or change APIs in `flutter_inappwebview_platform_interface` first, then update every platform implementation, and finally wire the public `flutter_inappwebview` wrapper.
+- **Propagation Order**: Add or change APIs in `drago_inappwebview_platform_interface` first, then update every platform implementation, and finally wire the public `drago_inappwebview` wrapper.
 - **Documentation Macros**: Respect `{@macro ...}` and keep comments synchronized with `platform_interface`.
 - **`@SupportedPlatforms`**: Add annotations to document platform availability. Only mark supported when implementation exists.
 - **Support Checks**: Implement `isClassSupported`, `isPropertySupported`, `isMethodSupported` by deferring to `platform_interface` static singleton.
@@ -122,10 +122,10 @@ When implementing platform-specific features, consult the official API documenta
 > **Platform-specific details**: See `.github/instructions/<platform>.instructions.md` for native code structure and implemented classes.
 
 ### Feature Update Checklist
-1. Update or add the contract inside `flutter_inappwebview_platform_interface`.
+1. Update or add the contract inside `drago_inappwebview_platform_interface`.
 2. Run `npm run build` (or the equivalent `build_runner` command) to regenerate annotated files.
-3. Mirror the new contract in every federated implementation under `flutter_inappwebview_<platform>/lib/src/inappwebview_platform.dart` (returning stub implementations for unsupported platforms).
-4. Wire the public API in `flutter_inappwebview/` (controllers, widgets, helpers) and update the example app if the feature is user-facing.
+3. Mirror the new contract in every federated implementation under `drago_inappwebview_<platform>/lib/src/inappwebview_platform.dart` (returning stub implementations for unsupported platforms).
+4. Wire the public API in `drago_inappwebview/` (controllers, widgets, helpers) and update the example app if the feature is user-facing.
 5. Add or update tests/analyzer coverage where possible.
 6. Update documentation (README, docs site) and add changelog entries for every package you touched (interface, each platform, public plugin, etc.).
 7. Re-run `dart analyze`/`flutter test` in the affected packages before sending the PR.
@@ -134,16 +134,16 @@ When implementing platform-specific features, consult the official API documenta
 - **Run Tests**: Run `flutter test` inside the relevant package before suggesting changes.
 - **Analyze**: For analyzer-only updates, run `dart analyze` and ensure `analysis_options.yaml` lints stay satisfied.
 - **Contract Updates**: When touching `platform_interface` contracts, explicitly explain how downstream packages must be updated and list the follow-up steps.
-- **Integration Tests**: Live under `flutter_inappwebview/example/integration_test` and can be executed via `scripts/test_and_log.sh` (accepts optional `NODE_SERVER_IP` and `DEVICE_ID`).
+- **Integration Tests**: Live under `drago_inappwebview/example/integration_test` and can be executed via `scripts/test_and_log.sh` (accepts optional `NODE_SERVER_IP` and `DEVICE_ID`).
 
 ## Documentation & Examples
 - **Update Docs**: Update `README.md`, `doc/`, or example apps when you expose new public APIs.
 - **Snippets**: Show simple snippets that exercise the new API on supported platforms only.
-- **Changelog**: Keep changelog entries scoped under the correct package (e.g., `flutter_inappwebview/CHANGELOG.md`).
+- **Changelog**: Keep changelog entries scoped under the correct package (e.g., `drago_inappwebview/CHANGELOG.md`).
   - If a change spans multiple packages, add a short entry to each relevant `CHANGELOG.md` so consumers of standalone packages understand what changed.
 
 ## Pull Request Tips
-- **Title**: Reference the federated package you changed in the PR title (e.g., `[flutter_inappwebview] Add PrintJobController helpers`).
+- **Title**: Reference the federated package you changed in the PR title (e.g., `[drago_inappwebview] Add PrintJobController helpers`).
 - **Testing Instructions**: Call out any manual steps required for testers (running example app, enabling permissions, etc.).
 - **Platform Parity**: Mention unsupported platforms explicitly instead of assuming parity.
 
@@ -151,8 +151,8 @@ When implementing platform-specific features, consult the official API documenta
 
 The root `package.json` contains useful scripts for development and maintenance:
 
-- **`npm run build`**: Runs `build_runner build` in `flutter_inappwebview_platform_interface`. Use this when you change code that requires generation (e.g., `*.g.dart` files).
-- **`npm run watch`**: Runs `build_runner watch` in `flutter_inappwebview_platform_interface`.
+- **`npm run build`**: Runs `build_runner build` in `drago_inappwebview_platform_interface`. Use this when you change code that requires generation (e.g., `*.g.dart` files).
+- **`npm run watch`**: Runs `build_runner watch` in `drago_inappwebview_platform_interface`.
 - **`npm run format`**: Formats code in all packages using `dart format`.
 - **`npm run docs:gen`**: Generates API documentation.
 - **`npm run docs:serve`**: Serves the generated API documentation locally.
@@ -164,10 +164,10 @@ The root `package.json` contains useful scripts for development and maintenance:
 
 **ALWAYS follow this order when adding/changing APIs:**
 
-1. **`flutter_inappwebview_platform_interface/`** - Define contracts, types, enums first
+1. **`drago_inappwebview_platform_interface/`** - Define contracts, types, enums first
 2. Run `npm run build` to regenerate `*.g.dart` files
-3. **`flutter_inappwebview_<platform>/`** - Implement in each platform package
-4. **`flutter_inappwebview/`** - Wire the public API wrapper last
+3. **`drago_inappwebview_<platform>/`** - Implement in each platform package
+4. **`drago_inappwebview/`** - Wire the public API wrapper last
 5. Update `CHANGELOG.md` in EACH touched package
 
 ### Critical Rules
@@ -219,7 +219,7 @@ Make sure to acquire the instructions before making any changes to the code.
 </instruction>
 <instruction>
 <file>.github/instructions/plugin-facing-api.instructions.md</file>
-<description>Public API wrapper implementation details. Use this when working on the `flutter_inappwebview` package and expose new API from the platform interface.</description>
+<description>Public API wrapper implementation details. Use this when working on the `drago_inappwebview` package and expose new API from the platform interface.</description>
 </instruction>
 <instruction>
 <file>.github/instructions/ios.instructions.md</file>

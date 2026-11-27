@@ -1,5 +1,5 @@
 ---
-applyTo: "flutter_inappwebview_ios/**"
+applyTo: "drago_inappwebview/**"
 ---
 
 # iOS Platform Implementation Instructions
@@ -281,7 +281,7 @@ JavaScript files injected into WebViews for native-web communication:
 
 | Script | File | Description |
 |--------|------|-------------|
-| **JavaScriptBridgeJS** | `JavaScriptBridgeJS.swift` | Core bridge enabling `window.flutter_inappwebview.callHandler()` for Dart-JS communication. Sets up Promise-based message passing via `WKScriptMessageHandler`. |
+| **JavaScriptBridgeJS** | `JavaScriptBridgeJS.swift` | Core bridge enabling `window.drago_inappwebview.callHandler()` for Dart-JS communication. Sets up Promise-based message passing via `WKScriptMessageHandler`. |
 | **ConsoleLogJS** | `ConsoleLogJS.swift` | Intercepts `console.log/debug/error/info/warn` and forwards messages to `onConsoleMessage` callback. Main frame only. |
 | **InterceptAjaxRequestJS** | `InterceptAjaxRequestJS.swift` | Wraps `XMLHttpRequest` to intercept AJAX requests. Enables `shouldInterceptAjaxRequest`, `onAjaxReadyStateChange`, `onAjaxProgress` callbacks. |
 | **InterceptFetchRequestJS** | `InterceptFetchRequestJS.swift` | Wraps `window.fetch()` to intercept Fetch API requests. Enables `shouldInterceptFetchRequest` callback. |
@@ -289,7 +289,7 @@ JavaScript files injected into WebViews for native-web communication:
 | **PrintJS** | `PrintJS.swift` | Overrides `window.print()` to trigger `onPrintRequest` callback instead of native print dialog. |
 | **PromisePolyfillJS** | `PromisePolyfillJS.swift` | Polyfill for `Promise` API on older WebKit versions using RSVP.js library. |
 | **FindTextHighlightJS** | `FindTextHighlightJS.swift` | JavaScript-based text search and highlighting for `FindInteractionController`. Highlights matches with CSS spans. |
-| **WebMessageListenerJS** | `WebMessageListenerJS.swift` | Implements `FlutterInAppWebViewWebMessageListener` class for `postMessage` API. |
+| **WebMessageListenerJS** | `WebMessageListenerJS.swift` | Implements `DragoInAppWebViewWebMessageListener` class for `postMessage` API. |
 | **WebMessageChannelJS** | `WebMessageChannelJS.swift` | Variable definitions for `WebMessageChannel` ports storage. |
 | **EnableViewportScaleJS** | `EnableViewportScaleJS.swift` | Adds viewport meta tag with `width=device-width` when `enableViewportScale` is true. |
 | **SupportZoomJS** | `SupportZoomJS.swift` | Modifies viewport meta tag to disable/enable user zooming via `user-scalable=no`. |
@@ -306,7 +306,7 @@ JavaScript files injected into WebViews for native-web communication:
 ## Dart-Side Development
 
 For Dart-only changes:
-1. Implement platform interface from `flutter_inappwebview_platform_interface`
+1. Implement platform interface from `drago_inappwebview_platform_interface`
 2. Extend `Platform*CreationParams` for iOS-specific parameters
 3. Register in `IOSInAppWebViewPlatform.registerWith()`
 4. iOS-specific features: `WebAuthenticationSession`, Safari-style callbacks
@@ -322,7 +322,7 @@ When modifying Swift/Obj-C code:
 ## Build Commands
 
 ```bash
-cd flutter_inappwebview_ios && flutter pub get
+cd drago_inappwebview && flutter pub get
 cd example && flutter build ios --debug --no-codesign
 ```
 

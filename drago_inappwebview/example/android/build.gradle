@@ -1,0 +1,27 @@
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+rootProject.buildDir = '../build'
+subprojects {
+    project.buildDir = "${rootProject.buildDir}/${project.name}"
+}
+// Every plugin (jni etc.) builds native code with the one installed NDK,
+// not Flutter's default flutter.ndkVersion.
+subprojects {
+    plugins.withId("com.android.library") {
+        extensions.getByType(com.android.build.api.variant.LibraryAndroidComponentsExtension).finalizeDsl { ext ->
+            ext.ndkVersion = "30.0.16248370"
+        }
+    }
+}
+subprojects {
+    project.evaluationDependsOn(':app')
+}
+
+tasks.register("clean", Delete) {
+    delete rootProject.buildDir
+}

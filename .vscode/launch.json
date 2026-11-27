@@ -5,168 +5,148 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "flutter_inappwebview",
-      "cwd": "flutter_inappwebview",
+      "name": "drago_inappwebview",
+      "cwd": "drago_inappwebview",
       "request": "launch",
       "type": "dart"
     },
     {
-      "name": "flutter_inappwebview (profile mode)",
-      "cwd": "flutter_inappwebview",
+      "name": "drago_inappwebview (profile mode)",
+      "cwd": "drago_inappwebview",
       "request": "launch",
       "type": "dart",
       "flutterMode": "profile"
     },
     {
-      "name": "flutter_inappwebview (release mode)",
-      "cwd": "flutter_inappwebview",
+      "name": "drago_inappwebview (release mode)",
+      "cwd": "drago_inappwebview",
       "request": "launch",
       "type": "dart",
       "flutterMode": "release"
     },
     {
-      "name": "flutter_inappwebview_android",
-      "cwd": "flutter_inappwebview_android",
+      "name": "drago_inappwebview",
+      "cwd": "drago_inappwebview",
       "request": "launch",
       "type": "dart"
     },
     {
-      "name": "flutter_inappwebview_android (profile mode)",
-      "cwd": "flutter_inappwebview_android",
+      "name": "drago_inappwebview (profile mode)",
+      "cwd": "drago_inappwebview",
       "request": "launch",
       "type": "dart",
       "flutterMode": "profile"
     },
     {
-      "name": "flutter_inappwebview_android (release mode)",
-      "cwd": "flutter_inappwebview_android",
+      "name": "drago_inappwebview (release mode)",
+      "cwd": "drago_inappwebview",
       "request": "launch",
       "type": "dart",
       "flutterMode": "release"
     },
     {
-      "name": "flutter_inappwebview_ios",
-      "cwd": "flutter_inappwebview_ios",
+      "name": "drago_inappwebview",
+      "cwd": "drago_inappwebview",
       "request": "launch",
       "type": "dart"
     },
     {
-      "name": "flutter_inappwebview_ios (profile mode)",
-      "cwd": "flutter_inappwebview_ios",
+      "name": "drago_inappwebview (profile mode)",
+      "cwd": "drago_inappwebview",
       "request": "launch",
       "type": "dart",
       "flutterMode": "profile"
     },
     {
-      "name": "flutter_inappwebview_ios (release mode)",
-      "cwd": "flutter_inappwebview_ios",
+      "name": "drago_inappwebview (release mode)",
+      "cwd": "drago_inappwebview",
       "request": "launch",
       "type": "dart",
       "flutterMode": "release"
     },
     {
-      "name": "flutter_inappwebview_linux",
-      "cwd": "flutter_inappwebview_linux",
+      "name": "drago_inappwebview",
+      "cwd": "drago_inappwebview",
       "request": "launch",
       "type": "dart"
     },
     {
-      "name": "flutter_inappwebview_linux (profile mode)",
-      "cwd": "flutter_inappwebview_linux",
+      "name": "drago_inappwebview (profile mode)",
+      "cwd": "drago_inappwebview",
       "request": "launch",
       "type": "dart",
       "flutterMode": "profile"
     },
     {
-      "name": "flutter_inappwebview_linux (release mode)",
-      "cwd": "flutter_inappwebview_linux",
+      "name": "drago_inappwebview (release mode)",
+      "cwd": "drago_inappwebview",
       "request": "launch",
       "type": "dart",
       "flutterMode": "release"
     },
     {
-      "name": "flutter_inappwebview_macos",
-      "cwd": "flutter_inappwebview_macos",
+      "name": "drago_inappwebview",
+      "cwd": "drago_inappwebview",
       "request": "launch",
       "type": "dart"
     },
     {
-      "name": "flutter_inappwebview_macos (profile mode)",
-      "cwd": "flutter_inappwebview_macos",
+      "name": "drago_inappwebview (profile mode)",
+      "cwd": "drago_inappwebview",
       "request": "launch",
       "type": "dart",
       "flutterMode": "profile"
     },
     {
-      "name": "flutter_inappwebview_macos (release mode)",
-      "cwd": "flutter_inappwebview_macos",
+      "name": "drago_inappwebview (release mode)",
+      "cwd": "drago_inappwebview",
       "request": "launch",
       "type": "dart",
       "flutterMode": "release"
     },
     {
-      "name": "flutter_inappwebview_platform_interface",
-      "cwd": "flutter_inappwebview_platform_interface",
+      "name": "drago_inappwebview",
+      "cwd": "drago_inappwebview",
       "request": "launch",
       "type": "dart"
     },
     {
-      "name": "flutter_inappwebview_platform_interface (profile mode)",
-      "cwd": "flutter_inappwebview_platform_interface",
+      "name": "drago_inappwebview (profile mode)",
+      "cwd": "drago_inappwebview",
       "request": "launch",
       "type": "dart",
       "flutterMode": "profile"
     },
     {
-      "name": "flutter_inappwebview_platform_interface (release mode)",
-      "cwd": "flutter_inappwebview_platform_interface",
+      "name": "drago_inappwebview (release mode)",
+      "cwd": "drago_inappwebview",
       "request": "launch",
       "type": "dart",
       "flutterMode": "release"
     },
     {
-      "name": "flutter_inappwebview_web",
-      "cwd": "flutter_inappwebview_web",
+      "name": "drago_inappwebview",
+      "cwd": "drago_inappwebview",
       "request": "launch",
       "type": "dart"
     },
     {
-      "name": "flutter_inappwebview_web (profile mode)",
-      "cwd": "flutter_inappwebview_web",
+      "name": "drago_inappwebview (profile mode)",
+      "cwd": "drago_inappwebview",
       "request": "launch",
       "type": "dart",
       "flutterMode": "profile"
     },
     {
-      "name": "flutter_inappwebview_web (release mode)",
-      "cwd": "flutter_inappwebview_web",
+      "name": "drago_inappwebview (release mode)",
+      "cwd": "drago_inappwebview",
       "request": "launch",
       "type": "dart",
       "flutterMode": "release"
     },
     {
-      "name": "flutter_inappwebview_windows",
-      "cwd": "flutter_inappwebview_windows",
-      "request": "launch",
-      "type": "dart"
-    },
-    {
-      "name": "flutter_inappwebview_windows (profile mode)",
-      "cwd": "flutter_inappwebview_windows",
-      "request": "launch",
-      "type": "dart",
-      "flutterMode": "profile"
-    },
-    {
-      "name": "flutter_inappwebview_windows (release mode)",
-      "cwd": "flutter_inappwebview_windows",
-      "request": "launch",
-      "type": "dart",
-      "flutterMode": "release"
-    },
-    {
-      "name": "flutter_inappwebview_internal_annotations",
-      "cwd": "dev_packages/flutter_inappwebview_internal_annotations",
+      "name": "drago_inappwebview_internal_annotations",
+      "cwd": "dev_packages/drago_inappwebview_internal_annotations",
       "request": "launch",
       "type": "dart"
     },
@@ -192,140 +172,140 @@
     },
     {
       "name": "example",
-      "cwd": "flutter_inappwebview/example",
+      "cwd": "drago_inappwebview/example",
       "request": "launch",
       "type": "dart"
     },
     {
       "name": "example (profile mode)",
-      "cwd": "flutter_inappwebview/example",
+      "cwd": "drago_inappwebview/example",
       "request": "launch",
       "type": "dart",
       "flutterMode": "profile"
     },
     {
       "name": "example (release mode)",
-      "cwd": "flutter_inappwebview/example",
+      "cwd": "drago_inappwebview/example",
       "request": "launch",
       "type": "dart",
       "flutterMode": "release"
     },
     {
       "name": "android example",
-      "cwd": "flutter_inappwebview_android/example",
+      "cwd": "drago_inappwebview/example",
       "request": "launch",
       "type": "dart"
     },
     {
       "name": "android example (profile mode)",
-      "cwd": "flutter_inappwebview_android/example",
+      "cwd": "drago_inappwebview/example",
       "request": "launch",
       "type": "dart",
       "flutterMode": "profile"
     },
     {
       "name": "android example (release mode)",
-      "cwd": "flutter_inappwebview_android/example",
+      "cwd": "drago_inappwebview/example",
       "request": "launch",
       "type": "dart",
       "flutterMode": "release"
     },
     {
       "name": "ios example",
-      "cwd": "flutter_inappwebview_ios/example",
+      "cwd": "drago_inappwebview/example",
       "request": "launch",
       "type": "dart"
     },
     {
       "name": "ios example (profile mode)",
-      "cwd": "flutter_inappwebview_ios/example",
+      "cwd": "drago_inappwebview/example",
       "request": "launch",
       "type": "dart",
       "flutterMode": "profile"
     },
     {
       "name": "ios example (release mode)",
-      "cwd": "flutter_inappwebview_ios/example",
+      "cwd": "drago_inappwebview/example",
       "request": "launch",
       "type": "dart",
       "flutterMode": "release"
     },
     {
       "name": "linux example",
-      "cwd": "flutter_inappwebview_linux/example",
+      "cwd": "drago_inappwebview/example",
       "request": "launch",
       "type": "dart"
     },
     {
       "name": "linux example (profile mode)",
-      "cwd": "flutter_inappwebview_linux/example",
+      "cwd": "drago_inappwebview/example",
       "request": "launch",
       "type": "dart",
       "flutterMode": "profile"
     },
     {
       "name": "linux example (release mode)",
-      "cwd": "flutter_inappwebview_linux/example",
+      "cwd": "drago_inappwebview/example",
       "request": "launch",
       "type": "dart",
       "flutterMode": "release"
     },
     {
       "name": "macos example",
-      "cwd": "flutter_inappwebview_macos/example",
+      "cwd": "drago_inappwebview/example",
       "request": "launch",
       "type": "dart"
     },
     {
       "name": "macos example (profile mode)",
-      "cwd": "flutter_inappwebview_macos/example",
+      "cwd": "drago_inappwebview/example",
       "request": "launch",
       "type": "dart",
       "flutterMode": "profile"
     },
     {
       "name": "macos example (release mode)",
-      "cwd": "flutter_inappwebview_macos/example",
+      "cwd": "drago_inappwebview/example",
       "request": "launch",
       "type": "dart",
       "flutterMode": "release"
     },
     {
       "name": "web example",
-      "cwd": "flutter_inappwebview_web/example",
+      "cwd": "drago_inappwebview/example",
       "request": "launch",
       "type": "dart"
     },
     {
       "name": "web example (profile mode)",
-      "cwd": "flutter_inappwebview_web/example",
+      "cwd": "drago_inappwebview/example",
       "request": "launch",
       "type": "dart",
       "flutterMode": "profile"
     },
     {
       "name": "web example (release mode)",
-      "cwd": "flutter_inappwebview_web/example",
+      "cwd": "drago_inappwebview/example",
       "request": "launch",
       "type": "dart",
       "flutterMode": "release"
     },
     {
       "name": "windows example",
-      "cwd": "flutter_inappwebview_windows/example",
+      "cwd": "drago_inappwebview/example",
       "request": "launch",
       "type": "dart"
     },
     {
       "name": "windows example (profile mode)",
-      "cwd": "flutter_inappwebview_windows/example",
+      "cwd": "drago_inappwebview/example",
       "request": "launch",
       "type": "dart",
       "flutterMode": "profile"
     },
     {
       "name": "windows example (release mode)",
-      "cwd": "flutter_inappwebview_windows/example",
+      "cwd": "drago_inappwebview/example",
       "request": "launch",
       "type": "dart",
       "flutterMode": "release"
